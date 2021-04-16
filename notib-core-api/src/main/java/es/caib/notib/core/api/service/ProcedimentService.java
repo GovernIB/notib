@@ -351,22 +351,6 @@ public interface ProcedimentService {
 			Long entitatId,
 			Long GrupId) throws NotFoundException;
 
-//	/**
-//	 * Comprova si l'usuari actual té permisos de consulta sobre algun procediment
-//	 * 
-//	 * @return true / false
-//	 */
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public boolean hasPermisConsultaProcediment(EntitatDto entitat);
-//
-//	/**
-//	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
-//	 * 
-//	 * @return true / false
-//	 */
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public boolean hasPermisNotificacioProcediment(EntitatDto entitat);
-	
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
 	 * 

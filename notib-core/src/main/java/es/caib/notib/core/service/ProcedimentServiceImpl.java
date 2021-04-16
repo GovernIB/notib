@@ -1117,7 +1117,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "procedimentsOrgan", key="{#entitatId, #organCodi, #organFiltre, #rol.ordinal(), #permis.ordinal()}")
 	public List<CodiValorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,
@@ -1244,7 +1243,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			List<ProcedimentOrganEntity> procedimentsOrgansAmbPermis = new ArrayList<>();
 			if(procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
 
-				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+				List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
 				for (ProcedimentOrganEntity procedimentOrgan: procedimentsOrgans) {
 					if (organsFills.contains(procedimentOrgan.getOrganGestor().getCodi()))
 						procedimentsOrgansAmbPermis.add(procedimentOrgan);

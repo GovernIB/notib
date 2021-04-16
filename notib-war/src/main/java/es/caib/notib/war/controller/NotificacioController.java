@@ -151,8 +151,6 @@ public class NotificacioController extends BaseUserController {
         }
         model.addAttribute("organsGestorsPermisLectura", organsDisponibles);
 
-//        model.addAttribute("procedimentsPermisLectura", procedimentsDisponibles);
-//        model.addAttribute("organsGestorsPermisLectura", organsGestorsDisponibles);
     }
 
     @RequestMapping(value = "/new")
@@ -235,6 +233,20 @@ public class NotificacioController extends BaseUserController {
                 organGestor,
                 rol,
                 permis
+        );
+    }
+
+    @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
+            HttpServletRequest request,
+            @PathVariable String organId) {
+
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        return procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organId.equals("-") ? null : organId,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
         );
     }
 
@@ -952,20 +964,6 @@ public class NotificacioController extends BaseUserController {
             dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
         }
         return dadesProcediment;
-    }
-
-    @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
-    @ResponseBody
-    public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
-            HttpServletRequest request,
-            @PathVariable String organId) {
-
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        return procedimentService.getProcedimentsOrganNotificables(
-                entitatActual.getId(),
-                organId.equals("-") ? null : organId,
-                RolEnumDto.valueOf(RolHelper.getRolActual(request))
-        );
     }
 
     @RequestMapping(value = "/paisos", method = RequestMethod.GET)
