@@ -26,7 +26,6 @@ import java.util.Date;
 @Getter
 @Builder(builderMethodName = "builder")
 @AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name="not_notificacio_event")
 @EntityListeners(AuditingEntityListener.class)
@@ -36,16 +35,18 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	@Column(name = "tipus", nullable = false)
 	private NotificacioEventTipusEnumDto tipus;
-	
+
+	@Builder.Default
 	@Column(name = "data", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date data;
+	private Date data = new Date();
 	
 	@Column(name = "descripcio", length = 256)
 	private String descripcio;
 	
 	@Column(name = "error", nullable = false)
-	private boolean error;
+	@Builder.Default
+	private boolean error = false;
 	
 	@Column(name = "error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String errorDescripcio;
@@ -78,6 +79,11 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	@Column(name = "NOTIFICA_ERROR_TIPUS")
 	protected NotificacioErrorTipusEnumDto errorTipus;
+
+	public NotificacioEventEntity() {
+		this.data = new Date();
+		this.error = false;
+	}
 
 	public int getCallbackIntents() {
 		return callbackIntents != null? callbackIntents : 0;
@@ -114,8 +120,6 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 				NotificacioEntity notificacio) {
 			built = new NotificacioEventEntity();
 			built.tipus = tipus;
-			built.data = new Date();
-			built.error = false;
 			built.notificacio = notificacio;
 		}
 		public BuilderOld descripcio(String descripcio) {

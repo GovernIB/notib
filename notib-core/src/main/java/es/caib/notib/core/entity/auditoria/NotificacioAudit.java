@@ -10,6 +10,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ import java.util.Date;
  */
 @Getter
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 @Entity
 @Table(name="not_notificacio_audit")
 @EntityListeners(AuditingEntityListener.class)

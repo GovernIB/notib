@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
