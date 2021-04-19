@@ -1,5 +1,6 @@
 package es.caib.notib.core.api.dto.notenviament;
 
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import lombok.Getter;
@@ -21,6 +22,9 @@ public class NotEnviamentTableItemDto implements Serializable {
 
 	private String destinataris;
 	private Date notificaDataCaducitat;
+	private NotificaEnviamentTipusEnumDto tipusEnviament;
+
+	private String codiNotibEnviament;
 
 	// Titular
 	private String titularNif;

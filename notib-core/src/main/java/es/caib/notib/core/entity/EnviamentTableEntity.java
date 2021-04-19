@@ -113,7 +113,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	// PROCEDIMENT
 	// //
 	@Column(name = "PROCEDIMENT_IS_COMU")
-	private boolean procedimentIsComu;
+	private Boolean procedimentIsComu;
 
 	@Column(name = "PROCEDIMENT_PROCORGAN_ID")
 	protected Long procedimentOrganId;
@@ -150,5 +150,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "NOTIFICA_ESTAT", length = 50)
 	protected NotificacioEnviamentEstatEnumDto notificaEstat;
 
+	@Column(name = "NOTIFICA_REF", length = 20)
+	protected String notificaReferencia;
 
 }

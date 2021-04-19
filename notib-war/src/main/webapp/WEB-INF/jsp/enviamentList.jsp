@@ -117,38 +117,56 @@ div.dataTables_wrapper {
 
 $(document).ready(function() {
 	
-	$('#notificacio').select2({
+	<%--$('#notificacio').select2({--%>
+	<%--	width: '100%',--%>
+    <%--    allowClear:true,--%>
+    <%--    placeholder: 'Selecciona una opció'//'${placeholderText}'--%>
+    <%--});--%>
+    <%--$('#notificacio').on('select2:select', function (e) {--%>
+    <%--	$("#enviament").dataTable().api().ajax.reload();--%>
+	<%--});--%>
+	<%--$('#notificacio').on('select2:unselect', function (e) {--%>
+    <%--	$("#enviament").dataTable().api().ajax.reload();--%>
+	<%--});--%>
+
+	var $estatColumn = $('#estat');
+	var $enviamentTipusColumn = $('#enviamentTipus');
+	$estatColumn.select2({
 		width: '100%',
         allowClear:true,
         placeholder: 'Selecciona una opció'//'${placeholderText}'
     });
-    $('#notificacio').on('select2:select', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
-	});
-	$('#notificacio').on('select2:unselect', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
+	$enviamentTipusColumn.select2({
+		width: '100%',
+		allowClear:true,
+		placeholder: '<spring:message code="notificacio.list.filtre.camp.enviament.tipus"/>'
 	});
 
-	if("${filtreEnviaments.enviamentTipus}" != ""){
-		$('#notificacio').val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
+	function configureColumnSelectFilter($selector) {
+		$selector.on('select2:select', function (e) {
+			$("#enviament").dataTable().api().ajax.reload();
+		});
+		$selector.on('select2:unselect', function (e) {
+			$("#enviament").dataTable().api().ajax.reload();
+		});
+		$selector.on('change', function () {
+			console.log($selector.val());
+			$selector.val($selector.val());
+			$("#btnFiltrar").first().click();
+		});
 	}
-	
-	$('#estat').select2({
-		width: '100%',
-        allowClear:true,
-        placeholder: 'Selecciona una opció'//'${placeholderText}'
-    });
-    $('#estat').on('select2:select', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
-	});
-    $('#estat').on('select2:unselect', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
-	});
+
+	configureColumnSelectFilter($estatColumn);
+	configureColumnSelectFilter($enviamentTipusColumn);
 	
     if("${filtreEnviaments.estat}" != ""){
-    	$('#estat').val("${filtreEnviaments.estat}").trigger('change');
+		$estatColumn.val("${filtreEnviaments.estat}").trigger('change');
     }
-    
+
+	if("${filtreEnviaments.enviamentTipus}" != ""){
+		$enviamentTipusColumn.val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
+	}
+
     $('.data').datepicker({
 		orientation: "bottom",
 		dateFormat: 'dd/mm/yy',
@@ -289,10 +307,6 @@ function clearSeleccio() {
 	sessionStorage.setItem('rowIdsStore', "{}");
 }
 
-function estatChange(value) {
-	$('#estat').val(value);
-	$("#btnFiltrar").first().click();
-}
 
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -646,7 +660,28 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
-				<%-- <c:choose>
+				<c:choose>
+					<c:when test = "${columnes.enviamentTipus == true}">
+						<c:set value="true" var="visible"></c:set>
+					</c:when>
+					<c:when test = "${columnes.enviamentTipus == false}">
+						<c:set value="false" var="visible"></c:set>
+					</c:when>
+				</c:choose>
+				<th data-col-name="tipusEnviament" class="enviamentTipusCol" width="5px" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament"/>
+					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
+					<div class="from-group" style="padding: 0; font-weight: 100;">
+						<select class="form-control" id="enviamentTipus" name="enviamentTipus"
+								style="width:100%" data-toggle="select2" data-minimumresults="-1" tabindex="-1" aria-hidden="true" data-select2-eval="true">
+							<option value=""></option>
+							<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
+								<option name="enviamentTipus" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
+							</c:forEach>
+						</select>
+					</div>
+					</script>
+				</th>
+				<c:choose>
 					<c:when test = "${columnes.codiNotibEnviament == true}"> 
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
@@ -660,7 +695,7 @@ function getCookie(cname) {
 							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotibenviament"/>"/>
 						</div>
 					</script>
-				</th> --%>
+				</th>
 				<c:choose>
 					<c:when test = "${columnes.numCertificacio == true}"> 
 					  <c:set value="true" var="visible"></c:set>
@@ -702,7 +737,7 @@ function getCookie(cname) {
 				<th data-col-name="estat"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script type="text/x-jsrender">
 						<div class="from-group" style="padding: 0; font-weight: 100;">
-							<select class="form-control" id="estat" name="estat" onchange="estatChange(this.value)">
+							<select class="form-control" id="estat" name="estat">
 								<option name="estat" class=""></option>
     							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">
         							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>

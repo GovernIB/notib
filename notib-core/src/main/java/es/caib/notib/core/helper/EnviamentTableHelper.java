@@ -59,7 +59,7 @@ public class EnviamentTableHelper {
                 .notificaIdentificador(enviament.getNotificaIdentificador())
                 .notificaCertificacioNumSeguiment(enviament.getNotificaCertificacioNumSeguiment())
                 .notificaEstat(enviament.getNotificaEstat())
-
+                .notificaReferencia(enviament.getNotificaReferencia())
                 .build();
 
         enviamentTableRepository.save(tableViewItem);
@@ -108,7 +108,7 @@ public class EnviamentTableHelper {
         tableViewItem.setNotificaIdentificador(enviament.getNotificaIdentificador());
         tableViewItem.setNotificaCertificacioNumSeguiment(enviament.getNotificaCertificacioNumSeguiment());
         tableViewItem.setNotificaEstat(enviament.getNotificaEstat());
-
+        tableViewItem.setNotificaReferencia(enviament.getNotificaReferencia());
         tableViewItem.setEntitat(notificacio.getEntitat());
 
         enviamentTableRepository.saveAndFlush(tableViewItem);

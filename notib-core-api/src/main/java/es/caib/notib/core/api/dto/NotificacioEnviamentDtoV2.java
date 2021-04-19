@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.api.dto;
 import lombok.Getter;
 import lombok.Setter;
@@ -88,93 +85,13 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private int notificaIntentNum;
 
 	private boolean isEnviant;
-//	public String getDestinatarisNomLlinatges() {
-//		destinatarisNomLlinatges = "";
-//		for(PersonaDto destinatari: destinataris) {
-//			destinatarisNomLlinatges += concatenarNomLlinatges(llinatgesDestinatari(destinatari), destinatari.getNom(), destinatari.getRaoSocial(), null)+"</br>";
-//		}
-//		return destinatarisNomLlinatges;
-//	}
+
 	public NotificacioEstatEnumDto getEstat() {
 		if (isEnviant){
 			return NotificacioEstatEnumDto.ENVIANT;
 		}
 		return this.estat;
 	}
-//
-//	public String getTitularNomLlinatge() {
-//		if(this.titularNomLlinatge != null) {
-//			return this.titularNomLlinatge;
-//		}else {
-//			if(titular != null) {
-//				titularNomLlinatge = concatenarNomLlinatges(
-//						getTitularLlinatges(),
-//						titular.getNom(),
-//						titular.getRaoSocial(),
-//						null);
-//			}
-//			return titularNomLlinatge;
-//		}
-//	}
-//
-//	public String getTitularLlinatges() {
-//		return concatenarLlinatges(
-//				titular.getLlinatge1(),
-//				titular.getLlinatge2());
-//	}
-//
-//	public String llinatgesDestinatari(PersonaDto destinatari) {
-//		return concatenarLlinatges(
-//				destinatari.getLlinatge1(),
-//				destinatari.getLlinatge2());
-//	}
-//
-//	private String concatenarLlinatges(
-//			String llinatge1,
-//			String llinatge2) {
-//		if (llinatge1 == null && llinatge2 == null) {
-//			return null;
-//		}
-//		StringBuilder sb = new StringBuilder();
-//		sb.append(llinatge1);
-//		if (llinatge2 != null && !llinatge2.isEmpty()) {
-//			sb.append(" ");
-//			sb.append(llinatge2);
-//		}
-//		return sb.toString();
-//	}
-//
-//	private String concatenarNomLlinatges(
-//			String llinatges,
-//			String nom,
-//			String raoSocial,
-//			String destinatariNif) {
-//		StringBuilder sb = new StringBuilder();
-//
-//		if (destinatariNif != null) {
-//			sb.append(destinatariNif);
-//			sb.append(" - ");
-//		}
-//		if (llinatges != null && !llinatges.isEmpty()) {
-//			sb.append("[");
-//			sb.append(llinatges);
-//		}
-//
-//		if (nom != null && !nom.isEmpty()) {
-//			sb.append(", ");
-//			sb.append(nom);
-//
-//			if (raoSocial == null) {
-//				sb.append("]");
-//			}
-//		}
-//		if (raoSocial != null && !raoSocial.isEmpty()) {
-//			sb.append(" | ");
-//			sb.append(raoSocial);
-//			sb.append("]");
-//		}
-//		return sb.toString();
-//	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 

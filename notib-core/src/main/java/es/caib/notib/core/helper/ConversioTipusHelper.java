@@ -75,12 +75,7 @@ public class ConversioTipusHelper {
 				register();
 
 		mapperFactory.classMap(EnviamentTableEntity.class, NotEnviamentTableItemDto.class).
-//				field("titularNif", "titular.nif").
-//				field("titularNom", "titular.nom").
-//				field("titularEmail", "titular.email").
-//				field("titularLlinatge1", "titular.llinatge1").
-//				field("titularLlinatge2", "titular.llinatge2").
-//				field("titularRaoSocial", "titular.raoSocial").
+				field("notificaReferencia", "codiNotibEnviament").
 				byDefault().
 				register();
 
