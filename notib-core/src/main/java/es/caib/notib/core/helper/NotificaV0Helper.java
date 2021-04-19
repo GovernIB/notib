@@ -98,7 +98,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 									resultadoEnvio.getIdentificador());
 							
 							//Registrar event per enviament
-							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+							auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 							logger.info(" >>> Canvi estat a ENVIADA ");
 							eventBulider.enviament(enviament);
 							notificacio.updateEventAfegir(event);
@@ -148,7 +148,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-//		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
 		return notificacio;
 	}
 

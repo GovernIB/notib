@@ -117,8 +117,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
-				
-				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+
+				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 
 				//Crea un nou event
 				startTime = System.nanoTime();

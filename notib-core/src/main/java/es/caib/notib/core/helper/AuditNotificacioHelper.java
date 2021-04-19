@@ -39,12 +39,6 @@ public class AuditNotificacioHelper {
 		return notificacioEntity;
 	}
 
-//	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-//	public NotificacioEntity updateNotificacioNetejarErrorsNotifica(NotificacioEntity notificacio) {
-//		notificacio.cleanNotificaError();
-//		return notificacio;
-//	}
-
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacio(
 			NotificacioEntity notificacioEntity,
@@ -144,6 +138,7 @@ public class AuditNotificacioHelper {
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviada(NotificacioEntity notificacioEntity) {
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+		notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
 		return notificacioEntity;
 	}
 	
