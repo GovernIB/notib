@@ -8,6 +8,9 @@ import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.MediaType;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+@Slf4j
 public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlugin {
 
 	
@@ -52,9 +56,9 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			Document response = new Document();
 			if (ambContingut)
 				response.setContingut(documentImprimibleCsv(identificador));
-
-			response.setMetadades(documentMetadadesCsv(identificador));
-
+			
+			response.setMetadades(consultaDocumentMetadadesCsv(identificador));
+			
 			return response;
 		} catch (Exception var12) {
 			throw new ArxiuException("S'ha produit un error obtenent els detalls del document: " + identificador, var12);
@@ -67,7 +71,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (ambContingut)
 				response.setContingut(documentImprimibleUuid(identificador));
 
-			response.setMetadades(documentMetadadesUuid(identificador));
+			response.setMetadades(consultaDocumentMetadadesUuid(identificador));
 
 			return response;
 		} catch (Exception var12) {
@@ -113,8 +117,10 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			contingut.setTamany(contingut.getContingut().length);
 			return contingut;
 		} catch (Exception ex) {
+			log.debug("S'ha produit un error generant la versió imprimible del document amb CSV " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"S'ha produit un error generant la versió imprimible del document amb CSV " + identificador,
 					ex);
 		}
 		
@@ -148,12 +154,24 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			contingut.setTamany(contingut.getContingut().length);
 			return contingut;
 		} catch (Exception ex) {
+			log.debug("S'ha produit un error generant la versió imprimible del document amb UUID " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"S'ha produit un error generant la versió imprimible del document amb UUID " + identificador,
 					ex);
 		}
 	}
-
+	
+	private DocumentMetadades consultaDocumentMetadadesUuid(String identificador) {	
+		try {
+			return documentMetadadesUuid(identificador);
+		}
+		catch(Exception e) {
+			log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador);
+		}
+		return null;
+	}
+	
 	private DocumentMetadades documentMetadadesUuid(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -178,12 +196,24 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			return toDocumentMetadades(result);
 
 		} catch (Exception ex) {
+			log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"No ha estat possible obtenir les metadades del document amb UUID " + identificador,
 					ex);
 		}
 	}
-
+	
+	private DocumentMetadades consultaDocumentMetadadesCsv(String identificador) {	
+		try {
+			return documentMetadadesCsv(identificador);
+		}
+		catch(Exception e) {
+			log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador);
+		}
+		return null;
+	}
+	
 	private DocumentMetadades documentMetadadesCsv(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -208,8 +238,10 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			return toDocumentMetadades(result);
 
 		} catch (Exception ex) {
+			log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"No ha estat possible obtenir les metadades del document amb CSV " + identificador,
 					ex);
 		}
 	}

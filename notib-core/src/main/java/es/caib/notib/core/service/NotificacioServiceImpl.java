@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -19,7 +20,10 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
@@ -27,6 +31,7 @@ import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -2002,6 +2007,39 @@ public class NotificacioServiceImpl implements NotificacioService {
         return buffer;
     }
 	
+	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
+		
+		Document documentArxiu = new Document();
+		
+		try {
+			if (esUuid)
+				documentArxiu = pluginHelper.arxiuDocumentConsultar(identificador, null, true, true);
+			else
+				documentArxiu = pluginHelper.arxiuDocumentConsultar(identificador, null, true, false);
+		} catch (Exception ex){
+			logger.debug("S'ha produit un error obtenent els detalls del document con identificador: " + identificador, ex);
+			return null;
+			
+		}
+		
+		
+		DocumentDto documentDto = new DocumentDto();
+		
+		if (documentArxiu != null) {
+			
+			documentDto.setCsv(identificador);
+		
+			if (documentArxiu.getMetadades() != null) {
+				documentDto.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
+				documentDto.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
+				documentDto.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
+				documentDto.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+			}
+		}
+		
+		return documentDto;	
+	}
+		
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 }

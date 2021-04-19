@@ -191,6 +191,9 @@
     color: #856404;
     display: none;
 }
+.warningClass {
+	border: 2px solid orange;
+}
 </style>
 </head>
 <body>
@@ -207,7 +210,28 @@
 	var msgInfoDoc = "<spring:message code='notificacio.for.camp.document.avis'/>";
 	var msgInfoDocSir = "<spring:message code='notificacio.for.camp.document.avis.sir'/>";
 	var locale = "${requestLocale}";
+	var consultarFocusout = true;
 
+	//Reset de los warning, errores que se muestran tras la consulta al arxiu para CSV y Uuid
+	function resetWarningIErrorsDocArxiu(indexId){
+		$('#document_err_'+indexId).remove();
+		$('#metadades_war_'+indexId).remove();
+		$('#id_err_'+indexId).remove();
+		let inputElementCsv = $("#documentArxiuCsv\\[" + indexId + "\\]"); 
+		let inputElementUuid = $("#documentArxiuUuid\\[" + indexId + "\\]");
+		inputElementCsv.parent().closest('.form-group').removeClass('has-error');
+		inputElementCsv.removeClass('warningClass');
+		inputElementUuid.parent().closest('.form-group').removeClass('has-error');
+		inputElementUuid.removeClass('warningClass');
+	}
+	
+	function activarCampsMetadades(indexId){
+		$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', false);
+		$("#documents\\[" +indexId+ "\\]\\.validesa").prop('disabled', false);
+		$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").prop('disabled', false);
+		$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('disabled', false);
+	}
+	
 	$(document).ready(function() {
 
 
@@ -227,7 +251,101 @@
 				$(provincia).parent().parent().removeClass('hidden');
 			}
 		});
+		
+		//Consulta al arxiu de los identificadores CSV o Uuid 
+		//para comprobar si existe el documento y sus metadatos	
+		$(".docArxiu").focusout(function() {
+			
+			if (!consultarFocusout)
+				return;
+			
+			let inputElement = $(this);
+			let inputElementValue = $(this).val().trim();
+			let indexId = $(this).attr("id").split("[")[1].substring(0,1);
+			let url = "";
+			
+			resetWarningIErrorsDocArxiu(indexId);
+			
+			let esCsv = $(this).attr("id").toLowerCase().includes("csv");
+			
+			if (esCsv){
+				if (inputElementValue.length < 20) {
+					inputElement.parent().closest('.form-group').addClass('has-error');
+					inputElement.parent().append('<div id="id_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.valor"/></p></div>');
+					return;
+				}
+			}
+			else { //Uuid
+				var uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+				if (!inputElementValue.match(uuidPattern)){
+					inputElement.parent().closest('.form-group').addClass('has-error');
+					inputElement.parent().append('<div id="id_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.valor"/></p></div>');
+					return;
+				}
+			}
 
+			if (esCsv) {
+				url = "consultaDocumentIMetadadesCsv";
+			}
+			else {
+				url = "consultaDocumentIMetadadesUuid";
+			}
+
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/"/>" + url + "/" + inputElementValue,
+						success: function(data) {
+							
+							consultarFocusout = false;
+
+							if (!data.documentExistent){
+								inputElement.parent().closest('.form-group').addClass('has-error');
+								inputElement.parent().append('<div id="document_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.document.inexistent"/></p></div>');
+							}
+							else if (!data.metadadesExistents){ //document pero sin metadades
+								inputElement.addClass('warningClass');
+								inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent"/></p></div>');
+							}
+							else { //document y metadades	
+								if (data.origen != null) {
+									$("#documents\\[" +indexId+ "\\]\\.origen").val(data.origen).trigger("change.select2");
+									$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', true);
+								}
+								if (data.validesa != null) {
+									$("#documents\\[" +indexId+ "\\]\\.validesa").val(data.validesa).trigger("change.select2");
+									$("#documents\\[" +indexId+ "\\]\\.validesa").prop('disabled', true);
+								}
+								if (data.tipoDocumental != null) {
+									$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(data.tipoDocumental).trigger("change.select2");
+									$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").prop('disabled', true);
+								}
+								if (data.modoFirma != null) {
+									$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', data.modoFirma);
+									$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('disabled', true);
+								}
+							}
+						},
+						error: function() {
+							consultarFocusout = false;
+							console.log("error obtenint el document CSV i les seves metadades...");
+					}
+				});
+		});
+		
+		$("#form").submit(function(event) {
+			for (indexId = 0; indexId < 5; indexId++) {
+				activarCampsMetadades(indexId);
+			}
+			return;
+		});
+		
+		$(".docArxiu").on('change', function() {
+			consultarFocusout = true;
+			let indexId = $(this).attr("id").split("[")[1].substring(0,1);
+			activarCampsMetadades(indexId);
+		});
+
+		
 		var document_0_arxiuNom = $('input[name="documents\\[0\\].arxiuNom"').val();
 		var document_1_arxiuNom = $('input[name="documents\\[1\\].arxiuNom"').val();
 		var document_2_arxiuNom = $('input[name="documents\\[2\\].arxiuNom"').val();
@@ -361,8 +479,9 @@
 
 		$('.tipusDocument').on('change', function() {
 			let id = $(this).attr("id").split("_")[1];
+			resetWarningIErrorsDocArxiu(id);
+			activarCampsMetadades(id);
 			if ($(this).val() == 'CSV') {
-				// $('#metadades').removeClass('hidden');
 				$('#input-origen-csv_' + id).removeClass('hidden');
 				$('#input-origen-uuid_' + id).addClass('hidden');
 				$('#documentArxiuUuid\\[' + id + '\\]').val('');
@@ -370,7 +489,7 @@
 				$('#documentArxiuUrl\\[' + id + '\\]').val('');
 				$('#input-origen-arxiu_' + id).addClass('hidden');
 				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).addClass('hidden');
+				$('#metadades_' + id).removeClass('hidden');
 			} else if ($(this).val() == 'UUID') {
 				$('#input-origen-csv_' + id).addClass('hidden');
 				$('#documentArxiuCsv\\[' + id + '\\]').val('');
@@ -379,7 +498,7 @@
 				$('#documentArxiuUrl\\[' + id + '\\]').val('');
 				$('#input-origen-arxiu_' + id).addClass('hidden');
 				$('#arxiu\\[' + id + '\\]').val('');
-				$('#metadades_' + id).addClass('hidden');
+				$('#metadades_' + id).removeClass('hidden');
 			} else if ($(this).val() == 'URL') {
 				$('#input-origen-csv_' + id).addClass('hidden');
 				$('#documentArxiuCsv\\[' + id + '\\]').val('');
@@ -2104,12 +2223,12 @@
 				<input type="hidden" name="documents[0].mida" value="${notificacioCommandV2.documents[0].mida}">
 				<!-- CSV -->
 				<div id="input-origen-csv_0" class="col-md-6">
-					<not:inputText name="documentArxiuCsv[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+					<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- UUID -->
 				<div id="input-origen-uuid_0" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUuid[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 				</div>
 				
 				<!-- URL -->
@@ -2170,12 +2289,12 @@
 					<input type="hidden" name="documents[1].mida" value="${notificacioCommandV2.documents[1].mida}">
 					<!-- CSV -->
 					<div id="input-origen-csv_1" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- UUID -->
 					<div id="input-origen-uuid_1" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- URL -->
@@ -2234,12 +2353,12 @@
 					<input type="hidden" name="documents[2].mida" value="${notificacioCommandV2.documents[2].mida}">
 					<!-- CSV -->
 					<div id="input-origen-csv_2" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- UUID -->
 					<div id="input-origen-uuid_2" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- URL -->
@@ -2298,12 +2417,12 @@
 					<input type="hidden" name="documents[3].mida" value="${notificacioCommandV2.documents[3].mida}">
 					<!-- CSV -->
 					<div id="input-origen-csv_3" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- UUID -->
 					<div id="input-origen-uuid_3" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- URL -->
@@ -2362,12 +2481,12 @@
 					<input type="hidden" name="documents[4].mida" value="${notificacioCommandV2.documents[4].mida}">
 					<!-- CSV -->
 					<div id="input-origen-csv_4" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- UUID -->
 					<div id="input-origen-uuid_4" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						<not:inputText name="documentArxiuUuid[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
 					</div>
 
 					<!-- URL -->

@@ -6,6 +6,9 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
@@ -153,6 +156,11 @@ public class NotificacioHelper {
 					doc.setUuid(arxiuUuid);
 					doc.setMediaType(documentArxiu.getContingut().getTipusMime());
 					doc.setMida(documentArxiu.getContingut().getTamany());
+					//Metadades
+					doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
+					doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
+					doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
+					doc.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
 					document = doc;
 				}
 			} else if (document.getCsv() != null) {
@@ -166,6 +174,12 @@ public class NotificacioHelper {
 					doc.setMediaType(documentArxiu.getTipusMime());
 					doc.setMida(documentArxiu.getTamany());
 					doc.setCsv(arxiuCsv);
+					//Metadades
+					Document documentArxiuDades = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
+					doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiuDades.getMetadades().getOrigen().ordinal()));
+					doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiuDades.getMetadades().getEstatElaboracio())));
+					doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiuDades.getMetadades().getTipusDocumental().toString()));
+					doc.setModoFirma(pluginHelper.getModeFirma(documentArxiuDades, documentArxiuDades.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
 					document = doc;
 				}
 			}

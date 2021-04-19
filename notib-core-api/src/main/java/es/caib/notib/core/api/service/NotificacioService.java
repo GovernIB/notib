@@ -429,6 +429,9 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public byte[] obtenirArxiuTemporal(String arxiuGestdocId);
 	
+	@PreAuthorize("hasRole('tothom')")
+	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
+	
 	
 
 }
