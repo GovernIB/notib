@@ -645,9 +645,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.errorLastCallback = errorLastCallback;
 	}
 
-	public void setNotificaErrorEvent(NotificacioEventEntity notificaErrorEvent) {
-		this.notificaErrorEvent = notificaErrorEvent;
-	}
 
 	public void setEntitat(EntitatEntity entitat) {
 		this.entitat = entitat;
@@ -680,10 +677,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void setEvents(Set<NotificacioEventEntity> events) {
 		this.events = events;
 	}
-
-//	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
-//		this.notificaEstat = notificaEstat;
-//	}
 
 	public boolean isTipusUsuariAplicacio() {
 		return this.tipusUsuari != null && this.tipusUsuari.equals(TipusUsuariEnumDto.APLICACIO);

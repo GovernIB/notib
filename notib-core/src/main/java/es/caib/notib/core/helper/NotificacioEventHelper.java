@@ -35,6 +35,7 @@ public class NotificacioEventHelper {
      * @param notificacio Notificació objectiu
      */
     public void clearOldUselessEvents(NotificacioEntity notificacio) {
+        auditNotificacioHelper.netejarErrorsNotifica(notificacio);
         for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
             enviament.setNotificacioErrorEvent(null);
         }
@@ -428,7 +429,7 @@ public class NotificacioEventHelper {
     private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
         NotificacioEventEntity eventNotificacioNotificaError = notificacio.getNotificaErrorEvent();
         if (eventNotificacioNotificaError != null && eventNotificacioNotificaError.getId() == event.getId()) {
-            notificacio.setNotificaErrorEvent(null);
+            auditNotificacioHelper.netejarErrorsNotifica(notificacio);
         }
         event.getEnviament().setNotificacioErrorEvent(null);
         if (enviament != null) {
