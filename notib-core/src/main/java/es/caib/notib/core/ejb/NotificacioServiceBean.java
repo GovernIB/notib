@@ -365,5 +365,10 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.obtenirArxiuTemporal(arxiuGestdocId);
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
+		return delegate.consultaDocumentIMetadades(identificador, esUuid);
+	}
 
 }

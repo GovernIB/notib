@@ -1605,7 +1605,7 @@ public class PluginHelper {
 		}
 	}
 
-	private String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
+	public String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
 		if (estatElaboracio == null)
 			return ValidesaEnum.ORIGINAL.getValor();	// Valor per defecte
 		switch (estatElaboracio) {
@@ -1620,7 +1620,7 @@ public class PluginHelper {
 				return ValidesaEnum.ORIGINAL.getValor();
 		}
 	}
-	private Integer getModeFirma(Document document, String nom) {
+	public Integer getModeFirma(Document document, String nom) {
 		Integer modeFirma = 0;
 		if (nom != null && nom.toLowerCase().endsWith("pdf") &&
 				(document.getFirmes() != null && !document.getFirmes().isEmpty()))

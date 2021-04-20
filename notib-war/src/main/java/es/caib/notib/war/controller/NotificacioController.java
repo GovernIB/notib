@@ -13,6 +13,7 @@ import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.war.command.*;
 import es.caib.notib.war.helper.*;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -45,6 +46,10 @@ import java.util.*;
 public class NotificacioController extends BaseUserController {
 
     private final static String NOTIFICACIONS_FILTRE = "notificacions_filtre";
+    private final static String METADADES_ORIGEN = "metadades_origen";
+    private final static String METADADES_VALIDESA = "metadades_validesa";
+    private final static String METADADES_TIPO_DOCUMENTAL = "metadades_tipo_documental";
+    private final static String METADADES_MODO_FIRMA = "metadades_modo_firma";
 
     @Autowired
     private AplicacioService aplicacioService;
@@ -1012,6 +1017,74 @@ public class NotificacioController extends BaseUserController {
         return notificacioService.actualitzacioEnviamentsEstat();
     }
 
+    @RequestMapping(value = "/consultaDocumentIMetadadesCsv/{csv}", method = RequestMethod.GET)
+    @ResponseBody
+    public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(
+            HttpServletRequest request,
+            @PathVariable String csv) {
+        DocumentDto doc = notificacioService.consultaDocumentIMetadades(csv, false);
+        
+        return existeixDocumentMetadades(doc, request);
+    }
+    
+    @RequestMapping(value = "/consultaDocumentIMetadadesUuid/{uuid}", method = RequestMethod.GET)
+    @ResponseBody
+    public RespostaConsultaArxiuDto consultaDocumentIMetadadesUuid(
+            HttpServletRequest request,
+            @PathVariable String uuid) {
+        DocumentDto doc = notificacioService.consultaDocumentIMetadades(uuid, true);
+        
+        return existeixDocumentMetadades(doc, request);
+    }
+    
+    private RespostaConsultaArxiuDto existeixDocumentMetadades(DocumentDto doc, HttpServletRequest request) {
+		
+		Boolean teMetadades = Boolean.FALSE;
+        if (doc != null) {
+        	teMetadades = doc.getOrigen() != null || doc.getValidesa() != null || 
+        		doc.getTipoDocumental() != null || doc.getModoFirma() != null;
+        	
+        	if (teMetadades) {
+    			//Es guarden en sessió
+            	RequestSessionHelper.actualitzarObjecteSessio(
+    	            request,
+    	            METADADES_ORIGEN,
+    	            doc.getOrigen());
+    			RequestSessionHelper.actualitzarObjecteSessio(
+    				request,
+    				METADADES_VALIDESA,
+    				doc.getValidesa());
+    			RequestSessionHelper.actualitzarObjecteSessio(
+    				request,
+    				METADADES_TIPO_DOCUMENTAL,
+    				doc.getTipoDocumental());
+    			RequestSessionHelper.actualitzarObjecteSessio(
+    				request,
+    				METADADES_MODO_FIRMA,
+    				doc.getModoFirma());
+            }
+        	
+        	 return RespostaConsultaArxiuDto.builder()
+             		.documentExistent(Boolean.TRUE)
+             		.metadadesExistents(teMetadades)
+             		.origen(doc.getOrigen())
+             		.validesa(doc.getValidesa())
+             		.tipoDocumental(doc.getTipoDocumental())
+             		.modoFirma(doc.getModoFirma())
+             		.build();
+        } else {
+        	return RespostaConsultaArxiuDto.builder()
+             		.documentExistent(Boolean.FALSE)
+             		.metadadesExistents(teMetadades)
+             		.origen(null)
+             		.validesa(null)
+             		.tipoDocumental(null)
+             		.modoFirma(null)
+             		.build();
+        }
+          
+    }
+    
     private boolean getLast3months() {
         return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
     }

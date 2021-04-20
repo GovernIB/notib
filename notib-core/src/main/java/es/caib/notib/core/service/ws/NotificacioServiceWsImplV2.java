@@ -6,6 +6,7 @@ package es.caib.notib.core.service.ws;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.*;
@@ -15,6 +16,7 @@ import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -271,6 +273,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								return setRespostaError("[1065] La longitud del document5 supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
 							}
 						}
+					} catch (NoMetadadesException me) {
+						logger.error("Error al obtenir les metadades del document " + numDoc, me);
+						String errorDescripcio = "[1066] No s'han pogut obtenir les metadades del document " + numDoc + ": " + me.getMessage();
+						integracioHelper.addAccioError(info, errorDescripcio);
+						return setRespostaError(errorDescripcio);
 					} catch (Exception e) {
 						logger.error("Error al obtenir el document " + numDoc, e);
 						String errorDescripcio = "[1064] No s'ha pogut obtenir el document " + numDoc + ": " + e.getMessage();
@@ -627,13 +634,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return enviamentTipus;
 	}
 
-	private DocumentDto comprovaDocument(DocumentV2 documentV2) { //, boolean versioImprimible) {
+	private DocumentDto comprovaDocument(DocumentV2 documentV2) {
 		DocumentDto document = new DocumentDto();
 		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
-		OrigenEnum origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.ADMINISTRACIO;
-		ValidesaEnum validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
-		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
-		Boolean modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
+		boolean utilizarValoresPorDefecto = getUtilizarValoresPorDefecto();
+		OrigenEnum origen = documentV2.getOrigen();
+		ValidesaEnum validesa = documentV2.getValidesa();
+		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental();
+		Boolean modoFirma = documentV2.getModoFirma();
+		if (utilizarValoresPorDefecto) {
+			origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.ADMINISTRACIO;
+			validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
+			tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
+			modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
+		}
 		// --
 		if(documentV2.getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
@@ -653,26 +667,56 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			String arxiuUuid = documentV2.getUuid();
 			logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
 			DocumentContingut contingut = null;
-//			if (versioImprimible) {
-				contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
-//			} else {
-//				Document doc = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true);
-//				contingut = doc.getContingut();
-//			}
+			contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+
 			document.setMida(contingut.getTamany());
 			document.setMediaType(contingut.getTipusMime());
+			
+			Document doc = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
+			if (doc.getMetadades() == null && 
+					(origen == null || validesa == null || 
+					tipoDocumental == null || modoFirma == null)) {
+				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de documentV2 ni per defecte");
+			}
+			if (doc.getMetadades() != null) {
+				document.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen().ordinal()));
+				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
+				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
+				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+			} else {
+				document.setOrigen(origen);
+				document.setValidesa(validesa);
+				document.setTipoDocumental(tipoDocumental);
+				document.setModoFirma(modoFirma);
+			}
+			
 		} else if (documentV2.getCsv() != null) {
 			String arxiuCsv = documentV2.getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
 			DocumentContingut contingut = null;
-//			if (versioImprimible) {
-				contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
-//			} else {
-//				Document doc = pluginHelper.arxiuDocumentConsultar("csv:" + arxiuCsv, null, true);
-//				contingut = doc.getContingut();
-//			}
+			contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+			
 			document.setMida(contingut.getTamany());
 			document.setMediaType(contingut.getTipusMime());
+			
+			Document doc = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
+			if (doc.getMetadades() == null && 
+					(origen == null || validesa == null || 
+					tipoDocumental == null || modoFirma == null)) {
+				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de documentV2 ni per defecte");
+			}
+			if (doc.getMetadades() != null) {
+				document.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen().ordinal()));
+				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
+				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
+				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+			} else {
+				document.setOrigen(origen);
+				document.setValidesa(validesa);
+				document.setTipoDocumental(tipoDocumental);
+				document.setModoFirma(modoFirma);
+			}
+			
 		} else if (documentV2.getUrl() != null) {
 			String arxiuUrl = documentV2.getUrl();
 			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
@@ -1905,6 +1949,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "15728640"));
 	}
 	
+	// Indica si usar valores por defecto cuando ni el documento ni documentV2 tienen metadades
+	private boolean getUtilizarValoresPorDefecto() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.notib.document.metadades.por.defecto", true);
+	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 
 }
