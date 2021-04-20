@@ -5,26 +5,26 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.service.BaseServiceTest;
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
-public class NotificacioEventHelperTest extends BaseServiceTest {
+public class NotificacioEventHelperIT extends BaseServiceTest {
 
 
     private static final String ENTITAT_DGTIC_DIR3CODI = "EA0004518";
@@ -43,6 +43,8 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
     private NotificacioRepository notificacioRepository;
     @Autowired
     private NotificacioEventRepository notificacioEventRepository;
+    @Autowired
+    private NotificacioEnviamentRepository notificacioEnviamentRepository;
 //    @Mock
 //    NotificaHelper notificaHelper;
 
@@ -109,9 +111,9 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
 
         procediment.setPermisos(permisosProcediment);
 
-        configureMockRegistrePlugin();
-        configureMockUnitatsOrganitzativesPlugin();
-        configureMockDadesUsuariPlugin();
+//        configureMockRegistrePlugin();
+//        configureMockUnitatsOrganitzativesPlugin();
+//        configureMockDadesUsuariPlugin();
 
         notificacio = generarNotificacio(
                 new Long(System.currentTimeMillis()).toString(),
@@ -125,8 +127,92 @@ public class NotificacioEventHelperTest extends BaseServiceTest {
     }
 
 
+    @Test
+    public void whenClearOldEventsNotificacioWithLastError_thenAllEventsRemoved() {
+        testCreantElements(
+                new TestAmbElementsCreats() {
+                    @Override
+                    public void executar(List<Object> elementsCreats) throws Exception {
+                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
+                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
+                        assertNotNull(procedimentCreat);
+                        assertNotNull(entitatCreada);
+                        assertNotNull(notificacioCreada);
+
+                        // Given: Una notificació amb un error associat a notificaError
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+                        NotificacioEnviamentEntity env = notificacioEnviamentRepository.findByNotificacio(notificacioEntity).get(0);
+                        notificacioEventHelper.addNotificaConsultaErrorEvent(notificacioEntity,
+                                env);
+
+                        assertNotNull(notificacioEntity.getNotificaErrorEvent());
+
+                        // When: clear all useless events
+                        notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
+
+                        // Then
+                        assertNull(env.getNotificacioErrorEvent());
+                        assertNull(notificacioEntity.getNotificaErrorEvent());
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
+                                true);
+                        assertTrue(events == null || events.size()== 0);
+
+                    }
+                },
+                "Netejar events no útils",
+                entitat,
+                organGestor,
+                procediment,
+                notificacio);
+
+    }
+
+    @Test
+    public void whenClearOldEventsEnviamentWithLastError_thenAllEventsRemoved() {
+        testCreantElements(
+                new TestAmbElementsCreats() {
+                    @Override
+                    public void executar(List<Object> elementsCreats) throws Exception {
+                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
+                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
+                        assertNotNull(procedimentCreat);
+                        assertNotNull(entitatCreada);
+                        assertNotNull(notificacioCreada);
+
+                        // Given: Una notificació amb un error associat a notificaError
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+                        NotificacioEnviamentEntity env = notificacioEnviamentRepository.findByNotificacio(notificacioEntity).get(0);
+                        notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
+                                env, "");
+
+                        assertNotNull(env.getNotificacioErrorEvent());
+
+                        // When: clear all useless events
+                        notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
+
+                        // Then
+                        assertNull(env.getNotificacioErrorEvent());
+                        assertNull(notificacioEntity.getNotificaErrorEvent());
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                                NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO,
+                                true);
+                        assertTrue(events == null || events.size()== 0);
+
+                    }
+                },
+                "Netejar events no útils",
+                entitat,
+                organGestor,
+                procediment,
+                notificacio);
+
+    }
+
 //    @Test
-    public void clearOldUselessEventsTest() {
+    public void whenClearOldUselessEventsTest_thenAllEventsRemoved() {
         testCreantElements(
                 new TestAmbElementsCreats() {
                     @Override
