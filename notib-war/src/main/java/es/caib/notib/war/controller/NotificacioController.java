@@ -1021,8 +1021,7 @@ public class NotificacioController extends BaseUserController {
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(
             HttpServletRequest request,
-            @PathVariable String csv) {
-  
+            @PathVariable String csv) {  
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
     
