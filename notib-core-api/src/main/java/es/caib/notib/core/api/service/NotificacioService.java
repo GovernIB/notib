@@ -432,6 +432,7 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
 	
-	
+	@PreAuthorize("hasRole('tothom')")
+	public boolean validarIdCsv (String idCsv);
 
 }

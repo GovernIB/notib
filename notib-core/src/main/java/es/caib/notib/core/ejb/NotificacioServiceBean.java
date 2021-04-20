@@ -371,4 +371,9 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.consultaDocumentIMetadades(identificador, esUuid);
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public boolean validarIdCsv (String idCsv) {
+		return delegate.validarIdCsv(idCsv);
+	}
 }

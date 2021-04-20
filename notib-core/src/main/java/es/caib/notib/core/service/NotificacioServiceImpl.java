@@ -2001,6 +2001,10 @@ public class NotificacioServiceImpl implements NotificacioService {
         return buffer;
     }
 	
+	public boolean validarIdCsv (String idCsv) {
+		return idCsv.length() >= getMidaMinIdCsv() ? Boolean.TRUE : Boolean.FALSE;
+	}
+	
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
 		
 		Document documentArxiu = new Document();
@@ -2015,7 +2019,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return null;
 			
 		}
-		
 		
 		DocumentDto documentDto = new DocumentDto();
 		
@@ -2033,7 +2036,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 		
 		return documentDto;	
 	}
-		
+	
+	private int getMidaMinIdCsv() {
+		return PropertiesHelper.getProperties().getAsInt(
+				"es.caib.notib.document.consulta.id.csv.mida.min", 16);
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 }

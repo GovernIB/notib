@@ -1022,9 +1022,14 @@ public class NotificacioController extends BaseUserController {
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(
             HttpServletRequest request,
             @PathVariable String csv) {
-        DocumentDto doc = notificacioService.consultaDocumentIMetadades(csv, false);
-        
-        return existeixDocumentMetadades(doc, request);
+  
+    	DocumentDto doc = null;
+    	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
+    
+    	if (validacioIdCsv)
+    		doc = notificacioService.consultaDocumentIMetadades(csv, false);
+    
+    	return existeixDocumentMetadades(validacioIdCsv, doc, request);
     }
     
     @RequestMapping(value = "/consultaDocumentIMetadadesUuid/{uuid}", method = RequestMethod.GET)
@@ -1034,10 +1039,10 @@ public class NotificacioController extends BaseUserController {
             @PathVariable String uuid) {
         DocumentDto doc = notificacioService.consultaDocumentIMetadades(uuid, true);
         
-        return existeixDocumentMetadades(doc, request);
+        return existeixDocumentMetadades(true, doc, request);
     }
     
-    private RespostaConsultaArxiuDto existeixDocumentMetadades(DocumentDto doc, HttpServletRequest request) {
+    private RespostaConsultaArxiuDto existeixDocumentMetadades(Boolean validacioIdCsv, DocumentDto doc, HttpServletRequest request) {
 		
 		Boolean teMetadades = Boolean.FALSE;
         if (doc != null) {
@@ -1065,6 +1070,7 @@ public class NotificacioController extends BaseUserController {
             }
         	
         	 return RespostaConsultaArxiuDto.builder()
+             		.validacioIdCsv(Boolean.TRUE)
              		.documentExistent(Boolean.TRUE)
              		.metadadesExistents(teMetadades)
              		.origen(doc.getOrigen())
@@ -1074,7 +1080,8 @@ public class NotificacioController extends BaseUserController {
              		.build();
         } else {
         	return RespostaConsultaArxiuDto.builder()
-             		.documentExistent(Boolean.FALSE)
+             		.validacioIdCsv(validacioIdCsv)
+        			.documentExistent(Boolean.FALSE)
              		.metadadesExistents(teMetadades)
              		.origen(null)
              		.validesa(null)

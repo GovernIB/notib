@@ -268,14 +268,11 @@
 			
 			let esCsv = $(this).attr("id").toLowerCase().includes("csv");
 			
-			if (esCsv){
-				if (inputElementValue.length < 20) {
-					inputElement.parent().closest('.form-group').addClass('has-error');
-					inputElement.parent().append('<div id="id_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.valor"/></p></div>');
-					return;
-				}
+			if (inputElementValue == '' || inputElementValue == null) {
+				return;
 			}
-			else { //Uuid
+			
+			if (!esCsv) { //Uuid validació
 				var uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 				if (!inputElementValue.match(uuidPattern)){
 					inputElement.parent().closest('.form-group').addClass('has-error');
@@ -297,6 +294,12 @@
 						success: function(data) {
 							
 							consultarFocusout = false;
+							
+							if (!data.validacioIdCsv) {
+								inputElement.parent().closest('.form-group').addClass('has-error');
+								inputElement.parent().append('<div id="id_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.valor"/></p></div>');
+								return;
+							}
 
 							if (!data.documentExistent){
 								inputElement.parent().closest('.form-group').addClass('has-error');

@@ -17,6 +17,7 @@ import lombok.Data;
 @Builder
 public class RespostaConsultaArxiuDto implements Serializable {
 	
+	private Boolean validacioIdCsv;
 	private Boolean documentExistent;
 	private Boolean metadadesExistents;
 	
