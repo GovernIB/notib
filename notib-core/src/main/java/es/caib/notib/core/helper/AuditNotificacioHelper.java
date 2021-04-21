@@ -121,7 +121,7 @@ public class AuditNotificacioHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateEstatNotificacio(
+	public NotificacioEntity updateEstatAFinalitzada(
 			String notificaEstatNom,
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);

@@ -78,7 +78,9 @@ public class CallbackHelper {
 					|| event.getTipus() == NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT
 					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR
 					|| event.getTipus() == NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
-					|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)) {
+					|| event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR
+					|| (event.isError() && event.getTipus() == NotificacioEventTipusEnumDto.CALLBACK_CLIENT)
+			) {
 				// Avisa al client que hi ha hagut una modificació a l'enviament
 				String resposta = notificaCanvi(event.getEnviament());
 				if ("INACTIVA".equals(resposta)) {

@@ -177,7 +177,7 @@ public class RegistreHelper {
 		}
 		logger.debug("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			auditNotificacioHelper.updateEstatNotificacio(registreEstat.name(), enviament.getNotificacio());
+			auditNotificacioHelper.updateEstatAFinalitzada(registreEstat.name(), enviament.getNotificacio());
 
 			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {

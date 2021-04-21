@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.api.dto;
 
 import java.io.Serializable;
@@ -24,5 +21,6 @@ public enum NotificacioEventTipusEnumDto implements Serializable {
 	REGISTRE_CONSULTA_INFO,
 	REGISTRE_CALLBACK_ESTAT,
 	NOTIFICA_CONSULTA_ERROR, // 12
-	NOTIFICA_CONSULTA_SIR_ERROR
+	NOTIFICA_CONSULTA_SIR_ERROR,
+	CALLBACK_ACTIVAR
 }

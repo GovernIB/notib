@@ -3,27 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.soap.SOAPFaultException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -35,11 +15,19 @@ import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvios;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datados;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.*;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.soap.SOAPFaultException;
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * Helper MOCK de prova.
@@ -53,6 +41,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
@@ -94,33 +84,22 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
+
+
+				logger.info(" >>> Canvi estat a ENVIADA ");
+				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+				notificacio.updateNotificaError(null, null);
+
 				//Crea un nou event
-				NotificacioEventEntity.Builder eventBulider = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-						notificacio);
-				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventBulider.callbackInicialitza();
-				
-				NotificacioEventEntity event = eventBulider.build();
-				
+				Map<NotificacioEnviamentEntity, String> identificadorsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							enviament.updateNotificaEnviada(
-									resultadoEnvio.getIdentificador());
-							
-							//Registrar event per enviament
-							notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-							logger.info(" >>> Canvi estat a ENVIADA ");
-							eventBulider.enviament(enviament);
-							notificacio.updateEventAfegir(event);
-							notificacio.updateNotificaError(
-									null,
-									null);
-							notificacioEventRepository.save(event);
+							identificadorsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
 				}
+				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsEnviaments);
 			} else {
 				logger.info(" >>> ... ERROR");
 				//Crea un nou event

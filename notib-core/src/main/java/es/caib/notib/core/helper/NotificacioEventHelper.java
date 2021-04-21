@@ -139,6 +139,18 @@ public class NotificacioEventHelper {
         notificacioEventRepository.saveAndFlush(callbackEvent);
     }
 
+    public void addCallbackActivarEvent(NotificacioEnviamentEntity enviament) {
+        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+                NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR,
+                enviament.getNotificacio())
+                .enviament(enviament)
+                .callbackInicialitza()
+                .build();
+        notificacioEventRepository.saveAndFlush(event);
+
+
+    }
+
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
         deleteByNotificacioAndTipusAndError(
                 notificacio,

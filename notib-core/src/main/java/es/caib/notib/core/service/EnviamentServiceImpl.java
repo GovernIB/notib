@@ -78,6 +78,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -1396,6 +1398,25 @@ public class EnviamentServiceImpl implements EnviamentService {
 		// si l'enviament esta pendent de refrescar l'estat enviat SIR
 		if (enviament.isPendentRefrescarEstatRegistre())
 			notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+	}
+
+	@Transactional
+	@Override
+	public void activarCallback(Long enviamentId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId,
+				CallbackEstatEnumDto.PENDENT);
+		if (
+				enviament.getNotificacio().isTipusUsuariAplicacio() &&
+				numEventsCallbackPendent == 0
+		) {
+			logger.info(String.format("Reactivam callback de l'enviment [id=%d]", enviamentId));
+			notificacioEventHelper.addCallbackActivarEvent(enviament);
+		} else {
+			logger.info(String.format("No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
