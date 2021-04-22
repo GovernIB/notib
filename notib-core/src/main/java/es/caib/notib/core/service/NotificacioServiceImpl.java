@@ -2171,8 +2171,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 						output);
 			}
 		} catch (Exception ex) {
-			logger.error(
-					"Error al recuperar l'arxiu temporal " + ex);
+			logger.error("Error al recuperar l'arxiu temporal ");
+			throw ex;
 		} 
 		return output.toByteArray();
 	}

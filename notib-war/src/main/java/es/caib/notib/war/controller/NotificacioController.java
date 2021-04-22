@@ -27,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -310,6 +311,10 @@ public class NotificacioController extends BaseUserController {
                     bindingResult,
                     tipusDocumentEnumDto,
                     model);
+            for (ObjectError error: bindingResult.getAllErrors()) {
+                logger.error("[Error validacio notif] " + error.toString());
+            }
+
             return "notificacioForm";
         }
         if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -318,9 +323,9 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute(new NotificacioFiltreCommand());
         model.addAttribute(new OrganGestorFiltreCommand());
 
-        updateDocuments(notificacioCommand);
-
         try {
+            updateDocuments(notificacioCommand);
+
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(
                         entitatActual.getId(),
@@ -330,22 +335,6 @@ public class NotificacioController extends BaseUserController {
                 notificacioService.create(
                         entitatActual.getId(),
                         NotificacioCommandV2.asDto(notificacioCommand));
-
-//                model.addAttribute("notificacioEstats",
-//                        EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
-//                model.addAttribute("tipusUsuari",
-//                        EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-//                                "es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-//                model.addAttribute("notificacioEnviamentEstats",
-//                        EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-//                model.addAttribute("notificacioComunicacioTipus",
-//                        EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-//                model.addAttribute("notificacioEnviamentTipus",
-//                        EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
-//                                "es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
             }
         } catch (Exception ex) {
             ex.printStackTrace();
