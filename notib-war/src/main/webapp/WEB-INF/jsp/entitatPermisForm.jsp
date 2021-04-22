@@ -19,6 +19,18 @@
 	<link href="<c:url value="/css/permisos.css"/>" rel="stylesheet" type="text/css">
 	<not:modalHead/>
 	<script>
+	
+		function formatRolUsuari() {
+			if ($("#tipus").val().toUpperCase() == "ROL") { 
+				if ($("#principal").val().trim().toLowerCase() == "tothom")
+					$("#principal").val($("#principal").val().trim().toLowerCase());
+				else
+					$("#principal").val($("#principal").val().trim().toUpperCase());
+			} else { // "USUARI"
+				$("#principal").val($("#principal").val().trim().toLowerCase());
+			}
+		}
+		
 		$(document).ready(function() {
 			$("#modal-botons button[type='submit']").on('click', function() {
 				$("form#permisCommand *:disabled").attr('readonly', 'readonly');
@@ -31,6 +43,14 @@
 					disableGuardarIfNoneChecked();
 				});
 			</c:if>		
+
+			$("#principal").on('change', function() {
+				formatRolUsuari();
+			});
+			
+			$("#tipus").on('change', function() {
+				formatRolUsuari();
+			});
 		});
 		
 		function disableGuardarIfNoneChecked(){

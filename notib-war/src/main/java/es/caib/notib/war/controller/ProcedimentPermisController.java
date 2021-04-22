@@ -19,6 +19,7 @@ import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -177,6 +178,24 @@ public class ProcedimentPermisController extends BaseUserController{
 				model.addAttribute("organs", getOrganismes(request));
 			return "procedimentAdminPermisForm";
 		}
+		
+		if (TipusEnumDto.ROL.equals(command.getTipus()) &&
+				command.getPrincipal().equalsIgnoreCase("tothom") &&
+				RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+			model.addAttribute(
+					"procediment",
+					procedimentService.findById(
+							entitatActual.getId(),
+							isAdministrador(request),
+							procedimentId));
+			if (command.getOrgan() != null)
+				model.addAttribute("organs", getOrganismes(request));
+			return getModalControllerReturnValueError(
+					request,
+					"procedimentAdminPermisForm",
+					"procediment.controller.permis.modificat.ko");
+		}
+		
 		Long organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisUpdate(
 				entitatActual.getId(),
