@@ -23,6 +23,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -163,6 +164,21 @@ public class OrganGestorPermisController extends BaseUserController{
 							organGestorId));
 			return "organGestorPermisForm";
 		}
+		
+		if (TipusEnumDto.ROL.equals(command.getTipus()) &&
+				command.getPrincipal().equalsIgnoreCase("tothom") &&
+				RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+			model.addAttribute(
+					"organGestor",
+					organGestorService.findById(
+							entitatActual.getId(),
+							organGestorId));
+			return getModalControllerReturnValueError(
+					request,
+					"organGestorPermisForm",
+					"organgestor.controller.permis.modificat.ko");
+		}
+		
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		organGestorService.permisUpdate(
 				entitatActual.getId(),

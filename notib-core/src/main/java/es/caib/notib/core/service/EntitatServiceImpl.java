@@ -464,6 +464,19 @@ public class EntitatServiceImpl implements EntitatService {
 			logger.debug("Modificació com a superusuari del permis de l'entitat (" +
 					"entitatId=" + entitatId + ", " +
 					"permis=" + permis + ")");
+			
+			if (TipusEnumDto.ROL.equals(permis.getTipus())) {
+				if (permis.getPrincipal().equalsIgnoreCase("tothom")) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());					
+				} else {
+					permis.setPrincipal(permis.getPrincipal().toUpperCase());
+				}
+			} else {
+				if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());
+				}
+			}
+			
 			entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					true,

@@ -587,6 +587,19 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permis=" + permisDto + ")");
+			
+			if (TipusEnumDto.ROL.equals(permisDto.getTipus())) {
+				if (permisDto.getPrincipal().equalsIgnoreCase("tothom")) {
+					permisDto.setPrincipal(permisDto.getPrincipal().toLowerCase());					
+				} else {
+					permisDto.setPrincipal(permisDto.getPrincipal().toUpperCase());
+				}
+			} else {
+				if (TipusEnumDto.USUARI.equals(permisDto.getTipus())) {
+					permisDto.setPrincipal(permisDto.getPrincipal().toLowerCase());
+				}
+			}
+			
 			EntitatEntity entitat = null;
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
 			if (entitatId != null)

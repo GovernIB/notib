@@ -1470,6 +1470,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							return 1;
 						if (p1.getOrgan() != null && p2.getOrgan() == null)
 							return -1;
+						if(p1.getOrgan() == null && p2.getOrgan() == null)
+							return p1.getTipus().compareTo(p2.getTipus());
+						
 						return p1.getOrgan().compareTo(p2.getOrgan());
 					}
 					return comp;
@@ -1563,6 +1566,18 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id + ", "
 					+ "permis=" + permis + ")");
+			
+			if (TipusEnumDto.ROL.equals(permis.getTipus())) {
+				if (permis.getPrincipal().equalsIgnoreCase("tothom")) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());					
+				} else {
+					permis.setPrincipal(permis.getPrincipal().toUpperCase());
+				}
+			} else {
+				if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());
+				}
+			}
 			
 			entityComprovarHelper.comprovarPermisAdminEntitatOAdminOrgan(entitatId,organGestorId);
 			ProcedimentEntity procediment = entityComprovarHelper.comprovarProcediment(entitatId, id);
