@@ -1157,7 +1157,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediments = procedimentRepository.findByEntitat(entitat);
 					} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
 						if (organCodi != null) {
-							List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+							List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(
 									entitat.getDir3Codi(),
 									organCodi);
 							procediments = procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
