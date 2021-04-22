@@ -50,11 +50,16 @@ public class CallbackServiceImpl implements CallbackService {
 				if (pendentsIds.size() > 0) {
 					logger.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 					int errors = 0;
-					for (Long pendentsId: pendentsIds) {
-						logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de la notificació amb identificador: " + pendentsId);
-						NotificacioEntity notificacioProcessada = callbackHelper.notifica(pendentsId);
-						if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) { 
-							errors++;
+					for (Long pendentId: pendentsIds) {
+						logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + pendentId);
+						try {
+							NotificacioEntity notificacioProcessada = callbackHelper.notifica(pendentId);
+							if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
+								errors++;
+							}
+						}catch (Exception e) {
+							logger.info(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId));
+							e.printStackTrace();
 						}
 					}
 					logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");

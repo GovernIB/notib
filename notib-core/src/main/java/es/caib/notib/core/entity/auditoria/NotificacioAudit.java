@@ -3,29 +3,16 @@
  */
 package es.caib.notib.core.entity.auditoria;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
 import es.caib.notib.core.entity.NotificacioEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.Date;
 
 
 /**
@@ -176,7 +163,11 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 			built.notificaEnviamentIntent = notificacioEntity.getNotificaEnviamentIntent();
 			built.notificaErrorTipus = notificacioEntity.getNotificaErrorTipus();
 			built.errorLastCallback = notificacioEntity.isErrorLastCallback();
-			built.errorEventId = notificacioEntity.getNotificaErrorEvent() != null ? notificacioEntity.getNotificaErrorEvent().getId() : null;
+			try {
+				built.errorEventId = notificacioEntity.getNotificaErrorEvent() != null ? notificacioEntity.getNotificaErrorEvent().getId() : null;
+			} catch (Exception e) {
+				built.errorEventId = null;
+			}
 		}
 		public NotificacioAudit build() {
 			return built;

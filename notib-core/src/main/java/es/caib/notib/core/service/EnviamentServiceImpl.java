@@ -1410,10 +1410,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				enviament.getNotificacio().isTipusUsuariAplicacio() &&
 				numEventsCallbackPendent == 0
 		) {
-			logger.info(String.format("Reactivam callback de l'enviment [id=%d]", enviamentId));
+			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
 			notificacioEventHelper.addCallbackActivarEvent(enviament);
 		} else {
-			logger.info(String.format("No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+			logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
 					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
 
 		}
