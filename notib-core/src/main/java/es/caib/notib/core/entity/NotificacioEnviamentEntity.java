@@ -213,7 +213,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Column(name = "notifica_datat_recnif", length = 9)
 	protected String notificaDatatReceptorNif;
 	
-	@Column(name = "notifica_datat_recnom", length = 100)
+	@Column(name = "notifica_datat_recnom", length = 400)
 	protected String notificaDatatReceptorNom;
 	
 	@Column(name = "notifica_datat_numseg", length = 50)
