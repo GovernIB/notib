@@ -260,6 +260,18 @@ $(document).ready(function() {
 			}
 			return false;
 		});
+
+		$('#reactivarCallback').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>")){
+				$.get(
+						"enviament/reactivar/callback",
+						function(data) {
+							location.reload();
+						}
+				);
+			}
+			return false;
+		});
 	});
 
 	$("#enviament th").last().empty();
@@ -354,6 +366,7 @@ function getCookie(cname) {
 						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
+						<li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="enviament.list.user.reactivar.callback"/></a></li>
 					</ul>
 				</div>
 			</div>

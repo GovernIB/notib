@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -156,6 +157,55 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 		this.notificaErrorTipus = lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null;
 		this.errorLastCallback = notificacioEntity.isErrorLastCallback();
 		this.errorEventId = lastErrorEvent != null ? lastErrorEvent.getId() : null;
+	}
+	
+	public static class Builder {
+		NotificacioAudit built;
+		Builder(
+				NotificacioEntity notificacioEntity,
+				TipusOperacio tipusOperacio, 
+				String joinPoint) {
+			built = new NotificacioAudit();
+			built.tipusOperacio = tipusOperacio;
+			built.joinPoint = joinPoint;
+			built.notificacioId = notificacioEntity.getId();
+			built.comunicacioTipus = notificacioEntity.getComunicacioTipus();
+			built.tipusUsuari = notificacioEntity.getTipusUsuari();
+			built.usuari = notificacioEntity.getUsuariCodi();
+			built.emisor = notificacioEntity.getEmisorDir3Codi();
+			built.tipus = notificacioEntity.getEnviamentTipus();
+			built.entitatId = notificacioEntity.getEntitat().getId();
+			built.procediment = notificacioEntity.getProcediment() != null ? notificacioEntity.getProcediment().getCodi() : null;
+			built.grup = notificacioEntity.getGrupCodi();
+			built.concepte = notificacioEntity.getConcepte();
+			built.descripcio = notificacioEntity.getDescripcio();
+			built.numExpedient = notificacioEntity.getNumExpedient();
+			built.enviamentDataProgramada = notificacioEntity.getEnviamentDataProgramada();
+			built.retard = notificacioEntity.getRetard();
+			built.caducitat = notificacioEntity.getCaducitat();
+			built.documentId = notificacioEntity.getDocument() != null ? notificacioEntity.getDocument().getId() : null;
+			built.estat = notificacioEntity.getEstat();
+			built.estatDate = notificacioEntity.getEstatDate();
+			built.motiu = notificacioEntity.getMotiu();
+			built.pagadorPostalId = notificacioEntity.getPagadorPostal() != null ? notificacioEntity.getPagadorPostal().getId() : null;
+			built.pagadorCieId = notificacioEntity.getPagadorCie() != null ? notificacioEntity.getPagadorCie().getId() : null;
+			built.registreEnviamentIntent = notificacioEntity.getRegistreEnviamentIntent();
+			built.registreNumero = notificacioEntity.getRegistreNumero();
+			built.registreNumeroFormatat = notificacioEntity.getRegistreNumeroFormatat();
+			built.registreData = notificacioEntity.getRegistreData();
+			built.notificaEnviamentData = notificacioEntity.getNotificaEnviamentData();
+			built.notificaEnviamentIntent = notificacioEntity.getNotificaEnviamentIntent();
+			built.notificaErrorTipus = notificacioEntity.getNotificaErrorTipus();
+			built.errorLastCallback = notificacioEntity.isErrorLastCallback();
+			try {
+				built.errorEventId = notificacioEntity.getNotificaErrorEvent() != null ? notificacioEntity.getNotificaErrorEvent().getId() : null;
+			} catch (Exception e) {
+				built.errorEventId = null;
+			}
+		}
+		public NotificacioAudit build() {
+			return built;
+		}
 	}
 
 	private static final long serialVersionUID = 7206301266966284277L;

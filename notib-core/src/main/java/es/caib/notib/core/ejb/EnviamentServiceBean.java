@@ -190,4 +190,9 @@ public class EnviamentServiceBean implements EnviamentService {
 	public void actualitzarEstat(Long enviamentId) {
 		delegate.actualitzarEstat(enviamentId);
 	}
+
+	@Override
+	public void activarCallback(Long enviamentId) {
+		delegate.activarCallback(enviamentId);
+	}
 }

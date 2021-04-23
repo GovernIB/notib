@@ -495,6 +495,52 @@ public class EnviamentController extends BaseUserController {
 		}
 		return resposta;
 	}
+
+	@RequestMapping(value = "/reactivar/callback", method = RequestMethod.GET)
+	@ResponseBody
+	public String reactivarCallbacks(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		String resposta = "";
+		if (seleccio == null || seleccio.isEmpty()) {
+			MissatgesHelper.error(
+					request,
+					getMessage(
+							request,
+							"enviament.controller.reactivar.callback.buida"));
+
+		}
+
+		boolean hasErrors = false;
+		for(Long enviamentId : seleccio) {
+			try {
+				enviamentService.activarCallback(enviamentId);
+			} catch (Exception e) {
+				hasErrors = true;
+				MissatgesHelper.error(
+						request,
+						getMessage(
+								request,
+								"enviament.controller.reactivar.callback.KO"));
+			}
+		}
+
+		if (hasErrors) {
+			return "error";
+		}
+
+		MissatgesHelper.info(
+				request,
+				getMessage(
+						request,
+						"enviament.controller.reactivar.callback.OK"));
+		return "ok";
+	}
+
 	@RequestMapping(value = "/actualitzarestat", method = RequestMethod.GET)
 	@ResponseBody
 	public String actualitzarEstat(

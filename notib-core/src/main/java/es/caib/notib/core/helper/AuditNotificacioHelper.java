@@ -80,7 +80,7 @@ public class AuditNotificacioHelper {
 
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateEstatNotificacio(
+	public NotificacioEntity updateEstatAFinalitzada(
 			String notificaEstatNom,
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
@@ -141,7 +141,7 @@ public class AuditNotificacioHelper {
 		notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
 		return notificacioEntity;
 	}
-	
+
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioRefreshRegistreNotificacio(NotificacioEntity notificacio) {
 		notificacio.refreshRegistre();

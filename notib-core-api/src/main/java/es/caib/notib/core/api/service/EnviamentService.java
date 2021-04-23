@@ -228,4 +228,13 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	void actualitzarEstat(Long enviamentId);
+
+	/**
+	 * Activa un event de callback de l'enviament indicat
+	 *
+	 * @param enviamentId
+	 *            id de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	void activarCallback(Long enviamentId);
 }

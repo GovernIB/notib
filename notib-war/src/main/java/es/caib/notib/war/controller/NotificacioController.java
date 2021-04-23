@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -324,6 +325,10 @@ public class NotificacioController extends BaseUserController {
                     bindingResult,
                     tipusDocumentEnumDto,
                     model);
+            for (ObjectError error: bindingResult.getAllErrors()) {
+                logger.error("[Error validacio notif] " + error.toString());
+            }
+
             return "notificacioForm";
         }
         if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -332,9 +337,9 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute(new NotificacioFiltreCommand());
         model.addAttribute(new OrganGestorFiltreCommand());
 
-        updateDocuments(notificacioCommand);
-
         try {
+            updateDocuments(notificacioCommand);
+
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(
                         entitatActual.getId(),
