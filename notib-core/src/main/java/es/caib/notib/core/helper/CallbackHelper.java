@@ -108,7 +108,8 @@ public class CallbackHelper {
 				integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat: " + errorDescripcio);
 			}
 		} catch (Exception ex) {
-			log.debug("[Callback] Excepció notificant l'event " + eventId, ex);
+			log.debug(String.format("[Callback] Excepció notificant l'event [Id: %d]: %s", eventId, ex.getMessage()));
+			ex.printStackTrace();
 			// Marca un error a l'event
 			Integer maxIntents = this.getEventsIntentsMaxProperty();
 			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
@@ -137,7 +138,8 @@ public class CallbackHelper {
 		
 		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		if (aplicacio == null)
-			throw new NotFoundException("codi usuari: " + usuari.getCodi(), AplicacioEntity.class);
+			throw new NotFoundException(String.format("codi usuari: %s, EntitatId: %d", usuari.getCodi(),
+					enviament.getNotificacio().getEntitat().getId()), AplicacioEntity.class);
 		if (aplicacio.getCallbackUrl() == null)
 			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
 		if (!aplicacio.isActiva())

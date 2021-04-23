@@ -58,7 +58,7 @@ public class CallbackServiceImpl implements CallbackService {
 								errors++;
 							}
 						}catch (Exception e) {
-							logger.info(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId));
+							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId));
 							e.printStackTrace();
 						}
 					}
