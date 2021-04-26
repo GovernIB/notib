@@ -22,14 +22,7 @@
 	font-size: x-small;
 }
 </style>
-<script>
-$('textarea').change(function() {
-	if(this.type != "file"){
-		this.value = this.value.trim();
-	}
-	
-});
-</script>
+
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
 	<label class="control-label col-xs-${campLabelSize}" for="${campPath}">
 		<c:choose>
