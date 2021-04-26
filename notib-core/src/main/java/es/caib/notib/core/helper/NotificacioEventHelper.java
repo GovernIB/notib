@@ -35,9 +35,8 @@ public class NotificacioEventHelper {
      * @param notificacio Notificació objectiu
      */
     public void clearOldUselessEvents(NotificacioEntity notificacio) {
-        auditNotificacioHelper.netejarErrorsNotifica(notificacio);
         for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
-            auditEnviamentHelper.actualizaErrorNotifica(enviament, false, null);
+            enviament.setNotificacioErrorEvent(null);
         }
         notificacioEventRepository.deleteOldUselessEvents(notificacio);
     }

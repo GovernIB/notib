@@ -83,10 +83,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
 
-
-				logger.info(" >>> Canvi estat a ENVIADA ");
-				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-				notificacio.updateNotificaError(null, null);
+				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 
 				//Crea un nou event
 				Map<NotificacioEnviamentEntity, String> identificadorsEnviaments = new HashMap<>();

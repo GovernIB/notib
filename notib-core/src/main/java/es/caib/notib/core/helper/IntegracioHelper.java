@@ -1,17 +1,7 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.entity.UsuariEntity;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioAccioEstatEnumDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.entity.UsuariEntity;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * Mètodes per a la gestió d'integracions.
@@ -37,7 +23,7 @@ public class IntegracioHelper {
 	@Resource
 	private UsuariHelper usuariHelper;
 	
-	public static final int DEFAULT_MAX_ACCIONS = 20;
+	public static final int DEFAULT_MAX_ACCIONS = 200;
 
 	public static final String INTCODI_USUARIS = "USUARIS";
 	public static final String INTCODI_REGISTRE = "REGISTRE";
