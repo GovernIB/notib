@@ -89,7 +89,9 @@ public abstract class AbstractNotificaHelper {
 				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat);
+				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.DESCONEGUT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO.equals(notificaEstat);
 		enviament.updateNotificaDatat(
 				notificaEstat,
 				notificaEstatData,
