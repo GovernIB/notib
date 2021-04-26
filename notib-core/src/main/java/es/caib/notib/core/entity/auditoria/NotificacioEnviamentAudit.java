@@ -105,7 +105,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	@Column(name = "notifica_cer_numseg", length = 50)
 	private String notificaCertificacioNumSeguiment;
-	
+
 	// Registre + SIR
 	@Column(name="registre_numero_formatat", length = 50)
 	private String registreNumeroFormatat;
@@ -125,7 +125,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	@Column(name = "sir_reg_desti_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date sirRegDestiData;
-	
+
 	// Errors
 	@Column(name = "notifica_error_event_id")
 	private Long notificacioErrorEvent;
@@ -133,23 +133,23 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	private boolean notificaError;
 	@Column(name = "notifica_datat_errdes", length = 255)
 	private String notificaDatatErrorDescripcio;
-	
-	
+
+
 	public static Builder getBuilder(
 			NotificacioEnviamentEntity notificacioEnviamentEntity,
-			TipusOperacio tipusOperacio, 
+			TipusOperacio tipusOperacio,
 			String joinPoint) {
 		return new Builder(
 				notificacioEnviamentEntity,
 				tipusOperacio,
 				joinPoint);
 	}
-	
+
 	public static class Builder {
 		NotificacioEnviamentAudit built;
 		Builder(
 				NotificacioEnviamentEntity notificacioEnviamentEntity,
-				TipusOperacio tipusOperacio, 
+				TipusOperacio tipusOperacio,
 				String joinPoint) {
 			built = new NotificacioEnviamentAudit();
 			built.tipusOperacio = tipusOperacio;
@@ -198,16 +198,16 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 		public NotificacioEnviamentAudit build() {
 			return built;
 		}
-		
+
 		private String getDestinataris(List<PersonaEntity> destinataris) {
 			String destinatariIds = "";
-			
+
 			if (destinataris != null) {
 				for (PersonaEntity destinatari: destinataris) {
 					destinatariIds += destinatari.getId() + " - ";
 				}
 			}
-			
+
 			if (destinatariIds.isEmpty()) {
 				return null;
 			} else {
@@ -217,38 +217,38 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 			}
 		}
 		private String getDomicili(NotificacioEnviamentEntity notificacioEnviamentEntity) {
-			
+
 			if (notificacioEnviamentEntity.getDomiciliConcretTipus() == null)
 				return null;
 
 			String domicili = "";
 			String domiciliPoblacio ="";
 			switch (notificacioEnviamentEntity.getDomiciliConcretTipus()) {
-			case ESTRANGER:
-				domicili = notificacioEnviamentEntity.getDomiciliPaisCodiIso() + "-";
-				domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
-				domicili += getAdressa(notificacioEnviamentEntity);
-				break;
-			case NACIONAL:
-				domicili = notificacioEnviamentEntity.getDomiciliProvinciaCodi() + "-";
-				domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
-				domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
-				domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
+				case ESTRANGER:
+					domicili = notificacioEnviamentEntity.getDomiciliPaisCodiIso() + "-";
+					domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
+					domicili += getAdressa(notificacioEnviamentEntity);
+					break;
+				case NACIONAL:
+					domicili = notificacioEnviamentEntity.getDomiciliProvinciaCodi() + "-";
+					domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
+					domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
+					domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
 
-				domicili += getAdressa(notificacioEnviamentEntity);
-				break;
-			case APARTAT_CORREUS:
-				domicili = notificacioEnviamentEntity.getDomiciliProvinciaCodi() + "-";
-				domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
-				domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
-				domicili += notificacioEnviamentEntity.getDomiciliApartatCorreus();
-				domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
-				break;
-			case SENSE_NORMALITZAR:
-				domicili = notificacioEnviamentEntity.getDomiciliLinea1() + " " + notificacioEnviamentEntity.getDomiciliLinea2();
-				break;
-			default:
-				return null;
+					domicili += getAdressa(notificacioEnviamentEntity);
+					break;
+				case APARTAT_CORREUS:
+					domicili = notificacioEnviamentEntity.getDomiciliProvinciaCodi() + "-";
+					domicili += notificacioEnviamentEntity.getDomiciliMunicipiCodiIne() + "-";
+					domicili += notificacioEnviamentEntity.getDomiciliCodiPostal() + "-";
+					domicili += notificacioEnviamentEntity.getDomiciliApartatCorreus();
+					domicili += getDomiciliPoblacio(notificacioEnviamentEntity.getDomiciliPoblacio());
+					break;
+				case SENSE_NORMALITZAR:
+					domicili = notificacioEnviamentEntity.getDomiciliLinea1() + " " + notificacioEnviamentEntity.getDomiciliLinea2();
+					break;
+				default:
+					return null;
 			}
 			return ellipsis(domicili, 500);
 		}

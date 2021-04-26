@@ -99,7 +99,7 @@ public class AuditNotificacioHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateEstatNotificacio(
+	public NotificacioEntity updateEstatAFinalitzada(
 			String notificaEstatNom,
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
@@ -133,6 +133,7 @@ public class AuditNotificacioHelper {
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity netejarErrorsNotifica(NotificacioEntity notificacio) {
 		notificacio.cleanNotificaError();
+		notificacioRepository.saveAndFlush(notificacio);
 		return notificacio;
 	}
 	
@@ -167,7 +168,7 @@ public class AuditNotificacioHelper {
 	public void updateNotificacioEnviada(NotificacioEntity notificacioEntity) {
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 	}
-	
+
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity refreshRegistreNotificacio(NotificacioEntity notificacio) {
 		notificacio.refreshRegistre();

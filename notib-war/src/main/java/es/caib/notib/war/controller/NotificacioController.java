@@ -1,7 +1,10 @@
+
+/**
+ *
+ */
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -24,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -307,6 +311,10 @@ public class NotificacioController extends BaseUserController {
                     bindingResult,
                     tipusDocumentEnumDto,
                     model);
+            for (ObjectError error: bindingResult.getAllErrors()) {
+                logger.error("[Error validacio notif] " + error.toString());
+            }
+
             return "notificacioForm";
         }
         if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -315,18 +323,18 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute(new NotificacioFiltreCommand());
         model.addAttribute(new OrganGestorFiltreCommand());
 
-        updateDocuments(notificacioCommand);
-
         try {
+            updateDocuments(notificacioCommand);
+
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(
                         entitatActual.getId(),
-                        notificacioCommand.asDatabaseDto(),
+                        NotificacioCommandV2.asDto(notificacioCommand),
                         RolHelper.isUsuariActualAdministradorEntitat(request));
             } else {
                 notificacioService.create(
                         entitatActual.getId(),
-                        notificacioCommand.asDatabaseDto());
+                        NotificacioCommandV2.asDto(notificacioCommand));
             }
         } catch (Exception ex) {
             ex.printStackTrace();

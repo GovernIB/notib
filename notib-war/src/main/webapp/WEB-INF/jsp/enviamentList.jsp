@@ -151,7 +151,7 @@ $(document).ready(function() {
     
     $('.data').datepicker({
 		orientation: "bottom",
-		format: 'dd/mm/yyyy',
+		dateFormat: 'dd/mm/yy',
 		weekStart: 1,
 		todayHighlight: true,
 		language: "${requestLocale}"
@@ -231,8 +231,31 @@ $(document).ready(function() {
 			}
 			return false;
 		});
+		$('#updateEstat').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>")){
+				$.get(
+						"enviament/actualitzarestat",
+						function(data) {
+							location.reload();
+						}
+				);
+			}
+			return false;
+		});
+
+		$('#reactivarCallback').on('click', function() {
+			if(confirm("<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>")){
+				$.get(
+						"enviament/reactivar/callback",
+						function(data) {
+							location.reload();
+						}
+				);
+			}
+			return false;
+		});
 	});
-	
+
 	$("#enviament th").last().empty();
 	$("#enviament th").last().css("padding", 0);
 
@@ -328,6 +351,8 @@ function getCookie(cname) {
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="enviament.list.user.reintentar.notificacio"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="enviament.list.user.reactivar.consulta"/></a></li>
 						<li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="enviament.list.user.reactivar.sir"/></a></li>
+						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="enviament.list.user.actualitzar.estat"/></a></li>
+						<li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="enviament.list.user.reactivar.callback"/></a></li>
 					</ul>
 				</div>
 			</div>
@@ -371,7 +396,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="createdDate" data-converter="datetime" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
+				<th data-col-name="createdDate" data-converter="date" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dataenviament"/>
 					<script id="dataTemplate" type="text/x-jsrender">
 						<div class="from-group">
 							<div class="input-group vdivide">

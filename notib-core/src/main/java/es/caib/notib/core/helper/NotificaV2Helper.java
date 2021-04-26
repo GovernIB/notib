@@ -116,15 +116,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
+				startTime = System.nanoTime();
 				logger.info(" >>> ... OK");
 				
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-				notificacio.updateNotificaError(
-						null,
-						null);
+				notificacio.updateNotificaError(null, null);
 
 				//Crea un nou event
-				startTime = System.nanoTime();
 				Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {

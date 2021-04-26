@@ -35,8 +35,9 @@ public class NotificacioEventHelper {
      * @param notificacio Notificació objectiu
      */
     public void clearOldUselessEvents(NotificacioEntity notificacio) {
+        auditNotificacioHelper.netejarErrorsNotifica(notificacio);
         for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
-            enviament.setNotificacioErrorEvent(null);
+            auditEnviamentHelper.actualizaErrorNotifica(enviament, false, null);
         }
         notificacioEventRepository.deleteOldUselessEvents(notificacio);
     }
@@ -136,6 +137,18 @@ public class NotificacioEventHelper {
         NotificacioEventEntity callbackEvent = eventBuilder.build();
         updateNotificacio(notificacio, callbackEvent);
         notificacioEventRepository.saveAndFlush(callbackEvent);
+    }
+
+    public void addCallbackActivarEvent(NotificacioEnviamentEntity enviament) {
+        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(
+                NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR,
+                enviament.getNotificacio())
+                .enviament(enviament)
+                .callbackInicialitza()
+                .build();
+        notificacioEventRepository.saveAndFlush(event);
+
+
     }
 
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
@@ -428,7 +441,7 @@ public class NotificacioEventHelper {
     private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
         NotificacioEventEntity eventNotificacioNotificaError = notificacio.getNotificaErrorEvent();
         if (eventNotificacioNotificaError != null && eventNotificacioNotificaError.getId() == event.getId()) {
-            notificacio.setNotificaErrorEvent(null);
+            auditNotificacioHelper.netejarErrorsNotifica(notificacio);
         }
         event.getEnviament().setNotificacioErrorEvent(null);
         if (enviament != null) {
