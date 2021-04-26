@@ -27,6 +27,8 @@ import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.core.repository.auditoria.ProcedimentAuditRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -48,6 +50,7 @@ public class AuditServiceImpl implements AuditService {
 	private ProcedimentAuditRepository procedimentAuditRepository;
 	
 	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
 	public void audita(
 			Object objecteAuditar,
 			TipusOperacio tipusOperacio,

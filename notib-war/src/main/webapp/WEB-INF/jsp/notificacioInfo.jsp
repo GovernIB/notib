@@ -47,6 +47,7 @@ var eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
 eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
+var notificacioApp = "${notificacio.tipusUsuari == 'APLICACIO'}";
 $(document).ready(function() {
 	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
 
@@ -597,6 +598,7 @@ $(document).ready(function() {
 						<th data-col-name="id" data-visible="false">#</th>
 						<th data-col-name="enviamentAssociat" data-visible="false"></th>
 						<th data-col-name="errorDescripcio" data-visible="false"></th>
+						<th data-col-name="callbackEstat" data-visible="false"></th>
 						<th data-col-name="createdBy.nom" data-orderable="false"><spring:message
 								code="notificacio.event.list.columna.usuari" /></th>
 						<th data-col-name="data" data-converter="datetime"
@@ -608,6 +610,7 @@ $(document).ready(function() {
 								id="cellTipus" type="text/x-jsrender">
 							{{:~eval('eventTipus["' + tipus + '"]')}}
 							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
+							{{if callbackEstat == 'PENDENT' && ~eval('notificacioApp') == 'true'}}<span style="padding-right:4px; color:#666;" class="fa fa-clock-o pull-right" title="<spring:message code="notificacio.event.list.info.pendent"/>"></span>{{/if}}
 						</script></th>
 						<th data-col-name="error" data-template="#cellResultat"
 							data-orderable="false"><spring:message
