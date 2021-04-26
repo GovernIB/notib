@@ -107,12 +107,13 @@ public class NotificacioEventHelper {
         return addErrorEvent(notificacio, eventTipus, null, errorDescripcio, notificaError);
     }
 
-    public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
+    public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
+        // Elimina tots els events de callback anteriors
         deleteByNotificacioAndTipusAndError(
                 notificacio,
                 null,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-                event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)
+                isError
         );
 
         // Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
@@ -129,7 +130,7 @@ public class NotificacioEventHelper {
                     notificacio). // event.getNotificacio()).
                     descripcio("Callback " + event.getTipus());
         }
-        if (event.getCallbackEstat().equals(CallbackEstatEnumDto.ERROR)) {
+        if (isError) {
             clearUselessErrors(notificacio, null, NotificacioEventTipusEnumDto.CALLBACK_CLIENT);
             eventBuilder.error(true)
                     .errorDescripcio(event.getCallbackError());
@@ -416,7 +417,8 @@ public class NotificacioEventHelper {
 
     private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
                                                      NotificacioEnviamentEntity enviament,
-                                                     NotificacioEventTipusEnumDto tipus, boolean isError){
+                                                     NotificacioEventTipusEnumDto tipus,
+                                                     boolean isError){
         if (isError) {
             for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
                 if (e.getTipus().equals(tipus) && e.isError() == isError){

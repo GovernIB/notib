@@ -22,11 +22,17 @@ public class NotificacioEventDto extends AuditoriaDto {
 	private boolean error;
 	private String errorDescripcio;
 	private CallbackEstatEnumDto callbackEstat;
+	private String callbackError;
+	private Integer callbackIntents;
 
 	private NotificacioEventEnviamentDto enviament;
 
 	public boolean isEnviamentAssociat() {
 		return enviament != null;
+	}
+
+	public String getCallbackError(){
+		return callbackError !=null ? callbackError : "";
 	}
 
 	@Override

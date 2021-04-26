@@ -598,7 +598,6 @@ $(document).ready(function() {
 						<th data-col-name="id" data-visible="false">#</th>
 						<th data-col-name="enviamentAssociat" data-visible="false"></th>
 						<th data-col-name="errorDescripcio" data-visible="false"></th>
-						<th data-col-name="callbackEstat" data-visible="false"></th>
 						<th data-col-name="createdBy.nom" data-orderable="false"><spring:message
 								code="notificacio.event.list.columna.usuari" /></th>
 						<th data-col-name="data" data-converter="datetime"
@@ -610,8 +609,32 @@ $(document).ready(function() {
 								id="cellTipus" type="text/x-jsrender">
 							{{:~eval('eventTipus["' + tipus + '"]')}}
 							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
-							{{if callbackEstat == 'PENDENT' && ~eval('notificacioApp') == 'true'}}<span style="padding-right:4px; color:#666;" class="fa fa-clock-o pull-right" title="<spring:message code="notificacio.event.list.info.pendent"/>"></span>{{/if}}
 						</script></th>
+						<c:if test="${notificacio.tipusUsuari == 'APLICACIO'}">
+							<th data-col-name="callbackEstat" data-visible="false"></th>
+							<th data-col-name="callbackIntents" data-visible="false"><spring:message
+									code="notificacio.event.list.columna.callbackIntents" /></th>
+							<th data-col-name="callbackError" data-template="#cellCallback" data-orderable="false">
+								<spring:message code="notificacio.event.list.columna.callback" />
+								<script id="cellCallback" type="text/x-jsrender">
+								{{if callbackEstat == 'PENDENT'}}
+									<span style="padding-right:4px; color:#666;" class="fa fa-clock-o pull-left" title="<spring:message code="notificacio.event.list.info.callback.pendent"/>"></span>
+									{{if callbackIntents > 0}}
+										<span style="padding-right:4px;" class="fa fa-warning text-warning pull-left" title="{{:callbackError}}"></span>
+									{{/if}}
+								{{/if}}
+								{{if callbackEstat == 'NOTIFICAT'}}
+									<span style="padding-right:4px;" class="fa fa-check text-success pull-left" title="<spring:message code="notificacio.event.list.info.callback.notificat"/>"></span>
+								{{/if}}
+								{{if callbackEstat == 'PROCESSAT'}}
+								<span style="padding-right:4px;" class="fa fa-info text-info pull-left" title="<spring:message code="notificacio.event.list.info.callback.processat"/>"></span>
+								{{/if}}
+								{{if callbackEstat == 'ERROR'}}
+									<span style="padding-right:4px;" class="fa fa-warning text-danger pull-left" title="{{:callbackError}}"></span>
+								{{/if}}
+								</script>
+							</th>
+						</c:if>
 						<th data-col-name="error" data-template="#cellResultat"
 							data-orderable="false"><spring:message
 								code="notificacio.event.list.columna.estat" /> <script
