@@ -41,30 +41,29 @@ public class CallbackServiceImpl implements CallbackService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
-				logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
+				logger.debug("[Callback] Cercant notificacions pendents d'enviar al client");
 				int maxPendents = getEventsProcessarMaxProperty(); 
 				Pageable page = new PageRequest(
 						0,
 						maxPendents);
 				List<Long> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
 				if (pendentsIds.size() > 0) {
-					logger.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
+					logger.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 					int errors = 0;
 					for (Long pendentId: pendentsIds) {
-						logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + pendentId);
+						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + pendentId);
 						try {
 							NotificacioEntity notificacioProcessada = callbackHelper.notifica(pendentId);
 							if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
 								errors++;
 							}
 						}catch (Exception e) {
-							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId));
-							e.printStackTrace();
+							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId), e);
 						}
 					}
-					logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
+					logger.debug("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 				} else {
-					logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
+					logger.debug("[Callback] No hi ha notificacions pendents d'enviar. ");
 				}
 			} else {
 				logger.debug("[Callback] Enviament callbacks deshabilitat. ");

@@ -114,6 +114,7 @@ public class CallbackHelper {
 			CallbackEstatEnumDto estatNou = maxIntents == null || intents < maxIntents ? 
 												CallbackEstatEnumDto.PENDENT
 												: CallbackEstatEnumDto.ERROR;
+			log.debug(String.format("[Callback] Actualitzam la base de dades amb l'error de l'event [Id: %d]", eventId));
 			event.updateCallbackClient(
 					estatNou,
 					intents,
@@ -122,7 +123,9 @@ public class CallbackHelper {
 			auditNotificacioHelper.updateLastCallbackError(notificacio, true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 		}
+
 		notificacioEventHelper.addCallbackEvent(notificacio, event, isError);
+
 		log.debug(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
 				intents, eventId, notificacio.getId()));
 		return notificacio;
@@ -203,7 +206,7 @@ public class CallbackHelper {
 		return ret;
 	}
 
-	private Integer getIntentsPeriodeProperty() {
+	private int getIntentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.callback.pendents.periode", 30000);
 	}
 	private Client getClient(AplicacioEntity aplicacio) {
