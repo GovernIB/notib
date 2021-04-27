@@ -2177,7 +2177,8 @@ public class PluginHelper {
 		if (notificacio.getEntitat().isOficinaEntitat() && notificacio.getEntitat().getOficina() != null) {
 			dadesOficina.setOficinaCodi(notificacio.getEntitat().getOficina());
 			dadesOficina.setOficinaNom(notificacio.getEntitat().getOficina());
-		} else if (!notificacio.getEntitat().isOficinaEntitat() && notificacio.getOrganGestor().getOficina() != null) {
+		} else if (!notificacio.getEntitat().isOficinaEntitat() &&
+				notificacio.getOrganGestor() != null && notificacio.getOrganGestor().getOficina() != null) {
 			OrganGestorEntity organGestor = notificacio.getOrganGestor();
 			dadesOficina.setOficinaCodi(organGestor.getOficina());
 			dadesOficina.setOficinaNom(organGestor.getOficinaNom());
