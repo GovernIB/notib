@@ -86,7 +86,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.callbackIntents = intents;
 		this.callbackEstat = estat;
 		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.MILLISECOND, reintentsPeriode*(2^callbackIntents));
+		cal.add(Calendar.SECOND, reintentsPeriode*(2^callbackIntents));
 		this.callbackData = cal.getTime();
 		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH);
 	}
