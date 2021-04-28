@@ -878,21 +878,21 @@
 			}
 
 			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
-			document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[index].value = dir3Desc+'-'+raoSocialDesc;
-			$(dir3codi).find('.help-block').addClass('hidden')
-			$(dir3codi).find('.form-group').removeClass('has-error')
-		}else if(document.getElementById("enviaments0.titular.dir3Codi.errors") != null && document.getElementById("enviaments0.titular.dir3Codi.errors").innerText != '' ){
-			$(dir3codi).find('.help-block').removeClass('hidden')
-			$(dir3codi).find('.form-group').addClass('has-error')
-		}
-			comprovarTitularComuniacio();
-			var dir3Codi = closest.find("input[name='enviaments[0].titular.dir3Codi']");
-			var sir = $('#organigrama').val().indexOf(dir3Codi.val());
-			if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
-				document.getElementById("searchOrganTit0").getElementsByTagName('input')[0].value = '';
-				$(dir3Codi).val("");
-				closest.find("input[name='enviaments[0].titular.nom']").val("");
+				document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0].value = dir3Desc+'-'+raoSocialDesc;
+				$(dir3codi).find('.help-block').addClass('hidden')
+				$(dir3codi).find('.form-group').removeClass('has-error')
+			}else if(document.getElementById("enviaments["+ index+ "].titular.dir3Codi.errors") != null && document.getElementById("enviaments["+ index+ "].titular.dir3Codi.errors").innerText != '' ){
+				$(dir3codi).find('.help-block').removeClass('hidden')
+				$(dir3codi).find('.form-group').addClass('has-error')
 			}
+			comprovarTitularComuniacio();
+//			var dir3Codi = closest.find("input[name='enviaments[" + index + "].titular.dir3Codi']");
+//			var sir = $('#organigrama').val().indexOf(dir3Codi.val());
+//			if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
+//				document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0].value = '';
+//				$(dir3Codi).val("");
+//				closest.find("input[name='enviaments[" + index + "].titular.nom']").val("");
+// 			}
 
 
 		});
@@ -1185,8 +1185,8 @@
 		<div class="form-group"> \
 			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
 			<div class="col-xs-12"> \
-				<div class="input-group" id="$searchOrgan#num_enviament#" onclick="obrirModalOrganismes(#num_enviament#)"> \
-					<input id="searchOrgan#num_enviament#" class="form-control " type="text" value=""> \
+				<div class="input-group" id="$searchOrgan#num_enviament##num_destinatari#" onclick="obrirModalOrganismesDestinatari(#num_enviament#,#num_destinatari#)"> \
+					<input id="searchOrgan#num_enviament##num_destinatari#" class="form-control " type="text" value=""> \
 					<span class="input-group-addon habilitat">  \
 						<a><span class="fa fa-search"></span></a> \
 					</span> \
@@ -1282,6 +1282,11 @@
 				}
 			});
 			enviamentForm.find('#entregaPostal').removeClass('entregaPostal_' + num).addClass('entregaPostal_' + numPlus);
+			var searchOrgan = enviamentForm.find('#searchOrganTit' + number);
+			searchOrgan.attr("id", "searchOrganTit" + numPlus);
+			searchOrgan[0].onclick = null;
+			searchOrgan.click(function() { obrirModalOrganismes('Tit-' + numPlus); });
+			
 			//select
 			$(enviamentForm).find("span.select2").remove();
 			$(enviamentForm).find('p').remove();
@@ -1505,23 +1510,34 @@
 
 
 	function obrirModalOrganismes(index){
-		var from = index.split('-')[0];
+		var from = index;
+		if (index.includes('-'))
+			from = index.split('-')[0];
 
 		$("#organismesModal").modal();
-// 	$("#indexTitular").val(index);
-		$("#titular").val(index);
-		var j = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
-// 	var selOrganismes = $('#selOrganismes');
+		
+		var indexEnviament;
+		var indexDestinatari;
+		// Titular
+		if (from == "Tit") {
+			$("#titular").val(index);
+			indexEnviament = index.split('-')[1];
+		} else {
+		// Destinatario
+			$("#titular").val(index);
+			indexEnviament = index.split('-')[0];
+			indexDestinatari = index.split('-')[1];
+		}
+		
 		webutilModalAdjustHeight();
-// 	selOrganismes.append("<option value=\"\"></option>");
 
 		loadNivellsAdministracions($("#o_nivellAdmin").val());
 		loadComunitatsAutonomes($("#o_comunitat").val());
 
 		if(from == 'Tit'){
-			dir3CodiDesc =  document.getElementById("searchOrganTit" + j ).getElementsByTagName('input')[0];
+			dir3CodiDesc =  document.getElementById("searchOrganTit" + indexEnviament ).getElementsByTagName('input')[0];
 		}else{
-			dir3CodiDesc =  document.getElementById("searchOrgan" + j );
+			dir3CodiDesc =  document.getElementById("searchOrgan" + indexEnviament + indexDestinatari );
 		}
 
 		if(dir3CodiDesc.value == '' || dir3CodiDesc.value == null){
@@ -1532,8 +1548,12 @@
 
 		$(".loading-screen").hide();
 		loadOrganigrama();
-
-
+		
+	}
+	
+	function obrirModalOrganismesDestinatari(indexEnviament, indexDestinatari) {
+		let index = indexEnviament + "-" + indexDestinatari;
+		obrirModalOrganismes(index);
 	}
 
 	// function searchCodiChange(text){
@@ -1793,9 +1813,9 @@
 				raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
 				dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
 			}else{
-				dir3Codi = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].dir3Codi");
-				raoSocial = document.getElementById("enviaments[" + index + "].destinataris[" + index + "].nom");
-				dir3CodiDesc =  document.getElementById("searchOrgan" + index);
+				dir3Codi = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].dir3Codi");
+				raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nom");
+				dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
 			}
 
 			dir3Codi.value = codi;
