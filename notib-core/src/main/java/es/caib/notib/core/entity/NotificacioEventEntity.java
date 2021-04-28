@@ -15,7 +15,9 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Classe del model de dades que representa un event
@@ -90,12 +92,14 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	}
 	public void updateCallbackClient(
 			CallbackEstatEnumDto estat,
-			Date data,
 			Integer intents,
-			String error) {
-		this.callbackEstat = estat;
-		this.callbackData = data;
+			String error,
+			int reintentsPeriode) {
 		this.callbackIntents = intents;
+		this.callbackEstat = estat;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.SECOND, (int) ((reintentsPeriode/1000)*Math.pow(3, callbackIntents)));
+		this.callbackData = cal.getTime();
 		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH);
 	}
 	

@@ -1,17 +1,18 @@
-/**
- * 
- */
 package es.caib.notib.core.api.dto;
 
-import java.util.Date;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.util.Date;
 
 /**
  * Informació d'un event associat a una notificació.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class NotificacioEventDto extends AuditoriaDto {
 
 	private Long id;
@@ -20,54 +21,18 @@ public class NotificacioEventDto extends AuditoriaDto {
 	private String descripcio;
 	private boolean error;
 	private String errorDescripcio;
+	private CallbackEstatEnumDto callbackEstat;
+	private String callbackError;
+	private Integer callbackIntents;
 
 	private NotificacioEventEnviamentDto enviament;
 
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public NotificacioEventTipusEnumDto getTipus() {
-		return tipus;
-	}
-	public void setTipus(NotificacioEventTipusEnumDto tipus) {
-		this.tipus = tipus;
-	}
-	public Date getData() {
-		return data;
-	}
-	public void setData(Date data) {
-		this.data = data;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public boolean isError() {
-		return error;
-	}
-	public void setError(boolean error) {
-		this.error = error;
-	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
-	}
-	public void setErrorDescripcio(String errorDescripcio) {
-		this.errorDescripcio = errorDescripcio;
-	}
-	public NotificacioEventEnviamentDto getEnviament() {
-		return enviament;
-	}
-	public void setEnviament(NotificacioEventEnviamentDto enviament) {
-		this.enviament = enviament;
-	}
-
 	public boolean isEnviamentAssociat() {
 		return enviament != null;
+	}
+
+	public String getCallbackError(){
+		return callbackError !=null ? callbackError : "";
 	}
 
 	@Override
