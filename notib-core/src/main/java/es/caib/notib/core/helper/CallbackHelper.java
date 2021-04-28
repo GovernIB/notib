@@ -65,6 +65,8 @@ public class CallbackHelper {
 		if (event == null)
 			throw new NotFoundException("eventId:" + eventId, NotificacioEventEntity.class);
 		NotificacioEntity notificacio = event.getNotificacio();
+		info.getParams().add(new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
+
 		int intents = event.getCallbackIntents() + 1;
 		log.debug(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
 				intents, eventId, notificacio.getId()));
@@ -140,8 +142,8 @@ public class CallbackHelper {
 		
 		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		if (aplicacio == null)
-			throw new NotFoundException(String.format("codi usuari: %s, EntitatId: %d", usuari.getCodi(),
-					enviament.getNotificacio().getEntitat().getId()), AplicacioEntity.class);
+			throw new Exception(String.format("No s'ha trobat l'aplicació: codi usuari: %s, EntitatId: %d", usuari.getCodi(),
+					enviament.getNotificacio().getEntitat().getId()));
 		if (aplicacio.getCallbackUrl() == null)
 			throw new Exception("La aplicació " + aplicacio.getUsuariCodi() + " no té cap url de callback configurada");
 		if (!aplicacio.isActiva())
@@ -209,6 +211,7 @@ public class CallbackHelper {
 	private int getIntentsPeriodeProperty() {
 		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.callback.pendents.periode", 30000);
 	}
+
 	private Client getClient(AplicacioEntity aplicacio) {
 		Client jerseyClient =  new Client();
 		// Només per depurar la sortida, esborrar o comentar-ho:
