@@ -47,7 +47,7 @@ public class OrganGestorItemTest extends DatabaseItemTest<OrganGestorDto>{
                 object.getId());
     }
 
-    @Override
+//    @Override
     public OrganGestorDto getRandomInstance() {
         List<PermisDto> permisosOrgan = new ArrayList<PermisDto>();
         OrganGestorDto organGestorCreate = new OrganGestorDto();

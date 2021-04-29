@@ -3,19 +3,15 @@
  */
 package es.caib.notib.core.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import es.caib.notib.core.audit.NotibAuditable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
+import javax.persistence.*;
 
 /**
  * Classe del model de dades que representa una aplicació amb
@@ -23,7 +19,10 @@ import lombok.Getter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="not_aplicacio")
 @EntityListeners(AuditingEntityListener.class)
@@ -52,7 +51,7 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 			boolean activa) {
 		this.activa = activa;
 	}
-	
+
 	public static Builder getBuilder(
 			EntitatEntity entitat,
 			String codi,

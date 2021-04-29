@@ -1139,7 +1139,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Notificant canvi al client...");
-			NotificacioEntity notificacio = callbackHelper.notifica(eventId); 
+			// Recupera l'event
+			NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+			NotificacioEntity notificacio = callbackHelper.notifica(event);
 			return (notificacio != null && !notificacio.isErrorLastCallback());
 		} finally {
 			metricsHelper.fiMetrica(timer);
