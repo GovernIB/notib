@@ -50,7 +50,6 @@ public class CallbackHelperTest {
         Mockito.when(entitatMock.getId()).thenReturn(2L);
 
         aplicacio = AplicacioEntity.builder()
-                .entitat(null)
                 .usuariCodi("")
                 .callbackUrl("")
                 .activa(true)

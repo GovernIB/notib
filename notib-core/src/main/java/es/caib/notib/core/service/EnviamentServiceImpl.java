@@ -1228,10 +1228,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Transactional
 	@Override
-	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
+	public NotificacioEnviamentDtoV2 getOne(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(entitatId), NotificacioEnviamentDtoV2.class);
+			return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(enviamentId), NotificacioEnviamentDtoV2.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

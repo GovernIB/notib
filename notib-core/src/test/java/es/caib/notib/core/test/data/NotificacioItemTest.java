@@ -33,12 +33,9 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 
     @Override
     public NotificacioDatabaseDto create(NotificacioDatabaseDto element, Long entitatId) throws Exception{
-        NotificacioDatabaseDto item = (NotificacioDatabaseDto) element;
-        authenticationTest.autenticarUsuari("admin");
-        NotificacioDatabaseDto entitatCreada = notificacioService.create(
+        return notificacioService.create(
                 entitatId,
-                item);
-        return entitatCreada;
+                element);
     }
 
     @Override
