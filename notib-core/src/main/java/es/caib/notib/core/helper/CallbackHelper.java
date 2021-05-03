@@ -194,6 +194,7 @@ public class CallbackHelper {
 				getEventsIntentsMaxProperty(),
 				"Error fatal: " + errorDescripcio + "\n" + longErrorMessage,
 				getIntentsPeriodeProperty());
+		log.debug(String.format("[Callback] Event [Id: %d] eliminat de la coa d'events per error fatal. Error: %s", eventId, errorDescripcio));
 	}
 
 	private boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
