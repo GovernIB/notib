@@ -65,7 +65,7 @@ public class CallbackHelper {
 		if (event == null)
 			throw new NotFoundException("eventId:" + eventId, NotificacioEventEntity.class);
 		NotificacioEntity notificacio = event.getNotificacio();
-		info.getParams().add(new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
+//		info.getParams().add(new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
 
 		int intents = event.getCallbackIntents() + 1;
 		log.debug(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
