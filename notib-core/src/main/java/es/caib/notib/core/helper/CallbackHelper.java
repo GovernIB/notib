@@ -54,7 +54,7 @@ public class CallbackHelper {
 				new AccioParam("Identificador de l'event", String.valueOf(event.getId())));
 
 		NotificacioEntity notificacio = event.getNotificacio();
-		info.getParams().add(new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
+//		info.getParams().add(new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())));
 
 		int intents = event.getCallbackIntents() + 1;
 		log.debug(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
@@ -161,6 +161,17 @@ public class CallbackHelper {
 		}
 
 		return response.getEntity(String.class);
+	}
+
+	@Transactional
+	public void marcarEventNoProcessable(Long eventId, String errorDescripcio, String longErrorMessage){
+		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+		event.updateCallbackClient(
+				CallbackEstatEnumDto.ERROR,
+				getEventsIntentsMaxProperty(),
+				"Error fatal: " + errorDescripcio + "\n" + longErrorMessage,
+				getIntentsPeriodeProperty());
+		log.debug(String.format("[Callback] Event [Id: %d] eliminat de la coa d'events per error fatal. Error: %s", eventId, errorDescripcio));
 	}
 
 	private boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
