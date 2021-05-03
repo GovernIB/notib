@@ -164,14 +164,15 @@ public class CallbackHelper {
 	}
 
 	@Transactional
-	public void marcarEventNoProcessable(Long eventId, String errorDescripcio, String longErrorMessage){
-		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+	public void marcarEventNoProcessable(@NonNull NotificacioEventEntity event,
+										 String errorDescripcio,
+										 String longErrorMessage){
 		event.updateCallbackClient(
 				CallbackEstatEnumDto.ERROR,
 				getEventsIntentsMaxProperty(),
 				"Error fatal: " + errorDescripcio + "\n" + longErrorMessage,
 				getIntentsPeriodeProperty());
-		log.debug(String.format("[Callback] Event [Id: %d] eliminat de la coa d'events per error fatal. Error: %s", eventId, errorDescripcio));
+		log.debug(String.format("[Callback] Event [Id: %d] eliminat de la coa d'events per error fatal. Error: %s", event.getId(), errorDescripcio));
 	}
 
 	private boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {

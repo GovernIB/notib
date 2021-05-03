@@ -56,9 +56,8 @@ public class CallbackServiceImpl implements CallbackService {
 					int errors = 0;
 					for (Long pendentId: pendentsIds) {
 						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + pendentId);
+						NotificacioEventEntity event = notificacioEventRepository.findOne(pendentId);
 						try {
-							// Recupera l'event
-							NotificacioEventEntity event = notificacioEventRepository.findOne(pendentId);
 							NotificacioEntity notificacioProcessada = callbackHelper.notifica(event);
 							if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
 								errors++;
@@ -68,7 +67,7 @@ public class CallbackServiceImpl implements CallbackService {
 							e.printStackTrace();
 
 							// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
-							callbackHelper.marcarEventNoProcessable(pendentId,
+							callbackHelper.marcarEventNoProcessable(event,
 									e.getMessage(),
 									ExceptionUtils.getStackTrace(e));
 						}
