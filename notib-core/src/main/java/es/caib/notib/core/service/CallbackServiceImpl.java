@@ -7,6 +7,7 @@ import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,12 @@ public class CallbackServiceImpl implements CallbackService {
 							}
 						}catch (Exception e) {
 							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId), e);
+							e.printStackTrace();
+
+							// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
+							callbackHelper.marcarEventNoProcessable(pendentId,
+									e.getMessage(),
+									ExceptionUtils.getStackTrace(e));
 						}
 					}
 					logger.debug("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");

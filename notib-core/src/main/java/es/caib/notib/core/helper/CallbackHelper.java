@@ -185,7 +185,17 @@ public class CallbackHelper {
 
 		return response.getEntity(String.class);
 	}
-	
+
+	@Transactional
+	public void marcarEventNoProcessable(Long eventId, String errorDescripcio, String longErrorMessage){
+		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+		event.updateCallbackClient(
+				CallbackEstatEnumDto.ERROR,
+				getEventsIntentsMaxProperty(),
+				"Error fatal: " + errorDescripcio + "\n" + longErrorMessage,
+				getIntentsPeriodeProperty());
+	}
+
 	private boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
 		boolean estatsEnviamentsFinals = true;
 		if (notificacio != null) {
