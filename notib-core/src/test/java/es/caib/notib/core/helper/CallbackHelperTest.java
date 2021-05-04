@@ -1,6 +1,5 @@
 package es.caib.notib.core.helper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.Statuses;
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
@@ -79,7 +78,7 @@ public class CallbackHelperTest {
     }
 
     @Test
-    public void whenNotificaACallbackInactiu_ThenCallBackEstatIsPROCESSAT() {
+    public void whenNotificaACallbackInactiu_ThenCallBackEstatIsPROCESSAT() throws Exception {
         // Given
         aplicacio.updateActiva(false);
 
@@ -105,7 +104,7 @@ public class CallbackHelperTest {
     }
 
     @Test
-    public void whenNotificaCorrecte_ThenCallBackEstatIsNOTIFICAT() {
+    public void whenNotificaCorrecte_ThenCallBackEstatIsNOTIFICAT() throws Exception {
         // Given
         NotificacioEventEntity event = NotificacioEventEntity.builder()
                 .callbackIntents(0)
@@ -130,7 +129,7 @@ public class CallbackHelperTest {
     }
 
     @Test
-    public void whenNotificaTipusEventIncorrecte_ThenCallBackEstatIsERROR() {
+    public void whenNotificaTipusEventIncorrecte_ThenCallBackEstatIsERROR() throws Exception {
         // Given
         NotificacioEventEntity event = NotificacioEventEntity.builder()
                 .callbackIntents(0)
@@ -154,7 +153,7 @@ public class CallbackHelperTest {
     }
 
     @Test
-    public void whenNotificaRaiseExceptionAndIntentsPendents_ThenCallBackEstatIsPENDENT() throws JsonProcessingException {
+    public void whenNotificaRaiseExceptionAndIntentsPendents_ThenCallBackEstatIsPENDENT() throws Exception {
         // Given
         ClientResponse responseMock = Mockito.mock(ClientResponse.class);
         Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(404, "Not found"));
@@ -184,7 +183,7 @@ public class CallbackHelperTest {
     }
 
     @Test
-    public void whenNotificaRaiseExceptionAndIsLastIntent_ThenCallBackEstatIsERROR() throws JsonProcessingException {
+    public void whenNotificaRaiseExceptionAndIsLastIntent_ThenCallBackEstatIsERROR() throws Exception {
         // Given
         ClientResponse responseMock = Mockito.mock(ClientResponse.class);
         Mockito.when(responseMock.getStatusInfo()).thenReturn(Statuses.from(404, "Not found"));

@@ -45,7 +45,7 @@ public class CallbackHelper {
 	private RequestsHelper requestsHelper;
 
 	@Transactional (rollbackFor = RuntimeException.class)
-	public NotificacioEntity notifica(@NonNull NotificacioEventEntity event) {
+	public NotificacioEntity notifica(@NonNull NotificacioEventEntity event) throws Exception{
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_CLIENT, 
@@ -167,6 +167,8 @@ public class CallbackHelper {
 	public void marcarEventNoProcessable(@NonNull NotificacioEventEntity event,
 										 String errorDescripcio,
 										 String longErrorMessage){
+		errorDescripcio = errorDescripcio == null ? "" : errorDescripcio;
+		longErrorMessage = longErrorMessage == null ? "" : longErrorMessage;
 		event.updateCallbackClient(
 				CallbackEstatEnumDto.ERROR,
 				getEventsIntentsMaxProperty(),

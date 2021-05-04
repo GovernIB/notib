@@ -16,8 +16,6 @@ import es.caib.notib.core.service.BaseServiceTestV2;
 import es.caib.notib.core.test.data.EntitatItemTest;
 import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.core.test.data.ProcedimentItemTest;
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.registre.RegistrePluginException;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -103,7 +100,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
     }
 
     @Test
-    public void whenNotificaCorrecte_thenEstatIsNotifica() throws IOException, RegistrePluginException, SistemaExternException {
+    public void whenNotificaCorrecte_thenEstatIsNotifica() throws Exception {
         // Given
         NotificacioDatabaseDto notificacioDto = (NotificacioDatabaseDto) database.get("notificacio");
         NotificacioEnviamentDtoV2 enviamentDto = notificacioDto.getEnviaments().get(0);
@@ -140,7 +137,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
     }
 
     @Test
-    public void whenCallbackResponse404_thenAddCallbackErrorEvent() throws IOException, RegistrePluginException, SistemaExternException {
+    public void whenCallbackResponse404_thenAddCallbackErrorEvent() throws Exception {
         // Given
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notificaCanvi"))
                 .willReturn(WireMock.aResponse()

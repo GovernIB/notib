@@ -13,6 +13,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1141,8 +1142,20 @@ public class EnviamentServiceImpl implements EnviamentService {
 			logger.info("Notificant canvi al client...");
 			// Recupera l'event
 			NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
-			NotificacioEntity notificacio = callbackHelper.notifica(event);
-			return (notificacio != null && !notificacio.isErrorLastCallback());
+			try {
+				NotificacioEntity notificacio = callbackHelper.notifica(event);
+				return (notificacio != null && !notificacio.isErrorLastCallback());
+			}catch (Exception e) {
+				logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", event.getId()), e);
+				e.printStackTrace();
+
+				// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
+				callbackHelper.marcarEventNoProcessable(event,
+						e.getMessage(),
+						ExceptionUtils.getStackTrace(e));
+				return false;
+			}
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
