@@ -18,7 +18,7 @@ public abstract class DatabaseItemTest<T> {
 
     public abstract T create (T element, Long entitatId) throws Exception;
     public abstract void delete(Long entitatId, T object) throws Exception;
-    public abstract T getRandomInstance();
+//    public abstract T getRandomInstance();
 
     public void addRelated(String key, String elementKey, DatabaseItemTest<?> container){
         if(!relatedObjects.containsKey(key)) {

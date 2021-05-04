@@ -1,21 +1,16 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -23,94 +18,250 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.plugins.arxiu.api.ContingutOrigen;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.DocumentTipus;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioServiceTest {
 
-    @Mock
-    private EntityComprovarHelper entityComprovarHelper;
-    @Mock
-    private ConversioTipusHelper conversioTipusHelper;
-    @Mock
-    private PaginacioHelper paginacioHelper;
-    @Mock
-    private NotificaHelper notificaHelper;
-    @Mock
-    private PluginHelper pluginHelper;
-    @Mock
-    private NotificacioRepository notificacioRepository;
-    @Mock
-    private NotificacioEnviamentRepository notificacioEnviamentRepository;
-    @Mock
-    private NotificacioEventRepository notificacioEventRepository;
-    @Mock
-    private NotificacioTableViewRepository notificacioTableViewRepository;
-    @Mock
-    private EntitatRepository entitatRepository;
-    @Mock
-    private DocumentRepository documentRepository;
-    @Mock
-    private PersonaRepository personaRepository;
-    @Mock
-    private ProcedimentRepository procedimentRepository;
-    @Mock
-    private OrganGestorRepository organGestorRepository;
-    @Mock
-    private EmailHelper emailHelper;
-    @Mock
-    private UsuariHelper usuariHelper;
-    @Mock
-    private RegistreNotificaHelper registreNotificaHelper;
-    @Mock
-    private OrganigramaHelper organigramaHelper;
-    @Mock
-    private RegistreHelper registreHelper;
-    @Mock
-    private AuditNotificacioHelper auditNotificacioHelper;
-    @Mock
-    private AuditEnviamentHelper auditEnviamentHelper;
-    @Mock
-    private AplicacioService aplicacioService;
-    @Mock
-    private CacheHelper cacheHelper;
-    @Mock
-    private MetricsHelper metricsHelper;
-    @Mock
-    private JustificantHelper justificantHelper;
-    @Mock
-    private MessageHelper messageHelper;
-    @Mock
-    private NotificacioHelper notificacioHelper;
-    @Mock
-    private IntegracioHelper integracioHelper;
-    @Mock
-    private ProcedimentService procedimentService;
-    @Mock
-    private NotificacioTableHelper notificacioTableHelper;
+	@Mock
+	private PluginHelper pluginHelper;
+	
+	@InjectMocks
+	NotificacioService notificacioService = new NotificacioServiceImpl();
+	
+	@Before
+	public void setUp() {
+		System.setProperty("es.caib.notib.document.consulta.id.csv.mida.min", "16");
+	}
+	
+	//Test consultaDocumentIMetadades para Uuid docu existent y metadades existents
+	@Test
+	public void whenConsultaDocumentIMetadades_uuid_withDocuAndMetadades_thenReturn() {
+		
+		// Given	
+		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
+		Boolean esUuid = Boolean.TRUE;
+		
+		Document documentArxiu = initDocument(identificador);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+				
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);
+			
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNotNull(document.getOrigen());
+		assertNotNull(document.getValidesa());
+		assertNotNull(document.getTipoDocumental());
+		assertNotNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		comprobarMetadadesCoinciden(documentArxiu, document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid); 
+	}
+	
+	//Test consultaDocumentIMetadades para CSV docu existent y metadades existents
+	@Test
+	public void whenConsultaDocumentIMetadades_csv_withDocuAndMetadades_thenReturn() {
+		
+		// Given	
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean esUuid = Boolean.FALSE;
+		
+		Document documentArxiu = initDocument(identificador);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+			
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);		
+		
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNotNull(document.getOrigen());
+		assertNotNull(document.getValidesa());
+		assertNotNull(document.getTipoDocumental());
+		assertNotNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		comprobarMetadadesCoinciden(documentArxiu, document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+		
+	}
+	
+	//Test consultaDocumentIMetadades para Uuid docu existent y metadades inexistents
+	@Test
+	public void whenConsultaDocumentIMetadades_uuid_withDocuWithoutMetadades_thenReturn() {
+		
+		// Given	
+		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
+		Boolean esUuid = Boolean.TRUE;
+		
+		Document documentArxiu = initDocument(identificador);
+		documentArxiu.setMetadades(null);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+				
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);
+			
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNull(document.getOrigen());
+		assertNull(document.getValidesa());
+		assertNull(document.getTipoDocumental());
+		assertNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid); 
+		
+	}
+	//Test consultaDocumentIMetadades para CSV docu existent y metadades inexistents
+	@Test
+	public void whenConsultaDocumentIMetadades_csv_withDocuWithoutMetadades_thenReturn() {
+		
+		// Given	
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean esUuid = Boolean.FALSE;
+		
+		Document documentArxiu = initDocument(identificador);
+		documentArxiu.setMetadades(null);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+		
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);		
+		
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNull(document.getOrigen());
+		assertNull(document.getValidesa());
+		assertNull(document.getTipoDocumental());
+		assertNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+	}
+	//Test consultaDocumentIMetadades para Uuid docu inexistent
+	@Test(expected = Exception.class)
+	public void whenConsultaDocumentIMetadades_uuid_withoutDocument_thenException() {
+		
+		// Given	
+		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
+		Boolean esUuid = Boolean.TRUE;
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenThrow(Exception.class);
 
-    @InjectMocks
-    private NotificacioService notificacioService = new NotificacioServiceImpl();
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);
+		
+		// Then
+		assertNull(document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+	}
+	//Test consultaDocumentIMetadades para CSV docu inexistent
+	@Test(expected = Exception.class)
+	public void whenConsultaDocumentIMetadades_csv_withoutDocument_thenException() {
+		
+		// Given	
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean esUuid = Boolean.FALSE;
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false))).thenThrow(Exception.class);
 
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);		
+		
+		// Then
+		assertNull(document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+	}	
+	private Document initDocument(String identificador) {
+		Document documentArxiu = new Document();
+		
+		DocumentContingut contingut = new DocumentContingut();
+		contingut.setArxiuNom("arxiu.pdf");
+		contingut.setTipusMime("application/pdf");
+		contingut.setContingut("/es/caib/notib/core/arxiu.pdf".getBytes());
+//		try {
+//			byte[] arxiuBytes = IOUtils.toByteArray(getClass().getResourceAsStream(
+//					"/es/caib/notib/core/notificacio_adjunt.pdf"));		
+//			contingut.setContingut(arxiuBytes);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		contingut.setTamany(contingut.getContingut().length);
+		documentArxiu.setContingut(contingut);
+		
+		documentArxiu.setEstat(DocumentEstat.DEFINITIU);
+		documentArxiu.setFirmes(null);
+		documentArxiu.setIdentificador(identificador);
+		
+		DocumentMetadades metadades = new DocumentMetadades();
+		metadades.setOrigen(ContingutOrigen.ADMINISTRACIO);
+		metadades.setEstatElaboracio(DocumentEstatElaboracio.ORIGINAL);
+		metadades.setTipusDocumental(DocumentTipus.INFORME);
+		documentArxiu.setMetadades(metadades);
+		
+		documentArxiu.setNom("Nombre Document Arxiu");
+		documentArxiu.setVersio("Version");
 
-    @Test
-    public void whenFindById_thenReturn() throws RegistreNotificaException {
-
-        // Given
-        NotificacioEntity notificaioEntity = new NotificacioEntity();
-
-        when(metricsHelper.iniciMetrica()).thenReturn(null);
-        when(notificacioRepository.findById(anyLong())).thenReturn(notificaioEntity);
-
-        // When
-        NotificacioDtoV2 notificacioDtoV2 = notificacioService.findAmbId(
-                1L,
-                true
-        );
-
-        // Then
-        Mockito.verify(notificacioRepository).findById(
-                anyLong());
-    }
+		return documentArxiu;
+	}
+	
+	private void comprobarMetadadesCoinciden(Document documentArxiu, DocumentDto document) {
+		assertEquals("El origen no coincide", OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()), document.getOrigen());
+		assertEquals("Validesa no coincide", ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())), document.getValidesa());
+		assertEquals("El tipo documental no coincide", TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()), document.getTipoDocumental());
+		assertEquals("El modo firma no coincide", pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE, document.getModoFirma());
+	}
+	
+	@Test
+	public void whenValidarIdCsv_valid_thenReturnTrue() {
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean validaIdCsv = notificacioService.validarIdCsv(identificador);
+		assertTrue(validaIdCsv);
+	}
+	
+	@Test
+	public void whenValidarIdCsv_noValid_thenReturnFalse() {
+		String identificador = "54a27c163550ef2";
+		Boolean validaIdCsv = notificacioService.validarIdCsv(identificador);
+		assertFalse(validaIdCsv);
+	}
+	
+	@After
+	public void tearDown() {
+		Mockito.reset(pluginHelper);
+	}
 }

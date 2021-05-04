@@ -280,7 +280,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateNotificaNouEnviament(int reintentsPeriodeNotifica) {
 		this.notificaEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.MILLISECOND, reintentsPeriodeNotifica*(2^notificaEnviamentIntent));
+		cal.add(Calendar.SECOND, (int) ((reintentsPeriodeNotifica/1000)*Math.pow(2, notificaEnviamentIntent)));
 		this.notificaEnviamentData = cal.getTime();
 	}
 	
@@ -291,7 +291,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateRegistreNouEnviament(int reintentsPeriodeRegistre) {
 		this.registreEnviamentIntent++;
 		Calendar cal = GregorianCalendar.getInstance();
-		cal.add(Calendar.MILLISECOND, reintentsPeriodeRegistre*(2^registreEnviamentIntent));
+		cal.add(Calendar.SECOND, (int) ((reintentsPeriodeRegistre/1000)*Math.pow(2, registreEnviamentIntent)));
 		this.registreData = cal.getTime();
 	}
 	

@@ -28,6 +28,12 @@
 			<version>2.21.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>2.27.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 		    <groupId>com.sun.jersey</groupId>
 		    <artifactId>jersey-client</artifactId>
 		    <version>1.19.3</version>

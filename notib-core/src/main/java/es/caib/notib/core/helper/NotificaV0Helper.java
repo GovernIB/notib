@@ -26,9 +26,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 /**
  * Helper MOCK de prova.
@@ -42,6 +40,8 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
@@ -82,30 +82,19 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				logger.info(" >>> ... OK");
+
+				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
+
 				//Crea un nou event
-				NotificacioEventEntity.BuilderOld eventBulider = NotificacioEventEntity.getBuilder(
-						NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-						notificacio);
-				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					eventBulider.callbackInicialitza();
-				
-				NotificacioEventEntity event = eventBulider.build();
-				
+				Map<NotificacioEnviamentEntity, String> identificadorsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							enviament.updateNotificaEnviada(
-									resultadoEnvio.getIdentificador());
-							
-							//Registrar event per enviament
-							auditNotificacioHelper.updateNotificacioEnviada(notificacio);
-							logger.info(" >>> Canvi estat a ENVIADA ");
-							eventBulider.enviament(enviament);
-							notificacio.updateEventAfegir(event);
-							notificacioEventRepository.save(event);
+							identificadorsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
 				}
+				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsEnviaments);
 			} else {
 				logger.info(" >>> ... ERROR");
 				//Crea un nou event

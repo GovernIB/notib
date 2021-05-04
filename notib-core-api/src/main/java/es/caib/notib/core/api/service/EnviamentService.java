@@ -172,16 +172,8 @@ public interface EnviamentService {
 			Long entitatId,
 			UsuariDto usuari);
 	
-	/**
-	 * Obté les columnes visibles per un usuari i entitat
-	 * 
-	 * @param columnes
-	 *            Attribut amb les columnes a visualitzar.
-	 * @return columnes que s'han de visualitzar.
-	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public NotificacioEnviamentDtoV2 getOne(
-			Long entitatId);
+	NotificacioEnviamentDtoV2 getOne(Long enviamentId);
 
 	/**
 	 * Obté les el justificant del registre.
@@ -228,4 +220,13 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	void actualitzarEstat(Long enviamentId);
+
+	/**
+	 * Activa un event de callback de l'enviament indicat
+	 *
+	 * @param enviamentId
+	 *            id de l'enviament.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	void activarCallback(Long enviamentId);
 }

@@ -212,16 +212,38 @@ public class NotificacioCommandV2 {
 				}
 				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
 					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
+				
+				establecerCamposPersona(enviament.getTitular());
 
 				if (enviament.getDestinataris() != null) {
 					for (PersonaDto destinatari : enviament.getDestinataris()) {
 						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())
 							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+",""));
+						
+						establecerCamposPersona(destinatari);
+						destinatari.setIncapacitat(Boolean.FALSE);
 					}
 				}
 			}
 		}
 		return dto;
+	}
+	
+	private void establecerCamposPersona(PersonaDto persona) {
+		if (persona != null) {
+			if (InteressatTipusEnumDto.FISICA.equals(persona.getInteressatTipus())) {
+				persona.setDir3Codi(null);
+			} else if (InteressatTipusEnumDto.JURIDICA.equals(persona.getInteressatTipus())) {
+				persona.setDir3Codi(null);
+				persona.setLlinatge1(null);
+				persona.setLlinatge2(null);
+			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
+				persona.setIncapacitat(Boolean.FALSE);
+				persona.setNom(null);
+				persona.setLlinatge1(null);
+				persona.setLlinatge2(null);	
+			}
+		}
 	}
 	
 	public int getConcepteDefaultSize() {

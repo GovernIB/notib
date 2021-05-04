@@ -133,7 +133,7 @@ public class AuditEnviamentHelper {
 		enviament.refreshSirConsulta();
 		return enviament;
 	}
-	
+
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity updateEnviamentEnviat(
 			NotificacioEntity notificacio,
@@ -141,13 +141,13 @@ public class AuditEnviamentHelper {
 			String identificadorResultat,
 			NotificacioEnviamentEntity enviament) {
 		enviament.updateNotificaEnviada(identificadorResultat);
-		
+
 		//Registrar event per enviament
 		log.info(" >>> Canvi estat a ENVIADA ");
 		event.setEnviament(enviament);
 		notificacio.updateEventAfegir(event);
 		notificacioEventRepository.save(event);
-		
+
 		return enviament;
 	}
 	
@@ -159,6 +159,7 @@ public class AuditEnviamentHelper {
 		enviament.updateNotificaError(
 				notificaError, 
 				event);
+		notificacioEnviamentRepository.saveAndFlush(enviament);
 		return enviament;
 	}
 	

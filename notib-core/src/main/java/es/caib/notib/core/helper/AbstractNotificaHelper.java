@@ -89,7 +89,9 @@ public abstract class AbstractNotificaHelper {
 				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat);
+				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.DESCONEGUT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO.equals(notificaEstat);
 		enviament.updateNotificaDatat(
 				notificaEstat,
 				notificaEstatData,
@@ -113,7 +115,7 @@ public abstract class AbstractNotificaHelper {
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
-			auditNotificacioHelper.updateEstatNotificacio(notificaEstat.name(), enviament.getNotificacio());
+			auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
 
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 //			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {

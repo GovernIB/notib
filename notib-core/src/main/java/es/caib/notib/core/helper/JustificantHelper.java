@@ -406,7 +406,7 @@ public class JustificantHelper {
 		
 	    Document justificant = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
 		PdfWriter writer = PdfWriter.getInstance(justificant, out);
-		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
+//		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
 		
 		writer.setPageEvent(headerEvent);
 		writer.setPageEvent(footerEvent);

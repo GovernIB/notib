@@ -1,5 +1,6 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -29,17 +30,22 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(
 			Long enviamentId);
 
+	long countByEnviamentIdAndCallbackEstat(
+			Long enviamentId,
+			CallbackEstatEnumDto callbackEstat);
+
 	@Modifying
 	@Query( " delete from " +
 			"	NotificacioEventEntity ne " +
 			" where " +
 			"		ne.notificacio = :notificacio " +
 			"	and (ne.error = true " +
-			"  		 or (ne.error = false " +
-			"		 	 and  ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
-			"								   es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
-			"								   es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO)" +
-			")) "
+			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO)" +
+			"			)" +
+			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+			") "
 	)
 	void deleteOldUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
 
@@ -60,7 +66,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 		   "  from NotificacioEventEntity ne " +
 	       " where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
 	       " order by ne.callbackData asc nulls first, data asc")
-	List<Long> findEventsPendentsIds(Pageable page);
+	List<Long> findEventsAmbCallbackPendentIds(Pageable page);
 
 	@Query("select ne " + 
 			   "  from NotificacioEventEntity ne " +

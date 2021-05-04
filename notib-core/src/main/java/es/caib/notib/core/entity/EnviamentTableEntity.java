@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;

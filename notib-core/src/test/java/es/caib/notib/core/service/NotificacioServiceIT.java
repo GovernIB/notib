@@ -1,6 +1,9 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.EnviamentTableEntity;
@@ -11,6 +14,7 @@ import es.caib.notib.core.repository.EnviamentTableRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import es.caib.notib.core.test.data.ConfigTest;
+import es.caib.notib.core.test.data.EntitatItemTest;
 import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.core.test.data.ProcedimentItemTest;
 import es.caib.notib.plugin.SistemaExternException;
@@ -27,11 +31,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
@@ -60,36 +62,9 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 	@Before
 	public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
-//		configureMockUnitatsOrganitzativesPlugin();
-//		configureMockGestioDocumentalPlugin();
+		configureMockGestioDocumentalPlugin();
 
-		List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
-		entitatCreate = new EntitatDto();
-		entitatCreate.setCodi("LIMIT");
-		entitatCreate.setNom("Limit Tecnologies");
-		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-		entitatCreate.setDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
-		entitatCreate.setApiKey(ConfigTest.ENTITAT_DGTIC_KEY);
-		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
-		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-		entitatCreate.setTipusDocDefault(tipusDocDefault);
-		
-		PermisDto permisUsuari = new PermisDto();
-		PermisDto permisAdminEntitat = new PermisDto();
-		
-		permisUsuari.setUsuari(true);
-		permisUsuari.setTipus(TipusEnumDto.USUARI);
-		permisUsuari.setPrincipal("admin");
-		permisosEntitat.add(permisUsuari);
-		
-		permisAdminEntitat.setAdministradorEntitat(true);
-		permisAdminEntitat.setTipus(TipusEnumDto.USUARI);
-		permisAdminEntitat.setPrincipal("admin");
-		permisosEntitat.add(permisAdminEntitat);
-		entitatCreate.setPermisos(permisosEntitat);
+		entitatCreate = EntitatItemTest.getRandomInstance();
 
 //		organGestorCreate.setItemIdentifier("organGestor");
 
@@ -100,10 +75,6 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		notificacioCreate.addObject("notificacioError", notificacioCreate.getRandomInstance());
 		notificacioCreate.addRelated("notificacioError", "procediment", procedimentCreate);
-
-		System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
-
-
 
 	}
 	

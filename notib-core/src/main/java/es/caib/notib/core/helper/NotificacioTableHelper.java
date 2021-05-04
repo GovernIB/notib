@@ -53,6 +53,10 @@ public class NotificacioTableHelper {
 
     public void actualitzarRegistre(NotificacioEntity notificacio){
         NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
+        if (tableViewItem == null) {
+            this.crearRegistre(notificacio);
+            return;
+        }
 
         tableViewItem.setEntitat(notificacio.getEntitat());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());

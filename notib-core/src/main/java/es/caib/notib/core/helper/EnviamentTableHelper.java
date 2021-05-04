@@ -67,6 +67,11 @@ public class EnviamentTableHelper {
 
     public void actualitzarRegistre(NotificacioEnviamentEntity enviament){
         EnviamentTableEntity tableViewItem = enviamentTableRepository.findOne(enviament.getId());
+        if (tableViewItem == null) {
+            this.crearRegistre(enviament);
+            return;
+        }
+
         PersonaEntity titular = enviament.getTitular();
         NotificacioEntity notificacio = enviament.getNotificacio();
         DocumentEntity document = notificacio.getDocument();

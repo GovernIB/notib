@@ -13,6 +13,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private PersonaRepository personaRepository;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private NotificacioEventHelper notificacioEventHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -1137,8 +1140,22 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Notificant canvi al client...");
-			NotificacioEntity notificacio = callbackHelper.notifica(eventId); 
-			return (notificacio != null && !notificacio.isErrorLastCallback());
+			// Recupera l'event
+			NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+			try {
+				NotificacioEntity notificacio = callbackHelper.notifica(event);
+				return (notificacio != null && !notificacio.isErrorLastCallback());
+			}catch (Exception e) {
+				logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", event.getId()), e);
+				e.printStackTrace();
+
+				// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
+				callbackHelper.marcarEventNoProcessable(event,
+						e.getMessage(),
+						ExceptionUtils.getStackTrace(e));
+				return false;
+			}
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1224,10 +1241,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Transactional
 	@Override
-	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
+	public NotificacioEnviamentDtoV2 getOne(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(entitatId), NotificacioEnviamentDtoV2.class);
+			return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(enviamentId), NotificacioEnviamentDtoV2.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1378,6 +1395,25 @@ public class EnviamentServiceImpl implements EnviamentService {
 		// si l'enviament esta pendent de refrescar l'estat enviat SIR
 		if (enviament.isPendentRefrescarEstatRegistre())
 			notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+	}
+
+	@Transactional
+	@Override
+	public void activarCallback(Long enviamentId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId,
+				CallbackEstatEnumDto.PENDENT);
+		if (
+				enviament.getNotificacio().isTipusUsuariAplicacio() &&
+				numEventsCallbackPendent == 0
+		) {
+			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
+			notificacioEventHelper.addCallbackActivarEvent(enviament);
+		} else {
+			logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);

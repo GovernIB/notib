@@ -33,12 +33,9 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 
     @Override
     public NotificacioDatabaseDto create(NotificacioDatabaseDto element, Long entitatId) throws Exception{
-        NotificacioDatabaseDto item = (NotificacioDatabaseDto) element;
-        authenticationTest.autenticarUsuari("admin");
-        NotificacioDatabaseDto entitatCreada = notificacioService.create(
+        return notificacioService.create(
                 entitatId,
-                item);
-        return entitatCreada;
+                element);
     }
 
     @Override
@@ -58,7 +55,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         }
     }
 
-    public NotificacioDatabaseDto getRandomInstanceWithoutEnviaments() {
+    public static NotificacioDatabaseDto getRandomInstanceWithoutEnviaments() {
         String notificacioId = new Long(System.currentTimeMillis()).toString();
 
         DocumentDto document = new DocumentDto();
@@ -102,7 +99,8 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         notCreated.setDocument(document);
         return notCreated;
     }
-    public NotificacioDatabaseDto getRandomInstance() {
+
+    public static NotificacioDatabaseDto getRandomInstance() {
         NotificacioDatabaseDto notCreated = getRandomInstanceWithoutEnviaments();
         int numDestinataris = 2;
         List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
@@ -127,7 +125,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         return notCreated;
     }
 
-    public NotificacioEnviamentDtoV2 getRandomEnviament(int i){
+    public static NotificacioEnviamentDtoV2 getRandomEnviament(int i){
         NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
         PersonaDto titular = PersonaDto.builder()
                 .interessatTipus(InteressatTipusEnumDto.FISICA)
@@ -153,8 +151,8 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
         return enviament;
     }
-    private InputStream getContingutNotificacioAdjunt() {
-        return getClass().getResourceAsStream(
+    private static InputStream getContingutNotificacioAdjunt() {
+        return NotificacioItemTest.class.getResourceAsStream(
                 "/es/caib/notib/core/notificacio_adjunt.pdf");
     }
 }

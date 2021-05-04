@@ -51,7 +51,7 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
                 true);
     }
 
-    @Override
+//    @Override
     public ProcedimentDto getRandomInstance() {
         ProcedimentDto procedimentCreate = new ProcedimentDto();
         procedimentCreate.setCodi("216076");
