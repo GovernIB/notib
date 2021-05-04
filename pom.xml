@@ -30,6 +30,8 @@
 		<apache.poi.version>4.1.2</apache.poi.version>
 		<xdocreport.version>2.0.2</xdocreport.version>
 		<itext.pdf.version>5.4.3</itext.pdf.version>
+	  	<docker.image.prefix>280421</docker.image.prefix>
+		<docker.image.name>notib</docker.image.name>
 	</properties>
 	<modules>
 		<module>notib-client</module>
@@ -120,6 +122,7 @@
 				<version>2.2.0</version>
 			</plugin>
 		</plugins>
+		<finalName>notib</finalName>
 	</build>
 	<distributionManagement>
 		<repository>
