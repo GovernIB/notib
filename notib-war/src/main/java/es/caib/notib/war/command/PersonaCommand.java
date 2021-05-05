@@ -23,6 +23,7 @@ public class PersonaCommand {
 	private Long id;
 	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
+	@Size(max=255)
 	private String nom;
 	@Size(max=40)	
 	private String llinatge1;

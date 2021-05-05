@@ -63,7 +63,6 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 				break;
 			case JURIDICA:
 				valid = validarNom(persona, context, "notificacio.form.valid.juridica.rao");
-
 				if (persona.getNif() == null || persona.getNif().isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
