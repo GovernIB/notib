@@ -6,8 +6,8 @@
   <version>${revision}</version>
   <packaging>pom</packaging>
   <properties>
-		<revision>1.1.9.13</revision>
-		<version.date>2021.05.05 10:30h</version.date>
+		<revision>1.1.9.14</revision>
+		<version.date>2021.05.05 12:30h</version.date>
 		<github.global.server>github</github.global.server>
 		<spring.version>3.2.16.RELEASE</spring.version>
 		<spring-security.version>3.2.9.RELEASE</spring-security.version>
