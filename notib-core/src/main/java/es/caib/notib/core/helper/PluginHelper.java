@@ -1900,34 +1900,210 @@ public class PluginHelper {
 	}
 
 	
-	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
-		RegistreInteressatDto interessat = new RegistreInteressatDto();
-		interessat.setNom(persona.getNom());
-		interessat.setLlinatge1(persona.getLlinatge1());
-		interessat.setLlinatge2(persona.getLlinatge2());
-		interessat.setRaoSocial(persona.getRaoSocial());
-		interessat.setTelefon(persona.getTelefon());
-		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-			interessat.setDocumentNumero(persona.getDir3Codi());
-			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-		} else {
-			interessat.setDocumentNumero(persona.getNif());
-			if (isDocumentEstranger(persona.getNif()))
-				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-			else
-				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
+//	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
+//		RegistreInteressatDto interessat = new RegistreInteressatDto();
+//		interessat.setNom(persona.getNom());
+//		interessat.setLlinatge1(persona.getLlinatge1());
+//		interessat.setLlinatge2(persona.getLlinatge2());
+//		interessat.setRaoSocial(persona.getRaoSocial());
+//		interessat.setTelefon(persona.getTelefon());
+//		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+//			interessat.setDocumentNumero(persona.getDir3Codi());
+//			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
+//		} else {
+//			interessat.setDocumentNumero(persona.getNif());
+//			if (isDocumentEstranger(persona.getNif()))
+//				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+//			else
+//				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
+//		}
+//		return interessat;
+//	}
+	
+//	public InteresadoWsDto personaToInteresadoWs (PersonaEntity persona) {
+//		InteresadoWsDto interessat = new InteresadoWsDto();
+//		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
+//		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
+//		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+//			interessatDades.setDocumento(persona.getDir3Codi());
+//			interessatDades.setTipoDocumentoIdentificacion("O");
+//		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
+//			interessatDades.setDocumento(persona.getNif());
+//			if (isDocumentEstranger(persona.getNif()))
+//				interessatDades.setTipoDocumentoIdentificacion("E");
+//			else
+//				interessatDades.setTipoDocumentoIdentificacion("N");
+//		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
+//			interessatDades.setDocumento(persona.getNif());
+//			interessatDades.setTipoDocumentoIdentificacion("C");
+//		}
+//		interessatDades.setRazonSocial(persona.getNom());
+//		interessatDades.setNombre(persona.getNom());
+//		interessatDades.setApellido1(persona.getLlinatge1());
+//		interessatDades.setApellido2(persona.getLlinatge2());
+//		interessatDades.setCodigoDire("");
+//		interessatDades.setDireccion("");
+//		interessatDades.setCp("");
+//		interessatDades.setObservaciones("");
+//		interessatDades.setEmail(persona.getEmail());
+//		interessatDades.setDireccionElectronica(persona.getEmail());
+//		interessatDades.setTelefono(persona.getTelefon());
+//		interessat.setInteresado(interessatDades);
+//		return interessat;
+//	}
+	
+//	public DadesInteressat personaToDadesInteressatIRepresenat (
+//			NotificacioDtoV2 notificacio,
+//			PersonaDto titular,
+//			PersonaDto destinatari) {
+//		String dir3Codi;
+//
+//		if (notificacio.getEntitat().getDir3CodiReg() != null)
+//			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
+//		else
+//			dir3Codi = notificacio.getEmisorDir3Codi();
+//		DadesInteressat interessatRepresentat = new DadesInteressat();
+//		Interessat dadesRepresentat = null;
+//		Interessat dadesInteressat = new Interessat();
+//		if (titular != null && notificacio != null) {
+//			dadesInteressat.setNom(titular.getNom());
+//			dadesInteressat.setEntitatCodi(dir3Codi);
+//			dadesInteressat.setAutenticat(false);
+//			if (titular.getInteressatTipus() != null) {
+//				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
+//			}
+//			if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+//				dadesInteressat.setNif(titular.getDir3Codi());
+//				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
+//			} else if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
+//				dadesInteressat.setNom(titular.getRaoSocial());
+//				dadesInteressat.setNif(titular.getNif());
+//				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
+//			} else {
+//				dadesInteressat.setNif(titular.getNif());
+//				if (isDocumentEstranger(titular.getNif()))
+//					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+//				else
+//					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+//			}
+//			dadesInteressat.setCognom1(titular.getLlinatge1());
+//			dadesInteressat.setCognom2(titular.getLlinatge2());
+//			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
+//			dadesInteressat.setPaisCodi(null);
+//			dadesInteressat.setPaisNom(null);
+//			dadesInteressat.setProvinciaCodi(null);
+//			dadesInteressat.setProvinciaNom(null);
+//			dadesInteressat.setMunicipiCodi(null);
+//			dadesInteressat.setMunicipiNom(null);
+//		}
+//		interessatRepresentat.setInteressat(dadesInteressat);
+//
+//		if (destinatari != null && titular.isIncapacitat()) {
+//			dadesRepresentat = new Interessat();
+//			dadesRepresentat.setEntitatCodi(dir3Codi);
+//			dadesRepresentat.setAutenticat(false);
+//			if (destinatari.getInteressatTipus() != null) {
+//				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
+//			}
+//			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+//				dadesRepresentat.setNif(destinatari.getDir3Codi());
+//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
+//			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
+//				dadesRepresentat.setNif(destinatari.getNif());
+//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
+//			} else {
+//				dadesRepresentat.setNif(destinatari.getNif());
+//				if (isDocumentEstranger(titular.getNif()))
+//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+//				else
+//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+//			}
+//			dadesRepresentat.setNom(destinatari.getNom());
+//			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
+//			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
+//			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
+//			dadesRepresentat.setPaisCodi(null);
+//			dadesRepresentat.setPaisNom(null);
+//			dadesRepresentat.setProvinciaCodi(null);
+//			dadesRepresentat.setProvinciaNom(null);
+//			dadesRepresentat.setMunicipiCodi(null);
+//			dadesRepresentat.setMunicipiNom(null);
+//		}
+//		interessatRepresentat.setRepresentat(dadesRepresentat);
+//
+//		return interessatRepresentat;
+//	}
+	
+//	@SuppressWarnings("unused")
+//	private DadesRepresentat personaToDadesRepresentat (
+//			NotificacioDtoV2 notificacio,
+//			PersonaDto titular,
+//			PersonaDto destinatari) {
+//		String dir3Codi;
+//
+//		if (notificacio.getEntitat().getDir3CodiReg() != null)
+//			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
+//		else
+//			dir3Codi = notificacio.getEmisorDir3Codi();
+//
+//		DadesRepresentat dadesRepresentat = null;
+//		if (destinatari != null && titular.isIncapacitat()) {
+//			dadesRepresentat = new DadesRepresentat();
+//			dadesRepresentat.setEntitatCodi(dir3Codi);
+//			dadesRepresentat.setAutenticat(false);
+//			if (destinatari.getInteressatTipus() != null) {
+//				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
+//			}
+//			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+//				dadesRepresentat.setNif(destinatari.getDir3Codi());
+//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
+//			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
+//				dadesRepresentat.setNif(destinatari.getNif());
+//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
+//			} else {
+//				dadesRepresentat.setNif(destinatari.getNif());
+//				if (isDocumentEstranger(destinatari.getNif()))
+//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
+//				else
+//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
+//			}
+//			dadesRepresentat.setNom(destinatari.getNom());
+//			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
+//			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
+//			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
+//			dadesRepresentat.setPaisCodi(null);
+//			dadesRepresentat.setPaisNom(null);
+//			dadesRepresentat.setProvinciaCodi(null);
+//			dadesRepresentat.setProvinciaNom(null);
+//			dadesRepresentat.setMunicipiCodi(null);
+//			dadesRepresentat.setMunicipiNom(null);
+//		}
+//		return dadesRepresentat;
+//	}
+	
+	public InteresadoWsDto personaToRepresentanteEInteresadoWs (
+			PersonaEntity titular, 
+			PersonaEntity destinatari) {
+		InteresadoWsDto interessat = new InteresadoWsDto();
+		if(titular != null) {
+			DatosInteresadoWsDto interessatDades = persona2DatosInteresadoWsDto(titular);
+			interessat.setInteresado(interessatDades);
+		}
+		if(destinatari != null && titular != null && titular.isIncapacitat()) {
+			DatosInteresadoWsDto representantDades = persona2DatosInteresadoWsDto(destinatari);
+			interessat.setRepresentante(representantDades);	
 		}
 		return interessat;
 	}
-	
-	public InteresadoWsDto personaToInteresadoWs (PersonaEntity persona) {
-		InteresadoWsDto interessat = new InteresadoWsDto();
+
+	private DatosInteresadoWsDto persona2DatosInteresadoWsDto(PersonaEntity persona) {
 		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
+		if (persona.getInteressatTipus() != null)
+			interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
 		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 			interessatDades.setDocumento(persona.getDir3Codi());
 			interessatDades.setTipoDocumentoIdentificacion("O");
-		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
+		}  else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
 			interessatDades.setDocumento(persona.getNif());
 			if (isDocumentEstranger(persona.getNif()))
 				interessatDades.setTipoDocumentoIdentificacion("E");
@@ -1937,8 +2113,12 @@ public class PluginHelper {
 			interessatDades.setDocumento(persona.getNif());
 			interessatDades.setTipoDocumentoIdentificacion("C");
 		}
-		interessatDades.setRazonSocial(persona.getNom());
-		interessatDades.setNombre(persona.getNom());
+		String raoSocial = persona.getRaoSocial() == null || persona.getNom().length() <= 80 ?
+				persona.getRaoSocial() : persona.getRaoSocial().substring(0, 80);
+		String nom = persona.getNom() == null || persona.getNom().length() <= 30 ?
+				persona.getNom() : persona.getNom().substring(0, 30);
+		interessatDades.setRazonSocial(raoSocial);
+		interessatDades.setNombre(nom);
 		interessatDades.setApellido1(persona.getLlinatge1());
 		interessatDades.setApellido2(persona.getLlinatge2());
 		interessatDades.setCodigoDire("");
@@ -1948,204 +2128,9 @@ public class PluginHelper {
 		interessatDades.setEmail(persona.getEmail());
 		interessatDades.setDireccionElectronica(persona.getEmail());
 		interessatDades.setTelefono(persona.getTelefon());
-		interessat.setInteresado(interessatDades);
-		return interessat;
+		return interessatDades;
 	}
-	
-	public DadesInteressat personaToDadesInteressatIRepresenat (
-			NotificacioDtoV2 notificacio, 
-			PersonaDto titular,
-			PersonaDto destinatari) {
-		String dir3Codi;
 
-		if (notificacio.getEntitat().getDir3CodiReg() != null)
-			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-		else
-			dir3Codi = notificacio.getEmisorDir3Codi();
-		DadesInteressat interessatRepresentat = new DadesInteressat();
-		Interessat dadesRepresentat = null;
-		Interessat dadesInteressat = new Interessat();
-		if (titular != null && notificacio != null) {
-			dadesInteressat.setNom(titular.getNom());
-			dadesInteressat.setEntitatCodi(dir3Codi);
-			dadesInteressat.setAutenticat(false);
-			if (titular.getInteressatTipus() != null) {
-				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
-			}
-			if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				dadesInteressat.setNif(titular.getDir3Codi());
-				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-			} else if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-				dadesInteressat.setNom(titular.getRaoSocial());
-				dadesInteressat.setNif(titular.getNif());
-				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-			} else {
-				dadesInteressat.setNif(titular.getNif());
-				if (isDocumentEstranger(titular.getNif()))
-					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-				else
-					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-			}
-			dadesInteressat.setCognom1(titular.getLlinatge1());
-			dadesInteressat.setCognom2(titular.getLlinatge2());
-			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
-			dadesInteressat.setPaisCodi(null);
-			dadesInteressat.setPaisNom(null);
-			dadesInteressat.setProvinciaCodi(null);
-			dadesInteressat.setProvinciaNom(null);
-			dadesInteressat.setMunicipiCodi(null);
-			dadesInteressat.setMunicipiNom(null);
-		}
-		interessatRepresentat.setInteressat(dadesInteressat);
-		
-		if (destinatari != null && titular.isIncapacitat()) {
-			dadesRepresentat = new Interessat();
-			dadesRepresentat.setEntitatCodi(dir3Codi);
-			dadesRepresentat.setAutenticat(false);
-			if (destinatari.getInteressatTipus() != null) {
-				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
-			}
-			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				dadesRepresentat.setNif(destinatari.getDir3Codi());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-				dadesRepresentat.setNif(destinatari.getNif());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-			} else {
-				dadesRepresentat.setNif(destinatari.getNif());
-				if (isDocumentEstranger(titular.getNif()))
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-				else
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-			}
-			dadesRepresentat.setNom(destinatari.getNom());
-			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
-			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
-			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-			dadesRepresentat.setPaisCodi(null);
-			dadesRepresentat.setPaisNom(null);
-			dadesRepresentat.setProvinciaCodi(null);
-			dadesRepresentat.setProvinciaNom(null);
-			dadesRepresentat.setMunicipiCodi(null);
-			dadesRepresentat.setMunicipiNom(null);
-		}
-		interessatRepresentat.setRepresentat(dadesRepresentat);
-		
-		return interessatRepresentat;
-	}
-	
-	@SuppressWarnings("unused")
-	private DadesRepresentat personaToDadesRepresentat (
-			NotificacioDtoV2 notificacio,
-			PersonaDto titular,
-			PersonaDto destinatari) {
-		String dir3Codi;
-
-		if (notificacio.getEntitat().getDir3CodiReg() != null)
-			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-		else
-			dir3Codi = notificacio.getEmisorDir3Codi();
-		
-		DadesRepresentat dadesRepresentat = null;
-		if (destinatari != null && titular.isIncapacitat()) {
-			dadesRepresentat = new DadesRepresentat();
-			dadesRepresentat.setEntitatCodi(dir3Codi);
-			dadesRepresentat.setAutenticat(false);
-			if (destinatari.getInteressatTipus() != null) {
-				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
-			}
-			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				dadesRepresentat.setNif(destinatari.getDir3Codi());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-				dadesRepresentat.setNif(destinatari.getNif());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-			} else {
-				dadesRepresentat.setNif(destinatari.getNif());
-				if (isDocumentEstranger(destinatari.getNif()))
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-				else
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-			}
-			dadesRepresentat.setNom(destinatari.getNom());
-			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
-			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
-			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-			dadesRepresentat.setPaisCodi(null);
-			dadesRepresentat.setPaisNom(null);
-			dadesRepresentat.setProvinciaCodi(null);
-			dadesRepresentat.setProvinciaNom(null);
-			dadesRepresentat.setMunicipiCodi(null);
-			dadesRepresentat.setMunicipiNom(null);
-		}
-		return dadesRepresentat;
-	}
-	
-	public InteresadoWsDto personaToRepresentanteEInteresadoWs (
-			PersonaEntity titular, 
-			PersonaEntity destinatari) {
-		InteresadoWsDto interessat = new InteresadoWsDto();
-		if(titular != null) {
-			DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-			if (titular.getInteressatTipus() != null)
-				interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
-			if (titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				interessatDades.setDocumento(titular.getDir3Codi());
-				interessatDades.setTipoDocumentoIdentificacion("O");
-			}  else if (titular.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-				interessatDades.setDocumento(titular.getNif());
-				if (isDocumentEstranger(titular.getNif()))
-					interessatDades.setTipoDocumentoIdentificacion("E");
-				else
-					interessatDades.setTipoDocumentoIdentificacion("N");
-			} else if (titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-				interessatDades.setDocumento(titular.getNif());
-				interessatDades.setTipoDocumentoIdentificacion("C");
-			}
-			interessatDades.setRazonSocial(titular.getRaoSocial());
-			interessatDades.setNombre(titular.getNom());
-			interessatDades.setApellido1(titular.getLlinatge1());
-			interessatDades.setApellido2(titular.getLlinatge2());
-			interessatDades.setCodigoDire("");
-			interessatDades.setDireccion("");
-			interessatDades.setCp("");
-			interessatDades.setObservaciones("");
-			interessatDades.setEmail(titular.getEmail());
-			interessatDades.setDireccionElectronica(titular.getEmail());
-			interessatDades.setTelefono(titular.getTelefon());
-			interessat.setInteresado(interessatDades);
-		}
-		if(destinatari != null && titular.isIncapacitat()) {
-			DatosInteresadoWsDto representantDades = new DatosInteresadoWsDto();
-			representantDades.setTipoInteresado(destinatari.getInteressatTipus().getLongVal());
-			if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				representantDades.setDocumento(destinatari.getDir3Codi());
-				representantDades.setTipoDocumentoIdentificacion("O");
-			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-				representantDades.setDocumento(destinatari.getNif());
-				if (isDocumentEstranger(destinatari.getNif()))
-					representantDades.setTipoDocumentoIdentificacion("E");
-				else
-					representantDades.setTipoDocumentoIdentificacion("N");
-			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-				representantDades.setDocumento(destinatari.getNif());
-				representantDades.setTipoDocumentoIdentificacion("C");
-			}
-			representantDades.setRazonSocial(destinatari.getRaoSocial());
-			representantDades.setNombre(destinatari.getNom());
-			representantDades.setApellido1(destinatari.getLlinatge1());
-			representantDades.setApellido2(destinatari.getLlinatge2());
-			representantDades.setCodigoDire("");
-			representantDades.setDireccion("");
-			representantDades.setCp("");
-			representantDades.setObservaciones("");
-			representantDades.setEmail(destinatari.getEmail());
-			representantDades.setDireccionElectronica(destinatari.getEmail());
-			representantDades.setTelefono(destinatari.getTelefon());
-			interessat.setRepresentante(representantDades);	
-		}
-		return interessat;
-	}
 	public void addOficinaAndLlibreRegistre(NotificacioEntity notificacio){
 		DadesOficina dadesOficina = new DadesOficina();
 		String dir3Codi;
