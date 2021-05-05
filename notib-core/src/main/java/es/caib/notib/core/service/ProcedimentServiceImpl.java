@@ -403,14 +403,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					IntegracioAccioTipusEnumDto.PROCESSAR, 
 					new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 
-//				logger.debug(">>>> Inici actualitzar procediments");
-//				logger.debug(">>>> ==========================================================================");
+			logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 			// Comprova si hi ha una altre instància del procés en execució
 			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
 			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-//					logger.debug(">>>> Ja existeix un altre procés que està executant l'actualització");
-//					logger.debug(">>>> ==========================================================================");
-
+				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
 				return;	// Ja existeix un altre procés que està executant l'actualització.
 			}
 
@@ -420,7 +417,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			try {
 				boolean modificar = isActualitzacioProcedimentsModificarProperty();
-				boolean eliminarOrgans = isActualitzacioProcedimentsEliminarOrgansProperty();
 				Long ti = System.currentTimeMillis();
 
 				progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
@@ -435,14 +431,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				startTime = System.nanoTime();
 				Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-PRO] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
+				logger.info(" [PROCEDIMENTS] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
 
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
 				List<ProcedimentDto> procedimentsGda  = new ArrayList<ProcedimentDto>();
 				startTime = System.nanoTime();
 				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-PRO] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
+				logger.info(" [PROCEDIMENTS] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
 				int totalElementsCons = totalElements;
 				Long t1 = System.currentTimeMillis();
 				int numPagina = 1;
@@ -482,7 +478,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 //					logger.debug(">>>> Processar procediments");
 //					logger.debug(">>>> ==========================================================================");
 					progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediments", new Object[] {procedimentsGda.size()}));
-					
+
 					for (ProcedimentDto procedimentGda: procedimentsGda) {
 						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava, 
 						//i també d'aquesta forma els que s'han carregat ja es guardan.
@@ -504,7 +500,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				} while (!darreraLlista || (errorConsultantLlista && reintents < 3));
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-PRO] Recorregut procediments i actualització: " + elapsedTime + " ms");
-				
+
+				boolean eliminarOrgans = isActualitzacioProcedimentsEliminarOrgansProperty();
 				if (eliminarOrgans) {
 					startTime = System.nanoTime();
 //					int i = 1;

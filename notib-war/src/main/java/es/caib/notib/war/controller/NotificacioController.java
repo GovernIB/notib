@@ -13,11 +13,10 @@ import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.war.command.*;
 import es.caib.notib.war.helper.*;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -42,6 +41,7 @@ import java.util.*;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/notificacio")
 public class NotificacioController extends BaseUserController {
@@ -305,10 +305,11 @@ public class NotificacioController extends BaseUserController {
             @Valid NotificacioCommandV2 notificacioCommand,
             BindingResult bindingResult,
             Model model) throws IOException {
-        List<String> tipusDocumentEnumDto = new ArrayList<String>();
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
+        List<String> tipusDocumentEnumDto = new ArrayList<>();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         ProcedimentDto procedimentActual = null;
-        
+
         if (notificacioCommand.getProcedimentId() != null)
             procedimentActual = procedimentService.findById(
                     entitatActual.getId(),
@@ -317,6 +318,7 @@ public class NotificacioController extends BaseUserController {
         notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
 
         if (bindingResult.hasErrors()) {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
             ompliModelFormulari(
                     request,
                     procedimentActual,
@@ -326,11 +328,12 @@ public class NotificacioController extends BaseUserController {
                     tipusDocumentEnumDto,
                     model);
             for (ObjectError error: bindingResult.getAllErrors()) {
-                logger.error("[Error validacio notif] " + error.toString());
+                log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
             }
 
             return "notificacioForm";
         }
+
         if (RolHelper.isUsuariActualAdministrador(request)) {
             model.addAttribute("entitat", entitatService.findAll());
         }
@@ -338,6 +341,7 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute(new OrganGestorFiltreCommand());
 
         try {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
             updateDocuments(notificacioCommand);
 
             if (notificacioCommand.getId() != null) {
@@ -352,7 +356,8 @@ public class NotificacioController extends BaseUserController {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            logger.error("Error creant una notificació", ex);
+            log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
+            log.error(ExceptionUtils.getFullStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
             ompliModelFormulari(
                     request,
@@ -364,6 +369,7 @@ public class NotificacioController extends BaseUserController {
                     model);
             return "notificacioForm";
         }
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
 
         return "redirect:../notificacio";
     }
@@ -521,7 +527,7 @@ public class NotificacioController extends BaseUserController {
                     notificacioId);
 
         } catch (Exception ex) {
-            logger.error("Hi ha hagut un error esborrant la notificació", ex);
+            log.error("Hi ha hagut un error esborrant la notificació", ex);
             return getModalControllerReturnValueError(
                     request,
                     "redirect:../../notificacio",
@@ -568,7 +574,7 @@ public class NotificacioController extends BaseUserController {
                     "redirect:../../notificacio",
                     "notificacio.controller.refrescar.estat.ok");
         } catch (Exception ex) {
-            logger.error("Hi ha hagut un error processant la notificació", ex);
+            log.error("Hi ha hagut un error processant la notificació", ex);
             return getModalControllerReturnValueError(
                     request,
                     "redirect:../../notificacio",
@@ -803,36 +809,36 @@ public class NotificacioController extends BaseUserController {
                 response);
     }
 
-	
+
 	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
 	@ResponseBody
 	private List<CodiValorDto> getNivellsAdministracions(
 		HttpServletRequest request,
-		Model model) {		
+		Model model) {
 		return notificacioService.llistarNivellsAdministracions();
 	}
-	
-	
+
+
 	@RequestMapping(value = "/comunitatsAutonomes", method = RequestMethod.GET)
 	@ResponseBody
 	private List<CodiValorDto> getComunitatsAutonomess(
 		HttpServletRequest request,
-		Model model) {		
+		Model model) {
 		return notificacioService.llistarComunitatsAutonomes();
 	}
-	
-	
+
+
 
 	@RequestMapping(value = "/provincies/{codiCA}", method = RequestMethod.GET)
 	@ResponseBody
 	private List<ProvinciesDto> getProvinciesPerCA(
 		HttpServletRequest request,
 		Model model,
-		@PathVariable String codiCA) {		
+		@PathVariable String codiCA) {
 		return notificacioService.llistarProvincies(codiCA);
 	}
-	
-	
+
+
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/justificantDescarregar", method = RequestMethod.GET)
     @ResponseBody
@@ -923,7 +929,7 @@ public class NotificacioController extends BaseUserController {
                             lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR) ||
                             lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE) ||
                             lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT))) {
-                logger.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
+                log.info("Preparant per notificar canvi del event : " + lastEvent.getId() + " de tipus " + lastEvent.getTipus().name());
                 notificat = enviamentService.reintentarCallback(lastEvent.getId());
             }
         }
@@ -1012,7 +1018,7 @@ public class NotificacioController extends BaseUserController {
         try {
             notificacioService.enviamentsRefrescarEstat();
         } catch (Exception ex) {
-            logger.error("S'ha produit un error consultant els enviaments", ex);
+            log.error("S'ha produit un error consultant els enviaments", ex);
         }
     }
 
@@ -1026,33 +1032,33 @@ public class NotificacioController extends BaseUserController {
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(
             HttpServletRequest request,
-            @PathVariable String csv) {  
+            @PathVariable String csv) {
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
-    
+
     	if (validacioIdCsv)
     		doc = notificacioService.consultaDocumentIMetadades(csv, false);
-    
+
     	return existeixDocumentMetadades(validacioIdCsv, doc, request);
     }
-    
+
     @RequestMapping(value = "/consultaDocumentIMetadadesUuid/{uuid}", method = RequestMethod.GET)
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesUuid(
             HttpServletRequest request,
             @PathVariable String uuid) {
         DocumentDto doc = notificacioService.consultaDocumentIMetadades(uuid, true);
-        
+
         return existeixDocumentMetadades(true, doc, request);
     }
-    
+
     private RespostaConsultaArxiuDto existeixDocumentMetadades(Boolean validacioIdCsv, DocumentDto doc, HttpServletRequest request) {
-		
+
 		Boolean teMetadades = Boolean.FALSE;
         if (doc != null) {
-        	teMetadades = doc.getOrigen() != null || doc.getValidesa() != null || 
+        	teMetadades = doc.getOrigen() != null || doc.getValidesa() != null ||
         		doc.getTipoDocumental() != null || doc.getModoFirma() != null;
-        	
+
         	if (teMetadades) {
     			//Es guarden en sessió
             	RequestSessionHelper.actualitzarObjecteSessio(
@@ -1072,7 +1078,7 @@ public class NotificacioController extends BaseUserController {
     				METADADES_MODO_FIRMA,
     				doc.getModoFirma());
             }
-        	
+
         	 return RespostaConsultaArxiuDto.builder()
              		.validacioIdCsv(Boolean.TRUE)
              		.documentExistent(Boolean.TRUE)
@@ -1093,9 +1099,9 @@ public class NotificacioController extends BaseUserController {
              		.modoFirma(null)
              		.build();
         }
-          
+
     }
-    
+
     private boolean getLast3months() {
         return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
     }
@@ -1247,18 +1253,18 @@ public class NotificacioController extends BaseUserController {
 	                entitatActual.getId(),
 	                usuariActual.getCodi(),
 	                PermisEnum.NOTIFICACIO);
-	
+
 	        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
 	                entitatActual.getId(),
 	                usuariActual.getCodi(),
 	                PermisEnum.NOTIFICACIO);
-	
+
 	        procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
-	
+
 	        if (procedimentsDisponibles.isEmpty()) {
 	            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
 	        }
-	
+
 	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
 	                entitatActual,
 	                procedimentsDisponibles,
@@ -1332,7 +1338,7 @@ public class NotificacioController extends BaseUserController {
             model.addAttribute("emailSize", notificacio.getEmailDefaultSize());
             model.addAttribute("telefonSize", notificacio.getTelefonDefaultSize());
         } catch (Exception ex) {
-            logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+            log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
 
     }
@@ -1446,7 +1452,7 @@ public class NotificacioController extends BaseUserController {
 	                usuariActual.getCodi(),
 	                PermisEnum.NOTIFICACIO);
 	        addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
-	
+
 	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
 	                entitatActual,
 	                procedimentsDisponibles,
@@ -1461,11 +1467,11 @@ public class NotificacioController extends BaseUserController {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
         model.addAttribute("organsGestors", organsGestors);
-        
+
         if (procedimentActual != null) {
         	 model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
         }
-           
+
         model.addAttribute("comunicacioTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificacioComunicacioTipusEnumDto.class,
@@ -1523,7 +1529,7 @@ public class NotificacioController extends BaseUserController {
                 try {
                     contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
                 } catch (Exception ex) {
-                    logger.error("No s'ha pogut codificar els bytes de l'arxiu: " + ex.getMessage());
+                    log.error("No s'ha pogut codificar els bytes de l'arxiu: " + ex.getMessage());
                 }
                 notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
                 notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
@@ -1554,7 +1560,7 @@ public class NotificacioController extends BaseUserController {
             model.addAttribute("concepteSize", notificacioCommand.getConcepteDefaultSize() );
             model.addAttribute("descripcioSize", notificacioCommand.getDescripcioDefaultSize());
         } catch (Exception ex) {
-            logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+            log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
     }
 
@@ -1591,6 +1597,4 @@ public class NotificacioController extends BaseUserController {
             this.caducitat = format.format(data);
         }
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(NotificacioController.class);
 }
