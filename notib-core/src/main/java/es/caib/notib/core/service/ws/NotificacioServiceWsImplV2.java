@@ -1341,6 +1341,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return setRespostaError("[1060] El camp 'document' no pot ser null.");
 		}
 		DocumentV2 document = notificacio.getDocument();
+		//TODO: Revisar la validación del nom. Para CSV/UUid en el formulario web
+		//NO se pide un nombre; se recupera posteriormente del plugin.
 		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
 			return setRespostaError("[1061] El camp 'arxiuNom' del document no pot ser null.");
 		}

@@ -2114,16 +2114,16 @@ public class PluginHelper {
 		if (persona.getInteressatTipus() != null)
 			interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
 		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-			interessatDades.setDocumento(persona.getDir3Codi());
+			interessatDades.setDocumento(persona.getDir3Codi() != null ? persona.getDir3Codi().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("O");
 		}  else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-			interessatDades.setDocumento(persona.getNif());
+			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			if (isDocumentEstranger(persona.getNif()))
 				interessatDades.setTipoDocumentoIdentificacion("E");
 			else
 				interessatDades.setTipoDocumentoIdentificacion("N");
 		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-			interessatDades.setDocumento(persona.getNif());
+			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("C");
 		}
 		String raoSocial = persona.getRaoSocial() == null || persona.getNom().length() <= 80 ?
