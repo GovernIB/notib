@@ -239,7 +239,6 @@ public class NotificacioCommandV2 {
 				persona.setLlinatge2(null);
 			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
 				persona.setIncapacitat(Boolean.FALSE);
-				persona.setNom(null);
 				persona.setLlinatge1(null);
 				persona.setLlinatge2(null);	
 			}
