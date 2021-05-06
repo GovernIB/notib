@@ -167,7 +167,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Obtenint usuari actual");
-			return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
+			if (auth == null){
+				return null;
+			} else {
+				return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

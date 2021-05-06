@@ -10,7 +10,6 @@ import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -18,13 +17,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
-import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
@@ -1706,18 +1699,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 			
 			logger.debug("S'ha iniciat els procés d'actualització dels enviaments expirats");
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			String username = auth == null ? "schedulled" : auth.getName();
 			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_NOTIFICA, 
-					"Actualització d'enviaments expirats sense certificació", 
-					IntegracioAccioTipusEnumDto.PROCESSAR, 
-					new AccioParam("Usuari encarregat: ", auth.getName()));
+					IntegracioHelper.INTCODI_NOTIFICA,
+					"Actualització d'enviaments expirats sense certificació",
+					IntegracioAccioTipusEnumDto.PROCESSAR,
+					new AccioParam("Usuari encarregat: ", username));
 			
-			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
+			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(username);
 			if (progres != null && progres.getProgres() != 0) {
 				progres.addInfo(TipusActInfo.ERROR, "Existeix un altre procés en progrés...");
 			} else {
 				progres = new ProgresActualitzacioCertificacioDto();
-				progresActulitzacioExpirades.put(auth.getName(), progres);
+				progresActulitzacioExpirades.put(username, progres);
 				List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
 				if (enviamentsIds == null || enviamentsIds.isEmpty()) {
 					progres.setProgres(100);
