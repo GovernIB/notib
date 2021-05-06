@@ -3,7 +3,6 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
@@ -108,18 +107,31 @@ public class NotificacioTableHelper {
         return event != null && notificacio.isTipusUsuariAplicacio() && event.isError() && errorsTipus.contains(event.getTipus());
     }
 
+    /**
+     * Ignoram els esdeveniments d'error de la notificació indicada
+     * * quan ja esta enviada
+     * * quan encara no s'ha intentat enviar ni al registre
+     * * Quan ja ha estat registrada però encara no s'ha intentat enviar a notifica
+     *
+     * @param notificacio
+     *
+     * @return boleà indicant si s'ha d'ignorar l'error de la notificació
+     */
     private boolean ignoreNotificaError(NotificacioEntity notificacio) {
-        boolean hasNotificaIntents = false;
-        boolean hasSirConsultaIntents = false;
-        for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-            if(enviament.getNotificaIntentNum() != 0 ){
-                hasNotificaIntents = true;
-            }
-            if(enviament.getSirConsultaIntent() != 0 ){
-                hasSirConsultaIntents = true;
-            }
-        }
-        return notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIADA) || notificacio.getRegistreEnviamentIntent() == 0 ||
-                (!hasNotificaIntents && !hasSirConsultaIntents);
+        boolean hasNotificaIntents = notificacio.getNotificaEnviamentIntent() != 0;
+//        boolean hasSirConsultaIntents = false;
+        boolean hasRegistreIntents = notificacio.getRegistreEnviamentIntent() != 0;
+//        for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+//            if(!hasNotificaIntents && enviament.getNotificaIntentNum() != 0 ){
+//                hasNotificaIntents = true;
+//            }
+//            if(enviament.getSirConsultaIntent() != 0 ){
+//                hasSirConsultaIntents = true;
+//            }
+//        }
+        NotificacioEstatEnumDto notificacioEstat = notificacio.getEstat();
+        return notificacioEstat.equals(NotificacioEstatEnumDto.ENVIADA) ||
+                (notificacioEstat.equals(NotificacioEstatEnumDto.PENDENT) && !hasRegistreIntents) ||
+                (notificacioEstat.equals(NotificacioEstatEnumDto.REGISTRADA) && !hasNotificaIntents);
     }
 }

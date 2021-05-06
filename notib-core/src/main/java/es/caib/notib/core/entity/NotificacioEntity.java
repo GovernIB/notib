@@ -69,10 +69,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "motiu")
 	protected String motiu;
-	
-//	@Column(name = "not_error_tipus")
-//	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
-	
+
 	@Column(name = "not_env_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEnviamentData;
@@ -80,10 +77,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "not_env_data_notifica")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date notificaEnviamentNotificaData;
-	
+
+	@Setter // Només a test
 	@Column(name = "not_env_intent")
 	protected int notificaEnviamentIntent;
-	
+
+	@Setter // Només a test
 	@Column(name = "registre_env_intent")
 	protected int registreEnviamentIntent;
 	
@@ -106,12 +105,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "idioma")
 	protected IdiomaEnumDto idioma;
 
-//	@Setter
-//	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
-//	@JoinColumn(name = "not_error_event_id")
-//	@ForeignKey(name = "not_noterrevent_notificacio_fk")
-//	protected NotificacioEventEntity notificaErrorEvent;
-	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
@@ -201,9 +194,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "registre_llibre_nom")
 	private String registreLlibreNom;
 
-//	@Column(name = "IS_ERROR_LAST_EVENT")
-//	protected Boolean errorLastEvent;
-
 	@Setter
 	@Transient
 	protected boolean permisProcessar;
@@ -212,31 +202,11 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Transient
 	protected boolean hasEnviamentsPendents;
 
-//	@Transient
-//	protected boolean hasEnviamentsPendentsRegistre;
-
-//	@Transient
-//	protected NotificacioEnviamentEstatEnumDto notificaEstat;
-
 	public void addEnviament(
 			NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
 	}
 
-//
-//	public void setErrorLastEvent(boolean errorLastEvent) {
-//		this.errorLastEvent = errorLastEvent;
-//	}
-//
-//	public void setHasEnviamentsPendents(boolean hasEnviamentsPendents) {
-//		this.hasEnviamentsPendents = hasEnviamentsPendents;
-//	}
-//
-//	public void setHasEnviamentsPendentsRegistre(boolean hasEnviamentsPendentsRegistre) {
-//		this.hasEnviamentsPendentsRegistre = hasEnviamentsPendentsRegistre;
-//	}
-
-	
 	public void updateRegistreNumero(Integer registreNumero) {
 		this.registreNumero = registreNumero;
 	}
@@ -300,17 +270,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		Calendar cal = GregorianCalendar.getInstance();
 		this.registreData = cal.getTime();
 	}
-	
-//	public void updateNotificaError(
-//			NotificacioErrorTipusEnumDto errorTipus,
-//			NotificacioEventEntity errorEvent) {
-//		this.notificaErrorTipus = errorTipus;
-//		this.notificaErrorEvent = errorEvent;
-//	}
-//	public void cleanNotificaError() {
-//		this.notificaErrorTipus = null;
-//		this.notificaErrorEvent = null;
-//	}
+
 	public void updateEventAfegir(NotificacioEventEntity event) {
 		events.add(event);
 	}
@@ -546,125 +506,125 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return true;
 	}
 
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi;
-	}
-
-	public void setEmisorDir3Codi(String emisorDir3Codi) {
-		this.emisorDir3Codi = emisorDir3Codi;
-	}
-
-	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
-		this.comunicacioTipus = comunicacioTipus;
-	}
-
-	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
-		this.enviamentTipus = enviamentTipus;
-	}
-
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-
-	public void setRetard(Integer retard) {
-		this.retard = retard;
-	}
-
-	public void setCaducitat(Date caducitat) {
-		this.caducitat = caducitat;
-	}
-
-	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
-		this.procedimentCodiNotib = procedimentCodiNotib;
-	}
-
-	public void setGrupCodi(String grupCodi) {
-		this.grupCodi = grupCodi;
-	}
-
-	public void setEstat(NotificacioEstatEnumDto estat) {
-		this.estat = estat;
-	}
-
-	public void setEstatDate(Date estatDate) {
-		this.estatDate = estatDate;
-	}
-
-	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
-		this.tipusUsuari = tipusUsuari;
-	}
-
-	public void setMotiu(String motiu) {
-		this.motiu = motiu;
-	}
-
-	public void setNotificaEnviamentData(Date notificaEnviamentData) {
-		this.notificaEnviamentData = notificaEnviamentData;
-	}
-
-	public void setNotificaEnviamentIntent(int notificaEnviamentIntent) {
-		this.notificaEnviamentIntent = notificaEnviamentIntent;
-	}
-
-	public void setRegistreEnviamentIntent(int registreEnviamentIntent) {
-		this.registreEnviamentIntent = registreEnviamentIntent;
-	}
-
-	public void setRegistreNumero(Integer registreNumero) {
-		this.registreNumero = registreNumero;
-	}
-
-	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
-		this.registreNumeroFormatat = registreNumeroFormatat;
-	}
-
-	public void setRegistreData(Date registreData) {
-		this.registreData = registreData;
-	}
-
-	public void setNumExpedient(String numExpedient) {
-		this.numExpedient = numExpedient;
-	}
-
-	public void setEntitat(EntitatEntity entitat) {
-		this.entitat = entitat;
-	}
-
-	public void setPagadorPostal(PagadorPostalEntity pagadorPostal) {
-		this.pagadorPostal = pagadorPostal;
-	}
-
-	public void setPagadorCie(PagadorCieEntity pagadorCie) {
-		this.pagadorCie = pagadorCie;
-	}
-
-	public void setProcediment(ProcedimentEntity procediment) {
-		this.procediment = procediment;
-	}
-
-	public void setDocument(DocumentEntity document) {
-		this.document = document;
-	}
-
-	public void setOrganGestor(OrganGestorEntity organGestor) {
-		this.organGestor = organGestor;
-	}
-
-	public void setEnviaments(Set<NotificacioEnviamentEntity> enviaments) {
-		this.enviaments = enviaments;
-	}
-
-	public void setEvents(Set<NotificacioEventEntity> events) {
-		this.events = events;
-	}
+//	public void setUsuariCodi(String usuariCodi) {
+//		this.usuariCodi = usuariCodi;
+//	}
+//
+//	public void setEmisorDir3Codi(String emisorDir3Codi) {
+//		this.emisorDir3Codi = emisorDir3Codi;
+//	}
+//
+//	public void setComunicacioTipus(NotificacioComunicacioTipusEnumDto comunicacioTipus) {
+//		this.comunicacioTipus = comunicacioTipus;
+//	}
+//
+//	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
+//		this.enviamentTipus = enviamentTipus;
+//	}
+//
+//	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
+//		this.enviamentDataProgramada = enviamentDataProgramada;
+//	}
+//
+//	public void setConcepte(String concepte) {
+//		this.concepte = concepte;
+//	}
+//
+//	public void setDescripcio(String descripcio) {
+//		this.descripcio = descripcio;
+//	}
+//
+//	public void setRetard(Integer retard) {
+//		this.retard = retard;
+//	}
+//
+//	public void setCaducitat(Date caducitat) {
+//		this.caducitat = caducitat;
+//	}
+//
+//	public void setProcedimentCodiNotib(String procedimentCodiNotib) {
+//		this.procedimentCodiNotib = procedimentCodiNotib;
+//	}
+//
+//	public void setGrupCodi(String grupCodi) {
+//		this.grupCodi = grupCodi;
+//	}
+//
+//	public void setEstat(NotificacioEstatEnumDto estat) {
+//		this.estat = estat;
+//	}
+//
+//	public void setEstatDate(Date estatDate) {
+//		this.estatDate = estatDate;
+//	}
+//
+//	public void setTipusUsuari(TipusUsuariEnumDto tipusUsuari) {
+//		this.tipusUsuari = tipusUsuari;
+//	}
+//
+//	public void setMotiu(String motiu) {
+//		this.motiu = motiu;
+//	}
+//
+//	public void setNotificaEnviamentData(Date notificaEnviamentData) {
+//		this.notificaEnviamentData = notificaEnviamentData;
+//	}
+//
+//	public void setNotificaEnviamentIntent(int notificaEnviamentIntent) {
+//		this.notificaEnviamentIntent = notificaEnviamentIntent;
+//	}
+//
+//	public void setRegistreEnviamentIntent(int registreEnviamentIntent) {
+//		this.registreEnviamentIntent = registreEnviamentIntent;
+//	}
+//
+//	public void setRegistreNumero(Integer registreNumero) {
+//		this.registreNumero = registreNumero;
+//	}
+//
+//	public void setRegistreNumeroFormatat(String registreNumeroFormatat) {
+//		this.registreNumeroFormatat = registreNumeroFormatat;
+//	}
+//
+//	public void setRegistreData(Date registreData) {
+//		this.registreData = registreData;
+//	}
+//
+//	public void setNumExpedient(String numExpedient) {
+//		this.numExpedient = numExpedient;
+//	}
+//
+//	public void setEntitat(EntitatEntity entitat) {
+//		this.entitat = entitat;
+//	}
+//
+//	public void setPagadorPostal(PagadorPostalEntity pagadorPostal) {
+//		this.pagadorPostal = pagadorPostal;
+//	}
+//
+//	public void setPagadorCie(PagadorCieEntity pagadorCie) {
+//		this.pagadorCie = pagadorCie;
+//	}
+//
+//	public void setProcediment(ProcedimentEntity procediment) {
+//		this.procediment = procediment;
+//	}
+//
+//	public void setDocument(DocumentEntity document) {
+//		this.document = document;
+//	}
+//
+//	public void setOrganGestor(OrganGestorEntity organGestor) {
+//		this.organGestor = organGestor;
+//	}
+//
+//	public void setEnviaments(Set<NotificacioEnviamentEntity> enviaments) {
+//		this.enviaments = enviaments;
+//	}
+//
+//	public void setEvents(Set<NotificacioEventEntity> events) {
+//		this.events = events;
+//	}
 
 
 	public boolean isTipusUsuariAplicacio() {

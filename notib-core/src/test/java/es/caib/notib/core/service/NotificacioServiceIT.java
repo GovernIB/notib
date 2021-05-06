@@ -381,7 +381,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 						// Given: notificacio pendent registrar amb nombre màxim de reintents
 						NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
 						notEntity.setRegistreEnviamentIntent(pluginHelper.getRegistreReintentsMaxProperty());
-						notEntity.setEstat(NotificacioEstatEnumDto.PENDENT);
+						notEntity.updateEstat(NotificacioEstatEnumDto.PENDENT);
 						notificacioRepository.saveAndFlush(notEntity);
 
 						// When
@@ -416,7 +416,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 						// Given: notificacio pendent registrar amb nombre màxim de reintents
 						NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
 						notEntity.setNotificaEnviamentIntent(pluginHelper.getNotificaReintentsMaxProperty());
-						notEntity.setEstat(NotificacioEstatEnumDto.REGISTRADA);
+						notEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
 						notificacioRepository.saveAndFlush(notEntity);
 
 						// When

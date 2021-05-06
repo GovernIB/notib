@@ -170,7 +170,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isOrganCodiNull") boolean isOrganGestorNull,
 			@Param("organCodi") String organCodi,
 			@Param("isProcedimentNull") boolean isProcedimentNull,
-			@Param("procediment") String procedimentCodi,
+			@Param("procedimentCodi") String procedimentCodi,
 			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
 			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuar,
 			@Param("isNumExpedientNull") boolean isNumExpedientNull,

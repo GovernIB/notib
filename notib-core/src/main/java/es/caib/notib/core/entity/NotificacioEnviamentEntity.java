@@ -556,25 +556,25 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				serveiTipus,
 				notificacio);
 	}
-	
-	public static BuilderV1 getBuilderV1(
-			Enviament enviament, 
-			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-			NotificaDomiciliConcretTipusEnumDto tipusConcret,
-			ServeiTipusEnumDto tipusServei,
-			NotificacioEntity notificacioGuardada,
-			PersonaEntity titular,
-			List<PersonaEntity> destinataris) {
-		return new BuilderV1(
-				enviament,
-				numeracioTipus,
-				tipusConcret,
-				tipusServei,
-				notificacioGuardada,
-				titular,
-				destinataris
-				);
-	}
+
+//	public static BuilderV1 getBuilderV1(
+//			Enviament enviament,
+//			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
+//			NotificaDomiciliConcretTipusEnumDto tipusConcret,
+//			ServeiTipusEnumDto tipusServei,
+//			NotificacioEntity notificacioGuardada,
+//			PersonaEntity titular,
+//			List<PersonaEntity> destinataris) {
+//		return new BuilderV1(
+//				enviament,
+//				numeracioTipus,
+//				tipusConcret,
+//				tipusServei,
+//				notificacioGuardada,
+//				titular,
+//				destinataris
+//				);
+//	}
 
 	public static BuilderV2 getBuilderV2(
 			Enviament enviament, 
@@ -733,67 +733,67 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		}
 	}
 	
-	public static class BuilderV1 {
-		NotificacioEnviamentEntity built;
-		BuilderV1(
-				Enviament enviament, 
-				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-				NotificaDomiciliConcretTipusEnumDto tipusConcret,
-				ServeiTipusEnumDto tipusServei,
-				NotificacioEntity notificacioGuardada,
-				PersonaEntity titular,
-				List<PersonaEntity> destinataris) {
-			built = new NotificacioEnviamentEntity();
-			built.serveiTipus = tipusServei;
-			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.notificaIntentNum = 0;
-			built.notificacio = notificacioGuardada;
-			
-			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
-			built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
-			built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
-			built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
-			built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
-			built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
-			built.domiciliPortal = enviament.getEntregaPostal().getPortal();
-			built.domiciliEscala = enviament.getEntregaPostal().getEscala();
-			built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
-			built.domiciliPorta = enviament.getEntregaPostal().getPorta();
-			built.domiciliBloc = enviament.getEntregaPostal().getBloc();
-			built.domiciliComplement = enviament.getEntregaPostal().getComplement();
-			built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
-			built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
-			built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
-			built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
-			built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
-			built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
-			built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
-			built.domiciliCie = enviament.getEntregaPostal().getCie();
-			built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
-			built.dehObligat = enviament.getEntregaDeh().isObligat();			
-			
-			built.titular = titular;
-			built.destinataris = destinataris;
-		}
-		public BuilderV1 domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
-			built.domiciliViaTipus = domiciliViaTipus;
-			return this;
-		}
-		
-		public BuilderV1 titular(PersonaEntity titular) {
-			built.titular = titular;
-			return this;
-		}
-		
-		public BuilderV1 destinataris(List<PersonaEntity> destinataris) {
-			built.destinataris = destinataris;
-			return this;
-		}
-		
-		public NotificacioEnviamentEntity build() {
-			return built;
-		}
-	}
+//	public static class BuilderV1 {
+//		NotificacioEnviamentEntity built;
+//		BuilderV1(
+//				Enviament enviament,
+//				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
+//				NotificaDomiciliConcretTipusEnumDto tipusConcret,
+//				ServeiTipusEnumDto tipusServei,
+//				NotificacioEntity notificacioGuardada,
+//				PersonaEntity titular,
+//				List<PersonaEntity> destinataris) {
+//			built = new NotificacioEnviamentEntity();
+//			built.serveiTipus = tipusServei;
+//			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+//			built.notificaIntentNum = 0;
+//			built.notificacio = notificacioGuardada;
+//
+//			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
+//			built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
+//			built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
+//			built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
+//			built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
+//			built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
+//			built.domiciliPortal = enviament.getEntregaPostal().getPortal();
+//			built.domiciliEscala = enviament.getEntregaPostal().getEscala();
+//			built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
+//			built.domiciliPorta = enviament.getEntregaPostal().getPorta();
+//			built.domiciliBloc = enviament.getEntregaPostal().getBloc();
+//			built.domiciliComplement = enviament.getEntregaPostal().getComplement();
+//			built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
+//			built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
+//			built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
+//			built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
+//			built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
+//			built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
+//			built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
+//			built.domiciliCie = enviament.getEntregaPostal().getCie();
+//			built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
+//			built.dehObligat = enviament.getEntregaDeh().isObligat();
+//
+//			built.titular = titular;
+//			built.destinataris = destinataris;
+//		}
+//		public BuilderV1 domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
+//			built.domiciliViaTipus = domiciliViaTipus;
+//			return this;
+//		}
+//
+//		public BuilderV1 titular(PersonaEntity titular) {
+//			built.titular = titular;
+//			return this;
+//		}
+//
+//		public BuilderV1 destinataris(List<PersonaEntity> destinataris) {
+//			built.destinataris = destinataris;
+//			return this;
+//		}
+//
+//		public NotificacioEnviamentEntity build() {
+//			return built;
+//		}
+//	}
 	
 	public static class BuilderV2 {
 		NotificacioEnviamentEntity built;

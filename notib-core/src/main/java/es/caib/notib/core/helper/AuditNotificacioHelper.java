@@ -96,34 +96,6 @@ public class AuditNotificacioHelper {
 		notificacio.updateLastCallbackError(error);
 		return notificacio;
 	}
-//
-//	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-//	public NotificacioEntity updateNotificacioError(NotificacioEntity notificacio,
-//													NotificacioErrorTipusEnumDto tipueError,
-//													NotificacioEventEntity eventReintents) {
-//		notificacio.updateNotificaError(
-//				tipueError,
-//				eventReintents);
-//		return notificacio;
-//	}
-//
-//	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-//	public NotificacioEntity updateNotificacioErrorSir(NotificacioEntity notificacio, NotificacioEventEntity eventReintents) {
-//		notificacio.updateNotificaError(
-//				NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR,
-//				eventReintents);
-//		return notificacio;
-//	}
-//
-//	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-//	public NotificacioEntity updateNotificacioErrorRegistre(NotificacioEntity notificacioEntity,
-//															NotificacioEventEntity event) {
-//		notificacioEntity.updateNotificaError(
-//				NotificacioErrorTipusEnumDto.ERROR_REGISTRE,
-//				event);
-//		notificacioEntity.updateEventAfegir(event);
-//		return notificacioEntity;
-//	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioRegistre(RespostaConsultaRegistre arbResposta,
@@ -132,6 +104,12 @@ public class AuditNotificacioHelper {
 		notificacioEntity.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 		notificacioEntity.updateRegistreData(arbResposta.getRegistreData());
 		notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+		return notificacioEntity;
+	}
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateRegistreNouEnviament(NotificacioEntity notificacioEntity, int reintentsPeriode) {
+		notificacioEntity.updateRegistreNouEnviament(reintentsPeriode);
 		return notificacioEntity;
 	}
 	

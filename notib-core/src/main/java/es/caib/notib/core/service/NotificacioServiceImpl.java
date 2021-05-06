@@ -585,7 +585,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		
+		logger.info("Consulta taula de remeses ...");
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			boolean isUsuari = RolEnumDto.tothom.equals(rol);
@@ -601,9 +601,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Page<NotificacioTableEntity> notificacions = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
-			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {(isUsuari ? "organ.codi" : "organGestor.codi")});
-			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"pro.nom"});
-			mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"pro.codi"});
+			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organCodi"});
+			mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"procedimentNom"});
+			mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
 			mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 

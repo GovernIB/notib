@@ -158,7 +158,8 @@ public class RegistreNotificaHelper {
 			long t0) throws RegistrePluginException {
 		//Crea assentament registral + Notific@
 		logger.info(" >>> Nou assentament registral...");
-		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
+				pluginHelper.getRegistreReintentsPeriodeProperty());
 		AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 				notificacioEntity, 
 				notificacioEntity.getEnviaments());
@@ -201,7 +202,8 @@ public class RegistreNotificaHelper {
 			IntegracioInfo info,
 			long t0) throws RegistrePluginException {
 		logger.info(" >>> Nou assentament registral...");
-		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
+				pluginHelper.getRegistreReintentsPeriodeProperty());
 		AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 				notificacioEntity, 
 				enviament);
