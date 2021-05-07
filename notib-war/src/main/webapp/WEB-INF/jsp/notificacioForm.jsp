@@ -1317,6 +1317,8 @@
 			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge2', '${llinatge2Size}');
 			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.email', '${emailSize}');
 			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.telefon', '${telefonSize}');
+			
+			$('.interessat').trigger('change');
 		}
 
 	}
@@ -2685,7 +2687,7 @@
 <%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
 													<input type="hidden" name="enviaments[${j}].destinataris[${i}].id" value="${destinatari.id}"/>
 													<!-- TIPUS INTERESSAT -->
-													<div class="col-md-3 interessat">
+													<div class="col-md-3 interessatTipus">
 														<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 													</div>
 													<!-- NIF -->
@@ -2693,7 +2695,7 @@
 														<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" />
 													</div>
 													<!-- NOM / RAÓ SOCIAL -->
-													<div class="col-md-3">
+													<div class="col-md-3 rao">
 														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" inputMaxLength="${concepteSize}" showsize="true"/>
 													</div>
 													<!-- PRIMER LLINATGE -->
@@ -2717,6 +2719,9 @@
 													</div>
 													<!-- CODI DIR3 -->
 													<div class="col-md-3 dir3Codi hidden">
+														<not:inputTextSearch  funcio="obrirModalOrganismesDestinatari(${j},${i})" searchButton="searchOrgan${j}${i}" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12" value="${destinatari.dir3Codi}-${destinatari.nom}"/> 	
+													</div>						
+													<div class="col-md-3 hidden">
 														<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
 													</div>
 													<!-- ELIMINAR DESTINATARI -->
