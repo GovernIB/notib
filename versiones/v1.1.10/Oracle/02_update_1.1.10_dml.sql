@@ -1,3 +1,4 @@
+-- 492
 INSERT INTO NOT_NOTIFICACIO_TABLE(
                                   ID,
                                   ENTITAT_ID,
@@ -171,8 +172,33 @@ FROM
         LEFT JOIN NOT_DOCUMENT doc on n.DOCUMENT_ID = doc.ID
         LEFT JOIN NOT_ENTITAT entitat on n.ENTITAT_ID = entitat.ID;
 
+-- 504
 UPDATE NOT_NOTIFICACIO_TABLE
 SET
     NOTIFICA_ERROR_DATE = null,
     NOTIFICA_ERROR_DESCRIPCIO = null
 WHERE ESTAT = 1;
+
+-- 489
+-- Actualitzar els estats DESCONEGUT i SENSE_INFORMACIO a estats finals
+UPDATE NOT_NOTIFICACIO_ENV
+SET NOTIFICA_ESTAT_FINAL = 1
+WHERE NOTIFICA_ESTAT IN (4, 21);
+
+COMMIT;
+
+-- Actualitzar els estats de les notificacions
+UPDATE NOT_NOTIFICACIO
+SET ESTAT = 3
+WHERE ID IN (
+    SELECT nn.ID
+    FROM NOT_NOTIFICACIO nn
+             INNER JOIN NOT_NOTIFICACIO_ENV nne ON nn.ID = nne.NOTIFICACIO_ID
+    WHERE nne.NOTIFICACIO_ID NOT IN (
+        SELECT NOTIFICACIO_ID
+        FROM NOT_NOTIFICACIO_ENV
+        WHERE NOTIFICA_ESTAT_FINAL = 0)
+      AND nn.ESTAT NOT IN (3, 4)
+);
+
+--
