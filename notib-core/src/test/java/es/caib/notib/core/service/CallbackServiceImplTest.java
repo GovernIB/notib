@@ -38,11 +38,11 @@ public class CallbackServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        EntitatEntity entitatMock = Mockito.mock(EntitatEntity.class);
-        Mockito.when(entitatMock.getId()).thenReturn(2L);
+//        EntitatEntity entitatMock = Mockito.mock(EntitatEntity.class);
+//        Mockito.when(entitatMock.getId()).thenReturn(2L);
 
         NotificacioEntity notificacioMock = Mockito.mock(NotificacioEntity.class);
-        Mockito.when(notificacioMock.getEntitat()).thenReturn(entitatMock);
+//        Mockito.when(notificacioMock.getEntitat()).thenReturn(entitatMock);
 
         List<Long> eventsIds = Arrays.asList(1L, 2L, 3L);
 //        notificacioEventRepository = Mockito.mock(NotificacioEventRepository.class);
@@ -51,7 +51,7 @@ public class CallbackServiceImplTest {
         ).thenReturn(eventsIds);
 
         UsuariEntity mockUser = Mockito.mock(UsuariEntity.class);
-        Mockito.when(mockUser.getCodi()).thenReturn("CODI_USER");
+//        Mockito.when(mockUser.getCodi()).thenReturn("CODI_USER");
 
         NotificacioEnviamentEntity enviamentMock = NotificacioEnviamentEntity.getBuilder("",
                 ServeiTipusEnumDto.NORMAL, notificacioMock).build();
@@ -60,9 +60,9 @@ public class CallbackServiceImplTest {
         eventsMap = new HashMap<>();
         for (Long eventId : eventsIds) {
             NotificacioEventEntity eventMock = Mockito.mock(NotificacioEventEntity.class);
-            Mockito.when(
-                    eventMock.getId()
-            ).thenReturn(eventId);
+//            Mockito.when(
+//                    eventMock.getId()
+//            ).thenReturn(eventId);
             eventsMap.put(eventId, eventMock);
             Mockito.when(
                     notificacioEventRepository.findOne(Mockito.eq(eventId))
