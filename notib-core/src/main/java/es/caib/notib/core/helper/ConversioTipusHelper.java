@@ -76,6 +76,8 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(EnviamentTableEntity.class, NotEnviamentTableItemDto.class).
 				field("notificaReferencia", "codiNotibEnviament").
+				field("notificacio.id", "notificacioId").
+				field("csv_uuid", "csvUuid").
 				byDefault().
 				register();
 

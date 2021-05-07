@@ -431,23 +431,24 @@ public class EnviamentServiceImpl implements EnviamentService {
 			logger.info("Consulta de taula d'enviaments ...");
 
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"n.enviamentDataProgramada"});
-			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"nenv.notificaIdentificador"});
-			mapeigPropietatsOrdenacio.put("procedimentCodiNotib", new String[] {"n.procedimentCodiNotib"});
-			mapeigPropietatsOrdenacio.put("grupCodi", new String[] {"n.grupCodi"});
-			mapeigPropietatsOrdenacio.put("emisorDir3Codi", new String[] {"n.emisorDir3Codi"});
-			mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"n.usuariCodi"});
-			mapeigPropietatsOrdenacio.put("concepte", new String[] {"n.concepte"});
-			mapeigPropietatsOrdenacio.put("descripcio", new String[] {"n.descripcio"});
-			mapeigPropietatsOrdenacio.put("titularNif", new String[] {"t.nif"});
-			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"concat(t.llinatge1, t.llinatge2, t.nom)"});
-			mapeigPropietatsOrdenacio.put("titularEmail", new String[] {"t.email"});
-			mapeigPropietatsOrdenacio.put("llibre", new String[] {"n.registreLlibreNom"});
-			mapeigPropietatsOrdenacio.put("registreNumero", new String[] {"n.registreNumero"});
-			mapeigPropietatsOrdenacio.put("notificaDataCaducitat", new String[] {"nenv.notificaDataCaducitat"});
-			mapeigPropietatsOrdenacio.put("notificaCertificacioNumSeguiment", new String[] {"nenv.notificaCertificacioNumSeguiment"});
-			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"concat(d.uuid, d.csv)"});
-			mapeigPropietatsOrdenacio.put("estat", new String[] {"n.estat"});
+			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"enviamentDataProgramada"});
+			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"notificaIdentificador"});
+			mapeigPropietatsOrdenacio.put("procedimentCodiNotib", new String[] {"procedimentCodiNotib"});
+			mapeigPropietatsOrdenacio.put("grupCodi", new String[] {"grupCodi"});
+			mapeigPropietatsOrdenacio.put("emisorDir3Codi", new String[] {"emisorDir3Codi"});
+			mapeigPropietatsOrdenacio.put("usuariCodi", new String[] {"usuariCodi"});
+			mapeigPropietatsOrdenacio.put("concepte", new String[] {"concepte"});
+			mapeigPropietatsOrdenacio.put("descripcio", new String[] {"descripcio"});
+			mapeigPropietatsOrdenacio.put("titularNif", new String[] {"titularNif"});
+			mapeigPropietatsOrdenacio.put("titularNomLlinatge", new String[] {"concat(titularLlinatge1, titularLlinatge2, titularNom)"});
+			mapeigPropietatsOrdenacio.put("titularEmail", new String[] {"titularEmail"});
+			mapeigPropietatsOrdenacio.put("llibre", new String[] {"registreLlibreNom"});
+			mapeigPropietatsOrdenacio.put("registreNumero", new String[] {"registreNumero"});
+			mapeigPropietatsOrdenacio.put("notificaDataCaducitat", new String[] {"notificaDataCaducitat"});
+			mapeigPropietatsOrdenacio.put("notificaCertificacioNumSeguiment", new String[] {"notificaCertificacioNumSeguiment"});
+			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"csv_uuid"});
+			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
+			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
