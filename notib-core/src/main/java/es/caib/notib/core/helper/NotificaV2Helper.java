@@ -164,8 +164,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-//		return NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat());
-//		notificacioEventHelper.clearUselessErrors(notificacio);
 		return notificacio;
 	}
 
@@ -721,7 +719,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			boolean notificaError) {
 
 		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacio,
-				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificaError);
+				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
 //
 //		notificacio.updateNotificaError(
 //				notificacioErrorTipus,

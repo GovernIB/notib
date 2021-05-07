@@ -131,8 +131,10 @@ public class NotificacioEventHelper {
     public NotificacioEventEntity addErrorEvent(NotificacioEntity notificacio,
                                                 NotificacioEventTipusEnumDto eventTipus,
                                                 String errorDescripcio,
+                                                NotificacioErrorTipusEnumDto errorTipus,
                                                 boolean notificaError) {
-        return addErrorEvent(notificacio, eventTipus, null, errorDescripcio, notificaError);
+        return addErrorEvent(notificacio, eventTipus, null, errorDescripcio,
+                errorTipus, notificaError);
     }
 
     public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
@@ -381,28 +383,30 @@ public class NotificacioEventHelper {
                               NotificacioEventTipusEnumDto eventTipus,
                               NotificacioEnviamentEntity enviament,
                               String errorDescripcio,
+                             NotificacioErrorTipusEnumDto errorTipus,
                               boolean notificaError) {
         clearUselessErrors(notificacio, enviament, eventTipus);
         //Crea un nou event
-        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(
-                eventTipus,
-                notificacio).
-                error(true).
-                errorDescripcio(errorDescripcio);
+        NotificacioEventEntity event = NotificacioEventEntity.builder()
+                .tipus(eventTipus)
+                .notificacio(notificacio)
+                .error(true)
+                .errorTipus(errorTipus)
+                .errorDescripcio(errorDescripcio)
+                .build();
 
         if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            eventBuilder.callbackInicialitza();
+            event.callbackInicialitza();
         }
 
-        NotificacioEventEntity event = eventBuilder.build();
 
         //Actualitza l'event per cada enviament
         if (enviament != null) {
-            eventBuilder.enviament(enviament);
+            event.setEnviament(enviament);
             notificacioEventRepository.saveAndFlush(event);
         } else {
             for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
-                eventBuilder.enviament(enviamentEntity);
+                event.setEnviament(enviamentEntity);
                 notificacioEventRepository.saveAndFlush(event);
 
                 switch (eventTipus)

@@ -158,8 +158,6 @@ public class RegistreNotificaHelper {
 			long t0) throws RegistrePluginException {
 		//Crea assentament registral + Notific@
 		logger.info(" >>> Nou assentament registral...");
-		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
-				pluginHelper.getRegistreReintentsPeriodeProperty());
 		AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 				notificacioEntity, 
 				notificacioEntity.getEnviaments());
@@ -191,6 +189,8 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
 			enviarANotifica = true;
 		}
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
+				pluginHelper.getRegistreReintentsPeriodeProperty());
 		return enviarANotifica;
 	}
 
@@ -202,8 +202,6 @@ public class RegistreNotificaHelper {
 			IntegracioInfo info,
 			long t0) throws RegistrePluginException {
 		logger.info(" >>> Nou assentament registral...");
-		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
-				pluginHelper.getRegistreReintentsPeriodeProperty());
 		AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 				notificacioEntity, 
 				enviament);
@@ -246,6 +244,8 @@ public class RegistreNotificaHelper {
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 		}
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
+				pluginHelper.getRegistreReintentsPeriodeProperty());
 	}
 	
 	private String getEnviamentIds(NotificacioEntity notificacio) {
