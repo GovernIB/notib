@@ -803,7 +803,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
-							filtre.getComu()== null,		
 							filtre.getComu()== null ? false : filtre.getComu(),
 							pageable);
 					
@@ -819,7 +818,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
-							filtre.getComu()== null,
 							filtre.getComu()== null ? false : filtre.getComu(),
 							pageable);
 					
@@ -836,7 +834,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
 							organsFills,
-							filtre.getComu()== null,
 							filtre.getComu()== null ? false : filtre.getComu(),
 							pageable);
 					
