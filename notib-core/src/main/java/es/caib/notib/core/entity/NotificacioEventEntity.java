@@ -196,4 +196,12 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	}
 	private static final long serialVersionUID = -2299453443943600172L;
 
+	// Custom builder setters
+	public static class NotificacioEventEntityBuilder {
+		private String errorDescripcio;
+		public NotificacioEventEntityBuilder errorDescripcio(String errorDescripcio){
+			errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
+			return this;
+		}
+	}
 }

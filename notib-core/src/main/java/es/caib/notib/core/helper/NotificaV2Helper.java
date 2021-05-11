@@ -11,7 +11,6 @@ import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -735,13 +734,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			NotificacioErrorTipusEnumDto notificacioErrorTipus,
 			boolean notificaError) {
 
-		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacio,
+		notificacioEventHelper.addErrorEvent(notificacio,
 				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
-//
-//		notificacio.updateNotificaError(
-//				notificacioErrorTipus,
-//				event);
-		notificacio.updateEventAfegir(event);
 	}
 	
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {

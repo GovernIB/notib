@@ -128,14 +128,6 @@ public class NotificacioEventHelper {
         updateNotificacio(notificacio, event);
         return event;
     }
-    public NotificacioEventEntity addErrorEvent(NotificacioEntity notificacio,
-                                                NotificacioEventTipusEnumDto eventTipus,
-                                                String errorDescripcio,
-                                                NotificacioErrorTipusEnumDto errorTipus,
-                                                boolean notificaError) {
-        return addErrorEvent(notificacio, eventTipus, null, errorDescripcio,
-                errorTipus, notificaError);
-    }
 
     public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
         log.debug("[Events-CALLBACK_CLIENT] Intentam afegir nou event de callback a client");
@@ -379,74 +371,48 @@ public class NotificacioEventHelper {
         notificacioEventRepository.saveAndFlush(event);
     }
 
-    private NotificacioEventEntity addErrorEvent(NotificacioEntity notificacio,
+    public void addErrorEvent(NotificacioEntity notificacio,
                               NotificacioEventTipusEnumDto eventTipus,
-                              NotificacioEnviamentEntity enviament,
                               String errorDescripcio,
                              NotificacioErrorTipusEnumDto errorTipus,
                               boolean notificaError) {
-        clearUselessErrors(notificacio, enviament, eventTipus);
-        //Crea un nou event
-        NotificacioEventEntity event = NotificacioEventEntity.builder()
-                .tipus(eventTipus)
-                .notificacio(notificacio)
-                .error(true)
-                .errorTipus(errorTipus)
-                .errorDescripcio(errorDescripcio)
-                .build();
-
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
-            event.callbackInicialitza();
-        }
-
+        clearUselessErrors(notificacio, null, eventTipus);
 
         //Actualitza l'event per cada enviament
-        if (enviament != null) {
-            event.setEnviament(enviament);
-            notificacioEventRepository.saveAndFlush(event);
-        } else {
-            for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
-                event.setEnviament(enviamentEntity);
-                notificacioEventRepository.saveAndFlush(event);
+        for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
+            //Crea un nou event
+            NotificacioEventEntity event = NotificacioEventEntity.builder()
+                    .tipus(eventTipus)
+                    .notificacio(notificacio)
+                    .error(true)
+                    .errorTipus(errorTipus)
+                    .errorDescripcio(errorDescripcio)
+                    .enviament(enviamentEntity)
+                    .build();
 
-                switch (eventTipus)
-                {
-                    case NOTIFICA_REGISTRE:
-                        enviamentEntity.updateNotificaError(true, event);
-                        break;
-                    case NOTIFICA_ENVIAMENT:
-                        auditEnviamentHelper.updateErrorNotifica(enviamentEntity, notificaError, event);
-                        break;
-                    default:
-                        break;
-                }
+            if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
+                event.callbackInicialitza();
+            }
+
+            notificacioEventRepository.saveAndFlush(event);
+            updateNotificacio(notificacio, event);
+
+            switch (eventTipus)
+            {
+                case NOTIFICA_REGISTRE:
+                    enviamentEntity.updateNotificaError(true, event);
+                    break;
+                case NOTIFICA_ENVIAMENT:
+                    auditEnviamentHelper.updateErrorNotifica(enviamentEntity, notificaError, event);
+                    break;
+                default:
+                    break;
             }
         }
-        updateNotificacio(notificacio, event);
-        notificacioEventRepository.saveAndFlush(event);
-        return event;
     }
-//    private void updateNotificacio(NotificacioEntity notificacio, NotificacioEventEntity eventCreat) {
-//        updateNotificacio(notificacio, eventCreat, null);
-//    }
 
     private void updateNotificacio(NotificacioEntity notificacio, NotificacioEventEntity eventCreat) {
         notificacio.updateEventAfegir(eventCreat);
-//        List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(
-//                NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-//                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-//                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-//                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-//                NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-//                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-//                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
-//                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
-//        );
-
-//        if (notificacio.isTipusUsuariAplicacio() && eventCreat.isError() && errorsTipus.contains(eventCreat.getTipus())){
-            // TODO: revisar
-//            notificacio.setErrorLastEvent(true);
-//        }
     }
 
     private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
