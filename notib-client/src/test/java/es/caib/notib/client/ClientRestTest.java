@@ -3,10 +3,7 @@
  */
 package es.caib.notib.client;
 
-import es.caib.notib.ws.notificacio.EnviamentReferencia;
-import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
-import es.caib.notib.ws.notificacio.NotificacioV2;
-import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.*;
 import org.apache.commons.codec.DecoderException;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +22,7 @@ import static org.junit.Assert.*;
 public class ClientRestTest extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
+	private static final String URL = "http://localhost:8080/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 	
@@ -46,7 +43,7 @@ public class ClientRestTest extends ClientBaseTest {
 				URL,
 				USERNAME,
 				PASSWORD,
-				false);
+				true);
 	}
 
 	@Test
@@ -57,13 +54,15 @@ public class ClientRestTest extends ClientBaseTest {
 						notificacioId,
 						1,
 						false));
+
+		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
-			
+
 		} else {
 			System.out.println(">>> Reposta Ok");
 		}
-		assertNotNull(respostaAlta);
+
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
@@ -74,7 +73,39 @@ public class ClientRestTest extends ClientBaseTest {
 				NotificacioEstatEnum.ENVIADA,
 				respostaAlta.getEstat());
 	}
-	
+
+	@Test
+	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		RespostaAlta respostaAlta = client.alta(
+				generarNotificacioV2(
+						notificacioId,
+						1,
+						false));
+
+		// When
+		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(
+				respostaAlta.getReferencies().get(0).getReferencia());
+		assertNotNull(respostaConsultaEstatEnviament);
+		if (respostaConsultaEstatEnviament.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
+		assertFalse(respostaConsultaEstatEnviament.isError());
+		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
+//		assertNotNull(respostaConsultaEstatEnviament.getReferencies());
+//		List<EnviamentReferencia> referencies = respostaConsultaEstatEnviament.getReferencies();
+//		assertEquals(1, referencies.size());
+//		assertNotNull(referencies.get(0).getReferencia());
+//		assertEquals(
+//				NotificacioEstatEnum.ENVIADA,
+//				respostaConsultaEstatEnviament.getEstat());
+	}
+
 	@Test
 	public void testCarga1() {
 		for (int i = 0; i < 200000; i++) {
