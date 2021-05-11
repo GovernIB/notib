@@ -181,7 +181,6 @@ public class NotificacioCommandV2 {
 		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(
 				this,
 				NotificacioDatabaseDto.class);
-
 		ProcedimentDto procedimentDto = new ProcedimentDto();
 		procedimentDto.setId(this.getProcedimentId());
 		dto.setProcediment(procedimentDto);

@@ -162,6 +162,7 @@ public class ConversioTipusHelper {
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
 						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
+						notificacioDto.setOrganGestorCodi(notificacioCommand.getOrganGestor());
 					}
 				})
 				.register();
