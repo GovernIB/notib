@@ -167,18 +167,35 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return notificacio;
 	}
 
+
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		try {
+			return enviamentRefrescarEstat(enviament, false);
+		} catch (Exception e) {
+			if (e instanceof SistemaExternException) {
+				throw (SistemaExternException) e;
+			}
+		}
+		return enviament;
+	}
+
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		return enviamentRefrescarEstat(enviament, raiseExceptions);
+	}
+
 	@UpdateEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+	private NotificacioEnviamentEntity enviamentRefrescarEstat(NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_NOTIFICA, 
 				"Consultar estat d'un enviament", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Identificador de l'enviament", String.valueOf(enviamentId)));
-		
-//		boolean resposta = true;
-		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
+
+
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
 //		enviament.setNotificacio(notificacio);
@@ -210,7 +227,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
 			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			logger.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+			logger.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 
 			if (resultadoInfoEnvio.getDatados() == null) {
 				String errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
@@ -283,7 +300,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 							datatDarrer.getResultado());
 				}
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				logger.info(" [TIMER-EST] Actualitzar informació enviament amb certificació  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+				logger.info(" [TIMER-EST] Actualitzar informació enviament amb certificació  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 				logger.info("Enviament actualitzat");
 			}
 			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, null, false);
@@ -332,7 +349,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					startTime = System.nanoTime();
 					emailHelper.prepararEnvioEmailNotificacio(notificacio);
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
-					logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviamentId + "]: " + elapsedTime + " ms");
+					logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 				}
 			}
 			logger.info("Enviament actualitzat");
@@ -354,14 +371,14 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				notificacioEventHelper.addNotificaConsultaErrorEvent(notificacio, enviament);
 			}
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
-//			resposta = false;
+			if (raiseExceptions){
+				throw ex;
+			}
 		}
-//		notificacioEventHelper.clearUselessErrors(notificacio);
 		return enviament;
 	}
 
-	private ResultadoAltaRemesaEnvios enviaNotificacio(
-			NotificacioEntity notificacio) throws Exception {
+	private ResultadoAltaRemesaEnvios enviaNotificacio(NotificacioEntity notificacio) throws Exception {
 		ResultadoAltaRemesaEnvios resultat = null;
 		try {
 			String apiKey = notificacio.getEntitat().getApiKey();

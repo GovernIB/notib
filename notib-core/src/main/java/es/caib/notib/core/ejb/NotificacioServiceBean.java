@@ -293,8 +293,8 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public void enviamentsRefrescarEstat() {
-		delegate.enviamentsRefrescarEstat();
+	public void refrescarEnviamentsExpirats() {
+		delegate.refrescarEnviamentsExpirats();
 	}
 	
 	@RolesAllowed({"tothom"})

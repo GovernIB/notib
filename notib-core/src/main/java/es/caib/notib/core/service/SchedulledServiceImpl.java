@@ -201,7 +201,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("[NOT] Refrescant notificacions expirades");
-			notificacioService.enviamentsRefrescarEstat();
+			notificacioService.refrescarEnviamentsExpirats();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

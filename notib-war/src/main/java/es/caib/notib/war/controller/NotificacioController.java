@@ -1016,7 +1016,7 @@ public class NotificacioController extends BaseUserController {
     @ResponseBody
     public void refrescarEstatNotifica() {
         try {
-            notificacioService.enviamentsRefrescarEstat();
+            notificacioService.refrescarEnviamentsExpirats();
         } catch (Exception ex) {
             log.error("S'ha produit un error consultant els enviaments", ex);
         }

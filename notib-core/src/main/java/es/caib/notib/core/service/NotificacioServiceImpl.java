@@ -1693,7 +1693,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	public void enviamentsRefrescarEstat() {
+	public void refrescarEnviamentsExpirats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			

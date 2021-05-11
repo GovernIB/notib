@@ -64,7 +64,7 @@ public class NotificacioHelper {
 			String msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
 			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
-			notificaHelper.enviamentRefrescarEstat(enviamentId);
+			notificaHelper.enviamentRefrescarEstat(enviamentId, true);
 			String msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
 			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
 			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdated));

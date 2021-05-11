@@ -4,6 +4,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -142,6 +143,26 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		try {
+			return enviamentRefrescarEstat(enviament, false);
+		} catch (Exception e) {
+			if (e instanceof SistemaExternException) {
+				throw (SistemaExternException) e;
+			}
+		}
+		return enviament;
+	}
+
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		return enviamentRefrescarEstat(enviament, raiseExceptions);
+	}
+
+
+	@UpdateEnviamentTable
+//	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
+	private NotificacioEnviamentEntity enviamentRefrescarEstat(NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
+
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
 //		enviament.setNotificacio(notificacio);
@@ -336,6 +357,9 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					true,
 					event);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+			if (raiseExceptions){
+				throw ex;
+			}
 		}
 		return enviament;
 	}
