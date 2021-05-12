@@ -38,7 +38,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private Date enviamentDataProgramada;
 	private String procedimentCodiNotib;
 	private String grupCodi;
-	private String emisorDir3Codi;
+	private String organCodi;
 	private String usuariCodi;
 	private String concepte;
 	private String descripcio;

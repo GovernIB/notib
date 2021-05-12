@@ -1697,12 +1697,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		
 		// Procediment
-		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO) {
+		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO ) {
 			if (notificacio.getProcedimentCodi() == null) {
 				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
 			}
 		} else if (notificacio.getProcedimentCodi() == null && notificacio.getOrganGestor() == null){
 			return setRespostaError("[1022] El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment.");
+		}
+		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO &&  comunicacioSenseAdministracio) {
+			if (notificacio.getProcedimentCodi() == null) {
+				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
+			}
 		}
 
 		// Documents
