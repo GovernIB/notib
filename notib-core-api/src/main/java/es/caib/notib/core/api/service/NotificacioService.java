@@ -427,8 +427,10 @@ public interface NotificacioService {
 	public String guardarArxiuTemporal(String string);
 
 	@PreAuthorize("hasRole('tothom')")
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId);
-	
+	byte[] obtenirArxiuTemporal(String arxiuGestdocId);
+	@PreAuthorize("hasRole('tothom')")
+	byte[] obtenirArxiuNotificacio(String arxiuGestdocId);
+
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
 	

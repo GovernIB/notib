@@ -64,7 +64,6 @@ public class CallbackServiceImpl implements CallbackService {
 							}
 						}catch (Exception e) {
 							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId), e);
-							e.printStackTrace();
 
 							// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
 							callbackHelper.marcarEventNoProcessable(event,

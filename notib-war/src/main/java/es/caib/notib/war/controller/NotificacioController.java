@@ -392,7 +392,13 @@ public class NotificacioController extends BaseUserController {
 //                                notificacioCommand.getDocument()[i].setMetadadesKeys(notificacioCommand.getDocument()[i].getMetadadesKeys());
 //                                notificacioCommand.getDocument()[i].setMetadadesValues(notificacioCommand.getDocument()[i].getMetadadesValues());
                         } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
-                            byte[] result = notificacioService.obtenirArxiuTemporal(arxiuGestdocId);
+                            byte[] result;
+                            if (notificacioCommand.getId() != null) {
+                                result = notificacioService.obtenirArxiuNotificacio(arxiuGestdocId);
+                            } else {
+                                result = notificacioService.obtenirArxiuTemporal(arxiuGestdocId);
+                            }
+
                             String contingutBase64 = Base64.encodeBase64String(result);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
                         }

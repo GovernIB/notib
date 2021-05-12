@@ -1916,70 +1916,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional(rollbackFor=Exception.class)
 	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
+		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
+	}
+
+	@Override
+	@Transactional(rollbackFor=Exception.class)
+	public byte[] obtenirArxiuNotificacio(String arxiuGestdocId) {
+		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS);
+	}
+
+	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
 			if(arxiuGestdocId != null) {
-				
 				pluginHelper.gestioDocumentalGet(
 						arxiuGestdocId,
-						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
-//						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+						agrupacio,
 						output);
 			}
 		} catch (Exception ex) {
-			logger.error("Error al recuperar l'arxiu temporal ");
+			logger.error("Error al recuperar l'arxiu de l'agrupació: " + agrupacio);
 			throw ex;
-		} 
+		}
 		return output.toByteArray();
 	}
-	
-	
-	
 
-
-//	private boolean isNotificaEnviamentsActiu() {
-//		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
-//		if (actives != null) {
-//			return new Boolean(actives).booleanValue();
-//		} else {
-//			return true;
-//		}
-//	}
-//	private int getNotificaEnviamentsProcessarMaxProperty() {
-//		return propertiesHelper.getAsInt(
-//				"es.caib.notib.tasca.notifica.enviaments.processar.max",
-//				10);
-//	}
-//	
-//	private int getRegistreEnviamentsProcessarMaxProperty() {
-//		return propertiesHelper.getAsInt(
-//				"es.caib.notib.tasca.registre.enviaments.processar.max",
-//				10);
-//	}
-//
-//	private boolean isEnviamentActualitzacioEstatActiu() {
-//		String actives = propertiesHelper.getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
-//		if (actives != null) {
-//			return new Boolean(actives).booleanValue();
-//		} else {
-//			return true;
-//		}
-//	}
-//	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
-//		return propertiesHelper.getAsInt(
-//				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
-//				10);
-//	}
-//
-//	private boolean isTasquesActivesProperty() {
-//		String actives = propertiesHelper.getProperty("es.caib.notib.tasques.actives");
-//		if (actives != null) {
-//			return new Boolean(actives).booleanValue();
-//		} else {
-//			return true;
-//		}
-//	}
-	
 	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{
         URL url = new URL(urlStr);
         BufferedInputStream bis = new BufferedInputStream(url.openStream());
