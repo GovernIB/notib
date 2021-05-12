@@ -5,6 +5,7 @@ package es.caib.notib.core.service;
 
 import es.caib.loginModule.util.Base64.InputStream;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.service.*;
@@ -27,6 +28,9 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -708,6 +712,97 @@ public class BaseServiceTest {
 	private java.io.InputStream getContingutNotificacioAdjunt() {
 		return getClass().getResourceAsStream(
 				"/es/caib/notib/core/notificacio_adjunt.pdf");
+	}
+	
+	// Contrucción PaginacioParamsDto
+	// ///////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected static PaginacioParamsDto getPaginacioDtoFromRequest(
+			Map<String, String[]> mapeigFiltres,
+			Map<String, String[]> mapeigOrdenacions) {
+		DatatablesParams params = new DatatablesParams();
+		logger.debug("Informació de la pàgina obtingudes de datatables (" +
+				"draw=" + params.getDraw() + ", " +
+				"start=" + params.getStart() + ", " +
+				"length=" + params.getLength() + ")");
+		PaginacioParamsDto paginacio = new PaginacioParamsDto();
+		int paginaNum = params.getStart() / params.getLength();
+		paginacio.setPaginaNum(paginaNum);
+		if (params.getLength() != null && params.getLength().intValue() == -1) {
+			paginacio.setPaginaTamany(Integer.MAX_VALUE);
+		} else {
+			paginacio.setPaginaTamany(params.getLength());
+		}
+		paginacio.setFiltre(params.getSearchValue());
+		for (int i = 0; i < params.getColumnsSearchValue().size(); i++) {
+			String columna = params.getColumnsData().get(i);
+			String[] columnes = new String[] {columna};
+			if (mapeigFiltres != null && mapeigFiltres.get(columna) != null) {
+				columnes = mapeigFiltres.get(columna);
+			}
+			for (String col: columnes) {
+				if (!"<null>".equals(col)) {
+					paginacio.afegirFiltre(
+							col,
+							params.getColumnsSearchValue().get(i));
+					logger.debug("Afegit filtre a la paginació (" +
+							"columna=" + col + ", " +
+							"valor=" + params.getColumnsSearchValue().get(i) + ")");
+				}
+			}
+		}
+		for (int i = 0; i < params.getOrderColumn().size(); i++) {
+			int columnIndex = params.getOrderColumn().get(i);
+			String columna = params.getColumnsData().get(columnIndex);
+			OrdreDireccioDto direccio;
+			if ("asc".equals(params.getOrderDir().get(i)))
+				direccio = OrdreDireccioDto.ASCENDENT;
+			else
+				direccio = OrdreDireccioDto.DESCENDENT;
+			String[] columnes = new String[] {columna};
+			if (mapeigOrdenacions != null && mapeigOrdenacions.get(columna) != null) {
+				columnes = mapeigOrdenacions.get(columna);
+			}
+			for (String col: columnes) {
+				paginacio.afegirOrdre(col, direccio);
+				logger.debug("Afegida ordenació a la paginació (columna=" + columna + ", direccio=" + direccio + ")");
+			}
+		}
+		logger.debug("Informació de la pàgina sol·licitada (paginaNum=" + paginacio.getPaginaNum() + ", paginaTamany=" + paginacio.getPaginaTamany() + ")");
+		return paginacio;
+	}
+	
+	// Listado de Procediments
+	@Getter @Setter
+	protected static class DatatablesParams {
+		private Integer draw;
+		private Integer start;
+		private Integer length;
+		private String searchValue;
+		private Boolean searchRegex;
+		private List<Integer> orderColumn = new ArrayList<Integer>();
+		private List<String> orderDir = new ArrayList<String>();
+		private List<String> columnsData = new ArrayList<String>();
+		private List<String> columnsName = new ArrayList<String>();
+		private List<Boolean> columnsSearchable = new ArrayList<Boolean>();
+		private List<Boolean> columnsOrderable = new ArrayList<Boolean>();
+		private List<String> columnsSearchValue = new ArrayList<String>();
+		private List<Boolean> columnsSearchRegex = new ArrayList<Boolean>();
+		protected DatatablesParams() {
+			draw = 1;
+			start = 0;
+			length = 10;
+			searchValue = "";
+			searchRegex = null;
+			orderColumn.add(3);
+			orderDir.add("desc");
+			columnsData = Arrays.asList("id", "codi", "nom", "organGestorDesc", "pagadorpostal", "pagadorcie", "comu", "agrupar", "grupsCount", "permisosCount", "id");
+			columnsName = Arrays.asList(null, null, null, null, null, null, null, null, null, null, null);
+			columnsSearchable = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
+			columnsOrderable = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
+			columnsSearchValue = Arrays.asList(null, null, null, null, null, null, null, null, null, null, null);
+			columnsSearchRegex = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
+		}
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
