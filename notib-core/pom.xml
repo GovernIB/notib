@@ -309,13 +309,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxws-maven-plugin</artifactId>
 				<version>2.4.1</version>
@@ -390,6 +383,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
 					<skip>false</skip>
+					<systemPropertyVariables>
+						<es.caib.notib.properties.path>classpath:/es/caib/notib/core/test.properties</es.caib.notib.properties.path>
+					</systemPropertyVariables>
 				</configuration>
             </plugin>
 		</plugins>
