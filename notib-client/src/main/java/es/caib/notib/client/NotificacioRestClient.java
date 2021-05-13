@@ -37,8 +37,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String password;
 
 	private boolean autenticacioBasic = false;
-	private int connecTimeout = 3000000;
-	private int readTimeout = 10000000;
+	private int connecTimeout = 10000;
+	private int readTimeout = 60000;
 
 	public NotificacioRestClient() {}
 	public NotificacioRestClient(

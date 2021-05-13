@@ -3,19 +3,8 @@
  */
 package es.caib.notib.war.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -25,12 +14,25 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controlador per a la consulta d'accions de les integracions.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/integracio")
 public class IntegracioController extends BaseUserController {
@@ -94,6 +96,14 @@ public class IntegracioController extends BaseUserController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_FILTRE));
+		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
+		try {
+			model.addAttribute("data",
+					(new ObjectMapper()).writeValueAsString(aplicacioService.integracioFindDarreresAccionsByCodi(codi))
+			);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 		return "integracioList";
 	}
 

@@ -23,7 +23,7 @@ public class IntegracioHelper {
 	@Resource
 	private UsuariHelper usuariHelper;
 	
-	public static final int DEFAULT_MAX_ACCIONS = 300;
+	public static final int DEFAULT_MAX_ACCIONS = 250;
 
 	public static final String INTCODI_USUARIS = "USUARIS";
 	public static final String INTCODI_REGISTRE = "REGISTRE";
