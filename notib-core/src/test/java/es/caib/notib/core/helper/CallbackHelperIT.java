@@ -80,6 +80,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         database = createDatabase(EntitatItemTest.getRandomInstance(),
                 notificacioCreate
                 );
+
         aplicacio = AplicacioEntity.builder()
                 .usuariCodi("admin")
                 .callbackUrl(CALLBACK_URL)

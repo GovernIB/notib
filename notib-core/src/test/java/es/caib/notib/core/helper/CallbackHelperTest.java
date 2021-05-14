@@ -3,6 +3,7 @@ package es.caib.notib.core.helper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.Statuses;
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
@@ -212,4 +213,71 @@ public class CallbackHelperTest {
         );
     }
 
+    @Test
+    public void whenAplicacioNull_thenAddErrorIntegracioAndRaiseException() throws Exception {
+        // Given
+        Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(),
+                Mockito.anyLong())).thenReturn(null);
+
+        NotificacioEventEntity event = NotificacioEventEntity.builder()
+                .callbackIntents(Integer.parseInt(MAX_INTENTS_CALLBACK)-1)
+                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+                .enviament(enviamentMock)
+                .notificacio(notificacioMock)
+                .build();
+
+        // When
+        try {
+            callbackHelper.notifica(event);
+        }catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+        // Then
+        Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
+
+        // Verificam que s'ha asociat un event i que és d'error
+        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+                Mockito.any(NotificacioEntity.class),
+                Mockito.eq(event),
+                Mockito.eq(true)
+        );
+
+        Mockito.verify(integracioHelper).addAccioError(
+                Mockito.any(IntegracioInfo.class),
+                Mockito.anyString()
+        );
+    }
+    @Test
+    public void whenAplicacioCallbackUrlNull_thenAddErrorIntegracioAndRaiseException() throws Exception {
+        // Given
+       aplicacio.update("", null);
+
+        NotificacioEventEntity event = NotificacioEventEntity.builder()
+                .callbackIntents(Integer.parseInt(MAX_INTENTS_CALLBACK)-1)
+                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+                .enviament(enviamentMock)
+                .notificacio(notificacioMock)
+                .build();
+
+        // When
+        try {
+            callbackHelper.notifica(event);
+        }catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+        // Then
+        Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
+
+        // Verificam que s'ha asociat un event i que és d'error
+        Mockito.verify(notificacioEventHelper).addCallbackEvent(
+                Mockito.any(NotificacioEntity.class),
+                Mockito.eq(event),
+                Mockito.eq(true)
+        );
+
+        Mockito.verify(integracioHelper).addAccioError(
+                Mockito.any(IntegracioInfo.class),
+                Mockito.anyString()
+        );
+    }
 }
