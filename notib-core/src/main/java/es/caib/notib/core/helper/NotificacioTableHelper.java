@@ -9,6 +9,8 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,7 @@ public class NotificacioTableHelper {
     @Autowired
     private NotificacioEventRepository notificacioEventRepository;
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
         NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                 .notificacio(notificacio)
@@ -50,6 +53,7 @@ public class NotificacioTableHelper {
         notificacioTableViewRepository.save(tableViewItem);
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEntity notificacio){
         NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
         if (tableViewItem == null) {
