@@ -60,7 +60,7 @@ public class CallbackHelper {
 		);
 
 		int intents = event.getCallbackIntents() + 1;
-		log.debug(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
+		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
 				intents, event.getId(), notificacio.getId()));
 		boolean isError = false;
 		try {
