@@ -93,6 +93,11 @@ public class NotificacioTableHelper {
         notificacioTableViewRepository.saveAndFlush(tableViewItem);
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void eliminarRegistre(NotificacioEntity notificacio){
+        notificacioTableViewRepository.delete(notificacio.getId());
+    }
+
     /////
     // PRIVATE METHODS
     ////

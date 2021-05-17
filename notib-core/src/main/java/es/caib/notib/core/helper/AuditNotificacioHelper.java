@@ -31,7 +31,8 @@ public class AuditNotificacioHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
-
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
 	public NotificacioEntity desaNotificacio(NotificacioEntity notificacioEntity) {
@@ -41,9 +42,9 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacio(
-			NotificacioEntity notificacioEntity,
+			NotificacioEntity notificacio,
 			NotificacioHelper.NotificacioData data) {
-		notificacioEntity.update(
+		notificacio.update(
 				data.getEntitat(),
 				data.getNotificacio().getEmisorDir3Codi(),
 				data.getOrganGestor(),
@@ -67,15 +68,17 @@ public class AuditNotificacioHelper {
 				data.getDocument5Entity(),
 				data.getProcedimentOrgan(),
 				data.getNotificacio().getIdioma());
-		return notificacioEntity;
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateNotificacioProcessada(NotificacioEntity notificacioEntity, String motiu) {
-		notificacioEntity.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
-		notificacioEntity.updateEstatDate(new Date());
-		notificacioEntity.updateMotiu(motiu);
-		return notificacioEntity;
+	public NotificacioEntity updateNotificacioProcessada(NotificacioEntity notificacio, String motiu) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
+		notificacio.updateEstatDate(new Date());
+		notificacio.updateMotiu(motiu);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
 	}
 
 
@@ -86,6 +89,7 @@ public class AuditNotificacioHelper {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
 
@@ -94,44 +98,49 @@ public class AuditNotificacioHelper {
 			NotificacioEntity notificacio,
 			boolean error) {
 		notificacio.updateLastCallbackError(error);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioRegistre(RespostaConsultaRegistre arbResposta,
-													   NotificacioEntity notificacioEntity) {
-		notificacioEntity.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
-		notificacioEntity.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
-		notificacioEntity.updateRegistreData(arbResposta.getRegistreData());
-		notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
-		return notificacioEntity;
+													   NotificacioEntity notificacio) {
+		notificacio.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
+		notificacio.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
+		notificacio.updateRegistreData(arbResposta.getRegistreData());
+		notificacio.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateRegistreNouEnviament(NotificacioEntity notificacioEntity, int reintentsPeriode) {
-		notificacioEntity.updateRegistreNouEnviament(reintentsPeriode);
-		return notificacioEntity;
+	public NotificacioEntity updateRegistreNouEnviament(NotificacioEntity notificacio, int reintentsPeriode) {
+		notificacio.updateRegistreNouEnviament(reintentsPeriode);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateNotificacioEnviada(NotificacioEntity notificacioEntity) {
-		notificacioEntity.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-		notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
-		return notificacioEntity;
+	public NotificacioEntity updateNotificacioEnviada(NotificacioEntity notificacio) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
+		notificacioEventHelper.clearOldUselessEvents(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioRefreshRegistreNotificacio(NotificacioEntity notificacio) {
 		notificacio.refreshRegistre();
 		notificacioRepository.saveAndFlush(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.DELETE)
-	public NotificacioEntity deleteNotificacio(NotificacioEntity notificacioEntity) {
-		notificacioRepository.delete(notificacioEntity);
+	public NotificacioEntity deleteNotificacio(NotificacioEntity notificacio) {
+		notificacioRepository.delete(notificacio);
 		notificacioRepository.flush();
-		return notificacioEntity;
+		return notificacio;
 	}
 
 }
