@@ -52,6 +52,7 @@ public class JustificantHelper {
 	private Font frutiger9 = FontFactory.getFont("Frutiger", 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
 	private Font frutigerTitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font calibri10 = FontFactory.getFont("Calibri", 10);
+	private Font calibri8 = FontFactory.getFont("Calibri", 8);
 	private Font calibri10Bold = FontFactory.getFont("Calibri", 10, Font.BOLD); 
 	private Font calibriWhiteBold = FontFactory.getFont("Calibri", 10, Font.BOLD, new BaseColor(255, 255, 255)); // #FFFFFF
 	
@@ -72,20 +73,8 @@ public class JustificantHelper {
 					justificant, 
 					notificacio, 
 					progres);
-
-			progres.setProgres(40);
-			int numEnviament = 1;
-			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament", new Object[] {numEnviament}));
-				crearTaulaEnviaments(
-						justificant, 
-						notificacio, 
-						enviament, 
-						numEnviament,
-						progres);
-				numEnviament++;
-			}
 			
+			progres.setProgres(40);
 			PdfPTable taulaAnnexos = new PdfPTable(1);
 			taulaAnnexos.setWidthPercentage(100f);
 			if (notificacio.getDocument() != null) {
@@ -101,6 +90,23 @@ public class JustificantHelper {
 						progres);
 			}
 
+			progres.setProgres(60);
+			crearIntroduccioEnviaments(
+					justificant, 
+					notificacio, 
+					progres);
+			int numEnviament = 1;
+			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament", new Object[] {numEnviament}));
+				crearTaulaEnviaments(
+						justificant, 
+						notificacio, 
+						enviament, 
+						numEnviament,
+						progres);
+				numEnviament++;
+			}
+			
 			justificant.close();
 		} catch (DocumentException ex) {
 			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.error", new Object[] {ex.getMessage()});
@@ -150,18 +156,19 @@ public class JustificantHelper {
 				setParametersBold(justificantDescripcio, descripcio);
 				justificantDescripcio.setSpacingBefore(10f);
 			}
-			
-//			## [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
-			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol", new Object[] {notificacio.getEnviaments().size()});
-			Paragraph justificantIntroduccioEnviaments = new Paragraph();
-			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
-			justificantIntroduccioEnviaments.setSpacingBefore(10f);
+//			## [INTRODUCCIÓ ANNEXOS JUSTIFICANT]
+			Paragraph justificantAnnexosIntroduccion = new Paragraph();
+			if (notificacio.getDocument() != null) {
+				String introAnnexos = messageHelper.getMessage("es.caib.notib.justificant.documents");				
+				setParametersBold(justificantAnnexosIntroduccion, introAnnexos);
+				justificantAnnexosIntroduccion.setSpacingBefore(10f);
+			}
 			
 			titolIntroduccioCell.addElement(justificantTitol);
 			titolIntroduccioCell.addElement(justificantIntroduccio);		
 			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty())
 				titolIntroduccioCell.addElement(justificantDescripcio);
-			titolIntroduccioCell.addElement(justificantIntroduccioEnviaments);
+			titolIntroduccioCell.addElement(justificantAnnexosIntroduccion);
 			
 			titolIntroduccioTable.addCell(titolIntroduccioCell);
 			titolIntroduccioTable.setSpacingAfter(10f);
@@ -173,7 +180,38 @@ public class JustificantHelper {
 			logger.debug(errorMessage, ex);
 		}
 	}
-
+	private void crearIntroduccioEnviaments(
+			Document justificant, 
+			NotificacioDtoV2 notificacio, 
+			ProgresDescarregaDto progres) throws JustificantException {
+		logger.debug("Creant la introducció de les enviaments del justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
+		try {
+//			## [TAULA QUE CONTÉ INTRODUCCIÓ DE LES ENVIAMENTS]
+			PdfPTable titolIntroduccioTableEnviaments = new PdfPTable(1);
+			titolIntroduccioTableEnviaments.setWidthPercentage(100);
+			PdfPCell titolIntroduccioEnviamentsCell = new PdfPCell();
+			titolIntroduccioEnviamentsCell.setBorder(Rectangle.NO_BORDER);
+			
+			
+//			## [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
+			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol", new Object[] {notificacio.getEnviaments().size()});
+			Paragraph justificantIntroduccioEnviaments = new Paragraph();
+			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
+			justificantIntroduccioEnviaments.setSpacingBefore(10f);
+			
+			titolIntroduccioEnviamentsCell.addElement(justificantIntroduccioEnviaments);
+			
+			titolIntroduccioTableEnviaments.addCell(titolIntroduccioEnviamentsCell);
+			titolIntroduccioTableEnviaments.setSpacingAfter(10f);
+			justificant.add(titolIntroduccioTableEnviaments);
+			
+		} catch (DocumentException ex) {
+			String errorMessage = "Hi ha hagut un error generant la introducció de les enviaments del justificant";
+			progres.setProgres(100);
+			progres.addInfo(TipusInfo.INFO, errorMessage);
+			logger.debug(errorMessage, ex);
+	}
+}
 	private void crearTaulaEnviaments(
 			Document justificant, 
 			NotificacioDtoV2 notificacio,
@@ -443,8 +481,8 @@ public class JustificantHelper {
 		logger.debug("Generant la taula de annexos del justificant d'enviament per als documents.");
 		try {
 //			## [CONTINGUT]
-			int[] headingTablewidths = {13, 8, 13, 13, 18, 14, 13, 8};
-			PdfPTable dadesAnnexoTable = new PdfPTable(8);
+			int[] headingTablewidths = {39, 8, 20, 20, 13};
+			PdfPTable dadesAnnexoTable = new PdfPTable(5);
 			dadesAnnexoTable.setWidthPercentage(100f);
 			dadesAnnexoTable.setWidths(headingTablewidths);
 			
@@ -464,12 +502,6 @@ public class JustificantHelper {
 			contingut.setBorder(PdfPCell.NO_BORDER);
 			contingut.addElement(dadesAnnexoTable);
 			
-	        //## [CONFIGURACIÓ CELLA CONTINGUT]
-//			contingut.setPaddingLeft(7f);
-//			contingut.setPaddingBottom(15f);
-//			contingut.setBorderWidth((float) 0.5);
-//			contingut.setBorderColor(new BaseColor(166, 166, 166));
-
 			taulaAnnexos.addCell(contingut);
 			justificant.add(taulaAnnexos);
 			justificant.add(Chunk.NEXTPAGE);
@@ -491,20 +523,11 @@ public class JustificantHelper {
 //		## [CSV - TÍTOL]
 		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.csv"), calibri10Bold);
 		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
-//		## [UUID - TÍTOL]
-		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.uuid"), calibri10Bold);
-		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
-//		## [ORIGEN - TÍTOL]
-		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.origen"), calibri10Bold);
-		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
 //		## [VALIDESA - TÍTOL]
 		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.validesa"), calibri10Bold);
 		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
 //		## [TIPODOCUMENTAL - TÍTOL]
 		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.tipoDocumental"), calibri10Bold);
-		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
-//		## [MODOFIRMA - TÍTOL]
-		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.modoFirma"), calibri10Bold);
 		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
 	}
 
@@ -517,14 +540,18 @@ public class JustificantHelper {
 	
 	private void getContingutAnnexos(DocumentDto document, PdfPTable dadesAnnexoTable) throws DocumentException {
 //		## [CONTINGUT COLUMNES]
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getArxiuNom() != null && !document.getArxiuNom().isEmpty()) ? document.getArxiuNom() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getMida() != null ? document.getMida().toString() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getCsv() != null && !document.getCsv().isEmpty()) ? document.getCsv() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getUuid() != null && !document.getUuid().isEmpty()) ? document.getUuid() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getOrigen() != null ? document.getOrigen().toString() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getValidesa() != null ? document.getValidesa().toString() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getTipoDocumental() != null ? document.getTipoDocumental().toString() : "", calibri10));
-		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getModoFirma() != null ? document.getModoFirma().toString() : "", calibri10));
+		String nomCsvOUuid = "";
+		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
+			if (document.getCsv() != null && document.getUuid() != null) //es Uuid
+				nomCsvOUuid = "uuid:" + document.getUuid();
+			else if (document.getCsv() != null && document.getUuid() == null) //es CSV
+					nomCsvOUuid = "csv:" + document.getCsv();		
+		}
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getArxiuNom() != null && !document.getArxiuNom().isEmpty()) ? document.getArxiuNom() : nomCsvOUuid, calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getMida() != null ? String.valueOf(Math.round(document.getMida() / 1024 )) + " KB" : "", calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getCsv() != null && !document.getCsv().isEmpty()) ? document.getCsv() : "", calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getValidesa() != null ? document.getValidesa().toString() : "", calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getTipoDocumental() != null ? document.getTipoDocumental().toString() : "", calibri8));
 	}
 	
 	private void createNewTableAnnexosContent(PdfPTable table, Chunk chunk) {

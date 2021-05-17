@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 /**
@@ -192,6 +194,16 @@ public class NotificacioHelper {
 					doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
 					doc.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
 					document = doc;
+					
+					// Recuperar csv
+					Map<String, Object> metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
+					if (metadadesAddicionals != null) {
+						if (metadadesAddicionals.containsKey("csv"))
+							document.setCsv((String) metadadesAddicionals.get("csv"));
+						else if (metadadesAddicionals.containsKey("eni:csv"))
+							document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+					}
+					
 				}
 			} else if (document.getCsv() != null) {
 				DocumentDto doc = new DocumentDto();
