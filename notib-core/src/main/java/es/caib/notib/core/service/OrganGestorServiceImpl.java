@@ -409,6 +409,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	public void updateNoms(Long entitatId, String organActualCodiDir3) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			logger.info("Actualitzant noms dels òrgans gestors");
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					entitatId); 
@@ -421,24 +422,38 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						entitat,
 						organGestorsListCodisDir3);
 			}
-			
+
+			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
 				String denominacio = findDenominacioOrganisme(organGestor.getCodi());
 				if (denominacio != null && !denominacio.isEmpty())
 					organGestor.update(denominacio);
 				// Llibre òrgan gestor
-				LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
-						entitat.getDir3Codi(),
-						organGestor.getCodi());
-				if (llibreOrgan != null)
-					organGestor.updateLlibre(llibreOrgan.getCodi(), llibreOrgan.getNomLlarg());
-				Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-				// Oficina SIR òrgan gestor
-				List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
-						arbreUnitats,
-						organGestor.getCodi());
-				if (oficinesSIR != null && !oficinesSIR.isEmpty())
-					organGestor.updateOficina(oficinesSIR.get(0).getCodi(), oficinesSIR.get(0).getNom());
+				try {
+					LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
+							entitat.getDir3Codi(),
+							organGestor.getCodi());
+					if (llibreOrgan != null)
+						organGestor.updateLlibre(llibreOrgan.getCodi(), llibreOrgan.getNomLlarg());
+				} catch (Exception e) {
+					logger.error(String.format("El llibre de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
+							organGestor.getCodi(),
+							entitat.getDir3Codi()));
+					e.printStackTrace();
+				}
+				try {
+					// Oficina SIR òrgan gestor
+					List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+							arbreUnitats,
+							organGestor.getCodi());
+					if (oficinesSIR != null && !oficinesSIR.isEmpty())
+						organGestor.updateOficina(oficinesSIR.get(0).getCodi(), oficinesSIR.get(0).getNom());
+				} catch (Exception e) {
+					logger.error(String.format("L'oficina de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
+							organGestor.getCodi(),
+							entitat.getDir3Codi()));
+					e.printStackTrace();
+				}
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

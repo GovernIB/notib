@@ -5,6 +5,8 @@ import es.caib.notib.core.repository.EnviamentTableRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +18,7 @@ public class EnviamentTableHelper {
     @Autowired
     private NotificacioEventRepository notificacioEventRepository;
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEnviamentEntity enviament){
         NotificacioEntity notificacio = enviament.getNotificacio();
         PersonaEntity titular = enviament.getTitular();
@@ -65,6 +68,7 @@ public class EnviamentTableHelper {
         enviamentTableRepository.save(tableViewItem);
     }
 
+    @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEnviamentEntity enviament){
         EnviamentTableEntity tableViewItem = enviamentTableRepository.findOne(enviament.getId());
         if (tableViewItem == null) {

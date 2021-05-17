@@ -158,15 +158,22 @@ public class RegistreNotificaHelper {
 			long t0) throws RegistrePluginException {
 		//Crea assentament registral + Notific@
 		logger.info(" >>> Nou assentament registral...");
-		AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
-				notificacioEntity, 
-				notificacioEntity.getEnviaments());
-		RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
-				dir3Codi, 
-				arb, 
-				!isSirActivat ? null : (isComunicacio ? 2L : 1L), //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
-				notificacioEntity.getId(),
-				getEnviamentIds(notificacioEntity));
+		RespostaConsultaRegistre arbResposta;
+		try {
+			AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
+					notificacioEntity,
+					notificacioEntity.getEnviaments());
+			arbResposta = pluginHelper.crearAsientoRegistral(
+					dir3Codi,
+					arb,
+					!isSirActivat ? null : (isComunicacio ? 2L : 1L), //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+					notificacioEntity.getId(),
+					getEnviamentIds(notificacioEntity));
+		} catch (Exception e) {
+			arbResposta = new RespostaConsultaRegistre();
+			arbResposta.setErrorCodi("ERROR");
+			arbResposta.setErrorDescripcio(e.getMessage());
+		}
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR");
@@ -202,15 +209,22 @@ public class RegistreNotificaHelper {
 			IntegracioInfo info,
 			long t0) throws RegistrePluginException {
 		logger.info(" >>> Nou assentament registral...");
-		AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
-				notificacioEntity, 
-				enviament);
-		RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
-				dir3Codi, 
-				arb, 
-				2L,
-				notificacioEntity.getId(),
-				String.valueOf(enviament.getId()));
+		RespostaConsultaRegistre arbResposta;
+		try {
+			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
+					notificacioEntity,
+					enviament);
+			arbResposta = pluginHelper.crearAsientoRegistral(
+					dir3Codi,
+					arb,
+					2L,
+					notificacioEntity.getId(),
+					String.valueOf(enviament.getId()));
+		} catch (Exception e) {
+			arbResposta = new RespostaConsultaRegistre();
+			arbResposta.setErrorCodi("ERROR");
+			arbResposta.setErrorDescripcio(e.getMessage());
+		}
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR");
@@ -265,7 +279,8 @@ public class RegistreNotificaHelper {
 			NotificacioEnviamentEntity enviament) {
 		
 		if (arbResposta != null)
-			errorDescripcio = arbResposta.getErrorDescripcio();
+			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n" +
+					arbResposta.getErrorDescripcio();
 
 		NotificacioEventEntity event = notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity,
 				enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
