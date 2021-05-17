@@ -466,7 +466,7 @@ public class NotificacioController extends BaseUserController {
                     codisProcedimentOrgansDisponibles.add(procedimentOrganDto.getId());
                 }
             }
-            if (isAdminOrgan) {
+            if (isAdminOrgan && entitatActual != null) {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
                 procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);

@@ -26,7 +26,7 @@ import java.util.GregorianCalendar;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
-@Builder(builderMethodName = "builder")
+@Builder
 @AllArgsConstructor
 @Entity
 @Table(name="not_notificacio_event")
@@ -200,7 +200,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	public static class NotificacioEventEntityBuilder {
 		private String errorDescripcio;
 		public NotificacioEventEntityBuilder errorDescripcio(String errorDescripcio){
-			errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
+			this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
 			return this;
 		}
 	}

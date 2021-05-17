@@ -179,7 +179,6 @@ public class RegistreNotificaHelper {
 			logger.info(" >>> ... ERROR");
 			updateEventWithError(
 					arbResposta,
-					null,
 					notificacioEntity,
 					null);
 			long t1 = System.currentTimeMillis();
@@ -230,7 +229,6 @@ public class RegistreNotificaHelper {
 			logger.info(" >>> ... ERROR");
 			updateEventWithError(
 					arbResposta,
-					null,
 					notificacioEntity,
 					enviament);
 			long t1 = System.currentTimeMillis();
@@ -274,10 +272,9 @@ public class RegistreNotificaHelper {
 	
 	private void updateEventWithError(
 			RespostaConsultaRegistre arbResposta,
-			String errorDescripcio,
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament) {
-		
+		String errorDescripcio = "";
 		if (arbResposta != null)
 			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n" +
 					arbResposta.getErrorDescripcio();

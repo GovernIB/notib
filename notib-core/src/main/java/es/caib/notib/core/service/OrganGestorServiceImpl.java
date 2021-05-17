@@ -62,8 +62,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private PagadorCieRepository pagadorCieReposity;
 	@Resource
-	private ProcedimentHelper procedimentHelper;
-	@Resource
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
@@ -71,6 +69,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private PermisosCacheable permisosCacheable;
 	@Resource
 	private ProcedimentsCacheable procedimentsCacheable;
+	@Resource
+	private PluginHelper pluginHelper;
 
 	@Override
 	@Transactional
@@ -370,7 +370,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId); 
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(organGestorCodi);
-			String denominacio = findDenominacioOrganisme(organGestorCodi);
+			String denominacio = pluginHelper.getDenominacio(organGestorCodi);
 			if (denominacio != null && !denominacio.isEmpty())
 				organGestor.update(denominacio);
 			else
@@ -425,9 +425,16 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
-				String denominacio = findDenominacioOrganisme(organGestor.getCodi());
-				if (denominacio != null && !denominacio.isEmpty())
-					organGestor.update(denominacio);
+				try {
+					String denominacio = findDenominacioOrganisme(organGestor.getCodi());
+					if (denominacio != null && !denominacio.isEmpty())
+						organGestor.update(denominacio);
+				} catch (Exception e) {
+					logger.error(String.format("La denominacio de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
+							organGestor.getCodi(),
+							entitat.getDir3Codi()));
+					e.printStackTrace();
+				}
 				// Llibre òrgan gestor
 				try {
 					LlibreDto llibreOrgan = cacheHelper.getLlibreOrganGestor(
