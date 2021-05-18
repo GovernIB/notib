@@ -180,7 +180,7 @@ public class CallbackHelper {
 					getIntentsPeriodeProperty());
 
 
-			integracioHelper.addAccioError(info, "Error consultant l'aplicació");
+			integracioHelper.addAccioError(info, "Error consultant l'aplicació: " + errorMessage);
 			notificacioEventHelper.addCallbackEvent(enviament.getNotificacio(), event, true);
 
 			throw new Exception(errorMessage);
