@@ -80,4 +80,8 @@
 			id="auditService"
 			jndi-name="notib/AuditServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.AuditService"/>
+	<jee:local-slsb
+			id="avisService"
+			jndi-name="notib/AvisServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.AvisService"/>
 </beans>
