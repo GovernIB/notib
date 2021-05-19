@@ -5,8 +5,10 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CallbackHelper {
 
 	private static final String NOTIFICACIO_CANVI = "notificaCanvi";
-
+	@Autowired
+	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
@@ -41,6 +44,26 @@ public class CallbackHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private RequestsHelper requestsHelper;
+
+	@Transactional
+	public boolean notifica(@NonNull Long eventId) {
+		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+		try {
+			NotificacioEntity notificacioProcessada = notifica(event);
+			if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
+				return false;
+			}
+		}catch (Exception e) {
+			log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
+
+			// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
+			marcarEventNoProcessable(event,
+					e.getMessage(),
+					ExceptionUtils.getStackTrace(e));
+			return false;
+		}
+		return true;
+	}
 
 	@Transactional (rollbackFor = RuntimeException.class)
 	public NotificacioEntity notifica(@NonNull NotificacioEventEntity event) throws Exception{

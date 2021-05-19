@@ -2,13 +2,10 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -37,7 +33,6 @@ public class CallbackServiceImpl implements CallbackService {
     private MetricsHelper metricsHelper;
     
 	@Override
-	@Transactional
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
 			initialDelayString = "${config:es.caib.notib.tasca.callback.pendents.retard.inicial}")
@@ -54,21 +49,10 @@ public class CallbackServiceImpl implements CallbackService {
 				if (pendentsIds.size() > 0) {
 					logger.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 					int errors = 0;
-					for (Long pendentId: pendentsIds) {
-						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + pendentId);
-						NotificacioEventEntity event = notificacioEventRepository.findOne(pendentId);
-						try {
-							NotificacioEntity notificacioProcessada = callbackHelper.notifica(event);
-							if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
-								errors++;
-							}
-						}catch (Exception e) {
-							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId), e);
-
-							// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
-							callbackHelper.marcarEventNoProcessable(event,
-									e.getMessage(),
-									ExceptionUtils.getStackTrace(e));
+					for (Long eventId: pendentsIds) {
+						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
+						if(!callbackHelper.notifica(eventId)) {
+							errors++;
 						}
 					}
 					logger.debug("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
