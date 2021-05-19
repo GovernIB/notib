@@ -40,7 +40,7 @@ public class CallbackServiceImpl implements CallbackService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
-				logger.debug("[Callback] Cercant notificacions pendents d'enviar al client");
+				logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
 				int maxPendents = getEventsProcessarMaxProperty(); 
 				Pageable page = new PageRequest(
 						0,
@@ -55,9 +55,9 @@ public class CallbackServiceImpl implements CallbackService {
 							errors++;
 						}
 					}
-					logger.debug("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
+					logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 				} else {
-					logger.debug("[Callback] No hi ha notificacions pendents d'enviar. ");
+					logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 				}
 			} else {
 				logger.debug("[Callback] Enviament callbacks deshabilitat. ");
