@@ -2,7 +2,6 @@ package es.caib.notib.core.aspect;
 
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.NotificacioTableHelper;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -20,8 +19,6 @@ import org.springframework.stereotype.Component;
 @Order(201)
 @Component
 public class NotificacioTableAdvice {
-	@Autowired
-	private NotificacioTableViewRepository notificacioTableViewRepository;
 
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
@@ -34,7 +31,8 @@ public class NotificacioTableAdvice {
 	}
 
 	@AfterReturning(
-			pointcut = "execution(* es.caib.notib.core.helper.AuditNotificacioHelper.update*(..)) || @annotation(UpdateNotificacioTable)",
+//			pointcut = "execution(* es.caib.notib.core.helper.AuditNotificacioHelper.update*(..)) || @annotation(UpdateNotificacioTable)",
+			pointcut = "@annotation(UpdateNotificacioTable)",
 			returning = "notificacio")
 	public void updateNotificacioTableView(NotificacioEntity notificacio) {
 		notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -43,7 +41,7 @@ public class NotificacioTableAdvice {
 	@Before(
 			"execution(* es.caib.notib.core.helper.AuditNotificacioHelper.deleteNotificacio(es.caib.notib.core.entity.NotificacioEntity)) && args(notificacio)")
 	public void deleteNotificacioTableView(NotificacioEntity notificacio) {
-		notificacioTableViewRepository.delete(notificacio.getId());
+		notificacioTableHelper.eliminarRegistre(notificacio);
 	}
 
 }

@@ -384,7 +384,7 @@
                 <configuration>
 					<skip>false</skip>
 					<systemPropertyVariables>
-						<es.caib.notib.properties.path>classpath:/es/caib/notib/core/test.properties</es.caib.notib.properties.path>
+						<es.caib.notib.properties.path>src/test/resources/es/caib/notib/core/test.properties</es.caib.notib.properties.path>
 					</systemPropertyVariables>
 				</configuration>
             </plugin>

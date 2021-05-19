@@ -7,6 +7,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Component
 public class NotificacioTableHelper {
     @Autowired
@@ -25,6 +27,7 @@ public class NotificacioTableHelper {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
+        log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                 .notificacio(notificacio)
                 .entitat(notificacio.getEntitat())
@@ -55,6 +58,7 @@ public class NotificacioTableHelper {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEntity notificacio){
+        log.info(String.format("[NOTIF-TABLE] Actualitzam el registre de la notificacio [Id: %d]", notificacio.getId()));
         NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
         if (tableViewItem == null) {
             this.crearRegistre(notificacio);
@@ -91,6 +95,12 @@ public class NotificacioTableHelper {
         tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
 
         notificacioTableViewRepository.saveAndFlush(tableViewItem);
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void eliminarRegistre(NotificacioEntity notificacio){
+        log.info(String.format("[NOTIF-TABLE] Eliminam el registre de la notificacio [Id: %d]", notificacio.getId()));
+        notificacioTableViewRepository.delete(notificacio.getId());
     }
 
     /////

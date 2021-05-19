@@ -1151,7 +1151,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				e.printStackTrace();
 
 				// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
-				callbackHelper.marcarEventNoProcessable(event,
+				callbackHelper.marcarEventNoProcessable(eventId,
 						e.getMessage(),
 						ExceptionUtils.getStackTrace(e));
 				return false;

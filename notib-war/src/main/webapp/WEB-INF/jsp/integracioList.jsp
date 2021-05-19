@@ -53,12 +53,12 @@
 			$('#integracio-descripcio').html(details.descripcio);
 			$('#integracio-tipus').html(details.tipus);
 			$('#integracio-estat').html(details.estat);
-			if (!details.parameters || details.parameters.length === 0) {
+			if (!details.parametres || details.parametres.length === 0) {
 				$('.integracio-parameters').hide();
 			} else {
 				$('.integracio-parameters').show();
 				var htmlList = "<ul>";
-				details.parameters.forEach(function (param) {
+				details.parametres.forEach(function (param) {
 					htmlList += '<li><strong>' + param.codi + ':</strong> ' + param.valor + '</li>'
 				});
 				htmlList += '</ul>';

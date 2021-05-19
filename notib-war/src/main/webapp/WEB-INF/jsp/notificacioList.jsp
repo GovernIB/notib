@@ -279,10 +279,11 @@ $(document).ready(function() {
 				if (data[i].notificacioError) {
 					var errorTitle = '';
 					if (data[i].notificacioErrorDescripcio) {
-						errorTitle = data[i].notificacioErrorDescripcio;
+						errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+					} else {
+						errorTitle = "Descripció de l'error no registrada";
 					}
-					var escaped = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
+					contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
 				}
 				contingutTbody += '</td>';
 				contingutTbody += '<td width="114px">';

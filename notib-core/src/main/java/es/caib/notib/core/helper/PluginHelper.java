@@ -2,7 +2,6 @@ package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
@@ -2622,10 +2621,11 @@ public class PluginHelper {
 	}
 
 	private static boolean isDocumentEstranger(String nie) {
-		boolean isNie = false;
-		if (nie != null && (nie.startsWith("X") || nie.startsWith("Y") || nie.startsWith("Z")))
-			isNie = true;
-		return isNie;
+		if (nie == null) {
+			return false;
+		}
+		String aux = nie.toUpperCase();
+		return aux.startsWith("X") || aux.startsWith("Y") || aux.startsWith("Z");
 	}
 
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
