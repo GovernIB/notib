@@ -8,7 +8,6 @@ import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,22 +45,14 @@ public class CallbackHelper {
 	private RequestsHelper requestsHelper;
 
 	@Transactional
-	public boolean notifica(@NonNull Long eventId) {
+	public boolean notifica(@NonNull Long eventId) throws Exception {
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
-		try {
-			NotificacioEntity notificacioProcessada = notifica(event);
-			if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
-				return false;
-			}
-		}catch (Exception e) {
-			log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
 
-			// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
-			marcarEventNoProcessable(event,
-					e.getMessage(),
-					ExceptionUtils.getStackTrace(e));
+		NotificacioEntity notificacioProcessada = notifica(event);
+		if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
 			return false;
 		}
+
 		return true;
 	}
 
@@ -213,9 +204,10 @@ public class CallbackHelper {
 	}
 
 	@Transactional
-	public void marcarEventNoProcessable(@NonNull NotificacioEventEntity event,
+	public void marcarEventNoProcessable(@NonNull Long eventId,
 										 String errorDescripcio,
 										 String longErrorMessage){
+		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 		errorDescripcio = errorDescripcio == null ? "" : errorDescripcio;
 		longErrorMessage = longErrorMessage == null ? "" : longErrorMessage;
 		event.updateCallbackClient(
