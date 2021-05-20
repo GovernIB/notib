@@ -33,11 +33,11 @@ public class ClientBaseTest {
 	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; //"2095292";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
-//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
 	
 	protected NotificacioV2 generarNotificacioV2(
 			String notificacioId,
@@ -46,7 +46,7 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setOrganGestor(ORGAN_CODI);
@@ -68,7 +68,7 @@ public class ClientBaseTest {
 //		document.setGenerarCsv(false);
 		
 		notificacio.setDocument(document);
-//		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
+		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 		for (int i = 0; i < numDestinataris; i++) {
 			Enviament enviament = new Enviament();
 			Persona titular = new Persona();
@@ -78,7 +78,7 @@ public class ClientBaseTest {
 			titular.setNif("00000000T");
 			titular.setTelefon("666010101");
 			titular.setEmail("sandreu@limit.es");
-			titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
 			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			enviament.setTitular(titular);
@@ -135,6 +135,16 @@ public class ClientBaseTest {
 	private InputStream getContingutNotificacioAdjunt() {
 		return getClass().getResourceAsStream(
 				"/es/caib/notib/client/notificacio_adjunt.pdf");
+	}
+	
+	protected InputStream getContingutNotificacioAdjuntTxt() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/client/notificacio_adjunt.txt");
+	}
+	
+	protected InputStream getContingutNotificacioAdjuntGrande() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/client/notificacio_adjunt_grande.pdf");
 	}
 
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {

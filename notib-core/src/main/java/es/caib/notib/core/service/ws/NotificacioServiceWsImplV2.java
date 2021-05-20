@@ -1191,6 +1191,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1063 | El format del document no és vàlid. Els formats vàlids són PDF i ZIP.
 	// 1064 | No s'ha pogut obtenir el document a notificar
 	// 1065 | La longitud del document supera el màxim definit
+	// 1066 | Error en les metadades del document
+	// 1067 | Les notificacions i comunicacions a ciutadà només admeten 1 únic document.
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1072 | El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters."
