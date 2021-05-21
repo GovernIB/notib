@@ -23,25 +23,23 @@ import java.util.*;
  */
 public class ClientBaseTest {
 
+
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-//	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ORGAN_CODI = "A04003003";
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292";
-
-
+	protected static final String ENTITAT_DIR3CODI = "A04003003";
 //	protected static final String ENTITAT_DIR3CODI = "A04013511";
-//	protected static final String ORGAN_CODI = "A04003003";
+	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; //"2095292";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
-//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-
+	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+	
 	// DEV data
-	protected static final String ENTITAT_DIR3CODI = "A04003003";
-	protected static final String ORGAN_CODI = "A04013529";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "874106";
+	// protected static final String ENTITAT_DIR3CODI = "A04003003";
+	// protected static final String ORGAN_CODI = "A04013529";
+	// protected static final String IDENTIFICADOR_PROCEDIMENT = "874106";
 
 
 	protected NotificacioV2 generarNotificacioV2(
