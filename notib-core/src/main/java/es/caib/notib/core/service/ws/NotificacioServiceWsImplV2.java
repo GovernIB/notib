@@ -1477,7 +1477,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 			
 			// Destinataris
-			if (!Boolean.getBoolean(isMultipleDestinataris()) && enviament.getDestinataris() != null && enviament.getDestinataris().size() > 1) {
+			if (!isMultipleDestinataris() && enviament.getDestinataris() != null && enviament.getDestinataris().size() > 1) {
 				return setRespostaError("[1160] El numero de destinatais està limitat a un destinatari.");
 			}
 			if (enviament.getDestinataris() != null) {
@@ -1939,11 +1939,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return docBase64.startsWith("JVBERi0");
 	}
 	
-	private static String isMultipleDestinataris() {
+	private static Boolean isMultipleDestinataris() {
 		String property = "es.caib.notib.destinatari.multiple";
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
-		return PropertiesHelper.getProperties().getProperty(property);
+		return PropertiesHelper.getProperties().getAsBoolean(property, false);
 	}
 	
 	private static Long getMaxSizeFile() {
