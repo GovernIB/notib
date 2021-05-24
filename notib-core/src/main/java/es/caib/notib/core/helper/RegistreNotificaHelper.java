@@ -54,12 +54,8 @@ public class RegistreNotificaHelper {
 				new AccioParam("Sir activat", String.valueOf(isSirActivat())));
 		
 		if (isSirActivat()) {
-			boolean totsAdministracio = true;
-			for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-				if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
-					totsAdministracio = false;
-				}
-			}
+			boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
+
 			long startTime;
 			double elapsedTime;
 //			### COMUNICACIÓ + TOT A ADMINISTRACIÓ
@@ -160,9 +156,11 @@ public class RegistreNotificaHelper {
 		logger.info(" >>> Nou assentament registral...");
 		RespostaConsultaRegistre arbResposta;
 		try {
+			boolean inclou_documents = isSendDocumentsActive() || (isSirActivat && isAnyEnviamentsAAdministracio(notificacioEntity));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 					notificacioEntity,
-					notificacioEntity.getEnviaments());
+					notificacioEntity.getEnviaments(),
+					inclou_documents);
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
@@ -212,7 +210,8 @@ public class RegistreNotificaHelper {
 		try {
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 					notificacioEntity,
-					enviament);
+					enviament,
+					isSendDocumentsActive() || enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO));
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
@@ -259,7 +258,25 @@ public class RegistreNotificaHelper {
 		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
 				pluginHelper.getRegistreReintentsPeriodeProperty());
 	}
-	
+
+	private boolean isAllEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
+		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isAnyEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
+		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private String getEnviamentIds(NotificacioEntity notificacio) {
 		String enviamentIds = "";
 		for(NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
@@ -306,14 +323,19 @@ public class RegistreNotificaHelper {
 	}
 
 	private boolean isSirActivat() {
-		String sir = getPropertyEmprarSir();
-		return Boolean.valueOf(sir);
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.emprar.sir");
 	}
-	
-	private String getPropertyEmprarSir() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.emprar.sir");
+
+	/**
+	 * Indica si els documents s'han d'enviar al registre.
+	 * Si es true els documents sempre s'han d'enviar.
+	 *
+	 * @return boolean
+	 */
+	private boolean isSendDocumentsActive() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.documents.enviar", true);
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(RegistreNotificaHelper.class);
 
 }
