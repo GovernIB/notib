@@ -54,7 +54,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 	@Test
 	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAlta respostaAlta = client.alta(
 				generarNotificacioV2(
 						notificacioId,
@@ -83,7 +83,7 @@ public class ClientRestTest extends ClientBaseTest {
 	@Test
 	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAlta respostaAlta = client.alta(
 				generarNotificacioV2(
 						notificacioId,

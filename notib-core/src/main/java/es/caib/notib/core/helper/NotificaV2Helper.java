@@ -302,7 +302,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				logger.info(" [TIMER-EST] Actualitzar informació enviament amb certificació  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 				logger.info("Enviament actualitzat");
 			}
-			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, null, false);
+			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, "", false);
 
 			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
 			NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());

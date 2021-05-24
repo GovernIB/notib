@@ -168,6 +168,61 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
 
     }
 
+    @Test
+    public void whenAddNotificaConsultaInfoEventWithError_thenOnlyRemainTwoEvents() {
+        testCreantElements(
+                new TestAmbElementsCreats() {
+                    @Override
+                    public void executar(ElementsCreats elementsCreats) throws Exception {
+                        EntitatDto entitatCreate = elementsCreats.getEntitat();
+                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+
+                        assertNotNull(procedimentCreate);
+                        assertNotNull(entitatCreate);
+                        assertNotNull(notificacioCreate);
+
+                        // Given: Una notificació amb més de 10 events associats
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreate.getId());
+                        NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificacio(notificacioEntity).get(0);
+
+                        for (int i = 0; i < 10; i++) {
+                            NotificacioEventEntity event  = NotificacioEventEntity.builder()
+                                    .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
+                                    .notificacio(notificacioEntity)
+                                    .enviament(enviament)
+                                    .error(true)
+                                    .errorDescripcio("Prova error " + i)
+                                    .build();
+                            notificacioEntity.updateEventAfegir(event);
+                            notificacioEventRepository.saveAndFlush(event);
+                        }
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+                                true);
+                        assertEquals(events.size(), 10);
+
+                        // When: clear all useless events
+                        notificacioEventHelper.addNotificaConsultaInfoEvent(notificacioEntity, enviament, "DarrerErrorAfegit", true);
+
+                        // Then
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
+                                true);
+
+                        // Comprovar que s'han conservat dos events i que aquests són el primer i el darrer afegit
+                        assertEquals(events.size(), 2);
+                        assertEquals(events.get(0).getErrorDescripcio(), "Prova error 0");
+                        assertEquals(events.get(1).getErrorDescripcio(), "DarrerErrorAfegit");
+
+                    }
+                },
+                "Neteja d'events repetits",
+                entitatCreate,
+                procedimentCreate,
+                notificacioCreate);
+    }
+
 //    @Test
 //    public void whenClearOldUselessEventsTest_thenAllEventsRemoved() {
 //        testCreantElements(
