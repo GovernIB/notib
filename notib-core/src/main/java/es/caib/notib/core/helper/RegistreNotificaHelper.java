@@ -157,6 +157,7 @@ public class RegistreNotificaHelper {
 		RespostaConsultaRegistre arbResposta;
 		try {
 			boolean inclou_documents = isSendDocumentsActive() || (isSirActivat && isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 					notificacioEntity,
 					notificacioEntity.getEnviaments(),
@@ -164,9 +165,10 @@ public class RegistreNotificaHelper {
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
-					!isSirActivat ? null : (isComunicacio ? 2L : 1L), //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+					isSirActivat ? (isComunicacio ? 2L : 1L) : null, //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
 					notificacioEntity.getId(),
-					getEnviamentIds(notificacioEntity));
+					getEnviamentIds(notificacioEntity),
+					generarJustificant);
 		} catch (Exception e) {
 			arbResposta = new RespostaConsultaRegistre();
 			arbResposta.setErrorCodi("ERROR");
@@ -208,6 +210,7 @@ public class RegistreNotificaHelper {
 		logger.info(" >>> Nou assentament registral...");
 		RespostaConsultaRegistre arbResposta;
 		try {
+			boolean generarJustificant =  isGenerarJustificant(true, true, isAnyEnviamentsAAdministracio(notificacioEntity));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 					notificacioEntity,
 					enviament,
@@ -217,7 +220,8 @@ public class RegistreNotificaHelper {
 					arb,
 					2L,
 					notificacioEntity.getId(),
-					String.valueOf(enviament.getId()));
+					String.valueOf(enviament.getId()),
+					generarJustificant);
 		} catch (Exception e) {
 			arbResposta = new RespostaConsultaRegistre();
 			arbResposta.setErrorCodi("ERROR");
@@ -257,6 +261,11 @@ public class RegistreNotificaHelper {
 		}
 		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
 				pluginHelper.getRegistreReintentsPeriodeProperty());
+	}
+
+	private boolean isGenerarJustificant(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
+		return isGenerarJustificantActive() || (isComunicacio && isSirActivat && aAdministracio);
+
 	}
 
 	private boolean isAllEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
@@ -334,6 +343,16 @@ public class RegistreNotificaHelper {
 	 */
 	private boolean isSendDocumentsActive() {
 		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.documents.enviar", true);
+	}
+
+	/**
+	 * Indica si s'ha de generar el justificant del registre de totes les notificacions.
+	 * Si es false només es generen per a comunicacions a administracions (enviaments SIR)
+	 *
+	 * @return boolean
+	 */
+	private boolean isGenerarJustificantActive() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.generar.justificant", false);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistreNotificaHelper.class);

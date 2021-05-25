@@ -74,7 +74,8 @@ public class PluginHelper {
 			AsientoRegistralBeanDto arb,
 			Long tipusOperacio,
 			Long notificacioId,
-			String enviamentIds) {
+			String enviamentIds,
+			boolean generarJustificant) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -91,7 +92,8 @@ public class PluginHelper {
 			resposta = getRegistrePlugin().salidaAsientoRegistral(
 					codiDir3Entitat, 
 					arb, 
-					tipusOperacio);
+					tipusOperacio,
+					generarJustificant);
 			
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
