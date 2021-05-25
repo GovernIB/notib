@@ -1529,7 +1529,10 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("errors", bindingResult.getAllErrors());
 
         for (int i = 0; i < 5; i++) {
-            if (notificacioCommand.getDocuments()[i].getArxiuGestdocId().isEmpty() && notificacioCommand.getTipusDocument()[i] != null && notificacioCommand.getArxiu()[i] != null && notificacioCommand.getTipusDocument()[i] == TipusDocumentEnumDto.ARXIU) {
+            if (notificacioCommand.getDocuments()[i].getArxiuGestdocId().isEmpty() && 
+            		notificacioCommand.getTipusDocument()[i] != null && 
+            		(notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) && 
+            		notificacioCommand.getTipusDocument()[i] == TipusDocumentEnumDto.ARXIU) {
                 String arxiuGestdocId = null;
                 String contingutBase64 = null;
                 try {
