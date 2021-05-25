@@ -31,7 +31,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		
 		try {
 			
-			// Validació del Concepte
+			// Validació del NIF/NIE/CIF
 			if (persona.getNif() != null && !persona.getNif().isEmpty()) {
 				if (!NifHelper.isvalid(persona.getNif())) {
 					valid = false;
@@ -60,13 +60,27 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 					.addNode("nif")
 					.addConstraintViolation();
 				}
+				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto"))
+					.addNode("nif")
+					.addConstraintViolation();
+				}
 				break;
 			case JURIDICA:
 				valid = validarNom(persona, context, "notificacio.form.valid.juridica.rao");
 				if (persona.getNif() == null || persona.getNif().isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.nif"))
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.cif"))
+					.addNode("nif")
+					.addConstraintViolation();
+				}
+				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidCif(persona.getNif())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.tipoDocumentoIncorrecto"))
 					.addNode("nif")
 					.addConstraintViolation();
 				}

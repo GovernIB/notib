@@ -24,6 +24,36 @@ public class NifHelper {
         }
     }
 	
+	public static boolean isValidNifNie(String nif) {
+		if (nif == null || nif.length() < 8)
+			return false;
+		
+        nif = nif.toUpperCase();
+        String primerCaracter = nif.substring(0, 1);
+
+        if (LLETRES_CIF.contains(primerCaracter)) {
+            return false;
+        } else if (LLETRES_NIE.contains(primerCaracter)) {
+            return isNieValid(nif);
+        } else {
+            return isDniValid(nif);
+        }
+    }
+	
+	public static boolean isValidCif(String nif) {
+		if (nif == null || nif.length() < 8)
+			return false;
+		
+        nif = nif.toUpperCase();
+        String primerCaracter = nif.substring(0, 1);
+
+        if (LLETRES_CIF.contains(primerCaracter)) {
+            return isCifValid(nif);
+        } else {
+            return false;
+        }
+    }
+	
 	private static boolean isCifValid(String cif) {
         String aux = cif.substring(0, 8);
         aux = calculaCif(aux);

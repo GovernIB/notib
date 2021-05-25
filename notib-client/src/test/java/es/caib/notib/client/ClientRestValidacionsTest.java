@@ -384,6 +384,22 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	}
 	
 	@Test
+	public void test1123_fisica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getTitular().setNif("W2460343C"); //CIF
+		enviaNotificacioError(notificacio, "1123");
+	}
+	
+	@Test
+	public void test1123_juridica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getTitular().setNif("58848076T"); //NIF o NIE
+		enviaNotificacioError(notificacio, "1123");
+	}
+	
+	@Test
 	public void test1130() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
@@ -532,6 +548,22 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A0123456789");
 		enviaNotificacioError(notificacio, "1180");
+	}
+	
+	@Test
+	public void test1181_fisica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("W2460343C"); //CIF
+		enviaNotificacioError(notificacio, "1181");
+	}
+	
+	@Test
+	public void test1181_juridica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("58848076T"); //NIF o NIE
+		enviaNotificacioError(notificacio, "1181");
 	}
 	
 	@Test

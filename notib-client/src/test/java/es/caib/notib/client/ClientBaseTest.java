@@ -30,7 +30,8 @@ public class ClientBaseTest {
 	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; //"2095292";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; // DEV
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
 	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
