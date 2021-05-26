@@ -5,6 +5,19 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
+
 <html>
 <head>
 	<title><spring:message code="enviament.info.titol"/></title>
@@ -94,6 +107,13 @@ $(document).ready(function() {
 				<spring:message code="enviament.info.tab.events"/>
 			</a>
 		</li>
+		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
+		<li role="presentation"<c:if test="${pipellaActiva == 'historic'}"> class="active"</c:if>>
+			<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
+				<spring:message code="notificacio.info.tab.historic"/>
+			</a>
+		</li>
+		</c:if>
 	</ul>
 	<div class="tab-content">
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'dades'}"> active</c:if>" id="dades">
@@ -585,6 +605,67 @@ $(document).ready(function() {
 					</th>
 				</tr>
 			</thead>
+			</table>
+		</div>
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'historic'}"> active</c:if>" id="historic">
+			<table id="historic"
+				   data-toggle="datatable"
+				   data-url="<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/historic"/>"
+				   data-search-enabled="false"
+				   data-paging="false"
+				   data-info="false"
+				   data-row-info="false"
+				   class="table table-striped table-bordered"
+				   style="width: 100%">
+				<thead>
+				<tr>
+
+					<th data-col-name="tipusOperacio" data-orderable="false"><spring:message code="enviament.historic.list.columna.tipusOperacio"/></th>
+					<th data-col-name="joinPoint" data-orderable="false"><spring:message code="enviament.historic.list.columna.joinPoint"/></th>
+					<th data-col-name="createdBy" data-orderable="false"><spring:message code="enviament.historic.list.columna.createdBy"/></th>
+					<th data-col-name="createdDate" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.createdDate"/></th>
+					<th data-col-name="titularId" data-orderable="false"><spring:message code="enviament.historic.list.columna.titularId"/></th>
+					<th data-col-name="destinataris" data-orderable="false"><spring:message code="enviament.historic.list.columna.destinataris"/></th>
+					<th data-col-name="domiciliTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.domiciliTipus"/></th>
+					<th data-col-name="domicili" data-orderable="false"><spring:message code="enviament.historic.list.columna.domicili"/></th>
+					<th data-col-name="serveiTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.serveiTipus"/></th>
+					<th data-col-name="cie" data-orderable="false"><spring:message code="enviament.historic.list.columna.cie"/></th>
+					<th data-col-name="formatSobre" data-orderable="false"><spring:message code="enviament.historic.list.columna.formatSobre"/></th>
+					<th data-col-name="formatFulla" data-orderable="false"><spring:message code="enviament.historic.list.columna.formatFulla"/></th>
+					<th data-col-name="dehObligat" data-orderable="false"><spring:message code="enviament.historic.list.columna.dehObligat"/></th>
+					<th data-col-name="dehNif" data-orderable="false"><spring:message code="enviament.historic.list.columna.dehNif"/></th>
+					<th data-col-name="notificaReferencia" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaReferencia"/></th>
+					<th data-col-name="notificaIdentificador" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaIdentificador"/></th>
+					<th data-col-name="notificaDataCreacio" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaDataCreacio"/></th>
+					<th data-col-name="notificaDataDisposicio" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaDataDisposicio"/></th>
+					<th data-col-name="notificaDataCaducitat" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaDataCaducitat"/></th>
+					<th data-col-name="notificaEmisorDir3" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaEmisorDir3"/></th>
+					<th data-col-name="notificaArrelDir3" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaArrelDir3"/></th>
+					<th data-col-name="notificaEstat" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaEstat"/></th>
+					<th data-col-name="notificaEstatData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaEstatData"/></th>
+					<th data-col-name="notificaEstatFinal" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaEstatFinal"/></th>
+					<th data-col-name="notificaDatatOrigen" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatOrigen"/></th>
+					<th data-col-name="notificaDatatReceptorNif" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatReceptorNif"/></th>
+					<th data-col-name="notificaDatatNumSeguiment" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatNumSeguiment"/></th>
+					<th data-col-name="notificaCertificacioData" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioData"/></th>
+					<th data-col-name="notificaCertificacioArxiuId" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioArxiuId"/></th>
+					<th data-col-name="notificaCertificacioOrigen" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioOrigen"/></th>
+					<th data-col-name="notificaCertificacioTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioTipus"/></th>
+					<th data-col-name="notificaCertificacioArxiuTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioArxiuTipus"/></th>
+					<th data-col-name="notificaCertificacioNumSeguiment" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioNumSeguiment"/></th>
+					<th data-col-name="registreNumeroFormatat" data-orderable="false"><spring:message code="enviament.historic.list.columna.registreNumeroFormatat"/></th>
+					<th data-col-name="registreData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.registreData"/></th>
+					<th data-col-name="registreEstat" data-orderable="false"><spring:message code="enviament.historic.list.columna.registreEstat"/></th>
+					<th data-col-name="registreEstatFinal" data-orderable="false"><spring:message code="enviament.historic.list.columna.registreEstatFinal"/></th>
+					<th data-col-name="sirConsultaData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.sirConsultaData"/></th>
+					<th data-col-name="sirRecepcioData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.sirRecepcioData"/></th>
+					<th data-col-name="sirRegDestiData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.sirRegDestiData"/></th>
+					<th data-col-name="notificacioErrorEvent" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificacioErrorEvent"/></th>
+					<th data-col-name="notificaError" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaError"/></th>
+					<th data-col-name="notificaDatatErrorDescripcio" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatErrorDescripcio"/></th>
+
+				</tr>
+				</thead>
 			</table>
 		</div>
 	</div>

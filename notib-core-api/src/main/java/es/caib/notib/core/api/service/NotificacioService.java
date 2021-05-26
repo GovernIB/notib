@@ -175,6 +175,11 @@ public interface NotificacioService {
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long entitatId,
 			Long notificacioId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	public List<NotificacioAuditDto> historicFindAmbNotificacio(
+			Long entitatId,
+			Long notificacioId);
 	
 	/**
 	 * Consulta l'últim event de callback d'una d'una notificació.
@@ -200,6 +205,12 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public List<NotificacioEventDto> eventFindAmbEnviament(
+			Long entitatId,
+			Long notificacioId,
+			Long enviamentId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
 			Long entitatId,
 			Long notificacioId,
 			Long enviamentId);

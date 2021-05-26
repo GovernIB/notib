@@ -51,6 +51,12 @@ public class NotificacioServiceBean implements NotificacioService {
 				entitatId,
 				notificacioId);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<NotificacioAuditDto> historicFindAmbNotificacio(Long entitatId, Long notificacioId) {
+		return delegate.historicFindAmbNotificacio(entitatId, notificacioId);
+	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})	
@@ -66,6 +72,18 @@ public class NotificacioServiceBean implements NotificacioService {
 			Long notificacioId,
 			Long enviamentId) {
 		return delegate.eventFindAmbEnviament(
+				entitatId,
+				notificacioId,
+				enviamentId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
+			Long entitatId,
+			Long notificacioId,
+			Long enviamentId) {
+		return delegate.historicFindAmbEnviament(
 				entitatId,
 				notificacioId,
 				enviamentId);

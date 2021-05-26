@@ -17,10 +17,26 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
+import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
@@ -44,7 +60,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -67,7 +90,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
+	private NotificacioAuditRepository notificacioAuditRepository;
+	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+	@Autowired
+	private NotificacioEnviamentAuditRepository notificacioEnviamentAuditRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
@@ -1132,6 +1159,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<NotificacioAuditDto> historicFindAmbNotificacio(
+			Long entitatId,
+			Long notificacioId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta dels històrics de la notificació (" +
+					"notificacioId=" + notificacioId + ")");
+			List<NotificacioAudit> historic = notificacioAuditRepository.findByNotificacioIdOrderByCreatedDateAsc(notificacioId);
+			return conversioTipusHelper.convertirList(
+					historic,
+					NotificacioAuditDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	
 	@Override
 	@Transactional(readOnly = true)
@@ -1187,6 +1232,32 @@ public class NotificacioServiceImpl implements NotificacioService {
 							notificacioId,
 							enviamentId),
 					NotificacioEventDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
+			Long entitatId,
+			Long notificacioId,
+			Long enviamentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta dels events associats a un destinatari (" +
+					"notificacioId=" + notificacioId + ", " +
+					"enviamentId=" + enviamentId + ")");
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+			entityComprovarHelper.comprovarPermisos(
+					enviament.getNotificacio().getId(),
+					true,
+					true,
+					true);
+			return conversioTipusHelper.convertirList(
+					notificacioEnviamentAuditRepository.findByEnviamentIdOrderByCreatedDateAsc(
+							enviamentId),
+					NotificacioEnviamentAuditDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

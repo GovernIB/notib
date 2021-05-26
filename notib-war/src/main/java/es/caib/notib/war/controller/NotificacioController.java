@@ -615,6 +615,20 @@ public class NotificacioController extends BaseUserController {
                 notificacioService.eventFindAmbNotificacio(entitatActual.getId(), notificacioId));
     }
 
+    @RequestMapping(value = "/{notificacioId}/historic/datatable", method = RequestMethod.GET)
+    @ResponseBody
+    public DatatablesResponse historicDatatable(
+            HttpServletRequest request,
+            @PathVariable Long notificacioId) {
+
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+        List<NotificacioAuditDto> historic = notificacioService.historicFindAmbNotificacio(entitatActual.getId(), notificacioId);
+        return DatatablesHelper.getDatatableResponse(
+                request,
+                historic);
+    }
+
     @RequestMapping(value = "/{notificacioId}/enviar", method = RequestMethod.GET)
     public String enviar(
             HttpServletRequest request,
@@ -763,6 +777,19 @@ public class NotificacioController extends BaseUserController {
         return DatatablesHelper.getDatatableResponse(
                 request,
                 notificacioService.eventFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
+    }
+
+    @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/historic/datatable", method = RequestMethod.GET)
+    @ResponseBody
+    public DatatablesResponse enviamentHistoricDatatable(
+            HttpServletRequest request,
+            @PathVariable Long notificacioId,
+            @PathVariable Long enviamentId) {
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+        return DatatablesHelper.getDatatableResponse(
+                request,
+                notificacioService.historicFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatNotifica", method = RequestMethod.GET)

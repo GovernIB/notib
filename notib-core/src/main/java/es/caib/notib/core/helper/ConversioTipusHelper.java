@@ -9,10 +9,16 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.auditoria.NotificacioAudit;
+import es.caib.notib.core.entity.auditoria.NotificacioEnviamentAudit;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import ma.glasnost.orika.*;
+import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.CustomMapper;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
@@ -172,6 +178,18 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDtoV2.class).
 				field("notificacio.id", "notificacioId").
 				customize(new NotificacioEnviamentEntitytoDtoV2Mapper()).
+				byDefault().
+				register();
+
+		mapperFactory.classMap(NotificacioAudit.class, NotificacioAuditDto.class).
+				field("createdBy.codi", "createdBy").
+				field("lastModifiedBy.codi", "lastModifiedBy").
+				byDefault().
+				register();
+
+		mapperFactory.classMap(NotificacioEnviamentAudit.class, NotificacioEnviamentAuditDto.class).
+				field("createdBy.codi", "createdBy").
+				field("lastModifiedBy.codi", "lastModifiedBy").
 				byDefault().
 				register();
 	

@@ -14,6 +14,9 @@
 	pageContext.setAttribute(
 			"isRolActualAdministradorOrgan",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 %>
 
 <html>
@@ -126,6 +129,13 @@ $(document).ready(function() {
 			<li role="presentation">
 				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
 					<spring:message code="notificacio.info.tab.accions" />
+				</a>
+			</li>
+		</c:if>
+		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
+			<li role="presentation">
+				<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
+					<spring:message code="notificacio.info.tab.historic" />
 				</a>
 			</li>
 		</c:if>
@@ -745,6 +755,58 @@ $(document).ready(function() {
 					<spring:message code="notificacio.info.accio.no.accions" />
 				</div>
 			</c:if>
+		</div>
+		<div role="tabpanel"
+			 class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"
+			 id="historic">
+			<table id="historic"
+				   data-toggle="datatable"
+				   data-url="<c:url value="/notificacio/${notificacio.id}/historic"/>"
+				   data-search-enabled="false"
+				   data-paging="false"
+				   data-row-info="false"
+				   class="table table-striped table-bordered"
+				   style="width: 100%">
+				<thead>
+				<tr>
+
+					<th data-col-name="tipusOperacio" data-orderable="false"><spring:message code="notificacio.historic.list.columna.tipusOperacio" /></th>
+					<th data-col-name="joinPoint" data-orderable="false"><spring:message code="notificacio.historic.list.columna.joinPoint" /></th>
+					<th data-col-name="createdBy" data-orderable="false"><spring:message code="notificacio.historic.list.columna.createdBy" /></th>
+					<th data-col-name="createdDate" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.createdDate" /></th>
+					<th data-col-name="comunicacioTipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.comunicacioTipus" /></th>
+					<th data-col-name="tipusUsuari" data-orderable="false"><spring:message code="notificacio.historic.list.columna.tipusUsuari" /></th>
+					<th data-col-name="usuari" data-orderable="false"><spring:message code="notificacio.historic.list.columna.usuari" /></th>
+					<th data-col-name="emisor" data-orderable="false"><spring:message code="notificacio.historic.list.columna.emisor" /></th>
+					<th data-col-name="tipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.tipus" /></th>
+					<th data-col-name="organ" data-orderable="false"><spring:message code="notificacio.historic.list.columna.organ" /></th>
+					<th data-col-name="procediment" data-orderable="false"><spring:message code="notificacio.historic.list.columna.procediment" /></th>
+					<th data-col-name="grup" data-orderable="false"><spring:message code="notificacio.historic.list.columna.grup" /></th>
+					<th data-col-name="concepte" data-orderable="false"><spring:message code="notificacio.historic.list.columna.concepte" /></th>
+					<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.historic.list.columna.descripcio" /></th>
+					<th data-col-name="numExpedient" data-orderable="false"><spring:message code="notificacio.historic.list.columna.numExpedient" /></th>
+					<th data-col-name="enviamentDataProgramada" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.enviamentDataProgramada" /></th>
+					<th data-col-name="retard" data-orderable="false"><spring:message code="notificacio.historic.list.columna.retard" /></th>
+					<th data-col-name="caducitat" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.caducitat" /></th>
+					<th data-col-name="documentId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.documentId" /></th>
+					<th data-col-name="estat" data-orderable="false"><spring:message code="notificacio.historic.list.columna.estat" /></th>
+					<th data-col-name="estatDate" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.estatDate" /></th>
+					<th data-col-name="motiu" data-orderable="false"><spring:message code="notificacio.historic.list.columna.motiu" /></th>
+					<th data-col-name="pagadorPostalId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.pagadorPostalId" /></th>
+					<th data-col-name="pagadorCieId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.pagadorCieId" /></th>
+					<th data-col-name="registreEnviamentIntent" data-orderable="false"><spring:message code="notificacio.historic.list.columna.registreEnviamentIntent" /></th>
+					<th data-col-name="registreNumero" data-orderable="false"><spring:message code="notificacio.historic.list.columna.registreNumero" /></th>
+					<th data-col-name="registreNumeroFormatat" data-orderable="false"><spring:message code="notificacio.historic.list.columna.registreNumeroFormatat" /></th>
+					<th data-col-name="registreData" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.registreData" /></th>
+					<th data-col-name="notificaEnviamentData" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.notificaEnviamentData" /></th>
+					<th data-col-name="notificaEnviamentIntent" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaEnviamentIntent" /></th>
+					<th data-col-name="notificaErrorTipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaErrorTipus" /></th>
+					<th data-col-name="errorLastCallback" data-orderable="false"><spring:message code="notificacio.historic.list.columna.errorLastCallback" /></th>
+					<th data-col-name="errorEventId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.errorEventId" /></th>
+
+				</tr>
+				</thead>
+			</table>
 		</div>
 	</div>
 	<div id="modal-botons" class="text-right">
