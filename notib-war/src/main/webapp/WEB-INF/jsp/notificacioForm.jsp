@@ -9,7 +9,7 @@
 
 
 <c:choose>
-    <c:when test="${empty notificacioCommand.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
+    <c:when test="${empty notificacioCommandV2.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
     <c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <c:set var="dadesGenerals"><spring:message code="notificacio.form.titol.dadesgenerals"/></c:set>
@@ -200,7 +200,6 @@
 <script type="text/javascript">
 
 
-
 	var interessatsTipus = new Array();
 	var interessatTipusOptions = "";
 	var numDocuments = 1;
@@ -213,6 +212,7 @@
 	var consultarFocusout = true;
 
 	//Reset de los warning, errores que se muestran tras la consulta al arxiu para CSV y Uuid
+	//o cuando no se introduce documento ya que es obligatorio
 	function resetWarningIErrorsDocArxiu(indexId){
 		$('#document_err_'+indexId).remove();
 		$('#metadades_war_'+indexId).remove();
@@ -221,8 +221,13 @@
 		let inputElementUuid = $("#documentArxiuUuid\\[" + indexId + "\\]");
 		inputElementCsv.parent().closest('.form-group').removeClass('has-error');
 		inputElementCsv.removeClass('warningClass');
+		inputElementCsv.parent().closest('.form-group').find("p.help-block").remove();
 		inputElementUuid.parent().closest('.form-group').removeClass('has-error');
 		inputElementUuid.removeClass('warningClass');
+		inputElementUuid.parent().closest('.form-group').find("p.help-block").remove();
+		let inputElementArxiu = $("#arxiu\\[" + indexId + "\\]"); 
+		inputElementArxiu.parent().closest('.form-group').removeClass('has-error');
+		inputElementArxiu.parent().closest('.form-group').find("p.help-block").remove();
 	}
 	
 	function activarCampsMetadades(indexId){
@@ -480,9 +485,16 @@
 			$('#addDocument').removeClass('hidden');
 		});
 
+		var isWindowReload = [true, true, true, true, true];
 		$('.tipusDocument').on('change', function() {
 			let id = $(this).attr("id").split("_")[1];
-			resetWarningIErrorsDocArxiu(id);
+			if (!isWindowReload[id]) {
+				resetWarningIErrorsDocArxiu(id);
+				
+			} else {
+				isWindowReload[id] = false;
+			}
+	
 			activarCampsMetadades(id);
 			if ($(this).val() == 'CSV') {
 				$('#input-origen-csv_' + id).removeClass('hidden');

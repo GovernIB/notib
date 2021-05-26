@@ -23,8 +23,6 @@ import java.util.*;
 @Component
 public class NotificacioEventHelper {
     @Autowired
-    private AuditNotificacioHelper auditNotificacioHelper;
-    @Autowired
     private NotificacioEventRepository notificacioEventRepository;
     @Autowired
     private AuditEnviamentHelper auditEnviamentHelper;
@@ -315,9 +313,6 @@ public class NotificacioEventHelper {
             eventBuilder.callbackInicialitza();
 
         NotificacioEventEntity event = eventBuilder.build();
-//        if (errorDescripcio != null) {
-//            log.debug("Error event: " + event.getDescripcio());
-//        }
         enviament.updateNotificaError(errorDescripcio != null, errorDescripcio != null ? event : null);
 
         updateNotificacio(notificacio, event);
@@ -327,7 +322,7 @@ public class NotificacioEventHelper {
 
     public void addNotificaConsultaInfoEvent(NotificacioEntity notificacio,
                                          NotificacioEnviamentEntity enviament,
-                                         String descripcio,
+                                         String errorDescripcio,
                                          boolean isError) {
         if (isError){
             clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO);
@@ -339,14 +334,13 @@ public class NotificacioEventHelper {
                     false
             );
         }
-        NotificacioEventEntity.BuilderOld eventBuilder =NotificacioEventEntity.getBuilder(
-                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
-                notificacio).
-                enviament(enviament).error(isError);
-        if (isError) {
-            eventBuilder.descripcio(descripcio);
-        }
-        NotificacioEventEntity event = eventBuilder.build();
+        NotificacioEventEntity event  = NotificacioEventEntity.builder()
+                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
+                .notificacio(notificacio)
+                .enviament(enviament)
+                .error(isError)
+                .errorDescripcio(errorDescripcio)
+                .build();
 
         updateNotificacio(notificacio, event);
         notificacioEventRepository.saveAndFlush(event);
@@ -442,10 +436,6 @@ public class NotificacioEventHelper {
     }
 
     private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
-//        NotificacioEventEntity eventNotificacioNotificaError = notificacio.getNotificaErrorEvent();
-//        if (eventNotificacioNotificaError != null && eventNotificacioNotificaError.getId() == event.getId()) {
-//            notificacio.setNotificaErrorEvent(null);
-//        }
         if (event.getEnviament() != null)
             event.getEnviament().setNotificacioErrorEvent(null);
         if (enviament != null) {
@@ -468,9 +458,11 @@ public class NotificacioEventHelper {
         if (events != null && events.size() > 1) {
             // conservam l'event més antic i eliminam els intermitjos,
             // si tot va correctament em aquest punt la llista només tendra dos elements.
-            NotificacioEventEntity event = events.get(1);
-            preRemoveErrorEvent(event, notificacio, enviament);
-            notificacioEventRepository.delete(event);
+            for (int i = 1; i < events.size(); i++) {
+                NotificacioEventEntity event = events.get(i);
+                preRemoveErrorEvent(event, notificacio, enviament);
+                notificacioEventRepository.delete(event);
+            }
             notificacioEventRepository.flush();
         }
     }

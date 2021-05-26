@@ -10,6 +10,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -45,6 +46,7 @@ public class RegistreHelper {
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 
+	@UpdateEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
 		long startTime;

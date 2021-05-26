@@ -12,9 +12,12 @@ import java.io.IOException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
@@ -31,13 +34,13 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
 public class ClientRestValidacionsTest extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
-	
-	//private static final String URL = "http://dev.caib.es/notib";
-	//private static final String USERNAME = "$ripea_notib";
-	//private static final String PASSWORD = "ripea_notib";
+//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
+//	
+	private static final String URL = "https://dev.caib.es/notib";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
 
 	/*
 	@Rule
@@ -79,10 +82,16 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1011() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEmisorDir3Codi("DE0000001");
+		notificacio.setEmisorDir3Codi("A04013511");
 		enviaNotificacioError(notificacio, "1011");
 	}
 	
+	@Test
+	public void test1012() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEmisorDir3Codi("X00000000");
+		enviaNotificacioError(notificacio, "1012");
+	}
 	
 	@Test
 	public void test1020() throws DatatypeConfigurationException, IOException, DecoderException {
@@ -96,6 +105,22 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setProcedimentCodi("P01234567890");
 		enviaNotificacioError(notificacio, "1021");
+	}
+	
+	@Test
+	public void test1022() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setProcedimentCodi(null);
+		notificacio.setOrganGestor(null);
+		enviaNotificacioError(notificacio, "1022");
+	}
+	@Test
+	public void test1023() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setProcedimentCodi("875082");
+		notificacio.setOrganGestor(null);
+		enviaNotificacioError(notificacio, "1023");
 	}
 	
 	@Test
@@ -134,6 +159,13 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	}
 	
 	@Test
+	public void test1042() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setDescripcio("Descripció\n");
+		enviaNotificacioError(notificacio, "1042");
+	}
+	
+	@Test
 	public void test1050() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setEnviamentTipus(null);
@@ -162,6 +194,52 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	}
 	
 	@Test
+	public void test1063() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjuntTxt());
+		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		notificacio.getDocument().setContingutBase64(arxiuB64);
+		enviaNotificacioError(notificacio, "1063");
+	}
+
+	@Test
+	public void test1064() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getDocument().setContingutBase64(null);
+		notificacio.getDocument().setCsv("csvInexistente");
+		enviaNotificacioError(notificacio, "1064");
+	}
+	
+	// @Test
+	// A veces da timeout en DEV. Se usa un archivo de pruebas de 11 MB, justo por encima del máximo.
+	public void test1065() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjuntGrande());
+		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		notificacio.getDocument().setContingutBase64(arxiuB64);
+		enviaNotificacioError(notificacio, "1065");
+	}
+	
+	// @Test
+	// No se puede realizar este test por falta de un CSV de antigua custodia sin metadatos
+//	public void test1066() throws DatatypeConfigurationException, IOException, DecoderException {
+//		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+//		notificacio.getDocument().setContingutBase64(null);
+//		notificacio.getDocument().setCsv("csvSinMetadatos");
+//		notificacio.getDocument().setValidesa(null);
+//		enviaNotificacioError(notificacio, "1066");
+//	}
+		
+	@Test
+	public void test1067() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		DocumentV2 document2 = new DocumentV2();
+		document2.setContingutBase64(notificacio.getDocument().getContingutBase64());
+		notificacio.setDocument2(document2);
+		enviaNotificacioError(notificacio, "1067");
+	}		
+		
+	@Test
 	public void test1070() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setUsuariCodi(null);
@@ -173,6 +251,16 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setUsuariCodi("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXY");
 		enviaNotificacioError(notificacio, "1071");
+	}
+	
+	@Test
+	public void test1072() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getDocument().setArxiuNom("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz"+
+				"ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXY" +
+				"ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXY" +
+				"ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJK");
+		enviaNotificacioError(notificacio, "1072");
 	}
 	
 	@Test
@@ -262,30 +350,53 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1118() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setTelefon("12345678901234567890");
+		notificacio.getEnviaments().get(0).getTitular().setEmail("emailConFormatoIncorrecto");
 		enviaNotificacioError(notificacio, "1118");
 	}
 	
 	@Test
 	public void test1119() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
+		notificacio.getEnviaments().get(0).getTitular().setTelefon("12345678901234567890");
 		enviaNotificacioError(notificacio, "1119");
 	}
 	
 	@Test
 	public void test1120() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A0123456789");
+		notificacio.getEnviaments().get(0).getTitular().setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
 		enviaNotificacioError(notificacio, "1120");
 	}
 	
 	@Test
 	public void test1121() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A0123456789");
+		enviaNotificacioError(notificacio, "1121");
+	}
+	
+	@Test
+	public void test1122() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getTitular().setIncapacitat(true);
 		notificacio.getEnviaments().get(0).getDestinataris().clear();
-		enviaNotificacioError(notificacio, "1121");
+		enviaNotificacioError(notificacio, "1122");
+	}
+	
+	@Test
+	public void test1123_fisica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getTitular().setNif("W2460343C"); //CIF
+		enviaNotificacioError(notificacio, "1123");
+	}
+	
+	@Test
+	public void test1123_juridica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getTitular().setNif("58848076T"); //NIF o NIE
+		enviaNotificacioError(notificacio, "1123");
 	}
 	
 	@Test
@@ -414,22 +525,45 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1177() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setTelefon("01234567890123456789");
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setEmail("emailConFormatoIncorrecto");
 		enviaNotificacioError(notificacio, "1177");
 	}
 	
 	@Test
 	public void test1178() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setTelefon("01234567890123456789");
 		enviaNotificacioError(notificacio, "1178");
 	}
 	
 	@Test
 	public void test1179() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A0123456789");
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
 		enviaNotificacioError(notificacio, "1179");
+	}
+	
+	@Test
+	public void test1180() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A0123456789");
+		enviaNotificacioError(notificacio, "1180");
+	}
+	
+	@Test
+	public void test1181_fisica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("W2460343C"); //CIF
+		enviaNotificacioError(notificacio, "1181");
+	}
+	
+	@Test
+	public void test1181_juridica() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("58848076T"); //NIF o NIE
+		enviaNotificacioError(notificacio, "1181");
 	}
 	
 	@Test
@@ -461,6 +595,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial(null);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNom(null);
 		enviaNotificacioError(notificacio, "1200");
 	}
 	
@@ -761,14 +896,18 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		enviaNotificacioError(notificacio, "1291");
 	}
 	
-	@Test
+	// @Test
+	// No se puede ejecutar este test en entorno DEV porque la entitat GOIB A04003003 no tiene activada
+	// la entrega DEH
 	public void test1300() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).setEntregaDehActiva(true);
 		enviaNotificacioError(notificacio, "1300");
 	}
 	
-	@Test
+	// @Test
+	// No se puede ejecutar este test en entorno DEV porque la entitat GOIB A04003003 no tiene activada
+	// la entrega DEH
 	public void test1301() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setEmisorDir3Codi("A04013511");
@@ -777,7 +916,9 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		enviaNotificacioError(notificacio, "1301");
 	}
 	
-	@Test
+	// @Test
+	// No se puede ejecutar este test en entorno DEV porque la entitat GOIB A04003003 no tiene activada
+	// la entrega DEH
 	public void test1302() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setEmisorDir3Codi("A04013511");
@@ -800,7 +941,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1320() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setProcedimentCodi("846823");
+		notificacio.setProcedimentCodi("PRUEBA");
 		notificacio.setGrupCodi("XXXX");
 		enviaNotificacioError(notificacio, "1320");
 	}
@@ -808,7 +949,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1321() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setProcedimentCodi("846823");
+		notificacio.setProcedimentCodi("PRUEBA2");
 		notificacio.setGrupCodi("NOT_APL");
 		enviaNotificacioError(notificacio, "1321");
 	}
@@ -816,8 +957,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1322() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setProcedimentCodi("234257");
-		notificacio.setGrupCodi("NOT_APL");
+		notificacio.setProcedimentCodi("PRUEBA");
+		notificacio.setGrupCodi("NOT_ADMIN");
 		enviaNotificacioError(notificacio, "1322");
 	}
 	

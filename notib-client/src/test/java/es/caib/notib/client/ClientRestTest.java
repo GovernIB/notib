@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.client;
 
 import es.caib.notib.ws.notificacio.*;
@@ -12,23 +9,32 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.
- * 
+ *
+ * Notes:
+ *  * Per a passar els tests el client ha d'estar configurat amb mode síncron
+ *  	- es.caib.notib.comunicacio.tipus.defecte=SINCRON
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class ClientRestTest extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8080/notib";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
-	
-//	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+//	private static final String URL = "http://localhost:8180/notib";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
+
+
+	private static final String URL = "https://dev.caib.es/notib";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
+
+	// Indicar si el servidor esta configurat en mode síncron
+	private static final boolean SYNC_MODE = false;
 
 	/*
 	@Rule
@@ -43,12 +49,12 @@ public class ClientRestTest extends ClientBaseTest {
 				URL,
 				USERNAME,
 				PASSWORD,
-				true);
+				false);
 	}
 
 	@Test
 	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAlta respostaAlta = client.alta(
 				generarNotificacioV2(
 						notificacioId,
@@ -77,7 +83,7 @@ public class ClientRestTest extends ClientBaseTest {
 	@Test
 	public void testConsultaEstatEnviament() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		String notificacioId = Long.toString(System.currentTimeMillis());
 		RespostaAlta respostaAlta = client.alta(
 				generarNotificacioV2(
 						notificacioId,
@@ -185,7 +191,370 @@ public class ClientRestTest extends ClientBaseTest {
 			notifica(i);
 		}
 	}
+	// PRUEBAS DE EMISIÓN – CORRECTAS
+	// =====================================================================================
 
+	// PETICIÓN CORRECTA TIPO CENTRO DE IMPRESIÓN, DOMICILIO CONCRETO Y NACIONAL
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un
+	// identificador, la referencia del emisor y el NIF del titular.
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision01() throws Exception {
+
+		int numDestinataris = 1;
+		boolean ambEnviamentPostal = true;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = false;
+
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 01",
+				numDestinataris,
+				numDestinataris,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
+		realitzarIComprovarEmissio(notificacio);
+	}
+
+	// PETICIÓN CORRECTA DE TIPO CENTRO DE IMPRESIÓN, DOMICILIO CONCRETO E INTERNACIONAL.
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un
+	// identificador, la referencia del emisor y el NIF del titular.
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision02() throws Exception {
+
+		// Petició TIPO CENTRO DE IMPRESIÓN, DOMICILIO CONCRETO E INTERNACIONAL
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = true;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = false;
+
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 02",
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
+
+		realitzarIComprovarEmissio(notificacio);
+	}
+
+
+	// PETICIÓN CORRECTA DE TIPO DEH VOLUNTARIO + CIE.
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un
+	// identificador, la referencia del emisor y el NIF del titular.
+	// NOTES:
+	//   * L'entitat ha de tenir activat el camp entrega DEH
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision03() throws Exception {
+
+		// Petició TIPO DEH VOLUNTARIO + CIE
+
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = true;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = true;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = false;
+
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 03",
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
+
+		realitzarIComprovarEmissio(notificacio);
+	}
+
+
+	// PETICIÓN CORRECTA DE TIPO DEH OBLIGADO.
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un
+	// identificador, la referencia del emisor y el NIF del titular.
+	// NOTES:
+	//   * L'entitat ha de tenir activat el camp entrega DEH
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision04() throws Exception {
+
+		// Petició TIPO DEH OBLIGADO
+
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = false;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = true;
+		boolean ambEnviamentDEHObligat = true;
+		boolean ambRetard = false;
+
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 04",
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertNotNull(respostaAlta);
+		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
+
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(numDestinataris));
+
+		// Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertNotNull(respostaInfo);
+		assertFalse(respostaInfo.isError());
+
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+			assertNotNull(info);
+			assertFalse(info.isError());
+
+			assertNotNull(referencia.getReferencia());
+			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
+		}
+	}
+
+	private void realitzarIComprovarEmissio(NotificacioV2 notificacio) {
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertNotNull(respostaAlta);
+		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
+
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(notificacio.getEnviaments().size()));
+
+		// Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertNotNull(respostaInfo);
+		assertFalse(respostaInfo.isError());
+
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+			assertNotNull(info);
+			assertFalse(info.isError());
+
+			assertNotNull(referencia.getReferencia());
+			if (SYNC_MODE) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
+		}
+	}
+
+	// PETICIÓN CORRECTA DE ENVIO SOLO CARPETA.
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un
+	// identificador, la referencia del emisor y el NIF del titular.
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision05() throws Exception {
+
+		// Petició DE ENVIO SOLO CARPETA
+
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = false;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = true;
+
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 05",
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertNotNull(respostaAlta);
+		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
+
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(numDestinataris));
+
+		// Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertNotNull(respostaInfo);
+		assertFalse(respostaInfo.isError());
+
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+			assertNotNull(info);
+			assertFalse(info.isError());
+
+			assertNotNull(referencia.getReferencia());
+			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
+		}
+	}
+
+	// PETICIÓN CORRECTA DE ENVIO SOLO CARPETA Y TIPUS INTERESADO NULO.
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un
+	// identificador, la referencia del emisor y el NIF del titular.
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision06() throws Exception {
+
+		// Petició DE ENVIO SOLO CARPETA CON TIPUS INTERESADO NULO
+		int numDestinataris = 1;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = false;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+
+		NotificacioV2 notificacio =  generaNotificacio(
+				"Test emissió 06",
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				false);
+
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertNotNull(respostaAlta);
+		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
+
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(numDestinataris));
+
+		// Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertNotNull(respostaInfo);
+		assertFalse(respostaInfo.isError());
+
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+			assertNotNull(info);
+			assertFalse(info.isError());
+
+			assertNotNull(referencia.getReferencia());
+			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
+		}
+	}
+
+
+	// PETICIÓN CORRECTA CON MAS DE UN DESTINATARIO.
+	// -------------------------------------------------------------------------------------
+	// Para cada destinatario se comprobará que devuelve un identificador, la referencia
+	// del emisor y el NIF del titular. En NotificaWS2 se haría como una remesa con varios
+	// envíos y en NotificaWS como un envio con varios destinatarios.
+	//
+	// NOTES:
+	//  * El client ha de tenir activada la property es.caib.notib.destinatari.multiple a true
+	// -------------------------------------------------------------------------------------
+	@Test
+	public void pruebaEmision07() throws Exception {
+		// Petició CON MAS DE UN DESTINATARIO
+
+		int numDestinataris = 3;
+		int numEnviaments = 1;
+		boolean ambEnviamentPostal = false;
+		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		boolean ambEnviamentDEH = false;
+		boolean ambEnviamentDEHObligat = false;
+		boolean ambRetard = true;
+
+		NotificacioV2 notificacio = generaNotificacio(
+				"Test emissió 07",
+				numDestinataris,
+				numEnviaments,
+				ambEnviamentPostal,
+				tipusEnviamentPostal,
+				ambEnviamentDEH,
+				ambEnviamentDEHObligat,
+				ambRetard);
+
+		RespostaAlta respostaAlta = client.alta(notificacio);
+		assertNotNull(respostaAlta);
+		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
+
+		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		assertNotNull(referencies);
+		assertThat(
+				referencies.size(),
+				is(numEnviaments));
+
+		// Consulta estat notificacio
+		RespostaConsultaEstatNotificacio respostaInfo = client.consultaEstatNotificacio(respostaAlta.getIdentificador());
+		assertNotNull(respostaInfo);
+		assertFalse(respostaInfo.isError());
+
+		//Consulta estat enviament
+		for (EnviamentReferencia referencia: referencies) {
+			//Si no hay error
+			RespostaConsultaEstatEnviament info = client.consultaEstatEnviament(referencia.getReferencia());
+			assertNotNull(info);
+			assertFalse(info.isError());
+
+			assertNotNull(referencia.getReferencia());
+			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+				assertNotNull(info.getCertificacio());
+				assertNotNull(info.getReceptorNif());
+			}
+		}
+	}
 
 	private void notifica(int i) {
 		try {

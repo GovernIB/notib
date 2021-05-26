@@ -1191,6 +1191,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1063 | El format del document no és vàlid. Els formats vàlids són PDF i ZIP.
 	// 1064 | No s'ha pogut obtenir el document a notificar
 	// 1065 | La longitud del document supera el màxim definit
+	// 1066 | Error en les metadades del document
+	// 1067 | Les notificacions i comunicacions a ciutadà només admeten 1 únic document.
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1072 | El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters."
@@ -1211,6 +1213,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1120 | El camp 'raoSocial' del titular no pot ser major que 255 caràcters
 	// 1121 | El camp 'dir3Codi' del titular no pot ser major que 9 caràcters
 	// 1122 | En cas de titular amb incapacitat es obligatori indicar un destinatari
+	// 1123 | El camp 'nif' del titular no és un tipus de document vàlid per a aquest tipus de persona
 	// 1130 | El camp 'nom' de la persona física titular no pot ser null
 	// 1131 | El camp 'llinatge1' de la persona física titular d'un enviament no pot ser null en el cas de persones físiques
 	// 1132 | El camp 'nif' de la persona física titular d'un enviament no pot ser null
@@ -1224,12 +1227,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1172 | El camp 'llinatge1' del destinatari no pot ser major que 40 caràcters
 	// 1173 | El camp 'llinatge2' del destinatari no pot ser major que 40 caràcters
 	// 1174 | El camp 'nif' del destinatari d'un enviament no pot tenir una longitud superior a 9 caràcters
-	// 1175 | El 'nif' del titular no és vàlid
+	// 1175 | El 'nif' del destinatari no és vàlid
 	// 1176 | El camp 'email' del destinatari no pot ser major que 255 caràcters
 	// 1177 | El format del camp 'email' del destinatari no és correcte
 	// 1178 | El camp 'telefon' del destinatari no pot ser major que 16 caràcters
 	// 1179 | El camp 'raoSocial' del destinatari no pot ser major que 255 caràcters
 	// 1180 | El camp 'dir3Codi' del destinatari no pot ser major que 9 caràcters
+	// 1181 | El camp 'nif' del destinatari no és un tipus de document vàlid per a aquest tipus de persona
 	// 1190 | El camp 'nom' de la persona física destinatària d'un enviament no pot ser null
 	// 1191 | El camp 'llinatge1' del destinatari d'un enviament no pot ser null en el cas de persones físiques
 	// 1192 | El camp 'nif' de la persona física destinatària d'un enviament no pot ser null
@@ -1421,6 +1425,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				} else {
 					return setRespostaError("[1116] El 'nif' del titular no és vàlid.");
 				}
+				switch (enviament.getTitular().getInteressatTipus()) {
+					case FISICA:
+						if (!NifHelper.isValidNifNie(enviament.getTitular().getNif())) {
+							return setRespostaError("[1123] El camp 'nif' del titular no és un tipus de document vàlid per a persona física. Només s'admet NIF/NIE.");
+						}
+						break;
+					case JURIDICA:
+						if (!NifHelper.isValidCif(enviament.getTitular().getNif())) {
+							return setRespostaError("[1123] El camp 'nif' del titular no és un tipus de document vàlid per a persona jurídica. Només s'admet CIF.");
+						}
+						break;
+					case ADMINISTRACIO:
+						break;
+				}
 			}
 			// - Email
 			if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 160) {
@@ -1475,7 +1493,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 			
 			// Destinataris
-			if (!Boolean.getBoolean(isMultipleDestinataris()) && enviament.getDestinataris() != null && enviament.getDestinataris().size() > 1) {
+			if (!isMultipleDestinataris() && enviament.getDestinataris() != null && enviament.getDestinataris().size() > 1) {
 				return setRespostaError("[1160] El numero de destinatais està limitat a un destinatari.");
 			}
 			if (enviament.getDestinataris() != null) {
@@ -1504,8 +1522,22 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						if (NifHelper.isvalid(destinatari.getNif())) {
 							senseNif = false;
 						} else {
-							return setRespostaError("[1175] El 'nif' del titular no és vàlid.");
+							return setRespostaError("[1175] El 'nif' del destinatari no és vàlid.");
 						}
+						switch (destinatari.getInteressatTipus()) {
+						case FISICA:
+							if (!NifHelper.isValidNifNie(destinatari.getNif())) {
+								return setRespostaError("[1181] El camp 'nif' del destinatari no és un tipus de document vàlid per a persona física. Només s'admet NIF/NIE.");
+							}
+							break;
+						case JURIDICA:
+							if (!NifHelper.isValidCif(destinatari.getNif())) {
+								return setRespostaError("[1181] El camp 'nif' del destinatari no és un tipus de document vàlid per a persona jurídica. Només s'admet CIF.");
+							}
+							break;
+						case ADMINISTRACIO:
+							break;
+					}
 					}
 					// - Email
 					if (destinatari.getEmail() != null && destinatari.getEmail().length() > 160) {
@@ -1937,11 +1969,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return docBase64.startsWith("JVBERi0");
 	}
 	
-	private static String isMultipleDestinataris() {
+	private static Boolean isMultipleDestinataris() {
 		String property = "es.caib.notib.destinatari.multiple";
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
-		return PropertiesHelper.getProperties().getProperty(property);
+		return PropertiesHelper.getProperties().getAsBoolean(property, false);
 	}
 	
 	private static Long getMaxSizeFile() {

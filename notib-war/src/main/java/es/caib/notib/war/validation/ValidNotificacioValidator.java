@@ -135,7 +135,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					switch (notificacio.getTipusDocument()[i]) {
 						case ARXIU:
 							if (i == 0 && ((notificacio.getContingutArxiu(i) == null || notificacio.getContingutArxiu(i).length == 0 || notificacio.getDocuments()[i].getArxiuGestdocId() == null)
-									&& (notificacio.getDocuments()[i].getArxiuGestdocId() == null))) {
+									&& (notificacio.getDocuments()[i].getArxiuGestdocId() == null || notificacio.getDocuments()[i].getArxiuGestdocId().isEmpty()))) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
 										.addNode("arxiu[" + i + "]")
