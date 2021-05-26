@@ -183,7 +183,7 @@ public class AvisServiceIT {
 		AvisDto avisCreated1 = avisService.create(avis);
 		
 		AvisDto avis2 = new AvisDto();
-		avis2.setAssumpte("Aviso nivel Warning");
+		avis2.setAssumpte("Aviso nivel Advertencia");
 		avis2.setMissatge("Se ha desplegado una nueva versión de NOTIB");
 		avis2.setDataInici(new Date()); // fecha actual
 		Calendar c = Calendar.getInstance();
@@ -192,17 +192,26 @@ public class AvisServiceIT {
 		avis2.setAvisNivell(AvisNivellEnumDto.WARNING);
 		AvisDto avisCreated2 = avisService.create(avis2);
 		
-		PaginacioParamsDto paginacioParamsDto = getPaginacioDtoFromRequest(null, null);
+		// Se ha establecido orden ascendente por la columna/campo "Assumpte"
+		PaginacioParamsDto paginacioParams = getPaginacioDtoFromRequest(null, null);
 		
 		authenticationTest.autenticarUsuari("user");
 		// When
-//		PaginaDto<AvisDto> avisosFound = avisService.findPaginat(paginacioParams);
+		PaginaDto<AvisDto> paginaDeAvisos = avisService.findPaginat(paginacioParams);
 		
 		// Then
-//		assertNotNull(avisosFound);
-//		assertEquals(2, avisosFound.size());
-//		comprobarAvisCoincide(avis, avisosFound.get(0));
-//		comprobarAvisCoincide(avisActive, avisosFound.get(1));
+		assertNotNull(paginaDeAvisos);
+		assertNotNull(paginaDeAvisos.getContingut());
+		assertEquals(2, paginaDeAvisos.getContingut().size());
+		// Se comprueba que ha ordenado correctamente: 1º elemento es avis2 y 2º es avis
+		comprobarAvisCoincide(avis2, paginaDeAvisos.getContingut().get(0));
+		comprobarAvisCoincide(avis, paginaDeAvisos.getContingut().get(1));
+		assertNotNull(paginaDeAvisos.getElementsNombre());
+		assertNotNull(paginaDeAvisos.getElementsTotal());
+		assertEquals(2,paginaDeAvisos.getElementsTotal());
+		assertNotNull(paginaDeAvisos.getNumero());
+		assertNotNull(paginaDeAvisos.getTamany());
+		assertNotNull(paginaDeAvisos.getTotal());
 		
 		// Borrado de los elementos creados
 		authenticationTest.autenticarUsuari("super");
@@ -481,14 +490,14 @@ public class AvisServiceIT {
 			length = 10;
 			searchValue = "";
 			searchRegex = null;
-			orderColumn.add(3);
-			orderDir.add("desc");
-			columnsData = Arrays.asList("id", "codi", "nom", "organGestorDesc", "pagadorpostal", "pagadorcie", "comu", "agrupar", "grupsCount", "permisosCount", "id");
-			columnsName = Arrays.asList(null, null, null, null, null, null, null, null, null, null, null);
-			columnsSearchable = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
-			columnsOrderable = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
-			columnsSearchValue = Arrays.asList(null, null, null, null, null, null, null, null, null, null, null);
-			columnsSearchRegex = Arrays.asList(false, false, false, false, false, false, false, false, false, false, false);
+			orderColumn.add(1);
+			orderDir.add("asc");
+			columnsData = Arrays.asList("id", "assumpte", "dataInici", "dataFinal", "actiu", "avisNivell", "id");
+			columnsName = Arrays.asList(null, null, null, null, null, null, null);
+			columnsSearchable = Arrays.asList(false, false, false, false, false, false, false);
+			columnsOrderable = Arrays.asList(false, false, false, false, false, false, false);
+			columnsSearchValue = Arrays.asList(null, null, null, null, null, null, null);
+			columnsSearchRegex = Arrays.asList(false, false, false, false, false, false, false);	
 		}
 	}
 
