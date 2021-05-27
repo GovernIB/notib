@@ -1501,18 +1501,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if(enviament.getTitular().getDir3Codi() == null) {
 					return setRespostaError("[1151] El camp 'dir3codi' de l'administració titular d'un enviament no pot ser null.");
 				}
+				OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
+				if (organDir3 == null) {
+					return setRespostaError("[1152] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") no es correspon a un codi Dir3 vàlid.");
+				}
 				if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
-					OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
-					if (organDir3 == null) {
-						return setRespostaError("[1152] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") no es correspon a un codi Dir3 vàlid.");
-					} else {
-						if (organDir3.getSir() == null || !organDir3.getSir()) {
-							return setRespostaError("[1153] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") no disposa d'oficina SIR. És obligatori per a comunicacions.");
-						}
-						if (organigramaByEntitat.containsKey(enviament.getTitular().getDir3Codi())) {
-							return setRespostaError("[1154] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat.");
-						}
+					if (organDir3.getSir() == null || !organDir3.getSir()) {
+						return setRespostaError("[1153] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") no disposa d'oficina SIR. És obligatori per a comunicacions.");
 					}
+					if (organigramaByEntitat.containsKey(enviament.getTitular().getDir3Codi())) {
+						return setRespostaError("[1154] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat.");
+					}
+				}
+				if (enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
+					enviament.getTitular().setNif(organDir3.getCif());
 				}
 			}
 			
@@ -1607,18 +1609,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						if(destinatari.getDir3Codi() == null) {
 							return setRespostaError("[1211] El camp 'dir3codi' de l'administració destinatària d'un enviament no pot ser null.");
 						}
+						OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(destinatari.getDir3Codi());
+						if (organDir3 == null) {
+							return setRespostaError("[1212] El camp 'dir3codi' (" + destinatari.getDir3Codi() + ") de l'administració destinatària d'un enviament no es correspon a un codi Dir3 vàlid.");
+						}
 						if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
-							OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(destinatari.getDir3Codi());
-							if (organDir3 == null) {
-								return setRespostaError("[1212] El camp 'dir3codi' (" + destinatari.getDir3Codi() + ") de l'administració destinatària d'un enviament no es correspon a un codi Dir3 vàlid.");
-							} else {
-								if (organDir3.getSir() == null || !organDir3.getSir()) {
-									return setRespostaError("[1213] El camp 'dir3codi' (" + destinatari.getDir3Codi() + ") de l'administració destinatària d'un enviament no disposa d'oficina SIR. És obligatori per a comunicacions.");
-								}
-								if (organigramaByEntitat.containsKey(destinatari.getDir3Codi())) {
-									return setRespostaError("[1214] El camp 'dir3codi' (" + destinatari.getDir3Codi() + ") de l'administració destinatària d'un enviament fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat.");
-								}
+							if (organDir3.getSir() == null || !organDir3.getSir()) {
+								return setRespostaError("[1213] El camp 'dir3codi' (" + destinatari.getDir3Codi() + ") de l'administració destinatària d'un enviament no disposa d'oficina SIR. És obligatori per a comunicacions.");
 							}
+							if (organigramaByEntitat.containsKey(destinatari.getDir3Codi())) {
+								return setRespostaError("[1214] El camp 'dir3codi' (" + destinatari.getDir3Codi() + ") de l'administració destinatària d'un enviament fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat.");
+							}
+						}
+						if (destinatari.getNif() == null || destinatari.getNif().isEmpty()) {
+							destinatari.setNif(organDir3.getCif());
 						}
 					}
 					
