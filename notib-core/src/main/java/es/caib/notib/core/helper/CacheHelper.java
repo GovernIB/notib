@@ -3,7 +3,9 @@
  */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -23,7 +25,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
@@ -148,6 +152,15 @@ public class CacheHelper {
 				codiDir3Organ,
 				arbreUnitats);
 	}
+
+	@Cacheable(value = "unitatPerCodi", key="#codi")
+	public OrganGestorDto unitatPerCodi(String codi) {
+		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codi);
+		if (organs != null && !organs.isEmpty()) {
+			return organs.get(0);
+		}
+		return null;
+	}
 	
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
 	public List<OficinaDto> getOficinesSIREntitat(
@@ -205,6 +218,10 @@ public class CacheHelper {
 
 	@CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
 	public void evictAllPermisosEntitatsUsuariActual() {
+	}
+
+	@CacheEvict(value = "unitatPerCodi", allEntries = true)
+	public void evictUnitatPerCodi() {
 	}
 	
 	public void clearCache(String value) {

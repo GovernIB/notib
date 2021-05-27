@@ -56,7 +56,7 @@ public class ProcedimentsCacheable {
                 ProcedimentEntity.class,
                 permisos
         );
-        // selecciona els expedients amb permisos per procediment de l'entitat i dels grups
+        // selecciona els procediments amb permisos per procediment de l'entitat i dels grups
 
         List<ProcedimentEntity> procedimentsAmbPermis;
         if (procedimentsAmbPermisIds.isEmpty()){

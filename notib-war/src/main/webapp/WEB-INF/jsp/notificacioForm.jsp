@@ -1198,7 +1198,7 @@
 			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
 			<div class="col-xs-12"> \
 				<div class="input-group" id="$searchOrgan#num_enviament##num_destinatari#" onclick="obrirModalOrganismesDestinatari(#num_enviament#,#num_destinatari#)"> \
-					<input id="searchOrgan#num_enviament##num_destinatari#" class="form-control " type="text" value=""> \
+					<input id="searchOrgan#num_enviament##num_destinatari#" class="form-control " readonly="true" type="text" value=""> \
 					<span class="input-group-addon habilitat">  \
 						<a><span class="fa fa-search"></span></a> \
 					</span> \
@@ -1813,6 +1813,7 @@
 		var dir3Codi;
 		var raoSocial;
 		var dir3CodiDesc;
+		var organCif;
 // 	var organSelect = document.getElementById('selOrganismes');
 		if(fila.size()>0){
 // 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
@@ -1821,20 +1822,24 @@
 			let codi = fila.data('codi');
 			let denominacio = fila.data('denominacio');
 			let ocodi = codi + '-' + denominacio;
+			let cif = fila.data('cif');
 
 			if(from == 'Tit'){
 				dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
 				raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
 				dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
+				organCif = document.getElementById("enviaments[" + index + "].titular.nif");
 			}else{
 				dir3Codi = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].dir3Codi");
 				raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nom");
 				dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
+				organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
 			}
 
 			dir3Codi.value = codi;
 			raoSocial.value = denominacio;
 			dir3CodiDesc.value = ocodi;
+			organCif.value = cif;
 			$('#cerrarModal').click();
 		}
 	};
@@ -1904,21 +1909,24 @@
 							var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
 							var local = $('#organigrama').val().indexOf(item.codi) != -1;
 							var clase = null;
-							var claseBoto = 'select btn btn-success';
 							var socSir = (item.sir?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
+							var comSir = enviamentTipus == 'COMUNICACIO' && !local && item.sir;
+							var comLocal = enviamentTipus == 'COMUNICACIO' && local;
 
-							if(enviamentTipus == 'COMUNICACIO' && local){
+							if(comLocal){
 								clase =   (i%2 == 0 ? 'even' : 'odd') +' unselectable';
-								claseBoto = 'hidden select btn btn-success';
 							}else{
 								clase = (i%2 == 0 ? 'even' : 'odd');
 							}
 
-							list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'">' +
+							list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'" data-cif="' + item.cif + '">' +
 									'<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
 									'<td>'+(socSir)+'</td>' +
-									'<td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td>' +
-									'</tr>';
+									'<td>';
+							if (enviamentTipus == 'NOTIFICACIO' || comSir) {
+								list_html += '<button type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button>';
+							}
+							list_html += '</td></tr>';
 						});
 					}else{
 						$("#total").text("0");
@@ -2716,7 +2724,7 @@
 													</div>
 													<!-- CODI DIR3 -->
 													<div class="col-md-3 dir3Codi hidden">
-														<not:inputTextSearch  funcio="obrirModalOrganismesDestinatari(${j},${i})" searchButton="searchOrgan${j}${i}" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12" value="${destinatari.dir3Codi}-${destinatari.nom}"/> 	
+														<not:inputTextSearch  funcio="obrirModalOrganismesDestinatari(${j},${i})" searchButton="searchOrgan${j}${i}" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12" readonly="true" value="${destinatari.dir3Codi}-${destinatari.nom}"/>
 													</div>						
 													<div class="col-md-3 hidden">
 														<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
