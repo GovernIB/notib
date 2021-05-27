@@ -166,6 +166,14 @@ public class NotificacioController extends BaseUserController {
         emplenarModelNotificacio(request, model, null);
         return "notificacioForm";
     }
+    
+    @RequestMapping(value = "/newMassiu")
+    public String altaMassiuForm(
+            HttpServletRequest request,
+            Model model) {
+    	model.addAttribute(new NotificacioMassiuCommand());
+        return "notificacioMassiuForm";
+    }
 
     @RequestMapping(value = "/procediments", method = RequestMethod.GET)
     public String formProcediments(
