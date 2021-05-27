@@ -1902,38 +1902,23 @@
 					if (data.length > 0) {
 						$.each(data, function(i, item) {
 							var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-							var sir = $('#organigrama').val().indexOf(data[i].codi);
+							var local = $('#organigrama').val().indexOf(item.codi) != -1;
 							var clase = null;
 							var claseBoto = 'select btn btn-success';
-							var socSir = (sir!=-1?'<spring:message code="comu.no"/>':'<spring:message code="comu.si"/>');
+							var socSir = (item.sir?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
 
-// 						if(enviamentTipus == 'NOTIFICACIO' && sir!=-1 ){
-// 							clase = 'unselectable';
-// 							claseBoto = 'unselectable select btn btn-success';
-// 						}else if(enviamentTipus == 'COMUNICACIO' && sir==-1 ){
-							if(enviamentTipus == 'COMUNICACIO' && sir!=-1 ){
+							if(enviamentTipus == 'COMUNICACIO' && local){
 								clase =   (i%2 == 0 ? 'even' : 'odd') +' unselectable';
 								claseBoto = 'hidden select btn btn-success';
 							}else{
 								clase = (i%2 == 0 ? 'even' : 'odd');
 							}
 
-							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].codi + ' - '+ data[i].nom +
-									'</td><td>'+(socSir)+'</td><td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
-
-
-// 						list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom +
-// 						'</td><td>'+socSir+'</td><td><button type="button" class="'+clase+'" select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
-
-
-// 						if($('#organigrama').val().indexOf(data[i].codi) != -1 ){
-// 							list_html += '<tr class="'+clase+'" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom +
-// 							'</td><td>'+sir!=-1?'Si':'No'+'</td><td><button type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button</td></tr>';
-// 						}else{
-// 							list_html += '<tr class="' + clase) + '" data-codi="' + data[i].codi +'" data-denominacio="' + data[i].nom +'"><td width="85%">' + data[i].nom +
-// 							'</td><td>No</td><td><button  type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button></td></tr>';
-// 						}
-
+							list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'">' +
+									'<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
+									'<td>'+(socSir)+'</td>' +
+									'<td><button type="button" class="'+claseBoto+'"> <spring:message code="comu.boto.seleccionar"/></button</td>' +
+									'</tr>';
 						});
 					}else{
 						$("#total").text("0");

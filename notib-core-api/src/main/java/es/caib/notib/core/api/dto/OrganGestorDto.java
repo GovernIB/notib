@@ -1,11 +1,11 @@
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Filtre per a la consulta de procediments.
@@ -26,6 +26,9 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private String oficinaNom;
 	private List<PermisDto> permisos;
 	private OficinaDto oficina;
+
+	private Boolean sir;
+	private String cif;
 	
 	public String getLlibreCodiNom() {
 		if (llibre != null)
