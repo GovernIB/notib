@@ -1908,16 +1908,10 @@
 						$.each(data, function(i, item) {
 							var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
 							var local = $('#organigrama').val().indexOf(item.codi) != -1;
-							var clase = null;
+							var clase = (i%2 == 0 ? 'even' : 'odd');
 							var socSir = (item.sir?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
 							var comSir = enviamentTipus == 'COMUNICACIO' && !local && item.sir;
 							var comLocal = enviamentTipus == 'COMUNICACIO' && local;
-
-							if(comLocal){
-								clase =   (i%2 == 0 ? 'even' : 'odd') +' unselectable';
-							}else{
-								clase = (i%2 == 0 ? 'even' : 'odd');
-							}
 
 							list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'" data-cif="' + item.cif + '">' +
 									'<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
