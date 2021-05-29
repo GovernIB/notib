@@ -1107,7 +1107,10 @@ public class PluginHelper {
 		List<NodeDir3> organismesNodeDir3 = null;
 		List<OrganGestorDto> organismes = null;
 		try {
-			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio.replaceAll(" ", "%20"), nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			if (denominacio != null) {
+				denominacio = denominacio.replaceAll(" ", "%20");
+			}
+			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {

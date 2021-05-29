@@ -3,27 +3,9 @@
  */
 package es.caib.notib.plugin.unitat;
 
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.ws.BindingProvider;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-
 import es.caib.dir3caib.ws.api.catalogo.CatPais;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWs;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWsService;
@@ -35,6 +17,21 @@ import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.utils.PropertiesHelper;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.ws.BindingProvider;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.
@@ -134,8 +131,10 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 				unidadTF.getCodUnidadRaiz(), 		// arrel 
 				unidadTF.getCodUnidadSuperior(),	// superior 
 				unidadTF.getDescripcionLocalidad(),	// localitat 
-				unidadTF.getCodUnidadSuperior(),	// idPare 
-				null );								// fills
+				unidadTF.getCodUnidadSuperior(),	// idPare
+				null,
+				null,
+				null );						// fills
 		return node;
 	}
 

@@ -162,6 +162,7 @@ public class ConversioTipusHelper {
 
 		mapperFactory.classMap(NodeDir3.class, OrganGestorDto.class).
 			field("denominacio", "nom").
+			field("tieneOficinaSir", "sir").
 			byDefault().
 			register();
 		

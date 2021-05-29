@@ -1,28 +1,28 @@
 package es.caib.notib.core.service.ws;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.plugins.arxiu.api.ContingutOrigen;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.DocumentTipus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,72 +34,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.ws.notificacio.DocumentV2;
-import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.EnviamentReferencia;
-import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioEstatEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
-import es.caib.notib.core.cacheable.OrganGestorCachable;
-import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.AuditEnviamentHelper;
-import es.caib.notib.core.helper.AuditNotificacioHelper;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.CaducitatHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.IntegracioHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.NotificacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.helper.RegistreNotificaHelper;
-import es.caib.notib.core.repository.AplicacioRepository;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.DocumentTipus;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioServiceWsV2Test {
@@ -204,7 +150,7 @@ public class NotificacioServiceWsV2Test {
 		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", 
 				"nom", 
 				null, 
-				"dir3Codi", 
+				"dir3Codi",
 				"dir3CodiReg", 
 				"apiKey", 
 				false, 
@@ -286,6 +232,8 @@ public class NotificacioServiceWsV2Test {
 		
 		PersonaEntity personaEntity = PersonaEntity.getBuilder("sandreu@limit.es", 
 				"Andreu", "Nadal", "00000000T", "Siòn", "666010101").build();
+		OrganGestorDto organ = new OrganGestorDto();
+		organ.setSir(true);
 		
 		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, 
 				notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, 
@@ -327,7 +275,11 @@ public class NotificacioServiceWsV2Test {
 		Mockito.when(notificacioEnviamentRepository.findByNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(listaNotificacioGuardada);
 		Mockito.when(notificacioHelper.getNotificaErrorEvent(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioEventEntity);
 		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
-//		try {
+//		Mockito.when(organGestorCachable.findOrganigramaByEntitat(Mockito.anyString())).thenReturn(new HashMap<String, OrganismeDto>());
+		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
+
+
+		//		try {
 //			Mockito.when(registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada)).thenReturn(false);
 //		} catch (RegistreNotificaException e) {
 //			e.printStackTrace();

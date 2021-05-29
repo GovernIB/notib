@@ -3,20 +3,6 @@
  */
 package es.caib.notib.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
-
 import es.caib.notib.ws.notificacio.DocumentV2;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
 import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
@@ -25,6 +11,18 @@ import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
 import es.caib.notib.ws.notificacio.NotificacioV2;
 import es.caib.notib.ws.notificacio.Persona;
 import es.caib.notib.ws.notificacio.RespostaAlta;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.
@@ -34,10 +32,10 @@ import es.caib.notib.ws.notificacio.RespostaAlta;
 public class ClientRestValidacionsTest extends ClientBaseTest {
 
 	
-//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String URL = "http://localhost:8080/notib";
 //	private static final String USERNAME = "admin";
 //	private static final String PASSWORD = "admin";
-//	
+
 	private static final String URL = "https://dev.caib.es/notib";
 	private static final String USERNAME = "$ripea_notib";
 	private static final String PASSWORD = "ripea_notib";
@@ -54,8 +52,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
-				PASSWORD);
-		// client.setServeiDesplegatDamuntJboss(false);
+				PASSWORD,
+				false);
 	}
 
 	@Test
@@ -456,6 +454,33 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi(null);
 		enviaNotificacioError(notificacio, "1151");
 	}
+
+	@Test
+	public void test1152() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("ABCDEFG");
+		enviaNotificacioError(notificacio, "1152");
+	}
+
+	@Test
+	public void test1153() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("LA0007752");
+		enviaNotificacioError(notificacio, "1153");
+	}
+
+	@Test
+	public void test1154() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A04026906");
+		enviaNotificacioError(notificacio, "1154");
+	}
 	
 	@Test
 	public void test1160() throws DatatypeConfigurationException, IOException, DecoderException {
@@ -622,6 +647,33 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi(null);
 		enviaNotificacioError(notificacio, "1211");
+	}
+
+	@Test
+	public void test1212() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("ABCDEFG");
+		enviaNotificacioError(notificacio, "1212");
+	}
+
+	@Test
+	public void test1213() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("LA0007752");
+		enviaNotificacioError(notificacio, "1213");
+	}
+
+	@Test
+	public void test1214() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A04026906");
+		enviaNotificacioError(notificacio, "1214");
 	}
 	
 	@Test
