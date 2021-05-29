@@ -17,6 +17,9 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
+
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 /**
@@ -398,5 +401,11 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"tothom"})
 	public boolean validarIdCsv (String idCsv) {
 		return delegate.validarIdCsv(idCsv);
+	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
+		return delegate.getModelDadesCarregaMassiuCSV();
 	}
 }

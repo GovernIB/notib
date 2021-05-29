@@ -13,6 +13,9 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.mail.MessagingException;
+
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 /**
@@ -448,4 +451,6 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public boolean validarIdCsv (String idCsv);
 
+	@PreAuthorize("hasRole('tothom')")
+	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
 }

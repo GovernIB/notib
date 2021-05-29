@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
-<c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set>
+<c:set var="titol"><spring:message code="notificacioMassiu.form.titol.crear"/></c:set>
 
 <html>
 <head>
@@ -16,11 +16,31 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>	
 </head>
 <body>
-	<c:set var="formAction"><not:modalUrl value="/newMassiuSave"/></c:set>
-    <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="NotificacioMassiuCommand" enctype="multipart/form-data">
-		<not:inputFile name="ficheroCsv" textKey="notificacioMassiu.form.camp.arxiuCsv" labelSize="3" inputSize="6"/>
-		<not:inputFile name="ficheroZip" textKey="notificacioMassiu.form.camp.arxiuZip" labelSize="3" inputSize="6"/>
-	
+	<div class="text-right col-md-12">
+		<a href="<c:url value="/notificacio/newMassiu/getModelDadesCarregaMassiuCSV"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="notificacioMassiu.accio.descarregar.modeloCsv"/>">
+			<spring:message code="notificacioMassiu.accio.descarregar.modeloCsv"/>
+			<span class="fa fa-download"></span>
+		</a>
+	</div>
+
+	<c:set var="formAction"><not:modalUrl value="/notificacio/newMassiuProcessar"/></c:set>
+    <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassiuCommand" enctype="multipart/form-data">
+		<not:inputFile name="ficheroCsv" textKey="notificacioMassiu.form.camp.arxiuCsv" labelSize="3" inputSize="6" required="true" info="true" messageInfo="notificacioMassiu.form.camp.arxiuCsv.avis"/>
+		<not:inputFile name="ficheroZip" textKey="notificacioMassiu.form.camp.arxiuZip" labelSize="3" inputSize="6" required="true" info="true" messageInfo="notificacioMassiu.form.camp.arxiuZip.avis"/>
+		<not:inputText name="email" textKey="notificacioMassiu.form.camp.email" inputMaxLength="${emailSize}" showsize="true" labelSize="3" inputSize="6" required="true"/>
+		<div class="text-right col-md-12">
+			<div class="btn-group">
+				<button type="submit" class="btn btn-success saveForm">
+					<span class="fa fa-paper-plane"></span>
+					<spring:message code="comu.boto.enviar.notificacio" />
+<%-- 				<spring:message code="notificacioMassiu.boto.processar.carrega" /> --%>
+				</button>
+<!-- 				<button type="submit" class="btn btn-success"> -->
+<!-- 					<span class="fa fa-save"></span>&nbsp; -->
+<%-- 					<spring:message code="comu.boto.guardar"/> --%>
+<!-- 				</button> -->
+			</div>
+		</div>	
 	</form:form>
 </body>
 </html>

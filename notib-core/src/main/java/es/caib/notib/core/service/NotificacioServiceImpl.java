@@ -60,6 +60,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -2066,6 +2070,31 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getMidaMinIdCsv() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.document.consulta.id.csv.mida.min", 16);
+	}
+	
+	@Transactional
+	@Override
+	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException{
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			String filePath;
+			if (getEnviarDocumentCapRegistre())
+				filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.model.dades.carrega.massiu.metadades");
+			else 
+				filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.model.dades.carrega.massiu");
+			
+			Path path = Paths.get(filePath);
+			
+			return Files.readAllBytes(path);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	//TODO: Revisar cómo se llama la que añadió Bernat y cambiar esto
+	private Boolean getEnviarDocumentCapRegistre() {
+		return PropertiesHelper.getProperties().getAsBoolean(
+				"es.caib.notib.document.enviar.registre", false);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);

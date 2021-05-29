@@ -169,9 +169,8 @@ public class NotificacioController extends BaseUserController {
     
     @RequestMapping(value = "/newMassiu")
     public String altaMassiuForm(
-            HttpServletRequest request,
-            Model model) {
-    	model.addAttribute(new NotificacioMassiuCommand());
+    		Model model) {
+    	model.addAttribute("notificacioMassiuCommand", new NotificacioMassiuCommand());
         return "notificacioMassiuForm";
     }
 
@@ -382,6 +381,57 @@ public class NotificacioController extends BaseUserController {
         return "redirect:../notificacio";
     }
 
+    @RequestMapping(value = "/newMassiuProcessar", method = RequestMethod.POST)
+    public String saveMassiu(
+            HttpServletRequest request,
+            @Valid NotificacioMassiuCommand notificacioMassiuCommand,
+            BindingResult bindingResult,
+            Model model) throws IOException {
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
+        
+        if (bindingResult.hasErrors()) {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
+            
+            model.addAttribute("errors", bindingResult.getAllErrors());
+            
+            for (ObjectError error: bindingResult.getAllErrors()) {
+                log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
+            }
+
+            return "notificacioMassiuForm";
+        }
+
+        try {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
+ 
+            
+            
+            
+            
+//                notificacioService.create(
+//                        entitatActual.getId(),
+//                        notificacioCommand.asDatabaseDto());
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
+            log.error(ExceptionUtils.getFullStackTrace(ex));
+            MissatgesHelper.error(request, ex.getMessage());
+//            ompliModelFormulari(
+//                    request,
+//                    procedimentActual,
+//                    entitatActual,
+//                    notificacioCommand,
+//                    bindingResult,
+//                    tipusDocumentEnumDto,
+//                    model);
+            return "notificacioMassiuForm";
+        }
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
+
+        return "redirect:../notificacio";
+    }
+    
     private void updateDocuments(NotificacioCommandV2 notificacioCommand) throws IOException {
 
         for (int i = 0; i < 5; i++) {
@@ -850,6 +900,22 @@ public class NotificacioController extends BaseUserController {
                 response);
     }
 
+	@RequestMapping(value = "/newMassiu/getModelDadesCarregaMassiuCSV", method = RequestMethod.GET)
+	@ResponseBody
+	public void getModelDadesCarregaMassiuCSV(
+			HttpServletResponse response) throws IOException {
+		
+				response.setHeader("Set-cookie", "fileDownload=true; path=/");
+				try {
+					writeFileToResponse(
+							"modelo_datos_carga_masiva.csv", 
+							notificacioService.getModelDadesCarregaMassiuCSV(), 
+							response);
+				} catch (Exception ex) {
+					log.debug("Error al obtenir la plantilla de el model de dades CSV de càrrega massiva", ex);
+				}
+	
+	}
 
 	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
 	@ResponseBody

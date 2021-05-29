@@ -17,6 +17,7 @@ public class NotificacioMassiuDto implements Serializable {
 
 	private byte[] ficheroCsvBytes;
 	private byte[] ficheroZipBytes;
+	private String email;
 	
 	@Override
 	public String toString() {

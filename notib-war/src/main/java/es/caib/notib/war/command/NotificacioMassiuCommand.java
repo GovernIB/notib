@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,8 @@ public class NotificacioMassiuCommand {
 	private MultipartFile ficheroCsv;
 	@NotEmpty
 	private MultipartFile ficheroZip;
+	@Size(max=160)
+	private String email;
 
 	public static NotificacioMassiuCommand asCommand(NotificacioMassiuDto dto) {
 		return ConversioTipusHelper.convertir(
@@ -41,6 +45,7 @@ public class NotificacioMassiuCommand {
 				NotificacioMassiuDto.class);
 		
 		notificacioMassiu.setFicheroCsvBytes(command.getFicheroCsv().getBytes());
+		notificacioMassiu.setFicheroZipBytes(command.getFicheroZip().getBytes());
 		
 		return notificacioMassiu;
 	}
