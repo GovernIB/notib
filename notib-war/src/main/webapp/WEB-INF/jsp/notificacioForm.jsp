@@ -198,7 +198,11 @@
 <body>
 <script type="text/javascript">
 
-
+	if ('${notificacioCommandV2 != null && notificacioCommandV2.procedimentId != null}') {
+		var procedimentIdAux = '${notificacioCommandV2.procedimentId}';
+	} else {
+		var procedimentIdAux = null;
+	}
 	var interessatsTipus = new Array();
 	var interessatTipusOptions = "";
 	var numDocuments = 1;
@@ -707,6 +711,15 @@
 						selProcediments.select2(select2Options);
 						// selProcediments.val(selProcediments.attr('data-enum-value'));
 						// selProcediments.trigger('change');
+
+						let numProcediments = $('#procedimentId').children('option').length - 1;
+						if (numProcediments > 1) {
+							if ('${notificacioCommandV2 != null && procedimentIdAux != null}') {
+								$("#procedimentId").val('${notificacioCommandV2.procedimentId}');
+								$('#procedimentId').trigger('change');
+								procedimentIdAux = null;
+							}
+						}
 					},
 					error: function() {
 						console.log("error obtenint els procediments de l'òrgan gestor...");
