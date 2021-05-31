@@ -29,6 +29,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -51,6 +52,7 @@ public class JustificantHelper {
 	private Font frutiger9 = FontFactory.getFont("Frutiger", 8, new BaseColor(127, 127, 127, 1)); // #7F7F7F
 	private Font frutigerTitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font calibri10 = FontFactory.getFont("Calibri", 10);
+	private Font calibri8 = FontFactory.getFont("Calibri", 8);
 	private Font calibri10Bold = FontFactory.getFont("Calibri", 10, Font.BOLD); 
 	private Font calibriWhiteBold = FontFactory.getFont("Calibri", 10, Font.BOLD, new BaseColor(255, 255, 255)); // #FFFFFF
 	
@@ -71,8 +73,28 @@ public class JustificantHelper {
 					justificant, 
 					notificacio, 
 					progres);
-
+			
 			progres.setProgres(40);
+			PdfPTable taulaAnnexos = new PdfPTable(1);
+			taulaAnnexos.setWidthPercentage(100f);
+			if (notificacio.getDocument() != null) {
+//				## [TÍTOL]
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.annexos"));
+				PdfPCell titolCell = getTitolAnnexos(notificacio.getId());
+				taulaAnnexos.addCell(titolCell);
+				crearTaulaAnnexos(
+						taulaAnnexos,
+						justificant,
+						notificacio.getId(),
+						notificacio,
+						progres);
+			}
+
+			progres.setProgres(60);
+			crearIntroduccioEnviaments(
+					justificant, 
+					notificacio, 
+					progres);
 			int numEnviament = 1;
 			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament", new Object[] {numEnviament}));
@@ -127,15 +149,26 @@ public class JustificantHelper {
 			setParametersBold(justificantIntroduccio, introduccio);
 			justificantIntroduccio.add(Chunk.NEWLINE);
 			
-//			## [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
-			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol", new Object[] {notificacio.getEnviaments().size()});
-			Paragraph justificantIntroduccioEnviaments = new Paragraph();
-			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
-			justificantIntroduccioEnviaments.setSpacingBefore(10f);
+//			## [DESCIPCIÓ NOFICACIÓ JUSTIFICANT]
+			Paragraph justificantDescripcio = new Paragraph();
+			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty()) {
+				String descripcio = messageHelper.getMessage("es.caib.notib.justificant.descripcio", new Object[] {notificacio.getDescripcio()});				
+				setParametersBold(justificantDescripcio, descripcio);
+				justificantDescripcio.setSpacingBefore(10f);
+			}
+//			## [INTRODUCCIÓ ANNEXOS JUSTIFICANT]
+			Paragraph justificantAnnexosIntroduccion = new Paragraph();
+			if (notificacio.getDocument() != null) {
+				String introAnnexos = messageHelper.getMessage("es.caib.notib.justificant.documents");				
+				setParametersBold(justificantAnnexosIntroduccion, introAnnexos);
+				justificantAnnexosIntroduccion.setSpacingBefore(10f);
+			}
 			
 			titolIntroduccioCell.addElement(justificantTitol);
-			titolIntroduccioCell.addElement(justificantIntroduccio);
-			titolIntroduccioCell.addElement(justificantIntroduccioEnviaments);
+			titolIntroduccioCell.addElement(justificantIntroduccio);		
+			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty())
+				titolIntroduccioCell.addElement(justificantDescripcio);
+			titolIntroduccioCell.addElement(justificantAnnexosIntroduccion);
 			
 			titolIntroduccioTable.addCell(titolIntroduccioCell);
 			titolIntroduccioTable.setSpacingAfter(10f);
@@ -147,7 +180,38 @@ public class JustificantHelper {
 			logger.debug(errorMessage, ex);
 		}
 	}
-
+	private void crearIntroduccioEnviaments(
+			Document justificant, 
+			NotificacioDtoV2 notificacio, 
+			ProgresDescarregaDto progres) throws JustificantException {
+		logger.debug("Creant la introducció de les enviaments del justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
+		try {
+//			## [TAULA QUE CONTÉ INTRODUCCIÓ DE LES ENVIAMENTS]
+			PdfPTable titolIntroduccioTableEnviaments = new PdfPTable(1);
+			titolIntroduccioTableEnviaments.setWidthPercentage(100);
+			PdfPCell titolIntroduccioEnviamentsCell = new PdfPCell();
+			titolIntroduccioEnviamentsCell.setBorder(Rectangle.NO_BORDER);
+			
+			
+//			## [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
+			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol", new Object[] {notificacio.getEnviaments().size()});
+			Paragraph justificantIntroduccioEnviaments = new Paragraph();
+			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
+			justificantIntroduccioEnviaments.setSpacingBefore(10f);
+			
+			titolIntroduccioEnviamentsCell.addElement(justificantIntroduccioEnviaments);
+			
+			titolIntroduccioTableEnviaments.addCell(titolIntroduccioEnviamentsCell);
+			titolIntroduccioTableEnviaments.setSpacingAfter(10f);
+			justificant.add(titolIntroduccioTableEnviaments);
+			
+		} catch (DocumentException ex) {
+			String errorMessage = "Hi ha hagut un error generant la introducció de les enviaments del justificant";
+			progres.setProgres(100);
+			progres.addInfo(TipusInfo.INFO, errorMessage);
+			logger.debug(errorMessage, ex);
+	}
+}
 	private void crearTaulaEnviaments(
 			Document justificant, 
 			NotificacioDtoV2 notificacio,
@@ -186,6 +250,20 @@ public class JustificantHelper {
 						numEnviament, 
 						notificacio.getEnviaments().size()});
 		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, calibriWhiteBold);
+		titolParagraph.setAlignment(Element.ALIGN_CENTER);
+		titolCell.addElement(titolParagraph);
+		titolCell.setPaddingBottom(6f);
+		titolCell.setBackgroundColor(new BaseColor(166, 166, 166));
+		titolCell.setBorderWidth((float) 0.5);
+		titolCell.setBorderColor(new BaseColor(166, 166, 166));
+		return titolCell;
+	}
+	
+	private PdfPCell getTitolAnnexos(Long notificacioId) {
+		logger.debug("Generant el títol de la taula d'annexos del justificant d'enviament de la notificació [notificacioId=" + notificacioId + "]");
+		PdfPCell titolCell = new PdfPCell();
+		String titolDocumentMessage = messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.titol");
+		Paragraph titolParagraph = new Paragraph(titolDocumentMessage, calibriWhiteBold);
 		titolParagraph.setAlignment(Element.ALIGN_CENTER);
 		titolCell.addElement(titolParagraph);
 		titolCell.setPaddingBottom(6f);
@@ -394,7 +472,95 @@ public class JustificantHelper {
 		table.addCell(procedimentTitleCell);
 		table.addCell(procedimentContentCell);
 	}	
+	
+	private void crearTaulaAnnexos(PdfPTable taulaAnnexos,
+			Document justificant,
+			Long notificacioId,
+			NotificacioDtoV2 notificacio,
+			ProgresDescarregaDto progres) throws JustificantException {
+		logger.debug("Generant la taula de annexos del justificant d'enviament per als documents.");
+		try {
+//			## [CONTINGUT]
+			int[] headingTablewidths = {39, 8, 20, 20, 13};
+			PdfPTable dadesAnnexoTable = new PdfPTable(5);
+			dadesAnnexoTable.setWidthPercentage(100f);
+			dadesAnnexoTable.setWidths(headingTablewidths);
+			
+			getHeadersAnnexos(dadesAnnexoTable);
+			if (notificacio.getDocument() != null)
+				getContingutAnnexos(notificacio.getDocument(), dadesAnnexoTable);
+			if (notificacio.getDocument2() != null)
+				getContingutAnnexos(notificacio.getDocument2(), dadesAnnexoTable);
+			if (notificacio.getDocument3() != null)
+				getContingutAnnexos(notificacio.getDocument3(), dadesAnnexoTable);
+			if (notificacio.getDocument4() != null)
+				getContingutAnnexos(notificacio.getDocument4(), dadesAnnexoTable);
+			if (notificacio.getDocument5() != null)
+				getContingutAnnexos(notificacio.getDocument5(), dadesAnnexoTable);
+			
+			PdfPCell contingut = new PdfPCell();
+			contingut.setBorder(PdfPCell.NO_BORDER);
+			contingut.addElement(dadesAnnexoTable);
+			
+			taulaAnnexos.addCell(contingut);
+			justificant.add(taulaAnnexos);
+			justificant.add(Chunk.NEXTPAGE);
+		} catch (Exception ex) {
+			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.annexos.error");
+			progres.setProgres(100);
+			progres.addInfo(TipusInfo.INFO, errorMessage);
+			logger.debug(errorMessage, ex);
+		}
+	}
+	
+	private void getHeadersAnnexos(PdfPTable dadesAnnexoTable) throws DocumentException {
+//		## [NOM - TÍTOL]
+		Paragraph dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.arxiuNom"), calibri10Bold);
+		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
+//		## [MIDA - TÍTOL]
+		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.mida"), calibri10Bold);
+		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
+//		## [CSV - TÍTOL]
+		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.csv"), calibri10Bold);
+		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
+//		## [VALIDESA - TÍTOL]
+		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.validesa"), calibri10Bold);
+		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
+//		## [TIPODOCUMENTAL - TÍTOL]
+		dadesAnnexoTitol = new Paragraph(messageHelper.getMessage("es.caib.notib.justificant.annexos.taula.tipoDocumental"), calibri10Bold);
+		createNewTableAnnexosHeader(dadesAnnexoTitol, dadesAnnexoTable);
+	}
 
+	private void createNewTableAnnexosHeader(Paragraph dadesAnnexoTitol, PdfPTable dadesAnnexoTable) {
+		dadesAnnexoTitol.setAlignment(Element.ALIGN_LEFT);
+		PdfPCell contingutCell = new PdfPCell();
+		contingutCell.addElement(dadesAnnexoTitol);
+		dadesAnnexoTable.addCell(contingutCell);
+	}
+	
+	private void getContingutAnnexos(DocumentDto document, PdfPTable dadesAnnexoTable) throws DocumentException {
+//		## [CONTINGUT COLUMNES]
+		String nomCsvOUuid = "";
+		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
+			if (document.getCsv() != null && document.getUuid() != null) //es Uuid
+				nomCsvOUuid = "uuid:" + document.getUuid();
+			else if (document.getCsv() != null && document.getUuid() == null) //es CSV
+					nomCsvOUuid = "csv:" + document.getCsv();		
+		}
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getArxiuNom() != null && !document.getArxiuNom().isEmpty()) ? document.getArxiuNom() : nomCsvOUuid, calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getMida() != null ? String.valueOf(Math.round(document.getMida() / 1024 )) + " KB" : "", calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk((document.getCsv() != null && !document.getCsv().isEmpty()) ? document.getCsv() : "", calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getValidesa() != null ? document.getValidesa().toString() : "", calibri8));
+		createNewTableAnnexosContent(dadesAnnexoTable, new Chunk(document.getTipoDocumental() != null ? document.getTipoDocumental().toString() : "", calibri8));
+	}
+	
+	private void createNewTableAnnexosContent(PdfPTable table, Chunk chunk) {
+		PdfPCell procedimentContentCell = new PdfPCell();
+		procedimentContentCell.addElement(chunk);
+		procedimentContentCell.setBorderWidth(0.25f);
+		table.addCell(procedimentContentCell);
+	}	
+	
 	private Document inicialitzaDocument(
 			ByteArrayOutputStream out,
 			ProgresDescarregaDto progres) throws DocumentException, JustificantException {
