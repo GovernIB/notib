@@ -176,7 +176,6 @@
 	font-size: 14px !important;
 }
 .unselectable {
-    background-color: #ddd;
     cursor: not-allowed;
 }
 .select2-results .select2-results__option[aria-disabled="true"] {
@@ -1912,7 +1911,9 @@
 							var socSir = (item.sir?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
 							var comSir = enviamentTipus == 'COMUNICACIO' && !local && item.sir;
 							var comLocal = enviamentTipus == 'COMUNICACIO' && local;
-
+							if (enviamentTipus != 'NOTIFICACIO' && !comSir) {
+								clase += ' unselectable';
+							}
 							list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'" data-cif="' + item.cif + '">' +
 									'<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
 									'<td>'+(socSir)+'</td>' +
