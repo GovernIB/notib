@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -15,6 +16,7 @@ import es.caib.notib.core.api.dto.NotificacioMassiuDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidNotificacioMassiu;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,11 +26,11 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
+@ValidNotificacioMassiu
 public class NotificacioMassiuCommand {
 	
-	@NotEmpty
 	private MultipartFile ficheroCsv;
-	@NotEmpty
+	
 	private MultipartFile ficheroZip;
 	@Size(max=160)
 	private String email;

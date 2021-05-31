@@ -408,4 +408,10 @@ public class NotificacioServiceBean implements NotificacioService {
 	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
 		return delegate.getModelDadesCarregaMassiuCSV();
 	}
+	
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public NotificacioDatabaseDto createMassiu(NotificacioMassiuDto notificacioMassiu) {
+		return delegate.createMassiu(notificacioMassiu);
+	}
 }

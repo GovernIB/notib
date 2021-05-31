@@ -395,18 +395,16 @@ public class NotificacioController extends BaseUserController {
             model.addAttribute("errors", bindingResult.getAllErrors());
             
             for (ObjectError error: bindingResult.getAllErrors()) {
-                log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
+                log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
             }
 
             return "notificacioMassiuForm";
         }
 
         try {
-            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
+            log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
  
-            
-            
-            
+            notificacioService.createMassiu(NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
             
 //                notificacioService.create(
 //                        entitatActual.getId(),
@@ -414,7 +412,7 @@ public class NotificacioController extends BaseUserController {
             
         } catch (Exception ex) {
             ex.printStackTrace();
-            log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
+            log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
 //            ompliModelFormulari(

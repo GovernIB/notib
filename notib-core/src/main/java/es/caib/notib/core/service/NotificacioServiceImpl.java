@@ -53,12 +53,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.io.ICsvListReader;
+import org.supercsv.prefs.CsvPreference;
 
 import javax.annotation.Resource;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -2078,7 +2084,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			String filePath;
-			if (getEnviarDocumentCapRegistre())
+			if (isSendDocumentsActive())
 				filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.model.dades.carrega.massiu.metadades");
 			else 
 				filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.model.dades.carrega.massiu");
@@ -2091,12 +2097,91 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
-	//TODO: Revisar cómo se llama la que añadió Bernat y cambiar esto
-	private Boolean getEnviarDocumentCapRegistre() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.notib.document.enviar.registre", false);
+	/**
+	 * Indica si els documents s'han d'enviar al registre.
+	 * Si es true els documents sempre s'han d'enviar.
+	 *
+	 * @return boolean
+	 */
+	private boolean isSendDocumentsActive() {
+		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.documents.enviar", true);
 	}
-	
+
+	@Override
+	public NotificacioDatabaseDto createMassiu(NotificacioMassiuDto notificacioMassiu) {
+        //llamar al service para leer el fichero csv
+        //abrir el zip para comprobar que los archivos nombrados en el csv están en el zip
+        //crear una lista de notificacio e ir insertando cada una de las filas del csv en
+        //realizar las validaciones
+        //si la fila pasa las validaciones detectar que tipo de documento. si es CSV/UUID 
+        //ir a arxiu para consultar metadades, tamaño y todo lo necesario y guardarlo en 
+        //un map en memoria (que no sé que tiene que guardar porque no sñe si tya guardé en tabla y puedo recuperar cosas de las tablas
+        //para no repeir consulta a arxiu que es costosa
+        //Rellenar notificacioDTo y dar de alta la notficacion con sus documentos
+        //las OK ponerlas en CSV de informe descargable
+        //las Ko ponerlas en CVS de errores descargable
+		
+		try {
+			List<String[]> linies = readCSV(notificacioMassiu.getFicheroCsvBytes());
+			
+			for (String[] linia : linies) {
+				NotificacioDatabaseDto notifica = csvToNotificaDatabaseDto(linia);
+			}
+			
+		} catch (Exception e) {
+			logger.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
+			return null;
+		}
+		
+
+		return null;
+	}
+
+	private NotificacioDatabaseDto csvToNotificaDatabaseDto(String[] linia) {
+		NotificacioDatabaseDto notifica = new NotificacioDatabaseDto();
+		GrupDto grupDto = new GrupDto();
+		ProcedimentDto procedimentDto = new ProcedimentDto();// linia[16]
+		notifica.setCaducitat(null);
+		notifica.setConcepte(linia[1]);
+		notifica.setDescripcio(null);
+		notifica.setDocument(null);
+		notifica.setEmisorDir3Codi(linia[0]);
+		notifica.setEnviamentDataProgramada(null);
+		notifica.setEnviaments(null);
+		notifica.setEnviamentTipus(NotificaEnviamentTipusEnumDto.toEnum(linia[2].toUpperCase()));
+		notifica.setGrup(grupDto);
+		notifica.setIdioma(null);
+		notifica.setNumExpedient(null);
+		notifica.setOrganGestorCodi(null);
+		notifica.setProcediment(procedimentDto);
+		notifica.setRetard(null);
+		notifica.setUsuariCodi(null);
+		return notifica;
+	}
+
+	private static List<String[]> readCSV(byte[] fitxer) throws Exception {
+		List<String[]> linies = new ArrayList<String[]>();
+		ICsvListReader listReader = null;
+		try {
+			Reader reader = new InputStreamReader(new ByteArrayInputStream(fitxer));
+//	      listReader = new CsvListReader(reader, CsvPreference.STANDARD_PREFERENCE);
+			listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+			List<String> linia;
+			int index = 0;
+			while( (linia = listReader.read()) != null ) {
+				if (index > 0) {
+					linies.add(linia.toArray(new String[]{}));
+				}
+				index++;
+			}
+		}
+		finally {
+			if( listReader != null )
+				listReader.close();
+		}
+		return linies;
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);
 
 }
