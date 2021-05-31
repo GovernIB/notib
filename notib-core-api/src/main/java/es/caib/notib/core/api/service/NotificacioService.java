@@ -455,5 +455,5 @@ public interface NotificacioService {
 	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	NotificacioDatabaseDto createMassiu(NotificacioMassiuDto notificacioMassiu);
+	NotificacioDatabaseDto createMassiu(Long entitatId, NotificacioMassiuDto notificacioMassiu);
 }

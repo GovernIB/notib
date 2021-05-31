@@ -411,7 +411,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDatabaseDto createMassiu(NotificacioMassiuDto notificacioMassiu) {
-		return delegate.createMassiu(notificacioMassiu);
+	public NotificacioDatabaseDto createMassiu(Long entitatId, NotificacioMassiuDto notificacioMassiu) {
+		return delegate.createMassiu(entitatId, notificacioMassiu);
 	}
 }

@@ -13,6 +13,9 @@
 	<title>${titol}</title>
     <link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
+		<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>	
 </head>
 <body>
@@ -27,7 +30,9 @@
     <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassiuCommand" enctype="multipart/form-data">
 		<not:inputFile name="ficheroCsv" textKey="notificacioMassiu.form.camp.arxiuCsv" labelSize="3" inputSize="6" required="true" info="true" messageInfo="notificacioMassiu.form.camp.arxiuCsv.avis" fileName="${notificacioMassiuCommand.ficheroCsv.originalFilename}"/>
 		<not:inputFile name="ficheroZip" textKey="notificacioMassiu.form.camp.arxiuZip" labelSize="3" inputSize="6" required="true" info="true" messageInfo="notificacioMassiu.form.camp.arxiuZip.avis" fileName="${notificacioMassiuCommand.ficheroZip.originalFilename}"/>
+		<not:inputDate name="caducitat" textKey="notificacioMassiu.form.camp.caducitat" labelSize="3" inputSize="6" />
 		<not:inputText name="email" textKey="notificacioMassiu.form.camp.email" inputMaxLength="${emailSize}" showsize="true" labelSize="3" inputSize="6" required="true"/>
+		
 		<div class="text-right col-md-12">
 			<div class="btn-group">
 				<button type="submit" class="btn btn-success saveForm">

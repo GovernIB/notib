@@ -170,7 +170,9 @@ public class NotificacioController extends BaseUserController {
     @RequestMapping(value = "/newMassiu")
     public String altaMassiuForm(
     		Model model) {
-    	model.addAttribute("notificacioMassiuCommand", new NotificacioMassiuCommand());
+    	NotificacioMassiuCommand notificacioMassiuCommand = new NotificacioMassiuCommand();
+    	model.addAttribute("notificacioMassiuCommand", notificacioMassiuCommand);
+    	model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
         return "notificacioMassiuForm";
     }
 
@@ -388,6 +390,7 @@ public class NotificacioController extends BaseUserController {
             BindingResult bindingResult,
             Model model) throws IOException {
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         
         if (bindingResult.hasErrors()) {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
@@ -398,17 +401,15 @@ public class NotificacioController extends BaseUserController {
                 log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
             }
 
+            model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
+            
             return "notificacioMassiuForm";
         }
 
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
  
-            notificacioService.createMassiu(NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
-            
-//                notificacioService.create(
-//                        entitatActual.getId(),
-//                        notificacioCommand.asDatabaseDto());
+            notificacioService.createMassiu(entitatActual.getId(), NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
             
         } catch (Exception ex) {
             ex.printStackTrace();

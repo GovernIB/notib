@@ -43,6 +43,7 @@ import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -2083,32 +2085,20 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String filePath;
-			if (isSendDocumentsActive())
-				filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.model.dades.carrega.massiu.metadades");
-			else 
-				filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.model.dades.carrega.massiu");
-			
-			Path path = Paths.get(filePath);
-			
-			return Files.readAllBytes(path);
+			InputStream input;
+			if (registreNotificaHelper.isSendDocumentsActive()) {
+				input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva_metadades.csv");
+			} else {
+				input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva.csv");
+			}
+			return IOUtils.toByteArray(input);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	/**
-	 * Indica si els documents s'han d'enviar al registre.
-	 * Si es true els documents sempre s'han d'enviar.
-	 *
-	 * @return boolean
-	 */
-	private boolean isSendDocumentsActive() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.documents.enviar", true);
-	}
 
 	@Override
-	public NotificacioDatabaseDto createMassiu(NotificacioMassiuDto notificacioMassiu) {
+	public NotificacioDatabaseDto createMassiu(Long entitatId, NotificacioMassiuDto notificacioMassiu) {
         //llamar al service para leer el fichero csv
         //abrir el zip para comprobar que los archivos nombrados en el csv están en el zip
         //crear una lista de notificacio e ir insertando cada una de las filas del csv en
@@ -2125,7 +2115,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<String[]> linies = readCSV(notificacioMassiu.getFicheroCsvBytes());
 			
 			for (String[] linia : linies) {
-				NotificacioDatabaseDto notifica = csvToNotificaDatabaseDto(linia);
+				NotificacioDatabaseDto notificacio = csvToNotificaDatabaseDto(linia);
 			}
 			
 		} catch (Exception e) {
