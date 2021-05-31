@@ -1,8 +1,8 @@
 package es.caib.notib.plugin.registre;
 
-import java.util.List;
-
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+
+import java.util.List;
 
 public interface RegistrePlugin {
 	
@@ -30,10 +30,11 @@ public interface RegistrePlugin {
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException
 	 */
-	public RespostaConsultaRegistre salidaAsientoRegistral(
+	RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
 			AsientoRegistralBeanDto arb, 
-			Long tipusOperacio);
+			Long tipusOperacio,
+			boolean generarJustificant);
 	
 	/**
 	 * Recupera un registre de sortida
@@ -46,7 +47,7 @@ public interface RegistrePlugin {
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException
 	 */
-	public RespostaConsultaRegistre obtenerAsientoRegistral(
+	RespostaConsultaRegistre obtenerAsientoRegistral(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat,
 			Long tipusOperacio,
@@ -63,7 +64,7 @@ public interface RegistrePlugin {
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException
 	 */
-	public RespostaJustificantRecepcio obtenerJustificante(
+	RespostaJustificantRecepcio obtenerJustificante(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat,
 			long tipusRegistre);
@@ -77,7 +78,7 @@ public interface RegistrePlugin {
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 * @throws RegistrePluginException
 	 */
-	public RespostaJustificantRecepcio obtenerOficioExterno(
+	RespostaJustificantRecepcio obtenerOficioExterno(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat);
 	
@@ -89,7 +90,7 @@ public interface RegistrePlugin {
 	 * 		Llistat dels tipus d'assumpte
 	 * @throws RegistrePluginException
 	 */
-	public List<TipusAssumpte> llistarTipusAssumpte(String entitatcodi) throws RegistrePluginException;
+	List<TipusAssumpte> llistarTipusAssumpte(String entitatcodi) throws RegistrePluginException;
 	
 	/**
 	 * Llista els codis d'assumpte d'una entitat i un tipus d'assumpte

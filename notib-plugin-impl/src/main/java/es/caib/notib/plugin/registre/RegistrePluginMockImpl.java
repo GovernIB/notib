@@ -26,7 +26,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
 			AsientoRegistralBeanDto arb, 
-			Long tipusOperacio) {
+			Long tipusOperacio,
+			boolean generarJustificant) {
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		logger.info(arb.toString());
 //		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
