@@ -17,6 +17,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -37,7 +38,8 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	NotificacioDatabaseDto create(
 			Long entitatId,
-			NotificacioDatabaseDto notificacio) throws RegistreNotificaException;
+			NotificacioDatabaseDto notificacio,
+			Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException;
 	
 	/**
 	 * Esborra la notificació indicada per paràmetre
@@ -455,5 +457,8 @@ public interface NotificacioService {
 	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	NotificacioDatabaseDto createMassiu(Long entitatId, NotificacioMassiuDto notificacioMassiu);
+	void createMassiu(
+			EntitatDto entitat, 
+			String usuariCodi, 
+			NotificacioMassiuDto notificacioMassiu) throws RegistreNotificaException;
 }

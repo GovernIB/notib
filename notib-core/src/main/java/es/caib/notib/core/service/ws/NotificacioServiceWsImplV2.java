@@ -173,6 +173,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						// Organ gestor
 						if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 							organGestor = procediment.getOrganGestor();
+							
+							// TODO: Esta validación queda comentada hasta consultar con la DGTIC
+//							if (notificacio.getOrganGestor() != null && !notificacio.getOrganGestor().isEmpty() && 
+//									notificacio.getOrganGestor() != organGestor.getCodi()) {
+//								logger.debug(">> [ALTA] Organ gestor no es correspon amb el de l'procediment");
+//								errorDescripcio = "[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.";
+//								integracioHelper.addAccioError(info, errorDescripcio);
+//								return setRespostaError(errorDescripcio);
+//							}
 						}
 					} else {
 						logger.debug(">> [ALTA] Sense procediment");
@@ -1187,6 +1196,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1021 | El camp 'procedimentCodi' no pot tenir una longitud superior a 9 caràcters
 	// 1022 | El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment
 	// 1023 | El camp 'organ gestor' no es correspon a cap Òrgan Gestor de l'entitat especificada
+	// 1024 | El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment
 	// 1030 | El concepte de la notificació no pot ser null
 	// 1031 | El concepte de la notificació no pot tenir una longitud superior a 255 caràcters
 	// 1032 | El format del camp concepte no és correcte. (Inclou caràcters no permesos)
@@ -1404,7 +1414,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 					comunicacioAmbAdministracio = true;
 				}
-				if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA))  {
+				if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.JURIDICA))  {
 					comunicacioSenseAdministracio = true;
 				}
 			}

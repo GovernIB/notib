@@ -3,6 +3,8 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.exception.NoDocumentException;
+import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
@@ -54,6 +56,8 @@ public class NotificacioHelper {
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private RegistreNotificaHelper registreNotificaHelper;
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
@@ -105,7 +109,8 @@ public class NotificacioHelper {
 	}
 	public NotificacioData buildNotificacioData(EntitatEntity entitat,
 												NotificacioDatabaseDto notificacio,
-												boolean checkProcedimentPermissions) {
+												boolean checkProcedimentPermissions,
+												Map<String, Long> documentsProcessatsMassiu) {
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
 		ProcedimentEntity procediment = null;
@@ -147,11 +152,11 @@ public class NotificacioHelper {
 		if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
 			grupNotificacio = grupRepository.findOne(notificacio.getGrup().getId());
 		}
-		DocumentEntity documentEntity = getDocumentEntity(notificacio.getDocument());
-		DocumentEntity document2Entity = getDocumentEntity(notificacio.getDocument2());
-		DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3());
-		DocumentEntity document4Entity = getDocumentEntity(notificacio.getDocument4());
-		DocumentEntity document5Entity = getDocumentEntity(notificacio.getDocument5());
+		DocumentEntity documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
+		DocumentEntity document2Entity = getDocumentEntity(notificacio.getDocument2(), null);
+		DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3(), null);
+		DocumentEntity document4Entity = getDocumentEntity(notificacio.getDocument4(), null);
+		DocumentEntity document5Entity = getDocumentEntity(notificacio.getDocument5(), null);
 
 		return NotificacioData.builder()
 				.notificacio(notificacio)
@@ -168,63 +173,103 @@ public class NotificacioHelper {
 	}
 
 
-	private DocumentEntity getDocumentEntity(DocumentDto document) {
+	private DocumentEntity getDocumentEntity(DocumentDto document, Map<String, Long> documentsProcessatsMassiu) {
 		DocumentEntity documentEntity = null;
 
 		if (document != null) {
 			String documentGesdocId = null;
 			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-						Base64.decodeBase64(document.getContingutBase64()));
+				if ( documentsProcessatsMassiu == null || //alta de notificacio web
+						!documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+						( documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && // alta massiu web
+						documentsProcessatsMassiu.get(document.getArxiuNom()) == null) ) { 
+					documentGesdocId = pluginHelper.gestioDocumentalCreate(
+							PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+							Base64.decodeBase64(document.getContingutBase64()));
+				}
 			} else if (document.getUuid() != null) {
-				DocumentDto doc = new DocumentDto();
-				String arxiuUuid = document.getUuid();
-				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true,true);
-					doc.setArxiuNom(documentArxiu.getNom());
-					doc.setNormalitzat(document.isNormalitzat());
-					doc.setGenerarCsv(document.isGenerarCsv());
-					doc.setUuid(arxiuUuid);
-					doc.setMediaType(documentArxiu.getContingut().getTipusMime());
-					doc.setMida(documentArxiu.getContingut().getTamany());
-					//Metadades
-					doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
-					doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
-					doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
-					doc.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
-					document = doc;
-					
-					// Recuperar csv
-					Map<String, Object> metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
-					if (metadadesAddicionals != null) {
-						if (metadadesAddicionals.containsKey("csv"))
-							document.setCsv((String) metadadesAddicionals.get("csv"));
-						else if (metadadesAddicionals.containsKey("eni:csv"))
-							document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+				if ( documentsProcessatsMassiu == null || //alta de notificacio web
+						!documentsProcessatsMassiu.containsKey(document.getUuid()) ||
+						( documentsProcessatsMassiu.containsKey(document.getUuid()) && // alta massiu web
+						documentsProcessatsMassiu.get(document.getUuid()) == null) ) {
+					DocumentDto doc = new DocumentDto();
+					String arxiuUuid = document.getUuid();
+					if (pluginHelper.isArxiuPluginDisponible()) {
+						Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
+						doc.setArxiuNom(documentArxiu.getNom());
+						doc.setNormalitzat(document.isNormalitzat());
+						doc.setGenerarCsv(document.isGenerarCsv());
+						doc.setUuid(arxiuUuid);
+						doc.setMediaType(documentArxiu.getContingut().getTipusMime());
+						doc.setMida(documentArxiu.getContingut().getTamany());
+						//Metadades
+						if (recuperarMetadadesArxiu(documentArxiu, document)) {
+							doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
+							doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
+							doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
+							doc.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+						} else {
+							doc.setOrigen(document.getOrigen());
+							doc.setValidesa(document.getValidesa());
+							doc.setTipoDocumental(document.getTipoDocumental());
+							doc.setModoFirma(document.getModoFirma());
+						}
+						document = doc;
+						
+						// Recuperar csv
+						Map<String, Object> metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
+						if (metadadesAddicionals != null) {
+							if (metadadesAddicionals.containsKey("csv"))
+								document.setCsv((String) metadadesAddicionals.get("csv"));
+							else if (metadadesAddicionals.containsKey("eni:csv"))
+								document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+						}
+						
 					}
-					
+				} else {
+					documentEntity = documentRepository.findOne(documentsProcessatsMassiu.get(document.getUuid()));
+					return documentEntity;
 				}
 			} else if (document.getCsv() != null) {
-				DocumentDto doc = new DocumentDto();
-				String arxiuCsv = document.getCsv();
-				if (pluginHelper.isArxiuPluginDisponible()) {
-					DocumentContingut documentArxiu = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
-					doc.setArxiuNom(documentArxiu.getArxiuNom());
-					doc.setNormalitzat(document.isNormalitzat());
-					doc.setGenerarCsv(document.isGenerarCsv());
-					doc.setMediaType(documentArxiu.getTipusMime());
-					doc.setMida(documentArxiu.getTamany());
-					doc.setCsv(arxiuCsv);
-					//Metadades
-					Document documentArxiuDades = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
-					doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiuDades.getMetadades().getOrigen().ordinal()));
-					doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiuDades.getMetadades().getEstatElaboracio())));
-					doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiuDades.getMetadades().getTipusDocumental().toString()));
-					doc.setModoFirma(pluginHelper.getModeFirma(documentArxiuDades, documentArxiuDades.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
-					document = doc;
+				if ( documentsProcessatsMassiu == null || //alta de notificacio web
+						!documentsProcessatsMassiu.containsKey(document.getCsv()) ||
+						( documentsProcessatsMassiu.containsKey(document.getCsv()) && // alta massiu web
+						documentsProcessatsMassiu.get(document.getCsv()) == null) ) {
+					DocumentDto doc = new DocumentDto();
+					String arxiuCsv = document.getCsv();
+					if (pluginHelper.isArxiuPluginDisponible()) {
+						Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
+						doc.setArxiuNom(documentArxiu.getNom());
+						doc.setNormalitzat(document.isNormalitzat());
+						doc.setGenerarCsv(document.isGenerarCsv());
+						doc.setMediaType(documentArxiu.getContingut().getTipusMime());
+						doc.setMida(documentArxiu.getContingut().getTamany());
+						doc.setCsv(arxiuCsv);
+						//Metadades
+						if (recuperarMetadadesArxiu(documentArxiu, document)) {
+							doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
+							doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
+							doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
+							doc.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+						} else {
+							doc.setOrigen(document.getOrigen());
+							doc.setValidesa(document.getValidesa());
+							doc.setTipoDocumental(document.getTipoDocumental());
+							doc.setModoFirma(document.getModoFirma());
+						}
+						document = doc;
+					}
+				} else {
+					documentEntity = documentRepository.findOne(documentsProcessatsMassiu.get(document.getCsv()));
+					return documentEntity;
 				}
+			} else if ( documentsProcessatsMassiu != null && 
+					documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && 
+					 documentsProcessatsMassiu.get(document.getArxiuNom()) != null ) {
+					documentEntity = documentRepository.findOne(documentsProcessatsMassiu.get(document.getArxiuNom()));
+					return documentEntity;
 			}
+			
 			// Guardar document
 			if (document.getCsv() != null ||
 					document.getUuid() != null ||
@@ -262,10 +307,38 @@ public class NotificacioHelper {
 							document.getTipoDocumental(),
 							document.getModoFirma()
 					).build());
+					
+					if ( documentsProcessatsMassiu != null ) { // Si NO es alta de notificacio web
+						if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+							documentsProcessatsMassiu.put(document.getArxiuNom(), documentEntity.getId());
+						} else if (document.getUuid() != null) {
+							documentsProcessatsMassiu.put(document.getUuid(), documentEntity.getId());
+						} else if (document.getCsv() != null) {
+							documentsProcessatsMassiu.put(document.getCsv(), documentEntity.getId());
+						}
+					}
 				}
 			}
 		}
 		return documentEntity;
+	}
+	
+	private Boolean recuperarMetadadesArxiu (Document documentArxiu, DocumentDto document){
+		if (documentArxiu == null) {
+			throw new NoDocumentException("No s'ha pogut obtenir el document de l'arxiu.");
+		}
+		if (documentArxiu.getMetadades() == null || documentArxiu.getMetadades().getOrigen() == null 
+				|| documentArxiu.getMetadades().getEstatElaboracio() == null
+				|| documentArxiu.getMetadades().getTipusDocumental() == null
+				|| documentArxiu.getContingut().getArxiuNom() == null) {
+			if (document.getOrigen() == null || document.getValidesa() == null || document.getTipoDocumental() == null || document.getModoFirma()) {
+				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
+			} else {
+				return false; // metadades de CSV o del formulario de alta web (no masiva)
+			}
+		} else {
+			return true; // metadades de Arxiu
+		}
 	}
 
 	public NotificacioEventEntity getNotificaErrorEvent(NotificacioEntity notificacio) {

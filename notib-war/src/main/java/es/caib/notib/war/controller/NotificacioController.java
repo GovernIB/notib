@@ -3,6 +3,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.exception.MaxLinesExceededException;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -361,7 +362,8 @@ public class NotificacioController extends BaseUserController {
             } else {
                 notificacioService.create(
                         entitatActual.getId(),
-                        notificacioCommand.asDatabaseDto());
+                        notificacioCommand.asDatabaseDto(), 
+                        null); // solo se informa para envíos masivos
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -391,12 +393,13 @@ public class NotificacioController extends BaseUserController {
             Model model) throws IOException {
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        UsuariDto usuariActual = aplicacioService.getUsuariActual();
         
         if (bindingResult.hasErrors()) {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
             
             model.addAttribute("errors", bindingResult.getAllErrors());
-            
+ 
             for (ObjectError error: bindingResult.getAllErrors()) {
                 log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
             }
@@ -409,21 +412,17 @@ public class NotificacioController extends BaseUserController {
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
  
-            notificacioService.createMassiu(entitatActual.getId(), NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
-            
+            notificacioService.createMassiu(entitatActual, usuariActual.getCodi(), NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
+      
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
-            MissatgesHelper.error(request, ex.getMessage());
-//            ompliModelFormulari(
-//                    request,
-//                    procedimentActual,
-//                    entitatActual,
-//                    notificacioCommand,
-//                    bindingResult,
-//                    tipusDocumentEnumDto,
-//                    model);
+            if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class))
+                MissatgesHelper.error(request, getMessage(request, "notificacioMassiu.csv.error"));
+            else 
+            	MissatgesHelper.error(request, ex.getMessage());
+
             return "notificacioMassiuForm";
         }
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");

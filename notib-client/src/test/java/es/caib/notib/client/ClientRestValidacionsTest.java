@@ -122,6 +122,13 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	}
 	
 	@Test
+	public void test1024() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setOrganGestor("A04035962");
+		enviaNotificacioError(notificacio, "1024");
+	}
+	
+	@Test
 	public void test1030() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setConcepte(null);
