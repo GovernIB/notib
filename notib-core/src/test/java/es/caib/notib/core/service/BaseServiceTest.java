@@ -421,7 +421,9 @@ public class BaseServiceTest {
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
 				return resposta;
 			}
-		}).when(registrePluginMock).salidaAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong());
+		}).when(registrePluginMock).salidaAsientoRegistral(
+				Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyBoolean()
+		);
 		
 		// obtenerAsientoRegistral
 		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
