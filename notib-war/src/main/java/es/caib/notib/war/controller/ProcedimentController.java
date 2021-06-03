@@ -122,9 +122,7 @@ public class ProcedimentController extends BaseUserController{
 	public String newGet(
 			HttpServletRequest request,
 			Model model) {
-		String vista = formGet(request, null, model);
-		
-		return vista;
+		return formGet(request, null, model);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
