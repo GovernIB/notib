@@ -1,6 +1,6 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.OrganismeDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;

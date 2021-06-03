@@ -1,6 +1,7 @@
 package es.caib.notib.core.entity;
 
-import lombok.Getter;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import lombok.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -13,6 +14,9 @@ import javax.persistence.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Getter
 @Entity
 @Table(name = "not_organ_gestor")
@@ -42,7 +46,10 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	
 	@Column(name = "oficina_nom")
 	protected String oficinaNom;
-	
+
+	@Column(name = "estat")
+	protected OrganGestorEstatEnum estat;
+
 	public void update(
 			String codi,
 			String nom,
@@ -57,8 +64,8 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 		this.oficina = oficina;
 		this.oficinaNom = oficinaNom;
 	}
-	public void update(
-			String nom) {
+
+	public void update(String nom) {
 		this.nom = nom;
 	}
 	
@@ -75,49 +82,29 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 		this.oficina = oficina;
 		this.oficinaNom = oficinaNom;
 	}
-	
-	public static Builder getBuilder(
+
+	public void updateEstat(OrganGestorEstatEnum estat) {
+		this.estat = estat;
+	}
+	public static OrganGestorEntityBuilder builder(
 			String codi,
 			String nom,
 			EntitatEntity entitat,
 			String llibre,
 			String llibreNom,
 			String oficina,
-			String oficinaNom) {
-		return new Builder(
-				codi,
-				nom,
-				entitat,
-				llibre,
-				llibreNom,
-				oficina,
-				oficinaNom);
+			String oficinaNom,
+			OrganGestorEstatEnum estat) {
+		return new OrganGestorEntityBuilder()
+				.entitat(entitat)
+				.codi(codi)
+				.nom(nom)
+				.llibre(llibre)
+				.llibreNom(llibreNom)
+				.oficina(oficina)
+				.oficinaNom(oficinaNom)
+				.estat(estat);
 	}
-	
-	public static class Builder {
-		OrganGestorEntity built;
-		Builder(
-				String codi,
-				String nom,
-				EntitatEntity entitat,
-				String llibre,
-				String llibreNom,
-				String oficina,
-				String oficinaNom) {
-			built = new OrganGestorEntity();
-			built.codi = codi;
-			built.nom = nom;
-			built.entitat = entitat;
-			built.llibre = llibre;
-			built.llibreNom = llibreNom;
-			built.oficina = oficina;
-			built.oficinaNom = oficinaNom;
-		}
-		public OrganGestorEntity build() {
-			return built;
-		}
-	}
-	
 	private static final long serialVersionUID = 458331024861203562L;
 
 }

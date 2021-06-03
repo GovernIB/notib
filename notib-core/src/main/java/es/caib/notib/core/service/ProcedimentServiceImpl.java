@@ -4,6 +4,8 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -22,7 +24,6 @@ import es.caib.notib.core.repository.*;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private ProcedimentsCacheable procedimentsCacheable;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -119,7 +122,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			// Organ gestor
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor()); 
 			if (organGestor == null) {
-				organGestor = createOrganGestor(procediment.getOrganGestor(), entitat);
+				organGestor = organGestorHelper.crearOrganGestor(entitat, procediment.getOrganGestor());
 			}
 			
 			ProcedimentEntity procedimentEntity = procedimentRepository.save(
@@ -145,27 +148,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
-	}
-
-	private OrganGestorEntity createOrganGestor(String organGestorCodi, EntitatEntity entitat) {
-		OrganGestorEntity organGestor;
-		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(
-				entitat.getCodi(),
-				organGestorCodi);
-		Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-		List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
-				arbreUnitats, 
-				organGestorCodi);
-		organGestor = OrganGestorEntity.getBuilder(
-				organGestorCodi,
-				findDenominacioOrganisme(organGestorCodi),
-				entitat,
-				llibre.getCodi(),
-				llibre.getNomLlarg(),
-				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
-				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
-		organGestorRepository.save(organGestor);
-		return organGestor;
 	}
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
@@ -235,7 +217,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			// Organ gestor
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor()); 
 			if (organGestor == null) {
-				organGestor = createOrganGestor(procediment.getOrganGestor(), entitat);
+				organGestor = organGestorHelper.crearOrganGestor(entitat, procediment.getOrganGestor());
 			}
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
 			OrganGestorEntity organGestorAntic = null;
@@ -360,24 +342,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			//Compravar si agrupar
 			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
 			return procediment.isAgrupar();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	private String findDenominacioOrganisme(String codiDir3) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			String denominacio = null;
-			try {
-				denominacio = cacheHelper.findDenominacioOrganisme(codiDir3);
-			} catch (Exception e) {
-				String errorMessage = "No s'ha pogut recuperar la denominació de l'organismes: " + codiDir3;
-				logger.error(
-						errorMessage, 
-						e.getMessage());
-			}
-			return denominacio;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1582,7 +1546,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				if (procedimentOrgan == null) {
 					OrganGestorEntity organGestor = organGestorRepository.findByCodi(permis.getOrgan());
 					if (organGestor == null) {
-						organGestor = createOrganGestor(permis.getOrgan(), entitat);
+						organGestor = organGestorHelper.crearOrganGestor(entitat, permis.getOrgan());
 					}
 					procedimentOrgan = procedimentOrganRepository.save(ProcedimentOrganEntity.getBuilder(procediment, organGestor).build());
 				}

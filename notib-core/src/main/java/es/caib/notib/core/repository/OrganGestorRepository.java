@@ -21,7 +21,6 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
-	public List<OrganGestorEntity> findByEntitatId(Long entitatId);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByCodi(String codi);
 

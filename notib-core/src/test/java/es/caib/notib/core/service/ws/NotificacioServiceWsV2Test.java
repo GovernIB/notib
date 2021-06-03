@@ -1,6 +1,7 @@
 package es.caib.notib.core.service.ws;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
@@ -190,7 +191,8 @@ public class NotificacioServiceWsV2Test {
 		grupDto.setId(1L);
 		grups.add(grupDto);
 		
-		OrganGestorEntity organGestor = OrganGestorEntity.getBuilder(null, null, entitatMock, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null,
+				entitatMock, null, null, null, null, null).build();
 		
 //		Map<String, OrganismeDto> organigramaEntitat = null;
 		

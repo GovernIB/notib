@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
 import org.springframework.beans.factory.annotation.Autowired;

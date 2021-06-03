@@ -1,6 +1,9 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -22,9 +25,16 @@ public interface OrganGestorService {
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public OrganGestorDto updateOficina(OrganGestorDto dto);
-	
+
+	/**
+	 * Actualitza les dades de l'organ gestor indicat de la base de dades
+	 * amb la informació de dir3
+	 *
+	 * @param entitatId Identificador de l'entitat en curs
+	 * @param organGestorCodi Codi Dir3 de l'òrgan gestor a actualitzar
+	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void updateNom(
+	void updateOne(
 			Long entitatId, 
 			String organGestorCodi);
 
@@ -37,7 +47,7 @@ public interface OrganGestorService {
 	 *                            null per actualitzar-los a tots
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	void updateNoms(
+	void updateAll(
 			Long entitatId, String organActualCodiDir3);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -74,7 +84,7 @@ public interface OrganGestorService {
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,
-			OrganGestorFiltreDto filtre, 
+			OrganGestorFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")

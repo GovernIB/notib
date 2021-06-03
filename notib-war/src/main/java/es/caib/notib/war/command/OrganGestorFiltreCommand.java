@@ -2,7 +2,7 @@ package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.OrganGestorFiltreDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
