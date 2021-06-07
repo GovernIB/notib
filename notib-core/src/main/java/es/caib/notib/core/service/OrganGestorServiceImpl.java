@@ -87,10 +87,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 					dto.getEntitatId());
-//					true,
-//					false,
-//					false);
 
+			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() :
+					OrganGestorEstatEnum.VIGENT;
 			OrganGestorEntity organGestor = OrganGestorEntity.builder(
 					dto.getCodi(),
 					dto.getNom(),
@@ -99,7 +98,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					dto.getLlibreNom(),
 					dto.getOficina() != null ? dto.getOficina().getCodi() : null,
 					dto.getOficina() != null ? dto.getOficina().getNom() : null,
-					OrganGestorEstatEnum.VIGENT).build();
+					estat).build();
 			return conversioTipusHelper.convertir(
 					organGestorRepository.save(organGestor),
 					OrganGestorDto.class);
@@ -838,8 +837,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
 			// 1. Obtenim els òrgans gestors amb permisos
-			List<OrganGestorEntity> organsDisponibles = organGestorRepository.findByEntitat(entitat);
-			
+			List<OrganGestorEntity> organsDisponibles;
+			if (!PermisEnum.CONSULTA.equals(permis)){
+				organsDisponibles = organGestorRepository.findByEntitatAndEstat(entitat, OrganGestorEstatEnum.VIGENT);
+			} else {
+				organsDisponibles = organGestorRepository.findByEntitat(entitat);
+			}
+
 			permisosHelper.filterGrantedAny(
 					organsDisponibles,
 					new ObjectIdentifierExtractor<OrganGestorEntity>() {
@@ -876,7 +880,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				Collections.sort(organsGestorsDto, new Comparator<OrganGestorDto>() {
 					@Override
 					public int compare(OrganGestorDto o1, OrganGestorDto o2) {
-						return o1.getCodi().compareTo(o1.getCodi());
+						return o1.getCodi().compareTo(o2.getCodi());
 					}
 				});
 			}

@@ -153,17 +153,19 @@ public interface OrganGestorService {
 			Long entitatId,
 			String dir3codi,
 			boolean isFiltre);
-	
+
 	/**
-	 * Recupera els òrgans sobre els quals té permís l'usuari actual
-	 * 
-	 * @param entitatId
-	 * @param permis
-	 * 
-	 * @return
+	 * Recupera els òrgans sobre els que l'usuari actual té el permís
+	 * indicat per paràmetre
+	 *
+	 * @param entitatId Identificador de l'entitat actual
+	 * @param usuariCodi Codi de l'usuari actual
+	 * @param permis Permís que volem que tinguin els òrgans consultats
+	 *
+	 * @return Llistat dels òrgans gestors sobre els que l'usuari té el permís
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public List<OrganGestorDto> findOrgansGestorsWithPermis(
+	List<OrganGestorDto> findOrgansGestorsWithPermis(
 			Long entitatId, 
 			String usuariCodi,
 			PermisEnum permis);

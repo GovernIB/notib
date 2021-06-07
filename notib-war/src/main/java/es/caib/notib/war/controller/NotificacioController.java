@@ -1409,13 +1409,14 @@ public class NotificacioController extends BaseUserController {
         // 1-recuperam els òrgans dels procediments disponibles (amb permís)
         if (!procedimentsDisponiblesIds.isEmpty())
             organsGestorsProcediments = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+
         // 2-recuperam els òrgans amb permís de notificació
         List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
                 entitatActual.getId(),
                 SecurityContextHolder.getContext().getAuthentication().getName(),
                 permis); //PermisEnum.NOTIFICACIO);
+
         // 3-juntam tots els òrgans i ordenam per nom
-        List<OrganGestorDto> organsGestors;
         Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
         setOrgansGestors.addAll(organsGestorsAmbPermis);
         if (procedimentsOrgansDisponibles != null) {
@@ -1423,7 +1424,8 @@ public class NotificacioController extends BaseUserController {
                 setOrgansGestors.add(procedimentOrgan.getOrganGestor());
             }
         }
-        organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
+
+        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
         if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
             organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
         }

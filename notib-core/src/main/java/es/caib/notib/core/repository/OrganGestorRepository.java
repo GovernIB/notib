@@ -2,6 +2,7 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,7 +21,8 @@ import es.caib.notib.core.entity.ProcedimentEntity;
  */
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
 
-	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
+	List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
+	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByCodi(String codi);
 

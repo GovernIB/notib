@@ -29,6 +29,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private String oficinaNom;
 	private List<PermisDto> permisos;
 	private OficinaDto oficina;
+	private OrganGestorEstatEnum estat = null;
 
 	private Boolean sir;
 	private String cif;
