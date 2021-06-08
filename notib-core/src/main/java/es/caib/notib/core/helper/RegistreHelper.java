@@ -152,19 +152,13 @@ public class RegistreHelper {
 			Date sirRegistreDestiData,
 			String registreNumeroFormatat,
 			NotificacioEnviamentEntity enviament) {
-		logger.debug("Actualitzant estat comunicació SIR...");
-		boolean estatFinal = 
-				NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat) ||
-				NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat);
-		
 		logger.debug("Estat actual: " + registreEstat.name());
 		enviament.updateRegistreEstat(
 				registreEstat,
 				registreEstatData,
 				sirRecepcioData,
 				sirRegistreDestiData,
-				registreNumeroFormatat,
-				estatFinal);
+				registreNumeroFormatat);
 		
 		boolean estatsEnviamentsFinals = true;
 		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();

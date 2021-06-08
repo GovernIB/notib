@@ -174,7 +174,7 @@ public class AuditEnviamentHelper {
 			NotificacioEventEntity event) {
 		enviament.setRegistreNumeroFormatat(registreNum);
 		enviament.setRegistreData(registreData);
-		enviament.setRegistreEstat(registreEstat);
+		enviament.updateRegistreEstat(registreEstat);
 		
 		//Comunicació + administració (SIR)
 		if (totsAdministracio) {

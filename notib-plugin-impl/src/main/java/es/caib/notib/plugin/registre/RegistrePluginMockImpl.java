@@ -50,7 +50,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	        resposta.setRegistreData(data);
 	        resposta.setRegistreNumero(String.valueOf(registre[1]));
 	        resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-	        resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUIT);
+	        resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
 	        
 	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 	        	resposta.setSirRecepecioData(data);
@@ -80,14 +80,15 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 			 respostaConsultaRegistre.setSirRecepecioData(data);
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
 			 respostaConsultaRegistre.setSirRegistreDestiData(data);
-	        
+
 		respostaConsultaRegistre.setEntitatCodi("A04003003");
 		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
 		if (respostaAmbError) {
 			respostaConsultaRegistre.setErrorCodi("500");
 			respostaConsultaRegistre.setErrorDescripcio("Simular error");
 		}
-		
+		respostaConsultaRegistre.setNumeroRegistroDestino("NUMERO REG. DESTINO");
+		respostaConsultaRegistre.setMotivo("motiu per el qual s’ha reenviat o rebutjat l’assentament en destí");
 		return respostaConsultaRegistre;
 	}
 	

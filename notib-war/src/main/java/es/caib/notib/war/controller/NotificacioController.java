@@ -68,6 +68,8 @@ public class NotificacioController extends BaseUserController {
     @Autowired
     private GrupService grupService;
     @Autowired
+    private JustificantService justificantService;
+    @Autowired
     private PagadorCieFormatSobreService pagadorCieFormatSobreService;
     @Autowired
     private PagadorCieFormatFullaService pagadorCieFormatFullaService;
@@ -872,11 +874,22 @@ public class NotificacioController extends BaseUserController {
 		return notificacioService.llistarProvincies(codiCA);
 	}
 
+	/////
+    /// CONTROLADORS DELS JUSTIFICANTS
+    /////
 
-
+    /**
+     * Controlador per a descarregar el justificant del registre.
+     *
+     * @param request
+     * @param response
+     * @param notificacioId
+     * @param enviamentId
+     * @throws IOException
+     */
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/justificantDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void justificantDescarregar(
+    public void justificantRegistreDescarregar(
             HttpServletRequest request,
             HttpServletResponse response,
             @PathVariable Long notificacioId,
@@ -912,7 +925,7 @@ public class NotificacioController extends BaseUserController {
             @PathVariable Long notificacioId) throws IOException {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         String sequence = request.getParameter("sequence");
-        FitxerDto justificant = notificacioService.recuperarJustificant(
+        FitxerDto justificant = justificantService.generarJustificantEnviament(
                 notificacioId,
                 entitatActual.getId(),
                 sequence);
@@ -930,7 +943,35 @@ public class NotificacioController extends BaseUserController {
             HttpServletResponse response,
             @PathVariable Long notificacioId,
             @PathVariable String sequence) throws IOException {
-        return notificacioService.justificantEstat(sequence);
+        return justificantService.consultaProgresGeneracioJustificant(sequence);
+    }
+
+    @RequestMapping(value = "/{notificacioId}/justificant/sir", method = RequestMethod.GET)
+    public String justificantComunicacioSIRDescarregar(
+            HttpServletRequest request,
+            Model model,
+            @PathVariable Long notificacioId) throws IOException {
+        model.addAttribute("notificacioId", notificacioId);
+        return "justificantSIRDownloadForm";
+    }
+
+    @RequestMapping(value = "/{enviamentId}/justificant/sir", method = RequestMethod.POST)
+    @ResponseBody
+    public void justificantComunicacioSIRDescarregar(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @PathVariable Long enviamentId) throws IOException {
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        String sequence = request.getParameter("sequence");
+        FitxerDto justificant = justificantService.generarJustificantComunicacioSIR(
+                enviamentId,
+                entitatActual.getId(),
+                sequence);
+        if (justificant == null) {
+            throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+        }
+        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
     @RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)

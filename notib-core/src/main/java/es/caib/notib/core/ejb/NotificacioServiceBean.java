@@ -8,7 +8,6 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
@@ -314,17 +313,6 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN"})
 	public void refrescarEnviamentsExpirats() {
 		delegate.refrescarEnviamentsExpirats();
-	}
-	
-	@RolesAllowed({"tothom"})
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
-		return delegate.recuperarJustificant(notificacioId, entitatId, sequence);
-	}
-
-	@Override
-	@RolesAllowed({"tothom"})
-	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
-		return delegate.justificantEstat(sequence);
 	}
 
 	@Override

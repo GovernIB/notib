@@ -192,7 +192,11 @@ $(document).ready(function() {
 						</tr>
 						<c:if test="${!notificacio.hasEnviamentsPendents}">
 							<tr>
-								<td colspan="2"><a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right"><spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span></a></td>
+								<td colspan="2">
+									<a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">
+									<spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span>
+									</a>
+								</td>
 							</tr>
 						</c:if>
 					</tbody>
@@ -515,6 +519,16 @@ $(document).ready(function() {
 							    				</c:otherwise>
 							    			</c:choose>
 							    		</tr>
+										<c:if test="${enviament.registreEstatFinal}">
+<%--										<c:if test="true">--%>
+											<tr>
+												<td colspan="2">
+													<a href="<c:url value="/notificacio/${enviament.id}/justificant/sir"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">
+														<spring:message code="enviament.info.accio.descarregar.justificant.sir"/>&nbsp;<span class="fa fa-download"></span>
+													</a>
+												</td>
+											</tr>
+										</c:if>
 						    			<tr>
 							    			<th><spring:message code="enviament.info.seccio.notifica.certificacio"/></th>
 						    				<c:choose>

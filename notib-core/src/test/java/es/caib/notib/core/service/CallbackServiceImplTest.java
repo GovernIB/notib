@@ -55,8 +55,11 @@ public class CallbackServiceImplTest {
         UsuariEntity mockUser = Mockito.mock(UsuariEntity.class);
 //        Mockito.when(mockUser.getCodi()).thenReturn("CODI_USER");
 
-        NotificacioEnviamentEntity enviamentMock = NotificacioEnviamentEntity.getBuilder("",
-                ServeiTipusEnumDto.NORMAL, notificacioMock).build();
+        NotificacioEnviamentEntity enviamentMock = NotificacioEnviamentEntity
+                .builder()
+                .serveiTipus(ServeiTipusEnumDto.NORMAL)
+                .notificacio(notificacioMock)
+                .build();
         enviamentMock.setCreatedBy(mockUser);
 
 //        eventsMap = new HashMap<>();
