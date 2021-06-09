@@ -2230,352 +2230,6 @@
 			</div>
 		</div>
 		
-		<!-- DOCUMENT -->
-		<div class="container-fluid">
-			<div class="title">
-				<span class="fa fa-file"></span>
-				<label><spring:message code="notificacio.form.titol.document" /></label>
-				<hr/>
-			</div>
-			
-			<!-- TIPUS DE DOCUMENT -->
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-						<form:hidden path="tipusDocumentSelected[0]" id="tipusDocumentSelected_0" value="${tipusDocument[0]}"/>
-						<div class="controls col-xs-8">
-							<form:hidden path="tipusDocumentDefault[0]"/>
-							<select id="tipusDocument_0" name="tipusDocument[0]" class="customSelect tipusDocument">
-							<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-								<option value="${enumValue}" <c:if test="${not empty tipusDocument[0] && tipusDocument[0] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
-							</c:forEach>
-							</select>
-						</div>
-					</div>
-				</div>
-				<input type="hidden" name="documents[0].id" value="${notificacioCommandV2.documents[0].id}">
-				<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommandV2.documents[0].arxiuGestdocId}">
-				<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommandV2.documents[0].arxiuNom}">
-				<input type="hidden" name="documents[0].mediaType" value="${notificacioCommandV2.documents[0].mediaType}">
-				<input type="hidden" name="documents[0].mida" value="${notificacioCommandV2.documents[0].mida}">
-				<!-- CSV -->
-				<div id="input-origen-csv_0" class="col-md-6">
-					<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
-				</div>
-				
-				<!-- UUID -->
-				<div id="input-origen-uuid_0" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-				</div>
-				
-				<!-- URL -->
-				<div id="input-origen-url_0" class="col-md-6 hidden">
-					<not:inputText name="documentArxiuUrl[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-				</div>
-				
-				<!-- FITXER -->
-				<div id="input-origen-arxiu_0" class="col-md-6 hidden">
-					<c:choose>
-						<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="test"/>
-						</c:when>
-						<c:otherwise>
-							<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_0}"/>
-						</c:otherwise>
-					</c:choose>
-				</div>
-			</div>
-			<div id="metadades_0" class="row doc-metadades hidden">
-				<div class="col-md-4 col-md-offset-2">
-					<not:inputSelect name="documents[0].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-				</div>
-				<div class="col-md-4 col-md-offset-2">
-					<not:inputSelect name="documents[0].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-				</div>
-				<div class="col-md-4 col-md-offset-2">
-					<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-				</div>
-				<div class="col-md-4 col-md-offset-2">
-					<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-				</div>
-				<hr/>
-			</div>
-
-			<div id="docs-addicionals" class="hidden">
-				<!-- DOCUMENT 2 -->
-				<div id="document2" class="row hidden">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-							<form:hidden path="tipusDocumentSelected[1]" id="tipusDocumentSelected_1" value="${tipusDocument[1]}"/>
-							<div class="controls col-xs-8">
-								<form:hidden path="tipusDocumentDefault[1]"/>
-								<select id="tipusDocument_1" name="tipusDocument[1]" class="customSelect tipusDocument">
-									<option value=""></option>
-									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-										<option value="${enumValue}" <c:if test="${not empty tipusDocument[1] && tipusDocument[1] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
-									</c:forEach>
-								</select>
-							</div>
-						</div>
-					</div>
-					<input type="hidden" name="documents[1].id" value="${notificacioCommandV2.documents[1].id}">
-					<input type="hidden" name="documents[1].arxiuGestdocId" value="${notificacioCommandV2.documents[1].arxiuGestdocId}">
-					<input type="hidden" name="documents[1].arxiuNom" value="${notificacioCommandV2.documents[1].arxiuNom}">
-					<input type="hidden" name="documents[1].mediaType" value="${notificacioCommandV2.documents[1].mediaType}">
-					<input type="hidden" name="documents[1].mida" value="${notificacioCommandV2.documents[1].mida}">
-					<!-- CSV -->
-					<div id="input-origen-csv_1" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- UUID -->
-					<div id="input-origen-uuid_1" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- URL -->
-					<div id="input-origen-url_1" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUrl[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- FITXER -->
-					<div id="input-origen-arxiu_1" class="col-md-6 hidden">
-						<c:choose>
-							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</div>
-				<div id="metadades_1" class="row doc-metadades hidden">
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[1].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[1].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[1].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputCheckbox name="documents[1].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-					</div>
-					<hr/>
-				</div>
-				<!-- DOCUMENT 3 -->
-				<div id="document3" class="row hidden">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-							<form:hidden path="tipusDocumentSelected[2]" id="tipusDocumentSelected_2" value="${tipusDocument[2]}"/>
-							<div class="controls col-xs-8">
-								<form:hidden path="tipusDocumentDefault[2]"/>
-								<select id="tipusDocument_2" name="tipusDocument[2]" class="customSelect tipusDocument">
-									<option value=""></option>
-									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-										<option value="${enumValue}" <c:if test="${not empty tipusDocument[2] && tipusDocument[2] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
-									</c:forEach>
-								</select>
-							</div>
-						</div>
-					</div>
-					<input type="hidden" name="documents[2].id" value="${notificacioCommandV2.documents[2].id}">
-					<input type="hidden" name="documents[2].arxiuGestdocId" value="${notificacioCommandV2.documents[2].arxiuGestdocId}">
-					<input type="hidden" name="documents[2].arxiuNom" value="${notificacioCommandV2.documents[2].arxiuNom}">
-					<input type="hidden" name="documents[2].mediaType" value="${notificacioCommandV2.documents[2].mediaType}">
-					<input type="hidden" name="documents[2].mida" value="${notificacioCommandV2.documents[2].mida}">
-					<!-- CSV -->
-					<div id="input-origen-csv_2" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- UUID -->
-					<div id="input-origen-uuid_2" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- URL -->
-					<div id="input-origen-url_2" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUrl[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- FITXER -->
-					<div id="input-origen-arxiu_2" class="col-md-6 hidden">
-						<c:choose>
-							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</div>
-				<div id="metadades_2" class="row doc-metadades hidden">
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[2].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[2].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-					</div>
-					<hr/>
-				</div>
-				<!-- DOCUMENT 4 -->
-				<div id="document4" class="row hidden">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-							<form:hidden path="tipusDocumentSelected[3]" id="tipusDocumentSelected_3" value="${tipusDocument[3]}"/>
-							<div class="controls col-xs-8">
-								<form:hidden path="tipusDocumentDefault[3]"/>
-								<select id="tipusDocument_3" name="tipusDocument[3]" class="customSelect tipusDocument">
-									<option value=""></option>
-									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-										<option value="${enumValue}" <c:if test="${not empty tipusDocument[3] && tipusDocument[3] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
-									</c:forEach>
-								</select>
-							</div>
-						</div>
-					</div>
-					<input type="hidden" name="documents[3].id" value="${notificacioCommandV2.documents[3].id}">
-					<input type="hidden" name="documents[3].arxiuGestdocId" value="${notificacioCommandV2.documents[3].arxiuGestdocId}">
-					<input type="hidden" name="documents[3].arxiuNom" value="${notificacioCommandV2.documents[3].arxiuNom}">
-					<input type="hidden" name="documents[3].mediaType" value="${notificacioCommandV2.documents[3].mediaType}">
-					<input type="hidden" name="documents[3].mida" value="${notificacioCommandV2.documents[3].mida}">
-					<!-- CSV -->
-					<div id="input-origen-csv_3" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- UUID -->
-					<div id="input-origen-uuid_3" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- URL -->
-					<div id="input-origen-url_3" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUrl[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- FITXER -->
-					<div id="input-origen-arxiu_3" class="col-md-6 hidden">
-						<c:choose>
-							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</div>
-				<div id="metadades_3" class="row doc-metadades hidden">
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[3].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[3].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[3].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputCheckbox name="documents[3].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-					</div>
-					<hr/>
-				</div>
-				<!-- DOCUMENT 5 -->
-				<div id="document5" class="row hidden">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
-							<form:hidden path="tipusDocumentSelected[4]" id="tipusDocumentSelected_4" value="${tipusDocument[4]}"/>
-							<div class="controls col-xs-8">
-								<form:hidden path="tipusDocumentDefault[4]"/>
-								<select id="tipusDocument_4" name="tipusDocument[4]" class="customSelect tipusDocument">
-									<option value=""></option>
-									<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
-										<option value="${enumValue}" <c:if test="${not empty tipusDocument[4] && tipusDocument[4] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
-									</c:forEach>
-								</select>
-							</div>
-						</div>
-					</div>
-					<input type="hidden" name="documents[4].id" value="${notificacioCommandV2.documents[4].id}">
-					<input type="hidden" name="documents[4].arxiuGestdocId" value="${notificacioCommandV2.documents[4].arxiuGestdocId}">
-					<input type="hidden" name="documents[4].arxiuNom" value="${notificacioCommandV2.documents[4].arxiuNom}">
-					<input type="hidden" name="documents[4].mediaType" value="${notificacioCommandV2.documents[4].mediaType}">
-					<input type="hidden" name="documents[4].mida" value="${notificacioCommandV2.documents[4].mida}">
-					<!-- CSV -->
-					<div id="input-origen-csv_4" class="col-md-6">
-						<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- UUID -->
-					<div id="input-origen-uuid_4" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUuid[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- URL -->
-					<div id="input-origen-url_4" class="col-md-6 hidden">
-						<not:inputText name="documentArxiuUrl[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
-					</div>
-
-					<!-- FITXER -->
-					<div id="input-origen-arxiu_4" class="col-md-6 hidden">
-						<c:choose>
-							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
-							</c:when>
-							<c:otherwise>
-								<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
-							</c:otherwise>
-						</c:choose>
-					</div>
-				</div>
-				<div id="metadades_4" class="row doc-metadades hidden">
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[4].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[4].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[4].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-					</div>
-					<div class="col-md-4 col-md-offset-2">
-						<not:inputCheckbox name="documents[4].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
-					</div>
-					<hr/>
-				</div>
-			</div>
-
-			<div id="btn-documents" class="text-left vt10 hidden">
-<%--				<div class="btn-group">--%>
-					<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
-					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
-<%--				</div>--%>
-			</div>
-
-			<!--  DOCUMENT NOTMALITZAT -->
-			<div id="normalitzat" class="row">
-				<div class="col-md-12">
-					<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
-				</div>
-			</div>
-		</div>
-
 		<!-- ENVIAMENT -->
 		<div class="container-fluid">
 			<div class="title">
@@ -2928,6 +2582,353 @@
 					<input type="button" class="btn btn-default" id="addEnviament" onclick="addEnvio()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
 				</div>
 			</div>
+
+			<!-- DOCUMENT -->
+			<div class="container-fluid">
+				<div class="title">
+					<span class="fa fa-file"></span>
+					<label><spring:message code="notificacio.form.titol.document" /></label>
+					<hr/>
+				</div>
+				
+				<!-- TIPUS DE DOCUMENT -->
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+							<form:hidden path="tipusDocumentSelected[0]" id="tipusDocumentSelected_0" value="${tipusDocument[0]}"/>
+							<div class="controls col-xs-8">
+								<form:hidden path="tipusDocumentDefault[0]"/>
+								<select id="tipusDocument_0" name="tipusDocument[0]" class="customSelect tipusDocument">
+								<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+									<option value="${enumValue}" <c:if test="${not empty tipusDocument[0] && tipusDocument[0] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+								</c:forEach>
+								</select>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" name="documents[0].id" value="${notificacioCommandV2.documents[0].id}">
+					<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommandV2.documents[0].arxiuGestdocId}">
+					<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommandV2.documents[0].arxiuNom}">
+					<input type="hidden" name="documents[0].mediaType" value="${notificacioCommandV2.documents[0].mediaType}">
+					<input type="hidden" name="documents[0].mida" value="${notificacioCommandV2.documents[0].mida}">
+					<!-- CSV -->
+					<div id="input-origen-csv_0" class="col-md-6">
+						<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+					
+					<!-- UUID -->
+					<div id="input-origen-uuid_0" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUuid[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+					
+					<!-- URL -->
+					<div id="input-origen-url_0" class="col-md-6 hidden">
+						<not:inputText name="documentArxiuUrl[0]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+					</div>
+					
+					<!-- FITXER -->
+					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
+						<c:choose>
+							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="test"/>
+							</c:when>
+							<c:otherwise>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_0}"/>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div id="metadades_0" class="row doc-metadades hidden">
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[0].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[0].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+					</div>
+					<div class="col-md-4 col-md-offset-2">
+						<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+					</div>
+					<hr/>
+				</div>
+	
+				<div id="docs-addicionals" class="hidden">
+					<!-- DOCUMENT 2 -->
+					<div id="document2" class="row hidden">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+								<form:hidden path="tipusDocumentSelected[1]" id="tipusDocumentSelected_1" value="${tipusDocument[1]}"/>
+								<div class="controls col-xs-8">
+									<form:hidden path="tipusDocumentDefault[1]"/>
+									<select id="tipusDocument_1" name="tipusDocument[1]" class="customSelect tipusDocument">
+										<option value=""></option>
+										<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+											<option value="${enumValue}" <c:if test="${not empty tipusDocument[1] && tipusDocument[1] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<input type="hidden" name="documents[1].id" value="${notificacioCommandV2.documents[1].id}">
+						<input type="hidden" name="documents[1].arxiuGestdocId" value="${notificacioCommandV2.documents[1].arxiuGestdocId}">
+						<input type="hidden" name="documents[1].arxiuNom" value="${notificacioCommandV2.documents[1].arxiuNom}">
+						<input type="hidden" name="documents[1].mediaType" value="${notificacioCommandV2.documents[1].mediaType}">
+						<input type="hidden" name="documents[1].mida" value="${notificacioCommandV2.documents[1].mida}">
+						<!-- CSV -->
+						<div id="input-origen-csv_1" class="col-md-6">
+							<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- UUID -->
+						<div id="input-origen-uuid_1" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUuid[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- URL -->
+						<div id="input-origen-url_1" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUrl[1]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- FITXER -->
+						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
+							<c:choose>
+								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
+								</c:when>
+								<c:otherwise>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div id="metadades_1" class="row doc-metadades hidden">
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[1].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[1].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[1].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputCheckbox name="documents[1].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+						</div>
+						<hr/>
+					</div>
+					<!-- DOCUMENT 3 -->
+					<div id="document3" class="row hidden">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+								<form:hidden path="tipusDocumentSelected[2]" id="tipusDocumentSelected_2" value="${tipusDocument[2]}"/>
+								<div class="controls col-xs-8">
+									<form:hidden path="tipusDocumentDefault[2]"/>
+									<select id="tipusDocument_2" name="tipusDocument[2]" class="customSelect tipusDocument">
+										<option value=""></option>
+										<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+											<option value="${enumValue}" <c:if test="${not empty tipusDocument[2] && tipusDocument[2] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<input type="hidden" name="documents[2].id" value="${notificacioCommandV2.documents[2].id}">
+						<input type="hidden" name="documents[2].arxiuGestdocId" value="${notificacioCommandV2.documents[2].arxiuGestdocId}">
+						<input type="hidden" name="documents[2].arxiuNom" value="${notificacioCommandV2.documents[2].arxiuNom}">
+						<input type="hidden" name="documents[2].mediaType" value="${notificacioCommandV2.documents[2].mediaType}">
+						<input type="hidden" name="documents[2].mida" value="${notificacioCommandV2.documents[2].mida}">
+						<!-- CSV -->
+						<div id="input-origen-csv_2" class="col-md-6">
+							<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- UUID -->
+						<div id="input-origen-uuid_2" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUuid[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- URL -->
+						<div id="input-origen-url_2" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUrl[2]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- FITXER -->
+						<div id="input-origen-arxiu_2" class="col-md-6 hidden">
+							<c:choose>
+								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
+								</c:when>
+								<c:otherwise>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div id="metadades_2" class="row doc-metadades hidden">
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[2].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[2].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+						</div>
+						<hr/>
+					</div>
+					<!-- DOCUMENT 4 -->
+					<div id="document4" class="row hidden">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+								<form:hidden path="tipusDocumentSelected[3]" id="tipusDocumentSelected_3" value="${tipusDocument[3]}"/>
+								<div class="controls col-xs-8">
+									<form:hidden path="tipusDocumentDefault[3]"/>
+									<select id="tipusDocument_3" name="tipusDocument[3]" class="customSelect tipusDocument">
+										<option value=""></option>
+										<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+											<option value="${enumValue}" <c:if test="${not empty tipusDocument[3] && tipusDocument[3] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<input type="hidden" name="documents[3].id" value="${notificacioCommandV2.documents[3].id}">
+						<input type="hidden" name="documents[3].arxiuGestdocId" value="${notificacioCommandV2.documents[3].arxiuGestdocId}">
+						<input type="hidden" name="documents[3].arxiuNom" value="${notificacioCommandV2.documents[3].arxiuNom}">
+						<input type="hidden" name="documents[3].mediaType" value="${notificacioCommandV2.documents[3].mediaType}">
+						<input type="hidden" name="documents[3].mida" value="${notificacioCommandV2.documents[3].mida}">
+						<!-- CSV -->
+						<div id="input-origen-csv_3" class="col-md-6">
+							<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- UUID -->
+						<div id="input-origen-uuid_3" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUuid[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- URL -->
+						<div id="input-origen-url_3" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUrl[3]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- FITXER -->
+						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
+							<c:choose>
+								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
+								</c:when>
+								<c:otherwise>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div id="metadades_3" class="row doc-metadades hidden">
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[3].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[3].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[3].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputCheckbox name="documents[3].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+						</div>
+						<hr/>
+					</div>
+					<!-- DOCUMENT 5 -->
+					<div id="document5" class="row hidden">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label col-xs-4"><spring:message code="entitat.form.camp.conf.tipusdoc"/></label>
+								<form:hidden path="tipusDocumentSelected[4]" id="tipusDocumentSelected_4" value="${tipusDocument[4]}"/>
+								<div class="controls col-xs-8">
+									<form:hidden path="tipusDocumentDefault[4]"/>
+									<select id="tipusDocument_4" name="tipusDocument[4]" class="customSelect tipusDocument">
+										<option value=""></option>
+										<c:forEach items="${tipusDocumentEnumDto}" var="enumValue">
+											<option value="${enumValue}" <c:if test="${not empty tipusDocument[4] && tipusDocument[4] == enumValue}">selected</c:if>><spring:message code="tipus.document.enum.${enumValue}"/></option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
+						</div>
+						<input type="hidden" name="documents[4].id" value="${notificacioCommandV2.documents[4].id}">
+						<input type="hidden" name="documents[4].arxiuGestdocId" value="${notificacioCommandV2.documents[4].arxiuGestdocId}">
+						<input type="hidden" name="documents[4].arxiuNom" value="${notificacioCommandV2.documents[4].arxiuNom}">
+						<input type="hidden" name="documents[4].mediaType" value="${notificacioCommandV2.documents[4].mediaType}">
+						<input type="hidden" name="documents[4].mida" value="${notificacioCommandV2.documents[4].mida}">
+						<!-- CSV -->
+						<div id="input-origen-csv_4" class="col-md-6">
+							<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- UUID -->
+						<div id="input-origen-uuid_4" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUuid[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- URL -->
+						<div id="input-origen-url_4" class="col-md-6 hidden">
+							<not:inputText name="documentArxiuUrl[4]" textKey="notificacio.form.camp.csvuuid" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" />
+						</div>
+	
+						<!-- FITXER -->
+						<div id="input-origen-arxiu_4" class="col-md-6 hidden">
+							<c:choose>
+								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
+								</c:when>
+								<c:otherwise>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div id="metadades_4" class="row doc-metadades hidden">
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[4].origen" textKey="notificacio.form.camp.origen" labelSize="4" optionItems="${origens}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[4].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputSelect name="documents[4].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						</div>
+						<div class="col-md-4 col-md-offset-2">
+							<not:inputCheckbox name="documents[4].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
+						</div>
+						<hr/>
+					</div>
+				</div>
+	
+				<div id="btn-documents" class="text-left vt10 hidden">
+	<%--				<div class="btn-group">--%>
+						<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
+						<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
+	<%--				</div>--%>
+				</div>
+	
+				<!--  DOCUMENT NOTMALITZAT -->
+				<div id="normalitzat" class="row">
+					<div class="col-md-12">
+						<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
+					</div>
+				</div>
+			</div>
+
 			<div class="col-md-12">
 				<hr>
 			</div>
