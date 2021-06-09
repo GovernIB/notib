@@ -395,4 +395,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			List<ProcedimentOrganDto> procedimentsOrgans) {
 		return delegate.findProcedimentsOrganCodiWithPermisByProcediment(procediment, entitatCodi, procedimentsOrgans);
 	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public ProcedimentDto findByNom(
+			Long entitatId,
+			String nomProcediment) throws NotFoundException {
+		return delegate.findByNom(entitatId, nomProcediment);
+	}
 }

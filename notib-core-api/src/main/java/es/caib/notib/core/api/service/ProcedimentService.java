@@ -428,4 +428,19 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	boolean isUpdatingProcediments(EntitatDto entitatDto);
 
+	/**
+	 * Consulta un procediment donat el seu nom i entitat.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param nomProcediment
+	 *            Atribut nom del procediment a trobar.
+	 * @return El procediment amb el nom especificat o null si no s'ha trobat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'procediment amb el nom especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	ProcedimentDto findByNom(
+			Long entitatId,
+			String nomProcediment) throws NotFoundException;
 }

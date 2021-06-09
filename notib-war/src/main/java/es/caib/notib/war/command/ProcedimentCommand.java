@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
-import es.caib.notib.war.validation.CodiProcedimentNoRepetit;
+import es.caib.notib.war.validation.ValidProcediment;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -20,7 +20,7 @@ import javax.validation.constraints.Size;
  *
  */
 @Getter @Setter
-@CodiProcedimentNoRepetit
+@ValidProcediment
 public class ProcedimentCommand {
 	
 	private Long id;

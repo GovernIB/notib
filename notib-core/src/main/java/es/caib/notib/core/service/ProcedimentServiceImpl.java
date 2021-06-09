@@ -649,6 +649,34 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public ProcedimentDto findByNom(
+			Long entitatId,
+			String nomProcediment) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta del procediment ("
+					+ "entitatId=" + entitatId + ", "
+					+ "nom=" + nomProcediment + ")");
+			EntitatEntity entitat = null;
+				
+			if (entitatId != null)
+				entitat = entityComprovarHelper.comprovarEntitat(
+						entitatId, 
+						false, 
+						false, 
+						false);
+			
+			ProcedimentEntity procediment = procedimentRepository.findByNomAndEntitat(nomProcediment, entitat);
+			
+			return conversioTipusHelper.convertir(
+					procediment, 
+					ProcedimentDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 
 	@Override
 	@Transactional(readOnly = true)

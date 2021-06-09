@@ -271,6 +271,31 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 	}
 	
 	@Test
+	public void findByNom() {
+		testCreantElements(
+			new TestAmbElementsCreats() {
+				@Override
+				public void executar(List<Object> elementsCreats)throws NotFoundException{
+					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+					autenticarUsuari("user");
+					
+					ProcedimentDto trobat = procedimentService.findByNom(
+							entitatCreada.getId(), 
+							createProcediment.getNom());
+					assertNotNull(trobat);
+					assertNotNull(trobat.getId());
+					comprovarProcedimentCoincideix(
+							createProcediment,
+							trobat);
+				}
+			},
+			"FindByCodi PROCEDIMENT",
+			entitatCreate,
+			createProcediment
+			);
+	}
+	
+	@Test
 	public void whenFindAmbFiltrePaginatPerAdminEntitatTots_thenReturnTots() {
 		testCreantElements(
 			new TestAmbElementsCreats() {
