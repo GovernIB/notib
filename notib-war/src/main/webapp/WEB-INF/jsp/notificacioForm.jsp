@@ -924,9 +924,26 @@
 		$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
 
 			comprovarTitularComunicacio();
+
+			let enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+			if (enviamentTipus === 'COMUNICACIO') {
+				netejaFormularisPersonesAdministracio();
+			}
+
 			$('.interessat').trigger('change');
 
 		});
+
+		function netejaFormularisPersonesAdministracio() {
+			let $formEnviaments = $(".enviamentsForm");
+			$formEnviaments.each(function (i_enviament) {
+				setPersonaAdministracio("Tit", i_enviament, null, null, null, null);
+				let $formDestinataris = $($formEnviaments[i_enviament]).find(".destinatariForm");
+				$formDestinataris.each(function (i_destinatari) {
+					setPersonaAdministracio(i_enviament, i_destinatari, null, null, null, null);
+				});
+			});
+		}
 
 		function comprovarTitularComunicacio() {
 			var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
@@ -948,15 +965,6 @@
 					$('#docs-addicionals').addClass('hidden');
 					$('#btn-documents').addClass('hidden');
 				}
-
-				let $formEnviaments = $(".enviamentsForm");
-				$formEnviaments.each(function (i_enviament) {
-					setPersonaAdministracio("Tit", i_enviament, null, null, null, null);
-					let $formDestinataris = $($formEnviaments[i_enviament]).find(".destinatariForm");
-					$formDestinataris.each(function (i_destinatari) {
-						setPersonaAdministracio(i_enviament, i_destinatari, null, null, null, null);
-					});
-				});
 
 			}else{
 				$('#rowRetard').removeClass('hidden');

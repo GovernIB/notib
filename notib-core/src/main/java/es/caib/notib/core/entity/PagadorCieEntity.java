@@ -1,23 +1,13 @@
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Classe de model de dades que conté la informació dels pagadors CIE.
@@ -38,12 +28,12 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	private Date contracteDataVig;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat")
 	@ForeignKey(name = "not_pagador_cie_entitat_fk")
 	private EntitatEntity entitat;
 	
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "organ_gestor")
 	@ForeignKey(name = "not_pagcie_organ_fk")
 	protected OrganGestorEntity organGestor;
