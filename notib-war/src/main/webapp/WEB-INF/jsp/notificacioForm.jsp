@@ -36,7 +36,7 @@
     <title>${titol}</title>
     <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
     <script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
-    <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+    <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
     <script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
@@ -909,7 +909,7 @@
 				$(dir3codi).find('.help-block').removeClass('hidden')
 				$(dir3codi).find('.form-group').addClass('has-error')
 			}
-			comprovarTitularComuniacio();
+			comprovarTitularComunicacio();
 //			var dir3Codi = closest.find("input[name='enviaments[" + index + "].titular.dir3Codi']");
 //			var sir = $('#organigrama').val().indexOf(dir3Codi.val());
 //			if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
@@ -923,23 +923,22 @@
 
 		$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
 
-			comprovarTitularComuniacio();
+			comprovarTitularComunicacio();
 			$('.interessat').trigger('change');
 
 		});
 
-
-		function comprovarTitularComuniacio() {
+		function comprovarTitularComunicacio() {
 			var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
 			var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
 			var comunicacioAdministracio = false;
 			var notificacio = true;
-			if(enviamentTipus == 'COMUNICACIO') { //&& (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
+			if(enviamentTipus === 'COMUNICACIO') { //&& (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
 				notificacio = false;
 				$('#rowRetard').addClass('hidden');
 				$('#rowDataProgramada').addClass('hidden');
 				$('#rowCaducitat').addClass('hidden');
-				if (tipusInteressatTitular == 'ADMINISTRACIO') {
+				if (tipusInteressatTitular === 'ADMINISTRACIO') {
 					$('#normalitzat').addClass('hidden');
 					$('#docs-addicionals').removeClass('hidden');
 					$('#btn-documents').removeClass('hidden');
@@ -949,7 +948,16 @@
 					$('#docs-addicionals').addClass('hidden');
 					$('#btn-documents').addClass('hidden');
 				}
-				
+
+				let $formEnviaments = $(".enviamentsForm");
+				$formEnviaments.each(function (i_enviament) {
+					setPersonaAdministracio("Tit", i_enviament, null, null, null, null);
+					let $formDestinataris = $($formEnviaments[i_enviament]).find(".destinatariForm");
+					$formDestinataris.each(function (i_destinatari) {
+						setPersonaAdministracio(i_enviament, i_destinatari, null, null, null, null);
+					});
+				});
+
 			}else{
 				$('#rowRetard').removeClass('hidden');
 				$('#rowDataProgramada').removeClass('hidden');
@@ -1822,10 +1830,7 @@
 	function seleccionar(fila){
 		var from = $('#titular').val().split('-')[0];
 		var index = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
-		var dir3Codi;
-		var raoSocial;
-		var dir3CodiDesc;
-		var organCif;
+
 // 	var organSelect = document.getElementById('selOrganismes');
 		if(fila.size()>0){
 // 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
@@ -1835,27 +1840,34 @@
 			let denominacio = fila.data('denominacio');
 			let ocodi = codi + '-' + denominacio;
 			let cif = fila.data('cif');
+			setPersonaAdministracio(from, index, codi, denominacio, ocodi, cif)
 
-			if(from == 'Tit'){
-				dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
-				raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
-				dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
-				organCif = document.getElementById("enviaments[" + index + "].titular.nif");
-			}else{
-				dir3Codi = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].dir3Codi");
-				raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nom");
-				dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
-				organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
-			}
-
-			dir3Codi.value = codi;
-			raoSocial.value = denominacio;
-			dir3CodiDesc.value = ocodi;
-			organCif.value = cif;
 			$('#cerrarModal').click();
 		}
-	};
+	}
 
+	function setPersonaAdministracio (from, index, codi, denominacio, ocodi, cif) {
+		var dir3Codi;
+		var raoSocial;
+		var dir3CodiDesc;
+		var organCif;
+		if(from === 'Tit'){
+			dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
+			raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
+			dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
+			organCif = document.getElementById("enviaments[" + index + "].titular.nif");
+		}else{
+			dir3Codi = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].dir3Codi");
+			raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nom");
+			dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
+			organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
+		}
+
+		dir3Codi.value = codi;
+		raoSocial.value = denominacio;
+		dir3CodiDesc.value = ocodi;
+		organCif.value = cif;
+	}
 	// function netejarFiltre(){
 	// 	var searchCodi = $('#searchCodi');
 	// 	var searchNom = $('#searchNom');
