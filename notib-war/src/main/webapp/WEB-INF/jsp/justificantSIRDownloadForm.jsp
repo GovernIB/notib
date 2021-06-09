@@ -42,7 +42,7 @@ $(document).ready(function() {
 function refreshProgres() {
 	itervalProgres =  setInterval(function(){
 			getProgres(); 
-		}, 10);
+		}, 5);
 }
 
 function getProgres() {

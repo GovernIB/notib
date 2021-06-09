@@ -21,7 +21,10 @@ public interface JustificantService {
      * @param sequence
      *         String per a identificar el procés de generació del justificant.
      *         El seu valor serà utilitzat per a posteriorment consultar el progrés de la generació.
-     * @return el justificant firmat
+     * @return
+     *      - Si tot va bé retorn el justificant firmat
+     *      - Si no es pot firmar retorn el justificant sense firmar
+     *      - Si hi ha un altre procés per generar el justificant en execució retorna null
      *
      * @throws JustificantException
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
@@ -41,7 +44,10 @@ public interface JustificantService {
      * @param sequence
      *         String per a identificar el procés de generació del justificant.
      *         El seu valor serà utilitzat per a posteriorment consultar el progrés de la generació.
-     * @return el justificant firmat
+     * @return
+     *      - Si tot va bé retorn el justificant firmat
+     *      - Si no es pot firmar retorn el justificant sense firmar
+     *      - Si hi ha un altre procés per generar el justificant en execució retorna null
      *
      * @throws JustificantException
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
