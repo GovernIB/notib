@@ -107,25 +107,25 @@ public abstract class JustificantHelper<T> {
         protected FooterPageEvent(ProgresDescarregaDto progres) throws JustificantException {
             String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer");
             log.debug(accioDescripcio);
-            progres.setProgres(20);
+            progres.setProgres(25);
             progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, accioDescripcio);
             try {
                 footer = new PdfPTable(2);
                 footer.setTotalWidth(523);
                 footer.setLockedWidth(true);
                 Image logoPeu = null;
-
+                PdfPCell cellTitolPeu = new PdfPCell();
                 if (getPeuTitol() != null) {
 //					## [PEU - TÍTOL]
                     Paragraph peuTitol = new Paragraph(getPeuTitol(), frutiger9);
                     peuTitol.setAlignment(Element.ALIGN_LEFT);
 
-                    PdfPCell cellTitolPeu = new PdfPCell();
+
                     cellTitolPeu.addElement(peuTitol);
                     cellTitolPeu.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     cellTitolPeu.setBorder(Rectangle.NO_BORDER);
-                    footer.addCell(cellTitolPeu);
                 }
+                footer.addCell(cellTitolPeu);
 
 //				## [LOGO ENTITAT]
                 if (getPeuLogo() != null) {
@@ -134,15 +134,14 @@ public abstract class JustificantHelper<T> {
                     byte[] logoBytes = IOUtils.toByteArray(getPeuDefaultLogo());
                     logoPeu = Image.getInstance(logoBytes);
                 }
-                if (logoPeu != null) {
-//					## [PEU - LOGO]
-                    logoPeu.setScaleToFitHeight(true);
-                    logoPeu.scaleToFit(100, 80);
-                    PdfPCell cellLogo = new PdfPCell(logoPeu);
-                    cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                    cellLogo.setBorder(Rectangle.NO_BORDER);
-                    footer.addCell(cellLogo);
-                }
+
+//				## [PEU - LOGO]
+                logoPeu.setScaleToFitHeight(true);
+                logoPeu.scaleToFit(100, 80);
+                PdfPCell cellLogo = new PdfPCell(logoPeu);
+                cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cellLogo.setBorder(Rectangle.NO_BORDER);
+                footer.addCell(cellLogo);
             } catch (Exception ex) {
                 String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer.error");
                 progres.setProgres(100);

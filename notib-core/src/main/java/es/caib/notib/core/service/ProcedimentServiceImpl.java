@@ -748,7 +748,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Page<ProcedimentFormEntity> procediments = null;
 			PaginaDto<ProcedimentFormDto> procedimentsPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor.codi"});
+			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor"});
 //			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestorNom"}); //{"organGestor", "organGestorNom"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			

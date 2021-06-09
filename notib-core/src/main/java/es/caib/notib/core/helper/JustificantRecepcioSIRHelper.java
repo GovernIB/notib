@@ -54,7 +54,8 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 			setParametersBold(paragrafContingut, messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat"));
 			List list = new List(false, LIST_SYMBOL_INDENT);
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item1"), resposta.getNumeroRegistroDestino()));
-			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item2"), resposta.getSirRegistreDestiData().toString()));
+			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item2"),
+					resposta.getSirRegistreDestiData() == null ? "" : resposta.getSirRegistreDestiData().toString()));
 			paragrafContingut.add(list);
 			paragrafContingut.add(Chunk.NEWLINE);
 

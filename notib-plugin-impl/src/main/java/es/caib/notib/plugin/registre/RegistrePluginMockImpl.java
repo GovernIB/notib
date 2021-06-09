@@ -74,11 +74,12 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		respostaConsultaRegistre.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
 		respostaConsultaRegistre.setRegistreNumero(String.valueOf(registre[1]));
 		respostaConsultaRegistre.setRegistreData(data);
-		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.REBUTJAT);
 		
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 			 respostaConsultaRegistre.setSirRecepecioData(data);
-		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
+		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT) ||
+				 respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.REBUTJAT))
 			 respostaConsultaRegistre.setSirRegistreDestiData(data);
 
 		respostaConsultaRegistre.setEntitatCodi("A04003003");
