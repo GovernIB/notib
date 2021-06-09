@@ -111,6 +111,8 @@ public class OrganGestorPermisController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long organGestorId,
 			Model model) throws ValidationException {
+		PermisCommand permisCommand = new PermisCommand();
+		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return get(request, organGestorId, null, model);
 	}
 	
@@ -162,6 +164,7 @@ public class OrganGestorPermisController extends BaseUserController{
 					organGestorService.findById(
 							entitatActual.getId(),
 							organGestorId));
+			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return "organGestorPermisForm";
 		}
 		

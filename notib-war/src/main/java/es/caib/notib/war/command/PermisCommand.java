@@ -3,11 +3,16 @@
  */
 package es.caib.notib.war.command;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
@@ -24,7 +29,7 @@ import lombok.Setter;
 public class PermisCommand {
 
 	private Long id;
-	@NotEmpty
+	@NotEmpty @Size(max=100)
 	private String principal;
 	private TipusEnumDto tipus;
 	private String organ;
@@ -71,9 +76,21 @@ public class PermisCommand {
 		return dto;
 	}
 
+	public int getPrincipalDefaultSize() {
+		int principalSize = 0;
+		try {
+			Field principal = this.getClass().getDeclaredField("principal");
+			principalSize = principal.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud de principal: " + ex.getMessage());
+		}
+		return principalSize;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(PermisCommand.class);
 }

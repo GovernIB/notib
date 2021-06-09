@@ -98,6 +98,8 @@ public class ProcedimentPermisController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long procedimentId,
 			Model model) {
+		PermisCommand permisCommand = new PermisCommand();
+		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return get(request, procedimentId, null, model);
 	}
 	
@@ -176,6 +178,7 @@ public class ProcedimentPermisController extends BaseUserController{
 							procedimentId));
 			if (command.getOrgan() != null)
 				model.addAttribute("organs", getOrganismes(request));
+			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return "procedimentAdminPermisForm";
 		}
 		

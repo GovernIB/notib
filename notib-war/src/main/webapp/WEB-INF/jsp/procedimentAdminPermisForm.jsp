@@ -104,7 +104,8 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
-		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
+		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
+			inputMaxLength="${principalSize}" showsize="true"/>
 		<c:if test="${procediment.comu}">
 			<not:inputSelect 
 				name="organ" 
