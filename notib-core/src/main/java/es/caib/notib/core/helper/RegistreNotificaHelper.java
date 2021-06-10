@@ -155,12 +155,12 @@ public class RegistreNotificaHelper {
 		logger.info(" >>> Nou assentament registral...");
 		RespostaConsultaRegistre arbResposta;
 		try {
-			boolean inclou_documents = isSendDocumentsActive() || (isSirActivat && isComunicacio && isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean inclouDocuments = isInclouDocuments(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
 			boolean generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 					notificacioEntity,
 					notificacioEntity.getEnviaments(),
-					inclou_documents);
+					inclouDocuments);
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
@@ -209,8 +209,10 @@ public class RegistreNotificaHelper {
 		logger.info(" >>> Nou assentament registral...");
 		RespostaConsultaRegistre arbResposta;
 		try {
-			boolean generarJustificant =  isGenerarJustificant(true, true, isAnyEnviamentsAAdministracio(notificacioEntity));
-			boolean inclouDocuments = isSendDocumentsActive() || enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO);
+			boolean generarJustificant =  isGenerarJustificant(true, true,
+					isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean inclouDocuments = isInclouDocuments(true, true,
+					enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 					notificacioEntity,
 					enviament,
@@ -265,6 +267,11 @@ public class RegistreNotificaHelper {
 
 	private boolean isGenerarJustificant(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
 		return isGenerarJustificantActive() || (isComunicacio && isSirActivat && aAdministracio);
+
+	}
+
+	private boolean isInclouDocuments(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
+		return isSendDocumentsActive() || (isSirActivat && isComunicacio && aAdministracio);
 
 	}
 
