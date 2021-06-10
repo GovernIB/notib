@@ -231,9 +231,14 @@ public class NotificacioServiceWsV2Test {
                 .activa(true)
                 .entitat(entitatMock)
                 .build();
-		
-		PersonaEntity personaEntity = PersonaEntity.getBuilder("sandreu@limit.es", 
-				"Andreu", "Nadal", "00000000T", "Siòn", "666010101").build();
+
+		PersonaEntity personaEntity = PersonaEntity.builder()
+				.email("sandreu@limit.es")
+				.llinatge1("Andreu")
+				.llinatge2("Nadal")
+				.nif("00000000T")
+				.nom("Siòn")
+				.telefon("666010101").build();
 		OrganGestorDto organ = new OrganGestorDto();
 		organ.setSir(true);
 		

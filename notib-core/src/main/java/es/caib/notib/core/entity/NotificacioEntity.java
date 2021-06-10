@@ -2,8 +2,7 @@ package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Index;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +16,9 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Entity
 @Table(name="not_notificacio")
