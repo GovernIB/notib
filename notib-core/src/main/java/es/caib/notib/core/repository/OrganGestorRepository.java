@@ -1,17 +1,17 @@
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -25,6 +25,13 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByCodi(String codi);
+
+	@Modifying
+	@Query( " update " +
+			"    OrganGestorEntity og " +
+			" set " +
+			"     og.estat = :estat")
+	void updateAllStatus(@Param("estat") OrganGestorEstatEnum estat);
 
 	@Query("from " +
 			"    OrganGestorEntity og " +

@@ -421,6 +421,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						organGestorsListCodisDir3);
 			}
 
+			organGestorRepository.updateAllStatus(OrganGestorEstatEnum.ALTRES);
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
 				updateNom(entitat, organGestor);
