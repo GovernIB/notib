@@ -54,7 +54,6 @@ public class BaseServiceTestV2 {
 	@Autowired
 	protected AuthenticationTest authenticationTest;
 
-	
 	@Autowired
 	protected  PluginHelper pluginHelper;
 
