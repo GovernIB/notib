@@ -1,6 +1,8 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -122,9 +124,7 @@ public class ProcedimentController extends BaseUserController{
 	public String newGet(
 			HttpServletRequest request,
 			Model model) {
-		String vista = formGet(request, null, model);
-		
-		return vista;
+		return formGet(request, null, model);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)

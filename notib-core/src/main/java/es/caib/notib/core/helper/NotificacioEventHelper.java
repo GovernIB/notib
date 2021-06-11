@@ -130,6 +130,7 @@ public class NotificacioEventHelper {
     public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
         log.debug("[Events-CALLBACK_CLIENT] Intentam afegir nou event de callback a client");
         log.debug("[Events-CALLBACK_CLIENT] Eliminam els events de callback a client innecessaris");
+        NotificacioEnviamentEntity enviamentEventOld = event.getEnviament();
         // Elimina tots els events de callback anteriors
         deleteByNotificacioAndTipusAndError(
                 notificacio,
@@ -159,6 +160,9 @@ public class NotificacioEventHelper {
             eventBuilder.error(true)
                     .errorDescripcio(event.getCallbackError());
         }
+        // TODO: l'enviament de l'event s'esborra amb l'anotació preremove (degut a un problema d'inconsistencia). Tornar a assignar l'enviament només a aquest event (SOLUCIÓ TEMPORAL!!!)
+     	eventBuilder.enviament(enviamentEventOld);
+     		
         log.debug("[Events-CALLBACK_CLIENT] Actualitzam la base de dades");
         NotificacioEventEntity callbackEvent = eventBuilder.build();
         updateNotificacio(notificacio, callbackEvent);

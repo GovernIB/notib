@@ -6,6 +6,8 @@ package es.caib.notib.core.service.ws;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
@@ -15,7 +17,6 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
@@ -93,6 +94,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private NotificacioHelper notificacioHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
@@ -193,22 +196,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							integracioHelper.addAccioError(info, errorDescripcio);
 							return setRespostaError(errorDescripcio);
 						}
-						LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
-								entitat.getCodi(),
-								notificacio.getOrganGestor());
-						Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-						List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
-								arbreUnitats, 
-								notificacio.getOrganGestor());
-						organGestor = OrganGestorEntity.getBuilder(
-								notificacio.getOrganGestor(),
-								organigramaEntitat.get(notificacio.getOrganGestor()).getNom(),
-								entitat,
-								llibreOrgan.getCodi(),
-								llibreOrgan.getNomLlarg(),
-								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
-								(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
-						organGestorRepository.save(organGestor);
+						organGestorHelper.crearOrganGestor(entitat, notificacio.getOrganGestor());
 					}
 				}
 				if (procediment != null && procediment.isComu() && organGestor != null) {

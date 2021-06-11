@@ -1,9 +1,10 @@
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
-
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 @Getter @Setter
 public class ProcedimentOrganDto extends AuditoriaDto implements Serializable{

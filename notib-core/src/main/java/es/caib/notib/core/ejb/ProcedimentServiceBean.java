@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -393,5 +394,13 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			String entitatCodi,
 			List<ProcedimentOrganDto> procedimentsOrgans) {
 		return delegate.findProcedimentsOrganCodiWithPermisByProcediment(procediment, entitatCodi, procedimentsOrgans);
+	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public ProcedimentDto findByNom(
+			Long entitatId,
+			String nomProcediment) throws NotFoundException {
+		return delegate.findByNom(entitatId, nomProcediment);
 	}
 }

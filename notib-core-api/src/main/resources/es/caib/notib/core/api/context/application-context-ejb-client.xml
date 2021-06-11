@@ -84,4 +84,8 @@
 			id="avisService"
 			jndi-name="notib/AvisServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.AvisService"/>
+	<jee:local-slsb
+			id="justificantService"
+			jndi-name="notib/JustificantServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.JustificantService"/>
 </beans>

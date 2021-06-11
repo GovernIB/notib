@@ -4,6 +4,7 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.test.AuthenticationTest;
@@ -13,10 +14,7 @@ import es.caib.notib.core.test.data.OrganGestorItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.Document;
@@ -56,7 +54,6 @@ public class BaseServiceTestV2 {
 	@Autowired
 	protected AuthenticationTest authenticationTest;
 
-	
 	@Autowired
 	protected  PluginHelper pluginHelper;
 
@@ -253,7 +250,9 @@ public class BaseServiceTestV2 {
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
 				return resposta;
 			}
-		}).when(registrePluginMock).salidaAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong());
+		}).when(registrePluginMock).salidaAsientoRegistral(
+				Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyBoolean()
+		);
 		
 		// obtenerAsientoRegistral
 		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
@@ -415,6 +414,7 @@ public class BaseServiceTestV2 {
 		Mockito.when(unitatsOrganitzativesPluginMock.paisos()).thenReturn(paisos);
 		Mockito.when(unitatsOrganitzativesPluginMock.provincies()).thenReturn(provincies);
 		Mockito.when(unitatsOrganitzativesPluginMock.localitats(Mockito.anyString())).thenReturn(localitats);
+		Mockito.when(unitatsOrganitzativesPluginMock.organigramaPerEntitat(Mockito.anyString())).thenReturn(new HashMap<String, NodeDir3>());
 		pluginHelper.setUnitatsOrganitzativesPlugin(unitatsOrganitzativesPluginMock);
 	}
 	

@@ -62,8 +62,10 @@ public class CallbackHelperTest {
         UsuariEntity mockUser = Mockito.mock(UsuariEntity.class);
         Mockito.when(mockUser.getCodi()).thenReturn("CODI_USER");
 
-        enviamentMock = NotificacioEnviamentEntity.getBuilder("",
-                ServeiTipusEnumDto.NORMAL, notificacioMock).build();
+        enviamentMock = NotificacioEnviamentEntity.builder()
+                .serveiTipus(ServeiTipusEnumDto.NORMAL)
+                .notificacio(notificacioMock)
+                .build();
         enviamentMock.setCreatedBy(mockUser);
         Mockito.when(aplicacioRepository.findByUsuariCodiAndEntitatId(Mockito.anyString(),
                 Mockito.anyLong())).thenReturn(aplicacio);

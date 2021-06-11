@@ -13,14 +13,14 @@ import javax.validation.Payload;
 
 /**
  * Constraint de validació que controla que no es repeteixi
- * el codi d'entitat.
+ * el codi de procediment ni el nom.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy=CodiProcedimentNoRepetitValidator.class)
-public @interface CodiProcedimentNoRepetit {
+@Constraint(validatedBy=ValidProcedimentValidator.class)
+public @interface ValidProcediment {
 
 	String message() default "Ja existeix una altre procediment amb aquest codi";
 

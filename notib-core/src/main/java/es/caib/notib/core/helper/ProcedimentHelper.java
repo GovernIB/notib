@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.*;
@@ -9,7 +10,6 @@ import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +48,8 @@ public class ProcedimentHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private OrganGestorService organGestorService;
+	@Resource
+	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private MessageHelper messageHelper;
 	
@@ -236,6 +238,8 @@ public class ProcedimentHelper {
 		return true;
 	}
 
+
+
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarProcedimentFromGda(
 			ProgresActualitzacioDto progres,
@@ -264,29 +268,15 @@ public class ProcedimentHelper {
 		progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ", new Object[] {procedimentGda.getOrganGestor()}));
 		
 		OrganGestorEntity organGestor = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
-						logger.debug(">>>> >> organ gestor " + (organGestor == null ? "NOU" : "EXISTENT"));
+		logger.trace(">>>> >> organ gestor " + (organGestor == null ? "NOU" : "EXISTENT"));
 		
 		if (organGestor == null) {
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.crear", new Object[] {procedimentGda.getOrganGestor()}));
 
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
-			LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
-					entitat.getCodi(),
-					organigramaEntitat.get(procedimentGda.getOrganGestor()).getCodi());
-			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-			List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
-					arbreUnitats, 
-					procedimentGda.getOrganGestor());
-			organGestor = OrganGestorEntity.getBuilder(
-					procedimentGda.getOrganGestor(),
-					organigramaEntitat.get(procedimentGda.getOrganGestor()).getNom(),
-					entitat,
-					llibreOrgan.getCodi(),
-					llibreOrgan.getNomLlarg(),
-					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
-					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
-			organGestorRepository.save(organGestor);
+
+			organGestorHelper.crearOrganGestor(entitat, procedimentGda.getOrganGestor());
 			
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.creat"));
 		} else {

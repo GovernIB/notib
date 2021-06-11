@@ -1,10 +1,10 @@
 package es.caib.notib.plugin.registre;
 
-import java.util.Date;
-
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 /**
  * Resposta a una consulta de registre d'entrada
@@ -25,6 +25,8 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	private String registreNumeroFormatat;
 	private String codiLlibre;
 	private NotificacioRegistreEstatEnumDto estat;
+	private String numeroRegistroDestino;
+	private String motivo;
 //	private String codiError;
 //	private String descripcioError;
 	

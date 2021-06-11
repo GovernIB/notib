@@ -1,6 +1,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
@@ -194,7 +195,7 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		try {
-			organGestorService.updateNom(
+			organGestorService.updateOne(
 					entitat.getId(),
 					organGestorCodi);
 			return getAjaxControllerReturnValueSuccess(
@@ -220,7 +221,7 @@ public class OrganGestorController extends BaseUserController{
 			String codiDir3OrganActual=null;
 			if (organGestorActual!=null) codiDir3OrganActual = organGestorActual.getCodi();
 			
-			organGestorService.updateNoms(
+			organGestorService.updateAll(
 					entitat.getId(), codiDir3OrganActual);
 			return getAjaxControllerReturnValueSuccess(
 					request,
