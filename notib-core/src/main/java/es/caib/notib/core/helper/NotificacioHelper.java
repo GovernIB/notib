@@ -1,7 +1,8 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
@@ -20,12 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 /**
  * Helper per notificacions
@@ -35,6 +32,7 @@ import javax.annotation.Resource;
 @Component
 public class NotificacioHelper {
 
+	@Autowired
 	private ProcedimentOrganRepository procedimentOrganRepository;
 	@Autowired
 	private GrupRepository grupRepository;
@@ -46,34 +44,10 @@ public class NotificacioHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-	@Resource
-	private MessageHelper messageHelper;
-	@Autowired
-	private NotificaHelper notificaHelper;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
-
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-	public void enviamentRefrescarEstat(
-			Long enviamentId, 
-			ProgresActualitzacioCertificacioDto progres,
-			IntegracioInfo info) {
-		logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
-		try {
-			progres.incrementProcedimentsActualitzats();
-			String msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
-			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
-			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
-			notificaHelper.enviamentRefrescarEstat(enviamentId, true);
-			String msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
-			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
-			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdated));
-		} catch (Exception ex) {
-			throw new RuntimeException(ex); 
-		}
-	}
 
 	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data) {
 		return 	auditNotificacioHelper.desaNotificacio(NotificacioEntity.

@@ -108,17 +108,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Resource
 	private MetricsHelper metricsHelper;
 	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
 	private NotificacioHelper notificacioHelper;
-	@Autowired
-	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 
-	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
+	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 	
 	
 	@Transactional(rollbackFor=Exception.class)
@@ -1746,44 +1744,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 			logger.debug("S'ha iniciat els procés d'actualització dels enviaments expirats");
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			String username = auth == null ? "schedulled" : auth.getName();
-			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_NOTIFICA,
-					"Actualització d'enviaments expirats sense certificació",
-					IntegracioAccioTipusEnumDto.PROCESSAR,
-					new AccioParam("Usuari encarregat: ", username));
-			
-			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(username);
-			if (progres != null && progres.getProgres() != 0) {
+
+			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(username);
+			if (progres != null) {
 				progres.addInfo(TipusActInfo.ERROR, "Existeix un altre procés en progrés...");
-			} else {
-				progres = new ProgresActualitzacioCertificacioDto();
-				progresActulitzacioExpirades.put(username, progres);
-				List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
-				if (enviamentsIds == null || enviamentsIds.isEmpty()) {
-					progres.setProgres(100);
-					String msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
-					progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
-					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
-				} else {
-					String msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
-					progres.setNumEnviamentsExpirats(enviamentsIds.size());
-					progres.addInfo(TipusActInfo.TITOL, msgInfoInici);
-					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoInici));
-					for (Long enviamentId : enviamentsIds) {
-						progres.incrementProcedimentsActualitzats();
-						try {
-							notificacioHelper.enviamentRefrescarEstat(
-									enviamentId, 
-									progres, 
-									info);	
-						} catch (Exception ex) {
-							progres.addInfo(TipusActInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ko", new Object[] {enviamentId}));
-							logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);
-						}
-					}
-				}
-				integracioHelper.addAccioOk(info);
+				return;
 			}
+
+			progres = new ProgresActualitzacioCertificacioDto();
+			progresActualitzacioExpirades.put(username, progres);
+			enviamentHelper.refrescarEnviamentsExpirats(progres);
+			progresActualitzacioExpirades.remove(username);
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1794,9 +1766,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
+			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(auth.getName());
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
-				progresActulitzacioExpirades.remove(auth.getName());
+				progresActualitzacioExpirades.remove(auth.getName());
 			}
 			return progres;
 		} finally {

@@ -12,10 +12,7 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.helper.CreacioSemaforDto;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +46,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private EntitatService entitatService;
 	@Autowired
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 
 	// 1. Enviament de notificacions pendents al registre y notific@
 	////////////////////////////////////////////////////////////////
@@ -201,7 +200,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("[NOT] Refrescant notificacions expirades");
-			notificacioService.refrescarEnviamentsExpirats();
+			enviamentHelper.refrescarEnviamentsExpirats();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
