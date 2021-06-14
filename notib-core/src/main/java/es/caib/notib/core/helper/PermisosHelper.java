@@ -11,8 +11,6 @@ import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.core.security.NotibMutableAclService;
 import es.caib.notib.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
@@ -785,7 +783,4 @@ public class PermisosHelper {
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(PermisosHelper.class);
-	
 }

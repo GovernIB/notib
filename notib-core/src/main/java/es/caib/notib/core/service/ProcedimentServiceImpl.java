@@ -1179,15 +1179,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<ProcedimentEntity> procediments;
 		if (RolEnumDto.NOT_ADMIN.equals(rol)) {
-
-			if (organCodi == null) {
-				procediments = procedimentRepository.findByEntitat(entitat);
-			}else {
-				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitat.getDir3Codi(),
-						organCodi);
-				procediments = procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
-			}
+			procediments = recuperarProcedimentSensePermis(entitat, organCodi);
 		} else {
 			procediments = recuperarProcedimentAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
 		}
@@ -1202,10 +1194,25 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (procediment.getNom() != null && !procediment.getNom().isEmpty()) {
 				nom += " - " + procediment.getNom();
 			}
-			response.add(new CodiValorOrganGestorComuDto(procediment.getId().toString(), nom, procediment.getOrganGestor().getCodi(),
+			String organCodi = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "";
+			response.add(new CodiValorOrganGestorComuDto(procediment.getId().toString(), nom, organCodi,
 					procediment.isComu()));
 		}
 		return response;
+	}
+
+	private List<ProcedimentEntity> recuperarProcedimentSensePermis(
+			EntitatEntity entitat,
+			String organCodi){
+
+		if (organCodi == null) {
+			return procedimentRepository.findByEntitat(entitat);
+		}else {
+			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+					entitat.getDir3Codi(),
+					organCodi);
+			return procedimentRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
+		}
 	}
 
 	private List<ProcedimentEntity> recuperarProcedimentAmbPermis(
@@ -1238,10 +1245,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 			results = addProcedimentsOrgan(procediments, procedimentsOrgansAmbPermis, organFiltre);
 
-			boolean hasComunsPermission = permisosHelper.hasPermission(
-					organGestorRepository.findByCodi(organFiltre).getId(),
-					OrganGestorEntity.class,
-					new Permission[] {ExtendedPermission.COMUNS});
+			boolean hasComunsPermission = hasPermisProcedimentsComuns(entitat.getDir3Codi(), organFiltre);
 			if (hasComunsPermission && PermisEnum.NOTIFICACIO.equals(permis)) {
 				List<ProcedimentEntity> procedimentsComuns = procedimentRepository.findByEntitatAndComuTrue(entitat);
 				for (ProcedimentEntity procediment: procedimentsComuns) {
@@ -1254,6 +1258,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 
 		return results;
+	}
+	private boolean hasPermisProcedimentsComuns(String codiEntitat, String codiOrgan) {
+		List<String> organsPares = organGestorCachable.getCodisAncestors(codiEntitat, codiOrgan);
+		for (String codiDir3 : organsPares) {
+			if(permisosHelper.hasPermission(
+					organGestorRepository.findByCodi(codiDir3).getId(),
+					OrganGestorEntity.class,
+					new Permission[]{ExtendedPermission.COMUNS})
+			) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private List<ProcedimentEntity> addProcedimentsOrgan(
@@ -1285,7 +1302,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 			}
 		}
-		return new ArrayList<ProcedimentEntity>(setProcediments);
+		return new ArrayList<>(setProcediments);
 	}
 
 	@Override

@@ -43,6 +43,18 @@ public class ProcedimentsCacheable {
     @Autowired
     private ProcedimentOrganRepository procedimentOrganRepository;
 
+    /**
+     * Obté un llistat de tots els procediments sobre els que l'usuari actual té els permisos indicats.
+     * - L'usuari té el permís directament al procediment o
+     * - L'usuari té el permís sobre l'òrgan gestor del procediment o
+     * - L'usuari té el permís a un òrgan pare del procediment
+     *
+     * @param usuariCodi El codi de l'usuari de la sessió
+     * @param entitat Entitat de la sessió
+     * @param permisos Permisos que volem que tinguin els procediments
+     *
+     * @return Llista dels procediments amb el permís indicat
+     */
     @Cacheable(value = "procedimentEntitiesPermis",
             key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
     public List<ProcedimentEntity> getProcedimentsWithPermis(
@@ -56,8 +68,8 @@ public class ProcedimentsCacheable {
                 ProcedimentEntity.class,
                 permisos
         );
-        // selecciona els procediments amb permisos per procediment de l'entitat i dels grups
 
+        // Filtre els procediments amb permisos per procediment de l'entitat i dels grups
         List<ProcedimentEntity> procedimentsAmbPermis;
         if (procedimentsAmbPermisIds.isEmpty()){
             procedimentsAmbPermis = new ArrayList<>();
@@ -66,6 +78,7 @@ public class ProcedimentsCacheable {
                     grups,
                     procedimentsAmbPermisIds);
         }
+
         // 2. Obtenim els òrgans gestors amb permisos
         List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.findOrganismesEntitatAmbPermis(entitat,
                 permisos);
@@ -95,6 +108,15 @@ public class ProcedimentsCacheable {
         return setProcediments;
     }
 
+    /**
+     * Consulta un llistat dels permisos de procediments donats a un òrgan gestor concret.
+     *
+     * @param usuariCodi El codi de l'usuari de la sessió
+     * @param auth Objecte de l'autentificació de la sessió actual
+     * @param entitat Entitat de la sessió
+     * @param permisos Permisos que volem que tinguin els procediments
+     * @return Retorna una llista de tuples procediment-organ amb tots els permisos a un organ gestor de tots els procediments.
+     */
     @Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
     public List<ProcedimentOrganEntity> getProcedimentOrganWithPermis(
             String usuariCodi,
