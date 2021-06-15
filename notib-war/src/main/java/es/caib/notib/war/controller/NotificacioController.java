@@ -131,7 +131,7 @@ public class NotificacioController extends BaseUserController {
             HttpServletRequest request,
             Model model) {
 
-        List<CodiValorDto> organsDisponibles = new ArrayList<>();
+        List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         Long entitatId = entitatActual.getId();

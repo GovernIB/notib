@@ -50,6 +50,7 @@ public class NotificacioTableHelper {
                 .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
                 .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
                 .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
+                .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
                 .isErrorLastEvent(false)
                 .build();
 
@@ -93,7 +94,8 @@ public class NotificacioTableHelper {
         tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());
         tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
         tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
-
+        tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
+        
         notificacioTableViewRepository.saveAndFlush(tableViewItem);
     }
 

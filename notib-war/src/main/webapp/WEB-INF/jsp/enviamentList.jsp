@@ -493,12 +493,18 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="organCodi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
+				<th data-col-name="organEstat" data-visible="false"></th>
+				<th data-col-name="organCodi" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="dir3Codi" value="${filtreEnviaments.dir3Codi}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>"/>
 						</div>
 					</script>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organCodi}}
+						{{if organEstat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
 				</th>
 				<c:choose>
 					<c:when test = "${columnes.usuari == true}"> 

@@ -44,6 +44,7 @@ public class EnviamentTableHelper {
                 .emisorDir3Codi(notificacio.getEmisorDir3Codi())
                 .usuariCodi(notificacio.getUsuariCodi())
                 .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
+                .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
                 .concepte(notificacio.getConcepte())
                 .descripcio(notificacio.getDescripcio())
                 .registreLlibreNom(notificacio.getRegistreLlibreNom())
@@ -99,6 +100,7 @@ public class EnviamentTableHelper {
         tableViewItem.setEmisorDir3Codi(notificacio.getEmisorDir3Codi());
         tableViewItem.setUsuariCodi(notificacio.getUsuariCodi());
         tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
+        tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
         tableViewItem.setConcepte(notificacio.getConcepte());
         tableViewItem.setDescripcio(notificacio.getDescripcio());
         tableViewItem.setRegistreLlibreNom(notificacio.getRegistreLlibreNom());

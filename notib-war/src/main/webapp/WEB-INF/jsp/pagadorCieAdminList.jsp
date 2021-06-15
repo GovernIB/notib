@@ -55,7 +55,14 @@ pageContext.setAttribute(
 			<tr>
 				<th data-col-name="dir3codi"><spring:message code="pagadorcie.list.columna.dir3codi"/></th>
 				<th data-col-name="contracteDataVig" data-converter="date"><spring:message code="pagadorcie.list.columna.contracteDataVig"/></th>
-				<th data-col-name="organGestorCodi"><spring:message code="pagadorcie.list.columna.organgestor"/></th>
+				<th data-col-name="organGestorEstat" data-visible="false"></th>
+				<th data-col-name="organGestorCodi" data-template="#cellOrganGestorTemplate"><spring:message code="pagadorcie.list.columna.organgestor"/>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organGestorCodi}}
+						{{if organGestorEstat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='pagadorcie.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
+				</th>
 				<th data-col-name="id" data-template="#cellFullaTemplate" data-orderable="false" width="10%">
 					<script id="cellFullaTemplate" type="text/x-jsrender">
 						<a href="${unitatCodiUrlPrefix}pagadorCie/{{:id}}/formats/fulla" class="btn btn-default"><span class="fa fa-sticky-note"></span>&nbsp;<spring:message code="pagadorcie.list.boto.format.fulla"/>&nbsp;</a>

@@ -52,7 +52,35 @@ pageContext.setAttribute(
 			$('#form-filtre').submit();
 		});
 		
+		loadOrgans();
 	});
+	var organsGestors = [];
+	organsGestors.push({id:"", text:"", estat:"VIGENT"});
+	<c:forEach items="${organsGestors}" var="organGestor">
+		organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
+	</c:forEach>
+
+	function formatState(organ) {
+		let msgObsolet = "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>";
+		if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
+			return organ.text;
+		}
+		return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
+	}
+
+	function loadOrgans(){
+		var listaOrganos = $('#organGestor');
+		listaOrganos.empty();
+
+		var select2Options = {
+				theme: 'bootstrap',
+				width: 'auto',
+				tags: organsGestors,
+				templateResult: formatState
+		};
+		
+		listaOrganos.select2(select2Options);
+	}
 	</script>
 </head>
 <body>
@@ -65,7 +93,7 @@ pageContext.setAttribute(
 				<not:inputText name="nom" inline="true" placeholderKey="procediment.list.columna.nom"/>
 			</div>
 			<div class="col-md-4">
-				<not:inputSelect name="organGestor" optionItems="${organsGestors}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-5">
 				<label for="comuBtn"><spring:message code="procediment.filter.form.camp.comu"/>:</label>
@@ -99,7 +127,14 @@ pageContext.setAttribute(
 				<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
 				<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
 <%-- 				<th data-col-name="entitatNom"><spring:message code="procediment.list.columna.entitat"/></th> --%>
-				<th data-col-name="organGestorDesc"><spring:message code="procediment.list.columna.organGestor"/></th>
+				<th data-col-name="organGestorEstat" data-visible="false"></th>
+				<th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate"><spring:message code="procediment.list.columna.organGestor"/>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organGestorDesc}}
+						{{if organGestorEstat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='procediment.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
+				</th>
 				<th data-col-name="pagadorpostal"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
 				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
 				<th data-col-name="comu" data-template="#cellActivaTemplate">

@@ -230,14 +230,14 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
+	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<CodiValorDto> organsGestors = new ArrayList<CodiValorDto>();
+			List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
 			for (OrganGestorEntity organ: organs) {
-				organsGestors.add(new CodiValorDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom()));
+				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
 			}
 			return organsGestors;
 		} finally {
@@ -894,7 +894,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
     @Override
 	@Transactional(readOnly = true)
-    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
     		Long entitatId,
 			String usuari,
 			RolEnumDto rol,
@@ -902,7 +902,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValorDto> organsGestors = new ArrayList<>();
+			List<CodiValorEstatDto> organsGestors = new ArrayList<>();
 			List<OrganGestorEntity> organsGestorsDisponibles = new ArrayList<>();
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
@@ -932,7 +932,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				if (organGestor.getNom() != null && !organGestor.getNom().isEmpty()) {
 					nom += " - " + organGestor.getNom();
 				}
-				organsGestors.add(new CodiValorDto(organGestor.getId().toString(), nom));
+				organsGestors.add(new CodiValorEstatDto(organGestor.getId().toString(), nom, organGestor.getEstat()));
 			}
 //		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
 //		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());

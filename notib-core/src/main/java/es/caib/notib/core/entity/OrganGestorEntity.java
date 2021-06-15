@@ -48,6 +48,7 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	protected String oficinaNom;
 
 	@Column(name = "estat")
+	@Enumerated(EnumType.ORDINAL)
 	protected OrganGestorEstatEnum estat;
 
 	public void update(

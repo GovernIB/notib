@@ -135,6 +135,7 @@ public class ConversioTipusHelper {
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").
 			field("organGestor.codi", "organGestorCodi").
+			field("organGestor.estat", "organGestorEstat").
 			byDefault().
 			register();
 		
@@ -142,6 +143,7 @@ public class ConversioTipusHelper {
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").
 			field("organGestor.codi", "organGestorCodi").
+			field("organGestor.estat", "organGestorEstat").
 			byDefault().
 			register();
 		
