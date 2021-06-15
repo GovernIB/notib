@@ -46,6 +46,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private OrganGestorRepository organGestorRepository;
 	@Resource
+	private NotificacioTableViewRepository notificacioTableViewRepository;
+	@Resource
+	private EnviamentTableRepository enviamentTableRepository;
+	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
@@ -307,6 +311,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							entitat,
 							pageable);
 				} else {
+					OrganGestorEstatEnum estat = filtre.getEstat();
+					boolean isEstatNull = estat == null;
 					organs = organGestorRepository.findByEntitatAndFiltre(
 							entitat,
 							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
@@ -315,6 +321,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOficina() == null || filtre.getOficina().isEmpty(),
 							filtre.getOficina() == null ? "" : filtre.getOficina(),
+							isEstatNull,
+							estat,
 							pageable);
 				}
 			//Cas d'Administrador d'Organ
@@ -336,6 +344,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							organGestorsListCodisDir3,
 							pageable);
 				} else {
+					OrganGestorEstatEnum estat = filtre.getEstat();
+					boolean isEstatNull = estat == null;
 					organs = organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
 							entitat,
 							organGestorsListCodisDir3,
@@ -345,6 +355,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOficina() == null || filtre.getOficina().isEmpty(),
 							filtre.getOficina() == null ? "" : filtre.getOficina(),
+							isEstatNull,
+							estat,
 							pageable);
 				}
 			}
@@ -433,6 +445,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				updateEstat(organGestor, arbreUnitats);
 
 			}
+			// Update de las tablas correspondientes a las datatables de notificaciones y envíos
+			notificacioTableViewRepository.updateOrganGestorEstat();
+			enviamentTableRepository.updateOrganGestorEstat();
+			
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

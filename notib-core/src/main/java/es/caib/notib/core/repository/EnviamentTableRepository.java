@@ -7,6 +7,7 @@ import es.caib.notib.core.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -317,4 +318,10 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable pageable);
+	
+	@Modifying
+	@Query("update EnviamentTableEntity et " +
+			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
+			"where et.organCodi is not null")
+	void updateOrganGestorEstat();
 }
