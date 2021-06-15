@@ -90,7 +90,14 @@
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="codi"><spring:message code="organgestor.list.columna.codi"/></th>
+				<th data-col-name="estat" data-visible="false"></th>
+				<th data-col-name="codi" data-template="#cellOrganGestorTemplate"><spring:message code="organgestor.list.columna.codi"/>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:codi}}
+						{{if estat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='organgestor.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
+				</th>
 				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
 				<c:if test="${setLlibre}">
 					<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>

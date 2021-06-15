@@ -3,6 +3,7 @@ package es.caib.notib.core.api.dto.notenviament;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,6 +40,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private String procedimentCodiNotib;
 	private String grupCodi;
 	private String organCodi;
+	private OrganGestorEstatEnum organEstat;
 	private String usuariCodi;
 	private String concepte;
 	private String descripcio;

@@ -2,11 +2,14 @@ package es.caib.notib.core.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +26,7 @@ import lombok.Setter;
 		+ "			ent.nom as entitatNom, "
 		+ "			pro.organ_gestor as organGestor, "
 		+ "			og.nom as organGestorNom, "	
+		+ "			og.estat as organGestorEstat, "
 		+ "			pro.codiassumpte as codiassumpte, "
 		+ " 		pro.tipusassumpte as tipusassumpte, "		
 		+ "			og.llibre as llibre, "
@@ -62,6 +66,10 @@ public class ProcedimentFormEntity {
 
 	@Column(name = "organGestorNom")
 	protected String organGestorNom;
+	
+	@Column(name = "organGestorEstat")
+	@Enumerated(EnumType.ORDINAL)
+	protected OrganGestorEstatEnum organGestorEstat;
 	
 	@Column(name = "tipusassumpte")
 	protected String tipusAssumpte;

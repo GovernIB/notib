@@ -3,8 +3,8 @@ package es.caib.notib.core.api.dto.organisme;
 import lombok.Getter;
 
 public enum OrganGestorEstatEnum {
-    VIGENT(1),
-    ALTRES(0);
+    ALTRES(0),
+	VIGENT(1);
 
     @Getter
     private final Integer numVal;

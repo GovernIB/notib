@@ -65,13 +65,13 @@ public class ProcedimentController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 
-		List<CodiValorDto> organsGestors = new ArrayList<CodiValorDto>();
+		List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 		if (organGestorActual == null) {
 			organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		} else {
 			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitat.getId(), organGestorActual.getCodi());
 			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(new CodiValorDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom()));
+				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
 			}
 		}
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);

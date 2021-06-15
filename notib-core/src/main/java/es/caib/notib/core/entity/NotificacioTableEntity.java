@@ -6,6 +6,7 @@ package es.caib.notib.core.entity;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -106,6 +107,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String organCodi;
 	@Column(name = "ORGAN_NOM")
 	private String organNom;
+	@Column(name = "ORGAN_ESTAT")
+	private OrganGestorEstatEnum organEstat;
 	@Column(name = "ERROR_LAST_EVENT")
 	private boolean isErrorLastEvent;
 

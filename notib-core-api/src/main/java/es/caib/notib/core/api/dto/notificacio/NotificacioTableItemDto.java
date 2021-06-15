@@ -6,6 +6,7 @@ package es.caib.notib.core.api.dto.notificacio;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -45,6 +46,7 @@ public class NotificacioTableItemDto {
 	private String procedimentNom;
 	private String organCodi;
 	private String organNom;
+	private OrganGestorEstatEnum organEstat;
 
 	protected int registreEnviamentIntent;
 

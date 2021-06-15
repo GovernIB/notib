@@ -70,7 +70,7 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId);
+	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
@@ -171,7 +171,7 @@ public interface OrganGestorService {
 			PermisEnum permis);
 
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
     		Long entitatId,
 			String usuari,
 			RolEnumDto rol,

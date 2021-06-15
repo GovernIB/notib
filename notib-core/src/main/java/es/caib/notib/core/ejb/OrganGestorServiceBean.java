@@ -86,7 +86,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
+	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		return delegate.findOrgansGestorsCodiByEntitat(entitatId);
 	}
 	
@@ -170,7 +170,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
     		Long entitatId,
 			String usuari,
 			RolEnumDto rol,
