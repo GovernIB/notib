@@ -2,10 +2,12 @@ package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
@@ -53,6 +55,9 @@ public class OrganGestorController extends BaseUserController{
 			Model model) {
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
+		model.addAttribute("organGestorEstats",
+				EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class,
+	                        "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 		model.addAttribute("oficinesEntitat",

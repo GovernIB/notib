@@ -62,7 +62,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where (og.entitat = :entitat)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))")
+			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))"+
+			" and (:isEstatNull = true or og.estat = :estat)")
 	public Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,
@@ -71,6 +72,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			@Param("isOficinaNull") boolean isOficinaNull,
 			@Param("oficina") String oficina,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") OrganGestorEstatEnum estat,
 			Pageable paginacio);
 	
 	@Query( "select distinct og " +
@@ -96,7 +99,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"and og.codi in (:organsIds)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))")
+			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))" +
+			" and (:isEstatNull = true or og.estat = :estat)")
 	public Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
@@ -106,6 +110,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			@Param("isOficinaNull") boolean isOficinaNull,
 			@Param("oficina") String oficina,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") OrganGestorEstatEnum estat,
 			Pageable paginacio);
 	
 	@Query(	"select distinct og.codi " +

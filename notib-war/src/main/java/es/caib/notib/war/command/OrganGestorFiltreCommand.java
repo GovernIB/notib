@@ -2,6 +2,7 @@ package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class OrganGestorFiltreCommand {
 	private String codi;
 	private String nom;
 	private String oficina;
+	private OrganGestorEstatEnum estat;
 	
 	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
 		if (dto == null) {

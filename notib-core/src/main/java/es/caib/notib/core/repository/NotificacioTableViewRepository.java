@@ -9,6 +9,7 @@ import es.caib.notib.core.entity.NotificacioTableEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -339,4 +340,9 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 
+	@Modifying
+	@Query("update NotificacioTableEntity nt " +
+			"set nt.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = nt.organCodi) " +
+			"where nt.organCodi is not null")
+	void updateOrganGestorEstat();
 }

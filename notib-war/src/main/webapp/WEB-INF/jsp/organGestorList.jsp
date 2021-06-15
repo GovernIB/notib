@@ -48,6 +48,9 @@
 			<div class="col-md-3">
 				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
 			</div>
+			<div class="col-md-2">
+				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
+			</div>
 			<c:if test="${setOficina}">
 				<div class="col-md-4">
 					<not:inputSelect 
@@ -108,6 +111,16 @@
 				<c:if test="${!setOficina}"> 
 					<th data-col-name="oficinaNom"><spring:message code="organgestor.list.columna.oficina"/></th>
 				</c:if>
+				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
+					<spring:message code="organgestor.list.columna.estat"/>
+					<script id="cellEstatTemplate" type="text/x-jsrender">
+						{{if estat == 'VIGENT'}}
+							<spring:message code="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.VIGENT"/>
+						{{else estat == 'ALTRES'}}
+							<spring:message code="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.ALTRES"/>
+						{{/if}}
+					</script>
+				</th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="100px">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="organgestor.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
