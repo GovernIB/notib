@@ -9,13 +9,20 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActIn
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.exception.JustificantException;
+import es.caib.notib.core.api.exception.MaxLinesExceededException;
+import es.caib.notib.core.api.exception.NoDocumentException;
+import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
+import es.caib.notib.core.api.exception.WriteCsvException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
@@ -28,6 +35,7 @@ import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +46,34 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.io.ICsvListReader;
+import org.supercsv.io.ICsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import javax.annotation.Resource;
+import javax.mail.internet.InternetAddress;
+
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.NoSuchFileException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -114,6 +142,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
+	private OrganGestorCachable organGestorCachable;
+	@Autowired
 	private EnviamentHelper enviamentHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
@@ -123,13 +153,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioDatabaseDto create(
 			Long entitatId,
-			NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
+			NotificacioDatabaseDto notificacio,
+			Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
+			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false, documentsProcessatsMassiu);
 			// Dades generals de la notificació
 			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
 	
@@ -318,7 +349,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, !isAdministradorEntitat);
+			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, !isAdministradorEntitat, null);
 
 			// Actualitzar notificació existent
 			auditNotificacioHelper.updateNotificacio(notificacioEntity, notData);
@@ -1919,6 +1950,720 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private int getMidaMinIdCsv() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.document.consulta.id.csv.mida.min", 16);
+	}
+	
+	@Transactional
+	@Override
+	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException{
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			InputStream input;
+			if (registreNotificaHelper.isSendDocumentsActive()) {
+				input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva_metadades.csv");
+			} else {
+				input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva.csv");
+			}
+			return IOUtils.toByteArray(input);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional(rollbackFor=Exception.class)
+	@Override
+	public void createMassiu(
+			EntitatDto entitat, 
+			String usuariCodi, 
+			NotificacioMassiuDto notificacioMassiu) throws RegistreNotificaException {
+ 
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<String[]> linies = readCSV(notificacioMassiu.getFicheroCsvBytes());
+			
+			if (linies.size() > 999) {
+				logger.debug("El fitxer CSV conté més de les 999 línies permeses.");
+				throw new MaxLinesExceededException(
+						"S'ha superat el màxim nombre de línies permès (999) per al CSV de càrrega massiva.");
+			}
+			List<String> fileNames = readZipFileNames(notificacioMassiu.getFicheroZipBytes());
+			Map<String, Long> documentsProcessatsMassiu = new HashMap<String, Long>(); // key: csv/uuid/arxiuFisicoNom - value: documentEntity.getId()
+			
+			// TODO: ver dónde colocar los ficheros generados
+			ICsvListWriter listWriterErrors = writeCsvHeader("C:\\Users\\Esther\u0020\u0020Puente\\dades\\notib-fs\\informeErrors.csv");
+			ICsvListWriter listWriterInforme = writeCsvHeader("C:\\Users\\Esther\u0020\u0020Puente\\dades\\notib-fs\\informe.csv");
+			
+			for (String[] linia : linies) {
+				NotificacioDatabaseDto notificacio = csvToNotificaDatabaseDto(
+						linia, 
+						notificacioMassiu.getCaducitat(), 
+						entitat, 
+						usuariCodi, 
+						fileNames,
+						notificacioMassiu.getFicheroZipBytes(),
+						documentsProcessatsMassiu);
+				
+				if (notificacio.getDocument().getContingutBase64() != null && !notificacio.getDocument().getContingutBase64().isEmpty()) {//arxiu
+					if (!documentsProcessatsMassiu.containsKey(notificacio.getDocument().getArxiuNom())) {
+						documentsProcessatsMassiu.put(notificacio.getDocument().getArxiuNom(), null);
+					}
+				} else if (notificacio.getDocument().getUuid() != null) {
+					if (!documentsProcessatsMassiu.containsKey(notificacio.getDocument().getUuid())) {
+						documentsProcessatsMassiu.put(notificacio.getDocument().getUuid(), null);
+					}
+				} else if (notificacio.getDocument().getCsv() != null) {
+					if (!documentsProcessatsMassiu.containsKey(notificacio.getDocument().getCsv())) {
+						documentsProcessatsMassiu.put(notificacio.getDocument().getCsv(), null);
+					}
+				}
+				
+				List<String> errors = validarNotificacioMassiu(
+						notificacio, entitat, linia,
+						documentsProcessatsMassiu);
+				try {
+					ProcedimentDto procediment = procedimentService.findByCodi(entitat.getId(), notificacio.getProcediment().getCodi());
+					notificacio.setProcediment(procediment);
+				} catch (NotFoundException e) {
+					errors.add("[1330] No s'ha trobat cap procediment amb el codi indicat.");
+				}
+				
+				if (errors == null || errors.size() == 0) {
+					try {
+						create(entitat.getId(), notificacio, documentsProcessatsMassiu);
+					} catch (NoDocumentException ex) {
+						errors.add("[1064] No s'ha pogut obtenir el document de l'arxiu.");
+					} catch (NoMetadadesException ex) {
+						errors.add("[1066] Error en les metadades del document. No s'han obtingut de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
+					}
+				}
+				
+				if (errors != null && errors.size() > 0) {
+					writeCsvLinia(listWriterErrors,linia, errors);
+					writeCsvLinia(listWriterInforme,linia, errors);
+				} else {
+					List<String> ok = new ArrayList<String>();
+					ok.add("OK");
+					writeCsvLinia(listWriterInforme,linia, ok);
+				}
+				
+			}
+			writeCsvClose(listWriterErrors);
+			writeCsvClose(listWriterInforme);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private NotificacioDatabaseDto csvToNotificaDatabaseDto(String[] linia, Date caducitat, EntitatDto entitat, 
+			String usuariCodi, List<String> fileNames, byte[] ficheroZipBytes, 
+			Map<String, Long> documentsProcessatsMassiu) {
+		NotificacioDatabaseDto notificacio = new NotificacioDatabaseDto();
+		NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
+		List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
+		DocumentDto document = new DocumentDto();
+		
+		notificacio.setCaducitat(caducitat);
+		notificacio.setOrganGestorCodi(linia[0]); 
+		notificacio.setEmisorDir3Codi(entitat.getDir3Codi());
+		notificacio.setConcepte(linia[1]);
+		notificacio.setDescripcio(null); 
+		notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.toEnum(linia[2].toUpperCase()));
+		notificacio.setGrup(null); 
+		notificacio.setIdioma(null); 
+		notificacio.setNumExpedient(null); 
+		notificacio.setUsuariCodi(usuariCodi); 
+		notificacio.setRetard(Integer.valueOf(linia[15]));
+		
+		// Procediment
+		ProcedimentDto procediment = new ProcedimentDto();
+		procediment.setCodi(linia[16]);
+		notificacio.setProcediment(procediment);
+		
+		// Fecha envío programado
+		try {//viene de CSV y es opcional pero NO sabemos formato
+			if (linia[17] != null && !linia[17].isEmpty()) {
+				notificacio.setEnviamentDataProgramada(new SimpleDateFormat("dd/MM/yyyy").parse(linia[17]));
+			} else { 
+				notificacio.setEnviamentDataProgramada(null);
+			}
+		} catch (ParseException e) {
+			notificacio.setEnviamentDataProgramada(null);
+		}
+				
+		// Document
+		if (fileNames.contains(linia[4])) { // Archivo físico
+			document.setArxiuNom(linia[4]);
+			byte [] arxiuBytes;
+			if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+					(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && 
+					documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
+				arxiuBytes = readZipFile (ficheroZipBytes, linia[4]);
+				document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
+				document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+				document.setGenerarCsv(false);
+				document.setMediaType(URLConnection.guessContentTypeFromName(linia[4]));
+				document.setMida(Long.valueOf(arxiuBytes.length));
+				if (registreNotificaHelper.isSendDocumentsActive()) {
+					leerMetadadesDelCsv(document, linia);
+				}
+			}
+		} else {
+			String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
+			Pattern pUuid = Pattern.compile(uuidPattern);
+			Matcher mUuid = pUuid.matcher(linia[4]);
+			if (mUuid.matches()) {
+				// Uuid
+				document.setUuid(linia[4]);
+				document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+				document.setGenerarCsv(false);
+				if (registreNotificaHelper.isSendDocumentsActive()) {
+					leerMetadadesDelCsv(document, linia);
+				}
+			} else {
+				// Csv
+				document.setCsv(linia[4]);
+				document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+				document.setGenerarCsv(false);
+				if (registreNotificaHelper.isSendDocumentsActive()) {
+					leerMetadadesDelCsv(document, linia);
+				}
+			}
+		}
+		notificacio.setDocument(document);
+		
+		// Enviaments
+		enviament.setNotificaReferencia((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null); //si no se envía, Notific@ genera una
+		enviament.setEntregaDehActiva(false); // De momento dejamos false
+		EntregaPostalDto entregaPostal = new EntregaPostalDto();
+		if (linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
+				linia[14] != null && !linia[14].isEmpty()) { 
+			enviament.setEntregaPostalActiva(true);
+			entregaPostal.setActiva(true); //??
+			entregaPostal.setLinea1(linia[12]);
+			entregaPostal.setLinea2(linia[13]);
+			entregaPostal.setCodiPostal(linia[14]);	
+			entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR);
+		} else {
+			enviament.setEntregaPostalActiva(false);
+			entregaPostal.setActiva(false); //??
+		}
+		enviament.setEntregaPostal(entregaPostal);
+		
+		enviament.setServeiTipus((linia[6] != null && !linia[6].isEmpty()) ? 
+				ServeiTipusEnumDto.valueOf(linia[6].trim().toUpperCase()) : ServeiTipusEnumDto.NORMAL);
+				
+		PersonaDto titular = new PersonaDto();
+		titular.setNom(linia[7]);
+		titular.setLlinatge1(linia[8]); // vienen ap1 y ap2 juntos
+		titular.setLlinatge2(null);
+		titular.setNif(linia[9]);
+		titular.setEmail(linia[10]);
+		titular.setDir3Codi(linia[11]);
+		titular.setIncapacitat(false);
+		// TODO:  Igual lo hemos planteado mal. Si es un nif, podria ser el Nif de la administración. 
+		//Entiendo que el "Código destino" = linia[11] solo se informará en caso de ser una administración
+		//Si es persona física o jurídica no tiene sentido
+		//Entonces podriamos utilizar este campo para saber si es una administración
+		if (NifHelper.isValidCif(linia[9])) {
+			titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		} else if (NifHelper.isValidNifNie(linia[9])) {
+			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		} else { 
+			List<OrganGestorDto> lista = unitatsPerCodi(linia[9]); 
+			if (lista != null && lista.size() > 0) {
+				titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+			}
+		}
+		enviament.setTitular(titular);
+		enviaments.add(enviament);
+		notificacio.setEnviaments(enviaments);
+		
+		
+		return notificacio;
+	}
+
+	private void leerMetadadesDelCsv(DocumentDto document, String[] linia) {
+		document.setOrigen((linia[18] != null && !linia[18].isEmpty()) ? 
+				OrigenEnum.valueOf(linia[18].trim().toUpperCase()): null);
+		document.setValidesa((linia[19] != null && !linia[19].isEmpty()) ? 
+				ValidesaEnum.valueOf(linia[19].trim().toUpperCase()) : null);
+		document.setTipoDocumental((linia[20] != null && !linia[20].isEmpty()) ? 
+				TipusDocumentalEnum.valueOf(linia[20].trim().toUpperCase()) : null);
+		document.setModoFirma((linia[21] != null && !linia[21].isEmpty()) ? 
+				Boolean.valueOf(linia[21]) : Boolean.FALSE);
+	}
+
+	private List<String[]> readCSV(byte[] fitxer) {
+		List<String[]> linies = new ArrayList<String[]>();
+		ICsvListReader listReader = null;
+		try {
+			Reader reader = new InputStreamReader(new ByteArrayInputStream(fitxer));
+			listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+			List<String> linia;
+			int index = 0;
+			while( (linia = listReader.read()) != null ) {
+				if (index > 0) {
+					linies.add(linia.toArray(new String[]{}));
+				}
+				index++;
+			}
+			if( listReader != null )
+				listReader.close();
+		} catch (Exception e) {
+			logger.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
+			return null;
+		}
+		return linies;
+	}
+	
+	private List<String> readZipFileNames (byte [] fitxer) {
+		List<String> names = new ArrayList<String>();
+		try {
+			ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
+			ZipEntry entrada;
+			while (null != (entrada=zip.getNextEntry()) ){
+			   names.add(entrada.getName());
+			   zip.closeEntry();
+			}
+			zip.close();		
+		} catch (Exception e) {
+			logger.debug("S'ha produït un error a l'llegir el fitxer ZIP per obtenir els noms dels fitxers.", e);
+			return null;
+		}
+		return names;
+	}
+
+	private byte [] readZipFile (byte [] fitxer, String fileName) {
+		ByteArrayOutputStream baos;
+		byte arxiuBytes[] = null;
+		try {
+			ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
+			ZipEntry entrada;
+			while (null != (entrada=zip.getNextEntry()) ){
+				if (fileName.equalsIgnoreCase(entrada.getName())) {
+					baos = new ByteArrayOutputStream();
+					int leido;
+					byte [] buffer = new byte[1024];
+					while ( 0 < (leido=zip.read(buffer))){
+						baos.write(buffer,0,leido);
+						
+					}
+					arxiuBytes = baos.toByteArray();
+					baos.close();
+					zip.closeEntry();
+				}
+			}
+			zip.close();		
+		} catch (Exception e) {
+			logger.debug("S'ha produït un error a l'llegir el fitxer ZIP per extreure un fitxer.", e);
+			return null;
+		}
+		return arxiuBytes;
+	}
+
+	private List<String> validarNotificacioMassiu(
+			NotificacioDatabaseDto notificacio, EntitatDto entitat, String[] linia, 
+			Map<String, Long> documentsProcessatsMassiu) {
+		List<String> errors = new ArrayList<String>();
+		boolean comunicacioSenseAdministracio = false;
+		
+		Map<String, OrganismeDto> organigramaByEntitat = null;
+		
+		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
+
+		organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);	
+
+		// Emisor
+		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
+			errors.add("[1000] El camp 'emisorDir3Codi' no pot ser null.");
+		} 
+		if (emisorDir3Codi.length() > 9) {
+			errors.add("[1001] El camp 'emisorDir3Codi' no pot tenir una longitud superior a 9 caràcters.");
+		}
+		// Entitat
+		if (entitat == null) {
+			errors.add("[1010] No s'ha trobat cap entitat configurada a Notib amb el codi Dir3 " + emisorDir3Codi + ". (emisorDir3Codi)");
+		}
+		if (!entitat.isActiva()) {
+			errors.add("[1011] L'entitat especificada està desactivada per a l'enviament de notificacions");
+		}
+		// Procediment
+		if (notificacio.getProcediment() != null && notificacio.getProcediment().getCodi() != null && notificacio.getProcediment().getCodi().length() > 9) {
+			errors.add("[1021] El camp 'procedimentCodi' no pot tenir una longitud superior a 9 caràcters.");
+		}
+		// Concepte
+		if (notificacio.getConcepte() == null || notificacio.getConcepte().isEmpty()) {
+			errors.add("[1030] El concepte de la notificació no pot ser null.");
+		}
+		if (notificacio.getConcepte().length() > 240) {
+			errors.add("[1031] El concepte de la notificació no pot tenir una longitud superior a 240 caràcters.");
+		}
+		if (!validFormat(notificacio.getConcepte()).isEmpty()) {
+			errors.add("[1032] El format del camp concepte no és correcte. Inclou els caràcters ("+ listToString(validFormat(notificacio.getConcepte())) +") que no són correctes");
+		}		
+		// Tipus d'enviament
+		if (notificacio.getEnviamentTipus() == null) {
+			errors.add("[1050] El tipus d'enviament de la notificació no pot ser null.");
+		}
+		// Document
+		if (notificacio.getDocument() == null) {
+			errors.add("[1060] El camp 'document' no pot ser null.");
+		}
+		DocumentDto document = notificacio.getDocument();
+
+		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
+			errors.add("[1072] El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters.");
+		}
+		
+		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+				(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && 
+				documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {			
+			if (	(document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
+					(document.getCsv() == null || document.getCsv().isEmpty()) &&
+					(document.getUrl() == null || document.getUrl().isEmpty()) &&
+					(document.getUuid() == null || document.getUuid().isEmpty())) {
+				errors.add("[1062] És necessari incloure un document (contingutBase64, CSV, UUID o URL) a la notificació.");
+			}
+		}
+		// Usuari
+		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
+			errors.add("[1070] El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida).");
+		} 
+		if (notificacio.getUsuariCodi().length() > 64) {
+			errors.add("[1071] El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters.");
+		}
+
+		// Enviaments
+		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
+			errors.add("[1100] El camp 'enviaments' no pot ser null.");
+		}
+		for(NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
+			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
+			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
+				if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || 
+						(enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.JURIDICA))  {
+					comunicacioSenseAdministracio = true;
+				}
+			}
+			boolean senseNif = true;
+			
+			// Servei tipus
+			if(enviament.getServeiTipus() == null) {
+				errors.add("[1101] El camp 'serveiTipus' d'un enviament no pot ser null.");
+			}
+			
+			// Titular
+			if(enviament.getTitular() == null) {
+				errors.add("[1110] El titular d'un enviament no pot ser null.");
+			}
+			// - Tipus
+			if(enviament.getTitular().getInteressatTipus() == null) {
+				errors.add("[1111] El camp 'interessat_tipus' del titular d'un enviament no pot ser null.");
+			}
+			// - Nom
+			if(enviament.getTitular().getNom() != null && enviament.getTitular().getNom().length() > 255) {
+				errors.add("[1112] El camp 'nom' del titular no pot ser tenir una longitud superior a 255 caràcters.");
+			}
+			// - Llinatge 1
+			if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 40) {
+				errors.add("[1113] El camp 'llinatge1' del titular no pot ser major que 40 caràcters.");
+			}
+			// - Llinatge 2
+			if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 40) {
+				errors.add("[1114] El camp 'llinatge2' del titular no pot ser major que 40 caràcters.");
+			}
+			// - Nif
+			if(enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
+				errors.add("[1115] El camp 'nif' del titular d'un enviament no pot tenir una longitud superior a 9 caràcters.");
+			}
+			if (enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+				if (NifHelper.isvalid(enviament.getTitular().getNif())) {
+					senseNif = false;
+				} else {
+					errors.add("[1116] El 'nif' del titular no és vàlid.");
+				}
+				switch (enviament.getTitular().getInteressatTipus()) {
+					case FISICA:
+						if (!NifHelper.isValidNifNie(enviament.getTitular().getNif())) {
+							errors.add("[1123] El camp 'nif' del titular no és un tipus de document vàlid per a persona física. Només s'admet NIF/NIE.");
+						}
+						break;
+					case JURIDICA:
+						if (!NifHelper.isValidCif(enviament.getTitular().getNif())) {
+							errors.add("[1123] El camp 'nif' del titular no és un tipus de document vàlid per a persona jurídica. Només s'admet CIF.");
+						}
+						break;
+					case ADMINISTRACIO:
+						break;
+				}
+			}
+			// - Email
+			if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 160) {
+				errors.add("[1117] El camp 'email' del titular no pot ser major que 160 caràcters.");
+			}
+			if (enviament.getTitular().getEmail() != null && !isEmailValid(enviament.getTitular().getEmail())) {
+				errors.add("[1118] El format del camp 'email' del titular no és correcte");
+			}
+			// - Telèfon
+			if (enviament.getTitular().getTelefon() != null && enviament.getTitular().getTelefon().length() > 16) {
+				errors.add("[1119] El camp 'telefon' del titular no pot ser major que 16 caràcters.");
+			}
+			// - Raó social
+			if (enviament.getTitular().getRaoSocial() != null && enviament.getTitular().getRaoSocial().length() > 80) {
+				errors.add("[1120] El camp 'raoSocial' del titular no pot ser major que 80 caràcters.");
+			}
+			// - Codi Dir3
+			if (enviament.getTitular().getDir3Codi() != null && enviament.getTitular().getDir3Codi().length() > 9) {
+				errors.add("[1121] El camp 'dir3Codi' del titular no pot ser major que 9 caràcters.");
+			}
+			// - Incapacitat
+			if (enviament.getTitular().isIncapacitat() && (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())) {
+				errors.add("[1122] En cas de titular amb incapacitat es obligatori indicar un destinatari.");
+			}
+			//   - Persona física
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+				if(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
+					errors.add("[1130] El camp 'nom' de la persona física titular no pot ser null.");
+				}
+				if (enviament.getTitular().getLlinatge1() == null || enviament.getTitular().getLlinatge1().isEmpty()) {
+					errors.add("[1131] El camp 'llinatge1' de la persona física titular d'un enviament no pot ser null en el cas de persones físiques.");
+				}
+				if(enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
+					errors.add("[1132] El camp 'nif' de la persona física titular d'un enviament no pot ser null.");
+				}
+			//   - Persona jurídica
+			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+				if((enviament.getTitular().getRaoSocial() == null || enviament.getTitular().getRaoSocial().isEmpty()) && 
+						(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty())) {
+					errors.add("[1140] El camp 'raoSocial/nom' de la persona jurídica titular d'un enviament no pot ser null.");
+				}
+				if(enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
+					errors.add("[1141] El camp 'nif' de la persona jurídica titular d'un enviament no pot ser null.");
+				}
+			//   - Administració
+			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				if(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
+					errors.add("[1150] El camp 'nom' de l'administració titular d'un enviament no pot ser null.");
+				}
+				if(enviament.getTitular().getDir3Codi() == null) {
+					errors.add("[1151] El camp 'dir3codi' de l'administració titular d'un enviament no pot ser null.");
+				}
+				OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
+				if (organDir3 == null) {
+					errors.add("[1152] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") no es correspon a un codi Dir3 vàlid.");
+				}
+				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
+					if (organDir3.getSir() == null || !organDir3.getSir()) {
+						errors.add("[1153] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") no disposa d'oficina SIR. És obligatori per a comunicacions.");
+					}
+					if (organigramaByEntitat.containsKey(enviament.getTitular().getDir3Codi())) {
+						errors.add("[1154] El camp 'dir3codi' (" + enviament.getTitular().getDir3Codi() + ") fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat.");
+					}
+				}
+				if (enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
+					enviament.getTitular().setNif(organDir3.getCif());
+				}
+			}
+			
+			// Destinataris.
+			// De momento se trata cada línea como 1 notificación con 1 envío y 1 titular
+
+			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO && senseNif) {
+				errors.add("[1220] En una notificació, com a mínim un dels interessats ha de tenir el Nif informat.");
+			}
+			
+			// Entrega postal
+			if(enviament.isEntregaPostalActiva()){
+				if(enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
+					errors.add("[1231] El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal).");
+				}
+				if(enviament.getEntregaPostal().getCodiPostal() != null && enviament.getEntregaPostal().getCodiPostal().length() > 10) {
+					errors.add("[1242] El camp 'codiPostal' no pot contenir més de 10 caràcters).");
+				}
+				if (enviament.getEntregaPostal().getLinea1() != null && enviament.getEntregaPostal().getLinea1().length() > 50) {
+					errors.add("[1248] El camp 'linea1' de l'entrega postal no pot contenir més de 50 caràcters.");
+				}
+				if (enviament.getEntregaPostal().getLinea2() != null && enviament.getEntregaPostal().getLinea2().length() > 50) {
+					errors.add("[1249] El camp 'linea2' de l'entrega postal no pot contenir més de 50 caràcters.");
+				}
+				if (enviament.getEntregaPostal().getLinea1() == null || enviament.getEntregaPostal().getLinea1().isEmpty()) {
+					errors.add("[1290] El camp 'linea1' no pot ser null.");
+				}
+				if (enviament.getEntregaPostal().getLinea2() == null || enviament.getEntregaPostal().getLinea2().isEmpty()) {
+					errors.add("[1291] El camp 'linea2' no pot ser null.");
+				}
+			}
+
+			// Entrega DEH de momento siempre es false
+		}
+		
+		// Procediment
+		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO ) {
+			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
+				errors.add("[1020] El camp 'procedimentCodi' no pot ser null.");
+			}
+		} else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) 
+				&& notificacio.getOrganGestorCodi() == null){
+			errors.add("[1022] El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment.");
+		}
+		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO && comunicacioSenseAdministracio) {
+			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
+				errors.add("[1020] El camp 'procedimentCodi' no pot ser null.");
+			}
+		}
+		if (!organigramaByEntitat.containsKey(notificacio.getOrganGestorCodi())) {
+			errors.add("[1023] El camp 'organ gestor' no es correspon a cap Òrgan Gestor de l'entitat especificada.");
+		}
+		//TODO: está fallando en REST y aquí esta validación. Es correcto???
+		// Respuesta: Por ahora no pongas esta validación. Lo consultaré con la DGTIC. Pero el problema no es la validación. Son los datos utilizados.
+		// Otra cosa es que la validación NO se tiene que hacer si notificacio.getOrganGestor() == null en el caso de REST.
+		// Entiendo que para CSV siempre tienen que enviarla.		
+		// En el CSV me indican órgano y procedimiento. Si el procedimiento no es común y es de otro órgano => error
+//		if (notificacio.getProcediment() != null && !notificacio.getProcediment().isComu()) {
+//		 if (notificacio.getOrganGestorCodi() != notificacio.getProcediment().getOrganGestor()) {
+//				errors.add("[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.");
+//			}
+//		}
+
+		// Documents
+		if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+				(documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && 
+				documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
+			
+			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+				if (!isFormatValid(document.getContingutBase64())) {
+					errors.add("[1063] El format del document no és vàlid. Les notificacions i comunicacions a ciutadà només admeten els formats PDF i ZIP.");
+				}
+				if (document.getMida() > getMaxSizeFile()) {
+					errors.add("[1065] La longitud del document supera el màxim definit (" + getMaxSizeFile() / (1024*1024) + "Mb).");
+				}
+			}
+
+			// Metadades
+			if ((document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) 
+					&& registreNotificaHelper.isSendDocumentsActive()) {
+				if (document.getOrigen() == null) {
+					errors.add("[1066] Error en les metadades del document. No està informat l'ORIGEN del document");
+				}
+				if (document.getValidesa() == null) {
+					errors.add("[1066] Error en les metadades del document. No està informat la VALIDESA(Estat elaboració) del document");
+				}
+				if (document.getTipoDocumental() == null) {
+					errors.add("[1066] Error en les metadades del document. No està informat el TIPUS DOCUMENTAL del document");
+				}
+				if (document.getArxiuNom().toUpperCase().endsWith("PDF") && document.getModoFirma() == null) {
+					errors.add("[1066] Error en les metadades del document. No està informat el MODE de FIRMA del document tipus PDF");
+				}
+			}
+		}
+			
+		return errors;
+	}
+	
+	private ICsvListWriter writeCsvHeader(String fileName) {		
+		
+		ICsvListWriter listWriter = null;
+		try {
+				listWriter = new CsvListWriter(new FileWriter(fileName),
+						CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+
+				final String[] header;
+				if (registreNotificaHelper.isSendDocumentsActive()) {
+					header = new String[] { "Codigo Unidad Remisora", "Concepto", "Tipo de Envio", "Referencia Emisor", "Nombre Fichero", "Normalizado", "Prioridad Servicio", "Nombre",	"APELLIDOS", "CIF/NIF",	"Email", "Codigo destino", "Línea 1", "Línea 2", "Codigo Postal", "Retardo Postal", "Código Procedimiento", "Fecha Envio Programado", "Origen", "Estado Elaboración", "Tipo Documental", "PDF Firmado", "Errores" };
+				} else {
+					header = new String[] { "Codigo Unidad Remisora", "Concepto", "Tipo de Envio", "Referencia Emisor", "Nombre Fichero", "Normalizado", "Prioridad Servicio", "Nombre",	"APELLIDOS", "CIF/NIF",	"Email", "Codigo destino", "Línea 1", "Línea 2", "Codigo Postal", "Retardo Postal", "Código Procedimiento", "Fecha Envio Programado", "Errores" };
+				}
+				
+				listWriter.writeHeader(header);	
+				return listWriter;
+		} catch (IOException e) {
+			logger.error("S'ha produït un error a l'escriure la capçalera de l'fitxer CSV.", e);
+			throw new WriteCsvException("No s'ha pogut escriure la capçalera de l'fitxer CSV.");
+		}
+	}
+	
+	private void writeCsvLinia(ICsvListWriter listWriter, String[] linia, List<String> errors) {		
+		
+		List<String> liniaAmbErrors = new ArrayList<String>();
+		for (int i = 0; i < linia.length; i++) {
+			liniaAmbErrors.add(linia[i]);
+		}
+		
+		StringBuffer sbErrors = new StringBuffer();
+		for(int i = 0; i < errors.size(); i++) {
+			sbErrors.append(errors.get(i));
+		}
+		
+		String errorsStr = sbErrors.toString();
+		liniaAmbErrors.add(errorsStr);
+		
+		try {
+			listWriter.write(liniaAmbErrors);		
+		} catch (IOException e) {
+			logger.error("S'ha produït un error a l'escriure la línia en el fitxer CSV.", e);
+			throw new WriteCsvException("No s'ha pogut escriure la línia en el fitxer CSV.");
+		}
+	}
+	
+	private void writeCsvClose(ICsvListWriter listWriter) {		
+		try {
+			if( listWriter != null ) {
+				listWriter.close();
+			}			
+		} catch (IOException e) {
+			logger.error("S'ha produït un error a l'tancar el fitxer CSV.", e);
+			throw new WriteCsvException("No s'ha pogut tancar el fitxer CSV.");
+		}
+	}
+
+
+	private ArrayList<Character> validFormat(String value) {
+		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
+		ArrayList<Character> charsNoValids = new ArrayList<Character>();
+		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
+		
+		boolean esCaracterValid = true;
+		for (int i = 0; i < chars.length; i++) {
+			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
+			if (!esCaracterValid) {
+				charsNoValids.add(chars[i]);
+			}
+	    }
+		return charsNoValids;
+	}
+	
+	private StringBuilder listToString(ArrayList<?> list) {
+	    StringBuilder str = new StringBuilder();
+	    for (int i = 0; i < list.size(); i++) {
+	    	str.append(list.get(i));
+	    }
+	    return str;
+	}
+	
+	private boolean isEmailValid(String email) {
+		boolean valid = true;
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (Exception e) {
+			valid = false; //no vàlid
+		}
+		return valid;
+	}
+	
+	private boolean isFormatValid(String docBase64) {
+		boolean valid = true;
+		String[] formatsValids = {"JVBERi0","UEsDBBQAAAAIA"}; //PDF / ZIP
+		
+		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1])))
+			valid = false;
+		
+		return valid;
+	}
+	
+	private static Long getMaxSizeFile() {
+		String property = "es.caib.notib.notificacio.document.size";
+		logger.debug("Consulta del valor de la property (property=" + property + ")");
+		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);

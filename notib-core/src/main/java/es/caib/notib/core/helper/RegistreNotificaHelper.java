@@ -350,7 +350,7 @@ public class RegistreNotificaHelper {
 	 *
 	 * @return boolean
 	 */
-	private boolean isSendDocumentsActive() {
+	public boolean isSendDocumentsActive() {
 		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.documents.enviar", true);
 	}
 

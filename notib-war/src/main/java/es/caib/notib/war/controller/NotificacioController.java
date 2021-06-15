@@ -3,6 +3,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.exception.MaxLinesExceededException;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -168,6 +169,15 @@ public class NotificacioController extends BaseUserController {
             Model model) {
         emplenarModelNotificacio(request, model, null);
         return "notificacioForm";
+    }
+    
+    @RequestMapping(value = "/newMassiu")
+    public String altaMassiuForm(
+    		Model model) {
+    	NotificacioMassiuCommand notificacioMassiuCommand = new NotificacioMassiuCommand();
+    	model.addAttribute("notificacioMassiuCommand", notificacioMassiuCommand);
+    	model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
+        return "notificacioMassiuForm";
     }
 
     @RequestMapping(value = "/procediments", method = RequestMethod.GET)
@@ -355,7 +365,8 @@ public class NotificacioController extends BaseUserController {
             } else {
                 notificacioService.create(
                         entitatActual.getId(),
-                        notificacioCommand.asDatabaseDto());
+                        notificacioCommand.asDatabaseDto(), 
+                        null); // solo se informa para envíos masivos
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -377,6 +388,51 @@ public class NotificacioController extends BaseUserController {
         return "redirect:../notificacio";
     }
 
+    @RequestMapping(value = "/newMassiuProcessar", method = RequestMethod.POST)
+    public String saveMassiu(
+            HttpServletRequest request,
+            @Valid NotificacioMassiuCommand notificacioMassiuCommand,
+            BindingResult bindingResult,
+            Model model) throws IOException {
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+        
+        if (bindingResult.hasErrors()) {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
+            
+            model.addAttribute("errors", bindingResult.getAllErrors());
+ 
+            for (ObjectError error: bindingResult.getAllErrors()) {
+                log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
+            }
+
+            model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
+            
+            return "notificacioMassiuForm";
+        }
+
+        try {
+            log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
+ 
+            notificacioService.createMassiu(entitatActual, usuariActual.getCodi(), NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
+      
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
+            log.error(ExceptionUtils.getFullStackTrace(ex));
+            if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class))
+                MissatgesHelper.error(request, getMessage(request, "notificacioMassiu.csv.error"));
+            else 
+            	MissatgesHelper.error(request, ex.getMessage());
+
+            return "notificacioMassiuForm";
+        }
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
+
+        return "redirect:../notificacio";
+    }
+    
     private void updateDocuments(NotificacioCommandV2 notificacioCommand) throws IOException {
 
         for (int i = 0; i < 5; i++) {
@@ -845,6 +901,22 @@ public class NotificacioController extends BaseUserController {
                 response);
     }
 
+	@RequestMapping(value = "/newMassiu/getModelDadesCarregaMassiuCSV", method = RequestMethod.GET)
+	@ResponseBody
+	public void getModelDadesCarregaMassiuCSV(
+			HttpServletResponse response) throws IOException {
+		
+				response.setHeader("Set-cookie", "fileDownload=true; path=/");
+				try {
+					writeFileToResponse(
+							"modelo_datos_carga_masiva.csv", 
+							notificacioService.getModelDadesCarregaMassiuCSV(), 
+							response);
+				} catch (Exception ex) {
+					log.debug("Error al obtenir la plantilla de el model de dades CSV de càrrega massiva", ex);
+				}
+	
+	}
 
 	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
 	@ResponseBody

@@ -337,6 +337,9 @@ body {
 <!-- 									</div> -->
 <%-- 								</c:if> --%>
 									<div class="btn-group">
+										<a class="btn btn-primary" href="<c:url value="/notificacio/newMassiu"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.notificacioMassiu"/></a>
+									</div>
+									<div class="btn-group">
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
 									<div class="btn-group">

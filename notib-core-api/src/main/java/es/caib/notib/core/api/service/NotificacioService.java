@@ -13,7 +13,11 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.mail.MessagingException;
+
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -34,7 +38,8 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	NotificacioDatabaseDto create(
 			Long entitatId,
-			NotificacioDatabaseDto notificacio) throws RegistreNotificaException;
+			NotificacioDatabaseDto notificacio,
+			Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException;
 	
 	/**
 	 * Esborra la notificació indicada per paràmetre
@@ -428,4 +433,12 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public boolean validarIdCsv (String idCsv);
 
+	@PreAuthorize("hasRole('tothom')")
+	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
+	
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	void createMassiu(
+			EntitatDto entitat, 
+			String usuariCodi, 
+			NotificacioMassiuDto notificacioMassiu) throws RegistreNotificaException;
 }
