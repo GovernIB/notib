@@ -308,9 +308,11 @@ public class RegistreNotificaHelper {
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament) {
 		String errorDescripcio = "";
-		if (arbResposta != null)
-			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n" +
-					arbResposta.getErrorDescripcio();
+		if (arbResposta != null) {
+			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n";
+			errorDescripcio += "Codi error: " + (arbResposta.getErrorCodi() != null ? arbResposta.getErrorCodi() : "Codi no proporcionat") + "\n";
+			errorDescripcio += arbResposta.getErrorDescripcio() != null ? arbResposta.getErrorDescripcio() : "El registre no aporta cap descripció de l'error";
+		}
 
 		notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity,
 				enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
