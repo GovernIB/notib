@@ -8,17 +8,16 @@ import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.auditoria.NotificacioEnviamentAudit;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import ma.glasnost.orika.CustomConverter;
-import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.*;
+import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -37,6 +37,7 @@ import java.util.Set;
 public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
+
 
 	public ConversioTipusHelper() {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
@@ -134,6 +135,7 @@ public class ConversioTipusHelper {
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").
 			field("organGestor.codi", "organGestorCodi").
+			field("organGestor.estat", "organGestorEstat").
 			byDefault().
 			register();
 		
@@ -141,6 +143,7 @@ public class ConversioTipusHelper {
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").
 			field("organGestor.codi", "organGestorCodi").
+			field("organGestor.estat", "organGestorEstat").
 			byDefault().
 			register();
 		
@@ -193,7 +196,13 @@ public class ConversioTipusHelper {
 				field("lastModifiedBy.codi", "lastModifiedBy").
 				byDefault().
 				register();
-	
+
+		defineConverters();
+	}
+
+	private void defineConverters(){
+		ConverterFactory converterFactory = mapperFactory.getConverterFactory();
+		converterFactory.registerConverter(new StringToOrganGestorEstatEnum());
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {
@@ -289,7 +298,22 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-	
+	public static class StringToOrganGestorEstatEnum extends CustomConverter<String, OrganGestorEstatEnum> {
+
+		@Override
+		public OrganGestorEstatEnum convert(String source, Type<? extends OrganGestorEstatEnum> destinationType) {
+			if (source == null){
+				return OrganGestorEstatEnum.ALTRES;
+			}
+
+			source = source.toLowerCase(Locale.ROOT);
+			if (source.equals("v") || source.equals("vigente")) {
+				return OrganGestorEstatEnum.VIGENT;
+			}
+
+			return OrganGestorEstatEnum.ALTRES;
+		}
+	}
 	private MapperFacade getMapperFacade() {
 		return mapperFactory.getMapperFacade();
 	}

@@ -7,7 +7,6 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.slf4j.Logger;
@@ -156,12 +155,12 @@ public class RegistreNotificaHelper {
 		logger.info(" >>> Nou assentament registral...");
 		RespostaConsultaRegistre arbResposta;
 		try {
-			boolean inclou_documents = isSendDocumentsActive() || (isSirActivat && isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean inclouDocuments = isInclouDocuments(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
 			boolean generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
 					notificacioEntity,
 					notificacioEntity.getEnviaments(),
-					inclou_documents);
+					inclouDocuments);
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
@@ -210,11 +209,14 @@ public class RegistreNotificaHelper {
 		logger.info(" >>> Nou assentament registral...");
 		RespostaConsultaRegistre arbResposta;
 		try {
-			boolean generarJustificant =  isGenerarJustificant(true, true, isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean generarJustificant =  isGenerarJustificant(true, true,
+					isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean inclouDocuments = isInclouDocuments(true, true,
+					enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 					notificacioEntity,
 					enviament,
-					isSendDocumentsActive() || enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO));
+					inclouDocuments);
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
@@ -268,6 +270,11 @@ public class RegistreNotificaHelper {
 
 	}
 
+	private boolean isInclouDocuments(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
+		return isSendDocumentsActive() || (isSirActivat && isComunicacio && aAdministracio);
+
+	}
+
 	private boolean isAllEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
 		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
 			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
@@ -305,7 +312,7 @@ public class RegistreNotificaHelper {
 			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n" +
 					arbResposta.getErrorDescripcio();
 
-		NotificacioEventEntity event = notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity,
+		notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity,
 				enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
 	}
 

@@ -3,6 +3,7 @@ package es.caib.notib.core.api.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	private String entitatNom;
 	private String organGestor;
 	private String organGestorNom;
+	private OrganGestorEstatEnum organGestorEstat;
 	private String pagadorpostal;
 	private String pagadorcie;
 	private boolean agrupar;

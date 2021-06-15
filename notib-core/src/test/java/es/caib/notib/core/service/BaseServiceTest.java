@@ -8,6 +8,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
@@ -421,7 +422,9 @@ public class BaseServiceTest {
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
 				return resposta;
 			}
-		}).when(registrePluginMock).salidaAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong());
+		}).when(registrePluginMock).salidaAsientoRegistral(
+				Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyBoolean()
+		);
 		
 		// obtenerAsientoRegistral
 		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {

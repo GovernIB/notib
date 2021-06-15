@@ -5,7 +5,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.EntitatRepository;

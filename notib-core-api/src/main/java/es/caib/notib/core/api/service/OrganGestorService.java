@@ -1,6 +1,9 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -22,9 +25,16 @@ public interface OrganGestorService {
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public OrganGestorDto updateOficina(OrganGestorDto dto);
-	
+
+	/**
+	 * Actualitza les dades de l'organ gestor indicat de la base de dades
+	 * amb la informació de dir3
+	 *
+	 * @param entitatId Identificador de l'entitat en curs
+	 * @param organGestorCodi Codi Dir3 de l'òrgan gestor a actualitzar
+	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void updateNom(
+	void updateOne(
 			Long entitatId, 
 			String organGestorCodi);
 
@@ -37,7 +47,7 @@ public interface OrganGestorService {
 	 *                            null per actualitzar-los a tots
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	void updateNoms(
+	void updateAll(
 			Long entitatId, String organActualCodiDir3);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -60,7 +70,7 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId);
+	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
@@ -74,7 +84,7 @@ public interface OrganGestorService {
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,
-			OrganGestorFiltreDto filtre, 
+			OrganGestorFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -143,23 +153,25 @@ public interface OrganGestorService {
 			Long entitatId,
 			String dir3codi,
 			boolean isFiltre);
-	
+
 	/**
-	 * Recupera els òrgans sobre els quals té permís l'usuari actual
-	 * 
-	 * @param entitatId
-	 * @param permis
-	 * 
-	 * @return
+	 * Recupera els òrgans sobre els que l'usuari actual té el permís
+	 * indicat per paràmetre
+	 *
+	 * @param entitatId Identificador de l'entitat actual
+	 * @param usuariCodi Codi de l'usuari actual
+	 * @param permis Permís que volem que tinguin els òrgans consultats
+	 *
+	 * @return Llistat dels òrgans gestors sobre els que l'usuari té el permís
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public List<OrganGestorDto> findOrgansGestorsWithPermis(
+	List<OrganGestorDto> findOrgansGestorsWithPermis(
 			Long entitatId, 
 			String usuariCodi,
 			PermisEnum permis);
 
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
     		Long entitatId,
 			String usuari,
 			RolEnumDto rol,

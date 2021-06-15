@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EntitatItemTest{
+public class EntitatItemTest extends DatabaseItemTest<EntitatDto> {
     @Autowired
     protected EntitatService entitatService;
     @Autowired
@@ -66,4 +66,13 @@ public class EntitatItemTest{
         return entitatCreate;
     }
 
+    @Override
+    public EntitatDto create(EntitatDto element, Long entitatId) throws Exception {
+        return create(element);
+    }
+
+    @Override
+    public void delete(Long entitatId, EntitatDto object) throws Exception {
+        delete(entitatId);
+    }
 }

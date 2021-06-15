@@ -1,6 +1,8 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -63,13 +65,13 @@ public class ProcedimentController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 
-		List<CodiValorDto> organsGestors = new ArrayList<CodiValorDto>();
+		List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 		if (organGestorActual == null) {
 			organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		} else {
 			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitat.getId(), organGestorActual.getCodi());
 			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(new CodiValorDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom()));
+				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
 			}
 		}
 		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
@@ -122,9 +124,7 @@ public class ProcedimentController extends BaseUserController{
 	public String newGet(
 			HttpServletRequest request,
 			Model model) {
-		String vista = formGet(request, null, model);
-		
-		return vista;
+		return formGet(request, null, model);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
@@ -111,6 +111,8 @@ public class OrganGestorPermisController extends BaseUserController{
 			HttpServletRequest request,
 			@PathVariable Long organGestorId,
 			Model model) throws ValidationException {
+		PermisCommand permisCommand = new PermisCommand();
+		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return get(request, organGestorId, null, model);
 	}
 	
@@ -162,6 +164,7 @@ public class OrganGestorPermisController extends BaseUserController{
 					organGestorService.findById(
 							entitatActual.getId(),
 							organGestorId));
+			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return "organGestorPermisForm";
 		}
 		

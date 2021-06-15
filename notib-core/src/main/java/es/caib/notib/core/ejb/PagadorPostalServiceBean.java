@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.PagadorPostalFiltreDto;
 import es.caib.notib.core.api.dto.PaginaDto;

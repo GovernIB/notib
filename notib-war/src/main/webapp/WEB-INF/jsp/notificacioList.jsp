@@ -378,7 +378,36 @@ $(document).ready(function() {
 	}
 
 	omplirProcediments();
+	loadOrgans();
 });
+
+var organsGestors = [];
+organsGestors.push({id:"", text:"", estat:"VIGENT"});
+<c:forEach items="${organsGestorsPermisLectura}" var="organGestor">
+	organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
+</c:forEach>
+
+function formatState(organ) {
+	let msgObsolet = "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>";
+	if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
+		return organ.text;
+	}
+	return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
+}
+
+function loadOrgans(){
+	var listaOrganos = $('#organGestor');
+	listaOrganos.empty();
+
+	var select2Options = {
+			theme: 'bootstrap',
+			width: 'auto',
+			tags: organsGestors,
+			templateResult: formatState
+	};
+	
+	listaOrganos.select2(select2Options);
+}
 </script>
 </head>
 <body>
@@ -414,7 +443,7 @@ $(document).ready(function() {
 				<not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
 			</div>
 			<div class="col-md-4">
-				<not:inputSelect name="organGestor" optionItems="${organsGestorsPermisLectura}" optionValueAttribute="codi" optionTextAttribute="valor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-6">
 				<not:inputSelect name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
@@ -498,7 +527,14 @@ $(document).ready(function() {
 						{{:~eval('comunicacioTipus["' + comunicacioTipus + '"]')}}
 					</script>
 				</th--%>
-				<th data-col-name="organGestorDesc"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th>
+				<th data-col-name="organEstat" data-visible="false"></th>
+				<th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organGestor"/>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organGestorDesc}}
+						{{if organEstat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='notificacio.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
+				</th>
 				<th data-col-name="procedimentDesc"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
 				<c:if test="${mostrarColumnaNumExpedient}">
 					<th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>

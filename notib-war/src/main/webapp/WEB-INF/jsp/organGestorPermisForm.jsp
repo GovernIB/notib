@@ -105,7 +105,8 @@ pageContext.setAttribute(
 		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
 		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
-		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
+		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
+			inputMaxLength="${principalSize}" showsize="true"/>
 		<div class="row">
 			<div class="col-xs-6">
 				<not:inputCheckbox name="selectAll" labelSize="8" textKey="procediment.permis.form.camp.all"/>

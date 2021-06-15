@@ -7,7 +7,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.core.api.exception.JustificantException;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -360,26 +360,6 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
-
-	/**
-	 * Genera un justificant d'enviament
-	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @return el justificant firmat
-	 * @throws JustificantException
-	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
-
-	/**
-	 * Recuperar l'estat de la generació del justificant
-	 * 
-	 * @return el justificant firmat
-	 * @throws JustificantException
-	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException;
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.

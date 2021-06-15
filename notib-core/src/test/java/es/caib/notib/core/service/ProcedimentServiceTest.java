@@ -1,12 +1,14 @@
 package es.caib.notib.core.service;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.codahale.metrics.Timer;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.ProcedimentFormRepository;
+import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,30 +20,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.codahale.metrics.Timer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.ProcedimentFormDto;
-import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentFormEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.ProcedimentFormRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcedimentServiceTest {
@@ -137,7 +121,7 @@ public class ProcedimentServiceTest {
 				null,
 				null,
 				false).build();
-		OrganGestorEntity organGestor = OrganGestorEntity.getBuilder(null, null, entitat, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entitat, null, null, null, null, null).build();
 		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, organGestor).build();
 		procedimentOrgans.add(procedimentOrgan);
 		

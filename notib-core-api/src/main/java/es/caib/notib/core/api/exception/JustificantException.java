@@ -20,6 +20,9 @@ public class JustificantException extends RuntimeException {
 		this.message = message;
 	}
 
+	public JustificantException(String message) {
+	}
+
 	public String getSistemaExternCodi() {
 		return message;
 	}

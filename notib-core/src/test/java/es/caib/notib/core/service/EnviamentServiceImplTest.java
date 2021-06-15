@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.PermisosHelper;

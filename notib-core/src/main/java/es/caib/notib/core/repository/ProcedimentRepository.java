@@ -202,4 +202,14 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	public List<ProcedimentEntity> findByOrganGestorCodiInOrComu(
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("entitat") EntitatEntity entitat);
+	
+	@Query(
+			"from " +
+			"    ProcedimentEntity pro " +
+			"where pro.entitat = (:entitatActual) and " + 
+			"lower(pro.nom) = (lower(:nomProcediment))")
+	ProcedimentEntity findByNomAndEntitat(
+			@Param("nomProcediment") String nomProcediment,
+			@Param("entitatActual") EntitatEntity entitat);
+	
 }

@@ -6,7 +6,6 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
-import es.caib.notib.core.api.dto.ProgresDescarregaDto.TipusInfo;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
@@ -14,6 +13,8 @@ import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.MaxLinesExceededException;
 import es.caib.notib.core.api.exception.NoDocumentException;
 import es.caib.notib.core.api.exception.NoMetadadesException;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -21,28 +22,14 @@ import es.caib.notib.core.api.exception.WriteCsvException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
@@ -82,15 +69,7 @@ import java.net.URLConnection;
 import java.nio.file.NoSuchFileException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -157,22 +136,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Resource
 	private MetricsHelper metricsHelper;
 	@Autowired
-	private JustificantHelper justificantHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
 	private NotificacioHelper notificacioHelper;
-	@Autowired
-	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
 
-	public static Map<String, ProgresDescarregaDto> progresDescarrega = new HashMap<String, ProgresDescarregaDto>();
-	public static Map<String, ProgresActualitzacioCertificacioDto> progresActulitzacioExpirades = new HashMap<String, ProgresActualitzacioCertificacioDto>();
+	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 	
 	
 	@Transactional(rollbackFor=Exception.class)
@@ -1801,44 +1775,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 			logger.debug("S'ha iniciat els procés d'actualització dels enviaments expirats");
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			String username = auth == null ? "schedulled" : auth.getName();
-			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_NOTIFICA,
-					"Actualització d'enviaments expirats sense certificació",
-					IntegracioAccioTipusEnumDto.PROCESSAR,
-					new AccioParam("Usuari encarregat: ", username));
-			
-			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(username);
-			if (progres != null && progres.getProgres() != 0) {
+
+			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(username);
+			if (progres != null) {
 				progres.addInfo(TipusActInfo.ERROR, "Existeix un altre procés en progrés...");
-			} else {
-				progres = new ProgresActualitzacioCertificacioDto();
-				progresActulitzacioExpirades.put(username, progres);
-				List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
-				if (enviamentsIds == null || enviamentsIds.isEmpty()) {
-					progres.setProgres(100);
-					String msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
-					progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
-					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
-				} else {
-					String msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
-					progres.setNumEnviamentsExpirats(enviamentsIds.size());
-					progres.addInfo(TipusActInfo.TITOL, msgInfoInici);
-					info.getParams().add(new AccioParam("Msg. Títol:", msgInfoInici));
-					for (Long enviamentId : enviamentsIds) {
-						progres.incrementProcedimentsActualitzats();
-						try {
-							notificacioHelper.enviamentRefrescarEstat(
-									enviamentId, 
-									progres, 
-									info);	
-						} catch (Exception ex) {
-							progres.addInfo(TipusActInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ko", new Object[] {enviamentId}));
-							logger.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);
-						}
-					}
-				}
-				integracioHelper.addAccioOk(info);
+				return;
 			}
+
+			progres = new ProgresActualitzacioCertificacioDto();
+			progresActualitzacioExpirades.put(username, progres);
+			enviamentHelper.refrescarEnviamentsExpirats(progres);
+			progresActualitzacioExpirades.remove(username);
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1849,110 +1797,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresActualitzacioCertificacioDto progres = progresActulitzacioExpirades.get(auth.getName());
+			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(auth.getName());
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
-				progresActulitzacioExpirades.remove(auth.getName());
+				progresActualitzacioExpirades.remove(auth.getName());
 			}
 			return progres;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	
-	@Transactional
-	@Override
-	public FitxerDto recuperarJustificant(
-			Long notificacioId,
-			Long entitatId,
-			String sequence) throws JustificantException {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
-			
-			if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) 
-				throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
-			
-			entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					false,
-					true, 
-					true, 
-					false);
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
-			
-			if (progres != null && progres.getProgres() != 0) {
-				logger.error("Ja existeix un altre procés iniciat"); 
-				progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
-				return null;
-			} else {
-				//## Únic procés per usuari per evitar sobrecàrrega
-				progres = new ProgresDescarregaDto();
-				progresDescarrega.put(auth.getName() + "_" + sequence, progres);
-				
-				//## GENERAR JUSTIFICANT
-				logger.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacioId + ")");
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
-				byte[] contingut = justificantHelper.generarJustificant(
-						conversioTipusHelper.convertir(
-								notificacio, 
-								NotificacioDtoV2.class),
-						progres);
-				FitxerDto justificantOriginal = new FitxerDto();
-				justificantOriginal.setNom("justificant_notificació_" + notificacio.getId() + ".pdf");
-				justificantOriginal.setContentType("application/pdf");
-				justificantOriginal.setContingut(contingut);
-				
-				//## FIRMA EN SERVIDOR
-				progres.setProgres(80);
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.aplicant.firma"));
-				byte[] contingutFirmat = null;
-				try {
-					contingutFirmat = pluginHelper.firmaServidorFirmar(
-							notificacio, 
-							justificantOriginal, 
-							TipusFirma.PADES, 
-							"justificant enviament Notib", 
-							"ca");
-					progres.setProgres(100);
-				} catch (Exception ex) {
-					progres.setProgres(100);
-					String errorDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.aplicant.firma.error");
-					progres.addInfo(TipusInfo.ERROR, errorDescripcio);
-					logger.error(errorDescripcio, ex);
-					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat"));
-					return justificantOriginal;
-				}
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat.firma"));
-				FitxerDto justificantFirmat = new FitxerDto();
-				justificantFirmat.setContentType("application/pdf");
-				justificantFirmat.setContingut(contingutFirmat);
-				justificantFirmat.setNom("justificant_notificació_" + notificacio.getId() + "_firmat.pdf");
-				justificantFirmat.setTamany(contingutFirmat.length);
-				return justificantFirmat;
-			}
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
-			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
-				progresDescarrega.remove(auth.getName());
-			}
-			return progres;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
+
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return PropertiesHelper.getProperties().getAsInt(
 				"es.caib.notib.tasca.registre.enviaments.processar.max",

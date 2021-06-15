@@ -4,6 +4,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.exception.MaxLinesExceededException;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -68,6 +69,8 @@ public class NotificacioController extends BaseUserController {
     @Autowired
     private GrupService grupService;
     @Autowired
+    private JustificantService justificantService;
+    @Autowired
     private PagadorCieFormatSobreService pagadorCieFormatSobreService;
     @Autowired
     private PagadorCieFormatFullaService pagadorCieFormatFullaService;
@@ -129,7 +132,7 @@ public class NotificacioController extends BaseUserController {
             HttpServletRequest request,
             Model model) {
 
-        List<CodiValorDto> organsDisponibles = new ArrayList<>();
+        List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         Long entitatId = entitatActual.getId();
@@ -943,11 +946,22 @@ public class NotificacioController extends BaseUserController {
 		return notificacioService.llistarProvincies(codiCA);
 	}
 
+	/////
+    /// CONTROLADORS DELS JUSTIFICANTS
+    /////
 
-
+    /**
+     * Controlador per a descarregar el justificant del registre.
+     *
+     * @param request
+     * @param response
+     * @param notificacioId
+     * @param enviamentId
+     * @throws IOException
+     */
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/justificantDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void justificantDescarregar(
+    public void justificantRegistreDescarregar(
             HttpServletRequest request,
             HttpServletResponse response,
             @PathVariable Long notificacioId,
@@ -983,7 +997,7 @@ public class NotificacioController extends BaseUserController {
             @PathVariable Long notificacioId) throws IOException {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         String sequence = request.getParameter("sequence");
-        FitxerDto justificant = notificacioService.recuperarJustificant(
+        FitxerDto justificant = justificantService.generarJustificantEnviament(
                 notificacioId,
                 entitatActual.getId(),
                 sequence);
@@ -1001,7 +1015,35 @@ public class NotificacioController extends BaseUserController {
             HttpServletResponse response,
             @PathVariable Long notificacioId,
             @PathVariable String sequence) throws IOException {
-        return notificacioService.justificantEstat(sequence);
+        return justificantService.consultaProgresGeneracioJustificant(sequence);
+    }
+
+    @RequestMapping(value = "/{notificacioId}/justificant/sir", method = RequestMethod.GET)
+    public String justificantComunicacioSIRDescarregar(
+            HttpServletRequest request,
+            Model model,
+            @PathVariable Long notificacioId) throws IOException {
+        model.addAttribute("notificacioId", notificacioId);
+        return "justificantSIRDownloadForm";
+    }
+
+    @RequestMapping(value = "/{enviamentId}/justificant/sir", method = RequestMethod.POST)
+    @ResponseBody
+    public void justificantComunicacioSIRDescarregar(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @PathVariable Long enviamentId) throws IOException {
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        String sequence = request.getParameter("sequence");
+        FitxerDto justificant = justificantService.generarJustificantComunicacioSIR(
+                enviamentId,
+                entitatActual.getId(),
+                sequence);
+        if (justificant == null) {
+            throw new ValidationException("Existeix un altre procés iniciat. Esperau que finalitzi la descàrrega del document.");
+        }
+        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        writeFileToResponse(justificant.getNom(), justificant.getContingut(), response);
     }
 
     @RequestMapping(value = "/{notificacioId}/refrescarEstatClient", method = RequestMethod.GET)
@@ -1480,13 +1522,14 @@ public class NotificacioController extends BaseUserController {
         // 1-recuperam els òrgans dels procediments disponibles (amb permís)
         if (!procedimentsDisponiblesIds.isEmpty())
             organsGestorsProcediments = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+
         // 2-recuperam els òrgans amb permís de notificació
         List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
                 entitatActual.getId(),
                 SecurityContextHolder.getContext().getAuthentication().getName(),
                 permis); //PermisEnum.NOTIFICACIO);
+
         // 3-juntam tots els òrgans i ordenam per nom
-        List<OrganGestorDto> organsGestors;
         Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
         setOrgansGestors.addAll(organsGestorsAmbPermis);
         if (procedimentsOrgansDisponibles != null) {
@@ -1494,7 +1537,8 @@ public class NotificacioController extends BaseUserController {
                 setOrgansGestors.add(procedimentOrgan.getOrganGestor());
             }
         }
-        organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
+
+        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
         if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
             organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
         }

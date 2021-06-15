@@ -3,8 +3,7 @@ package es.caib.notib.core.entity;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,12 +19,14 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Entity
 @Table(name="not_notificacio_env")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
-
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
@@ -307,7 +308,6 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Transient
 	private String csvUuid;
 
-	
 	public void setRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
 		this.registreEstat = registreEstat;
 	}
@@ -341,23 +341,28 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
 
-
 	public void updateRegistreEstat(
 			NotificacioRegistreEstatEnumDto registreEstat,
 			Date registreEstatData,
 			Date sirConsultaData,
 			Date sirRegDestiData,
-			String registreNumeroFormatat,
-			boolean registreEstatFinal) {
-		this.registreEstat = registreEstat;
+			String registreNumeroFormatat) {
+		this.updateRegistreEstat(registreEstat);
 		this.registreData = registreEstatData;
 		this.sirRecepcioData = sirConsultaData;
 		this.sirRegDestiData = sirRegDestiData;
 		this.registreNumeroFormatat = registreNumeroFormatat;
-		this.registreEstatFinal = registreEstatFinal;
 		
 	}
-	
+
+	public void updateRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
+		boolean estatFinal =
+				NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat) ||
+				NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat);
+		this.registreEstat = registreEstat;
+		this.registreEstatFinal = estatFinal;
+	}
+
 	public void updateNotificaEnviada(
 			String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
@@ -546,35 +551,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaIntentData = data;
 		this.sirConsultaData = data;
 	}
-	
-	public static Builder getBuilder(
-			String titularNif,
-			ServeiTipusEnumDto serveiTipus,
-			NotificacioEntity notificacio) {
-		return new Builder(
-				titularNif,
-				serveiTipus,
-				notificacio);
-	}
 
-//	public static BuilderV1 getBuilderV1(
-//			Enviament enviament,
-//			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-//			NotificaDomiciliConcretTipusEnumDto tipusConcret,
-//			ServeiTipusEnumDto tipusServei,
-//			NotificacioEntity notificacioGuardada,
-//			PersonaEntity titular,
-//			List<PersonaEntity> destinataris) {
-//		return new BuilderV1(
-//				enviament,
-//				numeracioTipus,
-//				tipusConcret,
-//				tipusServei,
-//				notificacioGuardada,
-//				titular,
-//				destinataris
-//				);
-//	}
 
 	public static BuilderV2 getBuilderV2(
 			Enviament enviament, 
@@ -595,206 +572,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				titular,
 				destinataris);
 	}
-	
-	public static class Builder {
-		NotificacioEnviamentEntity built;
-		Builder(
-				String titularNif,
-				ServeiTipusEnumDto serveiTipus,
-				NotificacioEntity notificacio) {
-			built = new NotificacioEnviamentEntity();
-			built.serveiTipus = serveiTipus;
-			built.notificacio = notificacio;
-			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-			built.notificaIntentNum = 0;
-		}
-		public Builder domiciliTipus(NotificaDomiciliTipusEnumDto domiciliTipus) {
-			built.domiciliTipus = domiciliTipus;
-			return this;
-		}
-		public Builder domiciliConcretTipus(NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus) {
-			built.domiciliConcretTipus = domiciliConcretTipus;
-			return this;
-		}
-		public Builder domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
-			built.domiciliViaTipus = domiciliViaTipus;
-			return this;
-		}
-		public Builder domiciliViaNom(String domiciliViaNom) {
-			built.domiciliViaNom = domiciliViaNom;
-			return this;
-		}
-		public Builder domiciliNumeracioTipus(NotificaDomiciliNumeracioTipusEnumDto domiciliNumeracioTipus) {
-			built.domiciliNumeracioTipus = domiciliNumeracioTipus;
-			return this;
-		}
-		public Builder domiciliNumeracioNumero(String domiciliNumeracioNumero) {
-			built.domiciliNumeracioNumero = domiciliNumeracioNumero;
-			return this;
-		}
-		public Builder domiciliNumeracioQualificador(String domiciliNumeracioQualificador) {
-			built.domiciliNumeracioQualificador = domiciliNumeracioQualificador;
-			return this;
-		}
-		public Builder domiciliNumeracioPuntKm(String domiciliNumeracioPuntKm) {
-			built.domiciliNumeracioPuntKm = domiciliNumeracioPuntKm;
-			return this;
-		}
-		public Builder domiciliApartatCorreus(String domiciliApartatCorreus) {
-			built.domiciliApartatCorreus = domiciliApartatCorreus;
-			return this;
-		}
-		public Builder domiciliBloc(String domiciliBloc) {
-			built.domiciliBloc = domiciliBloc;
-			return this;
-		}
-		public Builder domiciliPortal(String domiciliPortal) {
-			built.domiciliPortal = domiciliPortal;
-			return this;
-		}
-		public Builder domiciliEscala(String domiciliEscala) {
-			built.domiciliEscala = domiciliEscala;
-			return this;
-		}
-		public Builder domiciliPlanta(String domiciliPlanta) {
-			built.domiciliPlanta = domiciliPlanta;
-			return this;
-		}
-		public Builder domiciliPorta(String domiciliPorta) {
-			built.domiciliPorta = domiciliPorta;
-			return this;
-		}
-		public Builder domiciliComplement(String domiciliComplement) {
-			built.domiciliComplement = domiciliComplement;
-			return this;
-		}
-		public Builder domiciliPoblacio(String domiciliPoblacio) {
-			built.domiciliPoblacio = domiciliPoblacio;
-			return this;
-		}
-		public Builder domiciliMunicipiCodiIne(String domiciliMunicipiCodiIne) {
-			built.domiciliMunicipiCodiIne = domiciliMunicipiCodiIne;
-			return this;
-		}
-		public Builder domiciliMunicipiNom(String domiciliMunicipiNom) {
-			built.domiciliMunicipiNom = domiciliMunicipiNom;
-			return this;
-		}
-		public Builder domiciliCodiPostal(String domiciliCodiPostal) {
-			built.domiciliCodiPostal = domiciliCodiPostal;
-			return this;
-		}
-		public Builder domiciliProvinciaCodi(String domiciliProvinciaCodi) {
-			built.domiciliProvinciaCodi = domiciliProvinciaCodi;
-			return this;
-		}
-		public Builder domiciliProvinciaNom(String domiciliProvinciaNom) {
-			built.domiciliProvinciaNom = domiciliProvinciaNom;
-			return this;
-		}
-		public Builder domiciliPaisCodiIso(String domiciliPaisCodiIso) {
-			built.domiciliPaisCodiIso = domiciliPaisCodiIso;
-			return this;
-		}
-		public Builder domiciliPaisNom(String domiciliPaisNom) {
-			built.domiciliPaisNom = domiciliPaisNom;
-			return this;
-		}
-		public Builder domiciliLinea1(String domiciliLinea1) {
-			built.domiciliLinea1 = domiciliLinea1;
-			return this;
-		}
-		public Builder domiciliLinea2(String domiciliLinea2) {
-			built.domiciliLinea2 = domiciliLinea2;
-			return this;
-		}
-		public Builder domiciliCie(Integer domiciliCie) {
-			built.domiciliCie = domiciliCie;
-			return this;
-		}
-		public Builder dehObligat(Boolean dehObligat) {
-			built.dehObligat = dehObligat;
-			return this;
-		}
-		public Builder dehNif(String dehNif) {
-			built.dehNif = dehNif;
-			return this;
-		}
-		public Builder dehProcedimentCodi(String dehProcedimentCodi) {
-			built.dehProcedimentCodi = dehProcedimentCodi;
-			return this;
-		}
-		public Builder serveiTipus(ServeiTipusEnumDto serveiTipus) {
-			built.serveiTipus = serveiTipus;
-			return this;
-		}
-		public NotificacioEnviamentEntity build() {
-			return built;
-		}
-	}
-	
-//	public static class BuilderV1 {
-//		NotificacioEnviamentEntity built;
-//		BuilderV1(
-//				Enviament enviament,
-//				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-//				NotificaDomiciliConcretTipusEnumDto tipusConcret,
-//				ServeiTipusEnumDto tipusServei,
-//				NotificacioEntity notificacioGuardada,
-//				PersonaEntity titular,
-//				List<PersonaEntity> destinataris) {
-//			built = new NotificacioEnviamentEntity();
-//			built.serveiTipus = tipusServei;
-//			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
-//			built.notificaIntentNum = 0;
-//			built.notificacio = notificacioGuardada;
-//
-//			built.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
-//			built.domiciliViaNom = enviament.getEntregaPostal().getViaNom();
-//			built.domiciliNumeracioNumero = enviament.getEntregaPostal().getNumeroCasa();
-//			built.domiciliNumeracioQualificador = enviament.getEntregaPostal().getNumeroQualificador();
-//			built.domiciliNumeracioPuntKm = enviament.getEntregaPostal().getPuntKm();
-//			built.domiciliApartatCorreus = enviament.getEntregaPostal().getApartatCorreus();
-//			built.domiciliPortal = enviament.getEntregaPostal().getPortal();
-//			built.domiciliEscala = enviament.getEntregaPostal().getEscala();
-//			built.domiciliPlanta = enviament.getEntregaPostal().getPlanta();
-//			built.domiciliPorta = enviament.getEntregaPostal().getPorta();
-//			built.domiciliBloc = enviament.getEntregaPostal().getBloc();
-//			built.domiciliComplement = enviament.getEntregaPostal().getComplement();
-//			built.domiciliCodiPostal = enviament.getEntregaPostal().getCodiPostal();
-//			built.domiciliPoblacio = enviament.getEntregaPostal().getPoblacio();
-//			built.domiciliMunicipiCodiIne = enviament.getEntregaPostal().getMunicipiCodi();
-//			built.domiciliProvinciaCodi = enviament.getEntregaPostal().getProvincia();
-//			built.domiciliPaisCodiIso = enviament.getEntregaPostal().getPaisCodi();
-//			built.domiciliLinea1 = enviament.getEntregaPostal().getLinea1();
-//			built.domiciliLinea2 = enviament.getEntregaPostal().getLinea2();
-//			built.domiciliCie = enviament.getEntregaPostal().getCie();
-//			built.dehProcedimentCodi = enviament.getEntregaDeh().getProcedimentCodi();
-//			built.dehObligat = enviament.getEntregaDeh().isObligat();
-//
-//			built.titular = titular;
-//			built.destinataris = destinataris;
-//		}
-//		public BuilderV1 domiciliViaTipus(NotificaDomiciliViaTipusEnumDto domiciliViaTipus) {
-//			built.domiciliViaTipus = domiciliViaTipus;
-//			return this;
-//		}
-//
-//		public BuilderV1 titular(PersonaEntity titular) {
-//			built.titular = titular;
-//			return this;
-//		}
-//
-//		public BuilderV1 destinataris(List<PersonaEntity> destinataris) {
-//			built.destinataris = destinataris;
-//			return this;
-//		}
-//
-//		public NotificacioEnviamentEntity build() {
-//			return built;
-//		}
-//	}
-	
+
 	public static class BuilderV2 {
 		NotificacioEnviamentEntity built;
 		BuilderV2(

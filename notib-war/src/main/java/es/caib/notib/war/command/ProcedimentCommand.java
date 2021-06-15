@@ -1,18 +1,17 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PagadorCieDto;
 import es.caib.notib.core.api.dto.PagadorPostalDto;
 import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
-import es.caib.notib.war.validation.CodiProcedimentNoRepetit;
+import es.caib.notib.war.validation.ValidProcediment;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Size;
 
 /**
  * Command per al manteniment de procediments.
@@ -21,7 +20,7 @@ import lombok.Setter;
  *
  */
 @Getter @Setter
-@CodiProcedimentNoRepetit
+@ValidProcediment
 public class ProcedimentCommand {
 	
 	private Long id;
@@ -41,6 +40,7 @@ public class ProcedimentCommand {
 	private int retard;
 	@NotEmpty
 	private String organGestor;
+	@NotEmpty
 	private String organGestorNom;
 	private String tipusAssumpte;
 	private String tipusAssumpteNom;

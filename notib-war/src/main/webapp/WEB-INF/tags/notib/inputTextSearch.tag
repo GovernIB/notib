@@ -50,11 +50,11 @@
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
    		<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
-			<span class="input-group-addon"> 
-			<a id="${searchButton}" onclick="${funcio}">
-				<span class="fa fa-search"></span>
-			</a>
-			</span>
-		</c:otherwise>
+		<span class="input-group-addon">
+		<a id="${searchButton}" onclick="${funcio}">
+			<span class="fa fa-search"></span>
+		</a>
+		</span>
+	</c:otherwise>
 </c:choose>
 </div>

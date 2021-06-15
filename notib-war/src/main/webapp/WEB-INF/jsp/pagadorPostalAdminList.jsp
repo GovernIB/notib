@@ -60,7 +60,14 @@ pageContext.setAttribute(
 				<th data-col-name="contracteNum"><spring:message code="pagadorpostal.list.columna.contracteNum"/></th>
 				<th data-col-name="contracteDataVig" data-type="date" data-converter="date"><spring:message code="pagadorpostal.list.columna.contracteDataVig"/></th>
 				<th data-col-name="facturacioClientCodi"><spring:message code="pagadorpostal.list.columna.facturacioClientCodi"/></th>
-				<th data-col-name="organGestorCodi"><spring:message code="pagadorpostal.list.columna.organgestor"/></th>		
+				<th data-col-name="organGestorEstat" data-visible="false"></th>
+				<th data-col-name="organGestorCodi" data-template="#cellOrganGestorTemplate"><spring:message code="pagadorpostal.list.columna.organgestor"/>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organGestorCodi}}
+						{{if organGestorEstat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='pagadorpostal.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
+				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

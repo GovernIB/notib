@@ -1,6 +1,6 @@
 package es.caib.notib.core.test.data;
 
-import es.caib.notib.core.api.dto.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -47,8 +47,7 @@ public class OrganGestorItemTest extends DatabaseItemTest<OrganGestorDto>{
                 object.getId());
     }
 
-//    @Override
-    public OrganGestorDto getRandomInstance() {
+    public static OrganGestorDto getRandomInstance() {
         List<PermisDto> permisosOrgan = new ArrayList<PermisDto>();
         OrganGestorDto organGestorCreate = new OrganGestorDto();
         organGestorCreate.setCodi(ConfigTest.DEFAULT_ORGAN_DIR3);
