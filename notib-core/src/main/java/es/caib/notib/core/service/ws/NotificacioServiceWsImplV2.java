@@ -6,6 +6,7 @@ package es.caib.notib.core.service.ws;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NoMetadadesException;
@@ -140,10 +141,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 				return resposta;
 			}
-			boolean comunicacioAmbAdministracio = false;
-			if (COMUNICACIOAMBADMINISTRACIO.equals(resposta.getErrorDescripcio()))
-				comunicacioAmbAdministracio = true;
-			
+
+			boolean comunicacioAmbAdministracio = COMUNICACIOAMBADMINISTRACIO.equals(resposta.getErrorDescripcio());
 			try {
 				// Obtenir tipus d'enviament
 				NotificaEnviamentTipusEnumDto enviamentTipus = getEnviamentTipus(notificacio);
@@ -354,14 +353,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				notificacioGuardada = notificacioRepository.saveAndFlush(notificacioGuardada);
 
-				
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-					logger.debug(">> [ALTA] notificació síncrona");
-//					List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
-//					List<NotificacioEnviamentDtoV2> enviaments = conversioTipusHelper.convertirList(
-//							enviamentsEntity,
-//							NotificacioEnviamentDtoV2.class);
-					
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
 					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
@@ -449,7 +441,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");
 	}
 
-	public EnviamentReferencia saveEnviament(
+	private EnviamentReferencia saveEnviament(
 			EntitatEntity entitat,
 			NotificacioEntity notificacioGuardada,
 			Enviament enviament) {
@@ -948,7 +940,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			String referencia) throws NotificacioServiceWsException {
 		Timer.Context timer = metricsHelper.iniciMetrica();

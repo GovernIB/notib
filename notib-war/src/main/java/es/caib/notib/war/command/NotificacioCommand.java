@@ -3,20 +3,18 @@
  */
 package es.caib.notib.war.command;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.validation.constraints.Size;
-
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.war.helper.ConversioTipusHelper;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.war.helper.ConversioTipusHelper;
+import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Command per al manteniment de notificacions V1.

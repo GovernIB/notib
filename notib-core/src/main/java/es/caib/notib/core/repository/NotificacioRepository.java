@@ -3,23 +3,22 @@
  */
 package es.caib.notib.core.repository;
 
-import java.util.Date;
-import java.util.List;
-
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioMassivaEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -35,8 +34,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	
 	List<NotificacioEntity> findByProcedimentId(Long id);
 
-	List<NotificacioEntity> findByEntitatId(
-			Long entitatId);
+	List<NotificacioEntity> findByEntitatId(Long entitatId);
+
+	List<NotificacioEntity> findByNotificacioMassivaEntityId(Long NotificacioMassivaEntityId);
 
 	@Query(	"from " +
 			"    NotificacioEntity n " +
@@ -86,7 +86,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity " +
 			"where " +
-			"    estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+			"    estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 			"and registreEnviamentIntent < :maxReintents " +
 			//"and registreData is not null " +
 			"order by " +
@@ -99,7 +99,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity " +
 			"where " +
-			"    estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.REGISTRADA " +
+			"    estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA " +
 			"and notificaEnviamentIntent < :maxReintents " +
 			"and notificaEnviamentData is not null " +
 			"order by " +
@@ -112,8 +112,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity " +
 			"where " +
-			"estat in (es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT," +
-			"es.caib.notib.core.api.dto.NotificacioEstatEnumDto.REGISTRADA) " +
+			"estat in (es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT," +
+			"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA) " +
 			"and procediment = :procediment " + 
 			"order by " +
 			"    notificaEnviamentData ASC")
@@ -173,7 +173,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    NotificacioEntity n " +
 			" where " +
 			"    n.entitat.id = :entitatId " +
-			"   and n.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+			"   and n.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 			"   and n.registreEnviamentIntent >= :maxReintents ")
 	Page<NotificacioEntity> findByNotificaEstatPendentSenseReintentsDisponibles(
 			@Param("entitatId")Long entitatId, 
@@ -183,7 +183,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	@Query(    "  from NotificacioEntity n " +
 		       " where " +
 		       "    n.entitat.id = :entitatId " +
-		       "   and n.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+		       "   and n.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 		       "   and n.registreEnviamentIntent >= :maxReintents " +
 			   "   and (:isProcedimentNull = true or n.procediment = :procediment) " +
 		       "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +
@@ -210,7 +210,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"    NotificacioEntity n " +
 			" where " +
 			"    n.entitat.id = :entitatId " +
-			"   and n.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+			"   and n.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 			"   and n.registreEnviamentIntent >= :maxReintents ")
 	List<Long> findIdsByNotificaEstatPendentSenseReintentsDisponibles(
 			@Param("entitatId")Long entitatId, 
@@ -220,7 +220,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"  from NotificacioEntity n " +
 		    " where " +
 		    "    n.entitat.id = :entitatId " +
-		    "   and n.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PENDENT " +
+		    "   and n.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
 		    "   and n.registreEnviamentIntent >= :maxReintents " +
 			"   and (:isProcedimentNull = true or n.procediment = :procediment) " +
 		    "   and (:isDataIniciNull = true or n.createdDate >= :dataInici) " +

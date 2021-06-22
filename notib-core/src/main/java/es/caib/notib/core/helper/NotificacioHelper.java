@@ -1,21 +1,19 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NoDocumentException;
 import es.caib.notib.core.api.exception.NoMetadadesException;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.codec.binary.Base64;
@@ -24,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +52,114 @@ public class NotificacioHelper {
 	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private RegistreNotificaHelper registreNotificaHelper;
+	@Autowired
+	private PersonaHelper personaHelper;
+	@Autowired
+	private AuditEnviamentHelper auditEnviamentHelper;
+	@Autowired
+	private NotificaHelper notificaHelper;
+
+	public NotificacioEntity altaNotificacioWeb(EntitatEntity entitat,
+												NotificacioEntity notificacioEntity,
+												List<Enviament> enviaments) throws RegistreNotificaException {
+		List<NotificacioEnviamentEntity> enviamentsCreats = new ArrayList<NotificacioEnviamentEntity>();
+		for (Enviament enviament: enviaments) {
+			if (enviament.getTitular() != null) {
+				ServeiTipusEnumDto serveiTipus = null;
+				if (enviament.getServeiTipus() != null) {
+					switch (enviament.getServeiTipus()) {
+						case NORMAL:
+							serveiTipus = ServeiTipusEnumDto.NORMAL;
+							break;
+						case URGENT:
+							serveiTipus = ServeiTipusEnumDto.URGENT;
+							break;
+					}
+				}
+				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
+				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
+				if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
+					if (enviament.getEntregaPostal().getTipus() != null) {
+						switch (enviament.getEntregaPostal().getTipus()) {
+							case APARTAT_CORREUS:
+								tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+								break;
+							case ESTRANGER:
+								tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+								break;
+							case NACIONAL:
+								tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+								break;
+							case SENSE_NORMALITZAR:
+								tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+								break;
+						}
+					}
+					if (enviament.getEntregaPostal().getNumeroCasa() != null) {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
+					} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
+					} else if (enviament.getEntregaPostal().getPuntKm() != null) {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
+					} else {
+						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
+					}
+				}
+				PersonaEntity titular = personaHelper.create(enviament.getTitular(),enviament.getTitular().isIncapacitat());
+
+				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
+				if (enviament.getDestinataris() != null) {
+					for(Persona persona: enviament.getDestinataris()) {
+						if ((persona.getNif() != null && !persona.getNif().isEmpty()) ||
+								(persona.getDir3Codi() != null && !persona.getDir3Codi().isEmpty())) {
+							PersonaEntity destinatari = personaHelper.create(persona, false);
+							destinataris.add(destinatari);
+						}
+					}
+				}
+				EntregaPostalViaTipusEnum viaTipus = null;
+
+				if (enviament.getEntregaPostal() != null) {
+					viaTipus = enviament.getEntregaPostal().getViaTipus();
+				}
+				// Rellenar dades enviament titular
+				enviamentsCreats.add(auditEnviamentHelper.desaEnviament(
+						entitat,
+						notificacioEntity,
+						enviament,
+						serveiTipus,
+						numeracioTipus,
+						tipusConcret,
+						titular,
+						destinataris,
+						viaTipus));
+			}
+		}
+		notificacioEntity.getEnviaments().addAll(enviamentsCreats);
+
+		// Comprovar on s'ha d'enviar ara
+		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
+			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
+						notificacioEntity);
+				if (notificar)
+					notificaHelper.notificacioEnviar(notificacioEntity.getId());
+			}
+		}
+		return notificacioEntity;
+	}
+	public NotificacioEntity saveNotificacio(EntitatEntity entitat,
+											 NotificacioDatabaseDto notificacio,
+											 boolean checkProcedimentPermissions,
+											 NotificacioMassivaEntity notificacioMassivaEntity,
+											 Map<String, Long> documentsProcessatsMassiu) {
+		NotificacioHelper.NotificacioData notData = buildNotificacioData(entitat, notificacio,
+				checkProcedimentPermissions,
+				notificacioMassivaEntity,
+				documentsProcessatsMassiu);
+		// Dades generals de la notificació
+		return saveNotificacio(notData);
+	}
 
 	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data) {
 		return 	auditNotificacioHelper.desaNotificacio(NotificacioEntity.
@@ -79,11 +187,18 @@ public class NotificacioHelper {
 				.document3(data.getDocument3Entity())
 				.document4(data.getDocument4Entity())
 				.document5(data.getDocument5Entity())
+				.notificacioMassiva(data.getNotificacioMassivaEntity())
 				.build());
 	}
 	public NotificacioData buildNotificacioData(EntitatEntity entitat,
 												NotificacioDatabaseDto notificacio,
+												boolean checkProcedimentPermissions){
+		return buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, null, null);
+	}
+	public NotificacioData buildNotificacioData(EntitatEntity entitat,
+												NotificacioDatabaseDto notificacio,
 												boolean checkProcedimentPermissions,
+												NotificacioMassivaEntity notificacioMassivaEntity,
 												Map<String, Long> documentsProcessatsMassiu) {
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
@@ -143,6 +258,7 @@ public class NotificacioHelper {
 				.document3Entity(document3Entity)
 				.document4Entity(document4Entity)
 				.document5Entity(document5Entity)
+				.notificacioMassivaEntity(notificacioMassivaEntity)
 				.build();
 	}
 
@@ -335,7 +451,8 @@ public class NotificacioHelper {
 		private DocumentEntity document4Entity;
 		private DocumentEntity document5Entity;
 		private ProcedimentOrganEntity procedimentOrgan;
-
+		@Builder.Default
+		private NotificacioMassivaEntity notificacioMassivaEntity = null;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioHelper.class);

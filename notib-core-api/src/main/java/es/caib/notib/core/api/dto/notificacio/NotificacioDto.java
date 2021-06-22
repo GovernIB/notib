@@ -1,15 +1,15 @@
 /**
  * 
  */
-package es.caib.notib.core.api.dto;
+package es.caib.notib.core.api.dto.notificacio;
+
+import es.caib.notib.core.api.dto.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import lombok.Getter;
-import lombok.Setter;
 
 
 /**

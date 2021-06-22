@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.NotificaRespostaDatatDto.NotificaRespostaDatatEventDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
@@ -71,7 +72,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
-	private EmailHelper emailHelper;
+	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired 
 	ConversioTipusHelper conversioTipusHelper;
 	@Autowired 
@@ -346,7 +347,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 					startTime = System.nanoTime();
-					emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
 				}

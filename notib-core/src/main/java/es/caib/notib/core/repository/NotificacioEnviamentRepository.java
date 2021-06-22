@@ -222,9 +222,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
 		    " where ne.notificacio.enviamentTipus = :tipus " +
-		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.FINALITZADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PROCESSADA) " +
+		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
 		    "   or (upper(d.nif) = :nif)) ")
@@ -238,9 +238,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
 		    " where ne.notificacio.enviamentTipus =  :tipus " +
-		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.ENVIADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.FINALITZADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.NotificacioEstatEnumDto.PROCESSADA) " +
+		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
 		    "   or (upper(d.nif) = :nif)) ")

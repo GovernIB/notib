@@ -3,15 +3,21 @@
  */
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.io.Serializable;
 
 /**
  * Informació d'un fitxer.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FitxerDto implements Serializable {
 
 	private String nom;

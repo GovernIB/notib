@@ -37,6 +37,8 @@ public class RegistreNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private NotificacioMassivaHelper notificacioMassivaHelper;
 
 	public boolean realitzarProcesRegistrar(
 			NotificacioEntity notificacioEntity) throws RegistreNotificaException {
@@ -51,7 +53,12 @@ public class RegistreNotificaHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name()),
 				new AccioParam("Sir activat", String.valueOf(isSirActivat())));
-		
+
+		// Actualitzar progrés notificació massiva.
+		if (notificacioEntity.getNotificacioMassivaEntity() != null) {
+			notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
+		}
+
 		if (isSirActivat()) {
 			boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
 
@@ -184,7 +191,7 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			updateEventWithoutError(
+			finalitzaRegistre(
 					arbResposta,
 					notificacioEntity,
 					notificacioEntity.getEnviaments(),
@@ -240,7 +247,7 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			updateEventWithoutError(
+			finalitzaRegistre(
 					arbResposta,
 					notificacioEntity,
 					new HashSet<>(Arrays.asList(enviament)),
@@ -318,13 +325,15 @@ public class RegistreNotificaHelper {
 				enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
 	}
 
-	private void updateEventWithoutError(
+	private void finalitzaRegistre(
 			RespostaConsultaRegistre arbResposta,
 			NotificacioEntity notificacioEntity,
 			Set<NotificacioEnviamentEntity> enviaments,
 			boolean totsAdministracio) {
 		if (arbResposta != null) {
+
 			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
+
 
 			String registreNum = arbResposta.getRegistreNumeroFormatat();
 			Date registreData = arbResposta.getRegistreData();

@@ -1,11 +1,11 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.core.api.exception.MaxLinesExceededException;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.exception.NoPermisosException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -74,35 +74,20 @@ public class NotificacioController extends BaseUserController {
     private PagadorCieFormatSobreService pagadorCieFormatSobreService;
     @Autowired
     private PagadorCieFormatFullaService pagadorCieFormatFullaService;
+    @Autowired
+    private NotificacioListHelper notificacioListHelper;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(
             HttpServletRequest request,
             Model model) {
 
-        NotificacioFiltreCommand notificacioFiltreCommand = getFiltreCommand(request);
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        OrganGestorDto organGestorActual = getOrganGestorActual(request);
+        NotificacioFiltreCommand notificacioFiltreCommand = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
 
         model.addAttribute(notificacioFiltreCommand);
-        ompleProcediments(request, model);
-        model.addAttribute("notificacioEstats",
-                EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioEstatEnumDto."));
-        model.addAttribute("tipusUsuari",
-                EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-                        "es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-        model.addAttribute("notificacioEnviamentEstats",
-                EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-        model.addAttribute("notificacioComunicacioTipus",
-                EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
-        model.addAttribute("notificacioEnviamentTipus",
-                EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
-        model.addAttribute("mostrarColumnaEntitat",
-                aplicacioService.propertyGet("es.caib.notib.columna.entitat"));
-        model.addAttribute("mostrarColumnaNumExpedient",
-                aplicacioService.propertyGet("es.caib.notib.columna.num.expedient"));
+        notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "notificacioList";
     }
 
@@ -122,46 +107,12 @@ public class NotificacioController extends BaseUserController {
                 request,
                 NOTIFICACIONS_FILTRE,
                 command);
-        ompleProcediments(request, model);
-        model.addAttribute("notificacioFiltreCommand", command);
-        model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+//        notificacioListHelper.ompleProcediments(request, model);
+//        model.addAttribute("notificacioFiltreCommand", command);
+//        model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
         return "notificacioList";
     }
 
-    private void ompleProcediments(
-            HttpServletRequest request,
-            Model model) {
-
-        List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
-
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        Long entitatId = entitatActual.getId();
-        String usuari = SecurityContextHolder.getContext().getAuthentication().getName();
-        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-        OrganGestorDto organGestorActual = getOrganGestorActual(request);
-        String organ = organGestorActual != null ? organGestorActual.getCodi() : null;
-
-        if (RolHelper.isUsuariActualAdministrador(request)) {
-            model.addAttribute("entitat", entitatService.findAll());
-        }
-//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
-//		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
-//		organsGestorsDisponibles.remove(organEntitat);
-
-        try {
-            organsDisponibles = organGestorService.getOrgansGestorsDisponiblesConsulta(
-                    entitatId,
-                    usuari,
-                    rol,
-                    organ
-            );
-        }catch (Exception e) {
-            if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, NoPermisosException.class))
-                MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.lectura"));
-        }
-        model.addAttribute("organsGestorsPermisLectura", organsDisponibles);
-
-    }
 
     @RequestMapping(value = "/new")
     public String altaForm(
@@ -169,15 +120,6 @@ public class NotificacioController extends BaseUserController {
             Model model) {
         emplenarModelNotificacio(request, model, null);
         return "notificacioForm";
-    }
-    
-    @RequestMapping(value = "/newMassiu")
-    public String altaMassiuForm(
-    		Model model) {
-    	NotificacioMassiuCommand notificacioMassiuCommand = new NotificacioMassiuCommand();
-    	model.addAttribute("notificacioMassiuCommand", notificacioMassiuCommand);
-    	model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
-        return "notificacioMassiuForm";
     }
 
     @RequestMapping(value = "/procediments", method = RequestMethod.GET)
@@ -365,8 +307,7 @@ public class NotificacioController extends BaseUserController {
             } else {
                 notificacioService.create(
                         entitatActual.getId(),
-                        notificacioCommand.asDatabaseDto(), 
-                        null); // solo se informa para envíos masivos
+                        notificacioCommand.asDatabaseDto());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -388,50 +329,6 @@ public class NotificacioController extends BaseUserController {
         return "redirect:../notificacio";
     }
 
-    @RequestMapping(value = "/newMassiuProcessar", method = RequestMethod.POST)
-    public String saveMassiu(
-            HttpServletRequest request,
-            @Valid NotificacioMassiuCommand notificacioMassiuCommand,
-            BindingResult bindingResult,
-            Model model) throws IOException {
-        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        
-        if (bindingResult.hasErrors()) {
-            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
-            
-            model.addAttribute("errors", bindingResult.getAllErrors());
- 
-            for (ObjectError error: bindingResult.getAllErrors()) {
-                log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
-            }
-
-            model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
-            
-            return "notificacioMassiuForm";
-        }
-
-        try {
-            log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
- 
-            notificacioService.createMassiu(entitatActual, usuariActual.getCodi(), NotificacioMassiuCommand.asDto(notificacioMassiuCommand));
-      
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
-            log.error(ExceptionUtils.getFullStackTrace(ex));
-            if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class))
-                MissatgesHelper.error(request, getMessage(request, "notificacioMassiu.csv.error"));
-            else 
-            	MissatgesHelper.error(request, ex.getMessage());
-
-            return "notificacioMassiuForm";
-        }
-        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
-
-        return "redirect:../notificacio";
-    }
     
     private void updateDocuments(NotificacioCommandV2 notificacioCommand) throws IOException {
 
@@ -488,9 +385,8 @@ public class NotificacioController extends BaseUserController {
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
-        getEntitatActualComprovantPermisos(request);
-        NotificacioFiltreDto filtre = getFiltreCommand(request).asDto();
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         PaginaDto<NotificacioTableItemDto> notificacions = new PaginaDto<>();
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
         boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
@@ -901,23 +797,6 @@ public class NotificacioController extends BaseUserController {
                 response);
     }
 
-	@RequestMapping(value = "/newMassiu/getModelDadesCarregaMassiuCSV", method = RequestMethod.GET)
-	@ResponseBody
-	public void getModelDadesCarregaMassiuCSV(
-			HttpServletResponse response) throws IOException {
-		
-				response.setHeader("Set-cookie", "fileDownload=true; path=/");
-				try {
-					writeFileToResponse(
-							"modelo_datos_carga_masiva.csv", 
-							notificacioService.getModelDadesCarregaMassiuCSV(), 
-							response);
-				} catch (Exception ex) {
-					log.debug("Error al obtenir la plantilla de el model de dades CSV de càrrega massiva", ex);
-				}
-	
-	}
-
 	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
 	@ResponseBody
 	private List<CodiValorDto> getNivellsAdministracions(
@@ -1249,30 +1128,6 @@ public class NotificacioController extends BaseUserController {
 
     }
 
-    private boolean getLast3months() {
-        return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.filtre.remeses.last.3.month");
-    }
-
-    private NotificacioFiltreCommand getFiltreCommand(
-            HttpServletRequest request) {
-        NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession()
-                .getAttribute(NOTIFICACIONS_FILTRE);
-
-        if (notificacioFiltreCommand == null) {
-            notificacioFiltreCommand = new NotificacioFiltreCommand();
-            if (getLast3months()) {
-                Calendar cal = new GregorianCalendar();
-                cal.add(Calendar.MONTH, -3);
-                notificacioFiltreCommand.setDataInici(cal.getTime());
-                notificacioFiltreCommand.setDataFi(new Date());
-            }
-            RequestSessionHelper.actualitzarObjecteSessio(
-                    request,
-                    NOTIFICACIONS_FILTRE,
-                    notificacioFiltreCommand);
-        }
-        return notificacioFiltreCommand;
-    }
 
     private void emplenarModelNotificacioInfo(
             EntitatDto entitatActual,
@@ -1437,7 +1292,7 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("comunicacioTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificacioComunicacioTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+                        "es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
         model.addAttribute("enviamentTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificaEnviamentTipusEnumDto.class,
@@ -1624,7 +1479,7 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("comunicacioTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificacioComunicacioTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioComunicacioTipusEnumDto."));
+                        "es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
         model.addAttribute("enviamentTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificaEnviamentTipusEnumDto.class,

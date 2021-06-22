@@ -3,12 +3,11 @@
  */
 package es.caib.notib.core.service.ws;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
+
+import java.util.Date;
 
 //import static org.hamcrest.CoreMatchers.is;
 //import static org.junit.Assert.assertNotNull;
@@ -46,7 +45,7 @@ import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 //import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 //import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 //import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-//import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+//import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 //import es.caib.notib.core.api.dto.PermisDto;
 //import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 //import es.caib.notib.core.api.dto.TipusEnumDto;

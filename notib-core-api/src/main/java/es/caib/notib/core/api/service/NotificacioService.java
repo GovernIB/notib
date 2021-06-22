@@ -4,20 +4,14 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.mail.MessagingException;
-
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Declaració dels mètodes per a la consulta de notificacions i dels
@@ -29,18 +23,16 @@ public interface NotificacioService {
 
 	/**
 	 * Crea una nova notificació.
-	 * 
+	 *
 	 * @param notificacio
 	 *            Informació de la notificació a crear
 	 * @return La notificació amb l'id especificat.
-	 * @throws RegistreNotificaException 
+	 * @throws RegistreNotificaException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	NotificacioDatabaseDto create(
 			Long entitatId,
-			NotificacioDatabaseDto notificacio,
-			Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException;
-	
+			NotificacioDatabaseDto notificacio) throws RegistreNotificaException;
 	/**
 	 * Esborra la notificació indicada per paràmetre
 	 * 
@@ -432,13 +424,4 @@ public interface NotificacioService {
 	
 	@PreAuthorize("hasRole('tothom')")
 	public boolean validarIdCsv (String idCsv);
-
-	@PreAuthorize("hasRole('tothom')")
-	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
-	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	void createMassiu(
-			EntitatDto entitat, 
-			String usuariCodi, 
-			NotificacioMassiuDto notificacioMassiu) throws RegistreNotificaException;
 }

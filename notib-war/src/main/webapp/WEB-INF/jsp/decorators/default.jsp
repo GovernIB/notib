@@ -337,7 +337,11 @@ body {
 <!-- 									</div> -->
 <%-- 								</c:if> --%>
 									<div class="btn-group">
-										<a class="btn btn-primary" href="<c:url value="/notificacio/newMassiu"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.notificacioMassiu"/></a>
+										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a href="<c:url value="/notificacio/massiva/new"/>"><spring:message code="decorator.menu.notificacio.massiva.nova"/></a></li>
+											<li><a href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
+										</ul>
 									</div>
 									<div class="btn-group">
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
@@ -357,6 +361,7 @@ body {
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
+									<li><a href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
 								</ul>
 							</div>
 								

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package es.caib.notib.core.api.dto;
+package es.caib.notib.core.api.dto.notificacio;
 
 /**
  * Enumerat que indica el tipus de comunicació de la notificació.

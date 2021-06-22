@@ -1,15 +1,13 @@
 package es.caib.notib.war.validation;
 
-import java.util.Arrays;
-import java.util.List;
+import es.caib.notib.war.command.NotificacioMassiuCommand;
+import es.caib.notib.war.helper.MessageHelper;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.apache.commons.io.FilenameUtils;
-
-import es.caib.notib.war.command.NotificacioMassiuCommand;
-import es.caib.notib.war.helper.MessageHelper;
+import java.util.Arrays;
+import java.util.List;
 
 public class ValidNotificacioMassiuValidator  implements ConstraintValidator<ValidNotificacioMassiu, NotificacioMassiuCommand> {
 
@@ -60,12 +58,12 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 				}
 		}
 		
-		if (((notificacioMassiu.getFicheroZip() == null || notificacioMassiu.getFicheroZip().getSize() == 0))) {
-			valid = false;
-			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-					.addNode("ficheroZip")
-					.addConstraintViolation();
-		}
+//		if (((notificacioMassiu.getFicheroZip() == null || notificacioMassiu.getFicheroZip().getSize() == 0))) {
+//			valid = false;
+//			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+//					.addNode("ficheroZip")
+//					.addConstraintViolation();
+//		}
 		
 		if ((notificacioMassiu.getFicheroZip() != null && notificacioMassiu.getFicheroZip().getSize() != 0)) {
 				String extensio = FilenameUtils.getExtension(notificacioMassiu.getFicheroZip().getOriginalFilename());

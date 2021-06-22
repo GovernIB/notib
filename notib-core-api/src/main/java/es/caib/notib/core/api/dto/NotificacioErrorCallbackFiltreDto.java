@@ -6,6 +6,7 @@ package es.caib.notib.core.api.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import lombok.Getter;

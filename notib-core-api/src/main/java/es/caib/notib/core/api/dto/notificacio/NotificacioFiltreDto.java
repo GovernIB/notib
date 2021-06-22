@@ -1,15 +1,16 @@
 /**
  * 
  */
-package es.caib.notib.core.api.dto;
+package es.caib.notib.core.api.dto.notificacio;
+
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Filtre per a la consulta de notificacions.

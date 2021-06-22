@@ -1,6 +1,6 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
@@ -52,6 +52,7 @@ public class NotificacioTableHelper {
                 .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
                 .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
                 .isErrorLastEvent(false)
+                .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
                 .build();
 
         notificacioTableViewRepository.save(tableViewItem);
@@ -72,6 +73,8 @@ public class NotificacioTableHelper {
         tableViewItem.setUsuariCodi(notificacio.getUsuariCodi());
         tableViewItem.setGrupCodi(notificacio.getGrupCodi());
         tableViewItem.setTipusUsuari(notificacio.getTipusUsuari());
+        tableViewItem.setNotificacioMassiva(notificacio.getNotificacioMassivaEntity());
+
         if (ignoreNotificaError(notificacio)) {
             tableViewItem.setNotificaErrorData(null);
             tableViewItem.setNotificaErrorDescripcio(null);

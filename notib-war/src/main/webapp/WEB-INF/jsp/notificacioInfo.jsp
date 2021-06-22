@@ -169,7 +169,7 @@ $(document).ready(function() {
 						<c:if test="${notificacio.estat != null && notificacio.estat != ''}">
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.estat" /></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
+							<td><spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
 						</tr>
 						</c:if>
 						<tr>
@@ -372,7 +372,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
-				<c:if test="${not empty notificacio.procediment.pagadorpostal}">
+				<c:if test="${not empty notificacio.procediment.pagadorcie}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">

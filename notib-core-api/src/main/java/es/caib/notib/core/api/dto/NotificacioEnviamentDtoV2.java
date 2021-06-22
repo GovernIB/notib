@@ -1,4 +1,6 @@
 package es.caib.notib.core.api.dto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
 

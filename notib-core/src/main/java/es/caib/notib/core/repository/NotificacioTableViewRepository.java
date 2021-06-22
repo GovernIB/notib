@@ -2,9 +2,10 @@ package es.caib.notib.core.repository;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -335,6 +336,83 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isIdentificadorNull") boolean isIdentificadorNull,
 			@Param("identificador") String identificador,
 			@Param("organs") List<String> organs,
+			@Param("nomesSenseErrors") boolean nomesSenseErrors,
+			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			Pageable paginacio);
+
+
+
+	/**
+	 * Consulta de la taula de remeses d
+	 */
+	@Query(	"select ntf " +
+			"from " +
+			"     NotificacioTableEntity ntf " +
+			"where " +
+			"    (ntf.notificacioMassiva = :notificacioMassiva) " +
+			"and (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
+			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
+			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
+			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
+			"    select count(env.id) " +
+			"    from ntf.enviaments env " +
+			"    where env.notificaEstat = :notificaEstat" +
+			"    ) > 0 ) " +
+			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
+			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
+			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
+			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
+			"and (:isTitularNull = true or (" +
+			"    select count(env.id) " +
+			"    from ntf.enviaments env " +
+			"    where " +
+			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
+			"    ) > 0) " +
+			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
+			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
+			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
+			") " +
+			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
+			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
+			"and (:isIdentificadorNull = true or " +
+			"		(ntf.id in (select notificacio.id" +
+			"				from NotificacioEnviamentEntity env" +
+			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
+			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
+			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null)")
+	Page<NotificacioTableEntity> findAmbFiltreByNotificacioMassiva(
+			@Param("isEntitatIdNull") boolean isEntitatIdNull,
+			@Param("entitatId") Long entitatId,
+			@Param("notificacioMassiva") NotificacioMassivaEntity notificacioMassiva,
+			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
+			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
+			@Param("isConcepteNull") boolean isConcepteNull,
+			@Param("concepte") String concepte,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") NotificacioEstatEnumDto estat,
+			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
+			@Param("isDataIniciNull") boolean isDataIniciNull,
+			@Param("dataInici") Date dataInici,
+			@Param("isDataFiNull") boolean isDataFiNull,
+			@Param("dataFi") Date dataFi,
+			@Param("isTitularNull") boolean isTitularNull,
+			@Param("titular") String titular,
+			@Param("isOrganCodiNull") boolean isOrganCodiNull,
+			@Param("organCodi") String organCodi,
+			@Param("isProcedimentNull") boolean isProcedimentNull,
+			@Param("procedimentCodi") String procedimentCodi,
+			@Param("isTipusUsuariNull") boolean isTipusUsuariNull,
+			@Param("tipusUsuari") TipusUsuariEnumDto tipusUsuari,
+			@Param("isNumExpedientNull") boolean isNumExpedientNull,
+			@Param("numExpedient") String numExpedient,
+			@Param("isCreadaPerNull") boolean isCreadaPerNull,
+			@Param("creadaPer") String creadaPer,
+			@Param("isIdentificadorNull") boolean isIdentificadorNull,
+			@Param("identificador") String identificador,
+			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,

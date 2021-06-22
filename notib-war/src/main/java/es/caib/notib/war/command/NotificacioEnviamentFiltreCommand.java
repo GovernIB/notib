@@ -3,7 +3,7 @@ package es.caib.notib.war.command;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 

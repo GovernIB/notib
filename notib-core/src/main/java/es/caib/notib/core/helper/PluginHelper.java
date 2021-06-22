@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
@@ -51,7 +52,10 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
 	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
-	
+	public static final String GESDOC_AGRUPACIO_MASSIUS_CSV = "massius_csv";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_ZIP = "massius_zip";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_ERRORS = "massius_errors";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_INFORMES = "massius_informes";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;

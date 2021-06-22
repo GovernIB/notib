@@ -59,10 +59,11 @@ public class BaseServiceTestV2 {
 
 	private DadesUsuariPlugin dadesUsuariPluginMock;
 	@Mock
-	private GestioDocumentalPlugin gestioDocumentalPluginMock;
+	protected GestioDocumentalPlugin gestioDocumentalPluginMock;
+
 	private RegistrePlugin registrePluginMock;
 	private IArxiuPlugin arxiuPluginMock;
-	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
+	protected UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
 
 	@Autowired
 	OrganGestorItemTest organGestorCreate;

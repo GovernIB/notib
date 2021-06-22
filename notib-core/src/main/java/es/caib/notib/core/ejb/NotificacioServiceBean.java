@@ -4,9 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -17,11 +15,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implementació de NotificacioService com a EJB que empra una clase
@@ -135,11 +129,10 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public NotificacioDatabaseDto create(
 			Long entitatId,
-			NotificacioDatabaseDto notificacio,
-			Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
-		return delegate.create(entitatId, notificacio, documentsProcessatsMassiu);
+			NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
+		return delegate.create(entitatId, notificacio);
 	}
-	
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public NotificacioDatabaseDto update(
@@ -393,19 +386,5 @@ public class NotificacioServiceBean implements NotificacioService {
 	public boolean validarIdCsv (String idCsv) {
 		return delegate.validarIdCsv(idCsv);
 	}
-	
-	@Override
-	@RolesAllowed({"tothom"})
-	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
-		return delegate.getModelDadesCarregaMassiuCSV();
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public void createMassiu(
-			EntitatDto entitat, 
-			String usuariCodi, 
-			NotificacioMassiuDto notificacioMassiu) throws RegistreNotificaException {
-		delegate.createMassiu(entitat, usuariCodi, notificacioMassiu);
-	}
+
 }

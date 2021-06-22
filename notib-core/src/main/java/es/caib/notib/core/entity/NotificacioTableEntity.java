@@ -4,11 +4,12 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.*;
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -62,6 +63,11 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
+
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "NOTIFICACIO_MASSIVA_ID")
+	@ForeignKey(name = "NOT_NOT_TABLE_NOT_MASSIVA_FK")
+	protected NotificacioMassivaEntity notificacioMassiva;
 
 	/**
 	 * FIELDS

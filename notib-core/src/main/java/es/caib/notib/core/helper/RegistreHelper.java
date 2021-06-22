@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -40,7 +40,7 @@ public class RegistreHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
-	private EmailHelper emailHelper;
+	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
@@ -121,7 +121,7 @@ public class RegistreHelper {
 				logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
 				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 					startTime = System.nanoTime();
-					emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					logger.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 				}
