@@ -9,6 +9,7 @@ import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.plugin.conversio.ConversioArxiu;
 import es.caib.notib.plugin.conversio.ConversioPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
@@ -722,7 +723,7 @@ public class PluginHelper {
 			String identificador,
 			String versio,
 			boolean ambContingut,
-			boolean isUuid) {
+			boolean isUuid) throws DocumentNotFoundException{
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_ARXIU,
@@ -740,12 +741,12 @@ public class PluginHelper {
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al plugin d'arxiu digital: no s'ha pogut obtenir el codument amb identificador: " + identificador;
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_ARXIU,
-					errorDescripcio,
+			DocumentNotFoundException ex1 = new DocumentNotFoundException(
+					isUuid ? "UUID" : "CSV",
+					identificador,
 					ex);
+			integracioHelper.addAccioError(info, ex1.getMessage(), ex1);
+			throw ex1;
 		}
 	}
 	

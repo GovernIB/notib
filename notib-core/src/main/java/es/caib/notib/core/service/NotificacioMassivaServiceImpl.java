@@ -11,6 +11,7 @@ import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
@@ -253,7 +254,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 if (errors.size() == 0) {
                     try {
                         crearNotificacio(entitat, notificacio, notMassiva, documentsProcessatsMassiu);
-                    } catch (NoDocumentException ex) {
+                    } catch (DocumentNotFoundException|NoDocumentException ex) {
                         errors.add("[1064] No s'ha pogut obtenir el document de l'arxiu.");
                     } catch (NoMetadadesException ex) {
                         errors.add("[1066] Error en les metadades del document. No s'han obtingut de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");

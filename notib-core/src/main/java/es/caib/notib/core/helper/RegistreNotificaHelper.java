@@ -54,11 +54,6 @@ public class RegistreNotificaHelper {
 				new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name()),
 				new AccioParam("Sir activat", String.valueOf(isSirActivat())));
 
-		// Actualitzar progrés notificació massiva.
-		if (notificacioEntity.getNotificacioMassivaEntity() != null) {
-			notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
-		}
-
 		if (isSirActivat()) {
 			boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
 
@@ -333,7 +328,10 @@ public class RegistreNotificaHelper {
 		if (arbResposta != null) {
 
 			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
-
+			// Actualitzar progrés notificació massiva.
+			if (notificacioEntity.getNotificacioMassivaEntity() != null) {
+				notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
+			}
 
 			String registreNum = arbResposta.getRegistreNumeroFormatat();
 			Date registreData = arbResposta.getRegistreData();

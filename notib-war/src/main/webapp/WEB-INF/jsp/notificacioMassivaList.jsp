@@ -141,11 +141,13 @@
 				<th data-col-name="zipFilename" data-template="#cellZip"  width="120px">
 					<spring:message code="notificacio.massiva.list.columna.Documents"/>
 					<script id="cellZip" type="text/x-jsrender">
-						{{:zipFilename }}
-						<a id="download-zip" title="Descarregar fitxer zip" class="btn btn-default pull-right"
-							href="<c:url value="/notificacio/massiva/{{:id}}/zip/download"/>" target="_blank">
-							<span class="fa fa-download"></span>
-						</a>
+						{{if zipFilename }}
+							{{:zipFilename }}
+							<a id="download-zip" title="Descarregar fitxer zip" class="btn btn-default pull-right"
+								href="<c:url value="/notificacio/massiva/{{:id}}/zip/download"/>" target="_blank">
+								<span class="fa fa-download"></span>
+							</a>
+						{{/if}}
 					</script>
 				</th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="120px">
