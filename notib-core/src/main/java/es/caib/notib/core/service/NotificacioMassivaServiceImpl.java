@@ -197,13 +197,16 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     public NotificacioMassivaDataDto create(
             Long entitatId,
             @NonNull String usuariCodi,
-            @NonNull NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
+            @NonNull NotificacioMassivaDto notificacioMassiva) throws RegistreNotificaException {
 
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
+            log.info("[NOT-MASSIVA] Alta de nova notificacio massiva (usuari: {}). Fitxer csv: {}",
+                    usuariCodi, notificacioMassiva.getFicheroCsvNom());
+
             EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
-            List<String[]> linies = CSVReader.readFile(notificacioMassiu.getFicheroCsvBytes());
+            List<String[]> linies = CSVReader.readFile(notificacioMassiva.getFicheroCsvBytes());
             if (linies == null) {
                 throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
             }
@@ -211,12 +214,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 throw new InvalidCSVFileException("El fitxer CSV està buid.");
             }
             if (linies.size() > MAX_ENVIAMENTS) {
-                log.debug(String.format("El fitxer CSV conté més de les %d línies permeses.", MAX_ENVIAMENTS));
+                log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", MAX_ENVIAMENTS));
                 throw new MaxLinesExceededException(
                         String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", MAX_ENVIAMENTS));
             }
 
-            List<String> fileNames = ZipFileUtils.readZipFileNames(notificacioMassiu.getFicheroZipBytes());
+            List<String> fileNames = ZipFileUtils.readZipFileNames(notificacioMassiva.getFicheroZipBytes());
             Map<String, Long> documentsProcessatsMassiu = new HashMap<String, Long>(); // key: csv/uuid/arxiuFisicoNom - value: documentEntity.getId()
 
             StringWriter writerListErrors = new StringWriter();
@@ -226,15 +229,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             writeCsvHeader(listWriterErrors);
             writeCsvHeader(listWriterInforme);
 
-            NotificacioMassivaEntity notMassiva = registrarNotificacioMassiva(entitat, notificacioMassiu);
+            NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva);
             for (String[] linia : linies) {
                 NotificacioDatabaseDto notificacio = csvToNotificaDatabaseDto(
                         linia,
-                        notificacioMassiu.getCaducitat(),
+                        notificacioMassiva.getCaducitat(),
                         entitat,
                         usuariCodi,
                         fileNames,
-                        notificacioMassiu.getFicheroZipBytes(),
+                        notificacioMassiva.getFicheroZipBytes(),
                         documentsProcessatsMassiu);
                 String keyDocument = getKeyDocument(notificacio);
                 if (keyDocument != null && !documentsProcessatsMassiu.containsKey(keyDocument)) {
@@ -253,7 +256,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
                 if (errors.size() == 0) {
                     try {
-                        crearNotificacio(entitat, notificacio, notMassiva, documentsProcessatsMassiu);
+                        crearNotificacio(entitat, notificacio, notificacioMassivaEntity, documentsProcessatsMassiu);
                     } catch (DocumentNotFoundException|NoDocumentException ex) {
                         errors.add("[1064] No s'ha pogut obtenir el document de l'arxiu.");
                     } catch (NoMetadadesException ex) {
@@ -262,9 +265,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 }
 
                 if (errors.size() > 0) {
+                    log.debug("[NOT-MASSIVA] Alta errònea de la notificació de la nova notificacio massiva");
                     writeCsvLinia(listWriterErrors,linia, errors);
                     writeCsvLinia(listWriterInforme,linia, errors);
                 } else {
+                    log.debug("[NOT-MASSIVA] Alta satisfactoria de la notificació de la nova notificacio massiva");
                     List<String> ok = Collections.singletonList("OK");
                     writeCsvLinia(listWriterInforme,linia, ok);
                 }
@@ -275,15 +280,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 byte[] fileResumContent = writerListInforme.toString().getBytes();
                 byte[] fileErrorsContent = writerListErrors.toString().getBytes();
                 pluginHelper.gestioDocumentalUpdate(
-                        notMassiva.getErrorsGesdocId(),
+                        notificacioMassivaEntity.getErrorsGesdocId(),
                         PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS,
                         fileErrorsContent);
                 pluginHelper.gestioDocumentalUpdate(
-                        notMassiva.getResumGesdocId(),
+                        notificacioMassivaEntity.getResumGesdocId(),
                         PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES,
                         fileResumContent);
 
-                enviarCorreuElectronic(notMassiva, fileResumContent, fileErrorsContent);
+                enviarCorreuElectronic(notificacioMassivaEntity, fileResumContent, fileErrorsContent);
             } catch (IOException e) {
                 log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.");
                 e.printStackTrace();
@@ -295,10 +300,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             writeCsvClose(listWriterInforme);
 
             if (getPrioritatNotificacioMassiva().equals(NotificacioMassivaPrioritatDto.BAIXA)) {
-                notificacioMassivaHelper.posposarNotificacions(notMassiva.getId());
+                notificacioMassivaHelper.posposarNotificacions(notificacioMassivaEntity.getId());
             }
 
-            return conversioTipusHelper.convertir(notMassiva, NotificacioMassivaDataDto.class);
+            return conversioTipusHelper.convertir(notificacioMassivaEntity, NotificacioMassivaDataDto.class);
         } finally {
             metricsHelper.fiMetrica(timer);
         }
@@ -437,6 +442,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                                   NotificacioDatabaseDto notificacio,
                                   NotificacioMassivaEntity notMassiva,
                                   Map<String, Long> documentsProcessatsMassiu) throws RegistreNotificaException {
+        log.debug("[NOT-MASSIVA] Creació de notificació de nova notificacio massiva");
         NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(entitat, notificacio,
                 false,
                 notMassiva,
@@ -450,6 +456,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
         }
 
+        log.debug("[NOT-MASSIVA] Alta notificació de nova notificacio massiva");
         notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, enviaments);
         notMassiva.joinNotificacio(notificacioEntity);
     }

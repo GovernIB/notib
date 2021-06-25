@@ -88,4 +88,8 @@
 			id="justificantService"
 			jndi-name="notib/JustificantServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.JustificantService"/>
+	<jee:local-slsb
+			id="notificacioMassivaService"
+			jndi-name="notib/NotificacioMassivaServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.NotificacioMassivaService"/>
 </beans>

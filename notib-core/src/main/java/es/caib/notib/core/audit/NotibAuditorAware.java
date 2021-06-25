@@ -3,16 +3,15 @@
  */
 package es.caib.notib.core.audit;
 
-import javax.annotation.Resource;
-
+import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.repository.UsuariRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.repository.UsuariRepository;
+import javax.annotation.Resource;
 
 /**
  * Especifica els mètodes que s'han d'emprar per obtenir i modificar la
@@ -32,7 +31,6 @@ public class NotibAuditorAware implements AuditorAware<UsuariEntity> {
 		String auditorActual = (auth != null) ? auth.getName() : null;
 		LOGGER.debug("Obtenint l'usuari auditor per a l'usuari (codi=" + auditorActual + ")");
 		if (auditorActual == null) {
-			LOGGER.debug("Auditor actual: null");
 			return null;
 		} else {
 			UsuariEntity usuari = usuariRepository.findOne(auditorActual);

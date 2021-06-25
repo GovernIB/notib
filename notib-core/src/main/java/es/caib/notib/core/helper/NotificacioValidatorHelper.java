@@ -39,6 +39,8 @@ public class NotificacioValidatorHelper {
 			@NonNull NotificacioDatabaseDto notificacio,
 			@NonNull EntitatEntity entitat,
 			Map<String, Long> documentsProcessatsMassiu) {
+		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
+
 		List<String> errors = new ArrayList<String>();
 		boolean comunicacioSenseAdministracio = false;
 
@@ -386,7 +388,6 @@ public class NotificacioValidatorHelper {
 
 	private static Long getMaxSizeFile() {
 		String property = "es.caib.notib.notificacio.document.size";
-		log.debug("Consulta del valor de la property (property=" + property + ")");
 		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
 	}
 
