@@ -92,8 +92,8 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
                 database.entitat.getId(), usuariCodi, notificacioMassiva);
 
         // Then
-        // 3 vegades: 2 setup, 1 ara
-        Mockito.verify(gestioDocumentalPluginMock, Mockito.times(3)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
+        // 4 vegades: 3 setup, 1 ara
+        Mockito.verify(gestioDocumentalPluginMock, Mockito.times(4)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
                 fileContentCaptor.capture());
         ByteArrayInputStream fileContent = fileContentCaptor.getValue();
         List<String[]> linies = CSVReader.readFile(IOUtils.toByteArray(fileContent));
@@ -147,8 +147,8 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
                 database.entitat.getId(), usuariCodi, notificacioMassiva);
 
         // Then
-        // 3 vegades: 3 setup, 1 ara
-        Mockito.verify(gestioDocumentalPluginMock, Mockito.times(3)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
+        // 4 vegades: 4 setup, 1 ara
+        Mockito.verify(gestioDocumentalPluginMock, Mockito.times(4)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
                 fileContentCaptor.capture());
         ByteArrayInputStream fileContent = fileContentCaptor.getValue();
         List<String[]> linies = CSVReader.readFile(IOUtils.toByteArray(fileContent));
@@ -183,7 +183,7 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         Assert.assertEquals(2, notificacionsPre.size());
         Map<Long, Date> previousDates = new HashMap<>();
         for (NotificacioEntity n : notificacionsPre)
-            previousDates.put(n.getId(), n.getRegistreData());
+            previousDates.put(n.getId(), n.getNotificaEnviamentData());
 
         // When
         notificacioMassivaService.posposar(database.entitat.getId(), nMassivaDto.getId());
@@ -198,7 +198,7 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
             cal.setTime(previousDates.get(n.getId()));
             cal.add(Calendar.SECOND, 8*60*60);
             Date expected = cal.getTime();
-            Assert.assertEquals(DateUtils.truncate(expected, Calendar.MINUTE), DateUtils.truncate(n.getRegistreData(), Calendar.MINUTE));
+            Assert.assertEquals(DateUtils.truncate(expected, Calendar.MINUTE), DateUtils.truncate(n.getNotificaEnviamentData(), Calendar.MINUTE));
         }
     }
 
@@ -210,7 +210,7 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         Assert.assertEquals(2, notificacionsPre.size());
         Map<Long, Date> previousDates = new HashMap<>();
         for (NotificacioEntity n : notificacionsPre)
-            previousDates.put(n.getId(), n.getRegistreData());
+            previousDates.put(n.getId(), n.getNotificaEnviamentData());
 
         // When
         notificacioMassivaService.reactivar(database.entitat.getId(), nMassivaDto.getId());
@@ -223,7 +223,7 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         for (NotificacioEntity n : notificacionsPost) {
             Calendar cal = GregorianCalendar.getInstance();
             Date expected = cal.getTime();
-            Assert.assertEquals(DateUtils.truncate(expected, Calendar.MINUTE), DateUtils.truncate(n.getRegistreData(), Calendar.MINUTE));
+            Assert.assertEquals(DateUtils.truncate(expected, Calendar.MINUTE), DateUtils.truncate(n.getNotificaEnviamentData(), Calendar.MINUTE));
         }
     }
 }

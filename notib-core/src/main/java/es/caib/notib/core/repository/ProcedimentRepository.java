@@ -208,7 +208,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			"    ProcedimentEntity pro " +
 			"where pro.entitat = (:entitatActual) and " + 
 			"lower(pro.nom) = (lower(:nomProcediment))")
-	ProcedimentEntity findByNomAndEntitat(
+	List<ProcedimentEntity> findByNomAndEntitat(
 			@Param("nomProcediment") String nomProcediment,
 			@Param("entitatActual") EntitatEntity entitat);
 	

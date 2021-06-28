@@ -668,11 +668,15 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						false, 
 						false);
 			
-			ProcedimentEntity procediment = procedimentRepository.findByNomAndEntitat(nomProcediment, entitat);
-			
-			return conversioTipusHelper.convertir(
-					procediment, 
-					ProcedimentDto.class);
+			List<ProcedimentEntity> procediments = procedimentRepository.findByNomAndEntitat(nomProcediment, entitat);
+			if (procediments != null && !procediments.isEmpty()) {
+				return conversioTipusHelper.convertir(
+						procediments.get(0),
+						ProcedimentDto.class);
+
+			} else {
+				return null;
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
