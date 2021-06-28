@@ -4,14 +4,16 @@ import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDataDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDto;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
-import es.caib.notib.core.test.NotificacioMassivaTests;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.test.data.EntitatItemTest;
+import es.caib.notib.core.test.data.NotificacioMassivaCreator;
 import es.caib.notib.core.test.data.ProcedimentItemTest;
 import es.caib.notib.core.utils.CSVReader;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,13 +36,17 @@ import java.util.*;
 public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
-
+    @Autowired
+    private NotificacioRepository notificacioRepository;
 
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
 
     @Autowired
-    private ProcedimentItemTest procedimentCreate;
+    private NotificacioMassivaCreator notificacioMassivaCreator;
+
+    @Autowired
+    private ProcedimentItemTest procedimentCreator;
 
     private ElementsCreats database;
 
@@ -52,32 +58,26 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         configureMockGestioDocumentalPlugin();
         configureMockUnitatsOrganitzativesPlugin();
 
+        notificacioMassivaCreator.addObject("notMassiva_test1", NotificacioMassivaCreator.getTest1Instance());
+        notificacioMassivaCreator.addObject("notMassiva_test2", NotificacioMassivaCreator.getTest2Instance());
+        notificacioMassivaCreator.addObject("notMassiva_test3", NotificacioMassivaCreator.getTest3Instance());
 
-        ProcedimentDto procediment1 = procedimentCreate.getRandomInstance();
+        ProcedimentDto procediment1 = procedimentCreator.getRandomInstance();
         procediment1.setCodi("101310");
-        procedimentCreate.addObject("procediment", procediment1);
-//
-//        notificacioCreate.addObject("notificacio", NotificacioItemTest.getRandomInstance());
-//        notificacioCreate.addRelated("notificacio", "procediment", procedimentCreate);
-//
-//        notificacioCreate.addObject("notificacioError", NotificacioItemTest.getRandomInstance());
-//        notificacioCreate.addRelated("notificacioError", "procediment", procedimentCreate);
+        procedimentCreator.addObject("procediment", procediment1);
 
         database = createDatabase(EntitatItemTest.getRandomInstance(),
-                procedimentCreate
+                procedimentCreator,
+                notificacioMassivaCreator
                 );
 
-
-        Map<String, NodeDir3> organigramaEntitat = new HashMap<>();
-        organigramaEntitat.put("E04975701", new NodeDir3());
-        Mockito.when(unitatsOrganitzativesPluginMock.organigramaPerEntitat(Mockito.anyString()))
-                .thenReturn(organigramaEntitat);
     }
 
     @After
     public final void tearDown() {
         destroyDatabase(database.getEntitat().getId(),
-                procedimentCreate
+                notificacioMassivaCreator,
+                procedimentCreator
         );
     }
 
@@ -85,22 +85,15 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
     public void whenCreate_thenValidateCSVContent() throws Exception {
         // Given
         String usuariCodi = "CODI_USER";
-        NotificacioMassivaTests.TestMassiusFiles test1Data = NotificacioMassivaTests.getTest2Files();
-        NotificacioMassivaDto notificacioMassiva = NotificacioMassivaDto.builder()
-                .ficheroCsvNom("csv_test.csv")
-                .ficheroZipNom("zip_test.zip")
-                .ficheroCsvBytes(test1Data.getCsvContent())
-                .ficheroZipBytes(test1Data.getZipContent())
-                .caducitat(new Date())
-                .email("test@email.com")
-                .build();
+        NotificacioMassivaDto notificacioMassiva = NotificacioMassivaCreator.getTest2Instance();
 
         // When
         NotificacioMassivaDataDto massivaCreated = notificacioMassivaService.create(
                 database.entitat.getId(), usuariCodi, notificacioMassiva);
 
         // Then
-        Mockito.verify(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
+        // 3 vegades: 2 setup, 1 ara
+        Mockito.verify(gestioDocumentalPluginMock, Mockito.times(3)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
                 fileContentCaptor.capture());
         ByteArrayInputStream fileContent = fileContentCaptor.getValue();
         List<String[]> linies = CSVReader.readFile(IOUtils.toByteArray(fileContent));
@@ -137,7 +130,100 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
             i++;
         }
 
+        List<NotificacioEntity> notificacions = notificacioRepository.findByNotificacioMassivaEntityId(massivaCreated.getId());
+        Assert.assertEquals(0, notificacions.size());
+
         notificacioMassivaRepository.delete(massivaCreated.getId());
     }
 
+    @Test
+    public void whenCreate_thenCreateValidIgnoreOthers() throws Exception {
+        // Given
+        String usuariCodi = "CODI_USER";
+        NotificacioMassivaDto notificacioMassiva = NotificacioMassivaCreator.getTest3Instance();
+
+        // When
+        NotificacioMassivaDataDto massivaCreated = notificacioMassivaService.create(
+                database.entitat.getId(), usuariCodi, notificacioMassiva);
+
+        // Then
+        // 3 vegades: 3 setup, 1 ara
+        Mockito.verify(gestioDocumentalPluginMock, Mockito.times(3)).update(Mockito.anyString(), Mockito.eq(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES),
+                fileContentCaptor.capture());
+        ByteArrayInputStream fileContent = fileContentCaptor.getValue();
+        List<String[]> linies = CSVReader.readFile(IOUtils.toByteArray(fileContent));
+
+        int correctCount = 0;
+        int errorCount = 0;
+        for (String [] fila : linies) {
+            System.out.println(fila[22]);
+            if (fila[22].trim().substring(0, 2).equals("OK")) {
+                correctCount++;
+            } else {
+                errorCount ++;
+            }
+        }
+        Assert.assertEquals(2, correctCount);
+        Assert.assertEquals(2, errorCount);
+
+        List<NotificacioEntity> notificacions = notificacioRepository.findByNotificacioMassivaEntityId(massivaCreated.getId());
+        Assert.assertEquals(2, notificacions.size());
+
+        for (NotificacioEntity notificacio: notificacions) {
+            notificacioRepository.delete(notificacio.getId());
+        }
+        notificacioMassivaRepository.delete(massivaCreated.getId());
+    }
+
+    @Test
+    public void whenPosposar_thenIncreaseAllNotMassivaNotificacionsRegistreData() throws Exception {
+        // Given
+        NotificacioMassivaDataDto nMassivaDto = (NotificacioMassivaDataDto) database.get("notMassiva_test3");
+        List<NotificacioEntity> notificacionsPre = notificacioRepository.findByNotificacioMassivaEntityId(nMassivaDto.getId());
+        Assert.assertEquals(2, notificacionsPre.size());
+        Map<Long, Date> previousDates = new HashMap<>();
+        for (NotificacioEntity n : notificacionsPre)
+            previousDates.put(n.getId(), n.getRegistreData());
+
+        // When
+        notificacioMassivaService.posposar(database.entitat.getId(), nMassivaDto.getId());
+
+        // Then
+        List<NotificacioEntity> notificacionsPost = notificacioRepository.findByNotificacioMassivaEntityId(nMassivaDto.getId());
+        Assert.assertEquals(2, notificacionsPost.size());
+
+
+        for (NotificacioEntity n : notificacionsPost) {
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.setTime(previousDates.get(n.getId()));
+            cal.add(Calendar.SECOND, 8*60*60);
+            Date expected = cal.getTime();
+            Assert.assertEquals(DateUtils.truncate(expected, Calendar.MINUTE), DateUtils.truncate(n.getRegistreData(), Calendar.MINUTE));
+        }
+    }
+
+    @Test
+    public void whenReactivar_thenResetAllNotMassivaNotificacionsRegistreData() throws Exception {
+        // Given
+        NotificacioMassivaDataDto nMassivaDto = (NotificacioMassivaDataDto) database.get("notMassiva_test3");
+        List<NotificacioEntity> notificacionsPre = notificacioRepository.findByNotificacioMassivaEntityId(nMassivaDto.getId());
+        Assert.assertEquals(2, notificacionsPre.size());
+        Map<Long, Date> previousDates = new HashMap<>();
+        for (NotificacioEntity n : notificacionsPre)
+            previousDates.put(n.getId(), n.getRegistreData());
+
+        // When
+        notificacioMassivaService.reactivar(database.entitat.getId(), nMassivaDto.getId());
+
+        // Then
+        List<NotificacioEntity> notificacionsPost = notificacioRepository.findByNotificacioMassivaEntityId(nMassivaDto.getId());
+        Assert.assertEquals(2, notificacionsPost.size());
+
+
+        for (NotificacioEntity n : notificacionsPost) {
+            Calendar cal = GregorianCalendar.getInstance();
+            Date expected = cal.getTime();
+            Assert.assertEquals(DateUtils.truncate(expected, Calendar.MINUTE), DateUtils.truncate(n.getRegistreData(), Calendar.MINUTE));
+        }
+    }
 }

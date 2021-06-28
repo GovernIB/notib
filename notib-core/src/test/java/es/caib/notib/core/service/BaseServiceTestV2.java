@@ -415,7 +415,9 @@ public class BaseServiceTestV2 {
 		Mockito.when(unitatsOrganitzativesPluginMock.paisos()).thenReturn(paisos);
 		Mockito.when(unitatsOrganitzativesPluginMock.provincies()).thenReturn(provincies);
 		Mockito.when(unitatsOrganitzativesPluginMock.localitats(Mockito.anyString())).thenReturn(localitats);
-		Mockito.when(unitatsOrganitzativesPluginMock.organigramaPerEntitat(Mockito.anyString())).thenReturn(new HashMap<String, NodeDir3>());
+		Map<String, NodeDir3> organigramaEntitat = new HashMap<String, NodeDir3>();
+		organigramaEntitat.put("E04975701", new NodeDir3());
+		Mockito.when(unitatsOrganitzativesPluginMock.organigramaPerEntitat(Mockito.anyString())).thenReturn(organigramaEntitat);
 		pluginHelper.setUnitatsOrganitzativesPlugin(unitatsOrganitzativesPluginMock);
 	}
 	

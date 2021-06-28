@@ -67,8 +67,8 @@ public class EntitatItemTest extends DatabaseItemTest<EntitatDto> {
     }
 
     @Override
-    public EntitatDto create(EntitatDto element, Long entitatId) throws Exception {
-        return create(element);
+    public EntitatDto create(Object element, Long entitatId) throws Exception {
+        return create((EntitatDto) element);
     }
 
     @Override

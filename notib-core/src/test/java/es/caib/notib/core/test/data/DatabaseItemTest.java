@@ -10,15 +10,14 @@ import java.util.Map;
 
 public abstract class DatabaseItemTest<T> {
     @Getter
-    protected Map<String, T> objects = new HashMap<>();
+    protected Map<String, Object> objects = new HashMap<>();
     @Getter
     protected Map<String, List<RelatedObject>> relatedObjects = new HashMap<>();
 
     protected Map<String, Boolean> createdObjects = new HashMap<>();
 
-    public abstract T create (T element, Long entitatId) throws Exception;
+    public abstract T create (Object element, Long entitatId) throws Exception;
     public abstract void delete(Long entitatId, T object) throws Exception;
-//    public abstract T getRandomInstance();
 
     public void addRelated(String key, String elementKey, DatabaseItemTest<?> container){
         if(!relatedObjects.containsKey(key)) {
@@ -28,7 +27,7 @@ public abstract class DatabaseItemTest<T> {
     };
 
     public T getObject(String key) {
-        return this.objects.get(key);
+        return (T) this.objects.get(key);
     }
 
     public void relateElements() throws Exception {
@@ -42,7 +41,7 @@ public abstract class DatabaseItemTest<T> {
     public void relateElement(String key, Object element) throws Exception{
     }
 
-    public void addObject(String identifier, T object) {
+    public void addObject(String identifier, Object object) {
         this.objects.put(identifier, object);
         this.createdObjects.put(identifier, false);
     }
@@ -65,7 +64,7 @@ public abstract class DatabaseItemTest<T> {
 
     public void delete(Long entitatId, String key) throws Exception {
         if (this.createdObjects.get(key)) {
-            this.delete(entitatId, this.objects.get(key));
+            this.delete(entitatId, getObject(key));
         }
     }
 

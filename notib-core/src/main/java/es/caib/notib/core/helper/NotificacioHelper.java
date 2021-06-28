@@ -16,9 +16,8 @@ import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +30,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class NotificacioHelper {
 
@@ -58,12 +58,23 @@ public class NotificacioHelper {
 	private AuditEnviamentHelper auditEnviamentHelper;
 	@Autowired
 	private NotificaHelper notificaHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	public NotificacioEntity altaNotificacioWeb(EntitatEntity entitat,
 												NotificacioEntity notificacioEntity,
-												List<Enviament> enviaments) throws RegistreNotificaException {
+												List<NotificacioEnviamentDtoV2> enviamentsDto) throws RegistreNotificaException {
+
+		log.trace("Alta Notificació web - Preparam enviaments");
+		List<Enviament> enviaments = new ArrayList<>();
+		for(NotificacioEnviamentDtoV2 enviament: enviamentsDto) {
+			if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()))
+				enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
+			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
+		}
 		List<NotificacioEnviamentEntity> enviamentsCreats = new ArrayList<NotificacioEnviamentEntity>();
 		for (Enviament enviament: enviaments) {
+			log.trace("Alta Notificació web - Alta enviament id={}", enviament.getId());
 			if (enviament.getTitular() != null) {
 				ServeiTipusEnumDto serveiTipus = null;
 				if (enviament.getServeiTipus() != null) {
@@ -157,6 +168,7 @@ public class NotificacioHelper {
 				checkProcedimentPermissions,
 				notificacioMassivaEntity,
 				documentsProcessatsMassiu);
+
 		// Dades generals de la notificació
 		return saveNotificacio(notData);
 	}
@@ -200,6 +212,7 @@ public class NotificacioHelper {
 												boolean checkProcedimentPermissions,
 												NotificacioMassivaEntity notificacioMassivaEntity,
 												Map<String, Long> documentsProcessatsMassiu) {
+		log.debug("Construint les dades d'una notificació");
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
 		ProcedimentEntity procediment = null;
@@ -211,6 +224,7 @@ public class NotificacioHelper {
 		}
 
 		// Si tenim procediment --> Comprovam permisos i consultam info òrgan gestor
+		log.trace("Processam procediment");
 		if (procediment != null) {
 			if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 				organGestor = procediment.getOrganGestor();
@@ -233,14 +247,18 @@ public class NotificacioHelper {
 		}
 
 		// Recuperar òrgan gestor notificació
+		log.trace("Processam organ gestor");
 		if (organGestor == null && notificacio.getOrganGestorCodi() != null ) {
 			organGestor = organGestorHelper.createOrganGestorFromNotificacio(notificacio, entitat);
 		}
 
 		// Recupera grup notificació a partir del codi
+		log.trace("Processam grup");
 		if (notificacio.getGrup() != null && notificacio.getGrup().getId() != null) {
 			grupNotificacio = grupRepository.findOne(notificacio.getGrup().getId());
 		}
+
+		log.trace("Processam documents");
 		DocumentEntity documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
 		DocumentEntity document2Entity = getDocumentEntity(notificacio.getDocument2(), null);
 		DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3(), null);
@@ -269,15 +287,17 @@ public class NotificacioHelper {
 		if (document != null) {
 			String documentGesdocId = null;
 			if (document.getContingutBase64() != null && !document.getContingutBase64().isEmpty()) {
+				log.trace("Processam document gestió documental");
 				if ( documentsProcessatsMassiu == null || //alta de notificacio web
 						!documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
 						( documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && // alta massiu web
-						documentsProcessatsMassiu.get(document.getArxiuNom()) == null) ) { 
+						documentsProcessatsMassiu.get(document.getArxiuNom()) == null) ) {
 					documentGesdocId = pluginHelper.gestioDocumentalCreate(
 							PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 							Base64.decodeBase64(document.getContingutBase64()));
 				}
 			} else if (document.getUuid() != null) {
+				log.trace("Processam document desde UUID");
 				if ( documentsProcessatsMassiu == null || //alta de notificacio web
 						!documentsProcessatsMassiu.containsKey(document.getUuid()) ||
 						( documentsProcessatsMassiu.containsKey(document.getUuid()) && // alta massiu web
@@ -321,6 +341,7 @@ public class NotificacioHelper {
 					return documentEntity;
 				}
 			} else if (document.getCsv() != null) {
+				log.trace("Processam document desde CSV");
 				if ( documentsProcessatsMassiu == null || //alta de notificacio web
 						!documentsProcessatsMassiu.containsKey(document.getCsv()) ||
 						( documentsProcessatsMassiu.containsKey(document.getCsv()) && // alta massiu web
@@ -353,9 +374,9 @@ public class NotificacioHelper {
 					documentEntity = documentRepository.findOne(documentsProcessatsMassiu.get(document.getCsv()));
 					return documentEntity;
 				}
-			} else if ( documentsProcessatsMassiu != null && 
-					documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && 
-					 documentsProcessatsMassiu.get(document.getArxiuNom()) != null ) {
+			} else if (documentsProcessatsMassiu != null &&
+							documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
+							documentsProcessatsMassiu.get(document.getArxiuNom()) != null ) {
 					documentEntity = documentRepository.findOne(documentsProcessatsMassiu.get(document.getArxiuNom()));
 					return documentEntity;
 			}
@@ -365,6 +386,7 @@ public class NotificacioHelper {
 					document.getUuid() != null ||
 					document.getContingutBase64() != null ||
 					document.getArxiuGestdocId() != null) {
+				log.trace("Enregistram el document llegit a la base de dades");
 
 				if (document.getId() != null && !document.getId().isEmpty()) {
 					documentEntity = documentRepository.findOne(Long.valueOf(document.getId()));
@@ -454,7 +476,4 @@ public class NotificacioHelper {
 		@Builder.Default
 		private NotificacioMassivaEntity notificacioMassivaEntity = null;
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioHelper.class);
-
 }

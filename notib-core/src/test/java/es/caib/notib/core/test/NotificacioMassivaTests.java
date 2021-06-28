@@ -23,7 +23,13 @@ public class NotificacioMassivaTests {
                 .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip"))
                 .build();
     }
+    public static TestMassiusFiles getTest3Files() {
 
+        return TestMassiusFiles.builder()
+                .csvContent(getFileContent("/es/caib/notib/core/massiu/test3.csv"))
+                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip"))
+                .build();
+    }
     private static byte[] getFileContent(String filename) {
         InputStream is =  NotificacioMassivaTests.class.getResourceAsStream(filename);
         byte[] targetArray = new byte[0];

@@ -21,7 +21,7 @@ public class OrganGestorItemTest extends DatabaseItemTest<OrganGestorDto>{
 
 
     @Override
-    public OrganGestorDto create(OrganGestorDto element, Long entitatId) throws Exception{
+    public OrganGestorDto create(Object element, Long entitatId) throws Exception{
         authenticationTest.autenticarUsuari("admin");
         ((OrganGestorDto)element).setEntitatId(entitatId);
         OrganGestorDto entitatCreada = organGestorService.create((OrganGestorDto)element);

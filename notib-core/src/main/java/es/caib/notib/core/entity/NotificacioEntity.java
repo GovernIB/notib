@@ -272,6 +272,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	public void decreaseRegistreEnviamentPrioritat(int seconds) {
 		Calendar cal = GregorianCalendar.getInstance();
+		if (registreData != null)
+			cal.setTime(this.registreData);
 		cal.add(Calendar.SECOND, seconds);
 		this.registreData = cal.getTime();
 	}

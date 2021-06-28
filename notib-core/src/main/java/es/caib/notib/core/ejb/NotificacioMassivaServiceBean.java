@@ -84,6 +84,13 @@ public class NotificacioMassivaServiceBean implements NotificacioMassivaService 
 		return delegate.create(entitatId, usuariCodi, notificacioMassiu);
 	}
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public void delete(
+			Long entitatId,
+			Long notificacioMassivaId) {
+		delegate.delete(entitatId, notificacioMassivaId);
+	}
+	@Override
 	@RolesAllowed({"tothom"})
 	public PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,

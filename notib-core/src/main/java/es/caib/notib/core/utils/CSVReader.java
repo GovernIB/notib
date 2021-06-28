@@ -37,4 +37,17 @@ public class CSVReader {
         }
         return linies;
     }
+    public static List<String> readHeader(byte[] fitxer) {
+        ICsvListReader listReader = null;
+        try {
+            Reader reader = new InputStreamReader(new ByteArrayInputStream(fitxer));
+            listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+            List<String> res = listReader.read();
+            listReader.close();
+            return  res;
+        } catch (IOException e) {
+            log.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
+            return null;
+        }
+    }
 }

@@ -32,10 +32,10 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
     private String[] relatedFields = new String[]{ "procediment" };
 
     @Override
-    public NotificacioDatabaseDto create(NotificacioDatabaseDto element, Long entitatId) throws Exception{
+    public NotificacioDatabaseDto create(Object element, Long entitatId) throws Exception{
         return notificacioService.create(
                 entitatId,
-                element);
+                (NotificacioDatabaseDto) element);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 
     public void relateElement(String key, Object element) throws Exception{
         if (element instanceof ProcedimentDto) {
-            this.objects.get(key).setProcediment((ProcedimentDto) element);
+            getObject(key).setProcediment((ProcedimentDto) element);
         }
     }
 

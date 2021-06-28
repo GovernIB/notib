@@ -3,7 +3,6 @@ package es.caib.notib.core.service;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
@@ -97,11 +96,6 @@ public class NotificacioMassivaServiceTest {
 						Mockito.<Map<String, Long>>any()
 					))
 				.thenReturn(NotificacioEntity.builder().build());
-		Mockito.when(conversioTipusHelper.convertir(
-						Mockito.any(NotificacioEnviamentDtoV2.class),
-						Mockito.eq(Enviament.class)
-					))
-				.thenReturn(new Enviament());
 		Mockito.when(procedimentRepository.findByCodiAndEntitat(
 				Mockito.any(String.class),
 				Mockito.any(EntitatEntity.class)
@@ -114,7 +108,7 @@ public class NotificacioMassivaServiceTest {
 
 //	private void setUpAuthentication() {
 //		Authentication authentication = Mockito.mock(Authentication.class);
-//		Mockito.when(authentication.getName()).thenReturn("admin");
+//		ºº
 //
 //		// Mockito.whens() for your authorization object
 //		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
@@ -163,7 +157,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(notificacioHelper, Mockito.times(4)).altaNotificacioWeb(
 				Mockito.any(EntitatEntity.class),
 				Mockito.any(NotificacioEntity.class),
-				Mockito.<List<Enviament>>any()
+				Mockito.<List<NotificacioEnviamentDtoV2>>any()
 		);
 	}
 
@@ -193,7 +187,7 @@ public class NotificacioMassivaServiceTest {
 		Mockito.verify(notificacioHelper, Mockito.times(0)).altaNotificacioWeb(
 				Mockito.any(EntitatEntity.class),
 				Mockito.any(NotificacioEntity.class),
-				Mockito.<List<Enviament>>any()
+				Mockito.<List<NotificacioEnviamentDtoV2>>any()
 		);
 	}
 

@@ -23,15 +23,15 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
     protected AuthenticationTest authenticationTest;
 
     @Override
-    public ProcedimentDto create(ProcedimentDto element, Long entitatId) throws Exception{
+    public ProcedimentDto create(Object element, Long entitatId) throws Exception{
         authenticationTest.autenticarUsuari("admin");
         ProcedimentDto entitatCreada = procedimentService.create(
                 entitatId,
-                element);
+                (ProcedimentDto) element);
         OrganGestorDto organ = organGestorService.findByCodi(entitatId,
                 ConfigTest.DEFAULT_ORGAN_DIR3);
         if (((ProcedimentDto)element).getPermisos() != null) {
-            for (PermisDto permis: element.getPermisos()) {
+            for (PermisDto permis: ((ProcedimentDto)element).getPermisos()) {
                 procedimentService.permisUpdate(
                         entitatId,
                         organ.getId(),

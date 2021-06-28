@@ -129,13 +129,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			// Dades generals de la notificació
 			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
 
-			List<Enviament> enviaments = new ArrayList<Enviament>();
-			for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
-				if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()))
-					enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
-				enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
-			}
-			notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, enviaments);
+
+			notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 
 			return conversioTipusHelper.convertir(
 				notificacioEntity,

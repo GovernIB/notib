@@ -69,6 +69,17 @@ public interface NotificacioMassivaService {
 			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException;
 
 	/**
+	 * Esborra una notificació massiva
+	 *
+	 * @param entitatId Entitat actual
+	 * @param notificacioMassivaId Identificador de la notificació massiva a esborrar
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
+	void delete(
+			Long entitatId,
+			Long notificacioMassivaId);
+
+	/**
 	 * Consulta les notificacions massives que s'han donat d'alta al sistema de manera paginada.
 	 *
 	 * @param entitatId Identificador de l'entitat actual

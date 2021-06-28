@@ -6,7 +6,6 @@ import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.*;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
@@ -206,8 +205,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
+            List<String> csvHeader = CSVReader.readHeader(notificacioMassiva.getFicheroCsvBytes());
             List<String[]> linies = CSVReader.readFile(notificacioMassiva.getFicheroCsvBytes());
-            if (linies == null) {
+            if (linies == null || csvHeader == null) {
                 throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
             }
             if (linies.isEmpty()) {
@@ -224,10 +224,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             StringWriter writerListErrors = new StringWriter();
             StringWriter writerListInforme = new StringWriter();
+
+            csvHeader.add("Errores");
             ICsvListWriter listWriterErrors = initCsvWritter(writerListErrors);
             ICsvListWriter listWriterInforme = initCsvWritter(writerListInforme);
-            writeCsvHeader(listWriterErrors);
-            writeCsvHeader(listWriterInforme);
+            writeCsvHeader(listWriterErrors, csvHeader.toArray(new String[]{}));
+            writeCsvHeader(listWriterInforme, csvHeader.toArray(new String[]{}));
 
             NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva);
             for (String[] linia : linies) {
@@ -306,6 +308,16 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return conversioTipusHelper.convertir(notificacioMassivaEntity, NotificacioMassivaDataDto.class);
         } finally {
             metricsHelper.fiMetrica(timer);
+        }
+    }
+    @Override
+    public void delete(
+            Long entitatId,
+            Long notificacioMassivaId) {
+        entityComprovarHelper.comprovarEntitat(entitatId);
+        NotificacioMassivaEntity notificacioMassiva = notificacioMassivaRepository.findOne(notificacioMassivaId);
+        if (notificacioMassiva.getNotificacions().size() == 0) {
+            notificacioMassivaRepository.delete(notificacioMassivaId);
         }
     }
 
@@ -448,16 +460,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notMassiva,
                 documentsProcessatsMassiu);
 
-
-        List<Enviament> enviaments = new ArrayList<Enviament>();
-        for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
-            if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()))
-                enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
-            enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
-        }
-
         log.debug("[NOT-MASSIVA] Alta notificació de nova notificacio massiva");
-        notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, enviaments);
+        notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, notificacio.getEnviaments());
         notMassiva.joinNotificacio(notificacioEntity);
     }
 
@@ -557,6 +561,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private NotificacioDatabaseDto csvToNotificaDatabaseDto(String[] linia, Date caducitat, EntitatEntity entitat,
                                                             String usuariCodi, List<String> fileNames, byte[] ficheroZipBytes,
                                                             Map<String, Long> documentsProcessatsMassiu) {
+
+        log.debug("[NOT-MASSIVA] Construeix notificació de les dades del fitxer CSV");
         NotificacioDatabaseDto notificacio = new NotificacioDatabaseDto();
         NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
         List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
@@ -602,11 +608,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         } else {
             if (fileNames.contains(linia[4])) { // Archivo físico
                 document.setArxiuNom(linia[4]);
-                byte [] arxiuBytes;
+                byte[] arxiuBytes;
                 if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
                         (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
                                 documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
-                    arxiuBytes = ZipFileUtils.readZipFile (ficheroZipBytes, linia[4]);
+                    arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, linia[4]);
                     document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
                     document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
                     document.setGenerarCsv(false);
@@ -617,24 +623,31 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     }
                 }
             } else {
-                String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
-                Pattern pUuid = Pattern.compile(uuidPattern);
-                Matcher mUuid = pUuid.matcher(linia[4]);
-                if (mUuid.matches()) {
-                    // Uuid
-                    document.setUuid(linia[4]);
-                    document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
-                    document.setGenerarCsv(false);
-                    if (registreNotificaHelper.isSendDocumentsActive()) {
-                        leerMetadadesDelCsv(document, linia);
-                    }
+                String[] docSplit = linia[4].split("\\.");
+                if (docSplit.length > 1 && Arrays.asList("JPG", "JPEG", "ODT", "ODP", "ODS", "ODG", "DOCX", "XLSX", "PPTX",
+                        "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV").contains(docSplit[1].toUpperCase())) {
+                    notificacio.setDocument(null);
+
                 } else {
-                    // Csv
-                    document.setCsv(linia[4]);
-                    document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
-                    document.setGenerarCsv(false);
-                    if (registreNotificaHelper.isSendDocumentsActive()) {
-                        leerMetadadesDelCsv(document, linia);
+                    String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
+                    Pattern pUuid = Pattern.compile(uuidPattern);
+                    Matcher mUuid = pUuid.matcher(linia[4]);
+                    if (mUuid.matches()) {
+                        // Uuid
+                        document.setUuid(linia[4]);
+                        document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+                        document.setGenerarCsv(false);
+                        if (registreNotificaHelper.isSendDocumentsActive()) {
+                            leerMetadadesDelCsv(document, linia);
+                        }
+                    } else {
+                        // Csv
+                        document.setCsv(linia[4]);
+                        document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+                        document.setGenerarCsv(false);
+                        if (registreNotificaHelper.isSendDocumentsActive()) {
+                            leerMetadadesDelCsv(document, linia);
+                        }
                     }
                 }
             }
@@ -708,17 +721,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return new CsvListWriter(writer,
                 CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
     }
-    private ICsvListWriter writeCsvHeader(ICsvListWriter listWriter) {
-
+    private ICsvListWriter writeCsvHeader(ICsvListWriter listWriter, String[] csvHeader) {
         try {
-            final String[] header;
-            if (registreNotificaHelper.isSendDocumentsActive()) {
-                header = new String[] { "Codigo Unidad Remisora", "Concepto", "Tipo de Envio", "Referencia Emisor", "Nombre Fichero", "Normalizado", "Prioridad Servicio", "Nombre",	"APELLIDOS", "CIF/NIF",	"Email", "Codigo destino", "Línea 1", "Línea 2", "Codigo Postal", "Retardo Postal", "Código Procedimiento", "Fecha Envio Programado", "Origen", "Estado Elaboración", "Tipo Documental", "PDF Firmado", "Errores" };
-            } else {
-                header = new String[] { "Codigo Unidad Remisora", "Concepto", "Tipo de Envio", "Referencia Emisor", "Nombre Fichero", "Normalizado", "Prioridad Servicio", "Nombre",	"APELLIDOS", "CIF/NIF",	"Email", "Codigo destino", "Línea 1", "Línea 2", "Codigo Postal", "Retardo Postal", "Código Procedimiento", "Fecha Envio Programado", "Errores" };
-            }
-
-            listWriter.writeHeader(header);
+            listWriter.writeHeader(csvHeader);
             return listWriter;
         } catch (IOException e) {
             log.error("S'ha produït un error a l'escriure la capçalera de l'fitxer CSV.", e);
