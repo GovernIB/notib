@@ -5,6 +5,7 @@ package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -95,7 +96,13 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds) {
 		return delegate.findByProcedimentIds(procedimentIds);
 	}
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<OrganGestorDto> findByProcedimentIdsAndEstat(List<Long> procedimentIds, OrganGestorEstatEnum estat) {
+		return delegate.findByProcedimentIdsAndEstat(procedimentIds, estat);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi) {

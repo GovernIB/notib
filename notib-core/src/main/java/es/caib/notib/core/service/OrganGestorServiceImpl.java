@@ -261,7 +261,19 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findByProcedimentIdsAndEstat(List<Long> procedimentIds, OrganGestorEstatEnum estat) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			return conversioTipusHelper.convertirList(
+					organGestorRepository.findByEstatAndProcedimentIds(procedimentIds, estat),
+					OrganGestorDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findDescencentsByCodi(
@@ -887,7 +899,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 										organGestorEntity.getCodi());
 						if (organsFills != null)
 							for(String organCodi: organsFills) {
-								organsGestorsAmbPermis.add(findByCodi(entitatId, organCodi));
+								OrganGestorDto organ = findByCodi(entitatId, organCodi);
+								if (PermisEnum.CONSULTA.equals(permis) || organ.getEstat() == OrganGestorEstatEnum.VIGENT) {
+									organsGestorsAmbPermis.add(organ);
+								}
 							}
 										
 					}

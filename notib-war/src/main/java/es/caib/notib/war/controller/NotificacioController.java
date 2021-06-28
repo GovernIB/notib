@@ -6,6 +6,7 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -1376,7 +1377,7 @@ public class NotificacioController extends BaseUserController {
 
         // 1-recuperam els òrgans dels procediments disponibles (amb permís)
         if (!procedimentsDisponiblesIds.isEmpty())
-            organsGestorsProcediments = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+            organsGestorsProcediments = organGestorService.findByProcedimentIdsAndEstat(procedimentsDisponiblesIds, OrganGestorEstatEnum.VIGENT);
 
         // 2-recuperam els òrgans amb permís de notificació
         List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(

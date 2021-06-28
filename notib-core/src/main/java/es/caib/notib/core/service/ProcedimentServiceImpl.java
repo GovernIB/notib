@@ -1262,8 +1262,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private boolean hasPermisProcedimentsComuns(String codiEntitat, String codiOrgan) {
 		List<String> organsPares = organGestorCachable.getCodisAncestors(codiEntitat, codiOrgan);
 		for (String codiDir3 : organsPares) {
-			if(permisosHelper.hasPermission(
-					organGestorRepository.findByCodi(codiDir3).getId(),
+			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(codiDir3);
+			if(organGestorEntity != null && permisosHelper.hasPermission(
+					organGestorEntity.getId(),
 					OrganGestorEntity.class,
 					new Permission[]{ExtendedPermission.COMUNS})
 			) {

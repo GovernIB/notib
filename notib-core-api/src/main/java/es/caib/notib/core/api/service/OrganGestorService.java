@@ -2,6 +2,7 @@ package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -73,8 +74,11 @@ public interface OrganGestorService {
 	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
-	
+	List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	List<OrganGestorDto> findByProcedimentIdsAndEstat(List<Long> procedimentIds, OrganGestorEstatEnum estat);
+
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<OrganGestorDto> findDescencentsByCodi(
 			Long entitatId,

@@ -62,6 +62,10 @@ public class OrganGestorCachable {
     public List<String> getCodisAncestors(String codiDir3Entitat, String codiDir3Organ) {
         Map<String, OrganismeDto> organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
         OrganismeDto currentNode = organigramaEntitat.get(codiDir3Organ);
+        if (currentNode == null) { // organ obsolet
+            return new ArrayList<>();
+        }
+
         List<String> pares = new ArrayList<>();
         while(!currentNode.getCodi().equals(currentNode.getPare())) {
             pares.add(currentNode.getCodi());

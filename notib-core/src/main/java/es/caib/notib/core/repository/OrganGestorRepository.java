@@ -46,7 +46,18 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    ProcedimentEntity p " +
 			"    left outer join p.organGestor og " +
 			"where p.id in (:procedimentIds)")
-	public List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
+	List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
+
+	@Query(	"select distinct og " +
+			"from " +
+			"    ProcedimentEntity p " +
+			"    left outer join p.organGestor og " +
+			"where " +
+			"	p.id in (:procedimentIds) " +
+			"	and :estat = og.estat")
+	List<OrganGestorEntity> findByEstatAndProcedimentIds(
+			@Param("procedimentIds") List<Long> procedimentIds,
+			@Param("estat") OrganGestorEstatEnum estat);
 
 	@Query( "select distinct og " +
 			"from ProcedimentEntity pro " +
