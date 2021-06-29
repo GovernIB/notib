@@ -1,0 +1,14 @@
+-- #536 No permetre realitzar enviaments amb òrgans obsolets
+UPDATE NOT_NOTIFICACIO_TABLE nnt SET nnt.ORGAN_ESTAT =
+    (SELECT nog.ESTAT
+        FROM NOT_ORGAN_GESTOR nog
+        WHERE nog.CODI = nnt.ORGAN_CODI)
+    WHERE nnt.ORGAN_CODI IS NOT NULL;
+
+UPDATE NOT_NOTIFICACIO_ENV_TABLE nnet SET nnet.ORGAN_ESTAT =
+    (SELECT nog.ESTAT
+        FROM NOT_ORGAN_GESTOR nog
+        WHERE nog.CODI = nnet.NOT_ORGAN_CODI)
+    WHERE nnet.NOT_ORGAN_CODI IS NOT NULL;
+
+COMMIT;
