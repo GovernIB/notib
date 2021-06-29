@@ -8,16 +8,20 @@
 <%
 	pageContext.setAttribute(
 			"isRolActualAdministrador",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request),
+			PageContext.REQUEST_SCOPE);
 	pageContext.setAttribute(
 			"isRolActualUsuari",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request),
+			PageContext.REQUEST_SCOPE);
 	pageContext.setAttribute(
 			"isRolActualAdministradorEntitat",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request),
+			PageContext.REQUEST_SCOPE);
 	pageContext.setAttribute(
 			"isRolActualAdministradorOrgan",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request),
+			PageContext.REQUEST_SCOPE);
 %>
 
 <c:set var="mostraEntitat" value="${isRolActualAdministrador && mostrarColumnaEntitat}" scope="request"/>

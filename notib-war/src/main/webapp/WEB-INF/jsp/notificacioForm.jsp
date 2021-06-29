@@ -3060,7 +3060,7 @@
 <!-- 						</div> -->
 					</div>
 				
-					<div id="results" class="row" style="background-color: white; height: 240px; border: 1px solid #CCC; margin: 0px; overflow-y: scroll"" >
+					<div id="results" class="row" style="background-color: white; height: 240px; border: 1px solid #CCC; margin: 0px; overflow-y: scroll" >
 						<div class="loading-screen" style="text-align: center; width:100%; height: 0%;;">
 								<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 									<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>
