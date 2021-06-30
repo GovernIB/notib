@@ -133,7 +133,7 @@ public class NotificacioController extends BaseUserController {
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
 //		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-        List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+        List<ProcedimentSimpleDto> procedimentsDisponibles;
         List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 
         if (RolHelper.isUsuariActualUsuari(request)) {
@@ -142,7 +142,7 @@ public class NotificacioController extends BaseUserController {
             procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
             model.addAttribute("procediments", procedimentsDisponibles);
             List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-            for (ProcedimentDto pro : procedimentsDisponibles)
+            for (ProcedimentSimpleDto pro : procedimentsDisponibles)
                 procedimentsDisponiblesIds.add(pro.getId());
             organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
             model.addAttribute("organsGestors", organsGestorsDisponibles);
@@ -396,7 +396,7 @@ public class NotificacioController extends BaseUserController {
         boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
         String organGestorCodi = null;
         List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
-        List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+        List<ProcedimentSimpleDto> procedimentsDisponibles;
         List<ProcedimentOrganDto> procedimentOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
         List<String> codisProcedimentsDisponibles = new ArrayList<String>();
         List<Long> codisProcedimentOrgansDisponibles = new ArrayList<Long>();
@@ -411,7 +411,7 @@ public class NotificacioController extends BaseUserController {
                 procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
                 organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
                 procedimentOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-                for (ProcedimentDto procediment : procedimentsDisponibles) {
+                for (ProcedimentSimpleDto procediment : procedimentsDisponibles) {
                     if (!procediment.isComu())
                         codisProcedimentsDisponibles.add(procediment.getCodi());
                 }
@@ -426,7 +426,7 @@ public class NotificacioController extends BaseUserController {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
                 procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
-                for (ProcedimentDto procediment : procedimentsDisponibles) {
+                for (ProcedimentSimpleDto procediment : procedimentsDisponibles) {
                     codisProcedimentsDisponibles.add(procediment.getCodi());
                 }
             }
@@ -1249,7 +1249,7 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
         model.addAttribute("entitat", entitatActual);
 
-        List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+        List<ProcedimentSimpleDto> procedimentsDisponibles = new ArrayList<>();
         List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
         if (RolHelper.isUsuariActualUsuari(request)) {
 	        procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
@@ -1346,18 +1346,19 @@ public class NotificacioController extends BaseUserController {
 
     }
 
-    private List<ProcedimentDto> addProcedimentsOrgan(
-            List<ProcedimentDto> procedimentsDisponibles,
+    private List<ProcedimentSimpleDto> addProcedimentsOrgan(
+            List<ProcedimentSimpleDto> procedimentsDisponibles,
             List<ProcedimentOrganDto> procedimentsOrgansDisponibles) {
         if (procedimentsOrgansDisponibles != null && !procedimentsOrgansDisponibles.isEmpty()) {
-            Set<ProcedimentDto> setProcediments = new HashSet<ProcedimentDto>(procedimentsDisponibles);
+            Set<ProcedimentSimpleDto> setProcediments = new HashSet<>(procedimentsDisponibles);
             for (ProcedimentOrganDto procedimentOrgan : procedimentsOrgansDisponibles) {
-                setProcediments.add(procedimentOrgan.getProcediment());
+                setProcediments.add(
+                        ConversioTipusHelper.convertir(procedimentOrgan.getProcediment(), ProcedimentSimpleDto.class));
             }
-            procedimentsDisponibles = new ArrayList<ProcedimentDto>(setProcediments);
-            Collections.sort(procedimentsDisponibles, new Comparator<ProcedimentDto>() {
+            procedimentsDisponibles = new ArrayList<>(setProcediments);
+            Collections.sort(procedimentsDisponibles, new Comparator<ProcedimentSimpleDto>() {
                 @Override
-                public int compare(ProcedimentDto p1, ProcedimentDto p2) {
+                public int compare(ProcedimentSimpleDto p1, ProcedimentSimpleDto p2) {
                     return p1.getNom().compareTo(p2.getNom());
                 }
             });
@@ -1367,12 +1368,12 @@ public class NotificacioController extends BaseUserController {
 
     private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(
             EntitatDto entitatActual,
-            List<ProcedimentDto> procedimentsDisponibles,
+            List<ProcedimentSimpleDto> procedimentsDisponibles,
             List<ProcedimentOrganDto> procedimentsOrgansDisponibles,
             PermisEnum permis) {
         List<OrganGestorDto> organsGestorsProcediments = new ArrayList<OrganGestorDto>();
         List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-        for (ProcedimentDto pro : procedimentsDisponibles)
+        for (ProcedimentSimpleDto pro : procedimentsDisponibles)
             procedimentsDisponiblesIds.add(pro.getId());
 
         // 1-recuperam els òrgans dels procediments disponibles (amb permís)
@@ -1445,7 +1446,7 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("dir3Codi", entitatActual.getId());
         //model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
         //model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
-        List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+        List<ProcedimentSimpleDto> procedimentsDisponibles;
         List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
         if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
 	       	procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
