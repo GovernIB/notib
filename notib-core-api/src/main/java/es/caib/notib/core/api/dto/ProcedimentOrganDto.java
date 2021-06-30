@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ProcedimentOrganDto extends AuditoriaDto implements Serializable{
 
 	private Long id;
-	private ProcedimentDto procediment;
+	private ProcedimentSimpleDto procediment;
 	private OrganGestorDto organGestor;
 
 	private static final long serialVersionUID = -696557578055790854L;
