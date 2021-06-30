@@ -731,6 +731,11 @@
 		});
 		$('#procedimentId').on('change', function() {
 			var procediment = $(this).val();
+			if (procediment == null) {
+				alert("No s'ha pogut trobar el procediment de la notificació, segurament degut a que " +
+						"els permisos que hi tens assignats són insuficients.")
+				return;
+			}
 			if (procediment == '') {
 				$("#organGestor").prop("disabled", false);
 			} else {
