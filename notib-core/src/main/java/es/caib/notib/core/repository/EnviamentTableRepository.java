@@ -46,7 +46,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esNifTitularNull = true or lower(nenv.titularNif) like lower('%'||:nifTitular||'%')) " +
 			"and (:esNomTitularNull = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or nenv.titularEmail = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(nenv.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:esDir3CodiNull = true or lower(nenv.organCodi) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) "+
@@ -152,7 +152,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esNifTitularNull = true or lower(nenv.titularNif) like lower('%'||:nifTitular||'%')) " +
 			"and (:esNomTitularNull = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or nenv.titularEmail = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(nenv.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:esDir3CodiNull = true or lower(nenv.organCodi) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) "+
@@ -249,7 +249,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esNifTitularNull = true or lower(nenv.titularNif) like lower('%'||:nifTitular||'%')) " +
 			"and (:esNomTitularNull = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or nenv.titularEmail = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(nenv.emisorDir3Codi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:esDir3CodiNull = true or lower(nenv.organCodi) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) "+

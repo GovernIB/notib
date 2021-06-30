@@ -593,13 +593,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 				boolean isNullNumeroCertCorreus = filtre.getNumeroCertCorreus() == null || filtre.getNumeroCertCorreus().isEmpty();
 				boolean isNullUsuari = filtre.getUsuari() == null || filtre.getUsuari().isEmpty();
 				boolean isNullNumeroRegistre = filtre.getRegistreNumero() == null || filtre.getRegistreNumero().isEmpty();
-				logger.info("--------------");
-				logger.info("--------------");
-				logger.info("--------------");
-				logger.info("Inici Consulta");
-				logger.info("--------------");
-				logger.info("--------------");
-				logger.info("--------------");
 				long ti = System.nanoTime();
 				pageEnviaments = enviamentTableRepository.find4EntitatAdminRole(
 						isNullProcediment,
@@ -657,10 +650,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						hasZeronotificaEnviamentIntent == null,
 						hasZeronotificaEnviamentIntent,
 						pageable);
-				logger.info("--------------");
-				logger.info("--------------");
-				logger.info("Fi Consulta");
-				logger.info(String.format("Time spent: %f ms", (System.nanoTime() - ti) / 1e6));
+				logger.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
 				pageEnviaments = new PageImpl<>(new ArrayList<EnviamentTableEntity>());
