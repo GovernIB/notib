@@ -145,7 +145,7 @@ public class EnviamentController extends BaseUserController {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
 
-		List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
+		List<ProcedimentSimpleDto> procedimentsDisponibles;
 		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 		List<ProcedimentOrganDto> procedimentOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
 		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
@@ -163,7 +163,7 @@ public class EnviamentController extends BaseUserController {
 				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
 				procedimentOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-				for(ProcedimentDto procediment: procedimentsDisponibles) {
+				for(ProcedimentSimpleDto procediment: procedimentsDisponibles) {
 					if (!procediment.isComu())
 						codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
@@ -178,7 +178,7 @@ public class EnviamentController extends BaseUserController {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
 				procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
-				for(ProcedimentDto procediment: procedimentsDisponibles) {
+				for(ProcedimentSimpleDto procediment: procedimentsDisponibles) {
 					codisProcedimentsDisponibles.add(procediment.getCodi());
 				}
 			}

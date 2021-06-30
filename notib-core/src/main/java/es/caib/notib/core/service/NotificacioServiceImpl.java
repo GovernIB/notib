@@ -892,10 +892,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 
 		List<String> codisProcedimentsProcessables = new ArrayList<String>();
-		List<ProcedimentDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatEntity.getId(),
+		List<ProcedimentSimpleDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatEntity.getId(),
 				usuariCodi, PermisEnum.PROCESSAR);
 		if (procedimentsProcessables != null)
-			for (ProcedimentDto procediment : procedimentsProcessables) {
+			for (ProcedimentSimpleDto procediment : procedimentsProcessables) {
 				codisProcedimentsProcessables.add(procediment.getCodi());
 			}
 		List<ProcedimentOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);

@@ -688,7 +688,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findByEntitat(Long entitatId) {
+	public List<ProcedimentSimpleDto> findByEntitat(Long entitatId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
@@ -697,7 +697,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			
 			return conversioTipusHelper.convertirList(
 					procediment,
-					ProcedimentDto.class);
+					ProcedimentSimpleDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -705,7 +705,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<ProcedimentDto> findByOrganGestorIDescendents(
+	public List<ProcedimentSimpleDto> findByOrganGestorIDescendents(
 			Long entitatId, 
 			OrganGestorDto organGestor) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
@@ -714,7 +714,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				organGestor.getCodi());
 		return conversioTipusHelper.convertirList(
 				procedimentRepository.findByOrganGestorCodiIn(organsFills),
-				ProcedimentDto.class);
+				ProcedimentSimpleDto.class);
 	}
 
 	@Override
@@ -991,7 +991,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "procedimentsPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
-	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+	public List<ProcedimentSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -1018,7 +1018,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			// 7. Convertim els procediments a dto
 			return conversioTipusHelper.convertirList(
 					procediments,
-					ProcedimentDto.class);
+					ProcedimentSimpleDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
