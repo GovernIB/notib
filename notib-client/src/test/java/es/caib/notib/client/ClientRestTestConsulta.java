@@ -3,22 +3,24 @@
  */
 package es.caib.notib.client;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.datatype.DatatypeConfigurationException;
-
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.ws.notificacio.RespostaConsultaJustificantEnviament;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
 
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.
@@ -28,11 +30,11 @@ import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
 public class ClientRestTestConsulta {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
+	private static final String URL = "http://localhost:8180/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 	private static final boolean BASIC_AUTH = false;
-	private static final String CLAU_XIFRAT = "XXXXXX";
+	private static final String CLAU_XIFRAT = "P0rt4FI8";
 	
 //	private static final String URL = "http://dev.caib.es/notib";
 //	private static final String USERNAME = "$ripea_notib";
@@ -62,8 +64,21 @@ public class ClientRestTestConsulta {
 		assertNotNull(respostaEnv);
 
 	}
-	
-	private String xifrarId(Long id) throws GeneralSecurityException {
+
+	@Test
+	public void testConsultaJustificant() throws GeneralSecurityException, IOException {
+		RespostaConsultaJustificantEnviament respostaJustif = client.consultaJustificantEnviament(xifrarId(14556L));
+
+		assertNotNull(respostaJustif);
+		assertNotNull(respostaJustif.getJustificant());
+
+		Path path = Paths.get("./justificant_generat.pdf");
+		Files.write(path, respostaJustif.getJustificant().getContingut());
+
+
+	}
+
+	protected String xifrarId(Long id) throws GeneralSecurityException {
 		// Si el mode test està actiu concatena la data actual a l'identificador de
 		// base de dades per a generar l'id de Notifica. Si no ho fessim així es
 		// duplicarien els ids de Notifica en cada execució del test i les cridades
@@ -77,12 +92,12 @@ public class ClientRestTestConsulta {
 		return new String(Base64.encodeBase64(xifrat));
 //		return new String(Hex.encodeHex(xifrat));
 	}
-	private byte[] longToBytes(long l) {
+	protected byte[] longToBytes(long l) {
 		byte[] result = new byte[Long.SIZE / Byte.SIZE];
-	    for (int i = 7; i >= 0; i--) {
-	        result[i] = (byte)(l & 0xFF);
-	        l >>= 8;
-	    }
-	    return result;
+		for (int i = 7; i >= 0; i--) {
+			result[i] = (byte)(l & 0xFF);
+			l >>= 8;
+		}
+		return result;
 	}
 }

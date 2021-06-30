@@ -57,6 +57,31 @@ public class JustificantServiceImpl implements JustificantService {
     @Transactional
     @Override
     public FitxerDto generarJustificantEnviament(Long notificacioId,
+                                                 String sequence) throws JustificantException {
+        Timer.Context timer = metricsHelper.iniciMetrica();
+        try {
+
+            NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
+            List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
+
+            if (enviamentsPendents != null && !enviamentsPendents.isEmpty())
+                throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
+
+            if (isABackgroundProcessNotEnded(sequence)) {
+                log.error("Ja existeix un altre procés iniciat");
+                getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
+                return null;
+            } else {
+                return generarJustificantEnviament(notificacio, sequence);
+            }
+        } finally {
+            metricsHelper.fiMetrica(timer);
+        }
+    }
+
+    @Transactional
+    @Override
+    public FitxerDto generarJustificantEnviament(Long notificacioId,
             Long entitatId,
             String sequence) throws JustificantException {
         Timer.Context timer = metricsHelper.iniciMetrica();
@@ -151,7 +176,11 @@ public class JustificantServiceImpl implements JustificantService {
         ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
         return progres != null && progres.getProgres() != 0;
     }
-
+    private boolean isABackgroundProcessNotEnded(String sequence){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
+        return progres != null && progres.getProgres() < 100;
+    }
     private FitxerDto generarJustificantEnviament(
             NotificacioEntity notificacio,
             String sequence) throws JustificantException {

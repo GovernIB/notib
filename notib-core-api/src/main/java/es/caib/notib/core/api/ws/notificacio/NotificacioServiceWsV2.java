@@ -70,4 +70,15 @@ public interface NotificacioServiceWsV2 {
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(
 			DadesConsulta dadesConsulta);
 
+	/**
+	 * Consulta el justificant de l'enviament d'una notificació.
+	 *
+	 * @param identificador
+	 *            Identificador de la notificació consultada.
+	 * @return la informació de la notificació amb l'enviament
+	 *            especificat.
+	 */
+	RespostaConsultaJustificant consultaJustificantEnviament(
+			@WebParam(name="identificador") @XmlElement(required = true) String identificador);
+
 }

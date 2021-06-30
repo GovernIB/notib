@@ -3,39 +3,25 @@
  */
 package es.caib.notib.war.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-
-import javax.ejb.EJBAccessException;
-import javax.servlet.http.HttpServletRequest;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import es.caib.notib.core.api.rest.consulta.AppInfo;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.util.UtilitatsNotib;
+import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.war.interceptor.AplicacioInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-
-import es.caib.notib.core.api.rest.consulta.AppInfo;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.util.UtilitatsNotib;
-import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
-import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
-import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.notib.war.interceptor.AplicacioInterceptor;
+import javax.ejb.EJBAccessException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * Controlador del servei REST per a la gestio de notificacions.
@@ -226,8 +212,8 @@ public class NotificacioServiceController extends BaseController {
 			return resp;
 		}
 	}
-	
-	
+
+
 	@RequestMapping(
 			value = "/services/notificacioV2/permisConsulta", 
 			method = RequestMethod.POST,
@@ -262,4 +248,40 @@ public class NotificacioServiceController extends BaseController {
 		}
 	}
 
+	@RequestMapping(
+			value = {"/services/notificacioV2/consultaJustificantNotificacio/**"},
+			method = RequestMethod.GET,
+			produces="application/json")
+	@ApiOperation(
+			value = "Consulta el justificant de l'enviament d'una notificació",
+			notes = "Retorna el document PDF amb el justificant de l'enviament de la notificació",
+			response = RespostaConsultaJustificant.class)
+	@ApiParam(
+			name = "identificador",
+			value = "Identificador de la notificació a consultar",
+			required = true)
+	@ResponseBody
+	public RespostaConsultaJustificant consultaJustificant(HttpServletRequest request) {
+		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
+		String referencia = extractIdentificador(request);
+		try {
+			return notificacioServiceWsV2.consultaJustificantEnviament(referencia);
+		} catch (Exception e) {
+			RespostaConsultaJustificant resp = new RespostaConsultaJustificant();
+			resp.setError(true);
+			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
+				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
+			} else {
+				resp.setErrorDescripcio(UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(
+						e,
+						EJBAccessException.class));
+			}
+			if (resp.getErrorDescripcio() != null)
+				return resp;
+			else
+				resp.setErrorDescripcio(e.getMessage());
+
+			return resp;
+		}
+	}
 }

@@ -10,6 +10,8 @@
    <xs:element name="consultaEstatEnviamentResponse" type="tns:consultaEstatEnviamentResponse"/>
    <xs:element name="consultaEstatNotificacio" type="tns:consultaEstatNotificacio"/>
    <xs:element name="consultaEstatNotificacioResponse" type="tns:consultaEstatNotificacioResponse"/>
+   <xs:element name="consultaJustificantEnviament" type="tns:consultaJustificantEnviament"/>
+   <xs:element name="consultaJustificantEnviamentResponse" type="tns:consultaJustificantEnviamentResponse"/>
    <xs:element name="dadesConsulta" type="tns:dadesConsulta"/>
    <xs:element name="donarPermisConsulta" type="tns:donarPermisConsulta"/>
    <xs:element name="donarPermisConsultaResponse" type="tns:donarPermisConsultaResponse"/>
@@ -35,6 +37,33 @@
      <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
      <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
      <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:element name="respostaConsultaJustificantEnviament" type="tns:respostaConsultaJustificantEnviament"/>
+   <xs:complexType name="consultaJustificantEnviament">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaJustificantEnviamentResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaJustificantEnviament"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaJustificantEnviament">
+    <xs:sequence>
+     <xs:element name="error" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="justificant" type="tns:fitxer"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="fitxer">
+    <xs:sequence>
+     <xs:element name="nom" type="xs:string"/>
+     <xs:element name="contentType" type="xs:string"/>
+     <xs:element name="contingut" type="xs:base64Binary"/>
+     <xs:element name="tamany" type="xs:int"/>
     </xs:sequence>
    </xs:complexType>
    <xs:complexType name="consultaEstatEnviament">
@@ -425,6 +454,12 @@
  <message name="NotificacioServiceV2_consultaEstatNotificacioResponse">
   <part element="tns:consultaEstatNotificacioResponse" name="consultaEstatNotificacioResponse"/>
  </message>
+ <message name="NotificacioServiceV2_consultaJustificantEnviament">
+  <part element="tns:consultaJustificantEnviament" name="consultaJustificantEnviament"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaJustificantEnviamentResponse">
+  <part element="tns:consultaJustificantEnviamentResponse" name="consultaJustificantEnviamentResponse"/>
+ </message>
  <message name="NotificacioServiceV2_altaResponse">
   <part element="tns:altaResponse" name="altaResponse"/>
  </message>
@@ -450,6 +485,10 @@
   <operation name="consultaEstatNotificacio" parameterOrder="consultaEstatNotificacio">
    <input message="tns:NotificacioServiceV2_consultaEstatNotificacio"/>
    <output message="tns:NotificacioServiceV2_consultaEstatNotificacioResponse"/>
+  </operation>
+  <operation name="consultaJustificantEnviament" parameterOrder="consultaJustificantEnviament">
+   <input message="tns:NotificacioServiceV2_consultaJustificantEnviament"/>
+   <output message="tns:NotificacioServiceV2_consultaJustificantEnviamentResponse"/>
   </operation>
   <operation name="donarPermisConsulta" parameterOrder="donarPermisConsulta">
    <input message="tns:NotificacioServiceV2_donarPermisConsulta"/>
@@ -486,6 +525,15 @@
    </output>
   </operation>
   <operation name="consultaEstatNotificacio">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="consultaJustificantEnviament">
    <soap:operation soapAction=""/>
    <input>
     <soap:body use="literal"/>

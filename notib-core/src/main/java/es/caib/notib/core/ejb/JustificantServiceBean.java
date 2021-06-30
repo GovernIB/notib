@@ -27,6 +27,11 @@ public class JustificantServiceBean implements JustificantService {
 	@Autowired
 	JustificantService delegate;
 
+	@Override
+	public FitxerDto generarJustificantEnviament(Long notificacioId, String sequence) throws JustificantException {
+		return delegate.generarJustificantEnviament(notificacioId, sequence);
+	}
+
 	@RolesAllowed({"tothom"})
 	public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
 		return delegate.generarJustificantEnviament(notificacioId, entitatId, sequence);
@@ -43,6 +48,5 @@ public class JustificantServiceBean implements JustificantService {
 	public ProgresDescarregaDto consultaProgresGeneracioJustificant(String sequence) throws JustificantException {
 		return delegate.consultaProgresGeneracioJustificant(sequence);
 	}
-
 
 }

@@ -12,6 +12,7 @@ import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.JustificantService;
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.*;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sun.misc.BASE64Encoder;
 
 import javax.jws.WebService;
 import javax.mail.internet.InternetAddress;
@@ -97,6 +99,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioHelper notificacioHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private JustificantService justificantService;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
@@ -378,410 +382,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 	}
 
-	private RespostaAlta generaResposta(
-			IntegracioInfo info,
-			NotificacioEntity notificacioGuardada,
-			List<EnviamentReferencia> referencies) {
-		RespostaAlta resposta = new RespostaAlta();
-		try {
-			resposta.setIdentificador(
-					notificaHelper.xifrarId(notificacioGuardada.getId()));
-			logger.debug(">> [ALTA] identificador creat");
-		} catch (GeneralSecurityException ex) {
-			logger.debug(">> [ALTA] Error creant identificador");
-			throw new RuntimeException(
-					"No s'ha pogut crear l'identificador de la notificació",
-					ex);
-		}
-		switch (notificacioGuardada.getEstat()) {
-		case PENDENT:
-			resposta.setEstat(NotificacioEstatEnum.PENDENT);
-			break;
-		case ENVIADA:
-			resposta.setEstat(NotificacioEstatEnum.ENVIADA);
-			break;
-		case REGISTRADA:
-			resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
-			break;
-		case FINALITZADA:
-			resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
-			break;
-		case PROCESSADA:
-			resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
-			break;
-		default:
-			break;
-		}
-		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
-		if (errorEvent != null) {
-			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
-			resposta.setError(true);
-			resposta.setErrorDescripcio(
-					errorEvent.getErrorDescripcio());
-		}
-		resposta.setReferencies(referencies);
-		logger.debug(">> [ALTA] afegides referències");
-		integracioHelper.addAccioOk(info);
-		return resposta;
-	}
-
-	private void inicialitzaCallbacks(NotificacioEntity notificacioGuardada) {
-		logger.debug(">> [ALTA] notificació assíncrona");
-		List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
-		for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
-			NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
-					NotificacioEventTipusEnumDto.CALLBACK_CLIENT_PENDENT,
-					notificacioGuardada).
-					enviament(enviament).
-					callbackInicialitza().
-					build();
-			notificacioGuardada.updateEventAfegir(eventDatat);
-			notificacioEventRepository.saveAndFlush(eventDatat);
-		}
-		logger.debug(">> [ALTA] callbacks de client inicialitzats");
-	}
-
-	private EnviamentReferencia saveEnviament(
-			EntitatEntity entitat,
-			NotificacioEntity notificacioGuardada,
-			Enviament enviament) {
-
-		ServeiTipusEnumDto serveiTipus = getServeiTipus(enviament);
-		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
-			logger.debug(">> [ALTA] Entrega postal");
-			tipusConcret = getDomiciliTipusConcret(enviament);
-			numeracioTipus = getDomiciliNumeracioTipus(enviament);
-		}
-		
-		PersonaEntity titular = saveTitular(enviament);
-		List<PersonaEntity> destinataris = getDestinataris(enviament);
-		EntregaPostalViaTipusEnum viaTipus = getViaTipus(enviament);
-		
-		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(
-				entitat,
-				notificacioGuardada,
-				enviament,
-				serveiTipus,
-				numeracioTipus,
-				tipusConcret,
-				titular,
-				destinataris,
-				viaTipus);
-		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
-		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
-		if (titular.getInteressatTipus() != InteressatTipusEnumDto.ADMINISTRACIO)
-			enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
-		else
-			enviamentReferencia.setTitularNif(titular.getDir3Codi().toUpperCase());
-		notificacioGuardada.addEnviament(enviamentSaved);
-		return enviamentReferencia;
-	}
-
-	private EntregaPostalViaTipusEnum getViaTipus(Enviament enviament) {
-		EntregaPostalViaTipusEnum viaTipus = null;
-		
-		if (enviament.getEntregaPostal() != null) {
-			viaTipus = enviament.getEntregaPostal().getViaTipus();
-		}
-		return viaTipus;
-	}
-
-	private List<PersonaEntity> getDestinataris(Enviament enviament) {
-		List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
-		if (enviament.getDestinataris() != null) {
-			for(Persona persona: enviament.getDestinataris()) {
-				PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
-						persona.getInteressatTipus(),
-						persona.getEmail(), 
-						persona.getLlinatge1(), 
-						persona.getLlinatge2(), 
-						persona.getNif(), 
-						persona.getNom(), 
-						persona.getTelefon(),
-						persona.getRaoSocial(),
-						persona.getDir3Codi()
-						).incapacitat(false).build());
-				destinataris.add(destinatari);
-			}
-		}
-		return destinataris;
-	}
-
-	private PersonaEntity saveTitular(Enviament enviament) {
-		PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
-				enviament.getTitular().getInteressatTipus(),
-				enviament.getTitular().getEmail(), 
-				enviament.getTitular().getLlinatge1(), 
-				enviament.getTitular().getLlinatge2(), 
-				enviament.getTitular().getNif(), 
-				enviament.getTitular().getNom(), 
-				enviament.getTitular().getTelefon(),
-				enviament.getTitular().getRaoSocial(),
-				enviament.getTitular().getDir3Codi()
-				).incapacitat(enviament.getTitular().isIncapacitat()).build());
-		return titular;
-	}
-
-	private NotificaDomiciliNumeracioTipusEnumDto getDomiciliNumeracioTipus(Enviament enviament) {
-		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus;
-		if (enviament.getEntregaPostal().getNumeroCasa() != null) {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
-		} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
-		} else if (enviament.getEntregaPostal().getPuntKm() != null) {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
-		} else {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
-		}
-		return numeracioTipus;
-	}
-
-	private NotificaDomiciliConcretTipusEnumDto getDomiciliTipusConcret(
-			Enviament enviament) {
-		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-		if (enviament.getEntregaPostal().getTipus() != null) {
-			switch (enviament.getEntregaPostal().getTipus()) {
-			case APARTAT_CORREUS:
-				tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
-				break;
-			case ESTRANGER:
-				tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
-				break;
-			case NACIONAL:
-				tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-				break;
-			case SENSE_NORMALITZAR:
-				tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-				break;
-			}
-		} else {
-			throw new ValidationException(
-					"ENTREGA_POSTAL",
-					"L'entrega postal te el camp tipus buit");
-		}
-		return tipusConcret;
-	}
-
-	private ServeiTipusEnumDto getServeiTipus(Enviament enviament) {
-		ServeiTipusEnumDto serveiTipus = null;
-		if (enviament.getServeiTipus() != null) {
-			switch (enviament.getServeiTipus()) {
-			case NORMAL:
-				serveiTipus = ServeiTipusEnumDto.NORMAL;
-				break;
-			case URGENT:
-				serveiTipus = ServeiTipusEnumDto.URGENT;
-				break;
-			}
-		}
-		return serveiTipus;
-	}
-
-	private DocumentEntity getDocument(DocumentV2 documentV2, DocumentDto document) {
-		DocumentEntity documentEntity = null;
-		if(documentV2.getCsv() != null ||
-		   documentV2.getUuid() != null ||
-		   documentV2.getContingutBase64() != null ||
-		   documentV2.getUrl() != null ||
-		   documentV2.getArxiuId() != null) {
-
-			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
-					documentV2.getArxiuId(),
-					document.getArxiuGestdocId(), 
-					documentV2.getArxiuNom(),
-					documentV2.getUrl(),
-					documentV2.isNormalitzat(),
-					documentV2.getUuid(),
-					documentV2.getCsv(),
-					document.getMediaType(),
-					document.getMida(),
-					document.getOrigen(),
-					document.getValidesa(),
-					document.getTipoDocumental(),
-					document.getModoFirma()).build());
-			logger.debug(">> [ALTA] document creat");
-		}
-		return documentEntity;
-	}
-
-	private NotificaEnviamentTipusEnumDto getEnviamentTipus(
-			NotificacioV2 notificacio) {
-		NotificaEnviamentTipusEnumDto enviamentTipus = null;
-		if (notificacio.getEnviamentTipus() != null) {
-			switch (notificacio.getEnviamentTipus()) {
-			case COMUNICACIO:
-				enviamentTipus = NotificaEnviamentTipusEnumDto.COMUNICACIO;
-				break;
-			case NOTIFICACIO:
-				enviamentTipus = NotificaEnviamentTipusEnumDto.NOTIFICACIO;
-				break;
-			}
-			logger.debug(">> [ALTA] enviament tipus: " + enviamentTipus);
-		}
-		return enviamentTipus;
-	}
-
-	private DocumentDto comprovaDocument(DocumentV2 documentV2) {
-		DocumentDto document = new DocumentDto();
-		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
-		boolean utilizarValoresPorDefecto = getUtilizarValoresPorDefecto();
-		OrigenEnum origen = documentV2.getOrigen();
-		ValidesaEnum validesa = documentV2.getValidesa();
-		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental();
-		Boolean modoFirma = documentV2.getModoFirma();
-		if (utilizarValoresPorDefecto) {
-			origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.ADMINISTRACIO;
-			validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
-			tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
-			modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
-		}
-		// --
-		if(documentV2.getContingutBase64() != null) {
-			logger.debug(">> [ALTA] document contingut Base64");
-			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
-			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
-					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					contingut);
-			document.setArxiuGestdocId(documentGesdocId);
-			document.setMida(Long.valueOf(contingut.length));
-			document.setMediaType(getMimeTypeFromContingut(contingut));
-			document.setOrigen(origen);
-			document.setValidesa(validesa);
-			document.setTipoDocumental(tipoDocumental);
-			document.setModoFirma(modoFirma);
-			logger.debug(">> [ALTA] documentId: " + documentGesdocId);
-		} else if (documentV2.getUuid() != null) {
-			String arxiuUuid = documentV2.getUuid();
-			logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
-			DocumentContingut contingut = null;
-			contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
-
-			document.setMida(contingut.getTamany());
-			document.setMediaType(contingut.getTipusMime());
-			
-			Document doc = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
-			if (doc.getMetadades() == null && 
-					(origen == null || validesa == null || 
-					tipoDocumental == null || modoFirma == null)) {
-				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de documentV2 ni per defecte");
-			}
-			if (doc.getMetadades() != null) {
-				document.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen().ordinal()));
-				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
-				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
-				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
-			} else {
-				document.setOrigen(origen);
-				document.setValidesa(validesa);
-				document.setTipoDocumental(tipoDocumental);
-				document.setModoFirma(modoFirma);
-			}
-			
-			// Recuperar csv
-			Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
-			if (metadadesAddicionals != null) {
-				if (metadadesAddicionals.containsKey("csv"))
-					document.setCsv((String) metadadesAddicionals.get("csv"));
-				else if (metadadesAddicionals.containsKey("eni:csv"))
-					document.setCsv((String) metadadesAddicionals.get("eni:csv"));
-			}
-			
-		} else if (documentV2.getCsv() != null) {
-			String arxiuCsv = documentV2.getCsv();
-			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
-			DocumentContingut contingut = null;
-			contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
-			
-			document.setMida(contingut.getTamany());
-			document.setMediaType(contingut.getTipusMime());
-			
-			Document doc = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
-			if (doc.getMetadades() == null && 
-					(origen == null || validesa == null || 
-					tipoDocumental == null || modoFirma == null)) {
-				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de documentV2 ni per defecte");
-			}
-			if (doc.getMetadades() != null) {
-				document.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen().ordinal()));
-				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
-				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
-				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
-			} else {
-				document.setOrigen(origen);
-				document.setValidesa(validesa);
-				document.setTipoDocumental(tipoDocumental);
-				document.setModoFirma(modoFirma);
-			}
-			
-		} else if (documentV2.getUrl() != null) {
-			String arxiuUrl = documentV2.getUrl();
-			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
-			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
-			document.setMida(Long.valueOf(contingut.length));
-			document.setMediaType(getMimeTypeFromContingut(contingut));
-			document.setOrigen(origen);
-			document.setValidesa(validesa);
-			document.setTipoDocumental(tipoDocumental);
-			document.setModoFirma(modoFirma);
-		}
-		return document;
-	}
-
-	private String getMimeTypeFromContingut(byte[] contingut) {
-		String mimeType = null;
-		
-		try {
-			InputStream is = new BufferedInputStream(new ByteArrayInputStream(contingut));
-			mimeType = URLConnection.guessContentTypeFromStream(is);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return mimeType;
-	}
-
-	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcedimentEntity procediment) {
-		String errorDescripcio = null;
-		if (procediment.isAgrupar() && notificacio.getGrupCodi() != null && !notificacio.getGrupCodi().isEmpty()) {
-			logger.debug(">> [ALTA] procediment amb grups");
-			// Llistat de procediments amb grups
-			List<GrupDto> grupsProcediment = grupService.findByProcedimentAndUsuariGrups(procediment.getId());
-			GrupDto grupNotificacio = grupService.findByCodi(
-					notificacio.getGrupCodi(),
-					entitat.getId());
-			if (grupNotificacio == null) {
-				logger.debug(">> [ALTA] procediment grup: Sense grup");
-				errorDescripcio = "[1320] El grup indicat " + notificacio.getGrupCodi() + " no està definit dins NOTIB.";
-			} else {
-				if (grupsProcediment == null || grupsProcediment.isEmpty()) {
-					errorDescripcio = "[1321] S'ha indicat un grup per les notificacions però el procediment " + notificacio.getProcedimentCodi() + " no té cap grup assignat.";
-				} else {
-					if(!grupsProcediment.contains(grupNotificacio)) {
-						errorDescripcio = "[1322] El grup indicat " + notificacio.getGrupCodi() + " no està assignat al procediment " + notificacio.getProcedimentCodi();
-					}
-				}
-			}
-		}
-		return errorDescripcio;
-	}
-
-	private IntegracioInfo generateInfoAlta(NotificacioV2 notificacio) {
-		String json = "S'ha produït un error al intentar llegir la informació de la notificació";
-		ObjectMapper mapper  = new ObjectMapper();
-		try {
-			json = mapper.writeValueAsString(notificacio);
-		} catch (Exception e) { }
-		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_CLIENT, 
-				"Alta de notificació", 
-				IntegracioAccioTipusEnumDto.RECEPCIO, 
-				new AccioParam("Notificacio", json));
-		return info;
-	}
-	
 	@Override
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -1162,7 +762,636 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	@Transactional(readOnly = true)
+	public RespostaConsultaJustificant consultaJustificantEnviament(
+			String identificador) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			IntegracioInfo info = new IntegracioInfo(
+					IntegracioHelper.INTCODI_CLIENT,
+					"Consulta de la justificació d'una notificació",
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					new AccioParam("Identificador xifrat de la notificacio", identificador));
+
+			Long notificacioId;
+			RespostaConsultaJustificant resposta = new RespostaConsultaJustificant();
+
+			try {
+				try {
+					notificacioId = notificaHelper.desxifrarId(identificador);
+					info.getParams().add(new AccioParam("Identificador desxifrat de la notificació", String.valueOf(notificacioId)));
+				} catch (GeneralSecurityException ex) {
+					resposta.setError(true);
+					resposta.setErrorData(new Date());
+					resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
+					integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
+					return resposta;
+				}
+				NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+				if (notificacio == null) {
+					resposta.setError(true);
+					resposta.setErrorData(new Date());
+					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + identificador);
+					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
+					return resposta;
+				}
+			} catch (Exception ex) {
+				integracioHelper.addAccioError(info, "Error al obtenir la informació de la notificació", ex);
+				throw new RuntimeException(
+						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
+						ex);
+			}
+			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
+			if (progres != null && progres.getProgres() != null &&  progres.getProgres() < 100) {
+				// Ja hi ha un altre procés generant el justificant
+				resposta.setError(true);
+				resposta.setErrorData(new Date());
+				resposta.setErrorDescripcio("Ja hi ha un altre procés generant el justificant de la notificacio");
+				return resposta;
+			}
+
+			try {
+				FitxerDto justificantDto = justificantService.generarJustificantEnviament(notificacioId, identificador);
+				if (justificantDto == null || justificantDto.getContingut() == null) {
+					resposta.setError(true);
+					resposta.setErrorData(new Date());
+					resposta.setErrorDescripcio("Error durant la generació del justificant de la notificació");
+					return resposta;
+				}
+				resposta.setJustificant(FitxerBase64EncodedDto.builder()
+						.nom(justificantDto.getNom())
+						.contentType(justificantDto.getContentType())
+						.tamany(justificantDto.getTamany())
+						.contingut(new BASE64Encoder().encode(justificantDto.getContingut())).build());
+				integracioHelper.addAccioOk(info);
+				return resposta;
+
+			} catch (Exception ex) {
+				resposta.setError(true);
+				resposta.setErrorData(new Date());
+				resposta.setErrorDescripcio("Error durant la generació del justificant de la notificació");
+				return resposta;
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private RespostaAlta generaResposta(
+			IntegracioInfo info,
+			NotificacioEntity notificacioGuardada,
+			List<EnviamentReferencia> referencies) {
+		RespostaAlta resposta = new RespostaAlta();
+		try {
+			resposta.setIdentificador(
+					notificaHelper.xifrarId(notificacioGuardada.getId()));
+			logger.debug(">> [ALTA] identificador creat");
+		} catch (GeneralSecurityException ex) {
+			logger.debug(">> [ALTA] Error creant identificador");
+			throw new RuntimeException(
+					"No s'ha pogut crear l'identificador de la notificació",
+					ex);
+		}
+		switch (notificacioGuardada.getEstat()) {
+			case PENDENT:
+				resposta.setEstat(NotificacioEstatEnum.PENDENT);
+				break;
+			case ENVIADA:
+				resposta.setEstat(NotificacioEstatEnum.ENVIADA);
+				break;
+			case REGISTRADA:
+				resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
+				break;
+			case FINALITZADA:
+				resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+				break;
+			case PROCESSADA:
+				resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
+				break;
+			default:
+				break;
+		}
+		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
+		if (errorEvent != null) {
+			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
+			resposta.setError(true);
+			resposta.setErrorDescripcio(
+					errorEvent.getErrorDescripcio());
+		}
+		resposta.setReferencies(referencies);
+		logger.debug(">> [ALTA] afegides referències");
+		integracioHelper.addAccioOk(info);
+		return resposta;
+	}
+
+	private void inicialitzaCallbacks(NotificacioEntity notificacioGuardada) {
+		logger.debug(">> [ALTA] notificació assíncrona");
+		List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacioGuardada);
+		for (NotificacioEnviamentEntity enviament : enviamentsEntity) {
+			NotificacioEventEntity eventDatat = NotificacioEventEntity.getBuilder(
+					NotificacioEventTipusEnumDto.CALLBACK_CLIENT_PENDENT,
+					notificacioGuardada).
+					enviament(enviament).
+					callbackInicialitza().
+					build();
+			notificacioGuardada.updateEventAfegir(eventDatat);
+			notificacioEventRepository.saveAndFlush(eventDatat);
+		}
+		logger.debug(">> [ALTA] callbacks de client inicialitzats");
+	}
+
+	private EnviamentReferencia saveEnviament(
+			EntitatEntity entitat,
+			NotificacioEntity notificacioGuardada,
+			Enviament enviament) {
+
+		ServeiTipusEnumDto serveiTipus = getServeiTipus(enviament);
+		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
+		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
+		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
+			logger.debug(">> [ALTA] Entrega postal");
+			tipusConcret = getDomiciliTipusConcret(enviament);
+			numeracioTipus = getDomiciliNumeracioTipus(enviament);
+		}
+
+		PersonaEntity titular = saveTitular(enviament);
+		List<PersonaEntity> destinataris = getDestinataris(enviament);
+		EntregaPostalViaTipusEnum viaTipus = getViaTipus(enviament);
+
+		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(
+				entitat,
+				notificacioGuardada,
+				enviament,
+				serveiTipus,
+				numeracioTipus,
+				tipusConcret,
+				titular,
+				destinataris,
+				viaTipus);
+		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
+		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
+		if (titular.getInteressatTipus() != InteressatTipusEnumDto.ADMINISTRACIO)
+			enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
+		else
+			enviamentReferencia.setTitularNif(titular.getDir3Codi().toUpperCase());
+		notificacioGuardada.addEnviament(enviamentSaved);
+		return enviamentReferencia;
+	}
+
+	private EntregaPostalViaTipusEnum getViaTipus(Enviament enviament) {
+		EntregaPostalViaTipusEnum viaTipus = null;
+
+		if (enviament.getEntregaPostal() != null) {
+			viaTipus = enviament.getEntregaPostal().getViaTipus();
+		}
+		return viaTipus;
+	}
+
+	private List<PersonaEntity> getDestinataris(Enviament enviament) {
+		List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
+		if (enviament.getDestinataris() != null) {
+			for(Persona persona: enviament.getDestinataris()) {
+				PersonaEntity destinatari = personaRepository.save(PersonaEntity.getBuilderV2(
+						persona.getInteressatTipus(),
+						persona.getEmail(),
+						persona.getLlinatge1(),
+						persona.getLlinatge2(),
+						persona.getNif(),
+						persona.getNom(),
+						persona.getTelefon(),
+						persona.getRaoSocial(),
+						persona.getDir3Codi()
+				).incapacitat(false).build());
+				destinataris.add(destinatari);
+			}
+		}
+		return destinataris;
+	}
+
+	private PersonaEntity saveTitular(Enviament enviament) {
+		PersonaEntity titular = personaRepository.save(PersonaEntity.getBuilderV2(
+				enviament.getTitular().getInteressatTipus(),
+				enviament.getTitular().getEmail(),
+				enviament.getTitular().getLlinatge1(),
+				enviament.getTitular().getLlinatge2(),
+				enviament.getTitular().getNif(),
+				enviament.getTitular().getNom(),
+				enviament.getTitular().getTelefon(),
+				enviament.getTitular().getRaoSocial(),
+				enviament.getTitular().getDir3Codi()
+		).incapacitat(enviament.getTitular().isIncapacitat()).build());
+		return titular;
+	}
+
+	private NotificaDomiciliNumeracioTipusEnumDto getDomiciliNumeracioTipus(Enviament enviament) {
+		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus;
+		if (enviament.getEntregaPostal().getNumeroCasa() != null) {
+			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
+		} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
+			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
+		} else if (enviament.getEntregaPostal().getPuntKm() != null) {
+			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
+		} else {
+			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
+		}
+		return numeracioTipus;
+	}
+
+	private NotificaDomiciliConcretTipusEnumDto getDomiciliTipusConcret(
+			Enviament enviament) {
+		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
+		if (enviament.getEntregaPostal().getTipus() != null) {
+			switch (enviament.getEntregaPostal().getTipus()) {
+				case APARTAT_CORREUS:
+					tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+					break;
+				case ESTRANGER:
+					tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+					break;
+				case NACIONAL:
+					tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+					break;
+				case SENSE_NORMALITZAR:
+					tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+					break;
+			}
+		} else {
+			throw new ValidationException(
+					"ENTREGA_POSTAL",
+					"L'entrega postal te el camp tipus buit");
+		}
+		return tipusConcret;
+	}
+
+	private ServeiTipusEnumDto getServeiTipus(Enviament enviament) {
+		ServeiTipusEnumDto serveiTipus = null;
+		if (enviament.getServeiTipus() != null) {
+			switch (enviament.getServeiTipus()) {
+				case NORMAL:
+					serveiTipus = ServeiTipusEnumDto.NORMAL;
+					break;
+				case URGENT:
+					serveiTipus = ServeiTipusEnumDto.URGENT;
+					break;
+			}
+		}
+		return serveiTipus;
+	}
+
+	private DocumentEntity getDocument(DocumentV2 documentV2, DocumentDto document) {
+		DocumentEntity documentEntity = null;
+		if(documentV2.getCsv() != null ||
+				documentV2.getUuid() != null ||
+				documentV2.getContingutBase64() != null ||
+				documentV2.getUrl() != null ||
+				documentV2.getArxiuId() != null) {
+
+			documentEntity = documentRepository.saveAndFlush(DocumentEntity.getBuilderV2(
+					documentV2.getArxiuId(),
+					document.getArxiuGestdocId(),
+					documentV2.getArxiuNom(),
+					documentV2.getUrl(),
+					documentV2.isNormalitzat(),
+					documentV2.getUuid(),
+					documentV2.getCsv(),
+					document.getMediaType(),
+					document.getMida(),
+					document.getOrigen(),
+					document.getValidesa(),
+					document.getTipoDocumental(),
+					document.getModoFirma()).build());
+			logger.debug(">> [ALTA] document creat");
+		}
+		return documentEntity;
+	}
+
+	private NotificaEnviamentTipusEnumDto getEnviamentTipus(
+			NotificacioV2 notificacio) {
+		NotificaEnviamentTipusEnumDto enviamentTipus = null;
+		if (notificacio.getEnviamentTipus() != null) {
+			switch (notificacio.getEnviamentTipus()) {
+				case COMUNICACIO:
+					enviamentTipus = NotificaEnviamentTipusEnumDto.COMUNICACIO;
+					break;
+				case NOTIFICACIO:
+					enviamentTipus = NotificaEnviamentTipusEnumDto.NOTIFICACIO;
+					break;
+			}
+			logger.debug(">> [ALTA] enviament tipus: " + enviamentTipus);
+		}
+		return enviamentTipus;
+	}
+
+	private DocumentDto comprovaDocument(DocumentV2 documentV2) {
+		DocumentDto document = new DocumentDto();
+		// -- Per compatibilitat amb versions anteriors, posam valors per defecte
+		boolean utilizarValoresPorDefecto = getUtilizarValoresPorDefecto();
+		OrigenEnum origen = documentV2.getOrigen();
+		ValidesaEnum validesa = documentV2.getValidesa();
+		TipusDocumentalEnum tipoDocumental = documentV2.getTipoDocumental();
+		Boolean modoFirma = documentV2.getModoFirma();
+		if (utilizarValoresPorDefecto) {
+			origen = documentV2.getOrigen() != null ? documentV2.getOrigen() : OrigenEnum.ADMINISTRACIO;
+			validesa = documentV2.getValidesa() != null ? documentV2.getValidesa() : ValidesaEnum.ORIGINAL;
+			tipoDocumental = documentV2.getTipoDocumental() != null ? documentV2.getTipoDocumental() : TipusDocumentalEnum.NOTIFICACIO;
+			modoFirma = documentV2.getModoFirma() != null ? documentV2.getModoFirma() : false;
+		}
+		// --
+		if(documentV2.getContingutBase64() != null) {
+			logger.debug(">> [ALTA] document contingut Base64");
+			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
+			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
+					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
+					contingut);
+			document.setArxiuGestdocId(documentGesdocId);
+			document.setMida(Long.valueOf(contingut.length));
+			document.setMediaType(getMimeTypeFromContingut(contingut));
+			document.setOrigen(origen);
+			document.setValidesa(validesa);
+			document.setTipoDocumental(tipoDocumental);
+			document.setModoFirma(modoFirma);
+			logger.debug(">> [ALTA] documentId: " + documentGesdocId);
+		} else if (documentV2.getUuid() != null) {
+			String arxiuUuid = documentV2.getUuid();
+			logger.debug(">> [ALTA] documentUuid: " + arxiuUuid);
+			DocumentContingut contingut = null;
+			contingut = pluginHelper.arxiuGetImprimible(arxiuUuid, true);
+
+			document.setMida(contingut.getTamany());
+			document.setMediaType(contingut.getTipusMime());
+
+			Document doc = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
+			if (doc.getMetadades() == null &&
+					(origen == null || validesa == null ||
+							tipoDocumental == null || modoFirma == null)) {
+				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de documentV2 ni per defecte");
+			}
+			if (doc.getMetadades() != null) {
+				document.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen().ordinal()));
+				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
+				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
+				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+			} else {
+				document.setOrigen(origen);
+				document.setValidesa(validesa);
+				document.setTipoDocumental(tipoDocumental);
+				document.setModoFirma(modoFirma);
+			}
+
+			// Recuperar csv
+			Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
+			if (metadadesAddicionals != null) {
+				if (metadadesAddicionals.containsKey("csv"))
+					document.setCsv((String) metadadesAddicionals.get("csv"));
+				else if (metadadesAddicionals.containsKey("eni:csv"))
+					document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+			}
+
+		} else if (documentV2.getCsv() != null) {
+			String arxiuCsv = documentV2.getCsv();
+			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
+			DocumentContingut contingut = null;
+			contingut = pluginHelper.arxiuGetImprimible(arxiuCsv, false);
+
+			document.setMida(contingut.getTamany());
+			document.setMediaType(contingut.getTipusMime());
+
+			Document doc = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
+			if (doc.getMetadades() == null &&
+					(origen == null || validesa == null ||
+							tipoDocumental == null || modoFirma == null)) {
+				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de documentV2 ni per defecte");
+			}
+			if (doc.getMetadades() != null) {
+				document.setOrigen(OrigenEnum.valorAsEnum(doc.getMetadades().getOrigen().ordinal()));
+				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
+				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
+				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+			} else {
+				document.setOrigen(origen);
+				document.setValidesa(validesa);
+				document.setTipoDocumental(tipoDocumental);
+				document.setModoFirma(modoFirma);
+			}
+
+		} else if (documentV2.getUrl() != null) {
+			String arxiuUrl = documentV2.getUrl();
+			logger.debug(">> [ALTA] documentUrl: " + arxiuUrl);
+			byte[] contingut = pluginHelper.getUrlDocumentContent(arxiuUrl);
+			document.setMida(Long.valueOf(contingut.length));
+			document.setMediaType(getMimeTypeFromContingut(contingut));
+			document.setOrigen(origen);
+			document.setValidesa(validesa);
+			document.setTipoDocumental(tipoDocumental);
+			document.setModoFirma(modoFirma);
+		}
+		return document;
+	}
+
+	private String getMimeTypeFromContingut(byte[] contingut) {
+		String mimeType = null;
+
+		try {
+			InputStream is = new BufferedInputStream(new ByteArrayInputStream(contingut));
+			mimeType = URLConnection.guessContentTypeFromStream(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return mimeType;
+	}
+
+	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcedimentEntity procediment) {
+		String errorDescripcio = null;
+		if (procediment.isAgrupar() && notificacio.getGrupCodi() != null && !notificacio.getGrupCodi().isEmpty()) {
+			logger.debug(">> [ALTA] procediment amb grups");
+			// Llistat de procediments amb grups
+			List<GrupDto> grupsProcediment = grupService.findByProcedimentAndUsuariGrups(procediment.getId());
+			GrupDto grupNotificacio = grupService.findByCodi(
+					notificacio.getGrupCodi(),
+					entitat.getId());
+			if (grupNotificacio == null) {
+				logger.debug(">> [ALTA] procediment grup: Sense grup");
+				errorDescripcio = "[1320] El grup indicat " + notificacio.getGrupCodi() + " no està definit dins NOTIB.";
+			} else {
+				if (grupsProcediment == null || grupsProcediment.isEmpty()) {
+					errorDescripcio = "[1321] S'ha indicat un grup per les notificacions però el procediment " + notificacio.getProcedimentCodi() + " no té cap grup assignat.";
+				} else {
+					if(!grupsProcediment.contains(grupNotificacio)) {
+						errorDescripcio = "[1322] El grup indicat " + notificacio.getGrupCodi() + " no està assignat al procediment " + notificacio.getProcedimentCodi();
+					}
+				}
+			}
+		}
+		return errorDescripcio;
+	}
+
+	private IntegracioInfo generateInfoAlta(NotificacioV2 notificacio) {
+		String json = "S'ha produït un error al intentar llegir la informació de la notificació";
+		ObjectMapper mapper  = new ObjectMapper();
+		try {
+			json = mapper.writeValueAsString(notificacio);
+		} catch (Exception e) { }
+
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_CLIENT,
+				"Alta de notificació",
+				IntegracioAccioTipusEnumDto.RECEPCIO,
+				new AccioParam("Notificacio", json));
+		return info;
+	}
+
 	// Taula de codis d'error de la validació de la API
 	// ------------------------------------------------------------------------------------------
 	// Codi | Descripció
