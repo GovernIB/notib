@@ -219,6 +219,7 @@
 			<mvc:exclude-mapping path="/api-docs/**"/>
 			<mvc:exclude-mapping path="/**/api-docs/"/>
 			<mvc:exclude-mapping path="/api/consulta/**"/>
+			<mvc:exclude-mapping path="/api/services/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.notib.war.interceptor.AvisosInterceptor"/>
 		</mvc:interceptor>
