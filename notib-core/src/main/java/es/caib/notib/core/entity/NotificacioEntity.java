@@ -285,8 +285,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	}
 
 	public void restablirPrioritat() {
-		Calendar cal = GregorianCalendar.getInstance();
-		this.notificaEnviamentData = cal.getTime();
+		this.notificaEnviamentData = this.getCreatedDate().toDate();
 	}
 
 	public void refreshRegistre() {
