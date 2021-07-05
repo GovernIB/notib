@@ -267,7 +267,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Setter
 	@ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
 	@JoinColumn(name = "notifica_error_event_id")
-	@ForeignKey(name = "not_noteve_noterr_notdest_fk")
+	@ForeignKey(name = "NOT_NOTENV_NOTEVENT_ERROR_FK")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	protected NotificacioEventEntity notificacioErrorEvent;
 	
