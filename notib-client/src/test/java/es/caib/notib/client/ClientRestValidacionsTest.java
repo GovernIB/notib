@@ -87,7 +87,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1012() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEmisorDir3Codi("X00000000");
+		notificacio.setEmisorDir3Codi("A04027013");
 		enviaNotificacioError(notificacio, "1012");
 	}
 	
@@ -432,6 +432,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	public void test1140() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getTitular().setNif("F31513518");
 		notificacio.getEnviaments().get(0).getTitular().setRaoSocial(null);
 		notificacio.getEnviaments().get(0).getTitular().setNom(null);
 		enviaNotificacioError(notificacio, "1140");
@@ -518,7 +519,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNom("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
 		enviaNotificacioError(notificacio, "1171");
 	}
-	
+
 	@Test
 	public void test1172() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
@@ -626,6 +627,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	public void test1200() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("F31513518");
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial(null);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNom(null);
 		enviaNotificacioError(notificacio, "1200");
@@ -635,6 +637,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	public void test1201() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("F31513518");
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif(null);
 		enviaNotificacioError(notificacio, "1201");
@@ -689,10 +692,10 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setNif(null);
-		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A00000000");;
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A04026906");;
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif(null);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A00000000");;
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A04026906");;
 		enviaNotificacioError(notificacio, "1220");
 	}
 	
@@ -993,7 +996,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 2, false);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
 		notificacio.getEnviaments().get(1).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-		notificacio.getEnviaments().get(1).getTitular().setDir3Codi("A00000000");
+		notificacio.getEnviaments().get(1).getTitular().setDir3Codi(ORGAN_SIR_CODI);
 		enviaNotificacioError(notificacio, "1310");
 	}
 	

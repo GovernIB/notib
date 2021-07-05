@@ -179,15 +179,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						// Organ gestor
 						if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 							organGestor = procediment.getOrganGestor();
-							
-							// TODO: Esta validación queda comentada hasta consultar con la DGTIC
-//							if (notificacio.getOrganGestor() != null && !notificacio.getOrganGestor().isEmpty() && 
-//									notificacio.getOrganGestor() != organGestor.getCodi()) {
-//								logger.debug(">> [ALTA] Organ gestor no es correspon amb el de l'procediment");
-//								errorDescripcio = "[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.";
-//								integracioHelper.addAccioError(info, errorDescripcio);
-//								return setRespostaError(errorDescripcio);
-//							}
+
+							if (notificacio.getOrganGestor() != null && !notificacio.getOrganGestor().isEmpty() &&
+									organGestor != null && !notificacio.getOrganGestor().equals(organGestor.getCodi())) {
+								logger.debug(">> [ALTA] Organ gestor no es correspon amb el de l'procediment");
+								errorDescripcio = "[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.";
+								integracioHelper.addAccioError(info, errorDescripcio);
+								return setRespostaError(errorDescripcio);
+							}
 						}
 					} else {
 						logger.debug(">> [ALTA] Sense procediment");

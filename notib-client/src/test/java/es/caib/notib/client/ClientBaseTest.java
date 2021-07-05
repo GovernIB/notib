@@ -27,6 +27,7 @@ public class ClientBaseTest {
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 //	protected static final String ENTITAT_DIR3CODI = "A04013511";
+	protected static final String ORGAN_SIR_CODI = "E03141701";
 	protected static final String ORGAN_CODI = "A04003003";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
@@ -95,7 +96,7 @@ public class ClientBaseTest {
 			destinatari.setEmail("sandreu@limit.es");
 			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
-				destinatari.setDir3Codi(ENTITAT_DIR3CODI);
+				destinatari.setDir3Codi(ORGAN_SIR_CODI);
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
