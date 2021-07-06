@@ -1,18 +1,16 @@
 package es.caib.notib.core.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.notib.core.api.dto.AvisDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.service.AvisService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de AvisService com a EJB que empra una clase
@@ -52,13 +50,13 @@ public class AvisServiceBean implements AvisService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("NOT_SUPER")
 	public AvisDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed("NOT_SUPER")
 	public PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findPaginat(paginacioParams);
 	}
