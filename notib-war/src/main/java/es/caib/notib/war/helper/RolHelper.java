@@ -3,17 +3,15 @@
  */
 package es.caib.notib.war.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utilitat per a gestionar el canvi de rol de l'usuari actual.
@@ -22,11 +20,11 @@ import es.caib.notib.core.api.service.AplicacioService;
  */
 public class RolHelper {
 
-	private static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 				// "NOT_SUPER";
-	private static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name(); 		// "NOT_ADMIN";
-	private static final String ROLE_USUARI = RolEnumDto.tothom.name(); 				// "tothom";
-	private static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name(); 			// "NOT_APL";
-	private static final String ROLE_ADMIN_ORGAN = RolEnumDto.NOT_ADMIN_ORGAN.name(); 	// "NOT_ADMIN_ORGAN";
+	public static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 				// "NOT_SUPER";
+	public static final String ROLE_ADMIN_ENTITAT = RolEnumDto.NOT_ADMIN.name(); 		// "NOT_ADMIN";
+	public static final String ROLE_USUARI = RolEnumDto.tothom.name(); 				// "tothom";
+	public static final String ROLE_APLICACIO = RolEnumDto.NOT_APL.name(); 			// "NOT_APL";
+	public static final String ROLE_ADMIN_ORGAN = RolEnumDto.NOT_ADMIN_ORGAN.name(); 	// "NOT_ADMIN_ORGAN";
 
 	private static final String REQUEST_PARAMETER_CANVI_ROL = "canviRol";
 	private static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
