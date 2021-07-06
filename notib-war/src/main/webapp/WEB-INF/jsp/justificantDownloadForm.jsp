@@ -68,8 +68,10 @@ function getProgres() {
 					}
 				}
 				writtenLines = index;
-				if (data.progres == 100) {
+				if (data.progres >= 100) {
 					clearInterval(itervalProgres);
+					console.log("Tancam modal ");
+					window.parent.location.reload();
 				}
 			}
 		},

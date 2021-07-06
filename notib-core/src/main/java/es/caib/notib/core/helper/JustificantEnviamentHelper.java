@@ -37,23 +37,8 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 					notificacio,
 					progres);
 
-			progres.setProgres(40);
-			PdfPTable taulaAnnexos = new PdfPTable(1);
-			taulaAnnexos.setWidthPercentage(100f);
-			if (notificacio.getDocument() != null) {
-//				## [TÍTOL]
-				progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.annexos"));
-				PdfPCell titolCell = getTitolAnnexos(notificacio.getId());
-				taulaAnnexos.addCell(titolCell);
-				crearTaulaAnnexos(
-						taulaAnnexos,
-						justificant,
-						notificacio.getId(),
-						notificacio,
-						progres);
-			}
 
-			progres.setProgres(60);
+			progres.setProgres(40);
 			crearIntroduccioEnviaments(
 					justificant,
 					notificacio,
@@ -67,7 +52,25 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 						enviament,
 						numEnviament,
 						progres);
+				justificant.add(Chunk.NEXTPAGE);
 				numEnviament++;
+			}
+
+			progres.setProgres(70);
+			PdfPTable taulaAnnexos = new PdfPTable(1);
+			taulaAnnexos.setWidthPercentage(100f);
+			if (notificacio.getDocument() != null) {
+//				## [TÍTOL]
+				progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.annexos"));
+				PdfPCell titolCell = getTitolAnnexos(notificacio.getId());
+				taulaAnnexos.addCell(titolCell);
+				crearTaulaAnnexos(
+						taulaAnnexos,
+						notificacio,
+						progres);
+
+				justificant.add(taulaAnnexos);
+//				justificant.add(Chunk.NEXTPAGE);
 			}
 
 			justificant.close();
@@ -177,7 +180,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		}
 	}
 	private void crearTaulaEnviaments(
-			Document justificant, 
+			Document justificant,
 			NotificacioDtoV2 notificacio,
 			NotificacioEnviamentDtoV2 enviament, 
 			int numEnviament,
@@ -196,7 +199,6 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			taulaEnviaments.addCell(titolCell);
 			taulaEnviaments.addCell(contingut);
 			justificant.add(taulaEnviaments);
-			justificant.add(Chunk.NEXTPAGE);
 		} catch (Exception ex) {
 			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament.error");
 			progres.setProgres(100);
@@ -294,9 +296,10 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 //	     	## [DADES NOTIFICA - EMISOR]
 	     	String dadesNotificaEmisor = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.emisor");
 	     	Chunk dadesNotificaEmisorTitleChunk = new Chunk(dadesNotificaEmisor, calibri10);
-	     	Chunk dadesNotificaEmisorContentChunk = new Chunk("[" + notificacio.getOrganGestor() + "] " + notificacio.getOrganGestorNom(), calibri10);
-			createNewTableContent(dadesNotificaTable, dadesNotificaEmisorTitleChunk, dadesNotificaEmisorContentChunk);
-			
+	     	if (notificacio.getOrganGestor() != null) {
+				Chunk dadesNotificaEmisorContentChunk = new Chunk("[" + notificacio.getOrganGestor() + "] " + notificacio.getOrganGestorNom(), calibri10);
+				createNewTableContent(dadesNotificaTable, dadesNotificaEmisorTitleChunk, dadesNotificaEmisorContentChunk);
+			}
 //	     	## [DADES NOTIFICA - PROCEDIMENT]
 			if (notificacio.getProcediment() != null) {
 				String dadesNotificaProcediment = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.dades.notifica.procediment");
@@ -438,8 +441,6 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 	}	
 	
 	private void crearTaulaAnnexos(PdfPTable taulaAnnexos,
-			Document justificant,
-			Long notificacioId,
 			NotificacioDtoV2 notificacio,
 			ProgresDescarregaDto progres) throws JustificantException {
 		log.debug("Generant la taula de annexos del justificant d'enviament per als documents.");
@@ -467,8 +468,6 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			contingut.addElement(dadesAnnexoTable);
 			
 			taulaAnnexos.addCell(contingut);
-			justificant.add(taulaAnnexos);
-			justificant.add(Chunk.NEXTPAGE);
 		} catch (Exception ex) {
 			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.annexos.error");
 			progres.setProgres(100);
@@ -528,13 +527,16 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 	private String getNomInteressat(PersonaDto persona)  {
 		switch (persona.getInteressatTipus()) {
 		case FISICA:
-			return persona.getNom();
 		case ADMINISTRACIO:
-			return persona.getNom();
+			return persona.getNom() != null ? persona.getNom() : "";
 		case JURIDICA:
-			return persona.getRaoSocial() != null ? persona.getRaoSocial() : persona.getNom();
+			if (persona.getRaoSocial() != null) {
+				return persona.getRaoSocial();
+			} else {
+				return persona.getNom() != null ? persona.getNom() : "";
+			}
 		default:
-			return persona.getRaoSocial();
+			return persona.getRaoSocial() != null ? persona.getRaoSocial() : "";
 		}
 	}
 }

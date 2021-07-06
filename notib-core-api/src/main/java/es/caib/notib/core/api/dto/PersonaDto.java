@@ -24,7 +24,7 @@ public class PersonaDto implements Serializable{
 	private String dir3Codi;
 	
 	public String getLlinatges() {
-		return llinatge1 + " " + llinatge2; 
+		return concatenarLlinatges() != null ? concatenarLlinatges() : "";
 	}
 
 	public String getNomFormatted() {
