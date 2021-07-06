@@ -41,7 +41,7 @@ import java.util.Date;
 public class NotificacioMassivaController extends BaseUserController {
 
     private final static String TABLE_FILTRE = "not_massiva_filtre";
-    private final static String TABLE_NOTIFICACIONS_FILTRE = "notificacions_filtre";
+    private final static String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
 
     @Autowired
     private AplicacioService aplicacioService;
@@ -318,7 +318,7 @@ public class NotificacioMassivaController extends BaseUserController {
             log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
             if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class))
-                MissatgesHelper.error(request, getMessage(request, "notificacioMassiu.csv.error"));
+                MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error"));
             else 
             	MissatgesHelper.error(request, ex.getMessage());
 

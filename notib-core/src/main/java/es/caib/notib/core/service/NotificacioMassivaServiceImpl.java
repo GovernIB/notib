@@ -104,31 +104,38 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         List<String[]> linies = CSVReader.readFile(baos.toByteArray());
         List<NotificacioMassivaInfoDto.NotificacioInfo> info = new ArrayList<>();
         for (String[] linea : linies) {
-            info.add(NotificacioMassivaInfoDto.NotificacioInfo.builder()
-                    .codiDir3UnidadRemisora(linea[0])
-                    .concepto(linea[1])
-                    .enviamentTipus(linea[2])
-                    .referenciaEmisor(linea[3])
-                    .nombreFichero(linea[4])
-                    .normalizado(linea[5])
-                    .prioridadServicio(linea[6])
-                    .nombre(linea[7])
-                    .apellidos(linea[8])
-                    .cifNif(linea[9])
-                    .email(linea[10])
-                    .codigoDestino(linea[11])
-                    .linea1(linea[12])
-                    .linea2(linea[13])
-                    .codigoPostal(linea[14])
-                    .retardoPostal(linea[15])
-                    .codigoProcedimiento(linea[16])
-                    .fechaEnvioProgramado(linea[17])
-                    .origen(linea[18])
-                    .estadoElaboracion(linea[19])
-                    .tipoDocumental(linea[20])
-                    .pdfFirmado(linea[21])
-                    .errores(linea[22])
-                    .build());
+            NotificacioMassivaInfoDto.NotificacioInfo.NotificacioInfoBuilder builder =
+                    NotificacioMassivaInfoDto.NotificacioInfo.builder()
+                        .codiDir3UnidadRemisora(linea[0])
+                        .concepto(linea[1])
+                        .enviamentTipus(linea[2])
+                        .referenciaEmisor(linea[3])
+                        .nombreFichero(linea[4])
+                        .normalizado(linea[5])
+                        .prioridadServicio(linea[6])
+                        .nombre(linea[7])
+                        .apellidos(linea[8])
+                        .cifNif(linea[9])
+                        .email(linea[10])
+                        .codigoDestino(linea[11])
+                        .linea1(linea[12])
+                        .linea2(linea[13])
+                        .codigoPostal(linea[14])
+                        .retardoPostal(linea[15])
+                        .codigoProcedimiento(linea[16])
+                        .fechaEnvioProgramado(linea[17]);
+
+            if (linea.length >=23) { // si hi ha les metadades
+                builder.origen(linea[18])
+                       .estadoElaboracion(linea[19])
+                       .tipoDocumental(linea[20])
+                       .pdfFirmado(linea[21])
+                       .errores(linea[22]);
+            } else {
+                builder.errores(linea[18]);
+            }
+
+            info.add(builder.build());
         }
         NotificacioMassivaInfoDto dto = conversioTipusHelper.convertir(notificacioMassiva, NotificacioMassivaInfoDto.class);
         dto.setSummary(info);
@@ -207,17 +214,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             List<String> csvHeader = CSVReader.readHeader(notificacioMassiva.getFicheroCsvBytes());
             List<String[]> linies = CSVReader.readFile(notificacioMassiva.getFicheroCsvBytes());
-            if (linies == null || csvHeader == null) {
-                throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
-            }
-            if (linies.isEmpty()) {
-                throw new InvalidCSVFileException("El fitxer CSV està buid.");
-            }
-            if (linies.size() > MAX_ENVIAMENTS) {
-                log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", MAX_ENVIAMENTS));
-                throw new MaxLinesExceededException(
-                        String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", MAX_ENVIAMENTS));
-            }
+            checkCSVContent(linies, csvHeader);
 
             List<String> fileNames = ZipFileUtils.readZipFileNames(notificacioMassiva.getFicheroZipBytes());
             Map<String, Long> documentsProcessatsMassiu = new HashMap<String, Long>(); // key: csv/uuid/arxiuFisicoNom - value: documentEntity.getId()
@@ -233,6 +230,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva);
             for (String[] linia : linies) {
+                if (linia.length < numberRequiredColumns()) {
+                    break;
+                }
                 NotificacioDatabaseDto notificacio = csvToNotificaDatabaseDto(
                         linia,
                         notificacioMassiva.getCaducitat(),
@@ -449,6 +449,35 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
 
+    private void checkCSVContent(List<String[]> linies, List<String> csvHeader) {
+        if (linies == null || csvHeader == null) {
+            throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
+        }
+        if (linies.isEmpty()) {
+            throw new InvalidCSVFileException("El fitxer CSV està buid.");
+        }
+        if (linies.size() > MAX_ENVIAMENTS) {
+            log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", MAX_ENVIAMENTS));
+            throw new MaxLinesExceededException(
+                    String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", MAX_ENVIAMENTS));
+        }
+        if (csvHeader.size() < numberRequiredColumns()) {
+            throw new InvalidCSVFileException(
+                    String.format("El fitxer CSV no conté totes les columnes necessaries. " +
+                            "Nombre de columnes requerides: %d. Nombre de columnes trobades %d",
+                            numberRequiredColumns(), csvHeader.size())
+            );
+        }
+
+    }
+
+    public int numberRequiredColumns() {
+        if (registreNotificaHelper.isSendDocumentsActive()) {
+            return 22;
+        } else {
+            return 18;
+        }
+    }
 
     private void crearNotificacio(EntitatEntity entitat,
                                   NotificacioDatabaseDto notificacio,
@@ -657,20 +686,21 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         // Enviaments
         enviament.setNotificaReferencia((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null); //si no se envía, Notific@ genera una
         enviament.setEntregaDehActiva(false); // De momento dejamos false
-        EntregaPostalDto entregaPostal = new EntregaPostalDto();
-        if (linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
+
+        if (entitat.isAmbEntregaCie() && linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
                 linia[14] != null && !linia[14].isEmpty()) {
             enviament.setEntregaPostalActiva(true);
-            entregaPostal.setActiva(true); //??
+            EntregaPostalDto entregaPostal = new EntregaPostalDto();
+            entregaPostal.setActiva(true);
             entregaPostal.setLinea1(linia[12]);
             entregaPostal.setLinea2(linia[13]);
             entregaPostal.setCodiPostal(linia[14]);
             entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR);
+            enviament.setEntregaPostal(entregaPostal);
         } else {
             enviament.setEntregaPostalActiva(false);
-            entregaPostal.setActiva(false); //??
         }
-        enviament.setEntregaPostal(entregaPostal);
+
 
         enviament.setServeiTipus((linia[6] != null && !linia[6].isEmpty()) ?
                 ServeiTipusEnumDto.valueOf(linia[6].trim().toUpperCase()) : ServeiTipusEnumDto.NORMAL);
