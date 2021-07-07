@@ -228,6 +228,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             writeCsvHeader(listWriterErrors, csvHeader.toArray(new String[]{}));
             writeCsvHeader(listWriterInforme, csvHeader.toArray(new String[]{}));
 
+            int numAltes = 0;
             NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva);
             for (String[] linia : linies) {
                 if (linia.length < numberRequiredColumns()) {
@@ -274,8 +275,13 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     log.debug("[NOT-MASSIVA] Alta satisfactoria de la notificació de la nova notificacio massiva");
                     List<String> ok = Collections.singletonList("OK");
                     writeCsvLinia(listWriterInforme,linia, ok);
+                    numAltes++;
                 }
             }
+            if (numAltes == 0) {
+                notificacioMassivaEntity.updateProgress(-1);
+            }
+
             try {
                 listWriterInforme.flush();
                 listWriterErrors.flush();

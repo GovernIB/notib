@@ -1587,6 +1587,12 @@ public class NotificacioController extends BaseUserController {
         } catch (Exception ex) {
             log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
+
+        String referer = (String) RequestSessionHelper.obtenirObjecteSessio(
+                request,
+                EDIT_REFERER);
+        model.addAttribute("referer", referer);
+
     }
 
 

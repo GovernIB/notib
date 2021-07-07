@@ -838,6 +838,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							ProcedimentFormDto.class);
 				}
 			}
+			assert procedimentsPage != null;
 			for (ProcedimentFormDto procediment: procedimentsPage.getContingut()) {
 				List<PermisDto> permisos = permisosHelper.findPermisos(
 						procediment.getId(),

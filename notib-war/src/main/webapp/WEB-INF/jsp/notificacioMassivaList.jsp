@@ -165,6 +165,10 @@
 							<span class="label label-success">
 								{{:~eval('notificacioMassivaEstats["' + estat + '"]')}}
 							</span>
+						{{else estat == 'ERRONIA'}}
+							<span class="label label-danger">
+								{{:~eval('notificacioMassivaEstats["' + estat + '"]')}}
+							</span>
 						{{/if}}
 
 						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
