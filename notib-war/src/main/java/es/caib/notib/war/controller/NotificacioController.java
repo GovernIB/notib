@@ -120,6 +120,11 @@ public class NotificacioController extends BaseUserController {
     public String altaForm(
             HttpServletRequest request,
             Model model) {
+        String referer = request.getHeader("Referer");
+        RequestSessionHelper.actualitzarObjecteSessio(
+                request,
+                EDIT_REFERER,
+                referer);
         emplenarModelNotificacio(request, model, null);
         return "notificacioForm";
     }
