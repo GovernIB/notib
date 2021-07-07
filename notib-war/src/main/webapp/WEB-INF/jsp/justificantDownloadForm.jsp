@@ -48,9 +48,6 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-console.log("Esperam 5 segons");
-sleep(5000).then(() => { console.log("5 segons fi!"); });
-
 function getProgres() {
 	console.log("getProgres");
 	$.ajax({
@@ -76,10 +73,7 @@ function getProgres() {
 				writtenLines = index;
 				if (data.progres >= 100) {
 					clearInterval(itervalProgres);
-					console.log("Tancam modal ");
-
 					sleep(5000).then(() => { window.parent.location.reload(); });
-
 				}
 			}
 		},
