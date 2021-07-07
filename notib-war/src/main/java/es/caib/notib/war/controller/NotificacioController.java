@@ -54,6 +54,7 @@ public class NotificacioController extends BaseUserController {
     private final static String METADADES_VALIDESA = "metadades_validesa";
     private final static String METADADES_TIPO_DOCUMENTAL = "metadades_tipo_documental";
     private final static String METADADES_MODO_FIRMA = "metadades_modo_firma";
+    private final static String EDIT_REFERER = "edit_referer";
 
     @Autowired
     private AplicacioService aplicacioService;
@@ -456,6 +457,12 @@ public class NotificacioController extends BaseUserController {
             HttpServletRequest request,
             Model model,
             @PathVariable Long notificacioId) {
+        String referer = request.getHeader("Referer");
+        RequestSessionHelper.actualitzarObjecteSessio(
+                request,
+                EDIT_REFERER,
+                referer);
+
         emplenarModelNotificacio(request, model, notificacioId);
         return "notificacioForm";
     }
@@ -482,7 +489,7 @@ public class NotificacioController extends BaseUserController {
             Model model,
             @PathVariable Long notificacioId) {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-
+        String referer = request.getHeader("Referer");
         try {
             notificacioService.delete(
                     entitatActual.getId(),
@@ -492,13 +499,13 @@ public class NotificacioController extends BaseUserController {
             log.error("Hi ha hagut un error esborrant la notificació", ex);
             return getModalControllerReturnValueError(
                     request,
-                    "redirect:../../notificacio",
+                    "redirect:" + referer,
                     "notificacio.controller.esborrar.ko",
                     new Object[]{ex.getMessage()});
         }
         return getModalControllerReturnValueSuccess(
                 request,
-                "redirect:../../notificacio",
+                "redirect:" + referer,
                 "notificacio.controller.esborrar.ok");
     }
 
@@ -1344,6 +1351,10 @@ public class NotificacioController extends BaseUserController {
             log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
 
+        String referer = (String) RequestSessionHelper.obtenirObjecteSessio(
+                                    request,
+                                    EDIT_REFERER);
+        model.addAttribute("referer", referer);
     }
 
     private List<ProcedimentSimpleDto> addProcedimentsOrgan(

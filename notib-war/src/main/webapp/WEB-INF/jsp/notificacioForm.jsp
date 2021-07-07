@@ -2959,7 +2959,15 @@
 			</div>
 			<div class="text-right col-md-12">
 				<div class="btn-group">
-					<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+					<c:choose>
+						<c:when test="${ empty referer }">
+							<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+						</c:when>
+						<c:otherwise>
+							<a href="${ referer }" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+						</c:otherwise>
+					</c:choose>
+
 				</div>
 				<div class="btn-group">
 					<button type="submit" class="btn btn-success saveForm">
