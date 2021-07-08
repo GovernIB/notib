@@ -24,7 +24,6 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1550,52 +1549,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private String calcularNomArxiuCertificacio(
 			NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
-	}
-	
-	
-	@Override
-	@Transactional(rollbackFor=Exception.class)
-	public String guardarArxiuTemporal(String contigut) {
-		String documentGesdocId = null;
-		try {
-			if(contigut != null) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
-						Base64.decodeBase64(contigut));
-			}
-		} catch (Exception ex) {
-			logger.error(
-					"Error al guardar l'arxiu temporal " + ex);
-		} 
-		return documentGesdocId;
-	}
-	
-	@Override
-	@Transactional(rollbackFor=Exception.class)
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
-		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
-	}
-
-	@Override
-	@Transactional(rollbackFor=Exception.class)
-	public byte[] obtenirArxiuNotificacio(String arxiuGestdocId) {
-		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS);
-	}
-
-	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		try {
-			if(arxiuGestdocId != null) {
-				pluginHelper.gestioDocumentalGet(
-						arxiuGestdocId,
-						agrupacio,
-						output);
-			}
-		} catch (Exception ex) {
-			logger.error("Error al recuperar l'arxiu de l'agrupació: " + agrupacio);
-			throw ex;
-		}
-		return output.toByteArray();
 	}
 
 	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{

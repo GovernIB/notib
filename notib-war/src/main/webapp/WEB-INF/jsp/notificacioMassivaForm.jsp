@@ -63,11 +63,17 @@
 	</div>
 </div>
 	<c:set var="formAction"><not:modalUrl value="/notificacio/massiva/new"/></c:set>
-	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassiuCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassivaCommand" enctype="multipart/form-data">
+		<input type="hidden" name="fitxerCSVGestdocId" value="${notificacioMassivaCommand.fitxerCSVGestdocId}">
+		<input type="hidden" name="fitxerCSVNom" value="${notificacioMassivaCommand.fitxerCSVNom}">
 		<not:inputFile name="ficheroCsv" textKey="notificacio.massiva.form.camp.arxiuCsv" labelSize="2" inputSize="10"
-					   required="true" info="true" messageInfo="notificacio.massiva.form.camp.arxiuCsv.avis"/>
+					   required="true" info="true" messageInfo="notificacio.massiva.form.camp.arxiuCsv.avis"
+						fileName="${notificacioMassivaCommand.fitxerCSVNom}"/>
+		<input type="hidden" name="fitxerZIPGestdocId" value="${notificacioMassivaCommand.fitxerZIPGestdocId}">
+		<input type="hidden" name="fitxerZIPNom" value="${notificacioMassivaCommand.fitxerZIPNom}">
 		<not:inputFile name="ficheroZip" textKey="notificacio.massiva.form.camp.arxiuZip" labelSize="2" inputSize="10"
-					   required="false" info="true" messageInfo="notificacio.massiva.form.camp.arxiuZip.avis"/>
+					   required="false" info="true" messageInfo="notificacio.massiva.form.camp.arxiuZip.avis"
+					   fileName="${notificacioMassivaCommand.fitxerZIPNom}"/>
 		<not:inputDate name="caducitat" textKey="notificacio.massiva.form.camp.caducitat" labelSize="2" inputSize="10"
 					   required="true" />
 		<not:inputMail name="email" textKey="notificacio.massiva.form.camp.email" labelSize="2" inputSize="10"

@@ -460,7 +460,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
         }
         if (linies.isEmpty()) {
-            throw new InvalidCSVFileException("El fitxer CSV està buid.");
+            throw new InvalidCSVFileNotificacioMassivaException("El fitxer CSV està buid.");
         }
         if (linies.size() > MAX_ENVIAMENTS) {
             log.debug(String.format("[NOT-MASSIVA] El fitxer CSV conté més de les %d línies permeses.", MAX_ENVIAMENTS));
@@ -468,7 +468,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     String.format("S'ha superat el màxim nombre de línies permès (%d) per al CSV de càrrega massiva.", MAX_ENVIAMENTS));
         }
         if (csvHeader.size() < numberRequiredColumns()) {
-            throw new InvalidCSVFileException(
+            throw new InvalidCSVFileNotificacioMassivaException(
                     String.format("El fitxer CSV no conté totes les columnes necessaries. " +
                             "Nombre de columnes requerides: %d. Nombre de columnes trobades %d",
                             numberRequiredColumns(), csvHeader.size())

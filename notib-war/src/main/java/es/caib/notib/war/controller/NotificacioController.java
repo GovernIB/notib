@@ -77,6 +77,8 @@ public class NotificacioController extends BaseUserController {
     @Autowired
     private PagadorCieFormatFullaService pagadorCieFormatFullaService;
     @Autowired
+    private GestioDocumentalService gestioDocumentalService;
+    @Autowired
     private NotificacioListHelper notificacioListHelper;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -357,9 +359,9 @@ public class NotificacioController extends BaseUserController {
                         } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
                             byte[] result;
                             if (notificacioCommand.getId() != null) {
-                                result = notificacioService.obtenirArxiuNotificacio(arxiuGestdocId);
+                                result = gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId);
                             } else {
-                                result = notificacioService.obtenirArxiuTemporal(arxiuGestdocId);
+                                result = gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
                             }
 
                             String contingutBase64 = Base64.encodeBase64String(result);
@@ -1564,7 +1566,7 @@ public class NotificacioController extends BaseUserController {
                 notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
                 notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
 
-                arxiuGestdocId = notificacioService.guardarArxiuTemporal(notificacioCommand.getDocuments()[i].getContingutBase64());
+                arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(notificacioCommand.getDocuments()[i].getContingutBase64());
 
                 notificacioCommand.getDocuments()[i].setArxiuGestdocId(arxiuGestdocId);
                 model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());

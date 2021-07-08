@@ -383,13 +383,6 @@ public interface NotificacioService {
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
 			Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
 
-	
-
-//	void registrarEnviamentsPendents();
-//	void notificaEnviamentsRegistrats();
-//	void enviamentRefrescarEstatPendents();
-//	void enviamentRefrescarEstatEnviatSir();
-
 	/**
 	 * Actualitza enviaments expirats sense certificació
 	 * 
@@ -404,20 +397,6 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
-
-	
-	/**
-	 * Guarda un document a partir del string de bytes
-	 * 
-	 * @return el id
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public String guardarArxiuTemporal(String string);
-
-	@PreAuthorize("hasRole('tothom')")
-	byte[] obtenirArxiuTemporal(String arxiuGestdocId);
-	@PreAuthorize("hasRole('tothom')")
-	byte[] obtenirArxiuNotificacio(String arxiuGestdocId);
 
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
