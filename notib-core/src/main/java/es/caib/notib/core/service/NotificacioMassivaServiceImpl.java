@@ -250,12 +250,18 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 List<String> errors = notificacioValidatorHelper.validarNotificacioMassiu(
                         notificacio, entitat,
                         documentsProcessatsMassiu);
-                ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat);
-                if (procediment == null) {
-                    errors.add("[1330] No s'ha trobat cap procediment amb el codi indicat.");
-                } else {
-                    notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcedimentDto.class));
+                try {
+                    ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat);
+                    if (procediment == null) {
+                        errors.add("[1330] No s'ha trobat cap procediment amb el codi indicat.");
+                    } else {
+                        notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcedimentDto.class));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    errors.add(String.format("[1331] Error obtenint el procediment amb el codi %s.", notificacio.getProcediment().getCodi()));
                 }
+
 
                 if (errors.size() == 0) {
                     try {
