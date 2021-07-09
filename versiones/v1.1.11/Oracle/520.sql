@@ -19,3 +19,10 @@ where id in (select n.id from
                 ON env.notificacio_id = n.id
              where
                 env.id is null);
+
+-- Eliminam les notificacions eliminades de la taula de notificaicons
+delete from not_notificacio_table
+where id in (select nt.id from
+                not_notificacio_table nt left join not_notificacio n
+                on n.id = nt.id
+             where n.id is null);
