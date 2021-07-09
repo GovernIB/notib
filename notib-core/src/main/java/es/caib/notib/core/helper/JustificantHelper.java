@@ -113,7 +113,7 @@ public abstract class JustificantHelper<T> {
                 footer = new PdfPTable(2);
                 footer.setTotalWidth(523);
                 footer.setLockedWidth(true);
-                Image logoPeu = null;
+
                 PdfPCell cellTitolPeu = new PdfPCell();
                 if (getPeuTitol() != null) {
 //					## [PEU - TÍTOL]
@@ -127,85 +127,7 @@ public abstract class JustificantHelper<T> {
                 }
                 footer.addCell(cellTitolPeu);
 
-//				## [LOGO ENTITAT]
-                if (getPeuLogo() != null) {
-                    logoPeu = Image.getInstance(getPeuLogo());
-                } else {
-                    byte[] logoBytes = IOUtils.toByteArray(getPeuDefaultLogo());
-                    logoPeu = Image.getInstance(logoBytes);
-                }
-
-//				## [PEU - LOGO]
-                logoPeu.setScaleToFitHeight(true);
-                logoPeu.scaleToFit(100, 80);
-                PdfPCell cellLogo = new PdfPCell(logoPeu);
-                cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                cellLogo.setBorder(Rectangle.NO_BORDER);
-                footer.addCell(cellLogo);
-            } catch (Exception ex) {
-                String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer.error");
-                progres.setProgres(100);
-                progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);
-                log.error(errorMessage, ex);
-            }
-        }
-
-        private InputStream getPeuDefaultLogo() {
-            return getClass().getResourceAsStream("/es/caib/notib/core/justificant/logo.png");
-        }
-
-        private String getPeuLogo() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.logo"));
-        }
-
-        private String getPeuTitol() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.titol"));
-        }
-    }
-
-    protected class HeaderPageEvent extends PdfPageEventHelper {
-        private PdfPTable header;
-        private float tableHeight;
-
-        public float getTableHeight() {
-            return tableHeight;
-        }
-
-        public void onEndPage(PdfWriter writer, Document justificant) {
-            header.writeSelectedRows(
-                    0,
-                    -1,
-                    justificant.left(),
-                    750 + ((justificant.topMargin() + tableHeight) / 2),
-                    writer.getDirectContent());
-        }
-
-        protected HeaderPageEvent(ProgresDescarregaDto progres) throws JustificantException {
-            String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header");
-            log.debug(accioDescripcio);
-            progres.setProgres(15);
-            progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, accioDescripcio);
-            try {
                 PdfPCell cellDireccio = new PdfPCell();
-                header = new PdfPTable(2);
-                header.setTotalWidth(523);
-                header.setLockedWidth(true);
-                Image logoCapsalera = null;
-
-//				## [LOGO ENTITAT]
-                if (getCapsaleraLogo() != null) {
-                    logoCapsalera = Image.getInstance(getCapsaleraLogo());
-                } else {
-                    byte[] logoBytes = IOUtils.toByteArray(getCapsaleraDefaultLogo());
-                    logoCapsalera = Image.getInstance(logoBytes);
-                }
-                if (logoCapsalera != null) {
-                    logoCapsalera.scaleToFit(120f, 50f);
-                    PdfPCell cellLogo = new PdfPCell(logoCapsalera);
-                    cellLogo.setHorizontalAlignment(Element.ALIGN_LEFT);
-                    cellLogo.setBorder(Rectangle.NO_BORDER);
-                    header.addCell(cellLogo);
-                }
                 if (getNifDireccio() != null) {
 //					## [DIRECCIO - NIF]
                     Paragraph direccioNif = new Paragraph(getNifDireccio(), frutiger8);
@@ -240,10 +162,9 @@ public abstract class JustificantHelper<T> {
                 cellDireccio.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 cellDireccio.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cellDireccio.setBorder(Rectangle.NO_BORDER);
-                header.addCell(cellDireccio);
-                tableHeight = header.getTotalHeight();
+                footer.addCell(cellDireccio);
             } catch (Exception ex) {
-                String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header.error");
+                String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer.error");
                 progres.setProgres(100);
                 progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);
                 log.error(errorMessage, ex);
@@ -264,6 +185,86 @@ public abstract class JustificantHelper<T> {
 
         private String getEmailDireccio() {
             return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.email"));
+        }
+
+        private String getPeuTitol() {
+            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.titol"));
+        }
+    }
+
+    protected class HeaderPageEvent extends PdfPageEventHelper {
+        private PdfPTable header;
+        private float tableHeight;
+
+        public float getTableHeight() {
+            return tableHeight;
+        }
+
+        public void onEndPage(PdfWriter writer, Document justificant) {
+            header.writeSelectedRows(
+                    0,
+                    -1,
+                    justificant.left(),
+                    750 + ((justificant.topMargin() + tableHeight) / 2),
+                    writer.getDirectContent());
+        }
+
+        protected HeaderPageEvent(ProgresDescarregaDto progres) throws JustificantException {
+            String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header");
+            log.debug(accioDescripcio);
+            progres.setProgres(15);
+            progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, accioDescripcio);
+            try {
+                header = new PdfPTable(2);
+                header.setTotalWidth(523);
+                header.setLockedWidth(true);
+
+//				## [LOGO ENTITAT]
+                Image logoCapsalera = null;
+                if (getCapsaleraLogo() != null) {
+                    logoCapsalera = Image.getInstance(getCapsaleraLogo());
+                } else {
+                    byte[] logoBytes = IOUtils.toByteArray(getCapsaleraDefaultLogo());
+                    logoCapsalera = Image.getInstance(logoBytes);
+                }
+                if (logoCapsalera != null) {
+                    logoCapsalera.scaleToFit(120f, 50f);
+                    PdfPCell cellLogo = new PdfPCell(logoCapsalera);
+                    cellLogo.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    cellLogo.setBorder(Rectangle.NO_BORDER);
+                    header.addCell(cellLogo);
+                }
+
+//				## [LOGO ENTITAT]
+                Image logoPeu = null;
+                if (getPeuLogo() != null) {
+                    logoPeu = Image.getInstance(getPeuLogo());
+                } else {
+                    byte[] logoBytes = IOUtils.toByteArray(getPeuDefaultLogo());
+                    logoPeu = Image.getInstance(logoBytes);
+                }
+
+//				## [PEU - LOGO]
+                logoPeu.setScaleToFitHeight(true);
+                logoPeu.scaleToFit(100, 80);
+                PdfPCell cellLogo = new PdfPCell(logoPeu);
+                cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cellLogo.setBorder(Rectangle.NO_BORDER);
+                header.addCell(cellLogo);
+                tableHeight = header.getTotalHeight();
+            } catch (Exception ex) {
+                String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header.error");
+                progres.setProgres(100);
+                progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);
+                log.error(errorMessage, ex);
+            }
+        }
+        private InputStream getPeuDefaultLogo() {
+            return getClass().getResourceAsStream("/es/caib/notib/core/justificant/logo.png");
+        }
+
+        private String getPeuLogo() {
+            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.logo"));
         }
 
         private String getCapsaleraLogo() {
