@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 
 /**
  * Helper per generar el justificant de la notificació electrònica
@@ -102,7 +103,9 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			titolIntroduccioCell.setBorder(Rectangle.NO_BORDER);
 
 //			## [TITOL JUSTIFICANT]
-			String titolMessage = messageHelper.getMessage("es.caib.notib.justificant.titol");
+			String titolMessage = messageHelper.getMessage("es.caib.notib.justificant.titol", new Object[] {
+					messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toUpperCase(Locale.ROOT)
+			});
 			Paragraph justificantTitol = new Paragraph(titolMessage, frutigerTitolBold);
 			justificantTitol.setAlignment(Element.ALIGN_CENTER);
 			justificantTitol.add(Chunk.NEWLINE);
@@ -112,7 +115,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			String introduccio = messageHelper.getMessage(
 					"es.caib.notib.justificant.introduccio",
 					new Object[] {
-							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()),
+							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(Locale.ROOT),
 							notificacio.getConcepte(),
 							getDateTimeFormatted(notificacio.getNotificaEnviamentNotificaData() != null ? notificacio.getNotificaEnviamentNotificaData() : notificacio.getNotificaEnviamentData())});
 			Paragraph justificantIntroduccio = new Paragraph();
@@ -122,7 +125,11 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 //			## [DESCIPCIÓ NOFICACIÓ JUSTIFICANT]
 			Paragraph justificantDescripcio = new Paragraph();
 			if (notificacio.getDescripcio() != null && !notificacio.getDescripcio().isEmpty()) {
-				String descripcio = messageHelper.getMessage("es.caib.notib.justificant.descripcio", new Object[] {notificacio.getDescripcio()});
+				String descripcio = messageHelper.getMessage("es.caib.notib.justificant.descripcio",
+						new Object[] {
+								messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(),
+								notificacio.getDescripcio()
+				});
 				setParametersBold(justificantDescripcio, descripcio);
 				justificantDescripcio.setSpacingBefore(10f);
 			}
@@ -165,7 +172,11 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			
 			
 //			## [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
-			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol", new Object[] {notificacio.getEnviaments().size()});
+			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol",
+					new Object[] {
+							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(),
+							notificacio.getEnviaments().size()
+			});
 			Paragraph justificantIntroduccioEnviaments = new Paragraph();
 			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
 			justificantIntroduccioEnviaments.setSpacingBefore(10f);
@@ -197,7 +208,10 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 
 
 			// [INTRODUCCIÓ ENVIAMENTS JUSTIFICANT]
-			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.documents");
+			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.documents",
+					new Object[]{
+							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(Locale.ROOT).toLowerCase()
+			});
 			Paragraph justificantIntroduccioEnviaments = new Paragraph();
 			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
 			justificantIntroduccioEnviaments.setSpacingBefore(10f);
