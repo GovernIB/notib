@@ -3,16 +3,15 @@
  */
 package es.caib.notib.war.helper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.EntitatService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -47,16 +46,16 @@ public class SessioHelper {
         
 		request.getSession().setAttribute(
 				"SessionHelper.capsaleraCapLogo", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.logo"));
+				aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
 		request.getSession().setAttribute(
 				"SessionHelper.capsaleraPeuLogo", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.peu.logo"));
+				aplicacioService.propertyGet("es.caib.notib.peu.logo"));
 		request.getSession().setAttribute(
 				"SessionHelper.capsaleraColorFons", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.fons"));
+				aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
 		request.getSession().setAttribute(
 				"SessionHelper.capsaleraColorLletra", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.lletra"));
+				aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
 		
 		request.getSession().setAttribute(
 				SESSION_ATTRIBUTE_IDIOMA_USUARI, 

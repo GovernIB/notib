@@ -3,10 +3,14 @@
  */
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.config.ConfigRepository;
 import es.caib.notib.core.test.AuthenticationTest;
 import es.caib.notib.core.test.data.DatabaseItemTest;
 import es.caib.notib.core.test.data.EntitatItemTest;
@@ -17,6 +21,7 @@ import es.caib.notib.plugin.registre.*;
 import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
@@ -56,6 +61,8 @@ public class BaseServiceTestV2 {
 
 	@Autowired
 	protected  PluginHelper pluginHelper;
+	@Autowired
+	protected ConfigRepository configRepository;
 
 	private DadesUsuariPlugin dadesUsuariPluginMock;
 	@Mock
@@ -145,12 +152,11 @@ public class BaseServiceTestV2 {
 		try {
 			organGestorCreate.delete(entitatId, "organ_default");
 			entitatItemTest.delete(entitatId);
+			removeAllConfigs();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-
-
 	}
 	protected void testCreantElements(
 			final TestAmbElementsCreats test,
@@ -174,8 +180,20 @@ public class BaseServiceTestV2 {
 			return this.elementsCreats.get(key);
 		}
 	}
-	
-	
+
+	protected void addConfig(String key, String value) {
+		ConfigEntity configEntity = new ConfigEntity(key, value);
+		configRepository.save(configEntity);
+	}
+	protected void setDefaultConfigs() {
+		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
+		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
+			addConfig(entry.getKey().toString(), entry.getValue().toString());
+		}
+	}
+	protected void removeAllConfigs() {
+		configRepository.deleteAll();
+	}
 	// PLUGINS
 	// ///////////////////////////////////////////////////////////////////////////////////////////////
 	

@@ -82,6 +82,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private NotificacioTableViewRepository notificacioTableViewRepository;
     @Autowired
     private NotificacioListHelper notificacioListHelper;
+    @Autowired
+    private ConfigHelper configHelper;
 
     private static final int MAX_ENVIAMENTS = 999;
 
@@ -804,11 +806,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
 
-    private static NotificacioMassivaPrioritatDto getPrioritatNotificacioMassiva(){
+    private NotificacioMassivaPrioritatDto getPrioritatNotificacioMassiva(){
         NotificacioMassivaPrioritatDto tipus = NotificacioMassivaPrioritatDto.BAIXA;
 
         try {
-            String tipusStr = PropertiesHelper.getProperties().getProperty("es.caib.notib.enviament.massiu.prioritat", "BAIXA");
+            String tipusStr = configHelper.getConfig("es.caib.notib.enviament.massiu.prioritat");
             if (tipusStr != null && !tipusStr.isEmpty())
                 tipus = NotificacioMassivaPrioritatDto.valueOf(tipusStr);
         } catch (Exception ex) {

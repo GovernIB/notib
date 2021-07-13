@@ -49,6 +49,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
     @Before
     public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
+        setDefaultConfigs();
         List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
         entitatCreate = new EntitatDto();
         entitatCreate.setCodi("LIMIT");

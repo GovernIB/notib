@@ -86,7 +86,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	@Override
 	protected String getMailHtmlBody(NotificacioEntity notificacio) {
-		String appBaseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.app.base.url");
+		String appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		String htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
 				"<html>"+
@@ -212,7 +212,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		return htmlText;
 	}
 	protected String getMailPlainTextBody(NotificacioEntity notificacio) {
-		String appBaseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.app.base.url");
+		String appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		return
 				messageHelper.getMessage("notificacio.email.notificacio")+
 						"\t\t\t\t"+ Objects.toString(notificacio.getId(), "")+"\n"+

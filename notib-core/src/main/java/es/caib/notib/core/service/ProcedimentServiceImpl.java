@@ -93,6 +93,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private ProcedimentsCacheable procedimentsCacheable;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -553,21 +555,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	private boolean isActualitzacioProcedimentsModificarProperty() {
-		String modificar = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.modificar");
-		if (modificar != null) {
-			return new Boolean(modificar).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
 	}
 	
 	private boolean isActualitzacioProcedimentsEliminarOrgansProperty() {
-		String eliminar = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.eliminar.organs");
-		if (eliminar != null) {
-			return new Boolean(eliminar).booleanValue();
-		} else {
-			return false;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
 	}
 
 	@Override

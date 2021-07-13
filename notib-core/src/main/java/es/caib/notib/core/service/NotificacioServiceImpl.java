@@ -111,6 +111,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EnviamentHelper enviamentHelper;
 	@Autowired
 	private NotificacioListHelper notificacioListHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1509,27 +1511,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	private int getRegistreEnviamentsProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.registre.enviaments.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.processar.max");
 	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.notifica.enviaments.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max");
 	}
-	
-		
+
+	private int getMidaMinIdCsv() {
+		return configHelper.getAsInt("es.caib.notib.document.consulta.id.csv.mida.min");
+	}
 	
 	
 	private void estatCalcularCampsAddicionals(
@@ -1602,10 +1598,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return documentDto;	
 	}
 	
-	private int getMidaMinIdCsv() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.document.consulta.id.csv.mida.min", 16);
-	}
 
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);

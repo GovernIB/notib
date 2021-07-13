@@ -6,6 +6,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.CallbackHelper;
+import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.junit.After;
@@ -31,6 +32,8 @@ public class CallbackServiceImplTest {
     private CallbackHelper callbackHelper;
     @Mock
     private MetricsHelper metricsHelper;
+    @Mock
+    private ConfigHelper configHelper;
 
     @InjectMocks
     private CallbackServiceImpl callbackService;
@@ -61,6 +64,10 @@ public class CallbackServiceImplTest {
                 .notificacio(notificacioMock)
                 .build();
         enviamentMock.setCreatedBy(mockUser);
+        Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.tasques.actives"))).thenReturn(true);
+        Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.tasca.callback.pendents.actiu"))).thenReturn(true);
+        Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.tasca.callback.pendents.processar.max"))).thenReturn(3);
+
 
 //        eventsMap = new HashMap<>();
 //        for (Long eventId : eventsIds) {

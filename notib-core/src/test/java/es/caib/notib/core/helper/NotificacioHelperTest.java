@@ -49,14 +49,16 @@ public class NotificacioHelperTest {
 	private ProcedimentEntity procediment;
 	@Mock
 	private ProcedimentOrganEntity procedimentOrgan;
-	
+	@Mock
+	private ConfigHelper configHelper;
+
 	@InjectMocks
 	private NotificacioHelper notificacioHelper;
 	
 	@Before
 	public void setUp() {
-		System.setProperty("es.caib.notib.procediment.alta.auto.retard", "10");
-		System.setProperty("es.caib.notib.procediment.alta.auto.caducitat", "15");
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 	}
 	
 	@Test
@@ -71,8 +73,8 @@ public class NotificacioHelperTest {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "10")),
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "15")),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entidad,
 				null,
 				null,

@@ -25,7 +25,8 @@ public class NotificaHelper {
 	private NotificaV0Helper notificaV0Helper; // Mock
 	@Autowired
 	private NotificaV2Helper notificaV2Helper;
-
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId);
@@ -88,8 +89,7 @@ public class NotificaHelper {
 	}
 
 	private String getNotificaVersioProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.versio");
+		return configHelper.getConfig("es.caib.notib.notifica.versio");
 	}
 
 }

@@ -61,7 +61,8 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	EnviamentTableRepository enviamentTableRepository;
 
 	@Before
-	public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
+	public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {		addConfig("es.caib.notib.metriques.generar", "false");
+		setDefaultConfigs();
 		configureMockGestioDocumentalPlugin();
 
 		entitatCreate = EntitatItemTest.getRandomInstance();

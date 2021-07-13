@@ -68,6 +68,9 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
 
     @Before
     public void setup() throws Exception {
+        addConfig("es.caib.notib.metriques.generar", "false");
+        addConfig("es.caib.notib.emprar.sir", "true");
+        addConfig("es.caib.notib.tasca.registre.enviaments.periode", "60000");
         configureMockGestioDocumentalPlugin();
 
         entitatCreate = EntitatItemTest.getRandomInstance();

@@ -12,10 +12,11 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.repository.config.ConfigRepository;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
@@ -25,13 +26,13 @@ import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
+import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -99,6 +100,8 @@ public class BaseServiceTest {
 	
 	@Autowired
 	private  PluginHelper pluginHelper;
+	@Autowired
+	protected ConfigRepository configRepository;
 	
 	private DadesUsuariPlugin dadesUsuariPluginMock;
 	private GestioDocumentalPlugin gestioDocumentalPluginMock;
@@ -329,6 +332,7 @@ public class BaseServiceTest {
 				}
 				logger.debug("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
 			}
+			removeAllConfigs();
 			logger.info("-------------------------------------------------------------------");
 			logger.info("-- ...test \"" + descripcio + "\" executat.");
 			logger.info("-------------------------------------------------------------------");
@@ -345,8 +349,20 @@ public class BaseServiceTest {
 		public abstract void executar(
 				List<Object> elementsCreats) throws Exception;
 	}
-	
-	
+
+	protected void addConfig(String key, String value) {
+		ConfigEntity configEntity = new ConfigEntity(key, value);
+		configRepository.save(configEntity);
+	}
+	protected void setDefaultConfigs() {
+		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
+		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
+			addConfig(entry.getKey().toString(), entry.getValue().toString());
+		}
+	}
+	protected void removeAllConfigs() {
+		configRepository.deleteAll();
+	}
 	
 	// PLUGINS
 	// ///////////////////////////////////////////////////////////////////////////////////////////////

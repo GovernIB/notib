@@ -71,6 +71,8 @@ public class EntitatServiceImpl implements EntitatService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Transactional
@@ -621,7 +623,7 @@ public class EntitatServiceImpl implements EntitatService {
 	public byte[] getCapLogo() throws NoSuchFileException, IOException{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.capsalera.logo");
+			String filePath = configHelper.getConfig("es.caib.notib.capsalera.logo");
 			Path path = Paths.get(filePath);
 			
 			return Files.readAllBytes(path);
@@ -635,7 +637,7 @@ public class EntitatServiceImpl implements EntitatService {
 	public byte[] getPeuLogo() throws NoSuchFileException, IOException{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.peu.logo");
+			String filePath = configHelper.getConfig("es.caib.notib.peu.logo");
 			Path path = Paths.get(filePath);
 			
 			return Files.readAllBytes(path);

@@ -34,6 +34,8 @@ public class RegistreNotificaHelperTest {
 	private IntegracioHelper integracioHelper;
 	@Mock
 	private NotificacioEventHelper notificacioEventHelper;
+	@Mock
+	private ConfigHelper configHelper;
 
 	@InjectMocks
 	private RegistreNotificaHelper registreNotificaHelper;
@@ -51,6 +53,7 @@ public class RegistreNotificaHelperTest {
 						Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(), Mockito.anyBoolean()
 				)
 		).thenReturn(new RespostaConsultaRegistre());
+		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
 
 	}
 

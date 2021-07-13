@@ -1,13 +1,8 @@
 package es.caib.notib.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.helper.PermisosHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,16 +11,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
-import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.helper.PermisosHelper;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -45,6 +35,7 @@ public class PagadorCieFormatSobreServiceTest extends BaseServiceTest{
 	
 	@Before
 	public void setUp() {
+		addConfig("es.caib.notib.metriques.generar", "false");
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");

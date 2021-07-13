@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,6 +56,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -70,7 +71,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				logger.debug("Consultant plugin de dades d'usuari (" +
 						"usuariCodi=" + auth.getName() + ")");
 				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
+				String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 				if (dadesUsuari != null) {
 					usuari = usuariRepository.save(
 							UsuariEntity.getBuilder(
@@ -304,7 +305,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			logger.debug("Consulta del valor de la property (" +
 					"property=" + property + ")");
-			return PropertiesHelper.getProperties().getProperty(property);
+			return configHelper.getConfig(property);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -315,22 +316,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta del valor de la property (property=" + property + ", default=" + defaultValue + ")");
-			String propertyValue = PropertiesHelper.getProperties().getProperty(property);
+			String propertyValue = configHelper.getConfig(property);
 			if (propertyValue == null || propertyValue.trim().isEmpty())
 				return defaultValue;
 			return propertyValue;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	public Map<String, String> propertyFindByPrefix(String prefix) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Consulta del valor dels properties amb prefix (" +
-					"prefix=" + prefix + ")");
-			return PropertiesHelper.getProperties().findByPrefix(prefix);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

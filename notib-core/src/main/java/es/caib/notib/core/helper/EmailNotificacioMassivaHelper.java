@@ -1,12 +1,8 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.UsuariRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -20,20 +16,6 @@ import java.util.Arrays;
 @Slf4j
 @Component
 public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassivaEntity> {
-
-	private static final String PREFIX_NOTIB = "[NOTIB]";
-	@Resource
-	private ProcedimentHelper procedimentHelper;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Resource
-	private GrupRepository grupRepository;
-	@Resource
-	private GrupProcedimentRepository grupProcedimentRepository;
-	@Resource
-	private JavaMailSender mailSender;
 	@Resource
 	private MessageHelper messageHelper;
 
@@ -57,7 +39,6 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 	}
 	@Override
 	protected String getMailHtmlBody(NotificacioMassivaEntity item) {
-		String appBaseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.app.base.url");
 		String htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
 				"<html>"+
@@ -156,7 +137,7 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 
 	@Override
 	protected String getMailPlainTextBody(NotificacioMassivaEntity item) {
-		String appBaseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.app.base.url");
+		String appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		return 	"\t" + messageHelper.getMessage("notificacio.massiva.email.body") +
 				"\t\t\t\t" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer1") + "\n" +
 				"\t\t\t\t" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer2") + "\n" +

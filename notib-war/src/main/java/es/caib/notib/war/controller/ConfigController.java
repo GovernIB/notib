@@ -1,0 +1,80 @@
+package es.caib.notib.war.controller;
+
+import es.caib.notib.core.api.dto.config.ConfigDto;
+import es.caib.notib.core.api.dto.config.ConfigGroupDto;
+import es.caib.notib.core.api.service.ConfigService;
+import es.caib.notib.war.command.ConfigCommand;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
+
+/**
+ * Controlador per a la gestió de la configuració de l'aplicació.
+ * Només accessible amb el rol de superusuari.
+ *
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Slf4j
+@Controller
+@RequestMapping("/config")
+public class ConfigController extends BaseUserController{
+    @Autowired
+    private ConfigService configService;
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String get(
+            HttpServletRequest request,
+            Model model) {
+        List<ConfigGroupDto> configGroups = configService.findAll();
+        model.addAttribute("config_groups", configGroups);
+        for (ConfigGroupDto cGroup: configGroups) {
+            fillFormsModel(cGroup, model);
+        }
+        return "config";
+    }
+
+    @RequestMapping(value="/update", method = RequestMethod.POST)
+    public String updateConfig(
+            HttpServletRequest request,
+            Model model,
+			@Valid ConfigCommand configCommand,
+			BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return get(request, model);
+        }
+
+        String msg;
+        try {
+            configService.updateProperty(configCommand.asDto());
+            msg = "config.controller.edit.ok";
+        } catch (Exception e) {
+            e.printStackTrace();
+            msg = "config.controller.edit.error";
+        }
+        return getModalControllerReturnValueSuccess(
+                request,
+                "redirect:.",
+                msg);
+    }
+
+    private void fillFormsModel(ConfigGroupDto cGroup, Model model){
+        for (ConfigDto config: cGroup.getConfigs()) {
+            model.addAttribute("config_" + config.getKey().replace('.', '_'),
+                    ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+        }
+        if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()){
+            return;
+        }
+        for (ConfigGroupDto child : cGroup.getInnerConfigs()){
+            fillFormsModel(child, model);
+        }
+    }
+}

@@ -30,7 +30,9 @@ public abstract class JustificantHelper<T> {
     protected final Font calibriWhiteBold = FontFactory.getFont("Calibri", 10, Font.BOLD, new BaseColor(255, 255, 255)); // #FFFFFF
 
     @Autowired
-    MessageHelper messageHelper;
+    protected MessageHelper messageHelper;
+    @Autowired
+    protected ConfigHelper configHelper;
 
     public abstract byte[] generarJustificant(
             T notificacio,
@@ -172,23 +174,23 @@ public abstract class JustificantHelper<T> {
         }
 
         private String getDireccio() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.direccio"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.direccio"));
         }
 
         private String getNifDireccio() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.nif"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.nif"));
         }
 
         private String getCodiDireccio() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.codi"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.codi"));
         }
 
         private String getEmailDireccio() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.email"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.email"));
         }
 
         private String getPeuTitol() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.titol"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.peu.titol"));
         }
     }
 
@@ -264,11 +266,11 @@ public abstract class JustificantHelper<T> {
         }
 
         private String getPeuLogo() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.peu.logo"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.peu.logo"));
         }
 
         private String getCapsaleraLogo() {
-            return getNotBlankProperty(PropertiesHelper.getProperties().getProperty("es.caib.notib.justificant.capsalera.logo"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.logo"));
         }
 
         private InputStream getCapsaleraDefaultLogo() {

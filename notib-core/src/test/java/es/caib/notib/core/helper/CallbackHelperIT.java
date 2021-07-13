@@ -60,6 +60,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
 
     @Before
     public void setUp() throws Exception {
+        setDefaultConfigs();
         configureMockGestioDocumentalPlugin();
 
         WireMock.stubFor(WireMock.post(WireMock.urlPathEqualTo("/notificaCanvi"))
@@ -94,6 +95,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
 
     @After
     public final void tearDown() {
+        removeAllConfigs();
         aplicacioRepository.delete(aplicacio.getId());
         destroyDatabase(database.getEntitat().getId(),
                 notificacioCreate

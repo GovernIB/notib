@@ -69,8 +69,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired 
 	private PermisosHelper permisosHelper;
 	@Autowired 
@@ -101,6 +99,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private JustificantService justificantService;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
@@ -2237,29 +2237,24 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return docBase64.startsWith("JVBERi0");
 	}
 	
-	private static Boolean isMultipleDestinataris() {
+	private Boolean isMultipleDestinataris() {
 		String property = "es.caib.notib.destinatari.multiple";
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
-		return PropertiesHelper.getProperties().getAsBoolean(property, false);
+		return configHelper.getAsBoolean(property);
 	}
 	
-	private static Long getMaxSizeFile() {
-		String property = "es.caib.notib.notificacio.document.size";
-		logger.debug("Consulta del valor de la property (property=" + property + ")");
-		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
+	private Long getMaxSizeFile() {
+		return configHelper.getAsLong("es.caib.notib.notificacio.document.size");
 	}
 
-	private static Long getMaxTotalSizeFile() {
-		String property = "es.caib.notib.notificacio.document.total.size";
-		logger.debug("Consulta del valor de la property (property=" + property + ")");
-		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "15728640"));
+	private Long getMaxTotalSizeFile() {
+		return configHelper.getAsLong("es.caib.notib.notificacio.document.total.size");
 	}
 	
 	// Indica si usar valores por defecto cuando ni el documento ni documentV2 tienen metadades
 	private boolean getUtilizarValoresPorDefecto() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.notib.document.metadades.por.defecto", true);
+		return configHelper.getAsBoolean("es.caib.notib.document.metadades.por.defecto");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 
