@@ -1311,7 +1311,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 		transmissio.setNumExpedient(enviament.getNotificacio().getNumExpedient());
 		transmissio.setConcepte(enviament.getNotificacio().getConcepte());
 		transmissio.setDescripcio(enviament.getNotificacio().getDescripcio());
-		transmissio.setDataEnviament(enviament.getNotificacio().getEnviamentDataProgramada());
+		Date dataProgramada = enviament.getNotificacio().getEnviamentDataProgramada();
+		if (dataProgramada == null) {
+			transmissio.setDataEnviament(enviament.getNotificacio().getNotificaEnviamentData());
+		} else {
+			transmissio.setDataEnviament(dataProgramada);
+		}
+
 		transmissio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
 		transmissio.setDataEstat(enviament.getNotificacio().getEstatDate());
 		Document document = Document.builder()
@@ -1349,7 +1355,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (enviament.getNotificaCertificacioData() != null) {
 			transmissio.setCertificacio(basePath + "/certificacio/" + enviament.getId());
 		}
-		
+
 		return transmissio;
 	}
 	

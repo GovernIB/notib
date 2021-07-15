@@ -59,6 +59,7 @@ public class EnviamentHelper {
 		refrescarEnviamentsExpirats(new ProgresActualitzacioCertificacioDto());
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void refrescarEnviamentsExpirats(@NonNull ProgresActualitzacioCertificacioDto progres) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth == null ? "schedulled" : auth.getName();
@@ -72,6 +73,7 @@ public class EnviamentHelper {
 			String msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
 			progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
 			info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
+			progres.setProgres(100);
 		} else {
 			String msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
 			progres.setNumEnviamentsExpirats(enviamentsIds.size());
@@ -89,6 +91,7 @@ public class EnviamentHelper {
 					log.error("No s'ha pogut refrescar l'estat de l'enviament (enviamentId=" + enviamentId + ")", ex);
 				}
 			}
+			progres.setProgres(100);
 		}
 		integracioHelper.addAccioOk(info);
 	}
