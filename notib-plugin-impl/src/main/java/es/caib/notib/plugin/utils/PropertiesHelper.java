@@ -3,11 +3,11 @@
  */
 package es.caib.notib.plugin.utils;
 
-import java.io.FileInputStream;
-import java.util.Properties;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.util.Properties;
 
 /**
  * Utilitat per accedir a les entrades del fitxer de properties.

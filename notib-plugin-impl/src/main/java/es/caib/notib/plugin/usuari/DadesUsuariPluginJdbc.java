@@ -1,23 +1,17 @@
-/**
- * 
- */
 package es.caib.notib.plugin.usuari;
 
+import es.caib.notib.plugin.SistemaExternException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.
@@ -165,20 +159,20 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	}
 
 	private String getDatasourceJndiName() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name");
 	}
 	private String getJdbcQueryUsuariCodi() {
-		String query = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query");
+		String query = System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query");
 		if (query == null || query.isEmpty())
-			query = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.codi");
+			query = System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.codi");
 		return query;
 	}
 	private String getLdapFiltreRolsCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.rols");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.rols");
 	}
 	private String getJdbcQueryUsuariGrup() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.grup");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.grup");
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);

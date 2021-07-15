@@ -34,8 +34,8 @@ public class ConfigEntity {
     @Column(name = "JBOSS_PROPERTY", nullable = false)
     private boolean jbossProperty;
 
-    @Column(name = "TYPE_CODE", length = 2048, nullable = true)
-    private String typeCode;
+    @Column(name = "GROUP_CODE", length = 2048, nullable = true)
+    private String groupCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)

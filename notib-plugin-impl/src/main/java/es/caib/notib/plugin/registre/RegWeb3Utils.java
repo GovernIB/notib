@@ -1,36 +1,19 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.regweb3.ws.api.v3.*;
+import org.apache.commons.io.IOUtils;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.BindingProvider;
-
-import org.apache.commons.io.IOUtils;
-
-import es.caib.notib.plugin.utils.PropertiesHelper;
-import es.caib.regweb3.ws.api.v3.RegWebAsientoRegistralWs;
-import es.caib.regweb3.ws.api.v3.RegWebAsientoRegistralWsService;
 //import org.fundaciobit.genapp.common.utils.Utils;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWs;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWsService;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWs;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWsService;
-import es.caib.regweb3.ws.api.v3.RegWebInfoWs;
-import es.caib.regweb3.ws.api.v3.RegWebInfoWsService;
-import es.caib.regweb3.ws.api.v3.RegWebPersonasWs;
-import es.caib.regweb3.ws.api.v3.RegWebPersonasWsService;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWsService;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWsService;
-//import es.caib.regweb3.ws.v3.impl.RegWebAsientoRegistralWs;
-//import es.caib.regweb3.ws.v3.impl.RegWebAsientoRegistralWsService;
 /**
  * 
  * @author anadal
@@ -51,18 +34,18 @@ public abstract class RegWeb3Utils {
 
 
 	public static String getEndPoint(String api) {
-		String url = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.url");
+		String url = System.getProperties().getProperty("es.caib.notib.plugin.registre.url");
 		if (!url.endsWith("/"))
 			url = url + "/";
 		return url + api;
 	}
 
 	public static String getAppUserName() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.usuari");
+		return System.getProperties().getProperty("es.caib.notib.plugin.registre.usuari");
 	}
 
 	public static String getAppPassword() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.password");
+		return System.getProperties().getProperty("es.caib.notib.plugin.registre.password");
 	}
 
 	public static void configAddressUserPassword(

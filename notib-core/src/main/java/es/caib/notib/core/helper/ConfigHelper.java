@@ -2,6 +2,8 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
 import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.entity.config.ConfigGroupEntity;
+import es.caib.notib.core.repository.config.ConfigGroupRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public class ConfigHelper {
 
     @Autowired
     private ConfigRepository configRepository;
+    @Autowired
+    private ConfigGroupRepository configGroupRepository;
 
     public String getConfig(String key) throws NotDefinedConfigException {
         ConfigEntity configEntity = configRepository.findOne(key);
@@ -30,6 +34,23 @@ public class ConfigHelper {
         }
 
         return configEntity.getValue();
+    }
+
+    public Map<String, String> getGroupProperties(String codeGroup) {
+        Map<String, String> properties = new HashMap<>();
+        ConfigGroupEntity configGroup = configGroupRepository.findOne(codeGroup);
+        fillGroupProperties(configGroup, properties);
+        return properties;
+    }
+
+    public void fillGroupProperties(ConfigGroupEntity configGroup, Map<String, String> outProperties) {
+        for (ConfigEntity config : configGroup.getConfigs()) {
+            outProperties.put(config.getKey(), config.getValue());
+        }
+
+        for (ConfigGroupEntity child : configGroup.getInnerConfigs()) {
+            fillGroupProperties(child, outProperties);
+        }
     }
 
     public boolean getAsBoolean(String key) {

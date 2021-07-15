@@ -1773,187 +1773,6 @@ public class PluginHelper {
 		return registre;
 	}
 
-//	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
-//		RegistreInteressatDto interessat = new RegistreInteressatDto();
-//		interessat.setNom(persona.getNom());
-//		interessat.setLlinatge1(persona.getLlinatge1());
-//		interessat.setLlinatge2(persona.getLlinatge2());
-//		interessat.setRaoSocial(persona.getRaoSocial());
-//		interessat.setTelefon(persona.getTelefon());
-//		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-//			interessat.setDocumentNumero(persona.getDir3Codi());
-//			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-//		} else {
-//			interessat.setDocumentNumero(persona.getNif());
-//			if (isDocumentEstranger(persona.getNif()))
-//				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-//			else
-//				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
-//		}
-//		return interessat;
-//	}
-	
-//	public InteresadoWsDto personaToInteresadoWs (PersonaEntity persona) {
-//		InteresadoWsDto interessat = new InteresadoWsDto();
-//		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-//		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
-//		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-//			interessatDades.setDocumento(persona.getDir3Codi());
-//			interessatDades.setTipoDocumentoIdentificacion("O");
-//		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-//			interessatDades.setDocumento(persona.getNif());
-//			if (isDocumentEstranger(persona.getNif()))
-//				interessatDades.setTipoDocumentoIdentificacion("E");
-//			else
-//				interessatDades.setTipoDocumentoIdentificacion("N");
-//		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-//			interessatDades.setDocumento(persona.getNif());
-//			interessatDades.setTipoDocumentoIdentificacion("C");
-//		}
-//		interessatDades.setRazonSocial(persona.getNom());
-//		interessatDades.setNombre(persona.getNom());
-//		interessatDades.setApellido1(persona.getLlinatge1());
-//		interessatDades.setApellido2(persona.getLlinatge2());
-//		interessatDades.setCodigoDire("");
-//		interessatDades.setDireccion("");
-//		interessatDades.setCp("");
-//		interessatDades.setObservaciones("");
-//		interessatDades.setEmail(persona.getEmail());
-//		interessatDades.setDireccionElectronica(persona.getEmail());
-//		interessatDades.setTelefono(persona.getTelefon());
-//		interessat.setInteresado(interessatDades);
-//		return interessat;
-//	}
-	
-//	public DadesInteressat personaToDadesInteressatIRepresenat (
-//			NotificacioDtoV2 notificacio,
-//			PersonaDto titular,
-//			PersonaDto destinatari) {
-//		String dir3Codi;
-//
-//		if (notificacio.getEntitat().getDir3CodiReg() != null)
-//			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-//		else
-//			dir3Codi = notificacio.getEmisorDir3Codi();
-//		DadesInteressat interessatRepresentat = new DadesInteressat();
-//		Interessat dadesRepresentat = null;
-//		Interessat dadesInteressat = new Interessat();
-//		if (titular != null && notificacio != null) {
-//			dadesInteressat.setNom(titular.getNom());
-//			dadesInteressat.setEntitatCodi(dir3Codi);
-//			dadesInteressat.setAutenticat(false);
-//			if (titular.getInteressatTipus() != null) {
-//				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
-//			}
-//			if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-//				dadesInteressat.setNif(titular.getDir3Codi());
-//				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-//			} else if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-//				dadesInteressat.setNom(titular.getRaoSocial());
-//				dadesInteressat.setNif(titular.getNif());
-//				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-//			} else {
-//				dadesInteressat.setNif(titular.getNif());
-//				if (isDocumentEstranger(titular.getNif()))
-//					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-//				else
-//					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-//			}
-//			dadesInteressat.setCognom1(titular.getLlinatge1());
-//			dadesInteressat.setCognom2(titular.getLlinatge2());
-//			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
-//			dadesInteressat.setPaisCodi(null);
-//			dadesInteressat.setPaisNom(null);
-//			dadesInteressat.setProvinciaCodi(null);
-//			dadesInteressat.setProvinciaNom(null);
-//			dadesInteressat.setMunicipiCodi(null);
-//			dadesInteressat.setMunicipiNom(null);
-//		}
-//		interessatRepresentat.setInteressat(dadesInteressat);
-//
-//		if (destinatari != null && titular.isIncapacitat()) {
-//			dadesRepresentat = new Interessat();
-//			dadesRepresentat.setEntitatCodi(dir3Codi);
-//			dadesRepresentat.setAutenticat(false);
-//			if (destinatari.getInteressatTipus() != null) {
-//				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
-//			}
-//			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-//				dadesRepresentat.setNif(destinatari.getDir3Codi());
-//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-//			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-//				dadesRepresentat.setNif(destinatari.getNif());
-//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-//			} else {
-//				dadesRepresentat.setNif(destinatari.getNif());
-//				if (isDocumentEstranger(titular.getNif()))
-//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-//				else
-//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-//			}
-//			dadesRepresentat.setNom(destinatari.getNom());
-//			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
-//			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
-//			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-//			dadesRepresentat.setPaisCodi(null);
-//			dadesRepresentat.setPaisNom(null);
-//			dadesRepresentat.setProvinciaCodi(null);
-//			dadesRepresentat.setProvinciaNom(null);
-//			dadesRepresentat.setMunicipiCodi(null);
-//			dadesRepresentat.setMunicipiNom(null);
-//		}
-//		interessatRepresentat.setRepresentat(dadesRepresentat);
-//
-//		return interessatRepresentat;
-//	}
-	
-//	@SuppressWarnings("unused")
-//	private DadesRepresentat personaToDadesRepresentat (
-//			NotificacioDtoV2 notificacio,
-//			PersonaDto titular,
-//			PersonaDto destinatari) {
-//		String dir3Codi;
-//
-//		if (notificacio.getEntitat().getDir3CodiReg() != null)
-//			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-//		else
-//			dir3Codi = notificacio.getEmisorDir3Codi();
-//
-//		DadesRepresentat dadesRepresentat = null;
-//		if (destinatari != null && titular.isIncapacitat()) {
-//			dadesRepresentat = new DadesRepresentat();
-//			dadesRepresentat.setEntitatCodi(dir3Codi);
-//			dadesRepresentat.setAutenticat(false);
-//			if (destinatari.getInteressatTipus() != null) {
-//				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
-//			}
-//			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-//				dadesRepresentat.setNif(destinatari.getDir3Codi());
-//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-//			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-//				dadesRepresentat.setNif(destinatari.getNif());
-//				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-//			} else {
-//				dadesRepresentat.setNif(destinatari.getNif());
-//				if (isDocumentEstranger(destinatari.getNif()))
-//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-//				else
-//					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-//			}
-//			dadesRepresentat.setNom(destinatari.getNom());
-//			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
-//			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
-//			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-//			dadesRepresentat.setPaisCodi(null);
-//			dadesRepresentat.setPaisNom(null);
-//			dadesRepresentat.setProvinciaCodi(null);
-//			dadesRepresentat.setProvinciaNom(null);
-//			dadesRepresentat.setMunicipiCodi(null);
-//			dadesRepresentat.setMunicipiNom(null);
-//		}
-//		return dadesRepresentat;
-//	}
-	
 	public InteresadoWsDto personaToRepresentanteEInteresadoWs (
 			PersonaEntity titular, 
 			PersonaEntity destinatari) {
@@ -2152,7 +1971,7 @@ public class PluginHelper {
 			return false;
 		}
 	}
-	
+
 	public boolean isRegistrePluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -2168,7 +1987,7 @@ public class PluginHelper {
 			return false;
 		}
 	}
-	
+
 	public boolean isArxiuPluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -2188,6 +2007,7 @@ public class PluginHelper {
 
 	private boolean dadesUsuariPluginConfiguracioProvada = false;
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
+		loadPluginProperties("USUARIS");
 		if (dadesUsuariPlugin == null && !dadesUsuariPluginConfiguracioProvada) {
 			dadesUsuariPluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginDadesUsuari();
@@ -2212,6 +2032,7 @@ public class PluginHelper {
 
 	private boolean gestioDocumentalPluginConfiguracioProvada = false;
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
+		loadPluginProperties("GES_DOC");
 		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
 			gestioDocumentalPluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginGestioDocumental();
@@ -2236,6 +2057,7 @@ public class PluginHelper {
 
 	private boolean registrePluginConfiguracioProvada = false;
 	private RegistrePlugin getRegistrePlugin() {
+		loadPluginProperties("REGISTRE");
 		if (registrePlugin == null && !registrePluginConfiguracioProvada) {
 			registrePluginConfiguracioProvada = true;
 			String pluginClass = getPropertyPluginRegistre();
@@ -2259,6 +2081,7 @@ public class PluginHelper {
 	}
 	
 	private IArxiuPlugin getArxiuPlugin() {
+		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2291,6 +2114,7 @@ public class PluginHelper {
 	}
 
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+		loadPluginProperties("DIR3");
 		if (unitatsOrganitzativesPlugin == null) {
 			String pluginClass = getPropertyPluginUnitats();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2314,6 +2138,7 @@ public class PluginHelper {
 	}
 	
 	private GestorContingutsAdministratiuPlugin getGestorDocumentalAdministratiuPlugin() {
+		loadPluginProperties("GESCONADM");
 		if (gestorDocumentalAdministratiuPlugin == null) {
 			String pluginClass = getPropertyPluginGestorDocumentalAdministratu();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2336,6 +2161,7 @@ public class PluginHelper {
 		return gestorDocumentalAdministratiuPlugin;
 	}
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
+		loadPluginProperties("FIRMA");
 		if (firmaServidorPlugin == null) {
 			String pluginClass = getPropertyPluginFirmaServidor();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2355,6 +2181,21 @@ public class PluginHelper {
 			}
 		}
 		return firmaServidorPlugin;
+	}
+
+	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
+	private synchronized void loadPluginProperties(String codeProperties) {
+		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
+			propertiesLoaded.put(codeProperties, true);
+			Map<String, String> pluginProps = configHelper.getGroupProperties(codeProperties);
+			for (Map.Entry<String, String> entry : pluginProps.entrySet() ) {
+				System.setProperty(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+	public void reloadProperties(String codeProperties) {
+		if (propertiesLoaded.containsKey(codeProperties))
+			propertiesLoaded.put(codeProperties, false);
 	}
 	private String getPropertyPluginUnitats() {
 		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");

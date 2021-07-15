@@ -4,13 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.MediaType;
@@ -389,48 +386,41 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	}
 
 	private String getPropertyBaseUrl() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "base.url");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "base.url");
 	}
 	private String getPropertyAplicacioCodi() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "aplicacio.codi");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "aplicacio.codi");
 	}
 	private String getPropertyUsuari() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "usuari");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "usuari");
 	}
 	private String getPropertyContrasenya() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "contrasenya");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "contrasenya");
 	}
 	private String getPropertyConversioImprimibleUrlCsv() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.csv");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.csv");
 	}
 	private String getPropertyConversioImprimibleUrlUuid() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.uuid");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.url.uuid");
 	}
 	private String getPropertyConversioImprimibleUsuari() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.usuari");
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.usuari");
 	}
 	private String getPropertyConversioImprimibleContrasenya() {
-		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.contrasenya");
-	}
-	private String getPropertyQueryCsv() {
-		String query = PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "query.csv");
-		if (query == null || query.isEmpty())
-			query = "(+TYPE:\"eni:documento\" AND @eni\\:csv:\"*IDF*\" -ASPECT:\"gdib:borrador\" -ASPECT:\"gdib:trasladado\") " +
-					" OR (+TYPE:\"gdib:documentoMigrado\" AND @gdib\\:hash:\"*IDF*\") ";
-		return query;
+		return System.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.contrasenya");
 	}
 	private String getPropertyConcsvBaseUrl() {
-		return PropertiesHelper.getProperties().getProperty(ARXIU_BASE_PROPERTY + "csv.base.url");
+		return System.getProperties().getProperty(ARXIU_BASE_PROPERTY + "csv.base.url");
 	}
 
 	private int getPropertyTimeoutConnect() {
-		String timeout = PropertiesHelper.getProperties().getProperty(
+		String timeout = System.getProperties().getProperty(
 				ARXIUCAIB_BASE_PROPERTY + "timeout.connect",
 				JERSEY_TIMEOUT_CONNECT);
 		return Integer.parseInt(timeout);
 	}
 	private int getPropertyTimeoutRead() {
-		String timeout = PropertiesHelper.getProperties().getProperty(
+		String timeout = System.getProperties().getProperty(
 				ARXIUCAIB_BASE_PROPERTY + "timeout.read",
 				JERSEY_TIMEOUT_READ);
 		return Integer.parseInt(timeout);

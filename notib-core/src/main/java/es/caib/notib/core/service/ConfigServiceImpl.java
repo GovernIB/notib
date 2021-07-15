@@ -6,6 +6,7 @@ import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,15 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private PluginHelper pluginHelper;
 
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
         configEntity.update(property.getValue());
+        pluginHelper.reloadProperties(configEntity.getGroupCode());
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
 
