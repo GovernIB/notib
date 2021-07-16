@@ -410,8 +410,7 @@ INSERT ALL
                                                                             'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc',
                                                                             'Classe per a gestionar l''accés al plugin d''usuaris',
                                                                             'USUARIS' )
-    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name',
-                                                                            'java:comp/env/jdbc/UsuarisDS',
+    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name', 1,
                                                                             'Datasource dels usuaris',
                                                                             'USUARIS' )
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (2, 'es.caib.notib.plugin.dades.usuari.jdbc.query.codi',

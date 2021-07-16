@@ -96,4 +96,8 @@
 			id="GestioDocumentalService"
 			jndi-name="notib/GestioDocumentalServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.GestioDocumentalService"/>
+	<jee:local-slsb
+			id="ConfigService"
+			jndi-name="notib/ConfigServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.ConfigService"/>
 </beans>
