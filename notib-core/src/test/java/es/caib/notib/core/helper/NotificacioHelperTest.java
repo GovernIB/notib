@@ -84,6 +84,7 @@ public class NotificacioHelperTest {
 				null,
 				null,
 				null,
+				false,
 				false).build();
 		
 		ProcedimentDto procedimentDto = new ProcedimentDto();

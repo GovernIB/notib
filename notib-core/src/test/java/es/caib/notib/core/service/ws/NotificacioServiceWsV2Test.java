@@ -186,6 +186,7 @@ public class NotificacioServiceWsV2Test {
 				null,
 				null,
 				null,
+				false,
 				false).build();
 		
 		List<GrupDto> grups = new ArrayList<GrupDto>();
