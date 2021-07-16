@@ -37,6 +37,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -181,6 +182,7 @@ public class BaseServiceTestV2 {
 		}
 	}
 
+	@Transactional
 	protected void addConfig(String key, String value) {
 		ConfigEntity configEntity = new ConfigEntity(key, value);
 		configRepository.save(configEntity);

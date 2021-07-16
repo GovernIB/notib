@@ -56,6 +56,8 @@ INSERT ALL
     INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('API_PROTOCOL', 'REST,SOAP')
     INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('PRIORITAT_ENVIAMENT_MASSIU', 'ALTA,BAIXA')
     INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('REGISTRE_CLASS', 'es.caib.notib.plugin.registre.RegistrePluginRegweb3Impl,es.caib.notib.plugin.registre.RegistrePluginMockImpl')
+    INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('FIRMA_CLASS', 'es.caib.notib.plugin.firmaservidor.FirmaServidorPluginPortafib,es.caib.notib.plugin.firmaservidor.FirmaServidorPluginMock')
+    INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('USUARIS_CLASS', 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock')
 SELECT 1 FROM DUAL;
 
 INSERT ALL
@@ -399,20 +401,20 @@ INSERT ALL
                                                                             'es.caib.notib.plugin.gesdoc.GestioDocumentalPluginFilesystem',
                                                                             'Nom de la classe per a gestionar l''emmagatzament de documents',
                                                                             'GES_DOC' )
-    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.gesdoc.filesystem.base.dir',
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.gesdoc.filesystem.base.dir',
                                                                             '',
                                                                             'Directori del sistema de fitxers on emmagatzemar els documents',
                                                                             'GES_DOC' )
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.dades.usuari.class',
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.dades.usuari.class',
                                                                             'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc',
                                                                             'Classe per a gestionar l''accés al plugin d''usuaris',
-                                                                            'USUARIS' )
+                                                                            'USUARIS_CLASS', 'USUARIS' )
     INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name', 1,
-                                                                            'Datasource dels usuaris',
-                                                                            'USUARIS' )
+                                                                                     'Datasource dels usuaris',
+                                                                                     'USUARIS' )
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (2, 'es.caib.notib.plugin.dades.usuari.jdbc.query.codi',
                                                                             'select usu_codi, usu_nom, usu_nif, usu_codi||''@limit.es'' from sc_wl_usuari where usu_codi=:codi',
                                                                             'Consulta d''usuaris per codi',
@@ -540,9 +542,9 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.firmaservidor.class', 'es.caib.notib.plugin.firmaservidor.FirmaServidorPluginPortafib',
-                                                                            'Especificar la classe per a gestionar la firma del servidor',
-                                                                            'FIRMA' )
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.firmaservidor.class', 'es.caib.notib.plugin.firmaservidor.FirmaServidorPluginPortafib',
+                                                                                       'Especificar la classe per a gestionar la firma del servidor',
+                                                                                       'FIRMA_CLASS', 'FIRMA' )
 
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.firmaservidor.portafib.username', '',
                                                                             'Nom usuari firma portafib',

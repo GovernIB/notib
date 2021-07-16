@@ -2189,7 +2189,8 @@ public class PluginHelper {
 			propertiesLoaded.put(codeProperties, true);
 			Map<String, String> pluginProps = configHelper.getGroupProperties(codeProperties);
 			for (Map.Entry<String, String> entry : pluginProps.entrySet() ) {
-				System.setProperty(entry.getKey(), entry.getValue());
+				String value = entry.getValue() == null ? "" : entry.getValue();
+				System.setProperty(entry.getKey(), value);
 			}
 		}
 	}

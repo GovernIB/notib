@@ -63,6 +63,9 @@ public class ConfigEntity {
     public List<String> getValidValues() {
        return type.getValidValues();
     }
+    public String getTypeCode() {
+        return type.getCode();
+    }
 
     public void update(String value) {
         this.value = value;

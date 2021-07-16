@@ -27,13 +27,7 @@ public class ConfigHelper {
         if (configEntity == null) {
             throw new NotDefinedConfigException(key);
         }
-
-        if (configEntity.isJbossProperty()) {
-            // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat per defecte a la base de dades.
-            return JBossPropertiesHelper.getProperties().getProperty(configEntity.getKey(), configEntity.getValue());
-        }
-
-        return configEntity.getValue();
+        return getConfig(configEntity);
     }
 
     public Map<String, String> getGroupProperties(String codeGroup) {
@@ -44,8 +38,11 @@ public class ConfigHelper {
     }
 
     public void fillGroupProperties(ConfigGroupEntity configGroup, Map<String, String> outProperties) {
+        if (configGroup == null) {
+            return;
+        }
         for (ConfigEntity config : configGroup.getConfigs()) {
-            outProperties.put(config.getKey(), config.getValue());
+            outProperties.put(config.getKey(), getConfig(config));
         }
 
         for (ConfigGroupEntity child : configGroup.getInnerConfigs()) {
@@ -68,6 +65,17 @@ public class ConfigHelper {
 
     public String getJBossProperty(String key) {
         return JBossPropertiesHelper.getProperties().getProperty(key);
+    }
+    public String getJBossProperty(String key, String defaultValue) {
+        return JBossPropertiesHelper.getProperties().getProperty(key, defaultValue);
+    }
+
+    private String getConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
+        if (configEntity.isJbossProperty()) {
+            // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat per defecte a la base de dades.
+            return getJBossProperty(configEntity.getKey(), configEntity.getValue());
+        }
+        return configEntity.getValue();
     }
 
     @Slf4j
@@ -112,45 +120,17 @@ public class ConfigHelper {
             }
             return instance;
         }
-//
-//	public String getProperty(String key) {
-//		if (llegirSystem)
-//			return System.getProperty(key);
-//		else
-//			return super.getProperty(key);
-//	}
-//	public String getProperty(String key, String defaultValue) {
-//		String val = getProperty(key);
-//        return (val == null) ? defaultValue : val;
-//	}
-//
-//	public boolean getAsBoolean(String key) {
-//		return new Boolean(getProperty(key)).booleanValue();
-//	}
-//	public boolean getAsBoolean(String key, boolean defaultValue) {
-//		return new Boolean(getProperty(key, Boolean.toString(defaultValue))).booleanValue();
-//	}
-//	public int getAsInt(String key) {
-//		return new Integer(getProperty(key)).intValue();
-//	}
-//	public int getAsInt(String key, int defaultValue) {
-//		return new Integer(getProperty(key, Integer.toString(defaultValue))).intValue();
-//	}
-//	public long getAsLong(String key) {
-//		return new Long(getProperty(key)).longValue();
-//	}
-//	public long getAsLong(String key, long defaultValue) {
-//		return new Long(getProperty(key, Long.toString(defaultValue))).longValue();
-//	}
-//	public float getAsFloat(String key) {
-//		return new Float(getProperty(key)).floatValue();
-//	}
-//	public float getAsFloat(String key, float defaultValue) {
-//		return new Float(getProperty(key, Float.toString(defaultValue))).floatValue();
-//	}
-//	public double getAsDouble(String key, double defaultValue) {
-//		return new Double(getProperty(key, Double.toString(defaultValue))).doubleValue();
-//	}
+
+        public String getProperty(String key) {
+            if (llegirSystem)
+                return System.getProperty(key);
+            else
+                return super.getProperty(key);
+        }
+        public String getProperty(String key, String defaultValue) {
+            String val = getProperty(key);
+            return (val == null) ? defaultValue : val;
+        }
 
         public boolean isLlegirSystem() {
             return llegirSystem;
