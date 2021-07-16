@@ -48,7 +48,8 @@ public class ProcedimentCommand {
 	private String codiAssumpteNom;
 	private int caducitat;
 	private boolean comu;
-	
+	protected boolean requireDirectPermission;
+
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
 		if (dto == null) {
 			return null;

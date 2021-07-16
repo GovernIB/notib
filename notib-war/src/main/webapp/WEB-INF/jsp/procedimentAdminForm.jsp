@@ -243,6 +243,7 @@ $(document).ready(function() {
 				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
+				<not:inputCheckbox name="requireDirectPermission" textKey="procediment.form.camp.requireDirectPermission" labelSize="2"/>
 
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">

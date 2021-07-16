@@ -142,8 +142,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							procediment.getTipusAssumpteNom(),
 							procediment.getCodiAssumpte(),
 							procediment.getCodiAssumpteNom(),
-							procediment.isComu()).build());
-			
+							procediment.isComu(),
+							procediment.isRequireDirectPermission()).build());
+			cacheHelper.evictFindProcedimentsWithPermis();
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
 					ProcedimentDto.class);
@@ -227,7 +228,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				organGestorAntic = procedimentEntity.getOrganGestor();
 			}
 			// Si hi ha hagut qualque canvi a un d'aquests camps
-			if ((procediment.isComu() != procedimentEntity.isComu()) || (procediment.isAgrupar() != procedimentEntity.isAgrupar())) {
+			if ((procediment.isComu() != procedimentEntity.isComu()) || (procediment.isAgrupar() != procedimentEntity.isAgrupar()) ||
+					(procediment.isRequireDirectPermission() != procedimentEntity.isRequireDirectPermission())) {
 				cacheHelper.evictFindProcedimentsWithPermis();
 				cacheHelper.evictFindProcedimentsOrganWithPermis();
 			}
@@ -245,8 +247,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getTipusAssumpteNom(),
 						procediment.getCodiAssumpte(),
 						procediment.getCodiAssumpteNom(),
-						procediment.isComu());
-		
+						procediment.isComu(),
+						procediment.isRequireDirectPermission());
 			procedimentRepository.save(procedimentEntity);
 			
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)

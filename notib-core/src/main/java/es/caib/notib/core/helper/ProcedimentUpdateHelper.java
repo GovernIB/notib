@@ -56,7 +56,8 @@ public class ProcedimentUpdateHelper {
 				null,
 				null,
 				null,
-				procedimentGda.isComu()).build();
+				procedimentGda.isComu(),
+				false).build();
 		
 		procediment.updateDataActualitzacio(new Date());
 		return procedimentRepository.save(procediment);

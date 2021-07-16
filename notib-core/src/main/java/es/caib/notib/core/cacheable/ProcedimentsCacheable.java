@@ -46,8 +46,9 @@ public class ProcedimentsCacheable {
     /**
      * Obté un llistat de tots els procediments sobre els que l'usuari actual té els permisos indicats.
      * - L'usuari té el permís directament al procediment o
-     * - L'usuari té el permís sobre l'òrgan gestor del procediment o
-     * - L'usuari té el permís a un òrgan pare del procediment
+     * - Si el procediment no requereix permís directe:
+     *    * L'usuari té el permís sobre l'òrgan gestor del procediment o
+     *    * L'usuari té el permís a un òrgan pare del procediment
      *
      * @param usuariCodi El codi de l'usuari de la sessió
      * @param entitat Entitat de la sessió
@@ -61,24 +62,40 @@ public class ProcedimentsCacheable {
             String usuariCodi,
             EntitatEntity entitat,
             Permission[] permisos) {
+        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
 
         // 1. Obtenim els procediments amb permisos per procediment
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+        List<ProcedimentEntity> procedimentsAmbPermis = getProcedimentsAmbPermisDirecte(entitat, permisos, grups);
+
+        // 2. Consulta els procediments amb permís per òrgan gestor
+        List<ProcedimentEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
+
+        // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
+        List<ProcedimentEntity> setProcediments = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
+        setProcediments.addAll(procedimentsAmbPermisOrgan);
+        return setProcediments;
+    }
+
+    private List<ProcedimentEntity> getProcedimentsAmbPermisDirecte(EntitatEntity entitat,
+                                                                    Permission[] permisos,
+                                                                    List<String> grups) {
         List<Long> procedimentsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(
                 ProcedimentEntity.class,
                 permisos
         );
 
         // Filtre els procediments amb permisos per procediment de l'entitat i dels grups
-        List<ProcedimentEntity> procedimentsAmbPermis;
         if (procedimentsAmbPermisIds.isEmpty()){
-            procedimentsAmbPermis = new ArrayList<>();
-        } else {
-            procedimentsAmbPermis = procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
-                    grups,
-                    procedimentsAmbPermisIds);
+            return new ArrayList<>();
         }
 
+        return  procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
+                grups,
+                procedimentsAmbPermisIds);
+    }
+    private List<ProcedimentEntity> getProcedimentsAmbPermisOrganGestor(EntitatEntity entitat,
+                                                                        Permission[] permisos,
+                                                                        List<String> grups) {
         // 2. Obtenim els òrgans gestors amb permisos
         List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.findOrganismesEntitatAmbPermis(entitat,
                 permisos);
@@ -96,16 +113,13 @@ public class ProcedimentsCacheable {
             organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
         }
 
-        // 4. Obtenim els procediments amb permisos per òrgan gestor
-        List<ProcedimentEntity> procedimentsAmbPermisOrgan = new ArrayList<ProcedimentEntity>();
-        if (!organsGestorsCodisAmbPermis.isEmpty()) {
-            procedimentsAmbPermisOrgan = procedimentRepository.findByOrganGestorCodiInAndGrup(organsGestorsCodisAmbPermis, grups);
+        // Si no te permís a cap organ gestor
+        if (organsGestorsCodisAmbPermis.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-        List<ProcedimentEntity> setProcediments = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
-        setProcediments.addAll(procedimentsAmbPermisOrgan);
-        return setProcediments;
+        // 4. Obtenim els procediments amb permisos per òrgan gestor
+        return procedimentRepository.findProcedimentsAccesiblesPerOrganGestor(organsGestorsCodisAmbPermis, grups);
     }
 
     /**

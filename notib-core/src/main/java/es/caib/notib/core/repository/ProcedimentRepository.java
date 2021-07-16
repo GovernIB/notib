@@ -180,6 +180,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	@Query(
 			"from ProcedimentEntity pro " +
 			"where pro.organGestor.codi in (:organsCodis) " +
+			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procediment " +
@@ -187,7 +188,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcedimentEntity> findByOrganGestorCodiInAndGrup(
+	List<ProcedimentEntity> findProcedimentsAccesiblesPerOrganGestor(
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups);
 
