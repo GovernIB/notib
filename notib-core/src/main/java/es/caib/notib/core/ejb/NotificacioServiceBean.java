@@ -357,23 +357,6 @@ public class NotificacioServiceBean implements NotificacioService {
 	public List<ProvinciesDto> llistarProvincies(String codiCA) {
 		return delegate.llistarProvincies(codiCA);
 	}
-	
-	@Override
-	@RolesAllowed({"tothom"})
-	public String guardarArxiuTemporal(String nom){
-		return delegate.guardarArxiuTemporal(nom);
-	}
-
-	@Override
-	@RolesAllowed({"tothom"})
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
-		return delegate.obtenirArxiuTemporal(arxiuGestdocId);
-	}
-	@Override
-	@RolesAllowed({"tothom"})
-	public byte[] obtenirArxiuNotificacio(String arxiuGestdocId) {
-		return delegate.obtenirArxiuNotificacio(arxiuGestdocId);
-	}
 
 	@Override
 	@RolesAllowed({"tothom"})

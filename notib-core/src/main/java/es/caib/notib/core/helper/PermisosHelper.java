@@ -762,7 +762,7 @@ public class PermisosHelper {
 
 	private String getMapeigRol(String rol) {
 		String propertyMapeig = 
-				(String)PropertiesHelper.getProperties().get(
+				(String) ConfigHelper.JBossPropertiesHelper.getProperties().get(
 						"es.caib.notib.mapeig.rol." + rol);
 		if (propertyMapeig != null)
 			return propertyMapeig;

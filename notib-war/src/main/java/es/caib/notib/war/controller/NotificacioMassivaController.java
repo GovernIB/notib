@@ -3,15 +3,18 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.exception.InvalidCSVFileNotificacioMassivaException;
 import es.caib.notib.core.api.exception.MaxLinesExceededException;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.GestioDocumentalService;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
 import es.caib.notib.core.api.service.PagadorPostalService;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
-import es.caib.notib.war.command.NotificacioMassiuCommand;
+import es.caib.notib.war.command.NotificacioMassivaCommand;
 import es.caib.notib.war.command.NotificacioMassivaFiltreCommand;
 import es.caib.notib.war.helper.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -21,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +45,7 @@ import java.util.Date;
 public class NotificacioMassivaController extends BaseUserController {
 
     private final static String TABLE_FILTRE = "not_massiva_filtre";
-    private final static String TABLE_NOTIFICACIONS_FILTRE = "notificacions_filtre";
+    private final static String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
 
     @Autowired
     private AplicacioService aplicacioService;
@@ -51,6 +55,8 @@ public class NotificacioMassivaController extends BaseUserController {
     private PagadorPostalService pagadorPostalService;
     @Autowired
     private NotificacioListHelper notificacioListHelper;
+    @Autowired
+    private GestioDocumentalService gestioDocumentalService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String mainPage(
@@ -264,10 +270,10 @@ public class NotificacioMassivaController extends BaseUserController {
             HttpServletRequest request,
             Model model) {
         EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-        NotificacioMassiuCommand notificacioMassiuCommand = new NotificacioMassiuCommand();
+        NotificacioMassivaCommand notificacioMassiuCommand = new NotificacioMassivaCommand();
         notificacioMassiuCommand.setCaducitat(CaducitatHelper.sumarDiesLaborals(10));
 
-        model.addAttribute("notificacioMassiuCommand", notificacioMassiuCommand);
+        model.addAttribute("notificacioMassivaCommand", notificacioMassiuCommand);
         model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
 
         return getNotificacioMassivaForm(entitat, request, model);
@@ -288,7 +294,7 @@ public class NotificacioMassivaController extends BaseUserController {
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String post(
             HttpServletRequest request,
-            @Valid NotificacioMassiuCommand notificacioMassiuCommand,
+            @Valid NotificacioMassivaCommand notificacioMassivaCommand,
             BindingResult bindingResult,
             Model model) throws IOException {
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
@@ -304,22 +310,38 @@ public class NotificacioMassivaController extends BaseUserController {
                 log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
             }
 
-            model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
+            model.addAttribute("emailSize", notificacioMassivaCommand.getEmailDefaultSize());
+            MultipartFile csvMultipartFile = notificacioMassivaCommand.getFicheroCsv();
+            if (csvMultipartFile != null && !csvMultipartFile.isEmpty()) {
+                String contingutBase64 = Base64.encodeBase64String(csvMultipartFile.getBytes());
+                String csvGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+                notificacioMassivaCommand.setFitxerCSVNom(csvMultipartFile.getOriginalFilename());
+                notificacioMassivaCommand.setFitxerCSVGestdocId(csvGestdocId);
+            }
+            MultipartFile zipMultipartFile = notificacioMassivaCommand.getFicheroZip();
+            if (zipMultipartFile != null && !zipMultipartFile.isEmpty()) {
+                String contingutBase64 = Base64.encodeBase64String(zipMultipartFile.getBytes());
+                String csvGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+                notificacioMassivaCommand.setFitxerZIPNom(zipMultipartFile.getOriginalFilename());
+                notificacioMassivaCommand.setFitxerZIPGestdocId(csvGestdocId);
+            }
             return getNotificacioMassivaForm(entitat, request, model);
         }
 
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
 
-            notificacioMassivaService.create(entitat.getId(), usuariActual.getCodi(), notificacioMassiuCommand.asDto());
+            notificacioMassivaService.create(entitat.getId(), usuariActual.getCodi(),
+                    notificacioMassivaCommand.asDto(gestioDocumentalService));
       
         } catch (Exception ex) {
-            ex.printStackTrace();
             log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
             if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class))
-                MissatgesHelper.error(request, getMessage(request, "notificacioMassiu.csv.error"));
-            else 
+                MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error"));
+            else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, InvalidCSVFileNotificacioMassivaException.class))
+                MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error.format"));
+            else
             	MissatgesHelper.error(request, ex.getMessage());
 
             return getNotificacioMassivaForm(entitat, request, model);

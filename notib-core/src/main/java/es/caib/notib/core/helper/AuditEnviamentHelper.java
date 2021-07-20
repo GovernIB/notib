@@ -58,7 +58,8 @@ public class AuditEnviamentHelper {
 						serveiTipus, 
 						notificacioEntity, 
 						titular, 
-						destinataris).domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
+						destinataris)
+				.domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.CREATE)

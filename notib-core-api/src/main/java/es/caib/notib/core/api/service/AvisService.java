@@ -1,12 +1,11 @@
 package es.caib.notib.core.api.service;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.notib.core.api.dto.AvisDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió d'avisos.
@@ -27,10 +26,10 @@ public interface AvisService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	AvisDto delete(Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	AvisDto findById(Long id);
 
-	@PreAuthorize("hasRole('tothom')")
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('tothom')")

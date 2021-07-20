@@ -52,6 +52,8 @@ public class ProcedimentServiceTest {
 	private Pageable pageableMock;
 	@Mock
 	private ProcedimentOrganRepository procedimentOrganRepository;
+	@Mock
+	private ConfigHelper configHelper;
 	
 	@InjectMocks
 	ProcedimentService procedimentService = new ProcedimentServiceImpl();
@@ -60,6 +62,8 @@ public class ProcedimentServiceTest {
 	public void setUp() {
 		Mockito.doNothing().when(metricsHelper).fiMetrica(Mockito.nullable(Timer.Context.class));
 		Mockito.when(metricsHelper.iniciMetrica()).thenReturn(null);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 	}
 	
 	//
@@ -109,8 +113,8 @@ public class ProcedimentServiceTest {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "10")),
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "15")),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				null,
 				null,
@@ -120,6 +124,7 @@ public class ProcedimentServiceTest {
 				null,
 				null,
 				null,
+				false,
 				false).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entitat, null, null, null, null, null).build();
 		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, organGestor).build();

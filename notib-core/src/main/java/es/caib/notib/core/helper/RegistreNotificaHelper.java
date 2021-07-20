@@ -39,6 +39,8 @@ public class RegistreNotificaHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private NotificacioMassivaHelper notificacioMassivaHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public boolean realitzarProcesRegistrar(
 			NotificacioEntity notificacioEntity) throws RegistreNotificaException {
@@ -348,7 +350,7 @@ public class RegistreNotificaHelper {
 	}
 
 	private boolean isSirActivat() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.emprar.sir");
+		return configHelper.getAsBoolean("es.caib.notib.emprar.sir");
 	}
 
 	/**
@@ -358,7 +360,7 @@ public class RegistreNotificaHelper {
 	 * @return boolean
 	 */
 	public boolean isSendDocumentsActive() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.documents.enviar", true);
+		return configHelper.getAsBoolean("es.caib.notib.plugin.registre.documents.enviar");
 	}
 
 	/**
@@ -368,7 +370,7 @@ public class RegistreNotificaHelper {
 	 * @return boolean
 	 */
 	private boolean isGenerarJustificantActive() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.registre.generar.justificant", false);
+		return configHelper.getAsBoolean("es.caib.notib.plugin.registre.generar.justificant");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistreNotificaHelper.class);

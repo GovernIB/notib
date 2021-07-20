@@ -378,7 +378,7 @@
         var select2Options = {
             theme: 'bootstrap',
             width: 'auto',
-            tags: organsGestors,
+            data: organsGestors,
             templateResult: formatState
         };
 
@@ -420,7 +420,8 @@
             <not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
         </div>
         <div class="col-md-4">
-            <not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+            <not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor"
+                             inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
         <div class="col-md-6">
             <not:inputSelect name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio"

@@ -55,36 +55,6 @@ $(document).ready(function() {
 </style>
 </head>
 <body>
-<%--	<c:if test="${notificacio.notificaError}">--%>
-<%--		<div class="alert alert-danger well-sm">--%>
-<%--			<span class="fa fa-warning text-danger"></span>--%>
-<%--			<spring:message code="notificacio.info.error.titol" />--%>
-<%--			<button class="btn btn-default btn-xs pull-right"--%>
-<%--				data-toggle="collapse" data-target="#collapseError"--%>
-<%--				aria-expanded="false" aria-controls="collapseError">--%>
-<%--				<span class="fa fa-bars"></span>--%>
-<%--			</button>--%>
-<%--			<div id="collapseError" class="collapse">--%>
-<%--				<br />--%>
-<%--				<table class="table table-bordered"--%>
-<%--					style="background-color: white; width: 100%">--%>
-<%--					<tbody>--%>
-<%--						<tr>--%>
-<%--							<td width="10%"><strong><spring:message--%>
-<%--										code="notificacio.info.error.data" /></strong></td>--%>
-<%--							<td><fmt:formatDate value="${notificacio.notificaErrorData}"--%>
-<%--									pattern="dd/MM/yyyy HH:mm:ss" /></td>--%>
-<%--						</tr>--%>
-<%--						<tr>--%>
-<%--							<td><strong><spring:message--%>
-<%--										code="notificacio.info.error.error" /></strong></td>--%>
-<%--							<td><textarea rows="10" style="width: 100%">${fn:escapeXml(notificacio.notificaErrorDescripcio)}</textarea></td>--%>
-<%--						</tr>--%>
-<%--					</tbody>--%>
-<%--				</table>--%>
-<%--			</div>--%>
-<%--		</div>--%>
-<%--	</c:if>--%>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
@@ -191,8 +161,8 @@ $(document).ready(function() {
 								code="notificacio.massiva.info.resum.prioritat" /></strong></th>
 						<th><strong><spring:message
 								code="notificacio.massiva.info.resum.titular" /></strong></th>
-						<th><strong><spring:message
-								code="notificacio.massiva.info.resum.origen" /></strong></th>
+<%--						<th><strong><spring:message--%>
+<%--								code="notificacio.massiva.info.resum.origen" /></strong></th>--%>
 						<th><strong><spring:message
 								code="notificacio.massiva.info.resum.errors" /></strong></th>
 					</tr>
@@ -205,7 +175,7 @@ $(document).ready(function() {
 						<td>${notInfo.concepto}</td>
 						<td>${notInfo.prioridadServicio}</td>
 						<td>${notInfo.nombre} ${notInfo.apellidos} - ${notInfo.cifNif}</td>
-						<td>${notInfo.origen}</td>
+<%--						<td>${notInfo.origen}</td>--%>
 						<td>${notInfo.errores}</td>
 					</tr>
 					</c:forEach>

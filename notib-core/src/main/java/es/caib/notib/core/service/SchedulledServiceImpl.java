@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
@@ -48,6 +45,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private EnviamentHelper enviamentHelper;
+
+	@Autowired
+	private ConfigHelper configHelper;
 
 	// 1. Enviament de notificacions pendents al registre y notific@
 	////////////////////////////////////////////////////////////////
@@ -226,44 +226,19 @@ public class SchedulledServiceImpl implements SchedulledService {
 		
 	
 	private boolean isNotificaEnviamentsActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");
 	}
 	private boolean isEnviamentActualitzacioEstatActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
 	}
 	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
 	}
 	private boolean isTasquesActivesProperty() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasques.actives");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
 	}
 	private boolean isActualitzacioProcedimentsActiuProperty() {
-		String actiu = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.actiu");
-		if (actiu != null) {
-			return new Boolean(actiu).booleanValue();
-		} else {
-			return false;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");
 	}
 	
 	private boolean isSemaforInUse() {

@@ -23,7 +23,9 @@ public class ProcedimentUpdateHelper {
 	
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
-	
+	@Autowired
+	private ConfigHelper configHelper;
+
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.UPDATE)
 	public ProcedimentEntity updateProcediment(
 			ProcedimentDto procedimentGda,
@@ -43,8 +45,8 @@ public class ProcedimentUpdateHelper {
 		procediment = ProcedimentEntity.getBuilder(
 				procedimentGda.getCodi(),
 				procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null,
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "10")),
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "15")),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				null,
 				null,
@@ -54,7 +56,8 @@ public class ProcedimentUpdateHelper {
 				null,
 				null,
 				null,
-				procedimentGda.isComu()).build();
+				procedimentGda.isComu(),
+				false).build();
 		
 		procediment.updateDataActualitzacio(new Date());
 		return procedimentRepository.save(procediment);

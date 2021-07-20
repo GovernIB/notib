@@ -24,7 +24,6 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +111,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private EnviamentHelper enviamentHelper;
 	@Autowired
 	private NotificacioListHelper notificacioListHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1487,7 +1488,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			progres = new ProgresActualitzacioCertificacioDto();
 			progresActualitzacioExpirades.put(username, progres);
 			enviamentHelper.refrescarEnviamentsExpirats(progres);
-			progresActualitzacioExpirades.remove(username);
+//			progresActualitzacioExpirades.remove(username);
 
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1510,27 +1511,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	private int getRegistreEnviamentsProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.registre.enviaments.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.processar.max");
 	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.notifica.enviaments.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max",
-				10);
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max");
 	}
-	
-		
+
+	private int getMidaMinIdCsv() {
+		return configHelper.getAsInt("es.caib.notib.document.consulta.id.csv.mida.min");
+	}
 	
 	
 	private void estatCalcularCampsAddicionals(
@@ -1550,52 +1545,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private String calcularNomArxiuCertificacio(
 			NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
-	}
-	
-	
-	@Override
-	@Transactional(rollbackFor=Exception.class)
-	public String guardarArxiuTemporal(String contigut) {
-		String documentGesdocId = null;
-		try {
-			if(contigut != null) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
-						Base64.decodeBase64(contigut));
-			}
-		} catch (Exception ex) {
-			logger.error(
-					"Error al guardar l'arxiu temporal " + ex);
-		} 
-		return documentGesdocId;
-	}
-	
-	@Override
-	@Transactional(rollbackFor=Exception.class)
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId) {
-		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
-	}
-
-	@Override
-	@Transactional(rollbackFor=Exception.class)
-	public byte[] obtenirArxiuNotificacio(String arxiuGestdocId) {
-		return consultaArxiuGestioDocumental(arxiuGestdocId, PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS);
-	}
-
-	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		try {
-			if(arxiuGestdocId != null) {
-				pluginHelper.gestioDocumentalGet(
-						arxiuGestdocId,
-						agrupacio,
-						output);
-			}
-		} catch (Exception ex) {
-			logger.error("Error al recuperar l'arxiu de l'agrupació: " + agrupacio);
-			throw ex;
-		}
-		return output.toByteArray();
 	}
 
 	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{
@@ -1649,10 +1598,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return documentDto;	
 	}
 	
-	private int getMidaMinIdCsv() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.document.consulta.id.csv.mida.min", 16);
-	}
 
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceImpl.class);

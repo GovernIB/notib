@@ -93,6 +93,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private ProcedimentsCacheable procedimentsCacheable;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -140,8 +142,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							procediment.getTipusAssumpteNom(),
 							procediment.getCodiAssumpte(),
 							procediment.getCodiAssumpteNom(),
-							procediment.isComu()).build());
-			
+							procediment.isComu(),
+							procediment.isRequireDirectPermission()).build());
+			cacheHelper.evictFindProcedimentsWithPermis();
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
 					ProcedimentDto.class);
@@ -225,7 +228,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				organGestorAntic = procedimentEntity.getOrganGestor();
 			}
 			// Si hi ha hagut qualque canvi a un d'aquests camps
-			if ((procediment.isComu() != procedimentEntity.isComu()) || (procediment.isAgrupar() != procedimentEntity.isAgrupar())) {
+			if ((procediment.isComu() != procedimentEntity.isComu()) || (procediment.isAgrupar() != procedimentEntity.isAgrupar()) ||
+					(procediment.isRequireDirectPermission() != procedimentEntity.isRequireDirectPermission())) {
 				cacheHelper.evictFindProcedimentsWithPermis();
 				cacheHelper.evictFindProcedimentsOrganWithPermis();
 			}
@@ -243,8 +247,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getTipusAssumpteNom(),
 						procediment.getCodiAssumpte(),
 						procediment.getCodiAssumpteNom(),
-						procediment.isComu());
-		
+						procediment.isComu(),
+						procediment.isRequireDirectPermission());
 			procedimentRepository.save(procedimentEntity);
 			
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
@@ -553,21 +557,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 	
 	private boolean isActualitzacioProcedimentsModificarProperty() {
-		String modificar = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.modificar");
-		if (modificar != null) {
-			return new Boolean(modificar).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
 	}
 	
 	private boolean isActualitzacioProcedimentsEliminarOrgansProperty() {
-		String eliminar = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.eliminar.organs");
-		if (eliminar != null) {
-			return new Boolean(eliminar).booleanValue();
-		} else {
-			return false;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
 	}
 
 	@Override
@@ -838,6 +832,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							ProcedimentFormDto.class);
 				}
 			}
+			assert procedimentsPage != null;
 			for (ProcedimentFormDto procediment: procedimentsPage.getContingut()) {
 				List<PermisDto> permisos = permisosHelper.findPermisos(
 						procediment.getId(),

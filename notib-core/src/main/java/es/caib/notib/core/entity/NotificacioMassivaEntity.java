@@ -61,7 +61,9 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
     @JoinColumn(name = "NOTIFICACIO_MASSIVA_ID") // we need to duplicate the physical information
     protected List<NotificacioEntity> notificacions;
 
-    @Formula("(case  when progress = 0 then " +
+    @Formula("(case  when progress < 0 then " +
+            "           'ERRONIA' " +
+            "        when progress = 0 then " +
             "           'PENDENT' " +
             "        when progress < 100 then " +
             "           'EN_PROCES' " +
@@ -69,16 +71,6 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
             "           'FINALITZAT' " +
             " end)")
     private String estat;
-
-//    public NotificacioMassivaEstatDto getEstat(){
-//        if (progress == 0) {
-//            return NotificacioMassivaEstatDto.PENDENT;
-//        } else if(progress < 100) {
-//            return NotificacioMassivaEstatDto.EN_PROCES;
-//        } else {
-//            return NotificacioMassivaEstatDto.FINALITZAT;
-//        }
-//    }
 
     public void updateProgress(int progress) {
         this.progress = progress;

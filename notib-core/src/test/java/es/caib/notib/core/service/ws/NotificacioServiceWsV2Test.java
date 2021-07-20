@@ -123,6 +123,8 @@ public class NotificacioServiceWsV2Test {
 	private NotificacioEnviamentEntity enviamentSavedMock;
 	@Mock
 	private NotificacioEventEntity notificacioEventEntityMock;
+	@Mock
+	private ConfigHelper configHelper;
 
 	private AplicacioEntity aplicacio;
 	
@@ -133,9 +135,11 @@ public class NotificacioServiceWsV2Test {
 	
 	@Before
 	public void setUp() {
-		System.setProperty("es.caib.notib.procediment.alta.auto.retard", "10");
-		System.setProperty("es.caib.notib.procediment.alta.auto.caducitat", "15");
-		System.setProperty("es.caib.notib.document.metadades.por.defecto", "true");
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
+//		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
+		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
 		Mockito.when(auth.getName()).thenReturn("mockedName");
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
@@ -144,11 +148,8 @@ public class NotificacioServiceWsV2Test {
 	@Test
 	public void whenAltaUuid_thenReturnRespostaAltaOK() throws IOException {
 		
-		// Given	
-//		entitatMock.setCreatedDate(new DateTime());
-//		Mockito.when(llibreOrganMock.getCodi()).thenReturn("AB");
-//		Mockito.when(llibreOrganMock.getNomLlarg()).thenReturn("CD");
-		String notificacioId = new Long(System.currentTimeMillis()).toString();
+		// Given
+		String notificacioId = Long.toString(System.currentTimeMillis());
 		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", 
 				"nom", 
 				null, 
@@ -174,8 +175,8 @@ public class NotificacioServiceWsV2Test {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.retard", "10")),
-				Integer.parseInt(PropertiesHelper.getProperties().getProperty("es.caib.notib.procediment.alta.auto.caducitat", "15")),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
 				null,
 				null,
@@ -185,6 +186,7 @@ public class NotificacioServiceWsV2Test {
 				null,
 				null,
 				null,
+				false,
 				false).build();
 		
 		List<GrupDto> grups = new ArrayList<GrupDto>();
@@ -286,18 +288,6 @@ public class NotificacioServiceWsV2Test {
 //		Mockito.when(organGestorCachable.findOrganigramaByEntitat(Mockito.anyString())).thenReturn(new HashMap<String, OrganismeDto>());
 		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
 
-
-		//		try {
-//			Mockito.when(registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada)).thenReturn(false);
-//		} catch (RegistreNotificaException e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			Mockito.when(notificaHelper.xifrarId(Mockito.anyLong())).thenReturn(Long.toString(new Random().nextLong()));
-//		} catch (GeneralSecurityException e1) {
-//			e1.printStackTrace();
-//		}
-		
 		// Then
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
 		

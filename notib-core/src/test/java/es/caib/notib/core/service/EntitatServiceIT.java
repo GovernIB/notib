@@ -54,6 +54,8 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 
 	@Before
 	public void setUp() throws Exception {
+		setDefaultConfigs();
+//		addConfig("es.caib.notib.plugin.dades.usuari.class", "es.caib.notib.plugin.usuari.DadesUsuariPluginMock");
 		EntitatDto entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT2");
 		entitatCreate.setNom("Limit Tecnologies");
@@ -97,6 +99,7 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 
 	@After
 	public final void tearDown() {
+		removeAllConfigs();
 		destroyDatabase(database.getEntitat().getId(),
 				entitatItemTest
 		);

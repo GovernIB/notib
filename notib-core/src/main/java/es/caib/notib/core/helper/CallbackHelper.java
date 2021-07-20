@@ -43,6 +43,8 @@ public class CallbackHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private RequestsHelper requestsHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional
 	public boolean notifica(@NonNull Long eventId) throws Exception {
@@ -233,15 +235,11 @@ public class CallbackHelper {
 
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */
 	private Integer getEventsIntentsMaxProperty() {
-		Integer ret = null;
-		String maxIntents = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
-		if (maxIntents != null && !"".equals(maxIntents))
-			ret = Integer.parseInt(maxIntents);
-		return ret;
+		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
 	}
 
 	private int getIntentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.callback.pendents.periode", 30000);
+		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.periode");
 	}
 
 }

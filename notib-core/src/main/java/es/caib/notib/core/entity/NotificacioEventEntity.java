@@ -55,7 +55,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
-	@ForeignKey(name = "not_notifi_noteve_fk")
+	@ForeignKey(name = "NOT_NOTIFICACIO_NOTEVENT_FK")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private NotificacioEntity notificacio;
 

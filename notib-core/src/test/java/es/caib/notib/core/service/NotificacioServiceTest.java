@@ -1,14 +1,13 @@
 package es.caib.notib.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.plugins.arxiu.api.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,38 +17,29 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
-import es.caib.notib.core.helper.PluginHelper;
-import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.DocumentTipus;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioServiceTest {
 
 	@Mock
 	private PluginHelper pluginHelper;
+	@Mock
+	private ConfigHelper configHelper;
 	
 	@InjectMocks
 	NotificacioService notificacioService = new NotificacioServiceImpl();
 	
 	@Before
 	public void setUp() {
-		System.setProperty("es.caib.notib.document.consulta.id.csv.mida.min", "16");
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.document.consulta.id.csv.mida.min"))).thenReturn(16);
+
 	}
-	
+
 	//Test consultaDocumentIMetadades para Uuid docu existent y metadades existents
 	@Test
 	public void whenConsultaDocumentIMetadades_uuid_withDocuAndMetadades_thenReturn() {
-		
+
 		// Given	
 		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
 		Boolean esUuid = Boolean.TRUE;

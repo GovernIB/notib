@@ -78,7 +78,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private ProcedimentsCacheable procedimentsCacheable;
 	@Resource
-	private PluginHelper pluginHelper;
+	private ConfigHelper configHelper;
 
 	@Override
 	@Transactional
@@ -1053,7 +1053,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 		}
 		organsGestors = new ArrayList<>(setOrgansGestors);
-		if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
+		if (!configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
 			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
 		}
 		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty())

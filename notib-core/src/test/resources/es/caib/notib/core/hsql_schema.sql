@@ -53,3 +53,40 @@ create table not_aplicacio (
   constraint not_usumod_aplicacio_fk foreign key (lastmodifiedby_codi) references not_usuari (codi),
   constraint not_aplicacio_entitat_fk foreign key (entitat_id) references not_entitat (id)
 );
+
+CREATE TABLE NOT_CONFIG
+(
+    KEY                  varchar(256)     NOT NULL,
+    VALUE                varchar(2048),
+    DESCRIPTION          varchar(2048),
+    GROUP_CODE           varchar(128)     DEFAULT 'GENERAL',
+    POSITION             numeric(3, 0)    DEFAULT 0 NOT NULL,
+    JBOSS_PROPERTY       numeric(1, 0)    DEFAULT 0 NOT NULL,
+    TYPE_CODE            varchar(128)     DEFAULT 'TEXT',
+    LASTMODIFIEDBY_CODI  varchar(64),
+    LASTMODIFIEDDATE     TIMESTAMP(6)
+);
+
+CREATE TABLE NOT_CONFIG_GROUP
+(
+    CODE                 varchar(128)     NOT NULL,
+    PARENT_CODE          varchar(128)     DEFAULT NULL,
+    POSITION             numeric(3, 0)    DEFAULT 0 NOT NULL,
+    DESCRIPTION          varchar(512)     NOT NULL
+);
+
+CREATE TABLE NOT_CONFIG_TYPE
+(
+    CODE                 varchar(128)     NOT NULL,
+    VALUE                varchar(2048)   DEFAULT NULL
+);
+
+INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('BOOL');
+INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('TEXT');
+INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('INT');
+INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('FLOAT');
+INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('CRON');
+INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('CREDENTIALS');
+
+INSERT INTO NOT_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES
+    (0, 'GENERAL', 'Configuracions generals' );

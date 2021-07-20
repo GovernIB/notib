@@ -3,8 +3,8 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.helper.CallbackHelper;
+import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -32,7 +32,8 @@ public class CallbackServiceImpl implements CallbackService {
 	private CallbackHelper callbackHelper;
     @Autowired
     private MetricsHelper metricsHelper;
-    
+	@Autowired
+	private ConfigHelper configHelper;
 	@Override
 	@Scheduled(
 			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
@@ -79,25 +80,13 @@ public class CallbackServiceImpl implements CallbackService {
 
 
 	private boolean isTasquesActivesProperty() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasques.actives");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
 	}
 	private boolean isCallbackPendentsActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.callback.pendents.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.callback.pendents.actiu");
 	}
 	private int getEventsProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.callback.pendents.processar.max",
-				50);
+		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CallbackServiceImpl.class);

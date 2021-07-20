@@ -34,6 +34,8 @@ public class NotificacioValidatorHelper {
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private RegistreNotificaHelper registreNotificaHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public List<String> validarNotificacioMassiu(
 			@NonNull NotificacioDatabaseDto notificacio,
@@ -386,9 +388,8 @@ public class NotificacioValidatorHelper {
 		return valid;
 	}
 
-	private static Long getMaxSizeFile() {
-		String property = "es.caib.notib.notificacio.document.size";
-		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
+	private Long getMaxSizeFile() {
+		return configHelper.getAsLong("es.caib.notib.notificacio.document.size");
 	}
 
 }

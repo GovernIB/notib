@@ -81,6 +81,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@UpdateNotificacioTable
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
@@ -812,7 +814,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	private boolean isCodiDir3Entitat() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat", false);
+		return configHelper.getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
 

@@ -11,7 +11,6 @@ import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -41,25 +40,22 @@ public class PluginHelperTest {
     private IntegracioHelper integracioHelper;
     @Mock
     private ConversioTipusHelper conversioTipusHelper;
+    @Mock
+    private ConfigHelper configHelper;
 
     @InjectMocks
     private PluginHelper pluginHelper;
 
     @Before
     public void setUp() throws Exception {
-
+        Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.plugin.registre.segons.entre.peticions"))).thenReturn(secondsBetweenCalls);
     }
 
     static int secondsBetweenCalls = 2;
 
-    @BeforeClass
-    public static void init() {
-        System.setProperty("es.caib.notib.plugin.registre.segons.entre.peticions",
-                Integer.toString(secondsBetweenCalls));
-    }
-
     @Test
     public void whenObtenirJustificant_thenWaitForNextCall() {
+
         RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
         resposta.setErrorCodi(null);
         resposta.setErrorDescripcio("respostaMock");

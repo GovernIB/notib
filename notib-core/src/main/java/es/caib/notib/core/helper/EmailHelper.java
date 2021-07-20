@@ -6,6 +6,7 @@ import es.caib.notib.core.repository.UsuariRepository;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -30,6 +31,8 @@ public abstract class EmailHelper<T> {
     protected GrupRepository grupRepository;
     @Resource
     protected GrupProcedimentRepository grupProcedimentRepository;
+    @Autowired
+    protected ConfigHelper configHelper;
     @Resource
     private JavaMailSender mailSender;
 
@@ -79,11 +82,11 @@ public abstract class EmailHelper<T> {
     }
 
     public String getRemitent() {
-        return PropertiesHelper.getProperties().getProperty("es.caib.notib.email.remitent");
+        return configHelper.getConfig("es.caib.notib.email.remitent");
     }
 
     public String getEmailFooter() {
-        return PropertiesHelper.getProperties().getProperty("es.caib.notib.email.footer");
+        return configHelper.getConfig("es.caib.notib.email.footer");
     }
 
     @AllArgsConstructor

@@ -69,8 +69,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired 
 	private PermisosHelper permisosHelper;
 	@Autowired 
@@ -101,6 +99,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private JustificantService justificantService;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
 	@Transactional
@@ -179,15 +179,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						// Organ gestor
 						if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
 							organGestor = procediment.getOrganGestor();
-							
-							// TODO: Esta validación queda comentada hasta consultar con la DGTIC
-//							if (notificacio.getOrganGestor() != null && !notificacio.getOrganGestor().isEmpty() && 
-//									notificacio.getOrganGestor() != organGestor.getCodi()) {
-//								logger.debug(">> [ALTA] Organ gestor no es correspon amb el de l'procediment");
-//								errorDescripcio = "[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.";
-//								integracioHelper.addAccioError(info, errorDescripcio);
-//								return setRespostaError(errorDescripcio);
-//							}
+
+							if (notificacio.getOrganGestor() != null && !notificacio.getOrganGestor().isEmpty() &&
+									organGestor != null && !notificacio.getOrganGestor().equals(organGestor.getCodi())) {
+								logger.debug(">> [ALTA] Organ gestor no es correspon amb el de l'procediment");
+								errorDescripcio = "[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.";
+								integracioHelper.addAccioError(info, errorDescripcio);
+								return setRespostaError(errorDescripcio);
+							}
 						}
 					} else {
 						logger.debug(">> [ALTA] Sense procediment");
@@ -2005,11 +2004,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		} else if (notificacio.getProcedimentCodi() == null && notificacio.getOrganGestor() == null){
 			return setRespostaError("[1022] El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment.");
 		}
-		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO &&  comunicacioSenseAdministracio) {
-			if (notificacio.getProcedimentCodi() == null) {
-				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
-			}
-		}
+//		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO &&  comunicacioSenseAdministracio) {
+//			if (notificacio.getProcedimentCodi() == null) {
+//				return setRespostaError("[1020] El camp 'procedimentCodi' no pot ser null.");
+//			}
+//		}
 
 		// Documents
 		if (comunicacioAmbAdministracio) {
@@ -2238,29 +2237,24 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return docBase64.startsWith("JVBERi0");
 	}
 	
-	private static Boolean isMultipleDestinataris() {
+	private Boolean isMultipleDestinataris() {
 		String property = "es.caib.notib.destinatari.multiple";
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
-		return PropertiesHelper.getProperties().getAsBoolean(property, false);
+		return configHelper.getAsBoolean(property);
 	}
 	
-	private static Long getMaxSizeFile() {
-		String property = "es.caib.notib.notificacio.document.size";
-		logger.debug("Consulta del valor de la property (property=" + property + ")");
-		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "10485760"));
+	private Long getMaxSizeFile() {
+		return configHelper.getAsLong("es.caib.notib.notificacio.document.size");
 	}
 
-	private static Long getMaxTotalSizeFile() {
-		String property = "es.caib.notib.notificacio.document.total.size";
-		logger.debug("Consulta del valor de la property (property=" + property + ")");
-		return Long.valueOf(PropertiesHelper.getProperties().getProperty(property, "15728640"));
+	private Long getMaxTotalSizeFile() {
+		return configHelper.getAsLong("es.caib.notib.notificacio.document.total.size");
 	}
 	
 	// Indica si usar valores por defecto cuando ni el documento ni documentV2 tienen metadades
 	private boolean getUtilizarValoresPorDefecto() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.notib.document.metadades.por.defecto", true);
+		return configHelper.getAsBoolean("es.caib.notib.document.metadades.por.defecto");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 

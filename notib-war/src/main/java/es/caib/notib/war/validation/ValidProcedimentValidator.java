@@ -44,36 +44,18 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
 		boolean valid = true;
 		
 		try {
-			
-			final Long id = command.getId();
-			final String procedimentCodi = command.getCodi();
-			
 			// Comprovar codi no repetit
-			ProcedimentDto procediment = procedimentService.findByCodi(command.getEntitatId(), procedimentCodi);
-			if (procediment != null) {
-				if (id == null) {
-					valid = false;
-				} else {
-					valid = ( id.longValue() == procediment.getId().longValue() );
-				}
-				if (!valid) {
-					context.disableDefaultConstraintViolation();
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("procediment.validation.codi.repetit")).addNode("codi").addConstraintViolation();
-				}
+			if (!checkCodi(command)) {
+				context.disableDefaultConstraintViolation();
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("procediment.validation.codi.repetit")).addNode("codi").addConstraintViolation();
+				valid = false;
 			}
 			
 			// Comprovar nom no repetit
-			procediment = procedimentService.findByNom(command.getEntitatId(), command.getNom());
-			if (procediment != null) {
-				if (id == null) {
-					valid = false;
-				} else {
-					valid = ( id.longValue() == procediment.getId().longValue() );
-				}
-				if (!valid) {
-					context.disableDefaultConstraintViolation();
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("procediment.validation.nom.repetit")).addNode("nom").addConstraintViolation();
-				}
+			if (!checkNom(command)) {
+				context.disableDefaultConstraintViolation();
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("procediment.validation.nom.repetit")).addNode("nom").addConstraintViolation();
+				valid = false;
 			}
 			
         } catch (final Exception ex) {
@@ -89,6 +71,37 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
        	return valid;
 	}
 
+	private boolean checkCodi(
+			final ProcedimentCommand command
+	) {
+		boolean valid = true;
+		final Long id = command.getId();
+		final String procedimentCodi = command.getCodi();
+		ProcedimentDto procediment = procedimentService.findByCodi(command.getEntitatId(), procedimentCodi);
+		if (procediment != null) {
+			if (id == null) {
+				valid = false;
+			} else {
+				valid = ( id.longValue() == procediment.getId().longValue() );
+			}
+		}
+		return valid;
+	}
+	private boolean checkNom(
+			final ProcedimentCommand command
+	) {
+		boolean valid = true;
+		final Long id = command.getId();
+		ProcedimentDto procediment = procedimentService.findByNom(command.getEntitatId(), command.getNom());
+		if (procediment != null) {
+			if (id == null) {
+				valid = false;
+			} else {
+				valid = ( id.longValue() == procediment.getId().longValue() );
+			}
+		}
+		return valid;
+	}
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidProcedimentValidator.class);
 
 }

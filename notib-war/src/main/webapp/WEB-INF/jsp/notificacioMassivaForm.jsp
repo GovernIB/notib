@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
-<c:set var="titol"><spring:message code="notificacioMassiu.form.titol.crear"/></c:set>
+<c:set var="titol"><spring:message code="notificacio.massiva.form.titol.crear"/></c:set>
 
 <html>
 <head>
@@ -14,8 +14,8 @@
 		<a href="<c:url value="/notificacio/massiva/getModelDadesCarregaMassiuCSV"/>"
 		class="btn btn-info btn-sm fileDownloadSimpleRichExperience"
 		style="position: relative;top: -35px;right: -12px;"
-		title="<spring:message code="notificacioMassiu.accio.descarregar.modeloCsv"/>">
-		<spring:message code="notificacioMassiu.accio.descarregar.modeloCsv"/>
+		title="<spring:message code="notificacio.massiva.accio.descarregar.modeloCsv"/>">
+		<spring:message code="notificacio.massiva.accio.descarregar.modeloCsv"/>
 		<span class="fa fa-download"></span>
 		</a>
 		</div></title>
@@ -31,18 +31,55 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>	
 </head>
 <body>
+<style>
+	div.list {
+		counter-reset: list-number;
+		margin-top: 15px;
+		margin-left: 20px;
+	}
+	div.list div:before {
+		counter-increment: list-number;
+		content: counter(list-number);
+
+		margin-right: 10px;
+		margin-bottom:10px;
+		width:35px;
+		height:35px;
+		display:inline-flex;
+		align-items:center;
+		justify-content: center;
+		font-size:16px;
+		background-color:#37a2d6;
+		border-radius:50%;
+		color:#fff;
+	}
+</style>
+
+<div class="alert alert-info">
+	<strong><spring:message code="notificacio.massiva.form.info.titol"/></strong>
+	<div class="list">
+		<div><spring:message code="notificacio.massiva.form.info.indicacio1"/></div>
+		<div><spring:message code="notificacio.massiva.form.info.indicacio2"/></div>
+	</div>
+</div>
 	<c:set var="formAction"><not:modalUrl value="/notificacio/massiva/new"/></c:set>
-	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassiuCommand" enctype="multipart/form-data">
-		<not:inputFile name="ficheroCsv" textKey="notificacioMassiu.form.camp.arxiuCsv" labelSize="3" inputSize="9"
-					   required="true" info="true" messageInfo="notificacioMassiu.form.camp.arxiuCsv.avis"/>
-		<not:inputFile name="ficheroZip" textKey="notificacioMassiu.form.camp.arxiuZip" labelSize="3" inputSize="9"
-					   required="false" info="true" messageInfo="notificacioMassiu.form.camp.arxiuZip.avis"/>
-		<not:inputDate name="caducitat" textKey="notificacioMassiu.form.camp.caducitat" labelSize="3" inputSize="9"
+	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassivaCommand" enctype="multipart/form-data">
+		<input type="hidden" name="fitxerCSVGestdocId" value="${notificacioMassivaCommand.fitxerCSVGestdocId}">
+		<input type="hidden" name="fitxerCSVNom" value="${notificacioMassivaCommand.fitxerCSVNom}">
+		<not:inputFile name="ficheroCsv" textKey="notificacio.massiva.form.camp.arxiuCsv" labelSize="2" inputSize="10"
+					   required="true" info="true" messageInfo="notificacio.massiva.form.camp.arxiuCsv.avis"
+						fileName="${notificacioMassivaCommand.fitxerCSVNom}"/>
+		<input type="hidden" name="fitxerZIPGestdocId" value="${notificacioMassivaCommand.fitxerZIPGestdocId}">
+		<input type="hidden" name="fitxerZIPNom" value="${notificacioMassivaCommand.fitxerZIPNom}">
+		<not:inputFile name="ficheroZip" textKey="notificacio.massiva.form.camp.arxiuZip" labelSize="2" inputSize="10"
+					   required="false" info="true" messageInfo="notificacio.massiva.form.camp.arxiuZip.avis"
+					   fileName="${notificacioMassivaCommand.fitxerZIPNom}"/>
+		<not:inputDate name="caducitat" textKey="notificacio.massiva.form.camp.caducitat" labelSize="2" inputSize="10"
 					   required="true" />
-		<not:inputText name="email" textKey="notificacioMassiu.form.camp.email" labelSize="3" inputSize="9"
+		<not:inputMail name="email" textKey="notificacio.massiva.form.camp.email" labelSize="2" inputSize="10"
 					   required="false" inputMaxLength="${emailSize}" showsize="true"/>
 		<c:if test="${mostrarPagadorPostal}">
-			<not:inputSelect name="pagadorPostalId" textKey="procediment.form.camp.postal" labelSize="3" inputSize="9"
+			<not:inputSelect name="pagadorPostalId" textKey="procediment.form.camp.postal" labelSize="2" inputSize="10"
 							 optionItems="${pagadorsPostal}" emptyOption="true"
 							 optionValueAttribute="id" optionTextAttribute="dir3codi"/>
 		</c:if>
@@ -53,12 +90,7 @@
 				<button type="submit" class="btn btn-success saveForm">
 					<span class="fa fa-paper-plane"></span>
 					<spring:message code="comu.boto.enviar.notificacio" />
-<%-- 				<spring:message code="notificacioMassiu.boto.processar.carrega" /> --%>
 				</button>
-<!-- 				<button type="submit" class="btn btn-success"> -->
-<!-- 					<span class="fa fa-save"></span>&nbsp; -->
-<%-- 					<spring:message code="comu.boto.guardar"/> --%>
-<!-- 				</button> -->
 			</div>
 		</div>
 	</form:form>

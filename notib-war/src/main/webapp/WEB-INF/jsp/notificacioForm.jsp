@@ -29,6 +29,9 @@
 <c:url value="/notificacio/comunitatsAutonomes" 	var="urlComunitatsAutonomes"/>
 <c:url value="/notificacio/provincies" 				var="urlProvincies"/>
 <c:url value="/notificacio/localitats" 				var="urlLocalitats"/>
+<c:url value="/notificacio/cercaUnitats"			var="urlCercaUnitats"/>
+<c:url value="/notificacio/paisos"					var="urlPaisos"/>
+<c:url value="/notificacio/cercaUnitats"			var="urlCercaUnitats"/>
 
 
 <html>
@@ -50,6 +53,7 @@
     <script src="<c:url value="/js/webutil.common.js"/>"></script>
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/formEnviament.js"/>"></script>
 <style type="text/css">
 .help-block {
 	font-size: x-small;
@@ -196,6 +200,7 @@
 </style>
 </head>
 <body>
+<c:url var="urlOrganigrama" value="/entitat/organigrama/"/>
 <script type="text/javascript">
 
 	if ('${notificacioCommandV2 != null && notificacioCommandV2.procedimentId != null}') {
@@ -213,36 +218,168 @@
 	var msgInfoDocSir = "<spring:message code='notificacio.for.camp.document.avis.sir'/>";
 	var locale = "${requestLocale}";
 	var consultarFocusout = true;
+	var personaMaxSizes = {
+		nom: '${nomSize}',
+		llinatge1: '${llinatge1Size}',
+		llinatge2: '${llinatge2Size}',
+		email: '${emailSize}',
+		telefon: '${telefonSize}'
+	}
+	var textMessages = {
+		"notificacio.form.camp.logitud": "<spring:message code="notificacio.form.camp.logitud"/>",
+		"comu.placeholder.seleccio": "<spring:message code='comu.placeholder.seleccio'/>",
+		"notificacio.form.dir3.cercar.noMinimOrgansFiltre": "<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>",
+		"comu.si": "<spring:message code="comu.si"/>",
+		"comu.no": "<spring:message code="comu.no"/>",
+		"comu.boto.seleccionar": "<spring:message code="comu.boto.seleccionar"/>",
+	};
 
-	//Reset de los warning, errores que se muestran tras la consulta al arxiu para CSV y Uuid
-	//o cuando no se introduce documento ya que es obligatorio
-	function resetWarningIErrorsDocArxiu(indexId){
-		$('#document_err_'+indexId).remove();
-		$('#metadades_war_'+indexId).remove();
-		$('#id_err_'+indexId).remove();
-		let inputElementCsv = $("#documentArxiuCsv\\[" + indexId + "\\]"); 
-		let inputElementUuid = $("#documentArxiuUuid\\[" + indexId + "\\]");
-		inputElementCsv.parent().closest('.form-group').removeClass('has-error');
-		inputElementCsv.removeClass('warningClass');
-		inputElementCsv.parent().closest('.form-group').find("p.help-block").remove();
-		inputElementUuid.parent().closest('.form-group').removeClass('has-error');
-		inputElementUuid.removeClass('warningClass');
-		inputElementUuid.parent().closest('.form-group').find("p.help-block").remove();
-		let inputElementArxiu = $("#arxiu\\[" + indexId + "\\]"); 
-		inputElementArxiu.parent().closest('.form-group').removeClass('has-error');
-		inputElementArxiu.parent().closest('.form-group').find("p.help-block").remove();
+	function addDestinatari(enviament_id, isMultipleDestinatarisActiu) {
+		var isMultiple = isMultipleDestinatarisActiu;
+		var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
+		var num_destinatari = $('div.destenv_' + num_enviament).size();
+
+		var destinatari =' \
+    <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
+		<div class="col-md-3"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus"><spring:message code="notificacio.form.camp.interessatTipus"/></label> \
+				<div class="controls col-xs-12"> \
+					<select id="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus" class="form-control interessat" style="width:100%"> \
+						' + interessatTipusOptions + ' \
+					</select> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 nif"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif"><spring:message code="notificacio.form.camp.titular.nif"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 rao"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
+				<div class="col-xs-12"> \
+					<input maxlength="${nomSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+						<span class="glyphicon glyphicon-info-sign"></span> \
+						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].nom">0</span> \
+							<spring:message code="notificacio.form.camp.logitud"/> \
+						<span> ${nomSize}</span> \
+					</p> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 llinatge1 hidden"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1"><spring:message code="notificacio.form.camp.titular.llinatge1"/> *</label> \
+				<div class="col-xs-12"> \
+					<input maxlength="${llinatge1Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${llinatge1Size}</span> \
+					</p> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 llinatge2 hidden"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2"><spring:message code="notificacio.form.camp.titular.llinatge2"/></label> \
+				<div class="col-xs-12"> \
+					<input maxlength="${llinatge2Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${llinatge2Size}</span> \
+					</p> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon"><spring:message code="notificacio.form.camp.titular.telefon"/></label> \
+				<div class="col-xs-12"> \
+					<input maxlength="${telefonSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${telefonSize}</span> \
+					</p> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-4"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].email"><spring:message code="notificacio.form.camp.titular.email"/></label> \
+				<div class="col-xs-12"> \
+					<input maxlength="${emailSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+					<span class="glyphicon glyphicon-info-sign"></span> \
+					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].email">0</span> \
+						<spring:message code="notificacio.form.camp.logitud"/> \
+					<span> ${emailSize}</span> \
+					</p> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-3 dir3Codi"> \
+		<div class="form-group"> \
+			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
+			<div class="col-xs-12"> \
+				<div class="input-group" id="$searchOrgan#num_enviament##num_destinatari#" onclick="obrirModalOrganismesDestinatari(#num_enviament#,#num_destinatari#,${urlOrganigrama},${urlComunitatsAutonomes},${urlNivellAdministracions},${urlCercaUnitats})"> \
+					<input id="searchOrgan#num_enviament##num_destinatari#" class="form-control " readonly="true" type="text" value=""> \
+					<span class="input-group-addon habilitat">  \
+						<a><span class="fa fa-search"></span></a> \
+					</span> \
+				</div> \
+			</div> \
+		</div> \
+	</div> \
+		<div class="col-md-3 hidden"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
+				<div class="col-xs-12"> \
+					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi" class="form-control " type="text" value=""> \
+				</div> \
+			</div> \
+		</div> \
+		<div class="col-md-2 offset-col-md-2"> \
+			<div class="float-right"> \
+				<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[#num_enviament#][#num_destinatari#]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[#num_enviament#][#num_destinatari#]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"> \
+			</div> \
+		</div> \
+		<div class="col-md-12"> \
+			<hr style="border-top: 1px dotted #BBB"> \
+		</div> \
+	</div>';
+
+		destinatari = replaceAll(destinatari, "#num_enviament#", num_enviament);
+		destinatari = replaceAll(destinatari, "#num_destinatari#", num_destinatari);
+
+		$('div.newDestinatari_' + num_enviament).append(destinatari);
+		$('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
+
+		if (!isMultiple) {
+			$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
+		}
+		$('.interessat').trigger('change');
+
+		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
+		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
+		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
+		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
+		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
 	}
-	
-	function activarCampsMetadades(indexId){
-		$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', false);
-		$("#documents\\[" +indexId+ "\\]\\.validesa").prop('disabled', false);
-		$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").prop('disabled', false);
-		$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('disabled', false);
-	}
-	
+
+
 	$(document).ready(function() {
-
-
 		$(document).on('change','select.paisos', function() {
 			var provincia = $(this).closest("#entregaPostal").find("select[class*='provincies']");
 			var poblacioSelect = $(this).closest("#entregaPostal").find("div[class*='poblacioSelect']");
@@ -1036,11 +1173,6 @@
 			$('.loading').fadeIn();
 		});
 
-
-
-// 	var organigrama = loadOrganigrama();
-// // 	var organigrama =null;
-
 		$("#rOrgans").on("dblclick", "tr", function() {
 			if(!$(this).hasClass('unselectable')){
 				seleccionar($(this));
@@ -1087,1029 +1219,6 @@
 	
 
 	});
-
-	var t, makeTooltip = function(warning) {
-		var pos = $("#descripcio").position();
-		clearTimeout(t);
-		$('#tooltip').remove();
-		$('<p id="tooltip">' + warning + '</p>').insertBefore("#descripcio");
-		$('#tooltip').css({
-			top : pos.top - 30,
-			left: pos.left
-		}).fadeIn("fast");
-
-		t = setTimeout(function() {
-			$('#tooltip').fadeOut(300, function() {
-				$(this).remove();
-			});
-		}, 4000);
-	};
-
-
-
-	function loadOrganigrama(){
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/entitat/organigrama/"/>" + document.getElementById('emisorDir3Codi').value,
-			success: function(data) {
-				if (Object.keys(data).length > 0) {
-// 	 				$.each(data, function(i, item) {
-// 	 					list_html += '<tr class="' + (i%2 == 0 ? 'even' : 'odd') + '" data-codi="' + data[i].codigo +'" data-denominacio="' + data[i].denominacion +'"><td>' + data[i].denominacion + '<span class="fa fa-sign-out select pull-right" style="font-size:14px; cursor:pointer; color:#222;"></span></td></tr>';
-// 	 				});
-// 					$("#organigrama").val(data);
-					var t = buscarCodiEnOrganigrama(data);
-					$("#organigrama").val(buscarCodiEnOrganigrama(data));
-				}
-
-
-
-
-			},
-			error: function() {
-				console.log("error obtenint l'organigrama...");
-			}
-		});
-	}
-
-	function addDestinatari(enviament_id) {
-		var isMultiple = ${isMultiplesDestinataris};
-		var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
-		var num_destinatari = $('div.destenv_' + num_enviament).size();
-
-		var destinatari =' \
-    <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
-		<div class="col-md-3"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus"><spring:message code="notificacio.form.camp.interessatTipus"/></label> \
-				<div class="controls col-xs-12"> \
-					<select id="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].interessatTipus" class="form-control interessat" style="width:100%"> \
-						' + interessatTipusOptions + ' \
-					</select> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-3 nif"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif"><spring:message code="notificacio.form.camp.titular.nif"/></label> \
-				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nif" class="form-control " type="text" value=""> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-3 rao"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
-				<div class="col-xs-12"> \
-					<input maxlength="${nomSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
-					<p class="info-length text-success"> \
-						<span class="glyphicon glyphicon-info-sign"></span> \
-						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].nom">0</span> \
-							<spring:message code="notificacio.form.camp.logitud"/> \
-						<span> ${nomSize}</span> \
-					</p> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-3 llinatge1 hidden"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1"><spring:message code="notificacio.form.camp.titular.llinatge1"/> *</label> \
-				<div class="col-xs-12"> \
-					<input maxlength="${llinatge1Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1" class="form-control " type="text" value=""> \
-					<p class="info-length text-success"> \
-					<span class="glyphicon glyphicon-info-sign"></span> \
-					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge1">0</span> \
-						<spring:message code="notificacio.form.camp.logitud"/> \
-					<span> ${llinatge1Size}</span> \
-					</p> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-3 llinatge2 hidden"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2"><spring:message code="notificacio.form.camp.titular.llinatge2"/></label> \
-				<div class="col-xs-12"> \
-					<input maxlength="${llinatge2Size}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2" class="form-control " type="text" value=""> \
-					<p class="info-length text-success"> \
-					<span class="glyphicon glyphicon-info-sign"></span> \
-					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].llinatge2">0</span> \
-						<spring:message code="notificacio.form.camp.logitud"/> \
-					<span> ${llinatge2Size}</span> \
-					</p> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-3"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon"><spring:message code="notificacio.form.camp.titular.telefon"/></label> \
-				<div class="col-xs-12"> \
-					<input maxlength="${telefonSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon" class="form-control " type="text" value=""> \
-					<p class="info-length text-success"> \
-					<span class="glyphicon glyphicon-info-sign"></span> \
-					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].telefon">0</span> \
-						<spring:message code="notificacio.form.camp.logitud"/> \
-					<span> ${telefonSize}</span> \
-					</p> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-4"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].email"><spring:message code="notificacio.form.camp.titular.email"/></label> \
-				<div class="col-xs-12"> \
-					<input maxlength="${emailSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].email" class="form-control " type="text" value=""> \
-					<p class="info-length text-success"> \
-					<span class="glyphicon glyphicon-info-sign"></span> \
-					<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].email">0</span> \
-						<spring:message code="notificacio.form.camp.logitud"/> \
-					<span> ${emailSize}</span> \
-					</p> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-3 dir3Codi"> \
-		<div class="form-group"> \
-			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
-			<div class="col-xs-12"> \
-				<div class="input-group" id="$searchOrgan#num_enviament##num_destinatari#" onclick="obrirModalOrganismesDestinatari(#num_enviament#,#num_destinatari#)"> \
-					<input id="searchOrgan#num_enviament##num_destinatari#" class="form-control " readonly="true" type="text" value=""> \
-					<span class="input-group-addon habilitat">  \
-						<a><span class="fa fa-search"></span></a> \
-					</span> \
-				</div> \
-			</div> \
-		</div> \
-	</div> \
-		<div class="col-md-3 hidden"> \
-			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
-				<div class="col-xs-12"> \
-					<input id="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi" class="form-control " type="text" value=""> \
-				</div> \
-			</div> \
-		</div> \
-		<div class="col-md-2 offset-col-md-2"> \
-			<div class="float-right"> \
-				<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[#num_enviament#][#num_destinatari#]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[#num_enviament#][#num_destinatari#]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"> \
-			</div> \
-		</div> \
-		<div class="col-md-12"> \
-			<hr style="border-top: 1px dotted #BBB"> \
-		</div> \
-	</div>';
-
-		destinatari = replaceAll(destinatari, "#num_enviament#", num_enviament);
-		destinatari = replaceAll(destinatari, "#num_destinatari#", num_destinatari);
-
-		$('div.newDestinatari_' + num_enviament).append(destinatari);
-		$('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
-
-		if (!isMultiple) {
-			$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
-		}
-		$('.interessat').trigger('change');
-
-		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
-		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
-		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
-		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
-		addContadorAddicionalDestinatari('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
-	}
-
-	function replaceAll(string, search, replace) {
-		return string.split(search).join(replace);
-	}
-
-	function addEnvio() {
-		var number;
-		var num;
-		var numPlus
-		var enviamentForm = $(".enviamentsForm").last().clone();
-
-		var classList = enviamentForm.attr('class').split(/\s+/);
-		$.each(classList, function(index, classname) {
-			if (classname.startsWith('enviamentForm_')) {
-				number = classname.substring(14);
-				num = parseInt(number);
-			}
-		});
-
-		//Titol enviament
-		if (num != null) {
-			numPlus = num + 1;
-			enviamentForm.removeClass('enviamentForm_' + num).addClass('enviamentForm_' + numPlus);
-			var badge = enviamentForm.find('.envio\\['+numPlus+'\\]');
-			badge.removeClass('envio[' + numPlus + ']').addClass('envio[' + (numPlus + 1) + ']');
-			badge[0].innerText = "Enviament " + (numPlus + 1);
-			var destinataris = enviamentForm.find('.newDestinatari_' + num);
-			destinataris.removeClass('newDestinatari_' + num).addClass('newDestinatari_' + numPlus);
-			destinataris.empty();
-			enviamentForm.find(':input').each(function() {
-				this.name= this.name.replace(number,numPlus);
-				this.id= this.id.replace(number,numPlus);
-				this.value = this.value.replace(number,numPlus);
-				$(this).attr('data-select2-id', numPlus);
-
-				if($(this).attr("id") == "envioTooltip") {
-					this.value= this.value.replace(number,numPlus);
-					$(this).tooltip();
-				}
-
-				if($(this).hasClass('formEnviament')) {
-					this.name= this.name.replace("[" + number, "[" + numPlus);
-					this.id= this.id.replace("[" + number, "[" + numPlus);
-				}
-
-				if ($(this).attr('type') == 'hidden') {
-					var hiddenId = parseInt($(this).val());
-					if (typeof hiddenId == 'number') {
-						$(this).val(''); //remove hidden id (new)
-					}
-				}
-			});
-			enviamentForm.find('#entregaPostal').removeClass('entregaPostal_' + num).addClass('entregaPostal_' + numPlus);
-			var searchOrgan = enviamentForm.find('#searchOrganTit' + number);
-			searchOrgan.attr("id", "searchOrganTit" + numPlus);
-			searchOrgan[0].onclick = null;
-			searchOrgan.click(function() { obrirModalOrganismes('Tit-' + numPlus); });
-			
-			//select
-			$(enviamentForm).find("span.select2").remove();
-			$(enviamentForm).find('p').remove();
-			$(enviamentForm).find('div').removeClass('has-error');
-			$(enviamentForm).find("select").select2({theme: 'bootstrap', width: 'auto'});
-			$(enviamentForm).find("select").attr('data-select2-eval', 'true');
-			$(enviamentForm).appendTo(".newEnviament").slideDown("slow").find("input[type='text']").not(".procedimentcodi").val("");
-
-			//Remove last button addEnviament
-			if($(enviamentForm).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
-				$(enviamentForm).find('.eliminar_enviament').removeClass('hidden');
-			}
-			//Show button addDestinatari
-			$(enviamentForm).find('.addDestinatari').removeClass('hidden');
-			//Inicialitzar chechbox incapacitat
-			$(enviamentForm).find('input:checkbox').removeAttr('checked');
-			//Inicialitzar deh
-			$(enviamentForm).find('.entregaDeh_'+numPlus).hide();
-			//Inicialitzar entregapostal
-			$(enviamentForm).find('.entregaPostal_'+numPlus).hide();
-			$(enviamentForm).find('.entregaPostal_info_'+number).css('display','none');
-
-			actualitzarEntrega(numPlus);
-			webutilModalAdjustHeight();
-
-			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.nom', '${nomSize}');
-			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge1', '${llinatge1Size}');
-			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.llinatge2', '${llinatge2Size}');
-			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.email', '${emailSize}');
-			addContadorAddicionalEnviament('enviaments[' + numPlus + '].titular.telefon', '${telefonSize}');
-			
-			$('.interessat').trigger('change');
-		}
-
-	}
-
-	function addContadorAddicionalDestinatari(fieldId) {
-		//Contador
-		var fieldSize = 'inputCurrentLength_' + fieldId;
-		var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
-		if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
-			var size = $(fieldId).val().length;
-			$(fieldSizeClass).text(size);
-		} else {
-			$(fieldSizeClass).text(0);
-		};
-
-		$(document.getElementById(fieldId)).bind("change paste keyup", function() {
-			var size = $(this).val().length;
-			$(fieldSizeClass).text(size);
-		});
-	}
-
-	function addContadorAddicionalEnviament(fieldId, inputMaxLength) {
-		var p = '<p class="info-length text-success"> \
-				<span class="glyphicon glyphicon-info-sign"></span> \
-				<span class="inputCurrentLength_' + fieldId + '">0</span> \
-					<spring:message code="notificacio.form.camp.logitud"/> \
-				<span> ' + inputMaxLength + '</span> \
-			</p>';
-		var inputField = $(document.getElementById(fieldId));
-		$(p).insertAfter(inputField);
-		//Contador
-		var fieldSize = 'inputCurrentLength_' + fieldId;
-		var fieldSizeClass = $(document.getElementsByClassName(fieldSize)[0]);
-		if (fieldSizeClass.val() != undefined && fieldSizeClass.val().length != 0) {
-			var size = $(fieldId).val().length;
-			$(fieldSizeClass).text(size);
-		} else {
-			$(fieldSizeClass).text(0);
-		};
-
-		$(document.getElementById(fieldId)).bind("change paste keyup", function() {
-			var size = $(this).val().length;
-			$(fieldSizeClass).text(size);
-		});
-	}
-
-	function destinatarisDelete(className) {
-		var element = document.getElementById(className);
-		var parent = $(element).closest(".destinatariForm");
-		var classParent = $(parent).attr('class');
-		var destinatari_id_num = parseInt(className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']')));
-		var enviament_id_num = parseInt(className.substring(className.indexOf('[') + 1, className.indexOf(']')));
-		var destinatariRoot = $(element).closest(".dest");
-		var numDest = destinatariRoot.find(".destinatariForm").size();
-
-		$(parent).closest(".destinatari").find('.addDestinatari').removeClass('hidden');
-		$(parent).remove();
-
-		// Reanomenar destinataris posteriors
-		if (numDest > (destinatari_id_num + 1)) {
-			for(var i = (destinatari_id_num + 1); i < numDest; i++) {
-				reanumeraDestinatari($(destinatariRoot).find('.destinatariForm:nth-child(' + i + ')'), i);
-			}
-		}
-	}
-
-	function enviamentDelete(id) {
-		var element = document.getElementById(id);
-		var parent = $(element).closest(".enviamentsForm");
-		var classParent = $(parent).attr('class');
-		var enviament_id_num = parseInt(id.substring(16));
-		var enviamentRoot = $(element).closest(".newEnviament");
-		var numEnv = enviamentRoot.find(".enviamentsForm").size();
-
-		$(parent).remove();
-
-		// Reenumerar enviaments posteriors
-		if (numEnv > (enviament_id_num + 1)) {
-			for(var i = (enviament_id_num + 1); i < numEnv; i++) {
-				reanumeraEnviament($(enviamentRoot).find('.enviamentsForm:nth-child(' + i + ')'), i);
-			}
-		}
-	}
-
-	function reanumeraDestinatari(destinatari, index) {
-		var nouIndex = index - 1;
-
-		var classList = destinatari.attr('class').split(/\s+/);
-		$.each(classList, function(index, classname) {
-			if (classname.startsWith('personaForm_')) {
-				destinatari.removeClass(classname).addClass(classname.substring(0, classname.lastIndexOf('_') + 1) + nouIndex);
-			}
-		});
-
-		destinatari.find(':input').each(function() {
-			this.name= this.name.replace('destinataris[' + index,'destinataris[' +nouIndex);
-			this.id= this.id.replace('destinataris[' + index,'destinataris[' + nouIndex);
-
-			if($(this).hasClass('formEnviament')) {
-				this.name= this.name.replace("[" + index, "[" + nouIndex);
-				this.id= this.id.replace("[" + index, "[" + nouIndex);
-			}
-			if($(this).hasClass('delete')) {
-				this.name= this.name.substring(0, this.name.lastIndexOf('[') + 1) + nouIndex + ']';
-				this.id= this.id.substring(0, this.id.lastIndexOf('[') + 1) + nouIndex + ']';
-			}
-		});
-	}
-
-	function reanumeraEnviament(enviament, index) {
-		var nouIndex = index - 1;
-		enviament.removeClass('enviamentForm_' + index).addClass('enviamentForm_' + nouIndex);
-		var badge = enviament.find('.envio\\[' + (index + 1) + '\\]');
-		badge.removeClass('envio[' + (index + 1) + ']').addClass('envio[' + index + ']');
-		badge[0].innerText = "Enviament " + index;
-		var destinataris = enviament.find('.newDestinatari_' + index);
-		destinataris.removeClass('newDestinatari_' + index).addClass('newDestinatari_' + nouIndex);
-		destinataris.find('.destinatariForm').each(function(index) {
-			$(this).removeClass('destenv_' + index).addClass('destenv_' + nouIndex);
-			var classList = $(this).attr('class').split(/\s+/);
-			$.each(classList, function(index, classname) {
-				if (classname.startsWith('personaForm_')) {
-					$(this).removeClass(classname).addClass('personaForm_' + nouIndex + classname.substring(classname.lastIndexOf('_'), classname.length));
-				}
-			});
-		});
-		enviament.find('#entregaPostal').removeClass('entregaPostal_' + index).addClass('entregaPostal_' + nouIndex);
-		enviament.find(':input').each(function() {
-			this.name= this.name.replace('enviaments[' + index,'enviaments[' +nouIndex);
-			this.id= this.id.replace('enviaments[' + index,'enviaments[' + nouIndex);
-			if ($(this).attr('data--id') == index) {
-				$(this).attr('data-select2-id', nouIndex);
-			}
-
-			if($(this).hasClass('formEnviament')) {
-				this.name= this.name.replace("[" + index, "[" + nouIndex);
-				this.id= this.id.replace("[" + index, "[" + nouIndex);
-			}
-			if($(this).hasClass('delete')) {
-				this.name= this.name.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
-				this.id= this.id.replace("destinatarisDelete[" + index, "destinatarisDelete[" + nouIndex);
-			}
-			if($(this).hasClass('eliminar_enviament')) {
-				this.name= this.name.replace("enviamentDelete[" + index, "enviamentDelete[" + nouIndex);
-				this.id= this.id.replace("enviamentDelete_" + index, "enviamentDelete_" + nouIndex);
-			}
-		});
-
-//     if($(enviament).find('.eliminar_enviament').attr('id') != 'entregaPostal[0]') {
-// 		$(enviament).find('.eliminar_enviament').removeClass('hidden');
-//     }
-// 	actualitzarEntrega(nouIndex);
-	}
-
-	function mostrarEntregaPostal(className) {
-		var element = document.getElementById(className);
-		var parent = $(element).closest(".enviamentsForm");
-		var classParent = $(parent).attr('class');
-		var concepteLength = $('#concepte').val().length;
-
-		var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-
-		if ($(element).is(':checked') && concepteLength > 50) {
-			var longitidInfo = $('.entregaPostal_info_' + enviament_id_num);
-			$(longitidInfo).slideDown(1000);
-		};
-
-		if($('.entregaPostal_'+enviament_id_num).css('display') != 'none') {
-			$('.entregaPostal_'+enviament_id_num).hide();
-		} else {
-			$('.entregaPostal_'+enviament_id_num).show();
-		}
-	}
-
-	function mostrarDestinatari(enviament_id) {
-		var number;
-		var num;
-		var enviament_id_num = enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' ));
-		enviament_id_num = parseInt(enviament_id_num);
-//     var isMultiple = ($("div[class*=' personaForm_" + enviament_id_num + "']").find('#isMultiple').val() == 'true');
-		var isMultiple = ${isMultiplesDestinataris};
-
-		if ($("div[class*=' personaForm_" + enviament_id_num + "']").hasClass("hidden")) {
-			$("div[class*=' personaForm_" + enviament_id_num + "']").removeClass("hidden").show();
-
-			if (!isMultiple) {
-				$("div[class*=' personaForm_" + enviament_id_num + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
-			}
-		}
-	}
-
-
-	function obrirModalOrganismes(index){
-		var from = index;
-		if (index.includes('-'))
-			from = index.split('-')[0];
-
-		$("#organismesModal").modal();
-		
-		var indexEnviament;
-		var indexDestinatari;
-		// Titular
-		if (from == "Tit") {
-			$("#titular").val(index);
-			indexEnviament = index.split('-')[1];
-		} else {
-		// Destinatario
-			$("#titular").val(index);
-			indexEnviament = index.split('-')[0];
-			indexDestinatari = index.split('-')[1];
-		}
-		
-		webutilModalAdjustHeight();
-
-		loadNivellsAdministracions($("#o_nivellAdmin").val());
-		loadComunitatsAutonomes($("#o_comunitat").val());
-
-		if(from == 'Tit'){
-			dir3CodiDesc =  document.getElementById("searchOrganTit" + indexEnviament ).getElementsByTagName('input')[0];
-		}else{
-			dir3CodiDesc =  document.getElementById("searchOrgan" + indexEnviament + indexDestinatari );
-		}
-
-		if(dir3CodiDesc.value == '' || dir3CodiDesc.value == null){
-			netejar(true);
-		}else{
-			netejar(false);
-		}
-
-		$(".loading-screen").hide();
-		loadOrganigrama();
-		
-	}
-	
-	function obrirModalOrganismesDestinatari(indexEnviament, indexDestinatari) {
-		let index = indexEnviament + "-" + indexDestinatari;
-		obrirModalOrganismes(index);
-	}
-
-	// function searchCodiChange(text){
-	// 	var searchNom = $('#searchNom');
-	// 	if(text.trim().length ==0){
-	// 		searchNom.removeAttr('disabled');
-	// 	}else{
-	// 		searchNom.prop("disabled", true);
-	// 	}
-
-	// };
-
-	// function searchNomChange(text){
-	// 	var searchCodi = $('#searchCodi');
-	// 	if(text.trim().length ==0){
-	// 		searchCodi.removeAttr('disabled');
-	// 	}else{
-	// 		searchCodi.prop("disabled", true);
-	// 	}
-
-	// };
-
-	function loadNivellsAdministracions(value) {
-		var nivellAdmin = $("#o_nivellAdmin");
-		$.ajax({
-			type: 'GET',
-			url: '${urlNivellAdministracions}',
-			dataType: 'json',
-			async: false,
-			data: {	}
-		}).done(function(data){
-			var list_html = '<option value=""></option>';
-			if (data.length > 0) {
-				$.each(data, function(i, item) {
-					list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
-				});
-			}
-			nivellAdmin.html(list_html);
-			if(value !=null && value != ''){
-				nivellAdmin.val(value).trigger('change');
-			}
-// 		$("#o_nivellAdmin").select2({
-// 			enable : true,
-// 			allowClear : true,
-// 			dropdownParent: $("#dialeg_organs")
-// 		});
-
-			nivellAdmin.select2({
-				theme: 'bootstrap',
-				width: 'auto',
-				allowClear: true,
-		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
-			});
-
-
-
-		}).fail(function(jqXHR, textStatus) {
-// 		refreshAlertes();
-		});
-	}
-
-	function loadComunitatsAutonomes(value) {
-		var codiComunitat = $("#o_comunitat");
-		$.ajax({
-			type: 'GET',
-			url: '${urlComunitatsAutonomes}',
-			dataType: 'json',
-			async: false,
-			data: {	}
-		}).done(function(data){
-			var list_html = '<option value=""></option>';
-			if (data.length > 0) {
-				$.each(data, function(i, item) {
-					list_html += '<option value=' + data[i].codi + '>' + data[i].valor + '</option>';
-				});
-			}
-			codiComunitat.html(list_html);
-			if(value !=null && value != ''){
-				codiComunitat.val(value).trigger('change');
-			}
-			codiComunitat.select2({
-				theme: 'bootstrap',
-				width: 'auto',
-				allowClear: true,
-		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
-			});
-		}).fail(function(jqXHR, textStatus) {
-// 		refreshAlertes();
-		});
-
-	}
-
-	function loadProvincies(codiCA, value) {
-		var provincia = $('#o_provincia');
-		if (codiCA != null && codiCA != '') {
-			$(".loading-screen").show();
-			$.ajax({
-				type: 'GET',
-				url: '${urlProvincies}/' + codiCA ,
-				dataType: 'json',
-				async: false
-			}).done(function(data){
-				var list_html = '<option value=""></option>';
-				if (data.length > 0) {
-					$.each(data, function(i, item) {
-						list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
-					});
-				}
-				provincia.html(list_html);
-				if(value !=null && value != ''){
-					provincia.val(value).trigger('change');
-				}
-				$("#o_provincia").select2({
-					theme: 'bootstrap',
-					width: 'auto',
-					allowClear: true,
-			        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
-				});
-			}).fail(function(jqXHR, textStatus) {
-// 			refreshAlertes();
-			});
-			$(".loading-screen").hide();
-		} else {
-			var list_html = '<option value=""></option>';
-			$("#o_provincia").html(list_html);
-			$("#o_provincia").select2({
-				theme: 'bootstrap',
-				width: 'auto',
-				allowClear: true,
-		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
-			});
-		}
-
-
-	}
-
-	function comunitatAutonomaChange(value){
-		if(value.trim().length !=0){
-			loadProvincies(value,$('#o_provincia').val()!=null?$('#o_provincia').val():'');
-		}else{
-			limpiarProvincia(true);
-		}
-	};
-
-	function provinciesChange(value){
-		if(value.trim().length !=0){
-			loadLocalitats(value);
-		}else{
-			limpiarLocalitat(true);
-		}
-	};
-
-	function loadLocalitats(codiProvincia) {
-		if (codiProvincia != null && codiProvincia != '') {
-			$(".loading-screen").show();
-			$.ajax({
-				type: 'GET',
-				url: '${urlLocalitats}/' + codiProvincia,
-				dataType: 'json',
-				async: false
-			}).done(function(data){
-				var list_html = '<option value=""></option>';
-				if (data.length > 0) {
-					$.each(data, function(i, item) {
-						list_html += '<option value=' + data[i].id + '>' + data[i].descripcio + '</option>';
-					});
-				}
-				$("#o_localitat").html(list_html);
-				$("#o_localitat").select2({
-					theme: 'bootstrap',
-					width: 'auto',
-					allowClear: true
-				});
-			}).fail(function(jqXHR, textStatus) {
-// 			refreshAlertes();
-			});
-			$(".loading-screen").hide();
-		} else {
-			var list_html = '<option value=""></option>';
-			$("#o_localitat").html(list_html);
-			$("#o_localitat").select2({
-				theme: 'bootstrap',
-				width: 'auto',
-				allowClear: true,
-		        placeholder: "<spring:message code='comu.placeholder.seleccio'/>"
-			});
-		}
-	}
-
-	// function mbloquejar() {
-	// // 	var height = $("#dialeg_organs").css('height');
-	// 	var width = $("#dialeg_organs").css('width');
-	// 	var top = $("#dialeg_organs").css('top');
-	// // 	$(".mloading-screen").css('height', height);
-	// 	$(".mloading-screen").css('width', width);
-	// 	$(".mloading-screen").css('top', top);
-	// 	$(".mloading-screen").show();
-	// }
-
-	// function mdesbloquejar() {
-	// 	$(".mloading-screen").hide();
-	// }
-
-	function netejar(reload) {
-		if(reload){
-			limpiarNivellAdmin();
-			limpiarComunitat();
-			limpiarProvincia(true);
-			limpiarLocalitat(true);
-			$("#o_codi").val("");
-			$("#o_denominacio").val("");
-			$("#rOrgans").html('');
-			$("#resultatsTotal").addClass('hidden');
-		}else{
-			loadOrgansGestors();
-		}
-		$(".loading-screen").hide();
-	}
-
-	function limpiarNivellAdmin() {
-		$('#o_nivellAdmin').val(null).trigger('change');
-	}
-	function limpiarComunitat() {
-		$('#o_comunitat').val(null).trigger('change');
-	}
-	function limpiarProvincia(borrarLlistat) {
-		$("#o_provincia").val("").trigger('change');
-		if(borrarLlistat){
-			$("#o_provincia").html("");
-		}
-	}
-	function limpiarLocalitat(borrarLlistat) {
-		$("#o_localitat").val("").trigger('change');
-		if(borrarLlistat){
-			$("#o_localitat").html("");
-		}
-	}
-
-
-	function seleccionar(fila){
-		var from = $('#titular').val().split('-')[0];
-		var index = $('#titular').val().split('-')[1] != undefined?$('#titular').val().split('-')[1]:from;
-
-// 	var organSelect = document.getElementById('selOrganismes');
-		if(fila.size()>0){
-// 		var organSeleccionatValue = organSelect.options[organSelect.selectedIndex].value;
-// 		var organSeleccionatText = organSelect.options[organSelect.selectedIndex].text;
-
-			let codi = fila.data('codi');
-			let denominacio = fila.data('denominacio');
-			let ocodi = codi + '-' + denominacio;
-			let cif = fila.data('cif');
-			setPersonaAdministracio(from, index, codi, denominacio, ocodi, cif)
-
-			$('#cerrarModal').click();
-		}
-	}
-
-	function setPersonaAdministracio (from, index, codi, denominacio, ocodi, cif) {
-		var dir3Codi;
-		var raoSocial;
-		var dir3CodiDesc;
-		var organCif;
-		if(from === 'Tit'){
-			dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
-			raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
-			dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
-			organCif = document.getElementById("enviaments[" + index + "].titular.nif");
-		}else{
-			dir3Codi = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].dir3Codi");
-			raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nom");
-			dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
-			organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
-		}
-
-		dir3Codi.value = codi;
-		raoSocial.value = denominacio;
-		dir3CodiDesc.value = ocodi;
-		organCif.value = cif;
-	}
-	// function netejarFiltre(){
-	// 	var searchCodi = $('#searchCodi');
-	// 	var searchNom = $('#searchNom');
-	// 	var selOrganismes = $('#selOrganismes');
-
-	// 	searchCodi.removeAttr('disabled');
-	// 	searchCodi.val('');
-	// 	searchNom.removeAttr('disabled');
-	// 	searchNom.val('');
-
-	// 	selOrganismes.empty();
-	// 	selOrganismes.append("<option value=\"\"></option>");
-
-	// };
-
-
-	function buscarCodiEnOrganigrama(fills){
-		var array = new Array();
-		if(fills != null && fills != undefined){
-			$.each(fills, function(key, obj) {
-				array.push(key);
-				if(obj.fills != undefined && obj.fills != null){
-					$.each(obj.fills, function(key, obj) {
-						buscarCodiEnOrganigrama(obj.fills);
-					});
-				}
-			});
-
-		}
-		return array;
-	}
-
-	function loadOrgansGestors(){
-		var codi = $("#o_codi").val();
-		var denominacio = $("#o_denominacio").val();
-		var nivellAdmin = $("#o_nivellAdmin").val();
-		var codiComunitat = $('#o_comunitat').val();
-		var codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
-		var codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
-
-
-		if ((codi == null || codi == "") &&
-				(denominacio == null || denominacio == "") &&
-				(codiComunitat == null || codiComunitat == "")) {
-			alert("<spring:message code='notificacio.form.dir3.cercar.noMinimOrgansFiltre'/>");
-			return false;
-		} else {
-			$(".loading-screen").show();
-			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/notificacio/cercaUnitats"/>" +
-						'?codi='+codi.trim()+
-						'&denominacio='+denominacio+
-						'&nivellAdministracio='+nivellAdmin+
-						'&comunitatAutonoma='+codiComunitat+
-						'&provincia='+codiProvincia+
-						'&municipi='+codiLocalitat,
-				success: function(data) {
-					var list_html = '';
-					$("#resultatsTotal").removeClass('hidden');
-					if (data.length > 0) {
-						$.each(data, function(i, item) {
-							var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-							var local = $('#organigrama').val().indexOf(item.codi) != -1;
-							var clase = (i%2 == 0 ? 'even' : 'odd');
-							var socSir = (item.sir?'<spring:message code="comu.si"/>':'<spring:message code="comu.no"/>');
-							var comSir = enviamentTipus == 'COMUNICACIO' && !local && item.sir;
-							var comLocal = enviamentTipus == 'COMUNICACIO' && local;
-							if (enviamentTipus != 'NOTIFICACIO' && !comSir) {
-								clase += ' unselectable';
-							}
-							list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'" data-cif="' + item.cif + '">' +
-									'<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
-									'<td>'+(socSir)+'</td>' +
-									'<td>';
-							if (enviamentTipus == 'NOTIFICACIO' || comSir) {
-								list_html += '<button type="button" class="select btn btn-success"> <spring:message code="comu.boto.seleccionar"/></button>';
-							}
-							list_html += '</td></tr>';
-						});
-					}else{
-						$("#total").text("0");
-					}
-
-					$("#rOrgans").html(list_html);
-					$("#total").text(data.length);
-// 				$("#rOrgans").append('<tfoot><tr><th id="total" colspan="2"><spring:message code="comu.resultats"/></th><td>'+data.length+'</td></tr></tfoot>');
-					$(".loading-screen").hide();
-				},
-				error: function() {
-					console.log("error obtenint les administracions...");
-					$(".loading-screen").hide();
-				}
-			});
-		}
-
-
-	};
-
-
-
-	function mostrarEntregaDeh(className) {
-		var element = document.getElementById(className);
-		var parent = $(element).closest(".enviamentsForm");
-		var classParent = $(parent).attr('class');
-
-		var enviament_id_num = className.substring(className.lastIndexOf('[') + 1, className.lastIndexOf(']'));
-		if($('.entregaDeh_' + enviament_id_num).css('display') != 'none') {
-			$('.entregaDeh_'+enviament_id_num).hide();
-		} else {
-			$('.entregaDeh_'+enviament_id_num).show();
-		}
-	}
-
-	function actualitzarEntrega(j) {
-		var selPaisos = document.getElementById("enviaments[" + j + "].entregaPostal.paisCodi");
-		var selProvincies = document.getElementById("enviaments[" + j + "].entregaPostal.provincia");
-		var selLocalitats = document.getElementById("enviaments[" + j + "].entregaPostal.municipiCodi");
-		var selPoblacio =  document.getElementById("enviaments[" + j + "].entregaPostal.poblacio");
-
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/notificacio/paisos/"/>",
-			success: function(data) {
-				$(selPaisos).empty();
-				$(selPaisos).append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-					$.each(data, function(i, val) {
-						if (val.alfa2Pais == 'ES') {
-							$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\" selected>" + val.descripcioPais + "</option>");
-						} else {
-							$(selPaisos).append("<option value=\"" + val.alfa2Pais + "\">" + val.descripcioPais + "</option>");
-						}
-
-					});
-					var paisCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.paisCodi');
-
-					if (paisCodi !== undefined && paisCodi[0] !== undefined) {
-						$(selPaisos).val(paisCodi[0].value).change();
-					}
-				}
-				var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-				$(selPaisos).select2(select2Options);
-			},
-			error: function() {
-				console.log("error obtenint les provincies...");
-			}
-		});
-		//Provincies
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value="/notificacio/provincies/"/>",
-			success: function(data) {
-				$(selProvincies).empty();
-				$(selProvincies).append("<option value=\"\"></option>");
-				if (data && data.length > 0) {
-					$.each(data, function(i, val) {
-						$(selProvincies).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
-					});
-
-					var provinciaCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.provincia');
-
-					if (provinciaCodi !== undefined && provinciaCodi[0] !== undefined) {
-						$(selProvincies).val(provinciaCodi[0].value).change();
-					}
-				}
-				var select2Options = {
-					theme: 'bootstrap',
-					width: 'auto'};
-				$(selProvincies).select2(select2Options);
-			},
-			error: function() {
-				console.log("error obtenint les provincies...");
-			}
-		});
-
-		//Localitats
-		$(selProvincies).on('change', function() {
-			var provincia = $(this);
-			if ($(this).val() == '') {
-				$(selLocalitats).find('option').remove();
-			} else {
-				$.ajax({
-					type: 'GET',
-					url: "<c:url value="/notificacio/localitats/"/>" + $(provincia).val(),
-					success: function(data) {
-						$(selLocalitats).empty();
-						$(selLocalitats).append("<option value=\"\"></option>");
-						if (data && data.length > 0) {
-							$.each(data, function(i, val) {
-								$(selLocalitats).append("<option value=\"" + val.id + "\">" + val.descripcio + "</option>");
-							});
-
-							var municipiCodi = document.getElementsByClassName('enviaments[' + j + '].entregaPostal.municipiCodi');
-
-							if (municipiCodi !== undefined && municipiCodi[0] !== undefined) {
-								$(selLocalitats).val(municipiCodi[0].value).change();
-							}
-						}
-						var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-						$(selLocalitats).select2(select2Options);
-					},
-					error: function() {
-						console.log("error obtenint les provincies...");
-					}
-				});
-			}
-		});
-
-	}
-
-	function comptarCaracters(idCamp) {
-		var fieldConcepte = $('#' + idCamp);
-		if (fieldConcepte.val().length != 0) {
-			var size = $(fieldConcepte).val().length;
-			$('.inputCurrentLength').text(size);
-		} else {
-			$('.inputCurrentLength').text(0);
-		};
-
-		//$(fieldConcepte).bind("change paste keyup", function() {
-		//	var size = $(this).val().length;
-		//	$('.inputCurrentLength').text(size);
-		//});
-	}
 
 </script>
 <div class="loading">
@@ -2343,19 +1452,19 @@
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
-											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/> 
+											<not:inputTextSearch  funcio="obrirModalOrganismes('Tit-${j}', '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}', '${urlCercaUnitats}')" searchButton="searchOrganTit${j}" textKey="notificacio.form.camp.titular.dir3codi" required="true" readonly="true" value=""/>
 <%-- 											value="${fn:join(enviaments[j].titular.dir3Codi, enviaments[j].titular.nom)} "/> --%>
 										</div>
 										
 										<div class="col-md-6 codiDir3 hidden">
-<%-- 											<not:inputTextSearch  funcio="obrirModalOrganismes(${j})" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/> --%>
+<%-- 											<not:inputTextSearch  funcio="obrirModalOrganismes(${j}, '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}','${urlCercaUnitats}')" name="enviaments[${j}].titular.dir3Codi" searchButton="searchOrgan" textKey="notificacio.form.camp.titular.dir3codi" required="true"/> --%>
 											<not:inputText name="enviaments[${j}].titular.dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" required="true"/>
 										</div>
 										
 										<!-- INCAPACITAT -->
 										<c:if test="${isTitularAmbIncapacitat}">
 											<div class="col-md-12 incapacitat">
-												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id)"/>
+												<not:inputCheckbox name="enviaments[${j}].titular.incapacitat" textKey="notificacio.form.camp.titular.incapacitat" funcio="mostrarDestinatari(this.id, ${isMultiplesDestinataris})"/>
 											</div>
 										</c:if>
 									</div>
@@ -2411,7 +1520,7 @@
 													</div>
 													<!-- CODI DIR3 -->
 													<div class="col-md-3 dir3Codi hidden">
-														<not:inputTextSearch  funcio="obrirModalOrganismesDestinatari(${j},${i})" searchButton="searchOrgan${j}${i}" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12" readonly="true" value="${destinatari.dir3Codi}-${destinatari.nom}"/>
+														<not:inputTextSearch  funcio="obrirModalOrganismesDestinatari(${j},${i}, '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}','${urlCercaUnitats}')" searchButton="searchOrgan${j}${i}" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12" readonly="true" value="${destinatari.dir3Codi}-${destinatari.nom}"/>
 													</div>						
 													<div class="col-md-3 hidden">
 														<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
@@ -2436,7 +1545,7 @@
 									<div class="text-left">	
 										<input type="button" class="btn btn-default addDestinatari<c:if test="addHidden"> hidden</c:if>"
 											   name="enviaments[${j}]" id="enviaments[${j}]"
-											   onclick="addDestinatari(this.id)"
+											   onclick="addDestinatari(this.id, ${isMultiplesDestinataris})"
 											   value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
 									</div>
 								</div>
@@ -2525,7 +1634,7 @@
 												<not:inputSelect name="enviaments[${j}].entregaPostal.municipiCodi" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
 											<script>
-												actualitzarEntrega('${j}');
+												actualitzarEntrega('${j}', '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}'); // TODO: Averiguar si això està aquí per algún motiu
 											</script>
 											<div class="col-md-6">
 												<not:inputText name="enviaments[${j}].entregaPostal.poblacio" textKey="notificacio.form.camp.entregapostal.poblacio" labelClass="labelcss" inputClass="inputcss"/>
@@ -2604,7 +1713,9 @@
 			</div>
 			<div class="text-left vt10">
 				<div class="btn-group">
-					<input type="button" class="btn btn-default" id="addEnviament" onclick="addEnvio()" value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
+					<input type="button" class="btn btn-default" id="addEnviament"
+						   onclick="addEnvio('${urlOrganigrama}', '${urlComunitatsAutonomes}', '${urlNivellAdministracions}', ''${urlCercaUnitats}, '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}', personaMaxSizes)"
+						   value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
 				</div>
 			</div>
 
@@ -2959,7 +2070,15 @@
 			</div>
 			<div class="text-right col-md-12">
 				<div class="btn-group">
-					<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+					<c:choose>
+						<c:when test="${ empty referer }">
+							<a href="<c:url value="/notificacio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+						</c:when>
+						<c:otherwise>
+							<a href="${ referer }" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+						</c:otherwise>
+					</c:choose>
+
 				</div>
 				<div class="btn-group">
 					<button type="submit" class="btn btn-success saveForm">
@@ -3025,7 +2144,7 @@
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.comunitat.autonoma" /></label>
 								<div class="forminput">
-									<select id="o_comunitat" type="search" onchange="comunitatAutonomaChange(this.value)" class="form-control">
+									<select id="o_comunitat" type="search" onchange="comunitatAutonomaChange(this.value, '${urlProvincies}')" class="form-control">
 										<option value=""></option>
 				    				</select>
 				    				
@@ -3041,7 +2160,7 @@
 							<div class="form-group">
 								<label class="formlabel"><spring:message code="notificacio.form.dir3.cercar.provincia" /></label>
 								<div class="forminput">
-									<select id="o_provincia" onchange="provinciesChange(this.value)"class="form-control">
+									<select id="o_provincia" onchange="provinciesChange(this.value, '${urlLocalitats}')"class="form-control">
 										<option value=""></option>
 				    				</select>
 								</div>
@@ -3092,9 +2211,9 @@
 			</div>
 				
 				<div class="modal-footer">
-					<button id="btnNetejar" onclick="netejar(true)" type="submit" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button id="btnNetejar" onclick="netejar(true, '${urlCercaUnitats}')" type="submit" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button id="cerrarModal" type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="comu.boto.cancelar" /></button>
-					<button id="loadOrgansGestors" onclick="loadOrgansGestors()" name="accio" value="filtrar" type="button" class="btn btn-info"> <spring:message code="comu.boto.filtrar"/></button>
+					<button id="loadOrgansGestors" onclick="loadOrgansGestors('${urlCercaUnitats}')" name="accio" value="filtrar" type="button" class="btn btn-info"> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
 		</div>

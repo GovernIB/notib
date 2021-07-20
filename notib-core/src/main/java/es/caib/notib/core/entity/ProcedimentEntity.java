@@ -1,22 +1,12 @@
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
+import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Classe de model de dades que conté la informació dels procediments.
@@ -29,7 +19,7 @@ import lombok.Getter;
 @EntityListeners(AuditingEntityListener.class)
 public class ProcedimentEntity extends NotibAuditable<Long> {
 	
-	@Column(name = "codi", length = 64, nullable = false)
+	@Column(name = "codi", length = 64, nullable = false, unique = true)
 	protected String codi;
 	
 	@Column(name = "nom", length = 256, nullable = false)
@@ -58,7 +48,10 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "comu")
 	protected boolean comu;
-	
+
+	@Column(name = "DIRECT_PERMISSION_REQUIRED")
+	protected boolean requireDirectPermission;
+
 	@Column(name = "ultima_act")
 	@Temporal(TemporalType.DATE)
 	protected Date ultimaActualitzacio;
@@ -97,7 +90,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String tipusAssumpteNom,
 			String codiAssumpte,
 			String codiAssumpteNom,
-			boolean comu) {
+			boolean comu,
+			boolean requireDirectPermission) {
 		this.codi = codi;
 		this.nom = nom;
 		this.entitat = entitat;
@@ -112,6 +106,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.codiAssumpte = codiAssumpte;
 		this.codiAssumpteNom = codiAssumpteNom;
 		this.comu=comu;
+		this.requireDirectPermission = requireDirectPermission;
 	}
 	
 	public void update(
@@ -141,7 +136,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String tipusAssumpteNom,
 			String codiAssumpte,
 			String codiAssumpteNom,
-			boolean comu) {
+			boolean comu,
+			boolean requireDirectPermission) {
 		return new Builder(
 				codi,
 				nom,
@@ -156,7 +152,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				tipusAssumpteNom,
 				codiAssumpte,
 				codiAssumpteNom,
-				comu);
+				comu,
+				requireDirectPermission);
 	}
 	
 	public static class Builder {
@@ -175,7 +172,8 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				String tipusAssumpteNom,
 				String codiAssumpte,
 				String codiAssumpteNom,
-				boolean comu) {
+				boolean comu,
+				boolean requireDirectPermission) {
 			built = new ProcedimentEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -191,6 +189,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			built.codiAssumpte = codiAssumpte;
 			built.codiAssumpteNom = codiAssumpteNom;
 			built.comu=comu;
+			built.requireDirectPermission = requireDirectPermission;
 		}
 		public ProcedimentEntity build() {
 			return built;

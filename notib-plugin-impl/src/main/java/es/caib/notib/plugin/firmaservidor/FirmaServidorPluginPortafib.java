@@ -1,31 +1,16 @@
-/**
- * 
- */
 package es.caib.notib.plugin.firmaservidor;
+
+import es.caib.notib.plugin.SistemaExternException;
+import org.apache.commons.io.FileUtils;
+import org.fundaciobit.plugins.signature.api.*;
+import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
+import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerPlugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
-
-import org.apache.commons.io.FileUtils;
-import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
-import org.fundaciobit.plugins.signature.api.FileInfoSignature;
-import org.fundaciobit.plugins.signature.api.ITimeStampGenerator;
-import org.fundaciobit.plugins.signature.api.PdfVisibleSignature;
-import org.fundaciobit.plugins.signature.api.PolicyInfoSignature;
-import org.fundaciobit.plugins.signature.api.SecureVerificationCodeStampInfo;
-import org.fundaciobit.plugins.signature.api.SignaturesSet;
-import org.fundaciobit.plugins.signature.api.SignaturesTableHeader;
-import org.fundaciobit.plugins.signature.api.StatusSignature;
-import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
-import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
-import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerPlugin;
-
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 
 /**
  * Implementació del plugin de firma en servidor emprant PortaFIB.
@@ -42,7 +27,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 
 	public FirmaServidorPluginPortafib() {
 		super();
-		Properties prop = PropertiesHelper.getProperties();
+		Properties prop = System.getProperties();
 		plugin = new PortaFIBSignatureServerPlugin(PROPERTIES_BASE, prop);
 		String tempDir = System.getProperty("java.io.tmpdir");
 		final File base = new File(tempDir, FIRMASERVIDOR_TMPDIR);
@@ -113,7 +98,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 			boolean userRequiresTimeStamp) throws Exception, FileNotFoundException, IOException {
 		// Informació comú per a totes les signatures
 		String filtreCertificats = "";
-		String username = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username", null);
+		String username = System.getProperties().getProperty(PROPERTIES_BASE + "username", null);
 		String administrationID = null; // No te sentit en API Firma En Servidor
 		PolicyInfoSignature policyInfoSignature = null;
 		CommonInfoSignature commonInfoSignature = new CommonInfoSignature(
@@ -124,8 +109,8 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 				policyInfoSignature);
 		File source = new File(sourcePath);
 		String fileName = source.getName();
-		String location = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
-		String signerEmail = PropertiesHelper.getProperties().getProperty(
+		String location = System.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
+		String signerEmail = System.getProperties().getProperty(
 				PROPERTIES_BASE + "signerEmail",
 				"suport@caib.es");
 		int signNumber = 1;

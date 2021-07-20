@@ -1,12 +1,9 @@
 package es.caib.notib.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-import java.util.List;
-
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.plugin.SistemaExternException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,20 +13,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.ProcedimentFormDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.plugin.SistemaExternException;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
@@ -50,6 +37,10 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 		
 	@Before
 	public void setUp() throws SistemaExternException {
+		addConfig("es.caib.notib.metriques.generar", "false");
+		addConfig("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
+		addConfig("es.caib.notib.plugin.registre.class", "es.caib.notib.plugin.registre.RegistrePluginMockImpl");
+		addConfig("es.caib.notib.plugin.unitats.fitxer", "");
 		entitatCreate = new EntitatDto();
 		entitatCreate.setCodi("LIMIT");
 		entitatCreate.setNom("Limit Tecnologies");
