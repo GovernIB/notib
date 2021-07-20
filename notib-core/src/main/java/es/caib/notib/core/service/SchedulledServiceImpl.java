@@ -53,9 +53,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.registre.enviaments.periode}", 
-			initialDelayString = "${config:es.caib.notib.tasca.registre.enviaments.retard.inicial}")
 	public void registrarEnviamentsPendents() throws RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -79,9 +76,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	///////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
 	public void notificaEnviamentsRegistrats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -108,9 +102,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial}")
 	public void enviamentRefrescarEstatPendents() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -137,9 +128,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial}")
 	public void enviamentRefrescarEstatEnviatSir() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -167,7 +155,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	// 5. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
-	@Scheduled(cron = "${config:es.caib.notib.actualitzacio.procediments.cron}")
 	public void actualitzarProcediments() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -195,11 +182,11 @@ public class SchedulledServiceImpl implements SchedulledService {
 	// Refrescar notificacions expirades
 	/////////////////////////////////////////////////////////////////////////
 	@Override
-	@Scheduled(cron = "${config:es.caib.notib.refrescar.notificacions.expirades.cron}")
 	public void refrescarNotificacionsExpirades() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("[NOT] Refrescant notificacions expirades");
+			addAdminAuthentication();
 			enviamentHelper.refrescarEnviamentsExpirats();
 		} finally {
 			metricsHelper.fiMetrica(timer);

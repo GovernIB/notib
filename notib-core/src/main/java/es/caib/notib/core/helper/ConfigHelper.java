@@ -8,6 +8,7 @@ import es.caib.notib.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ public class ConfigHelper {
     @Autowired
     private ConfigGroupRepository configGroupRepository;
 
+    @Transactional(readOnly = true)
     public String getConfig(String key) throws NotDefinedConfigException {
         ConfigEntity configEntity = configRepository.findOne(key);
         if (configEntity == null) {
@@ -30,6 +32,7 @@ public class ConfigHelper {
         return getConfig(configEntity);
     }
 
+    @Transactional(readOnly = true)
     public Map<String, String> getGroupProperties(String codeGroup) {
         Map<String, String> properties = new HashMap<>();
         ConfigGroupEntity configGroup = configGroupRepository.findOne(codeGroup);
@@ -37,7 +40,7 @@ public class ConfigHelper {
         return properties;
     }
 
-    public void fillGroupProperties(ConfigGroupEntity configGroup, Map<String, String> outProperties) {
+    private void fillGroupProperties(ConfigGroupEntity configGroup, Map<String, String> outProperties) {
         if (configGroup == null) {
             return;
         }

@@ -2,10 +2,12 @@ package es.caib.notib.core.config;
 
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.api.service.SchedulledService;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.PropertiesConstants;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,8 +17,6 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
 import java.util.Date;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -27,41 +27,17 @@ public class SchedulingConfig implements SchedulingConfigurer {
     SchedulledService schedulledService;
     @Autowired
     CallbackService callbackService;
+    @Autowired
+    TaskScheduler taskScheduler;
+    @Autowired
+	private ConfigHelper configHelper;
 
-    // 1. Enviament de notificacions pendents al registre y notific@
-    public static Long registrarEnviamentsPendentsRate = 120L;
-    public static Long registrarEnviamentsPendentsInitialDelay = 10L;
-
-    // 2. Enviament de notificacions registrades a Notific@
-    public static Long notificaEnviamentsRegistratsRate = 120L;
-    public static Long notificaEnviamentsRegistratsInitialDelay = 20L;
-
-    // 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
-    public static Long enviamentRefrescarEstatPendentsRate = 120L;
-    public static Long enviamentRefrescarEstatPendentsInitialDelay = 30L;
-
-    // 4. Actualització de l'estat dels enviaments amb l'estat de enviat_sir
-    public static Long enviamentRefrescarEstatEnviatSirRate = 120L;
-    public static Long enviamentRefrescarEstatEnviatSirInitialDelay = 40L;
-
-    // 5. Actualització dels procediments a partir de la informació de Rolsac
-    public static String actualitzarProcedimentsCron = "0 52 11 * * *";
-
-    // 6. Refrescar notificacions expirades
-    public static String refrescarNotificacionsExpiradesCron = "0 0 0 * * ?";
-
-    // 7. Callback de client
-    public static Long processarPendentsRate = 120L;
-    public static Long processarPendentsInitialDelay = 50L;
-
-    @Bean
-    public Executor taskExecutor() {
-        return Executors.newScheduledThreadPool(20);
-    }
+    private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
+	
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.setScheduler(taskExecutor());
+    	taskRegistrar.setScheduler(taskScheduler);
 
         // 1. Enviament de notificacions pendents al registre y notific@
         ////////////////////////////////////////////////////////////////
@@ -76,11 +52,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(registrarEnviamentsPendentsRate, TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.SECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelay);
-                        registrarEnviamentsPendentsInitialDelay = 0L;
+                        Long registrarEnviamentsPendentsInitialDelayLong = 0L; 
+                        if (primeraVez[0]) {
+                        	registrarEnviamentsPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY);
+                        	primeraVez[0] = false;
+                        }
+                        trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -100,11 +80,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(notificaEnviamentsRegistratsRate, TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.SECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelay);
-                        notificaEnviamentsRegistratsInitialDelay = 0L;
+                        Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
+                        if (primeraVez[1]) {
+                        	notificaEnviamentsRegistratsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY);
+                        	primeraVez[1] = false;
+                        }
+                        trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -124,11 +108,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(enviamentRefrescarEstatPendentsRate, TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.SECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelay);
-                        enviamentRefrescarEstatPendentsInitialDelay = 0L;
+                        Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+                        if (primeraVez[2]) {
+                        	enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY);
+                        	primeraVez[2] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -148,11 +136,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(enviamentRefrescarEstatEnviatSirRate, TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.SECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelay);
-                        enviamentRefrescarEstatEnviatSirInitialDelay = 0L;
+                        Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
+                        if (primeraVez[3]) {
+                        	enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY);
+                        	primeraVez[3] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -172,7 +164,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(actualitzarProcedimentsCron);
+                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON));
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -192,7 +184,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(refrescarNotificacionsExpiradesCron);
+                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON));
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -212,11 +204,15 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(processarPendentsRate, TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE), TimeUnit.SECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        trigger.setInitialDelay(processarPendentsInitialDelay);
-                        processarPendentsInitialDelay = 0L;
+                        Long processarPendentsInitialDelayLong = 0L;
+                        if (primeraVez[4]) {
+                        	processarPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY);
+                        	primeraVez[4] = false;
+                        }
+                        trigger.setInitialDelay(processarPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }

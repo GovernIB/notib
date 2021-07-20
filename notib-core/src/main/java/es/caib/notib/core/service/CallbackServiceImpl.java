@@ -35,9 +35,6 @@ public class CallbackServiceImpl implements CallbackService {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.callback.pendents.retard.inicial}")
 	public void processarPendents() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
