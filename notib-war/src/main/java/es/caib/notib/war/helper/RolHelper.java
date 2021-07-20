@@ -6,6 +6,7 @@ package es.caib.notib.war.helper;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +119,7 @@ public class RolHelper {
 		return ROLE_ADMIN_ORGAN.equals(getRolActual(request));
 	}
 
-	public static List<String> getRolsUsuariActual(HttpServletRequest request) {
+	public static List<String> getRolsUsuariActual(@NonNull HttpServletRequest request) {
 		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
 		List<String> rols = new ArrayList<String>();
 		boolean permisUsuariSobreEntitat = request.isUserInRole(ROLE_USUARI);

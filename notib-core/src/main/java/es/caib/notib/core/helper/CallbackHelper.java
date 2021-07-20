@@ -208,6 +208,11 @@ public class CallbackHelper {
 										 String errorDescripcio,
 										 String longErrorMessage){
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+		if (event == null) {
+			log.info(String.format("[Callback] Event [Id: %d] a eliminar de la coa d'events no trobat a la base de dades. " +
+					"Error: %s", eventId, errorDescripcio));
+			return;
+		}
 		errorDescripcio = errorDescripcio == null ? "" : errorDescripcio;
 		longErrorMessage = longErrorMessage == null ? "" : longErrorMessage;
 		event.updateCallbackClient(
