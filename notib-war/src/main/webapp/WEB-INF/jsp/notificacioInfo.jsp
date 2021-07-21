@@ -69,6 +69,21 @@ $(document).ready(function() {
 	$(document.body).on('hidden.bs.modal', function () {
 		$('.tab-content').load(location.href + " .tab-content");
 	});
+
+	$('#registrar-btn').click(function() {
+		$('#registrar-avis-user').css('display', 'inline-block');
+	    $('#registrar-btn').attr('disabled', true);
+        window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>';
+	    return false;    
+    });	
+	
+	$('#enviar-btn').click(function() {
+		$('#enviar-avis-user').css('display', 'inline-block');
+	    $('#enviar-btn').attr('disabled', true);
+        window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>';
+	    return false;    
+    });	
+	
 });
 </script>
 <style type="text/css">
@@ -114,6 +129,12 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</c:if>
+	<div id="registrar-avis-user" class="alert alert-info well-sm" role="alert" style="display: none; width: 100%">
+		<spring:message code="notificacio.info.registrar.avis.user" />
+	</div>
+	<div id="enviar-avis-user" class="alert alert-info well-sm" role="alert" style="display: none; width: 100%">
+		<spring:message code="notificacio.info.enviar.avis.user" />
+	</div>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
@@ -690,7 +711,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<a
-									href="<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>"
+									id="registrar-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.registrar.boto" />
 								</a>
@@ -707,7 +728,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<a
-									href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
+									id="enviar-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.enviar.boto" />
 								</a>
