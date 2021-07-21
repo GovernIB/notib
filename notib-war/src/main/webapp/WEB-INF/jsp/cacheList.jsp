@@ -29,6 +29,7 @@
 			<tr>
 				<th data-col-name="codi"><spring:message code="cache.list.columna.codi"/></th>
 				<th data-col-name="descripcio"><spring:message code="cache.list.columna.descripcio"/></th>
+				<th data-col-name="localHeapSize">Size (Bytes)</th>
 				<th data-col-name="codi" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a class="btn btn-warning" href="<c:url value="/cache/{{:codi}}/buidar"/>" data-toggle="ajax" data-confirm="<spring:message code="cache.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="cache.boto.esborrar"/></a></li>
