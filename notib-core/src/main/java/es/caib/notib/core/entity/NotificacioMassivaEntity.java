@@ -1,6 +1,7 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.audit.NotibAuditable;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import lombok.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Formula;

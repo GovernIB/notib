@@ -381,8 +381,9 @@ body {
 									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 									<li class="divider"></li>
 									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-									<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>
-									<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li>
+									<li class="divider"></li>
+									<li><a href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.operadorpostal"/></a></li>
+									<li><a href="<c:url value="/cie"/>"><spring:message code="decorator.menu.operadorcie"/></a></li>
 								</ul>
 							</div>
 							</c:if>
@@ -400,8 +401,8 @@ body {
 									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 									<%--<li class="divider"></li>--%>
 									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-									<%--<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>  --%>
-									<%--<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li> --%>
+									<%--<li><a href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>  --%>
+									<%--<li><a href="<c:url value="/cie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li> --%>
 								</ul>
 							</div>
 							</c:if>

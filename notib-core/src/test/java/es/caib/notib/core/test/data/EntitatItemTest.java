@@ -44,7 +44,7 @@ public class EntitatItemTest extends DatabaseItemTest<EntitatDto> {
         entitatCreate.setDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
         entitatCreate.setApiKey(ConfigTest.ENTITAT_DGTIC_KEY);
         entitatCreate.setAmbEntregaDeh(true);
-        entitatCreate.setAmbEntregaCie(true);
+//        entitatCreate.setAmbEntregaCie(true);
         TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
         tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
         entitatCreate.setTipusDocDefault(tipusDocDefault);

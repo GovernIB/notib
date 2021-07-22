@@ -5,6 +5,8 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;

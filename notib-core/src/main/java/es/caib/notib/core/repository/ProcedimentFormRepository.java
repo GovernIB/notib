@@ -51,7 +51,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
 			" and (pro.comu = :isComu or pro.comu = true)")
-	public Page<ProcedimentFormEntity> findAmbEntitatAndFiltre(
+	Page<ProcedimentFormEntity> findAmbEntitatAndFiltre(
 			@Param("entitatId") Long entitatId,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,

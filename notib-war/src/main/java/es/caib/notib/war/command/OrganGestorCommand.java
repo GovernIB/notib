@@ -1,16 +1,15 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
-
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.OrganNoRepetit;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Size;
 
 /**
  * Command per al manteniment de procediments.
@@ -34,6 +33,11 @@ public class OrganGestorCommand {
 	private String llibreNom;
 	private String oficina;
 	private String oficinaNom;
+
+	private boolean entregaCieActiva;
+	private Long operadorPostalId;
+	private Long cieId;
+
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {
 		if (dto == null) {
 			return null;

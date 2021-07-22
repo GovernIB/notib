@@ -3,25 +3,20 @@
  */
 package es.caib.notib.war.command;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.web.multipart.MultipartFile;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.EntitatValorsNoRepetits;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Command per al manteniment d'entitats.
@@ -42,11 +37,10 @@ public class EntitatCommand {
 	@NotEmpty
 	@Size(max=9)
 	private String dir3Codi;
+	private String dir3CodiReg;
 	@NotEmpty
 	private String apiKey;
-	private String dir3CodiReg;
 	private boolean ambEntregaDeh;
-	private boolean ambEntregaCie;
 	private String descripcio;
 	private MultipartFile logoCap;
 	private boolean eliminarLogoCap;
@@ -58,15 +52,19 @@ public class EntitatCommand {
 	private String[] tipusDocName;
 	private String tipusDocDefault;
 	private String tipusDocDefaultSelected;
-	private String oficina;
-	private String nomOficinaVirtual;
-	
+
+	private boolean entregaCieActiva;
+	private Long operadorPostalId;
+	private Long cieId;
+
 	private boolean llibreEntitat;
 	private String llibre;
 	private String llibreNom;
 	
 	private boolean oficinaEntitat = true;
-	
+	private String oficina;
+	private String nomOficinaVirtual;
+
 	public String getLlibreCodiNom() {
 		if (llibre != null)
 			return llibre + " - " + (llibreNom != null ? llibreNom : "");
@@ -103,31 +101,31 @@ public class EntitatCommand {
 		}
 		return entitat;
 	}
-	public static EntitatDto asDto(EntitatCommand command) throws IOException {
-		EntitatDto entitat = ConversioTipusHelper.convertir(
-				command,
-				EntitatDto.class);
+	public EntitatDataDto asDto() throws IOException {
+		EntitatDataDto entitat = ConversioTipusHelper.convertir(
+				this,
+				EntitatDataDto.class);
 		List<TipusDocumentDto> tipusDocuments = new ArrayList<TipusDocumentDto>();
 		TipusDocumentDto tipusDocumentDefault = new TipusDocumentDto();
-		entitat.setLogoCapBytes(command.getLogoCap().getBytes());
-		entitat.setLogoPeuBytes(command.getLogoPeu().getBytes());
+		entitat.setLogoCapBytes(this.getLogoCap().getBytes());
+		entitat.setLogoPeuBytes(this.getLogoPeu().getBytes());
 		
-		if (command.getTipusDocName() != null) {
-			for (String tipusDocumentStr : command.getTipusDocName()) {
+		if (this.getTipusDocName() != null) {
+			for (String tipusDocumentStr : this.getTipusDocName()) {
 				TipusDocumentEnumDto tipusDocumentEnum = TipusDocumentEnumDto.valueOf(tipusDocumentStr);
 				TipusDocumentDto tipusDocument = new TipusDocumentDto();
 				tipusDocument.setTipusDocEnum(tipusDocumentEnum);
 				tipusDocuments.add(tipusDocument);
 			}
 		}
-		if (command.getTipusDocDefault() != null && !command.getTipusDocDefault().isEmpty()) {
-			TipusDocumentEnumDto tipusDocumentDefaultEnum = TipusDocumentEnumDto.valueOf(command.getTipusDocDefault());
+		if (this.getTipusDocDefault() != null && !this.getTipusDocDefault().isEmpty()) {
+			TipusDocumentEnumDto tipusDocumentDefaultEnum = TipusDocumentEnumDto.valueOf(this.getTipusDocDefault());
 			tipusDocumentDefault.setTipusDocEnum(tipusDocumentDefaultEnum);
 		}
 		entitat.setTipusDocDefault(tipusDocumentDefault);
 		entitat.setTipusDoc(tipusDocuments);
 		
-		if (!command.isLlibreEntitat()) {
+		if (!this.isLlibreEntitat()) {
 			entitat.setLlibre(null);
 			entitat.setLlibreNom(null);
 		}

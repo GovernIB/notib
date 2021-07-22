@@ -1,9 +1,7 @@
 package es.caib.notib.war.command;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.PagadorCieDto;
-import es.caib.notib.core.api.dto.PagadorPostalDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidProcediment;
 import lombok.Getter;
@@ -30,8 +28,8 @@ public class ProcedimentCommand {
 	private String nom;
 	private Long entitatId;
 	private String entitatNom;
-	private Long pagadorPostalId;
-	private Long pagadorCieId;	
+//	private Long pagadorPostalId;
+//	private Long pagadorCieId;
 	private boolean agrupar;
 	private boolean consulta;
 	private boolean processar;
@@ -49,6 +47,10 @@ public class ProcedimentCommand {
 	private int caducitat;
 	private boolean comu;
 	protected boolean requireDirectPermission;
+
+	private boolean entregaCieActiva;
+	private Long operadorPostalId;
+	private Long cieId;
 
 	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
 		if (dto == null) {
@@ -71,19 +73,19 @@ public class ProcedimentCommand {
 		entitatDto.setId(command.getEntitatId());
 		dto.setEntitat(entitatDto);
 
-		PagadorPostalDto pagadoPostalDto = null;
-		if (command.getPagadorPostalId() != null) {
-			pagadoPostalDto = new PagadorPostalDto();
-			pagadoPostalDto.setId(command.getPagadorPostalId());
-		}
-		dto.setPagadorpostal(pagadoPostalDto);
-
-		PagadorCieDto pagadorCieDto = null;
-		if (command.getPagadorCieId() != null) {
-			pagadorCieDto = new PagadorCieDto();
-			pagadorCieDto.setId(command.getPagadorCieId());
-		}
-		dto.setPagadorcie(pagadorCieDto);
+//		OperadorPostalDto pagadoPostalDto = null;
+//		if (command.getPagadorPostalId() != null) {
+//			pagadoPostalDto = new OperadorPostalDto();
+//			pagadoPostalDto.setId(command.getPagadorPostalId());
+//		}
+//		dto.setPagadorpostal(pagadoPostalDto);
+//
+//		CieDto cieDto = null;
+//		if (command.getPagadorCieId() != null) {
+//			cieDto = new CieDto();
+//			cieDto.setId(command.getPagadorCieId());
+//		}
+//		dto.setPagadorcie(cieDto);
 		return dto;
 	}
 

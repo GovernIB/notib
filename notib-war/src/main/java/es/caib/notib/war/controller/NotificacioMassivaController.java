@@ -8,7 +8,7 @@ import es.caib.notib.core.api.exception.MaxLinesExceededException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GestioDocumentalService;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
-import es.caib.notib.core.api.service.PagadorPostalService;
+import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.NotificacioMassivaCommand;
 import es.caib.notib.war.command.NotificacioMassivaFiltreCommand;
@@ -52,7 +52,7 @@ public class NotificacioMassivaController extends BaseUserController {
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
     @Autowired
-    private PagadorPostalService pagadorPostalService;
+    private OperadorPostalService operadorPostalService;
     @Autowired
     private NotificacioListHelper notificacioListHelper;
     @Autowired
@@ -283,12 +283,12 @@ public class NotificacioMassivaController extends BaseUserController {
                                              HttpServletRequest request,
                                              Model model) {
         OrganGestorDto organGestorActual = getOrganGestorActual(request);
-        if (organGestorActual != null) {
-            model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
-        } else {
-            model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
-        }
-        model.addAttribute("mostrarPagadorPostal", entitat.isAmbEntregaCie());
+//        if (organGestorActual != null) {
+//            model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
+//        } else {
+            model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitat(entitat.getId()));
+//        }
+//        model.addAttribute("mostrarPagadorPostal", entitat.isAmbEntregaCie());
         return "notificacioMassivaForm";
     }
     @RequestMapping(value = "/new", method = RequestMethod.POST)

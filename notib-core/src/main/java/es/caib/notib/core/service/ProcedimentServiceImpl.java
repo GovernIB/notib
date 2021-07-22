@@ -6,6 +6,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -18,6 +19,9 @@ import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
@@ -78,7 +82,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Resource
 	private OrganigramaHelper organigramaHelper;
 	@Resource
-	MessageHelper messageHelper;
+	private MessageHelper messageHelper;
 	@Resource
 	private IntegracioHelper integracioHelper;
 	@Resource
@@ -95,6 +99,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private EntregaCieRepository entregaCieRepository;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -103,23 +109,15 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Transactional
 	public ProcedimentDto create(
 			Long entitatId,
-			ProcedimentDto procediment) {
+			ProcedimentDataDto procediment) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Creant un nou procediment ("
 					+ "procediment=" + procediment + ")");
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			PagadorPostalEntity pagadorPostal = null;
-			PagadorCieEntity pagadorCie = null;
-			if (procediment.getPagadorpostal() != null) {
-				pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
-						procediment.getPagadorpostal().getId());
-			}
-			if (procediment.getPagadorcie() != null) {
-				pagadorCie = entityComprovarHelper.comprovarPagadorCie(
-						procediment.getPagadorcie().getId());
-			}
+			EntregaCieEntity entregaCie = procediment.isEntregaCieActiva() ? new EntregaCieEntity(
+					procediment.getCieId(), procediment.getOperadorPostalId()) : null;
 			
 			// Organ gestor
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor()); 
@@ -134,8 +132,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							procediment.getRetard(),
 							procediment.getCaducitat(),
 							entitat,
-							pagadorPostal,
-							pagadorCie,
+							entregaCieRepository.save(entregaCie),
 							procediment.isAgrupar(),
 							organGestor,
 							procediment.getTipusAssumpte(),
@@ -158,7 +155,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Transactional
 	public ProcedimentDto update(
 			Long entitatId,
-			ProcedimentDto procediment,
+			ProcedimentDataDto procediment,
 			boolean isAdmin,
 			boolean isAdminEntitat) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -189,14 +186,16 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			} else {
 				procedimentEntity = procedimentRepository.findOne(procediment.getId());
 			}
-			
-			if (procediment.getPagadorpostal() != null) {
-				pagadorPostal = entityComprovarHelper.comprovarPagadorPostal(
-						procediment.getPagadorpostal().getId());
-			}
-			if (procediment.getPagadorcie() != null) {
-				pagadorCie = entityComprovarHelper.comprovarPagadorCie(
-						procediment.getPagadorcie().getId());
+
+			EntregaCieEntity entregaCie = procedimentEntity.getEntregaCie();
+			if (procediment.isEntregaCieActiva()) {
+				if (entregaCie == null) {
+					entregaCie = entregaCieRepository.save(
+							new EntregaCieEntity(procediment.getCieId(), procediment.getOperadorPostalId())
+					);
+				} else {
+					entregaCie.update(procediment.getCieId(), procediment.getOperadorPostalId());
+				}
 			}
 			
 			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procedimentEntity);
@@ -237,8 +236,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getCodi(),
 						procediment.getNom(),
 						entitat,
-						pagadorPostal,
-						pagadorCie,
+						entregaCie,
 						procediment.getRetard(),
 						procediment.getCaducitat(),
 						procediment.isAgrupar(),

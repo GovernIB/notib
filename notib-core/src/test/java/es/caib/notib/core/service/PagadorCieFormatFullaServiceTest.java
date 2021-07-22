@@ -1,6 +1,8 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.CieDto;
+import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.helper.PermisosHelper;
 import org.junit.Before;
@@ -26,9 +28,9 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 
 	private EntitatDto entitatCreate;
 	private PermisDto permisAdmin;
-	private PagadorCieDto createPagadorCie;
-	private PagadorCieFormatFullaDto createPagadorCieFormatFulla;
-	private PagadorCieFormatFullaDto updatePagadorCieFormatFulla;
+	private CieDto createPagadorCie;
+	private CieFormatFullaDto createPagadorCieFormatFulla;
+	private CieFormatFullaDto updatePagadorCieFormatFulla;
 	
 
 	@Autowired
@@ -45,7 +47,7 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 		entitatCreate.setDir3Codi("23599770E");
 		entitatCreate.setApiKey("123abc");
 		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
+//		entitatCreate.setAmbEntregaCie(true);
 		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
 		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
 		entitatCreate.setTipusDocDefault(tipusDocDefault);
@@ -57,14 +59,14 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 		permisAdmin.setPrincipal("admin");
 		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
 		
-		createPagadorCie=new PagadorCieDto();
-		createPagadorCie.setDir3codi("A04027005");
+		createPagadorCie=new CieDto();
+		createPagadorCie.setOrganismePagadorCodi("A04027005");
 		createPagadorCie.setContracteDataVig(new Date());
 		
-		createPagadorCieFormatFulla=new PagadorCieFormatFullaDto();
+		createPagadorCieFormatFulla=new CieFormatFullaDto();
 		createPagadorCieFormatFulla.setCodi("122");
 		
-		updatePagadorCieFormatFulla=new PagadorCieFormatFullaDto();
+		updatePagadorCieFormatFulla=new CieFormatFullaDto();
 		updatePagadorCieFormatFulla.setCodi("12333");
 	}
 	
@@ -75,8 +77,8 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats) throws Exception {
-					PagadorCieDto pagadorCieCreat = (PagadorCieDto)elementsCreats.get(1);
-					PagadorCieFormatFullaDto formatFullaCreada = (PagadorCieFormatFullaDto)elementsCreats.get(2);
+					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
+					CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto)elementsCreats.get(2);
 					
 					assertNotNull(formatFullaCreada);
 					assertNotNull(formatFullaCreada.getId());
@@ -100,12 +102,12 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					PagadorCieDto pagadorCieCreat = (PagadorCieDto)elementsCreats.get(1);
-					PagadorCieFormatFullaDto formatCreat = (PagadorCieFormatFullaDto)elementsCreats.get(2);
+					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
+					CieFormatFullaDto formatCreat = (CieFormatFullaDto)elementsCreats.get(2);
 					autenticarUsuari("admin");
 
 					updatePagadorCieFormatFulla.setId(formatCreat.getId());
-					PagadorCieFormatFullaDto formatModificat = pagadorCieFormatFullaService.update(
+					CieFormatFullaDto formatModificat = pagadorCieFormatFullaService.update(
 							updatePagadorCieFormatFulla);	
 					
 					assertNotNull(formatModificat);
@@ -132,10 +134,10 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					PagadorCieFormatFullaDto formatCreat = (PagadorCieFormatFullaDto)elementsCreats.get(2);
+					CieFormatFullaDto formatCreat = (CieFormatFullaDto)elementsCreats.get(2);
 					autenticarUsuari("admin");
 
-					PagadorCieFormatFullaDto formatBorrat = pagadorCieFormatFullaService.delete(
+					CieFormatFullaDto formatBorrat = pagadorCieFormatFullaService.delete(
 							formatCreat.getId());
 					comprobarPagadorCieFormatFulla(
 							createPagadorCieFormatFulla,
@@ -162,9 +164,9 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
 					autenticarUsuari("admin");
-					PagadorCieFormatFullaDto formatCreat = (PagadorCieFormatFullaDto)elementsCreats.get(2);
+					CieFormatFullaDto formatCreat = (CieFormatFullaDto)elementsCreats.get(2);
 					
-					PagadorCieFormatFullaDto formatTrobat = pagadorCieFormatFullaService.findById(
+					CieFormatFullaDto formatTrobat = pagadorCieFormatFullaService.findById(
 							formatCreat.getId());
 					
 					assertNotNull(formatTrobat);
@@ -181,8 +183,8 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
 	}
 
 	private void comprobarPagadorCieFormatFulla(
-			PagadorCieFormatFullaDto original,
-			PagadorCieFormatFullaDto perComprovar) {
+			CieFormatFullaDto original,
+			CieFormatFullaDto perComprovar) {
 		assertEquals(
 				original.getCodi(),
 				perComprovar.getCodi());

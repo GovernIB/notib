@@ -173,6 +173,18 @@ $(document).ready(function() {
 	});
  	$('#oficinaEntitat').trigger("change");
 	loadOficines();
+
+	$('#entregaCieActiva').change(function() {
+		if (this.checked) {
+			$('#entrega-cie-form').show();
+		} else {
+			$('#entrega-cie-form').hide();
+		}
+	});
+
+	if (!$('#entregaCieActiva')[0].checked) {
+		$('#entrega-cie-form').hide();
+	}
 });	
 
 function loadOficines() {
@@ -256,7 +268,15 @@ function updateLlibre(dir3codi) {
 			<not:inputText name="dir3CodiReg" textKey="entitat.form.camp.codidir3reg" info="true" messageInfo="entitat.form.camp.codidir3reg.info"/>
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
-			<not:inputCheckbox name="ambEntregaCie" textKey="entitat.form.camp.entregacie"/>
+			<not:inputCheckbox name="entregaCieActiva" textKey="entitat.form.camp.entregacie"/>
+			<div id="entrega-cie-form">
+				<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
+								 optionTextAttribute="text" required="true" emptyOption="true"
+								 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id"
+								 optionTextAttribute="text" required="true" emptyOption="true"
+								 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+			</div>
 			<not:inputCheckbox name="llibreEntitat" textKey="entitat.form.camp.llibreEntitat"/>
 			<div id="llibre-entitat">
 				<div class="form-group">

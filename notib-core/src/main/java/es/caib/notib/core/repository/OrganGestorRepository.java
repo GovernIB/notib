@@ -81,8 +81,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))"+
-			" and (:isEstatNull = true or og.estat = :estat)")
-	public Page<OrganGestorEntity> findByEntitatAndFiltre(
+			" and (:isEstatNull = true or og.estat = :estat)" +
+			" and (:isEntregaCieActiva = false or og.entregaCie is not null)")
+	Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
@@ -92,13 +93,14 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("oficina") String oficina,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") OrganGestorEstatEnum estat,
+			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			Pageable paginacio);
 	
 	@Query( "select distinct og " +
 			"from OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
 			"and og.codi in (:organsIds)")
-	public Page<OrganGestorEntity> findByEntitatAndOrganGestor(
+	Page<OrganGestorEntity> findByEntitatAndOrganGestor(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
 			Pageable paginacio);
@@ -107,7 +109,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"from OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
 			"and og.codi in (:organsIds)")
-	public List<OrganGestorEntity> findByEntitatAndOrgansGestors(
+	List<OrganGestorEntity> findByEntitatAndOrgansGestors(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs);
 	
@@ -119,7 +121,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))" +
 			" and (:isEstatNull = true or og.estat = :estat)")
-	public Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
+	Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
 			@Param("isCodiNull") boolean isCodiNull,

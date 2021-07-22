@@ -1,6 +1,8 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
 import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -37,7 +39,7 @@ public class AuditServiceImpl implements AuditService {
 	private NotificacioHelper notificacioHelper;
 	
 	@Override
-	@Transactional(propagation = Propagation.MANDATORY)
+	@Transactional(propagation = Propagation.MANDATORY) // A JBoss ha de ser Propagation.MANDATORY, a tomcat Propagation.REQUIRED
 	public void audita(
 			Object objecteAuditar,
 			TipusOperacio tipusOperacio,

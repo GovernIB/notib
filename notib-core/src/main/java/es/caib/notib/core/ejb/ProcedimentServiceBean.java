@@ -5,6 +5,7 @@ package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto create(
 			Long entitatId, 
-			ProcedimentDto procediment) {
+			ProcedimentDataDto procediment) {
 		return delegate.create(
 				entitatId, 
 				procediment);
@@ -41,8 +42,8 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto update(
-			Long entitatId, 
-			ProcedimentDto procediment,
+			Long entitatId,
+			ProcedimentDataDto procediment,
 			boolean isAdmin,
 			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.update(
@@ -112,7 +113,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			boolean isUsuariEntitat,
 			boolean isAdministrador, 
 			OrganGestorDto organGestorActual,
-			ProcedimentFiltreDto filtre, 
+			ProcedimentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
 				entitatId, 

@@ -3,16 +3,18 @@
  */
 package es.caib.notib.war.controller;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OperadorPostalService;
+import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.war.command.EntitatCommand;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.MessageHelper;
+import es.caib.notib.war.helper.RolHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,21 +28,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import es.caib.notib.core.api.dto.CodiValorDescDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.organisme.OrganismeDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.war.command.EntitatCommand;
-import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.EntitatHelper;
-import es.caib.notib.war.helper.MessageHelper;
-import es.caib.notib.war.helper.RolHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -53,6 +48,10 @@ public class EntitatController extends BaseController {
 		
 	@Autowired
 	private EntitatService entitatService;
+	@Autowired
+	private OperadorPostalService operadorPostalService;
+	@Autowired
+	private PagadorCieService cieService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( 
@@ -105,6 +104,10 @@ public class EntitatController extends BaseController {
 			model.addAttribute(new EntitatCommand());
 		}
 		model.addAttribute("TipusDocumentEnumDto", TipusDocumentEnumDto.class);
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		model.addAttribute("operadorPostalList", operadorPostalList);
+		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}
 	@RequestMapping(method = RequestMethod.POST)
@@ -118,14 +121,14 @@ public class EntitatController extends BaseController {
 			return "entitatForm";
 		}
 		if (command.getId() != null) {
-			entitatService.update(EntitatCommand.asDto(command));
+			entitatService.update(command.asDto());
 			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:entitat" + (isAdminEntitat ? "/" + command.getId() : ""),
 					"entitat.controller.modificada.ok");
 		} else {
-			entitatService.create(EntitatCommand.asDto(command));
+			entitatService.create(command.asDto());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:entitat",

@@ -135,11 +135,17 @@ pageContext.setAttribute(
 							<span class="fa fa-warning text-danger" title="<spring:message code='procediment.list.columna.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
 				</th>
-				<th data-col-name="pagadorpostal"><spring:message code="procediment.list.columna.pagadorpostal"/></th>
-				<th data-col-name="pagadorcie"><spring:message code="procediment.list.columna.pagadorcie"/></th>
-				<th data-col-name="comu" data-template="#cellActivaTemplate">
-					<spring:message code="procediment.list.columna.comu"/>
+				<th data-col-name="entregaCieActiva" data-template="#cellActivaTemplate">
+					<spring:message code="organgestor.list.columna.cie"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
+						{{if entregaCieActiva > 0}}<span class="fa fa-check"></span>{{/if}}
+						{{if entregaCieActiva == 2}}<span class="label label-info"><spring:message code="procediment.list.columna.cie.organ"/></span>{{/if}}
+						{{if entregaCieActiva == 3}}<span class="label label-info"><spring:message code="procediment.list.columna.cie.entitat"/></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="comu" data-template="#cellComuTemplate">
+					<spring:message code="procediment.list.columna.comu"/>
+					<script id="cellComuTemplate" type="text/x-jsrender">
 						{{if comu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>

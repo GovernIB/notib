@@ -1,6 +1,6 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDataDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDto;
 import es.caib.notib.core.api.service.NotificacioMassivaService;

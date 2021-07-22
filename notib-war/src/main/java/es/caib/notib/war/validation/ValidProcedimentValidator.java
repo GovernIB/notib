@@ -1,6 +1,6 @@
 package es.caib.notib.war.validation;
 
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcedimentCommand;
 import es.caib.notib.war.helper.MessageHelper;

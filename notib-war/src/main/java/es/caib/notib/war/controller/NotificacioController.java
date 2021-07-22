@@ -1,12 +1,17 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
+import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -1009,11 +1014,12 @@ public class NotificacioController extends BaseUserController {
         if (procedimentActual.isAgrupar()) {
             dadesProcediment.setGrups(grupService.findByProcedimentAndUsuariGrups(procedimentId));
         }
-        if (procedimentActual.getPagadorcie() != null) {
-            dadesProcediment.setFormatsSobre(pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getPagadorcie().getId()));
-            dadesProcediment.setFormatsFulla(pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getPagadorcie().getId()));
+        if (procedimentActual.isEntregaCieActiva()) {
+            dadesProcediment.setFormatsSobre(pagadorCieFormatSobreService.findFormatSobreByPagadorCie(procedimentActual.getCieId()));
+            dadesProcediment.setFormatsFulla(pagadorCieFormatFullaService.findFormatFullaByPagadorCie(procedimentActual.getCieId()));
         }
         dadesProcediment.setComu(procedimentActual.isComu());
+        dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
 
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
@@ -1255,97 +1261,14 @@ public class NotificacioController extends BaseUserController {
                 tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
             }
         }
-        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat", "true"));
-        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple", "false"));
-        model.addAttribute("notificacioCommandV2", notificacio);
-        model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
-        model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
+
         model.addAttribute("entitat", entitatActual);
+        model.addAttribute("notificacioCommandV2", notificacio);
 
-        List<ProcedimentSimpleDto> procedimentsDisponibles = new ArrayList<>();
-        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
-        if (RolHelper.isUsuariActualUsuari(request)) {
-	        procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
-	                entitatActual.getId(),
-	                usuariActual.getCodi(),
-	                PermisEnum.NOTIFICACIO);
-
-	        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
-	                entitatActual.getId(),
-	                usuariActual.getCodi(),
-	                PermisEnum.NOTIFICACIO);
-
-	        procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
-
-	        if (procedimentsDisponibles.isEmpty()) {
-	            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
-	        }
-
-	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
-	                entitatActual,
-	                procedimentsDisponibles,
-	                procedimentsOrgansDisponibles,
-                    PermisEnum.NOTIFICACIO);
-        } else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-        	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
-        	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
-        } else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-        	OrganGestorDto organGestorActual = getOrganGestorActual(request);
-            procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
-            organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
-        }
-        model.addAttribute("organsGestors", organsGestors);
-        if (organsGestors == null || organsGestors.isEmpty()) {
-            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
-        } else {
-            model.addAttribute("procediments", procedimentsDisponibles);
-        }
+        fillNotificacioModel(request, entitatActual, model, usuariActual);
 
         model.addAttribute("amagat", Boolean.FALSE);
-
-        model.addAttribute("comunicacioTipus",
-                EnumHelper.getOptionsForEnum(
-                        NotificacioComunicacioTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
-        model.addAttribute("enviamentTipus",
-                EnumHelper.getOptionsForEnum(
-                        NotificaEnviamentTipusEnumDto.class,
-                        "notificacio.tipus.enviament.enum."));
-        model.addAttribute("serveiTipus",
-                EnumHelper.getOptionsForEnum(
-                        ServeiTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
-        model.addAttribute("interessatTipus",
-                EnumHelper.getOrderedOptionsForEnum(
-                        InteressatTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
-                        new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA}));
-        model.addAttribute("entregaPostalTipus",
-                EnumHelper.getOptionsForEnum(
-                        NotificaDomiciliConcretTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
-        model.addAttribute("registreDocumentacioFisica",
-                EnumHelper.getOptionsForEnum(
-                        RegistreDocumentacioFisicaEnumDto.class,
-                        "es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
-        model.addAttribute("idioma",
-                EnumHelper.getOptionsForEnum(
-                        IdiomaEnumDto.class,
-                        "es.caib.notib.core.api.dto.idiomaEnumDto."));
-        model.addAttribute("origens",
-                EnumHelper.getOptionsForEnum(
-                        OrigenEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.OrigenEnum."));
-        model.addAttribute("valideses",
-                EnumHelper.getOptionsForEnum(
-                        ValidesaEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.ValidesaEnum."));
-        model.addAttribute("tipusDocumentals",
-                EnumHelper.getOptionsForEnum(
-                        TipusDocumentalEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum."));
-
         try {
             model.addAttribute("concepteSize", notificacio.getConcepteDefaultSize());
             model.addAttribute("descripcioSize", notificacio.getDescripcioDefaultSize());
@@ -1455,88 +1378,15 @@ public class NotificacioController extends BaseUserController {
                     notificacioCommand.setTipusDocumentDefault(i, tipusDocumentDefault.name());
             }
         }
-
-        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat", "true"));
-        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple", "false"));
-        model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
-        model.addAttribute("ambEntregaCie", entitatActual.isAmbEntregaCie());
         model.addAttribute("tipusDocumentEnumDto", tipusDocumentEnumDto);
-        model.addAttribute("dir3Codi", entitatActual.getId());
-        //model.addAttribute("procediments", procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO));
-        //model.addAttribute("organsGestors", organGestorService.findOrganismes(entitatActual));
-        List<ProcedimentSimpleDto> procedimentsDisponibles;
-        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>();
-        if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
-	       	procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
-	                entitatActual.getId(),
-	                usuariActual.getCodi(),
-	                PermisEnum.NOTIFICACIO);
-	        List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
-	                entitatActual.getId(),
-	                usuariActual.getCodi(),
-	                PermisEnum.NOTIFICACIO);
-	        addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
 
-	        organsGestors = recuperarOrgansPerProcedimentAmbPermis(
-	                entitatActual,
-	                procedimentsDisponibles,
-	                procedimentsOrgansDisponibles,
-                    PermisEnum.NOTIFICACIO);
-        } else {
-        	procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
-        	organsGestors = organGestorService.findByEntitat(entitatActual.getId());
-        }
-        model.addAttribute("procediments", procedimentsDisponibles);
-        if (procedimentsDisponibles.isEmpty()) {
-            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
-        }
-        model.addAttribute("organsGestors", organsGestors);
+        model.addAttribute("dir3Codi", entitatActual.getId());
+
+        fillNotificacioModel(request, entitatActual, model, usuariActual);
 
         if (procedimentActual != null) {
-        	 model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
+            model.addAttribute("grups", grupService.findByProcedimentAndUsuariGrups(procedimentActual.getId()));
         }
-
-        model.addAttribute("comunicacioTipus",
-                EnumHelper.getOptionsForEnum(
-                        NotificacioComunicacioTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
-        model.addAttribute("enviamentTipus",
-                EnumHelper.getOptionsForEnum(
-                        NotificaEnviamentTipusEnumDto.class,
-                        "notificacio.tipus.enviament.enum."));
-        model.addAttribute("serveiTipus",
-                EnumHelper.getOptionsForEnum(
-                        ServeiTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
-        model.addAttribute("interessatTipus",
-                EnumHelper.getOrderedOptionsForEnum(
-                        InteressatTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
-                        new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA}));
-        model.addAttribute("entregaPostalTipus",
-                EnumHelper.getOptionsForEnum(
-                        NotificaDomiciliConcretTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
-        model.addAttribute("registreDocumentacioFisica",
-                EnumHelper.getOptionsForEnum(
-                        RegistreDocumentacioFisicaEnumDto.class,
-                        "es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
-        model.addAttribute("idioma",
-                EnumHelper.getOptionsForEnum(
-                        IdiomaEnumDto.class,
-                        "es.caib.notib.core.api.dto.idiomaEnumDto."));
-        model.addAttribute("origens",
-                EnumHelper.getOptionsForEnum(
-                        OrigenEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.OrigenEnum."));
-        model.addAttribute("valideses",
-                EnumHelper.getOptionsForEnum(
-                        ValidesaEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.ValidesaEnum."));
-        model.addAttribute("tipusDocumentals",
-                EnumHelper.getOptionsForEnum(
-                        TipusDocumentalEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum."));
 
         model.addAttribute("enviosGuardats", notificacioCommand.getEnviaments());
         model.addAttribute("tipusDocument", notificacioCommand.getTipusDocument());
@@ -1597,6 +1447,98 @@ public class NotificacioController extends BaseUserController {
 
     }
 
+    private void fillNotificacioModel(HttpServletRequest request, EntitatDto entitatActual, Model model, UsuariDto usuariActual) {
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        List<ProcedimentSimpleDto> procedimentsDisponibles;
+        List<OrganGestorDto> organsGestors;
+        if (RolEnumDto.NOT_ADMIN.equals(rol)) {
+            procedimentsDisponibles = procedimentService.findByEntitat(entitatActual.getId());
+            organsGestors = organGestorService.findByEntitat(entitatActual.getId());
+
+        } else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
+            OrganGestorDto organGestorActual = getOrganGestorActual(request);
+            procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
+            organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
+
+        } else { // Rol usuari o altres
+            procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(
+                    entitatActual.getId(),
+                    usuariActual.getCodi(),
+                    PermisEnum.NOTIFICACIO);
+
+            List<ProcedimentOrganDto> procedimentsOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(
+                    entitatActual.getId(),
+                    usuariActual.getCodi(),
+                    PermisEnum.NOTIFICACIO);
+
+            procedimentsDisponibles = addProcedimentsOrgan(procedimentsDisponibles, procedimentsOrgansDisponibles);
+
+            organsGestors = recuperarOrgansPerProcedimentAmbPermis(
+	                entitatActual,
+	                procedimentsDisponibles,
+	                procedimentsOrgansDisponibles,
+                    PermisEnum.NOTIFICACIO);
+        }
+
+        if (procedimentsDisponibles.isEmpty()) {
+            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
+        }
+
+        if (organsGestors == null || organsGestors.isEmpty()) {
+            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
+        }
+
+        model.addAttribute("organsGestors", organsGestors);
+        model.addAttribute("procediments", procedimentsDisponibles);
+
+
+        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat", "true"));
+        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple", "false"));
+        model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
+
+        model.addAttribute("comunicacioTipus",
+                EnumHelper.getOptionsForEnum(
+                        NotificacioComunicacioTipusEnumDto.class,
+                        "es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
+        model.addAttribute("enviamentTipus",
+                EnumHelper.getOptionsForEnum(
+                        NotificaEnviamentTipusEnumDto.class,
+                        "notificacio.tipus.enviament.enum."));
+        model.addAttribute("serveiTipus",
+                EnumHelper.getOptionsForEnum(
+                        ServeiTipusEnumDto.class,
+                        "es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
+        model.addAttribute("interessatTipus",
+                EnumHelper.getOrderedOptionsForEnum(
+                        InteressatTipusEnumDto.class,
+                        "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
+                        new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA}));
+        model.addAttribute("entregaPostalTipus",
+                EnumHelper.getOptionsForEnum(
+                        NotificaDomiciliConcretTipusEnumDto.class,
+                        "es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto."));
+        model.addAttribute("registreDocumentacioFisica",
+                EnumHelper.getOptionsForEnum(
+                        RegistreDocumentacioFisicaEnumDto.class,
+                        "es.caib.notib.core.api.dto.registreDocumentacioFisicaEnumDto."));
+        model.addAttribute("idioma",
+                EnumHelper.getOptionsForEnum(
+                        IdiomaEnumDto.class,
+                        "es.caib.notib.core.api.dto.idiomaEnumDto."));
+        model.addAttribute("origens",
+                EnumHelper.getOptionsForEnum(
+                        OrigenEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.OrigenEnum."));
+        model.addAttribute("valideses",
+                EnumHelper.getOptionsForEnum(
+                        ValidesaEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.ValidesaEnum."));
+        model.addAttribute("tipusDocumentals",
+                EnumHelper.getOptionsForEnum(
+                        TipusDocumentalEnum.class,
+                        "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum."));
+    }
+
 
     private boolean isAdministrador(HttpServletRequest request) {
         return RolHelper.isUsuariActualAdministrador(request);
@@ -1620,11 +1562,12 @@ public class NotificacioController extends BaseUserController {
         private List<String> organsDisponibles;
         private boolean agrupable = false;
         private List<GrupDto> grups = new ArrayList<GrupDto>();
-        private List<PagadorCieFormatSobreDto> formatsSobre = new ArrayList<PagadorCieFormatSobreDto>();
-        private List<PagadorCieFormatFullaDto> formatsFulla = new ArrayList<PagadorCieFormatFullaDto>();
+        private List<CieFormatSobreDto> formatsSobre = new ArrayList<CieFormatSobreDto>();
+        private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
         private boolean comu;
+        private boolean entregaCieActiva;
 
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
         public void setCaducitat(Date data) {
             this.caducitat = format.format(data);

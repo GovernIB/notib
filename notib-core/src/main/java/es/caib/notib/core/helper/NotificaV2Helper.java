@@ -13,6 +13,8 @@ import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
@@ -638,22 +640,27 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					
 					if (enviament.getDomiciliConcretTipus() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
-						if (notificacio.getProcediment() != null && notificacio.getProcediment().getPagadorpostal() != null) {
-							OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
-							pagadorPostal.setCodigoDIR3Postal(notificacio.getProcediment().getPagadorpostal().getDir3codi());
-							pagadorPostal.setCodClienteFacturacionPostal(notificacio.getProcediment().getPagadorpostal().getFacturacioClientCodi());
-							pagadorPostal.setNumContratoPostal(notificacio.getProcediment().getPagadorpostal().getContracteNum());
-							pagadorPostal.setFechaVigenciaPostal(
-								toXmlGregorianCalendar(notificacio.getProcediment().getPagadorpostal().getContracteDataVig()));
-							entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
+						ProcedimentEntity procedimentNotificacio = notificacio.getProcediment();
+						if (procedimentNotificacio != null && procedimentNotificacio.getEntregaCie() != null) {
+							EntregaCieEntity entregaCieEntity = procedimentNotificacio.getEntregaCie();
+							if (entregaCieEntity.getOperadorPostal() != null) {
+								OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
+								pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganismePagadorCodi());
+								pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
+								pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
+								pagadorPostal.setFechaVigenciaPostal(
+										toXmlGregorianCalendar(entregaCieEntity.getOperadorPostal().getContracteDataVig()));
+								entregaPostal.setOrganismoPagadorPostal(pagadorPostal);
+							}
+							if (entregaCieEntity.getCie() != null) {
+								OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
+								pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganismePagadorCodi());
+								pagadorCie.setFechaVigenciaCIE(
+										toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
+								entregaPostal.setOrganismoPagadorCIE(pagadorCie);
+							}
 						}
-						if (notificacio.getProcediment() != null && notificacio.getProcediment().getPagadorcie() != null) {
-							OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
-							pagadorCie.setCodigoDIR3CIE(notificacio.getProcediment().getPagadorcie().getDir3codi());
-							pagadorCie.setFechaVigenciaCIE(
-								toXmlGregorianCalendar(notificacio.getProcediment().getPagadorcie().getContracteDataVig()));
-							entregaPostal.setOrganismoPagadorCIE(pagadorCie);
-						}
+
 						if (enviament.getDomiciliConcretTipus() != null) {
 							switch (enviament.getDomiciliConcretTipus())  {
 							case NACIONAL:

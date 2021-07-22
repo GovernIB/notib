@@ -202,6 +202,53 @@
 <body>
 <c:url var="urlOrganigrama" value="/entitat/organigrama/"/>
 <script type="text/javascript">
+	var viewModel = {
+		ambEntregaCIEInternal: 10,
+		ambEntregaDEHInternal: '${ambEntregaDeh}' === 'true',
+		ambEntregaCIEListener: function(val) {},
+		set ambEntregaCIE(val) {
+			this.ambEntregaCIEInternal = val;
+			this.ambEntregaCIEListener(val);
+		},
+		get ambEntregaCIE() {
+			return this.ambEntregaCIEInternal;
+		},
+		get ambEntregaDEH() {
+			return this.ambEntregaDEHInternal;
+		},
+		registerListener: function(listener) {
+			this.ambEntregaCIEListener = listener;
+		}
+	}
+
+	// events al canviar els valors de les variables
+	viewModel.ambEntregaCIEListener = function(val) {
+		if (val || this.ambEntregaDEH) {
+			console.debug("Mostra formulari entrega cie");
+			$(".entrega-activa").show();
+			$(".entrega-inactiva").hide();
+		} else {
+			$(".entrega-activa").hide();
+			$(".entrega-inactiva").show();
+			console.debug("Oculta formulari entrega cie");
+		}
+		console.log(val);
+		if (val) {
+			console.debug("Entrega CIE activa");
+			$(".entrega-cie-activa").show();
+		} else {
+			$(".entrega-cie-activa").hide();
+		}
+	};
+
+	// valors inicials
+	$(document).ready(function() {
+		viewModel.ambEntregaCIE = false;
+	});
+
+
+	//////
+	//////
 
 	if ('${notificacioCommandV2 != null && notificacioCommandV2.procedimentId != null}') {
 		var procedimentIdAux = '${notificacioCommandV2.procedimentId}';
@@ -773,8 +820,8 @@
 //       return true;
 //     });
 
-		var agrupable = $("#procedimentId").children(":selected").attr("class");
-		var procedimentId = $("#procedimentId").children(":selected").attr("value");
+		// var agrupable = $("#procedimentId").children(":selected").attr("class");
+		// var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
 		$('#organGestor').on('change', function() {
 			//### seleccionat per defecte si només hi ha un (empty + òrgan)
@@ -909,6 +956,9 @@
 						} else {
 							$("#grups").addClass("hidden");
 						}
+
+						viewModel.ambEntregaCIE = data.entregaCieActiva;
+
 						// TODO: Afegir formats de fulla i sobre
 						// Format fulla
 // 					var selFormatFulla = $("#grupId");
@@ -1554,38 +1604,29 @@
 							<div class="col-md-12 separacio"></div>
 							
 							<div class="metodeEntrega">
-								<c:choose>
-									<c:when test="${ambEntregaDeh || ambEntregaCie}">
-										<div class="col-md-12 title-envios">
-											<div class="title-container entrega">
-												<label> ${metodeEntrega} </label>
-											</div>
-											<hr/>
-										</div>
-									</c:when>
-									<c:otherwise>
-										<div class="avis-metodo-envio col-md-12">
-											<p class="comentari"><span class="fa fa-info-circle"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info.cap"/></span></p>
-										</div>
-									</c:otherwise>
-								</c:choose>
+								<div class="col-md-12 title-envios entrega-activa">
+									<div class="title-container entrega">
+										<label> ${metodeEntrega} </label>
+									</div>
+									<hr/>
+								</div>
+								<div class="col-md-12 avis-metodo-envio entrega-inactiva">
+									<p class="comentari"><span class="fa fa-info-circle"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info.cap"/></span></p>
+								</div>
 								<div class="col-md-12">
 									<div class="entregaPostal_info_${j} entregaPostalInfo alert alert-info" role="alert">
 										<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 									  	<strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
 									</div>
-									<c:if test="${ambEntregaDeh || ambEntregaCie}">
-										<div>
-											<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
-										</div>
-									</c:if>
-									<c:if test="${ambEntregaCie}">
+									<div class="entrega-activa">
+										<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
+									</div>
+									<div class="entrega-cie-activa">
 										<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
-									</c:if>
+									</div>
 								</div>
-								<c:set var="entregaPostalActiva" value="${enviament.entregaPostal.activa}"></c:set>
 								<!-- ENTREGA POSTAL -->
-								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!entregaPostalActiva}">style="display:none"</c:if>>
+								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!enviament.entregaPostal.activa}">style="display:none"</c:if>>
 									<div class="col-md-12">
 										<div class="col-md-12">
 											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>

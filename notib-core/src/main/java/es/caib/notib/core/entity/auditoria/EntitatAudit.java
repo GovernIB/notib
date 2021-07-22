@@ -3,20 +3,14 @@
  */
 package es.caib.notib.core.entity.auditoria;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
 import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
 
 /**
  * Classe del model de dades que representa la informació de auditoria d'una entitat.
@@ -91,7 +85,7 @@ public class EntitatAudit extends NotibAuditoria<Long> {
 			built.dir3CodiReg = entitatDto.getDir3CodiReg();
 			built.apiKey = entitatDto.getApiKey();
 			built.ambEntregaDeh = entitatDto.isAmbEntregaDeh();
-			built.ambEntregaCie = entitatDto.isAmbEntregaCie();
+//			built.ambEntregaCie = entitatDto.isAmbEntregaCie();
 			built.oficina = entitatDto.getOficina();
 			built.llibreEntitat = entitatDto.isLlibreEntitat();
 			built.llibre = entitatDto.getLlibre();

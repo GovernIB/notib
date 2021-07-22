@@ -142,6 +142,18 @@ $(document).ready(function() {
 		getOficines(organSeleccionatValue);
 	});
 	getOficines(organSeleccionatValue);
+
+	$('#entregaCieActiva').change(function() {
+		if (this.checked) {
+			$('#entrega-cie-form').show();
+		} else {
+			$('#entrega-cie-form').hide();
+		}
+	});
+
+	if (!$('#entregaCieActiva')[0].checked) {
+		$('#entrega-cie-form').hide();
+	}
 });
 			
 	function getOficines(organSeleccionatValue) {
@@ -205,13 +217,23 @@ $(document).ready(function() {
 			<form:hidden path="codi"/>
 			<form:hidden path="nom"/>
 			<c:if test="${!isModificacio}">
-				<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select> 
+				<div class="form-group">
+					<label class="control-label col-xs-2" for="selLlibres"><spring:message code="organgestor.form.camp.llibre"/>:</label>
+					<div class="controls col-xs-10">
+						<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select>
+					</div>
+				</div>
 				<c:if test="${setLlibre}">
 					<br/>
 					<form:hidden path="llibre"/>
 					<form:hidden path="llibreNom"/>
-					<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
-					<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
+					<div class="form-group">
+						<label class="control-label col-xs-2" for="selLlibres"><spring:message code="organgestor.form.camp.llibre"/>:</label>
+						<div class="controls col-xs-10">
+							<select id="selLlibres" data-placeholder="<spring:message code="organgestor.form.camp.llibre"/>"></select>
+							<p class="comentari"><spring:message code="organgestor.form.camp.llibre.info"/></p>
+						</div>
+					</div>
 				</c:if>
 			</c:if>
 			<c:if test="${isModificacio}">
@@ -225,12 +247,23 @@ $(document).ready(function() {
 				<br/>
 				<form:hidden path="oficina"/>
 				<form:hidden path="oficinaNom"/>
-<%--				<div class="form-group">--%>
-					<label for="selOficines"><spring:message code="organgestor.form.camp.oficina"/>:</label>
-					<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
-<%--				</div>--%>
-				<p class="comentari oficinainfo hidden" style="color: #856404;"><spring:message code="organgestor.form.camp.oficina.info"/></p>
+				<div class="form-group">
+					<label class="control-label col-xs-2" for="selOficines"><spring:message code="organgestor.form.camp.oficina"/>:</label>
+					<div class="controls col-xs-10">
+						<select id="selOficines" data-placeholder="<spring:message code="organgestor.form.camp.oficina"/>"></select>
+						<p class="comentari oficinainfo hidden" style="color: #856404;"><spring:message code="organgestor.form.camp.oficina.info"/></p>
+					</div>
+				</div>
 			</c:if>
+			<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2"/>
+			<div id="entrega-cie-form">
+				<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+								 optionTextAttribute="text" required="true" emptyOption="true"
+								 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+								 optionTextAttribute="text" required="true" emptyOption="true"
+								 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+			</div>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 					<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>

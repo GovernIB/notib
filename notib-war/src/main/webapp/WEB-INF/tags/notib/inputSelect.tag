@@ -46,7 +46,10 @@
 	<c:when test="${not inline}">
 		<label class="control-label col-xs-${campLabelSize} ${labelClass}" for="${campPath}">${campLabelText}</label>
 		<div class="controls col-xs-${campInputSize} ${inputClass}">
-			<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}">
+			<form:select path="${campPath}" cssClass="form-control ${generalClass}" id="${campId}"
+						 disabled="${disabled}" style="width:100%" data-toggle="select2"
+						 data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}"
+						 data-enum="${optionEnum}" data-enum-value="${campValue}">
 				<c:if test="${emptyOption == 'true'}">
 					<c:choose>
 						<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>

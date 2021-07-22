@@ -9,7 +9,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.PagadorCieFormatSobreDto;
+import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -30,7 +30,7 @@ public class PagadorCieFormatSobreServiceBean implements PagadorCieFormatSobreSe
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public PagadorCieFormatSobreDto create(Long entitatId, PagadorCieFormatSobreDto formatSobre) {
+	public CieFormatSobreDto create(Long entitatId, CieFormatSobreDto formatSobre) {
 		return delegate.create(
 				entitatId, 
 				formatSobre);
@@ -38,37 +38,37 @@ public class PagadorCieFormatSobreServiceBean implements PagadorCieFormatSobreSe
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public PagadorCieFormatSobreDto update(PagadorCieFormatSobreDto formatSobre) throws NotFoundException {
+	public CieFormatSobreDto update(CieFormatSobreDto formatSobre) throws NotFoundException {
 		return delegate.update(formatSobre);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public PagadorCieFormatSobreDto delete(Long id) throws NotFoundException {
+	public CieFormatSobreDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PagadorCieFormatSobreDto findById(Long id) {
+	public CieFormatSobreDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<PagadorCieFormatSobreDto> findAll() {
+	public List<CieFormatSobreDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<PagadorCieFormatSobreDto> findFormatSobreByPagadorCie(Long pagadorCieId) {
+	public List<CieFormatSobreDto> findFormatSobreByPagadorCie(Long pagadorCieId) {
 		return delegate.findFormatSobreByPagadorCie(pagadorCieId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PaginaDto<PagadorCieFormatSobreDto> findAllPaginat(
+	public PaginaDto<CieFormatSobreDto> findAllPaginat(
 			Long pagadorCieId, 
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(

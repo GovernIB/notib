@@ -3,6 +3,8 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentFormDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -44,20 +46,20 @@ public class ProcedimentController extends BaseUserController{
 	private final static String PROCEDIMENTS_FILTRE = "procediments_filtre";
 	
 	@Autowired
-	ProcedimentService procedimentService;
+	private ProcedimentService procedimentService;
 	@Autowired
-	OrganGestorService organGestorService;
+	private OrganGestorService organGestorService;
 	@Autowired
-	EntitatService entitatService;
+	private EntitatService entitatService;
 	@Autowired
-	PagadorPostalService pagadorPostalService;
+	private OperadorPostalService operadorPostalService;
 	@Autowired
-	PagadorCieService pagadorCieService;
+	private PagadorCieService pagadorCieService;
 	@Autowired
-	GrupService grupsService;
+	private AplicacioService aplicacioService;
 	@Autowired
-	AplicacioService aplicacioService;
-	
+	private PagadorCieService cieService;
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -154,6 +156,10 @@ public class ProcedimentController extends BaseUserController{
 					procedimentCommand.getId(),
 					model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			model.addAttribute("operadorPostalList", operadorPostalList);
+			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			model.addAttribute("cieList", cieList);
 			return "procedimentAdminForm";
 		}
 		
@@ -196,14 +202,18 @@ public class ProcedimentController extends BaseUserController{
 		if (procediment != null) {
 			procedimentCommand = ProcedimentCommand.asCommand(procediment);
 			procedimentCommand.setEntitatId(procediment.getEntitat().getId());
-			if (procediment.getPagadorcie() != null)
-				procedimentCommand.setPagadorCieId(procediment.getPagadorcie().getId());
-			if (procediment.getPagadorpostal() != null)
-				procedimentCommand.setPagadorPostalId(procediment.getPagadorpostal().getId());
+//			if (procediment.getPagadorcie() != null)
+//				procedimentCommand.setPagadorCieId(procediment.getPagadorcie().getId());
+//			if (procediment.getPagadorpostal() != null)
+//				procedimentCommand.setPagadorPostalId(procediment.getPagadorpostal().getId());
 		} else {
 			procedimentCommand = new ProcedimentCommand();
 		}
 		model.addAttribute(procedimentCommand);
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		model.addAttribute("operadorPostalList", operadorPostalList);
+		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		model.addAttribute("cieList", cieList);
 		return "procedimentAdminForm";
 	}
 	
@@ -317,10 +327,10 @@ public class ProcedimentController extends BaseUserController{
 		
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		if (organGestorActual != null) {
-			model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
+			model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
 			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitatAndOrganGestor(entitat, organGestorActual));
 		} else {
-			model.addAttribute("pagadorsPostal", pagadorPostalService.findByEntitat(entitat.getId()));
+			model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitat(entitat.getId()));
 			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitat(entitat.getId()));
 		}
 		

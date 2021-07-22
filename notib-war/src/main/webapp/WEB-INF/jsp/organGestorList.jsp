@@ -34,8 +34,13 @@
 					this.selectedIndex = 0;
 				}
 			});
+			$('#btn-entregaCieActiva').removeClass('active');
 			$('#form-filtre').submit();
 		});
+		$('#btn-entregaCieActiva').click(function() {
+			let entregaCieActiva = !$(this).hasClass('active');
+			$('#entregaCieActiva').val(entregaCieActiva);
+		})
 	});
 	</script>
 </head>
@@ -52,7 +57,7 @@
 				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
 			</div>
 			<c:if test="${setOficina}">
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<not:inputSelect 
 							name="oficina" 
 							textKey="organgestor.list.columna.oficina"
@@ -68,6 +73,13 @@
 	<%-- 				<not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionMinimumResultsForSearch="0"/> --%>
 				</div>
 			</c:if>
+			<div class="col-md-2">
+<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
+				<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${entregaCieActiva}">active</c:if>" data-toggle="button">
+					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
+				</button>
+				<not:inputHidden name="entregaCieActiva"/>
+			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -111,7 +123,8 @@
 				<c:if test="${!setOficina}"> 
 					<th data-col-name="oficinaNom"><spring:message code="organgestor.list.columna.oficina"/></th>
 				</c:if>
-				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
+
+				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="100px">
 					<spring:message code="organgestor.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'VIGENT'}}
@@ -119,6 +132,12 @@
 						{{else estat == 'ALTRES'}}
 							<spring:message code="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.ALTRES"/>
 						{{/if}}
+					</script>
+				</th>
+				<th data-col-name="entregaCieActiva" data-template="#cellActivaTemplate">
+					<spring:message code="organgestor.list.columna.cie"/>
+					<script id="cellActivaTemplate" type="text/x-jsrender">
+						{{if entregaCieActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="100px">
@@ -132,7 +151,7 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<c:if test="${setOficina}">
-									<li><a href="organgestor/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<li><a href="organgestor/{{:id}}" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								</c:if>
 								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>
 								<li><a href="organgestor/{{:codi}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
@@ -147,7 +166,7 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
 			<a id="organgestor-boto-update" class="btn btn-warning" href="organgestor/update"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/></a>
-			<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a>
+			<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/new" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a>
 		</p>
 	</script>
 	

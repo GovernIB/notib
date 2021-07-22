@@ -158,7 +158,7 @@ public class RegistreNotificaHelperTest {
 				"dir3CodiReg",
 				"apiKey",
 				false,
-				false,
+//				false,
 				null,
 				null,
 				"colorFons",

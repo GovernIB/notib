@@ -3,6 +3,7 @@ package es.caib.notib.core.service;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.PermisosHelper;
@@ -59,7 +60,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         entitatCreate.setDir3Codi(ENTITAT_DGTIC_DIR3CODI);
         entitatCreate.setApiKey(ENTITAT_DGTIC_KEY);
         entitatCreate.setAmbEntregaDeh(true);
-        entitatCreate.setAmbEntregaCie(true);
+//        entitatCreate.setAmbEntregaCie(true);
         TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
         tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
         entitatCreate.setTipusDocDefault(tipusDocDefault);

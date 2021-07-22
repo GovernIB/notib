@@ -15,10 +15,12 @@ import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EntitatTipusDocRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,12 +75,14 @@ public class EntitatServiceImpl implements EntitatService {
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private EntregaCieRepository entregaCieRepository;
 
-	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Transactional
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public EntitatDto create(EntitatDto entitat) {
+	public EntitatDto create(EntitatDataDto entitat) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
@@ -87,7 +91,8 @@ public class EntitatServiceImpl implements EntitatService {
 					true,
 					false,
 					false );
-			
+			EntregaCieEntity entregaCie = entitat.isEntregaCieActiva() ? new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId())
+																 : null;
 			EntitatEntity entity = EntitatEntity.getBuilder(
 					entitat.getCodi(),
 					entitat.getNom(),
@@ -96,7 +101,6 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getDir3CodiReg(),
 					entitat.getApiKey(),
 					entitat.isAmbEntregaDeh(),
-					entitat.isAmbEntregaCie(),
 					entitat.getLogoCapBytes(),
 					entitat.getLogoPeuBytes(),
 					entitat.getColorFons(),
@@ -109,8 +113,9 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getLlibreNom(),
 					entitat.isOficinaEntitat()).
 					descripcio(entitat.getDescripcio()).
-					build();
-			
+					entregaCie(entregaCieRepository.save(entregaCie))
+					.build();
+
 			EntitatEntity entitatSaved = entitatRepository.save(entity);
 			
 			if (entitat.getTipusDoc() != null) {
@@ -130,10 +135,10 @@ public class EntitatServiceImpl implements EntitatService {
 		}
 	}
 
-	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Transactional
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Override
-	public EntitatDto update(EntitatDto entitat) {
+	public EntitatDto update(EntitatDataDto entitat) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
@@ -191,7 +196,17 @@ public class EntitatServiceImpl implements EntitatService {
 					logoPeuActual = entity.getLogoPeuBytes();
 				}
 			}
-			
+			EntregaCieEntity entregaCie = entity.getEntregaCie();
+			if (entitat.isEntregaCieActiva()) {
+				if (entregaCie == null) {
+					entregaCie = entregaCieRepository.save(
+							new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId())
+					);
+				} else {
+					entregaCie.update(entitat.getCieId(), entitat.getOperadorPostalId());
+				}
+			}
+
 			entity.update(
 					entitat.getCodi(),
 					entitat.getNom(),
@@ -200,7 +215,7 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getDir3CodiReg(),
 					entitat.getApiKey(),
 					entitat.isAmbEntregaDeh(),
-					entitat.isAmbEntregaCie(),
+					entitat.isEntregaCieActiva() ? entregaCie : null,
 					entitat.getDescripcio(),
 					logoCapActual,
 					logoPeuActual,
@@ -213,6 +228,10 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getLlibre(),
 					entitat.getLlibreNom(),
 					entitat.isOficinaEntitat());
+
+			if (!entitat.isEntregaCieActiva() && entregaCie != null) {
+				entregaCieRepository.delete(entregaCie);
+			}
 			return conversioTipusHelper.convertir(
 					entity,
 					EntitatDto.class);

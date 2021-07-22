@@ -4,13 +4,19 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.auditoria.NotificacioEnviamentAudit;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorCieFormatFullaEntity;
+import es.caib.notib.core.entity.cie.PagadorCieFormatSobreEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -48,10 +54,10 @@ public class ConversioTipusHelper {
 					}
 				});
 		
-		mapperFactory.classMap(EntitatEntity.class, EntitatDto.class).
-			customize(new EntitatEntitytoMapper()).
-			byDefault().
-			register();
+		mapperFactory.classMap(EntitatEntity.class, EntitatDto.class)
+			.byDefault()
+			.customize(new EntitatEntitytoMapper())
+			.register();
 		
 //		mapperFactory.classMap(NotificacioEntity.class, NotificacioDto.class).
 //			field("notificaErrorEvent.data", "notificaErrorData").
@@ -118,15 +124,37 @@ public class ConversioTipusHelper {
 			field("entitat.nom", "entitatNom").
 			field("entitat.oficina", "oficinaNom").
 			field("oficina", "oficina.codi").
-			field("oficinaNom", "oficina.nom").
-			byDefault().
-			register();
+			field("oficinaNom", "oficina.nom")
+			.customize(
+				new CustomMapper<OrganGestorEntity, OrganGestorDto>() {
+					public void mapAtoB(OrganGestorEntity a, OrganGestorDto b, MappingContext context) {
+						// add your custom mapping code here
+						b.setEntregaCieActiva(a.getEntregaCie() != null);
+						if (a.getEntregaCie() != null) {
+							b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
+							b.setCieId(a.getEntregaCie().getCieId());
+						}
+					}
+				})
+			.byDefault()
+			.register();
 		
 		mapperFactory.classMap(ProcedimentEntity.class, ProcedimentDto.class).
-			field("organGestor.codi", "organGestor").
-			field("organGestor.nom", "organGestorNom").
-			byDefault().
-			register();
+			field("organGestor.codi", "organGestor")
+				.field("organGestor.nom", "organGestorNom")
+				.customize(
+				new CustomMapper<ProcedimentEntity, ProcedimentDto>() {
+					public void mapAtoB(ProcedimentEntity a, ProcedimentDto b, MappingContext context) {
+						// add your custom mapping code here
+						b.setEntregaCieActiva(a.getEntregaCie() != null);
+						if (a.getEntregaCie() != null) {
+							b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
+							b.setCieId(a.getEntregaCie().getCieId());
+						}
+					}
+				})
+				.byDefault()
+				.register();
 		
 		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
 			field("entitat.id", "entitatId").
@@ -135,38 +163,46 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 
-		mapperFactory.classMap(PagadorCieEntity.class, PagadorCieDto.class).
+		mapperFactory.classMap(PagadorCieEntity.class, CieDto.class).
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").
-			field("organGestor.codi", "organGestorCodi").
-			field("organGestor.estat", "organGestorEstat").
 			byDefault().
 			register();
 		
-		mapperFactory.classMap(PagadorPostalEntity.class, PagadorPostalDto.class).
+		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalDto.class).
 			field("entitat.id", "entitatId").
-			field("organGestor.id", "organGestorId").
-			field("organGestor.codi", "organGestorCodi").
-			field("organGestor.estat", "organGestorEstat").
 			byDefault().
 			register();
-		
-		mapperFactory.classMap(PagadorCieFormatFullaEntity.class, PagadorCieFormatFullaDto.class).
-			field("pagadorCie.id", "pagadorCieId").
-			byDefault().
-			register();
-		
-		mapperFactory.classMap(PagadorCieFormatSobreEntity.class, PagadorCieFormatSobreDto.class).
-			field("pagadorCie.id", "pagadorCieId").
-			byDefault().
-			register();
-		
-//		mapperFactory.classMap(ProcedimentOrganEntity.class, ProcedimentOrganDto.class).
-//			field("procediment.id", "procedimentId").
-//			field("organGestor.codi", "organGestor").
-//			byDefault().
-//			register();
 
+		mapperFactory.classMap(PagadorCieFormatFullaEntity.class, CieFormatFullaDto.class).
+			field("pagadorCie.id", "pagadorCieId").
+			byDefault().
+			register();
+		
+		mapperFactory.classMap(PagadorCieFormatSobreEntity.class, CieFormatSobreDto.class).
+			field("pagadorCie.id", "pagadorCieId").
+			byDefault().
+			register();
+		mapperFactory.classMap(PagadorPostalEntity.class, IdentificadorTextDto.class)
+				.customize(
+				new CustomMapper<PagadorPostalEntity, IdentificadorTextDto>() {
+					public void mapAtoB(PagadorPostalEntity a, IdentificadorTextDto b, MappingContext context) {
+						// add your custom mapping code here
+						b.setText(a.getNom() + " - " + a.getContracteNum());
+					}
+				})
+				.byDefault()
+				.register();
+		mapperFactory.classMap(PagadorCieEntity.class, IdentificadorTextDto.class)
+				.customize(
+						new CustomMapper<PagadorCieEntity, IdentificadorTextDto>() {
+							public void mapAtoB(PagadorCieEntity a, IdentificadorTextDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setText(a.getNom() + " (Fins el " + a.getContracteDataVig() + ")");
+							}
+						})
+				.byDefault()
+				.register();
 		mapperFactory.classMap(NodeDir3.class, OrganGestorDto.class).
 			field("denominacio", "nom").
 			field("tieneOficinaSir", "sir").
@@ -250,6 +286,11 @@ public class ConversioTipusHelper {
 				tipusDocumentDto.setEntitat(entitatEntity.getId());
 				tipusDocumentDto.setTipusDocEnum(entitatEntity.getTipusDocDefault());
 				entitatDto.setTipusDocDefault(tipusDocumentDto);
+				entitatDto.setEntregaCieActiva(entitatEntity.getEntregaCie() != null);
+				if (entitatEntity.getEntregaCie() != null) {
+					entitatDto.setOperadorPostalId(entitatEntity.getEntregaCie().getOperadorPostalId());
+					entitatDto.setCieId(entitatEntity.getEntregaCie().getCieId());
+				}
 			}
 		}
 	}

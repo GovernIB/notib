@@ -6,6 +6,8 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import lombok.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Index;

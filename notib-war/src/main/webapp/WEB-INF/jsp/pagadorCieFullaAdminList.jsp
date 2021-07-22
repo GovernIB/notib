@@ -24,7 +24,7 @@
 	<table
 		id="pagadorFullaCie"
 		data-toggle="datatable"
-		data-url="<c:url value="/pagadorCie/${pagadorCie.id}/formats/fulla/datatable"/>"
+		data-url="<c:url value="/cie/${pagadorCie.id}/formats/fulla/datatable"/>"
 		data-search-enabled="false"
 		data-default-order="1"
 		data-default-dir="desc"

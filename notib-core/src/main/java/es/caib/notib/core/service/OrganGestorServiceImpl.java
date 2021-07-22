@@ -13,6 +13,9 @@ import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
@@ -79,6 +82,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private ProcedimentsCacheable procedimentsCacheable;
 	@Resource
 	private ConfigHelper configHelper;
+	@Autowired
+	private EntregaCieRepository entregaCieRepository;
 
 	@Override
 	@Transactional
@@ -94,6 +99,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() :
 					OrganGestorEstatEnum.VIGENT;
+			EntregaCieEntity entregaCie = dto.isEntregaCieActiva() ? new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId())
+					: null;
 			OrganGestorEntity organGestor = OrganGestorEntity.builder(
 					dto.getCodi(),
 					dto.getNom(),
@@ -102,7 +109,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					dto.getLlibreNom(),
 					dto.getOficina() != null ? dto.getOficina().getCodi() : null,
 					dto.getOficina() != null ? dto.getOficina().getNom() : null,
-					estat).build();
+					estat)
+					.entregaCie(entregaCieRepository.save(entregaCie))
+					.build();
 			return conversioTipusHelper.convertir(
 					organGestorRepository.save(organGestor),
 					OrganGestorDto.class);
@@ -145,7 +154,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@Override
 	@Transactional
-	public OrganGestorDto updateOficina(OrganGestorDto dto) {
+	public OrganGestorDto update(OrganGestorDto dto) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(
@@ -158,6 +167,20 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			organGestor.updateOficina(
 					dto.getOficina().getCodi(),
 					dto.getOficina().getNom());
+
+			EntregaCieEntity entregaCie = organGestor.getEntregaCie();
+			if (dto.isEntregaCieActiva()) {
+				if (entregaCie == null) {
+					entregaCie = entregaCieRepository.save(
+							new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId())
+					);
+				} else {
+					entregaCie.update(dto.getCieId(), dto.getOperadorPostalId());
+				}
+			}
+
+			organGestor.updateEntregaCie(entregaCie);
+
 			return conversioTipusHelper.convertir(
 					organGestor,
 					OrganGestorDto.class);
@@ -303,6 +326,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("llibreCodiNom", new String[] {"llibre"});
+			mapeigPropietatsOrdenacio.put("entregaCieActiva", new String[] {"entregaCie"});
 			//mapeigPropietatsOrdenacio.put("oficina", new String[] {"entitat.oficina"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
@@ -335,6 +359,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 							filtre.getOficina() == null ? "" : filtre.getOficina(),
 							isEstatNull,
 							estat,
+							filtre.isEntregaCieActiva(),
 							pageable);
 				}
 			//Cas d'Administrador d'Organ
