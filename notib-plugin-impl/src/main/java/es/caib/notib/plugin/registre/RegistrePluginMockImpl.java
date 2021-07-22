@@ -74,7 +74,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		respostaConsultaRegistre.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
 		respostaConsultaRegistre.setRegistreNumero(String.valueOf(registre[1]));
 		respostaConsultaRegistre.setRegistreData(data);
-		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.REBUTJAT);
+		respostaConsultaRegistre.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
 		
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 			 respostaConsultaRegistre.setSirRecepecioData(data);
@@ -90,6 +90,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		}
 		respostaConsultaRegistre.setNumeroRegistroDestino("NUMERO REG. DESTINO");
 		respostaConsultaRegistre.setMotivo("motiu per el qual s’ha reenviat o rebutjat l’assentament en destí");
+		respostaConsultaRegistre.setCodigoEntidadRegistralProcesado("A04026906"); // Codi oficina que ha acceptat/rebutjat
+		respostaConsultaRegistre.setDecodificacionEntidadRegistralProcesado("Nom oficina que ha acceptat/rebutjat ");
 		return respostaConsultaRegistre;
 	}
 	

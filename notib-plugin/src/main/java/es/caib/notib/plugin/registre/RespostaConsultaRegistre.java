@@ -27,7 +27,6 @@ public class RespostaConsultaRegistre extends RespostaBase {
 	private NotificacioRegistreEstatEnumDto estat;
 	private String numeroRegistroDestino;
 	private String motivo;
-//	private String codiError;
-//	private String descripcioError;
-	
+	private String codigoEntidadRegistralProcesado; // Codigo de la oficina que acepta o rechaza, reenvia
+	private String decodificacionEntidadRegistralProcesado; // Denominacion de la oficina que acepta o rechaza, reenvia
 }

@@ -54,7 +54,7 @@ public class ConfigHelper {
     }
 
     public boolean getAsBoolean(String key) {
-        return new Boolean(getConfig(key));
+        return Boolean.parseBoolean(getConfig(key));
     }
     public int getAsInt(String key) {
         return new Integer(getConfig(key));
