@@ -52,7 +52,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long registrarEnviamentsPendentsInitialDelayLong = 0L; 
@@ -80,7 +80,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
@@ -108,7 +108,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
@@ -136,7 +136,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
@@ -204,7 +204,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE), TimeUnit.SECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long processarPendentsInitialDelayLong = 0L;

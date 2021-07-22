@@ -161,7 +161,7 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.registre.enviaments.periode', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.registre.enviaments.periode', '120000', 0,
                                                                                                 'Iterval de temps entre les execucions de la tasca (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_REGISTRE' )
@@ -173,7 +173,7 @@ INSERT ALL
                                                                                        'Nombre màxim de vegades que una mateixa notificació s''intentarà registrar abans d''obtenir una resposta satisfactòria',
                                                                                        'INT',
                                                                                        'SCHEDULLED_REGISTRE' )
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (2, 'es.caib.notib.tasca.registre.enviaments.retard.inicial', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (2, 'es.caib.notib.tasca.registre.enviaments.retard.inicial', '10000', 0,
                                                                                                 'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_REGISTRE' )
@@ -195,11 +195,11 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.enviaments.periode', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.enviaments.periode', '120000', 0,
                                                                                                 'Iterval de temps entre les execucions de la tasca (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_NOTIFICA' )
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.enviaments.retard.inicial', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.notifica.enviaments.retard.inicial', '10000', 0,
                                                                                                 'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_NOTIFICA' )
@@ -222,11 +222,11 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.periode', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.periode', '300000', 0,
                                                                                                 'Iterval de temps entre les execucions de la tasca (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_UPDATE_STATUS_NOTIFICA' )
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial', '50000', 0,
                                                                                                 'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_UPDATE_STATUS_NOTIFICA' )
@@ -249,11 +249,11 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode', '600000', 0,
                                                                                                 'Iterval de temps entre les execucions de la tasca (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_UPDATE_STATUS_SIR' )
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial', 0,
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial', '400000', 0,
                                                                                                 'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_UPDATE_STATUS_SIR' )
@@ -283,7 +283,7 @@ INSERT ALL
                                                                                                 'Iterval de temps entre les execucions de la tasca (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_CALLBACK' )
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.callback.pendents.retard.inicial', 0,
+    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.callback.pendents.retard.inicial', 0, '60000'
                                                                                                 'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
                                                                                                 'INT',
                                                                                                 'SCHEDULLED_CALLBACK' )
