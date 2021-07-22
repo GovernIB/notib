@@ -1,7 +1,3 @@
-drop table NOT_CONFIG;
-drop table NOT_CONFIG_GROUP;
-drop table NOT_CONFIG_TYPE;
-
 CREATE TABLE NOT_CONFIG
 (
     KEY                  VARCHAR2(256 CHAR)     NOT NULL,
@@ -461,7 +457,7 @@ INSERT ALL
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (3, 'es.caib.notib.justificant.capsalera.email', '',
                                                                             'Especificar el correu electrònic a mostrar al justificant',
                                                                             'ASPECTE_JUSTIFICANT' )
-    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (4, 'es.caib.notib.justificant.peu.titol', 'NOTIB \u2013 Justificant d\u0027enviament de notificaci\u00F3 electr\u00F2nica',
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (4, 'es.caib.notib.justificant.peu.titol', 'NOTIB - Justificant d''enviament de notificació electrònica',
                                                                             'Especificar el text a mostrar al peu del justificant',
                                                                             'ASPECTE_JUSTIFICANT' )
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (5, 'es.caib.notib.justificant.peu.logo', '',
