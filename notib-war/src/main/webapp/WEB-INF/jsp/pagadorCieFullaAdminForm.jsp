@@ -31,7 +31,7 @@
 	<not:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><not:modalUrl value="/pagadorCie/${pagadorCie.id}/formats/fulla/newOrModify"/></c:set>
+	<c:set var="formAction"><not:modalUrl value="/cie/${pagadorCie.id}/formats/fulla/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorCieFormatFullaCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
@@ -40,7 +40,7 @@
 			</div>
 			<div id="modal-botons">
 				<button id="addPagadorCieButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-				<a href="<c:url value="/pagadorcie/${pagadorCie.id}/formats/fulla"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+				<a href="<c:url value="/cie/${pagadorCie.id}/formats/fulla"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 			</div>	
 		</div>
 	</form:form>

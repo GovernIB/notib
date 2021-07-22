@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.NotificacioHelper.NotificacioData;
@@ -76,7 +77,6 @@ public class NotificacioHelperTest {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entidad,
-				null,
 				null,
 				false,
 				null, // organGestor

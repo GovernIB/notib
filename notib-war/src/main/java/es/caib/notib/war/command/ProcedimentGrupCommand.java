@@ -4,7 +4,7 @@ package es.caib.notib.war.command;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
 import es.caib.notib.core.api.dto.TipusGrupEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;

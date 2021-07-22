@@ -1,6 +1,6 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
@@ -48,7 +48,6 @@ public class ProcedimentUpdateHelper {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
-				null,
 				null,
 				false,
 				organGestor,

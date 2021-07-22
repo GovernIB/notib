@@ -192,10 +192,10 @@
 			<bean class="es.caib.notib.war.interceptor.AccesGrupsInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
-			<mvc:mapping path="/pagadorCie**"/>
-			<mvc:mapping path="/pagadorCie/**"/>
-			<mvc:mapping path="/pagadorPostal**"/>
-			<mvc:mapping path="/pagadorPostal/**"/>
+			<mvc:mapping path="/cie**"/>
+			<mvc:mapping path="/cie/**"/>
+			<mvc:mapping path="/operadorPostal**"/>
+			<mvc:mapping path="/operadorPostal/**"/>
 			<bean class="es.caib.notib.war.interceptor.AccesPagadorsInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>

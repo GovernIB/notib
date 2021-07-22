@@ -18,13 +18,13 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
-import es.caib.notib.core.api.service.PagadorPostalService;
+import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.ProcedimentService.TipusPermis;
 import es.caib.notib.war.command.PermisCommand;
@@ -47,7 +47,7 @@ public class ProcedimentPermisController extends BaseUserController{
 	@Autowired
 	EntitatService entitatService;
 	@Autowired
-	PagadorPostalService pagadorPostalService;
+    OperadorPostalService operadorPostalService;
 	@Autowired
 	PagadorCieService pagadorCieService;
 	@Autowired

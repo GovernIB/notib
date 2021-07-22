@@ -64,7 +64,7 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 		entitatCreate.setDir3Codi("23599770E");
 		entitatCreate.setApiKey("123abc");
 		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
+//		entitatCreate.setAmbEntregaCie(true);
 		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
 		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
 		entitatCreate.setTipusDocDefault(tipusDocDefault);
@@ -76,7 +76,7 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 		entitatUpdate.setDir3Codi("23599771E");
 		entitatUpdate.setApiKey("cba321");
 		entitatUpdate.setAmbEntregaDeh(false);
-		entitatUpdate.setAmbEntregaCie(false);
+//		entitatUpdate.setAmbEntregaCie(false);
 		TipusDocumentDto tipusDocDefault2 = new TipusDocumentDto();
 		tipusDocDefault2.setTipusDocEnum(TipusDocumentEnumDto.CSV);
 		entitatUpdate.setTipusDocDefault(tipusDocDefault2);
@@ -408,9 +408,9 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 		assertEquals(
 				original.isAmbEntregaDeh(),
 				perComprovar.isAmbEntregaDeh());
-		assertEquals(
-				original.isAmbEntregaCie(),
-				perComprovar.isAmbEntregaCie());
+//		assertEquals(
+//				original.isAmbEntregaCie(),
+//				perComprovar.isAmbEntregaCie());
 	}
 	
 	private void comprovarPermisCoincideix(

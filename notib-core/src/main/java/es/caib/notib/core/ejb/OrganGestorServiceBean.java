@@ -191,8 +191,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public OrganGestorDto updateOficina(OrganGestorDto dto) {
-		return delegate.updateOficina(dto);
+	public OrganGestorDto update(OrganGestorDto dto) {
+		return delegate.update(dto);
 	}
 
 	@Override

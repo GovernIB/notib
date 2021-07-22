@@ -1,6 +1,7 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import lombok.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.NaturalId;
@@ -51,6 +52,11 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@Enumerated(EnumType.ORDINAL)
 	protected OrganGestorEstatEnum estat;
 
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "ENTREGA_CIE_ID")
+	@ForeignKey(name = "NOT_ORGAN_ENTREGA_CIE_FK")
+	private EntregaCieEntity entregaCie;
+
 	public void update(
 			String codi,
 			String nom,
@@ -82,6 +88,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 			String oficinaNom) {
 		this.oficina = oficina;
 		this.oficinaNom = oficinaNom;
+	}
+	public void updateEntregaCie(EntregaCieEntity entregaCie) {
+		this.entregaCie = entregaCie;
 	}
 
 	public void updateEstat(OrganGestorEstatEnum estat) {

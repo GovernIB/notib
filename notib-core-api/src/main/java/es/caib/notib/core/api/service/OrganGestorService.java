@@ -25,7 +25,7 @@ public interface OrganGestorService {
 	public OrganGestorDto delete(Long entitatId, Long organId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public OrganGestorDto updateOficina(OrganGestorDto dto);
+	public OrganGestorDto update(OrganGestorDto dto);
 
 	/**
 	 * Actualitza les dades de l'organ gestor indicat de la base de dades

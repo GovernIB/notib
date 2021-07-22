@@ -4,6 +4,8 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -60,7 +62,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String registreTipusAssumpte;
 	private String registreRefExterna;
 	private String numExpedient;
-	private PagadorPostalDto pagadorPostal;
+	private OperadorPostalDto pagadorPostal;
 	private String usuariCodi;
 	private String registreObservacions;
 	private Date registreData;

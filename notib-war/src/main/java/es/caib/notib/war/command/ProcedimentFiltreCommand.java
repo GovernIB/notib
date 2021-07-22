@@ -2,7 +2,7 @@ package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;

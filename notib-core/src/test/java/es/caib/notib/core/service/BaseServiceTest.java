@@ -6,9 +6,14 @@ package es.caib.notib.core.service;
 import es.caib.loginModule.util.Base64.InputStream;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.notib.core.api.dto.cie.CieDto;
+import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
+import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
@@ -82,7 +87,7 @@ public class BaseServiceTest {
 	@Autowired
 	protected GrupService grupService;
 	@Autowired
-	protected PagadorPostalService pagadorPostalService;
+	protected OperadorPostalService operadorPostalService;
 	@Autowired
 	protected PagadorCieService pagadorCieService;
 	@Autowired
@@ -173,7 +178,7 @@ public class BaseServiceTest {
 				logger.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
 				if (element instanceof EntitatDto) {
 					autenticarUsuari("super");
-					EntitatDto entitatCreada = entitatService.create((EntitatDto)element);
+					EntitatDto entitatCreada = entitatService.create((EntitatDataDto) element);
 					entitatId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					if (((EntitatDto)element).getPermisos() != null) {
@@ -228,33 +233,33 @@ public class BaseServiceTest {
 							(GrupDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				} else if(element instanceof PagadorPostalDto) {
+				} else if(element instanceof OperadorPostalDto) {
 					autenticarUsuari("admin");
-					PagadorPostalDto entitatCreada = pagadorPostalService.create(
+					OperadorPostalDto entitatCreada = operadorPostalService.create(
 							entitatId,
-							(PagadorPostalDto)element);
+							(OperadorPostalDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				} else if(element instanceof PagadorCieDto) {
+				} else if(element instanceof CieDto) {
 					autenticarUsuari("admin");
-					PagadorCieDto entitatCreada = pagadorCieService.create(
+					CieDto entitatCreada = pagadorCieService.create(
 							entitatId,
-							(PagadorCieDto)element);
+							(CieDto)element);
 					pagadorCieId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				} else if(element instanceof PagadorCieFormatFullaDto) {
+				} else if(element instanceof CieFormatFullaDto) {
 					autenticarUsuari("admin");
-					PagadorCieFormatFullaDto entitatCreada = pagadorCieFormatFullaService.create(
+					CieFormatFullaDto entitatCreada = pagadorCieFormatFullaService.create(
 							pagadorCieId,
-							(PagadorCieFormatFullaDto)element);
+							(CieFormatFullaDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
-				}else if(element instanceof PagadorCieFormatSobreDto) {
+				}else if(element instanceof CieFormatSobreDto) {
 					autenticarUsuari("admin");
-					PagadorCieFormatSobreDto entitatCreada = pagadorCieFormatSobreService.create(
+					CieFormatSobreDto entitatCreada = pagadorCieFormatSobreService.create(
 							pagadorCieId,
-							(PagadorCieFormatSobreDto)element);
+							(CieFormatSobreDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else if(element instanceof NotificacioDatabaseDto) {
@@ -314,18 +319,18 @@ public class BaseServiceTest {
 				} else if(element instanceof GrupDto) {
 					autenticarUsuari("admin");
 					grupService.delete(((GrupDto)element).getId());
-				} else if(element instanceof PagadorPostalDto) {
+				} else if(element instanceof OperadorPostalDto) {
 					autenticarUsuari("admin");
-					pagadorPostalService.delete(((PagadorPostalDto)element).getId());
-				} else if(element instanceof PagadorCieDto) {
+					operadorPostalService.delete(((OperadorPostalDto)element).getId());
+				} else if(element instanceof CieDto) {
 					autenticarUsuari("admin");
-					pagadorCieService.delete(((PagadorCieDto)element).getId());
-				} else if(element instanceof PagadorCieFormatFullaDto) {
+					pagadorCieService.delete(((CieDto)element).getId());
+				} else if(element instanceof CieFormatFullaDto) {
 					autenticarUsuari("admin");
-					pagadorCieFormatFullaService.delete(((PagadorCieFormatFullaDto)element).getId());
-				} else if(element instanceof PagadorCieFormatSobreDto) {
+					pagadorCieFormatFullaService.delete(((CieFormatFullaDto)element).getId());
+				} else if(element instanceof CieFormatSobreDto) {
 					autenticarUsuari("admin");
-					pagadorCieFormatSobreService.delete(((PagadorCieFormatSobreDto)element).getId());
+					pagadorCieFormatSobreService.delete(((CieFormatSobreDto)element).getId());
 				} else if(element instanceof NotificacioDtoV2) {
 					autenticarUsuari("admin");
 					notificacioService.delete(entitatId, ((NotificacioDtoV2)element).getId());

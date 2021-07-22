@@ -2,6 +2,7 @@ package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -23,9 +24,9 @@ public interface ProcedimentService {
 	 * @return El procediment creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcedimentDto create(
+	ProcedimentDto create(
 			Long entitatId,
-			ProcedimentDto procediment);
+			ProcedimentDataDto procediment);
 
 	/**
 	 * Actualitza la informació del procediment 
@@ -39,7 +40,7 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public ProcedimentDto update(
 			Long entitatId,
-			ProcedimentDto procediment,
+			ProcedimentDataDto procediment,
 			boolean isAdmin,
 			boolean isAdminEntitat) throws NotFoundException;
 

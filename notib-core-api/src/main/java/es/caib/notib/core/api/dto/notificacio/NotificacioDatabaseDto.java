@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import lombok.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 

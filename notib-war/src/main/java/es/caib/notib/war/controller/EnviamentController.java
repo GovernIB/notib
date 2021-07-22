@@ -9,6 +9,8 @@ import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.*;

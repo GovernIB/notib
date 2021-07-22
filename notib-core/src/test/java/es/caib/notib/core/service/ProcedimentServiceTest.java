@@ -2,6 +2,8 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentFormDto;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.*;
@@ -97,7 +99,7 @@ public class ProcedimentServiceTest {
 				"dir3CodiReg", 
 				"apiKey", 
 				false, 
-				false, 
+//				false,
 				null, 
 				null, 
 				"colorFons", 
@@ -116,7 +118,6 @@ public class ProcedimentServiceTest {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
-				null,
 				null,
 				false,
 				null, // organGestor
@@ -195,8 +196,8 @@ public class ProcedimentServiceTest {
 		proc1.setNom("Establiment, renovació o modificació de concerts educatius per a la prestació del servei públic de l'educació a les Illes Balears curs 2018-2019 [educació concertada]");
 		proc1.setOrganGestor("A04013522");
 		proc1.setOrganGestorNom("Dirección General de Planificación, Ordenación y Centros");
-		proc1.setPagadorcie(null);
-		proc1.setPagadorpostal(null);
+//		proc1.setPagadorcie(null);
+//		proc1.setPagadorpostal(null);
 		proc1.setPermisos(null);
 		proc1.setRetard(0);
 		
@@ -214,8 +215,8 @@ public class ProcedimentServiceTest {
 		proc2.setNom("Recurs d'alçada");
 		proc2.setOrganGestor("A04003003");
 		proc2.setOrganGestorNom("Gobierno de las Islas Baleares");
-		proc2.setPagadorcie(null);
-		proc2.setPagadorpostal(null);
+//		proc2.setPagadorcie(null);
+//		proc2.setPagadorpostal(null);
 		proc2.setPermisos(null);
 		proc2.setRetard(0);
 		for (int i=0; i < 5; i++) {

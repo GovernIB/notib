@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.CieDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.helper.PermisosHelper;
 import org.junit.Before;
@@ -31,8 +32,8 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 	
 	private PermisDto permisAdmin;
 	private EntitatDto entitatCreate;
-	private PagadorCieDto createPagadorCie;
-	private PagadorCieDto updatePagadorCie;
+	private CieDto createPagadorCie;
+	private CieDto updatePagadorCie;
 	
 	
 	@Before
@@ -46,7 +47,7 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 		entitatCreate.setDir3Codi("23599770E");
 		entitatCreate.setApiKey("123abc");
 		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
+//		entitatCreate.setAmbEntregaCie(true);
 		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
 		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
 		entitatCreate.setTipusDocDefault(tipusDocDefault);
@@ -58,12 +59,12 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 		permisAdmin.setPrincipal("admin");
 		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
 		
-		createPagadorCie=new PagadorCieDto();
-		createPagadorCie.setDir3codi("A04027005");
+		createPagadorCie=new CieDto();
+		createPagadorCie.setOrganismePagadorCodi("A04027005");
 		createPagadorCie.setContracteDataVig(new Date());
 		
-		updatePagadorCie=new PagadorCieDto();
-		updatePagadorCie.setDir3codi("A04026968");
+		updatePagadorCie=new CieDto();
+		updatePagadorCie.setOrganismePagadorCodi("A04026968");
 		updatePagadorCie.setContracteDataVig(new Date());
 	}
 	
@@ -75,7 +76,7 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws Exception {
 					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-					PagadorCieDto pagadorCreateCie=(PagadorCieDto)elementsCreats.get(1);
+					CieDto pagadorCreateCie=(CieDto)elementsCreats.get(1);
 					autenticarUsuari("admin");
 					assertNotNull(pagadorCreateCie);
 					assertNotNull(pagadorCreateCie.getId());
@@ -99,11 +100,11 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);	
-					PagadorCieDto pagadorCieCreat = (PagadorCieDto)elementsCreats.get(1);
+					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
 					autenticarUsuari("admin");
 				
 					updatePagadorCie.setId(pagadorCieCreat.getId());
-					PagadorCieDto pagadorCieModificat = pagadorCieService.update(updatePagadorCie);
+					CieDto pagadorCieModificat = pagadorCieService.update(updatePagadorCie);
 					
 					assertNotNull(pagadorCieModificat);
 					assertNotNull(pagadorCieModificat.getId());
@@ -129,10 +130,10 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					PagadorCieDto pagadorCieCreat = (PagadorCieDto)elementsCreats.get(1);
+					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
 					autenticarUsuari("admin");
 							
-					PagadorCieDto esborrada = pagadorCieService.delete(pagadorCieCreat.getId());
+					CieDto esborrada = pagadorCieService.delete(pagadorCieCreat.getId());
 					compararPagadorCie(
 							createPagadorCie,
 							esborrada);
@@ -155,10 +156,10 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 			new TestAmbElementsCreats() {
 				@Override
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
-					PagadorCieDto pagadorCieCreat = (PagadorCieDto)elementsCreats.get(1);
+					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
 					autenticarUsuari("admin");
 					
-					PagadorCieDto trobat= pagadorCieService.findById(
+					CieDto trobat= pagadorCieService.findById(
 							pagadorCieCreat.getId());
 					
 					assertNotNull(trobat);
@@ -194,11 +195,11 @@ public class PagadorCieServiceTest extends BaseServiceTest{
 	}
 	
 	private void compararPagadorCie(
-			PagadorCieDto original,
-			PagadorCieDto perComprovar) {
+			CieDto original,
+			CieDto perComprovar) {
 		assertEquals(
-				original.getDir3codi(),
-				perComprovar.getDir3codi());
+				original.getOrganismePagadorCodi(),
+				perComprovar.getOrganismePagadorCodi());
 	}
 	
 }

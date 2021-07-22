@@ -20,7 +20,8 @@ public class OrganGestorFiltreCommand {
 	private String nom;
 	private String oficina;
 	private OrganGestorEstatEnum estat;
-	
+	private boolean entregaCieActiva;
+
 	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
 		if (dto == null) {
 			return null;
@@ -30,14 +31,10 @@ public class OrganGestorFiltreCommand {
 				OrganGestorFiltreCommand.class );
 		return command;
 	}
-	public static OrganGestorFiltreDto asDto(OrganGestorFiltreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		OrganGestorFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
+	public OrganGestorFiltreDto asDto() {
+		return ConversioTipusHelper.convertir(
+				this,
 				OrganGestorFiltreDto.class);
-		return dto;
 	}
 
 	@Override

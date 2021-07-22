@@ -157,7 +157,7 @@ public class NotificacioServiceWsV2Test {
 				"dir3CodiReg", 
 				"apiKey", 
 				false, 
-				false, 
+//				false,
 				null, 
 				null, 
 				"colorFons", 
@@ -178,7 +178,6 @@ public class NotificacioServiceWsV2Test {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
-				null,
 				null,
 				false,
 				null, // organGestor

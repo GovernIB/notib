@@ -42,7 +42,7 @@ public class GrupServiceTest extends BaseServiceTest{
 		entitatCreate.setDir3Codi("23599770E");
 		entitatCreate.setApiKey("123abc");
 		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
+//		entitatCreate.setAmbEntregaCie(true);
 		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
 		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
 		entitatCreate.setTipusDocDefault(tipusDocDefault);

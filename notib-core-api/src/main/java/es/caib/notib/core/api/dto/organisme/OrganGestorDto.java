@@ -33,7 +33,11 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 
 	private Boolean sir;
 	private String cif;
-	
+
+	private boolean entregaCieActiva;
+	private Long operadorPostalId;
+	private Long cieId;
+
 	public String getLlibreCodiNom() {
 		if (llibre != null)
 			return llibre + " " + (llibreNom != null ? llibreNom : "");

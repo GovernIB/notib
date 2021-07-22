@@ -3,6 +3,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.*;

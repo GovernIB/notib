@@ -31,7 +31,7 @@
 	<jee:local-slsb
 			id="pagadorPostalService"
 			jndi-name="notib/PagadorPostalServiceBean/local"
-			business-interface="es.caib.notib.core.api.service.PagadorPostalService"/>	
+			business-interface="es.caib.notib.core.api.service.OperadorPostalService"/>
 	<jee:local-slsb
 			id="procedimentService"
 			jndi-name="notib/ProcedimentServiceBean/local"

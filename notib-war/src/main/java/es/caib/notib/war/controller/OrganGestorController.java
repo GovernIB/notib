@@ -39,15 +39,13 @@ public class OrganGestorController extends BaseUserController{
 	private final static String ORGANS_FILTRE = "organs_filtre";
 	
 	@Autowired
-	OrganGestorService organGestorService;
+	private OrganGestorService organGestorService;
 	@Autowired
-	EntitatService entitatService;
+	private EntitatService entitatService;
 	@Autowired
-	PagadorPostalService pagadorPostalService;
+	private OperadorPostalService operadorPostalService;
 	@Autowired
-	PagadorCieService pagadorCieService;
-	@Autowired
-	GrupService grupsService;
+	private PagadorCieService cieService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -87,7 +85,7 @@ public class OrganGestorController extends BaseUserController{
 			organs = organGestorService.findAmbFiltrePaginat(
 					entitat.getId(),
 					organActualCodiDir3,
-					OrganGestorFiltreCommand.asDto(organGestorFiltreCommand),
+					organGestorFiltreCommand.asDto(),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
 			MissatgesHelper.error(
@@ -127,6 +125,10 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 		model.addAttribute("isModificacio", false);
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		model.addAttribute("operadorPostalList", operadorPostalList);
+		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		model.addAttribute("cieList", cieList);
 		return "organGestorForm";
 	}
 	
@@ -142,13 +144,17 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("entitat", entitat);
 			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			model.addAttribute("operadorPostalList", operadorPostalList);
+			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			model.addAttribute("cieList", cieList);
 			if (organGestorCommand.getId() != null)
 				model.addAttribute("isModificacio", true);
-			
+
 			return "organGestorForm";
 		}
 		if (organGestorCommand.getId() != null) {
-			organGestorService.updateOficina(OrganGestorCommand.asDto(organGestorCommand));
+			organGestorService.update(OrganGestorCommand.asDto(organGestorCommand));
 		} else {
 			organGestorService.create(OrganGestorCommand.asDto(organGestorCommand));
 		}
@@ -178,6 +184,10 @@ public class OrganGestorController extends BaseUserController{
 				model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 				model.addAttribute("setOficina", !isOficinaEntitat);
 				model.addAttribute("isModificacio", true);
+				List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+				model.addAttribute("operadorPostalList", operadorPostalList);
+				List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+				model.addAttribute("cieList", cieList);
 				return "organGestorForm";
 			}
 			return getAjaxControllerReturnValueError(

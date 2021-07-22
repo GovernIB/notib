@@ -3,7 +3,7 @@ package es.caib.notib.core.service;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.EnviamentTableEntity;

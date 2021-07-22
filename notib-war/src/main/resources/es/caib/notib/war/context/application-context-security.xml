@@ -38,8 +38,8 @@
 		<sec:intercept-url pattern="/massiu*" access="hasRole('NOT_SUPER')"/>
 		<sec:intercept-url pattern="/permis*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')"/>
 		<sec:intercept-url pattern="/*" access="hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')"/>
-		<sec:intercept-url pattern="/pagadorPostal*" access="hasRole('NOT_ADMIN')"/>
-		<sec:intercept-url pattern="/pagadorCie*" access="hasRole('NOT_ADMIN')"/>
+		<sec:intercept-url pattern="/operadorPostal*" access="hasRole('NOT_ADMIN')"/>
+		<sec:intercept-url pattern="/cie*" access="hasRole('NOT_ADMIN')"/>
  		<!-- <sec:intercept-url pattern="/*" access="isAnonymous()"/> -->
 		<sec:custom-filter position="PRE_AUTH_FILTER" ref="preauthFilter"/>
 		<sec:anonymous/>

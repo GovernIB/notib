@@ -4,12 +4,14 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.*;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
@@ -701,7 +703,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         enviament.setNotificaReferencia((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null); //si no se envía, Notific@ genera una
         enviament.setEntregaDehActiva(false); // De momento dejamos false
 
-        if (entitat.isAmbEntregaCie() && linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
+        if (entitat.getEntregaCie() != null && linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
                 linia[14] != null && !linia[14].isEmpty()) {
             enviament.setEntregaPostalActiva(true);
             EntregaPostalDto entregaPostal = new EntregaPostalDto();

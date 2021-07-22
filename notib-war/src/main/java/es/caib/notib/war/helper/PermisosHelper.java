@@ -4,6 +4,7 @@
 package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;

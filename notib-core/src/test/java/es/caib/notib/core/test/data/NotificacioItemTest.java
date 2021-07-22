@@ -2,6 +2,7 @@ package es.caib.notib.core.test.data;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.test.AuthenticationTest;
 import lombok.Getter;
