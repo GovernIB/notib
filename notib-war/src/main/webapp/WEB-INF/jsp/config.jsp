@@ -34,10 +34,25 @@
     <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 </head>
 <body>
-    <c:forEach items="${config_groups}" var="group" varStatus="status_group">
-        <c:set var="group" value="${group}" scope="request"/>
-        <c:set var="level" value="0" scope="request"/>
-        <jsp:include page="includes/configGroup.jsp"/>
-    </c:forEach>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills nav-stacked">
+                <c:forEach items="${config_groups}" var="group" varStatus="status_group">
+                    <li role="presentation"><a data-toggle="tab" href="#group-${group.key}">${group.description}</a></li>
+                </c:forEach>
+            </ul>
+        </div>
+        <div class="col-md-9">
+            <div class="tab-content">
+            <c:forEach items="${config_groups}" var="group" varStatus="status_group">
+                <c:set var="group" value="${group}" scope="request"/>
+                <c:set var="level" value="0" scope="request"/>
+                <div id="group-${group.key}" class="tab-pane fade">
+                    <jsp:include page="includes/configGroup.jsp"/>
+                </div>
+            </c:forEach>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
