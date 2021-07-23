@@ -355,6 +355,9 @@ $(document).ready(function() {
 					</table>
 				</div>
 			</c:if>
+			<%-- TODO: quedan comentados pagadorPostal y pagadorCie porque faltan cosas por acabar aquí en relación
+					   a la issue #549 --%>
+			<%-- 
 			<c:if test="${not empty notificacio.procediment.pagadorpostal}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
@@ -420,6 +423,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
+				--%>
 				<c:if test="${not empty notificacio.enviaments}">
 				
 					<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
