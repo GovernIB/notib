@@ -113,7 +113,7 @@ public class EnviamentTableHelper {
 
         tableViewItem.setRegistreNumero(notificacio.getRegistreNumero());
         tableViewItem.setRegistreData(notificacio.getRegistreData());
-        tableViewItem.setRegistreEnviamentIntent(0);
+        tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
 
         tableViewItem.setNotificaDataCaducitat(enviament.getNotificaDataCaducitat());
         tableViewItem.setNotificaIdentificador(enviament.getNotificaIdentificador());
