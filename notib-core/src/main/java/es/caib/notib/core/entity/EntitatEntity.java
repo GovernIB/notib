@@ -177,7 +177,8 @@ public class EntitatEntity extends NotibAuditable<Long> {
 				.llibreEntitat(llibreEntitat)
 				.llibre(llibre)
 				.llibreNom(llibreNom)
-				.oficinaEntitat(oficinaEntitat);
+				.oficinaEntitat(oficinaEntitat)
+				.activa(true);
 	}
 
 	@Override

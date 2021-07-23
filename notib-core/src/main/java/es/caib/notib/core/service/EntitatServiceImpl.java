@@ -91,9 +91,8 @@ public class EntitatServiceImpl implements EntitatService {
 					true,
 					false,
 					false );
-			EntregaCieEntity entregaCie = entitat.isEntregaCieActiva() ? new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId())
-																 : null;
-			EntitatEntity entity = EntitatEntity.getBuilder(
+
+			EntitatEntity.EntitatEntityBuilder entitatBuilder = EntitatEntity.getBuilder(
 					entitat.getCodi(),
 					entitat.getNom(),
 					entitat.getTipus(),
@@ -112,12 +111,13 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getLlibre(),
 					entitat.getLlibreNom(),
 					entitat.isOficinaEntitat()).
-					descripcio(entitat.getDescripcio()).
-					entregaCie(entregaCieRepository.save(entregaCie))
-					.build();
+					descripcio(entitat.getDescripcio());
+			if (entitat.isEntregaCieActiva()) {
+				EntregaCieEntity entregaCie = new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId());
+				entitatBuilder.entregaCie(entregaCieRepository.save(entregaCie));
+			}
 
-			EntitatEntity entitatSaved = entitatRepository.save(entity);
-			
+			EntitatEntity entitatSaved = entitatRepository.save(entitatBuilder.build());
 			if (entitat.getTipusDoc() != null) {
 				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
 					EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(

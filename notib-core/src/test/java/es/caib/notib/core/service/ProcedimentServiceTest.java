@@ -118,7 +118,6 @@ public class ProcedimentServiceTest {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
-				null,
 				false,
 				null, // organGestor
 				null,

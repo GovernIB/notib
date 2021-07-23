@@ -77,7 +77,6 @@ public class NotificacioHelperTest {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entidad,
-				null,
 				false,
 				null, // organGestor
 				null,

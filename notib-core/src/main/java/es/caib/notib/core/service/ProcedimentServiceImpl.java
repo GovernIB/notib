@@ -116,23 +116,20 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					+ "procediment=" + procediment + ")");
 			
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			EntregaCieEntity entregaCie = procediment.isEntregaCieActiva() ? new EntregaCieEntity(
-					procediment.getCieId(), procediment.getOperadorPostalId()) : null;
-			
+
 			// Organ gestor
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(procediment.getOrganGestor()); 
 			if (organGestor == null) {
 				organGestor = organGestorHelper.crearOrganGestor(entitat, procediment.getOrganGestor());
 			}
 			
-			ProcedimentEntity procedimentEntity = procedimentRepository.save(
+			ProcedimentEntity.ProcedimentEntityBuilder procedimentEntityBuilder =
 					ProcedimentEntity.getBuilder(
 							procediment.getCodi(),
 							procediment.getNom(),
 							procediment.getRetard(),
 							procediment.getCaducitat(),
 							entitat,
-							entregaCieRepository.save(entregaCie),
 							procediment.isAgrupar(),
 							organGestor,
 							procediment.getTipusAssumpte(),
@@ -140,10 +137,15 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							procediment.getCodiAssumpte(),
 							procediment.getCodiAssumpteNom(),
 							procediment.isComu(),
-							procediment.isRequireDirectPermission()).build());
+							procediment.isRequireDirectPermission());
+
+			if (procediment.isEntregaCieActiva()) {
+				EntregaCieEntity entregaCie = new EntregaCieEntity(procediment.getCieId(), procediment.getOperadorPostalId());
+				procedimentEntityBuilder.entregaCie(entregaCieRepository.save(entregaCie));
+			}
 			cacheHelper.evictFindProcedimentsWithPermis();
 			return conversioTipusHelper.convertir(
-					procedimentEntity, 
+					procedimentRepository.save(procedimentEntityBuilder.build()),
 					ProcedimentDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

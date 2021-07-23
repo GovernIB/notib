@@ -168,7 +168,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			int retard,
 			int caducitat,
 			EntitatEntity entitat,
-			EntregaCieEntity entregaCie,
 			boolean agrupar,
 			OrganGestorEntity organGestor,
 			String tipusAssumpte,
@@ -183,7 +182,6 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 				.retard(retard)
 				.caducitat(caducitat)
 				.entitat(entitat)
-				.entregaCie(entregaCie)
 				.agrupar(agrupar)
 				.organGestor(organGestor)
 				.tipusAssumpte(tipusAssumpte)

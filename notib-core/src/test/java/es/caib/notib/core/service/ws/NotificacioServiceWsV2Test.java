@@ -178,7 +178,6 @@ public class NotificacioServiceWsV2Test {
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
 				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
-				null,
 				false,
 				null, // organGestor
 				null,

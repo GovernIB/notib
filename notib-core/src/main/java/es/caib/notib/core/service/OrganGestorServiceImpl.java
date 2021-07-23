@@ -99,9 +99,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() :
 					OrganGestorEstatEnum.VIGENT;
-			EntregaCieEntity entregaCie = dto.isEntregaCieActiva() ? new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId())
-					: null;
-			OrganGestorEntity organGestor = OrganGestorEntity.builder(
+			OrganGestorEntity.OrganGestorEntityBuilder organGestorBuilder = OrganGestorEntity.builder(
 					dto.getCodi(),
 					dto.getNom(),
 					entitat,
@@ -109,11 +107,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					dto.getLlibreNom(),
 					dto.getOficina() != null ? dto.getOficina().getCodi() : null,
 					dto.getOficina() != null ? dto.getOficina().getNom() : null,
-					estat)
-					.entregaCie(entregaCieRepository.save(entregaCie))
-					.build();
+					estat);
+			if (dto.isEntregaCieActiva()) {
+				EntregaCieEntity entregaCie = new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId());
+				organGestorBuilder.entregaCie(entregaCieRepository.save(entregaCie));
+			}
 			return conversioTipusHelper.convertir(
-					organGestorRepository.save(organGestor),
+					organGestorRepository.save(organGestorBuilder.build()),
 					OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
