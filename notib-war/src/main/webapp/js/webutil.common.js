@@ -664,6 +664,14 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				this.value = this.value.trim();
 			}
 		});
+
+		let session_timeout_minutes = 120;
+		let session_timeout_ms = session_timeout_minutes * 60 * 1000;
+		setTimeout(function() {
+			if (confirm("La seva sessió expirarà en breu. Desitja refrescar la sessió?")) {
+				window.location.reload();
+			}
+		}, session_timeout_ms - 60000); // un minut abans de que finalitzi la sessió
 	});
 
 }(jQuery));
