@@ -98,6 +98,7 @@ public class NotificacioTableHelper {
         tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
         tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
         tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
+        tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
         
         notificacioTableViewRepository.saveAndFlush(tableViewItem);
     }

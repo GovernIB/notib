@@ -6,6 +6,7 @@ import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class AuditNotificacioHelper {
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
+	@Autowired
+	private EnviamentTableHelper enviamentTableHelper;
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
 	public NotificacioEntity desaNotificacio(NotificacioEntity notificacioEntity) {
@@ -116,6 +119,9 @@ public class AuditNotificacioHelper {
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateRegistreNouEnviament(NotificacioEntity notificacio, int reintentsPeriode) {
 		notificacio.updateRegistreNouEnviament(reintentsPeriode);
+		for (NotificacioEnviamentEntity env: notificacio.getEnviaments()) {
+			enviamentTableHelper.actualitzarRegistre(env);
+		}
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
