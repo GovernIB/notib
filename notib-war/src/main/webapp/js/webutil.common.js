@@ -664,14 +664,38 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				this.value = this.value.trim();
 			}
 		});
-
-		let session_timeout_minutes = 120;
-		let session_timeout_ms = session_timeout_minutes * 60 * 1000;
-		setTimeout(function() {
-			if (confirm("La seva sessió expirarà en breu. Desitja refrescar la sessió?")) {
-				window.location.reload();
-			}
-		}, session_timeout_ms - 60000); // un minut abans de que finalitzi la sessió
+		resetSessionTimeout();
 	});
 
 }(jQuery));
+
+function sessionTimeoutMessage(timeout_margin_ms){
+	let timeout_margin_minutes = (timeout_margin_ms / 60000)
+	var popupdate = new Date();
+	var renewSession = confirm('La seva sessió expirarà en breu!\n\nLa sessió es tancará en  ' +
+		timeout_margin_minutes + ' minuts.\nVoleu mantenir la sessió iniciada?');
+	if(renewSession){
+		var response = new Date();
+		if(response - popupdate > timeout_margin_ms){
+			alert("Has tardat massa a contestar, ja s'ha tancat la sessió. \nSe't redigirà a la pagina de login.");
+		}else{
+			pingServer();
+			resetSessionTimeout();
+		}
+	}else{
+		window.location.href = webutilContextPath() + "/usuari/logout";
+	}
+}
+
+function pingServer(){
+	jQuery.ajax({url: webutilContextPath() + "/usuari/refresh", type: "HEAD", complete: function (XMLHttpRequest, textStatus) {}});
+}
+
+function resetSessionTimeout(){
+	let session_timeout_minutes = 2;
+	let session_timeout_ms = session_timeout_minutes * 60 * 1000;
+	let timeout_margin_ms = 60000;
+	setTimeout(function() {
+		sessionTimeoutMessage(timeout_margin_ms);
+	}, session_timeout_ms - timeout_margin_ms); // un minut abans de que finalitzi la sessió
+}
