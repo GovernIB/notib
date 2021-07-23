@@ -17,7 +17,9 @@
 <c:set var="parametresRegistre"><spring:message code="notificacio.form.titol.parametresregistre"/></c:set>
 <c:set var="enviaments"><spring:message code="notificacio.form.titol.enviaments"/></c:set>
 <c:set var="titular"><spring:message code="notificacio.form.titol.enviaments.titular"/></c:set>
+<c:set var="titularComunicacioSir"><spring:message code="notificacio.form.titol.enviaments.titularComunicacioSir"/></c:set>
 <c:set var="destinatarisTitol"><spring:message code="notificacio.form.titol.enviaments.destinataris"/></c:set>
+<c:set var="destinatarisTitolComunicacioSir"><spring:message code="notificacio.form.titol.enviaments.destinatarisComunicacioSir"/></c:set>
 <c:set var="metodeEntrega"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega"/></c:set>
 <c:set var="entregaPostal"><spring:message code="notificacio.form.titol.entregapostal"/></c:set>
 <c:set var="entregaPostalDades"><spring:message code="notificacio.form.titol.entregapostal.dades"/></c:set>
@@ -1152,10 +1154,14 @@
 					$('#docs-addicionals').removeClass('hidden');
 					$('#btn-documents').removeClass('hidden');
 					comunicacioAdministracio = true;
+					$('#labelTitular').text('${titularComunicacioSir}');
+					$('#labelDestinataris').text('${destinatarisTitolComunicacioSir}');
 				} else {
 					$('#normalitzat').removeClass('hidden');
 					$('#docs-addicionals').addClass('hidden');
 					$('#btn-documents').addClass('hidden');
+					$('#labelTitular').text('${titular}');
+					$('#labelDestinataris').text('${destinatarisTitol}');
 				}
 
 			}else{
@@ -1165,6 +1171,8 @@
 				$('#normalitzat').removeClass('hidden');
 				$('#docs-addicionals').addClass('hidden');
 				$('#btn-documents').addClass('hidden');
+				$('#labelTitular').text('${titular}');
+				$('#labelDestinataris').text('${destinatarisTitol}');
 			}
 
 			if (!comunicacioAdministracio) {
@@ -1455,7 +1463,7 @@
 							<div class="titular">
 								<div class="col-md-12 title-envios">
 									<div class="title-container">
-										<label>${titular}</label>
+										<label id="labelTitular">${titular}</label>
 									</div>
 									<hr/>
 								</div>
@@ -1525,7 +1533,7 @@
 							<div class="destinatari">
 								<div class="col-md-12 title-envios">
 									<div class="title-container">
-										<label> ${destinatarisTitol} </label>
+										<label id="labelDestinataris"> ${destinatarisTitol} </label>
 									</div>
 									<hr/>
 								</div>
