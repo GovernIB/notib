@@ -279,14 +279,14 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 INSERT ALL
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.callback.pendents.periode', 0, '30000',
-                                                                                                'Iterval de temps entre les execucions de la tasca (ms)',
-                                                                                                'INT',
-                                                                                                'SCHEDULLED_CALLBACK' )
-    INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.callback.pendents.retard.inicial', 0, '60000'
-                                                                                                'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
-                                                                                                'INT',
-                                                                                                'SCHEDULLED_CALLBACK' )
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.callback.pendents.periode', '30000',
+                                                                                       'Iterval de temps entre les execucions de la tasca (ms)',
+                                                                                       'INT',
+                                                                                       'SCHEDULLED_CALLBACK' )
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.tasca.callback.pendents.retard.inicial', '60000',
+                                                                                       'Temps a esperar per a executar la tasca per primera vegada un cop arrancat el servidor (ms)',
+                                                                                       'INT',
+                                                                                       'SCHEDULLED_CALLBACK' )
 SELECT 1 FROM DUAL;
 
 INSERT ALL
