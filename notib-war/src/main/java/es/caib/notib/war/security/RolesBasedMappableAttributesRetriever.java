@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.authority.mapping.MappableAttributesRetriever;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +56,8 @@ public class RolesBasedMappableAttributesRetriever implements MappableAttributes
 				mappableAttributes.addAll(rolsPermisos);
 				// Refrescam els rols disponibles cada hora
 				refrescarTimestamp = System.currentTimeMillis() + (60 * 60 * 1000);
-				String rolsPerMostrar = Arrays.toString(mappableAttributes.toArray(new String[mappableAttributes.size()]));
-				LOGGER.debug("Rols disponibles: " + rolsPerMostrar);
+//				String rolsPerMostrar = Arrays.toString(mappableAttributes.toArray(new String[mappableAttributes.size()]));
+//				LOGGER.debug("Rols disponibles: " + rolsPerMostrar);
 			} catch (RuntimeException ex) {
 				throw ex;
 			}

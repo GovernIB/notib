@@ -8,15 +8,14 @@ import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,11 +39,6 @@ import java.util.Map;
 @Slf4j
 @Component
 public class CacheHelper {
-
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private ProcedimentRepository procedimentRepository;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
 	@Resource
@@ -55,10 +49,6 @@ public class CacheHelper {
 	private PermisosHelper permisosHelper;
 	@Resource
 	private PluginHelper pluginHelper;
-	@Resource
-	private UsuariHelper usuariHelper;
-	@Resource
-	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private CacheManager cacheManager;
 
@@ -224,8 +214,26 @@ public class CacheHelper {
 	public void evictUnitatPerCodi() {
 	}
 	
-	public void clearCache(String value) {
-		cacheManager.getCache(value).clear();
+	public void clearCache(String cacheName) {
+		cacheManager.getCache(cacheName).clear();
 	}
 
+	public long getCacheSize(String cacheName)
+	{
+		Cache cache = cacheManager.getCache(cacheName);
+		Object nativeCache = cache.getNativeCache();
+		if (nativeCache instanceof net.sf.ehcache.Ehcache) {
+			net.sf.ehcache.Ehcache ehCache = (net.sf.ehcache.Ehcache) nativeCache;
+			return ehCache.getStatistics().getLocalHeapSizeInBytes();
+		}
+		return 0L;
+	}
+
+	public long getTotalEhCacheSize() {
+		long totalSize = 0L;
+		for (String cacheName : cacheManager.getCacheNames()) {
+			totalSize = getCacheSize(cacheName);
+		}
+		return totalSize;
+	}
 }

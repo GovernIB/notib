@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.*;
@@ -29,17 +26,11 @@ public class PermisosHelper {
 			AplicacioService aplicacioService) { 
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
-			
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-//			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-			List<ProcedimentSimpleDto> procedimentsDisponibles;
-			if (RolHelper.isUsuariActualUsuari(request)) {
-				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-//				procedimentsDisponibles = procedimentService.findProcedimentsSenseGrupsWithPermis(entitatActual.getId(), PermisEnum.NOTIFICACIO);
-//				if (procedimentsDisponibles.isEmpty())
-//					procedimentsDisponibles = procedimentService.findProcedimentsAmbGrupsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+			if (entitatActual != null && usuariActual != null && RolHelper.isUsuariActualUsuari(request)) {
+				List<ProcedimentSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
 				request.setAttribute("permisNotificacio", !procedimentsDisponibles.isEmpty());
 			}
 		}
