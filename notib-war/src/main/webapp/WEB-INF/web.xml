@@ -120,7 +120,7 @@
 	</error-page>
 
 	<session-config>
-		<session-timeout>2</session-timeout>
+		<session-timeout>120</session-timeout>
 	</session-config>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

@@ -692,7 +692,7 @@ function pingServer(){
 }
 
 function resetSessionTimeout(){
-	let session_timeout_minutes = 2;
+	let session_timeout_minutes = 120;
 	let session_timeout_ms = session_timeout_minutes * 60 * 1000;
 	let timeout_margin_ms = 60000;
 	setTimeout(function() {

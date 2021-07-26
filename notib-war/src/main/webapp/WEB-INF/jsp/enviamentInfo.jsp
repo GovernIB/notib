@@ -94,7 +94,14 @@ $(document).ready(function() {
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatNotifica'}"> class="active"</c:if>>
 			<a href="#estatNotifica" aria-controls="estatNotifica" role="tab" data-toggle="tab">
-				<spring:message code="enviament.info.tab.estat.notifica"/>
+				<c:choose>
+					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+						<spring:message code="enviament.info.tab.estat.sir"/>
+					</c:when>
+					<c:otherwise>
+						<spring:message code="enviament.info.tab.estat.notifica"/>
+					</c:otherwise>
+				</c:choose>				
 			</a>
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
@@ -366,12 +373,19 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
-				<p class="text-right" style="margin-top: 1em">
-					<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">
-						<span class="fa fa-refresh"></span>
-						<spring:message code="enviament.info.accio.refrescar.estat"/>
-					</a>
-				</p>
+				<c:choose>
+					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+						<br/>
+					</c:when>
+					<c:otherwise>
+						<p class="text-right" style="margin-top: 1em">
+							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">
+								<span class="fa fa-refresh"></span>
+								<spring:message code="enviament.info.accio.refrescar.estat"/>
+							</a>
+						</p>
+					</c:otherwise>
+				</c:choose>
 				<div class="row">
 					<c:set var="datatColSize" value="12"/>
 					<c:if test="${not empty enviament.notificaCertificacioData}"><c:set var="datatColSize" value="5"/></c:if>
