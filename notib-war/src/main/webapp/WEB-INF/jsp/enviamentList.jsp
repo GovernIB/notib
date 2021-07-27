@@ -216,11 +216,11 @@ $(document).ready(function() {
 
 		$('#reintentarNotificacio').on('click', function() {
 			if(confirm("<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>")){
-				$("#loading-screen").show();
 				$.get(
 					"enviament/reintentar/notificacio",
 					function(data) {
-						location.reload();
+						$('#enviament').DataTable().ajax.reload(null, false);
+				        webutilRefreshMissatges();
 					}
 				);
 			}
@@ -232,7 +232,8 @@ $(document).ready(function() {
 				$.get(
 					"enviament/reactivar/consulta",
 					function(data) {
-						location.reload();
+						$('#enviament').DataTable().ajax.reload(null, false);
+				        webutilRefreshMissatges();
 					}
 				);
 			}
@@ -244,7 +245,8 @@ $(document).ready(function() {
 				$.get(
 					"enviament/reactivar/sir",
 					function(data) {
-						location.reload();
+						$('#enviament').DataTable().ajax.reload(null, false);
+				        webutilRefreshMissatges();
 					}
 				);
 			}
@@ -255,7 +257,8 @@ $(document).ready(function() {
 				$.get(
 						"enviament/actualitzarestat",
 						function(data) {
-							location.reload();
+					        $('#enviament').DataTable().ajax.reload(null, false);
+					        webutilRefreshMissatges();
 						}
 				);
 			}
@@ -267,7 +270,8 @@ $(document).ready(function() {
 				$.get(
 						"enviament/reactivar/callback",
 						function(data) {
-							location.reload();
+							$('#enviament').DataTable().ajax.reload(null, false);
+					        webutilRefreshMissatges();
 						}
 				);
 			}
