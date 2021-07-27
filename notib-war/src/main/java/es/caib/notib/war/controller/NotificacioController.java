@@ -117,8 +117,8 @@ public class NotificacioController extends BaseUserController {
                 NOTIFICACIONS_FILTRE,
                 command);
 //        notificacioListHelper.ompleProcediments(request, model);
-//        model.addAttribute("notificacioFiltreCommand", command);
-//        model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
+        model.addAttribute("notificacioFiltreCommand", command);
+        model.addAttribute("nomesAmbErrors", command.isNomesAmbErrors());
         return "notificacioList";
     }
 

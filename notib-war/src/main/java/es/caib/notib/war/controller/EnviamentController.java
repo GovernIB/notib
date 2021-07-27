@@ -181,10 +181,6 @@ public class EnviamentController extends BaseUserController {
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
-				procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
-				for(ProcedimentSimpleDto procediment: procedimentsDisponibles) {
-					codisProcedimentsDisponibles.add(procediment.getCodi());
-				}
 			}
 
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(

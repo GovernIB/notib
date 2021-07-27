@@ -158,8 +158,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) "+
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
-			"and ((:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib)) " +
-			"   or (nenv.procedimentCodiNotib is null and nenv.organCodi is not null and nenv.organCodi in (:organs))) " +
+			"and (nenv.organCodi is not null and nenv.organCodi in (:organs)) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
 			"	(:hasZeronotificaEnviamentIntent = true and nenv.registreEnviamentIntent = 0) or " +
 			"	(:hasZeronotificaEnviamentIntent = false and nenv.registreEnviamentIntent > 0) " +
@@ -218,8 +217,6 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("dataRegistreInici") Date dataRegistreInici,
 			@Param("esDataRegistreFiNull") boolean esDataRegistreFiNull,
 			@Param("dataRegistreFi") Date dataRegistreFi,
-			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
-			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("organs") List<String> organs,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
