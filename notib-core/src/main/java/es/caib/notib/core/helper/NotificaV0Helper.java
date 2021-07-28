@@ -174,6 +174,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		NotificacioEventEntity.BuilderOld eventCertBuilder  = null;
 
 		enviament.updateNotificaDataRefrescEstat();
+		enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
 		
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
