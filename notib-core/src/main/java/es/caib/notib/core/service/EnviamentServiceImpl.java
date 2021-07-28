@@ -570,8 +570,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 						dataRegistreInici,
 						(dataRegistreFi == null),
 						dataRegistreFi,
-						esProcedimentsCodisNotibNull,
-						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
 						organs,
 						nomesAmbErrors,
 						nomesSenseErrors,
