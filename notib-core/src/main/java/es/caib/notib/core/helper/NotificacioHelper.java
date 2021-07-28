@@ -316,7 +316,10 @@ public class NotificacioHelper {
 						if (recuperarMetadadesArxiu(documentArxiu, document)) {
 							doc.setOrigen(OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()));
 							doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())));
-							doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
+							if (documentArxiu.getMetadades().getTipusDocumental() != null)
+								doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()));
+							else if (documentArxiu.getMetadades().getTipusDocumentalAddicional() != null) 
+								doc.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumentalAddicional()));
 							doc.setModoFirma(pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
 						} else {
 							doc.setOrigen(document.getOrigen());
@@ -441,7 +444,7 @@ public class NotificacioHelper {
 		}
 		if (documentArxiu.getMetadades() == null || documentArxiu.getMetadades().getOrigen() == null 
 				|| documentArxiu.getMetadades().getEstatElaboracio() == null
-				|| documentArxiu.getMetadades().getTipusDocumental() == null
+				|| (documentArxiu.getMetadades().getTipusDocumental() == null  && documentArxiu.getMetadades().getTipusDocumentalAddicional() == null)
 				|| documentArxiu.getContingut().getArxiuNom() == null) {
 			if (document.getOrigen() == null || document.getValidesa() == null || document.getTipoDocumental() == null || document.getModoFirma()) {
 				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
