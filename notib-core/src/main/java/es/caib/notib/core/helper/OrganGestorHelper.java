@@ -149,7 +149,7 @@ public class OrganGestorHelper {
 			return OrganGestorEstatEnum.ALTRES;
 		}
 
-		if ("Vigente".equals(nodeOrgan.getEstat())) {
+		if (nodeOrgan.getEstat().toUpperCase().startsWith("VIGENT")) {
 			return OrganGestorEstatEnum.VIGENT;
 
 		} else {
