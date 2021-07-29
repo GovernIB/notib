@@ -63,11 +63,13 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 
+	private final Object lock = new Object();
+	
 	@Override
 	@Transactional
 	public void sincronizarEnvio(
 			String organismoEmisor, 
-			Holder<String> identificador, 
+			Holder<String> hIdentificador, 
 			BigInteger tipoEntrega,
 			BigInteger modoNotificacion, 
 			String estado, 
@@ -82,10 +84,16 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			String identificador;
+			
+			synchronized (lock) {
+				identificador = hIdentificador == null ? null : hIdentificador.value;
+			}
+			
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm");
 			
 			logger.info("[ADV] Inici sincronització enviament Adviser [");
-			logger.info("        Id: " + (identificador != null ? identificador.value : ""));
+			logger.info("        Id: " + (identificador != null ? identificador : ""));
 			logger.info("        OrganismoEmisor: " + organismoEmisor);
 			logger.info("        TipoEntrega: " + tipoEntrega);
 			logger.info("        ModoNotificacion: " + modoNotificacion);
@@ -103,7 +111,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					"Recepció de canvi de notificació via Adviser", 
 					IntegracioAccioTipusEnumDto.RECEPCIO, 
 					new AccioParam("Organisme emisor", organismoEmisor),
-					new AccioParam("Identificador", (identificador != null ? identificador.value : "")),
+					new AccioParam("Identificador", (identificador != null ? identificador : "")),
 					new AccioParam("Tipus d'entrega", String.valueOf(tipoEntrega)),
 					new AccioParam("Mode de notificació", String.valueOf(modoNotificacion)),
 					new AccioParam("Estat", estado),
@@ -135,7 +143,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity updateEnviament(
 			String organismoEmisor,
-			Holder<String> identificador,
+			String identificador,
 			BigInteger tipoEntrega,
 			BigInteger modoNotificacion,
 			String estado,
@@ -151,7 +159,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		boolean eventInitialitzaCallback=false;
 		String eventErrorDescripcio = null;
 		try {
-			enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador.value);
+			enviament = notificacioEnviamentRepository.findByNotificaIdentificador(identificador);
 			if (enviament == null) {
 				logger.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
@@ -280,7 +288,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT.name());
 		}
-		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador.value : "") + "]");
+		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
 		return enviament;
 	}
 
@@ -334,7 +342,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			Acuse acusePDF,
 			String organismoEmisor,
 			BigInteger modoNotificacion,
-			Holder<String> identificador,
+			String identificador,
 			Holder<String> codigoRespuesta,
 			Holder<String> descripcionRespuesta,
 			NotificacioEnviamentEntity enviament) throws Exception {
