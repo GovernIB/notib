@@ -2244,6 +2244,12 @@ public class PluginHelper {
 	public int getConsultaReintentsMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim");
 	}
+	public int getConsultaReintentsDEHMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.deh.reintents.maxim");
+	}
+	public int getConsultaReintentsCIEMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.cie.reintents.maxim");
+	}
 	public int getConsultaSirReintentsMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
 	}

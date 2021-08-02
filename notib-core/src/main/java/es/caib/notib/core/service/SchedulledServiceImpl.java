@@ -13,7 +13,6 @@ import es.caib.notib.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -178,6 +177,62 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}	
 	}
+	
+	//6. Consulta certificació notificacions DEH finalitzades
+	//////////////////////////////////////////////////////////////////
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void enviamentRefrescarEstatDEH() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+				logger.info("[DEH] Cercant enviaments DEH finalitzats sense certificació...");
+				List pendents = notificacioService.getNotificacionsDEHPendentsRefrescarCert();
+				if (pendents != null && !pendents.isEmpty()) {
+					logger.info("[DEH] Realitzant refresc de certificació de Notifica per a " + pendents.size() + " enviaments");
+					for (NotificacioEnviamentEntity enviament: (List<NotificacioEnviamentEntity>)pendents) {
+						logger.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+						enviamentHelper.updateDEHCertNovaConsulta(enviament.getId());
+						notificacioService.enviamentRefrescarEstat(enviament.getId());
+					}
+				} else {
+					logger.info("[DEH] No hi ha enviaments DEH sense certificació");
+				}
+			} else {
+				logger.info("[DEH] L'actualització de la certificació dels enviaments amb l'estat de Notific@ està deshabilitada");
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	//7. Consulta certificació notificacions CIE finalitzades
+	//////////////////////////////////////////////////////////////////
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void enviamentRefrescarEstatCIE() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+				logger.info("[CIE] Cercant enviaments CIE finalitzats sense certificació...");
+				List pendents = notificacioService.getNotificacionsCIEPendentsRefrescarCert();
+				if (pendents != null && !pendents.isEmpty()) {
+					logger.info("[CIE] Realitzant refresc de certificació de Notifica per a " + pendents.size() + " enviaments");
+					for (NotificacioEnviamentEntity enviament: (List<NotificacioEnviamentEntity>)pendents) {
+						logger.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+						enviamentHelper.updateCIECertNovaConsulta(enviament.getId());
+						notificacioService.enviamentRefrescarEstat(enviament.getId());
+					}
+				} else {
+					logger.info("[CIE] No hi ha enviaments CIE sense certificació");
+				}
+			} else {
+				logger.info("[CIE] L'actualització de la certificació dels enviaments amb l'estat de Notific@ està deshabilitada");
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 
 	// Refrescar notificacions expirades
 	/////////////////////////////////////////////////////////////////////////
@@ -226,6 +281,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 	private boolean isActualitzacioProcedimentsActiuProperty() {
 		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");
+	}
+	private boolean isEnviamentActualitzacioCertificacioActiva() {
+		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.certificacio.finalitzades.actiu");
 	}
 	
 	private boolean isSemaforInUse() {

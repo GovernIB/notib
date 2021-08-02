@@ -305,6 +305,20 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date sirRegDestiData;
 	
+	@Column(name = "deh_cert_intent_num")
+	protected int dehCertIntentNum;
+	
+	@Column(name = "deh_cert_intent_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date dehCertIntentData;
+	
+	@Column(name = "cie_cert_intent_num")
+	protected int cieCertIntentNum;
+	
+	@Column(name = "cie_cert_intent_data")
+	@Temporal(TemporalType.TIMESTAMP)
+	protected Date cieCertIntentData;
+	
 	@Transient
 	private String csvUuid;
 
@@ -489,6 +503,20 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void refreshSirConsulta() {
 		this.sirConsultaIntent = 0;
 		this.sirConsultaData = new Date();
+	}
+	
+	public void updateDEHCertNovaConsulta(Integer reintentPeriode) {
+		this.dehCertIntentNum++;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^dehCertIntentNum));
+		this.dehCertIntentData = cal.getTime();
+	}
+	
+	public void updateCIECertNovaConsulta(Integer reintentPeriode) {
+		this.cieCertIntentNum++;
+		Calendar cal = GregorianCalendar.getInstance();
+		cal.add(Calendar.MILLISECOND, reintentPeriode*(2^cieCertIntentNum));
+		this.cieCertIntentData = cal.getTime();
 	}
 	
 	public void update(

@@ -212,6 +212,29 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<NotificacioEnviamentEntity> findByRegistreRefresc(
 			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
+	
+	
+	// Recupera enviaments amb DEH finalitzats sense certificació
+	@Query(	"from NotificacioEnviamentEntity " +
+			" where	notificaEstatFinal = true " + 
+			"	and notificaCertificacioData is null" +
+			"	and dehNif is not null" +
+			"	and dehCertIntentNum < :maxReintents " +
+			" order by notificaEstatDataActualitzacio asc nulls first")
+	List<NotificacioEnviamentEntity> findByDEHAndEstatFinal(
+			@Param("maxReintents")Integer maxReintents,
+			Pageable pageable);
+	
+	// Recupera enviaments a CIE finalitzats sense certificació
+	@Query(	"from NotificacioEnviamentEntity " +
+			" where	notificaEstatFinal = true " + 
+			"	and notificaCertificacioData is null" +
+			"	and domiciliCodiPostal is not null" +
+			"	and cieCertIntentNum < :maxReintents " +
+			" order by notificaEstatDataActualitzacio asc nulls first")
+	List<NotificacioEnviamentEntity> findByCIEAndEstatFinal(
+			@Param("maxReintents")Integer maxReintents,
+			Pageable pageable);
 
 	
 	

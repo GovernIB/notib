@@ -27,4 +27,12 @@ public class PropertiesConstants {
     // 7. Callback de client
     public static final String PROCESSAR_PENDENTS_RATE = "es.caib.notib.tasca.callback.pendents.periode";
     public static final String PROCESSAR_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.callback.pendents.retard.inicial";
+    
+    // 8. Consulta certificació notificacions DEH finalitzades
+    public static final String ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE = "es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.periode";
+    public static final String ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.retard.inicial";
+    
+    // 9. Consulta certificació notificacions CIE finalitzades
+    public static final String ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE = "es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.periode";
+    public static final String ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.retard.inicial";
 }

@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class EnviamentHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public void enviamentRefrescarEstat(
@@ -94,5 +97,17 @@ public class EnviamentHelper {
 			progres.setProgres(100);
 		}
 		integracioHelper.addAccioOk(info);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void updateDEHCertNovaConsulta(Long enviamentId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		enviament.updateDEHCertNovaConsulta(configHelper.getAsInt(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE));
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void updateCIECertNovaConsulta(Long enviamentId) {
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		enviament.updateCIECertNovaConsulta(configHelper.getAsInt(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE));
 	}
 }

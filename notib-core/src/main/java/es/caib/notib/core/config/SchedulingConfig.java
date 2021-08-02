@@ -32,7 +32,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Autowired
 	private ConfigHelper configHelper;
 
-    private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
+    private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
 	
 
     @Override
@@ -213,6 +213,62 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         	primeraVez[4] = false;
                         }
                         trigger.setInitialDelay(processarPendentsInitialDelayLong);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+        
+        // 6. Consulta certificació notificacions DEH finalitzades
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        schedulledService.enviamentRefrescarEstatDEH();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        trigger.setFixedRate(true);
+                        // Només la primera vegada que s'executa
+                        Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
+                        if (primeraVez[5]) {
+                        	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY);
+                        	primeraVez[5] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+        
+        // 7. Consulta certificació notificacions CIE finalitzades
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        schedulledService.enviamentRefrescarEstatCIE();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        trigger.setFixedRate(true);
+                        // Només la primera vegada que s'executa
+                        Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
+                        if (primeraVez[6]) {
+                        	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY);
+                        	primeraVez[6] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
