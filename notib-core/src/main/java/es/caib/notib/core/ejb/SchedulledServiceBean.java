@@ -61,4 +61,14 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.refrescarNotificacionsExpirades();
 	}
 
+	@Override
+	public void enviamentRefrescarEstatDEH() {
+		delegate.enviamentRefrescarEstatDEH();
+	}
+
+	@Override
+	public void enviamentRefrescarEstatCIE() {
+		delegate.enviamentRefrescarEstatCIE();
+	}
+
 }

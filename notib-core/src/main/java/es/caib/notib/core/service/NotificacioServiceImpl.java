@@ -1510,6 +1510,39 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
+	@Transactional(readOnly = true)
+	@Override
+	public List getNotificacionsDEHPendentsRefrescarCert() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			int maxPendents = getEnviamentDEHActualitzacioCertProcessarMaxProperty();
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByDEHAndEstatFinal(
+					pluginHelper.getConsultaReintentsDEHMaxProperty(),
+					new PageRequest(0, maxPendents));
+			return pendents;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Transactional(readOnly = true)
+	@Override
+	public List getNotificacionsCIEPendentsRefrescarCert() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			int maxPendents = getEnviamentCIEActualitzacioCertProcessarMaxProperty();
+			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByCIEAndEstatFinal(
+					pluginHelper.getConsultaReintentsCIEMaxProperty(),
+					new PageRequest(0, maxPendents));
+			return pendents;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.processar.max");
 	}
@@ -1518,6 +1551,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max");
+	}
+	private int getEnviamentDEHActualitzacioCertProcessarMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.processar.max");
+	}
+	private int getEnviamentCIEActualitzacioCertProcessarMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max");

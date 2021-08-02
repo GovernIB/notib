@@ -337,6 +337,10 @@ public interface NotificacioService {
 	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstat();
 	@SuppressWarnings("rawtypes")
+	List getNotificacionsDEHPendentsRefrescarCert();
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsCIEPendentsRefrescarCert();
+	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstatRegistre();
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")

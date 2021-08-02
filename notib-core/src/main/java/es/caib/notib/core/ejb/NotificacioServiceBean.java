@@ -9,6 +9,8 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -368,6 +370,18 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"tothom"})
 	public boolean validarIdCsv (String idCsv) {
 		return delegate.validarIdCsv(idCsv);
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List getNotificacionsDEHPendentsRefrescarCert() {
+		return delegate.getNotificacionsDEHPendentsRefrescarCert();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List getNotificacionsCIEPendentsRefrescarCert() {
+		return delegate.getNotificacionsCIEPendentsRefrescarCert();
 	}
 
 }
