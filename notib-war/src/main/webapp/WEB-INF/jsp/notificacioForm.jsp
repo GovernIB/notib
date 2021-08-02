@@ -1763,7 +1763,7 @@
 			<div class="text-left vt10">
 				<div class="btn-group">
 					<input type="button" class="btn btn-default" id="addEnviament"
-						   onclick="addEnvio('${urlOrganigrama}', '${urlComunitatsAutonomes}', '${urlNivellAdministracions}', ''${urlCercaUnitats}, '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}', personaMaxSizes)"
+						   onclick="addEnvio('${urlOrganigrama}', '${urlComunitatsAutonomes}', '${urlNivellAdministracions}', '${urlCercaUnitats}', '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}', personaMaxSizes)"
 						   value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
 				</div>
 			</div>
