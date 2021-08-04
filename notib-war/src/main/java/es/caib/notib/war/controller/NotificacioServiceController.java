@@ -21,7 +21,10 @@ import org.springframework.web.servlet.HandlerMapping;
 import javax.ejb.EJBAccessException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Controlador del servei REST per a la gestio de notificacions.
@@ -108,12 +111,18 @@ public class NotificacioServiceController extends BaseController {
 	@ResponseBody
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			HttpServletRequest request) throws UnsupportedEncodingException {
+		RespostaConsultaEstatNotificacio resp = new RespostaConsultaEstatNotificacio();
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
 		String identificador = extractIdentificador(request);
 		try {
+			if (identificador.isEmpty()) {
+				resp.setError(true);
+				resp.setErrorDescripcio("No s'ha informat cap identificador de la notificació");
+				resp.setErrorData(new Date());
+				return resp;
+			}
 			return notificacioServiceWsV2.consultaEstatNotificacio(identificador);
 		} catch (Exception e) {
-			RespostaConsultaEstatNotificacio resp = new RespostaConsultaEstatNotificacio();
 			resp.setError(true);
 			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
 				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
@@ -146,12 +155,18 @@ public class NotificacioServiceController extends BaseController {
 	@ResponseBody
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(
 			HttpServletRequest request) throws UnsupportedEncodingException {
+		RespostaConsultaEstatEnviament resp = new RespostaConsultaEstatEnviament();
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
 		String referencia = extractIdentificador(request);
 		try {
+			if (referencia.isEmpty()) {
+				resp.setError(true);
+				resp.setErrorDescripcio("No s'ha informat cap referència de l'enviament");
+				resp.setErrorData(new Date());
+				return resp;
+			}
 			return notificacioServiceWsV2.consultaEstatEnviament(referencia);
 		} catch (Exception e) {
-			RespostaConsultaEstatEnviament resp = new RespostaConsultaEstatEnviament();
 			resp.setError(true);
 			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
 				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
@@ -170,10 +185,16 @@ public class NotificacioServiceController extends BaseController {
 	}
 	
 	private String extractIdentificador(HttpServletRequest request) {
-		String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-	 
-		return new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
+		String url = request.getRequestURL().toString();
+		String[] urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
+		String referencia = urlArr.length > 1 ? urlArr[1].substring(1) : "";
+		return referencia;
+//		####MÈTODE ANTERIOR PER EXTREURE REFERÈNCIA [NO FUNCIONA SI LA REFERÈNCIA CONTÉ MÉS D'UNA BARRA]
+//		####EMPRAR MÈTODE ANTERIOR O TODO: CANVIAR GENERACIÓ REFERÈNCIA PER NO INCLOURE BARRES
+//		String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+//		String bestMatchPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+//	 
+//		return new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
 	}
 	
 	@RequestMapping(
@@ -262,12 +283,18 @@ public class NotificacioServiceController extends BaseController {
 			required = true)
 	@ResponseBody
 	public RespostaConsultaJustificant consultaJustificant(HttpServletRequest request) {
+		RespostaConsultaJustificant resp = new RespostaConsultaJustificant();
 		String usuariActualCodi = aplicacioService.getUsuariActual().getCodi();
 		String referencia = extractIdentificador(request);
 		try {
+			if (referencia.isEmpty()) {
+				resp.setError(true);
+				resp.setErrorDescripcio("No s'ha informat cap identificador de la notificació");
+				resp.setErrorData(new Date());
+				return resp;
+			}
 			return notificacioServiceWsV2.consultaJustificantEnviament(referencia);
 		} catch (Exception e) {
-			RespostaConsultaJustificant resp = new RespostaConsultaJustificant();
 			resp.setError(true);
 			if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
 				resp.setErrorDescripcio("L'usuari " + usuariActualCodi + " no té els permisos necessaris: " + e.getMessage());
