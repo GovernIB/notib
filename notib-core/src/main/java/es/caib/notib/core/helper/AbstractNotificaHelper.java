@@ -5,9 +5,12 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.repository.NotificacioRepository;
+
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +44,11 @@ public abstract class AbstractNotificaHelper {
 	AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private ConfigHelper configHelper;
-
+	@Autowired 
+	private EmailNotificacioHelper emailNotificacioHelper;
+	@Autowired
+	private NotificacioRepository notificacioRepository;
+	
 	private boolean modeTest;
 	
 	public abstract NotificacioEntity notificacioEnviar(
@@ -74,7 +81,7 @@ public abstract class AbstractNotificaHelper {
 			String notificaDatatReceptorNom,
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
-			NotificacioEnviamentEntity enviament) {
+			NotificacioEnviamentEntity enviament) throws Exception {
 		boolean estatFinal = 
 				NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
@@ -111,7 +118,22 @@ public abstract class AbstractNotificaHelper {
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
 			auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
-
+			
+			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
+			NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
+			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+				long startTime = System.nanoTime();
+				
+				try {
+					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
+				} catch (Exception ex) {
+					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
+				}
+				
+				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
+			}
+			
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 //			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
 //				logger.info("Marcant notificació com processada per ser usuari aplicació...");

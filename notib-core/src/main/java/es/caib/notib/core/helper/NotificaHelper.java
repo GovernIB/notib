@@ -64,7 +64,7 @@ public class NotificaHelper {
 			String notificaDatatReceptorNom,
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
-			NotificacioEnviamentEntity enviament) {
+			NotificacioEnviamentEntity enviament) throws Exception {
 		getNotificaHelper().enviamentUpdateDatat(
 				notificaEstat,
 				notificaEstatData,
