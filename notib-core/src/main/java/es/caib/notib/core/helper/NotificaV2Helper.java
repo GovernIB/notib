@@ -370,7 +370,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				throw ex;
 			}
 		}
-		notificacio.addEnviament(enviament);
 		return enviament;
 	}
 
