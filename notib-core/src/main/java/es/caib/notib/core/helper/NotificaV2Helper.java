@@ -74,8 +74,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
-	private EmailNotificacioHelper emailNotificacioHelper;
-	@Autowired 
 	ConversioTipusHelper conversioTipusHelper;
 	@Autowired 
 	ProcedimentRepository procedimentRepository;
@@ -348,13 +346,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						enviament);
 				logger.info("Fi actualització Datat");
 
-				logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
-				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
-					startTime = System.nanoTime();
-					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-					elapsedTime = (System.nanoTime() - startTime) / 10e6;
-					logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
-				}
 			}
 			logger.info("Enviament actualitzat");
 
