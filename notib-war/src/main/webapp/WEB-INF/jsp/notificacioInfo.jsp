@@ -546,7 +546,7 @@ $(document).ready(function() {
 							    				</c:otherwise>
 							    			</c:choose>
 							    		</tr>
-										<c:if test="${enviament.registreEstatFinal}">
+										<c:if test="${notificacio.comunicacioSir and enviament.registreEstatFinal}">
 											<tr>
 												<td colspan="2">
 													<a href="<c:url value="/notificacio/${enviament.id}/justificant/sir"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">

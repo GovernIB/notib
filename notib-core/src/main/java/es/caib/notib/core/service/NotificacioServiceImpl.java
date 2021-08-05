@@ -421,6 +421,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(),
 						CieDataDto.class));
 			}
+
+			if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
+				dto.setComunicacioSir(true);
+				for(NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
+					if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+						dto.setComunicacioSir(false);
+						break;
+					}
+				}
+			} else {
+				dto.setComunicacioSir(false);
+			}
+
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

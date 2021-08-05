@@ -41,7 +41,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String serveiTipus;
-	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
+	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
 	private String usuariCodi;
 	private String motiu;
 	private String numExpedient;
@@ -66,6 +66,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 
 	private boolean hasEnviamentsPendents;
 
+	private boolean comunicacioSir;
 
 	private String registreLlibreNom;
 	private String registreOficinaNom;
