@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -106,7 +106,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
     public void whenNotificaCorrecte_thenEstatIsNotifica() throws Exception {
         // Given
         NotificacioDatabaseDto notificacioDto = (NotificacioDatabaseDto) database.get("notificacio");
-        NotificacioEnviamentDtoV2 enviamentDto = notificacioDto.getEnviaments().get(0);
+        NotEnviamentDatabaseDto enviamentDto = notificacioDto.getEnviaments().get(0);
         NotificacioEnviamentEntity enviament = enviamentRepository.getOne(enviamentDto.getId());
         NotificacioEntity notificacio = notificacioRepository.getOne(notificacioDto.getId());
         NotificacioEventEntity eventNotificar = NotificacioEventEntity.builder()
@@ -148,7 +148,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
                         .withHeader("Content-Type", "text/xml")
                         .withBody("<response>Some content</response>")));
         NotificacioDatabaseDto notificacioDto = (NotificacioDatabaseDto) database.get("notificacio");
-        NotificacioEnviamentDtoV2 enviamentDto = notificacioDto.getEnviaments().get(0);
+        NotEnviamentDatabaseDto enviamentDto = notificacioDto.getEnviaments().get(0);
         NotificacioEnviamentEntity enviament = enviamentRepository.getOne(enviamentDto.getId());
         NotificacioEntity notificacio = notificacioRepository.getOne(notificacioDto.getId());
         NotificacioEventEntity eventNotificar = NotificacioEventEntity.builder()

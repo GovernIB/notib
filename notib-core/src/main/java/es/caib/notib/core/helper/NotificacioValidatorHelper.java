@@ -3,7 +3,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
@@ -92,7 +92,7 @@ public class NotificacioValidatorHelper {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			errors.add("[1100] El camp 'enviaments' no pot ser null.");
 		} else {
-			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
+			for (NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
 				//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
 					if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) ||

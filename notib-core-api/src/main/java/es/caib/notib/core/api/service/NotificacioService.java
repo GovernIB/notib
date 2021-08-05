@@ -46,7 +46,7 @@ public interface NotificacioService {
 	 *              Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public void delete(
+	void delete(
 			Long entitatId,
 			Long notificacioId) throws NotFoundException;
 	
@@ -79,7 +79,19 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioDtoV2 findAmbId(
+	NotificacioDtoV2 findAmbId(
+			Long id,
+			boolean isAdministrador);
+
+	/**
+	 * Consulta una notificació donat el seu id.
+	 *
+	 * @param id
+	 *            Atribut id de la notificació.
+	 * @return La notificació amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	NotificacioInfoDto findNotificacioInfo(
 			Long id,
 			boolean isAdministrador);
 

@@ -107,7 +107,7 @@ public class ProcedimentController extends BaseUserController{
 					isUsuariEntitat,
 					isAdministrador,
 					organGestorActual,
-					ProcedimentFiltreCommand.asDto(procedimentFiltreCommand),
+					procedimentFiltreCommand.asDto(),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
 			MissatgesHelper.error(

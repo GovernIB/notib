@@ -1,6 +1,7 @@
 package es.caib.notib.core.test.data;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.NotificacioService;
@@ -90,7 +91,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 //                .procediment(procediment)
 //				.procedimentCodiNotib()
 //                .grup(grupCreate)
-                .enviaments(new ArrayList<NotificacioEnviamentDtoV2>())
+                .enviaments(new ArrayList<NotEnviamentDatabaseDto>())
                 .usuariCodi("admin")
 //				.motiu()
                 .numExpedient("EXPEDIENTEX")
@@ -102,23 +103,14 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
     }
 
     public static NotificacioDatabaseDto getRandomInstance() {
+        return getRandomInstance(2);
+    }
+
+    public static NotificacioDatabaseDto getRandomInstance(int numEnviaments) {
         NotificacioDatabaseDto notCreated = getRandomInstanceWithoutEnviaments();
-        int numDestinataris = 2;
-        List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
-//		if (ambEnviamentPostal) {
-//			PagadorPostal pagadorPostal = new PagadorPostal();
-//			pagadorPostal.setDir3Codi("A04013511");
-//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-//			pagadorPostal.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorPostal(pagadorPostal);
-//			PagadorCie pagadorCie = new PagadorCie();
-//			pagadorCie.setDir3Codi("A04013511");
-//			pagadorCie.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorCie(pagadorCie);
-//		}
-        for (int i = 0; i < numDestinataris; i++) {
-            NotificacioEnviamentDtoV2 enviament = getRandomEnviament(i);
+        List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
+        for (int i = 0; i < numEnviaments; i++) {
+            NotEnviamentDatabaseDto enviament = getRandomEnviament(i);
             enviaments.add(enviament);
         }
         notCreated.setEnviaments(enviaments);
@@ -126,8 +118,8 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         return notCreated;
     }
 
-    public static NotificacioEnviamentDtoV2 getRandomEnviament(int i){
-        NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
+    public static NotEnviamentDatabaseDto getRandomEnviament(int i){
+        NotEnviamentDatabaseDto enviament = new NotEnviamentDatabaseDto();
         PersonaDto titular = PersonaDto.builder()
                 .interessatTipus(InteressatTipusEnumDto.FISICA)
                 .nom("titularNom" + i)
@@ -152,6 +144,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
         return enviament;
     }
+
     private static InputStream getContingutNotificacioAdjunt() {
         return NotificacioItemTest.class.getResourceAsStream(
                 "/es/caib/notib/core/notificacio_adjunt.pdf");

@@ -13,14 +13,11 @@ import java.io.Serializable;
  */
 @Getter @Setter
 public class ProcedimentFiltreDto extends AuditoriaDto implements Serializable {
-	
-	
 	private String id;
 	private String codi;
 	private String nom;
 	private String organGestor;
 	private Long entitatId;
-	private Boolean comu;
-	
-	private static final long serialVersionUID = -2393511650074099319L;
+	private boolean comu;
+	private boolean entregaCieActiva;
 }

@@ -2,14 +2,13 @@ package es.caib.notib.war.validation;
 
 
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import es.caib.notib.war.command.EntregapostalCommand;
+import es.caib.notib.war.helper.MessageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.caib.notib.war.command.EntregapostalCommand;
-import es.caib.notib.war.helper.MessageHelper;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
@@ -30,7 +29,7 @@ public class ValidEntregaPostalValidator implements ConstraintValidator<ValidEnt
 		if (entregaPostal.isActiva()) {
 			try {
 				// Validacions per tipus de entrega postal
-				switch (entregaPostal.getTipus()) {
+				switch (entregaPostal.getDomiciliConcretTipus()) {
 				case NACIONAL:
 					if (entregaPostal.getViaTipus() == null) {
 						valid = false;

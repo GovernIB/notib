@@ -273,9 +273,8 @@ public class NotificacioServiceWsV2Test {
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
 		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), 
 				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class), 
-				Mockito.any(ServeiTipusEnumDto.class), Mockito.nullable(NotificaDomiciliNumeracioTipusEnumDto.class), 
-				Mockito.nullable(NotificaDomiciliConcretTipusEnumDto.class), Mockito.any(PersonaEntity.class), 
-				Mockito.anyListOf(PersonaEntity.class), Mockito.nullable(EntregaPostalViaTipusEnum.class))).thenReturn(enviamentSavedMock);
+				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
+				Mockito.anyListOf(PersonaEntity.class))).thenReturn(enviamentSavedMock);
 		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
 		Mockito.when(auditNotificacioHelper.desaNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
 		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);

@@ -1179,7 +1179,7 @@
 				for (var i = numDocuments - 1; i > 0; i--) {
 					$('#tipusDocument_' + i).val('').trigger('change');
 				}
-			}			
+			}
 			$("#documents\\[0\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
 			$("#documents\\[0\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
 			$("#documents\\[1\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
@@ -1637,7 +1637,8 @@
 								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!enviament.entregaPostal.activa}">style="display:none"</c:if>>
 									<div class="col-md-12">
 										<div class="col-md-12">
-											<not:inputSelect name="enviaments[${j}].entregaPostal.tipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true" optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
+											<not:inputSelect name="enviaments[${j}].entregaPostal.domiciliConcretTipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true"
+															 optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
 										</div>	
 										<div class="normalitzat">
 											<div class="col-md-4">
@@ -1650,10 +1651,16 @@
 												<not:inputText name="enviaments[${j}].entregaPostal.apartatCorreus" textKey="notificacio.form.camp.entregapostal.apartatcorreus" labelClass="labelcss" inputClass="inputcss" />
 											</div>
 											<div class="col-md-4">
-												<not:inputText name="enviaments[${j}].entregaPostal.numeroCasa" textKey="notificacio.form.camp.entregapostal.numerocasa" labelClass="labelcss" inputClass="inputcss" />
+												<not:inputText name="enviaments[${j}].entregaPostal.numeroCasa"
+															   textKey="notificacio.form.camp.entregapostal.numerocasa"
+															   labelClass="labelcss" inputClass="inputcss"
+															   required="true"/>
 											</div>
 											<div class="col-md-4">
-												<not:inputText name="enviaments[${j}].entregaPostal.puntKm" textKey="notificacio.form.camp.entregapostal.puntkm" labelClass="labelcss" inputClass="inputcss" />
+												<not:inputText name="enviaments[${j}].entregaPostal.puntKm"
+															   textKey="notificacio.form.camp.entregapostal.puntkm"
+															   labelClass="labelcss" inputClass="inputcss"
+															   required="true"/>
 											</div>
 											<div class="col-md-4">
 												<not:inputText name="enviaments[${j}].entregaPostal.portal" textKey="notificacio.form.camp.entregapostal.portal" labelClass="labelcss" inputClass="inputcss" />
@@ -1671,16 +1678,27 @@
 												<not:inputText name="enviaments[${j}].entregaPostal.bloc" textKey="notificacio.form.camp.entregapostal.bloc" labelClass="labelcss" inputClass="inputcss" />
 											</div>
 											<div class="col-md-4">
-												<not:inputText name="enviaments[${j}].entregaPostal.codiPostal" textKey="notificacio.form.camp.entregapostal.codipostal" labelClass="labelcss" inputClass="inputcss"/>
+												<not:inputText name="enviaments[${j}].entregaPostal.codiPostal"
+															   textKey="notificacio.form.camp.entregapostal.codipostal"
+															   labelClass="labelcss" inputClass="inputcss"
+															   required="true"/>
 											</div>
 											<div class="col-md-6">
 												<not:inputSelect name="enviaments[${j}].entregaPostal.paisCodi" generalClass="paisos" emptyOption="true" textKey="notificacio.form.camp.entregapostal.paiscodi" labelClass="labelcss" inputClass="inputcss"/>
 											</div>
 											<div class="col-md-6">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.provincia" generalClass="provincies" emptyOption="true" textKey="notificacio.form.camp.entregapostal.provincia" labelClass="labelcss" inputClass="inputcss"/>
+												<not:inputSelect name="enviaments[${j}].entregaPostal.provincia"
+																 generalClass="provincies" emptyOption="true"
+																 textKey="notificacio.form.camp.entregapostal.provincia"
+																 labelClass="labelcss" inputClass="inputcss"
+																 required="true"/>
 											</div>
 											<div class="col-md-6 poblacioSelect">
-												<not:inputSelect name="enviaments[${j}].entregaPostal.municipiCodi" generalClass="localitats" emptyOption="true" textKey="notificacio.form.camp.entregapostal.municipi" labelClass="labelcss" inputClass="inputcss"/>
+												<not:inputSelect name="enviaments[${j}].entregaPostal.municipiCodi"
+																 generalClass="localitats" emptyOption="true"
+																 textKey="notificacio.form.camp.entregapostal.municipi"
+																 labelClass="labelcss" inputClass="inputcss"
+																 required="true"/>
 											</div>
 											<script>
 												actualitzarEntrega('${j}', '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}'); // TODO: Averiguar si això està aquí per algún motiu

@@ -86,10 +86,10 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	@Column(name = "motiu")
 	private String motiu;
 	
-	@Column(name = "pagador_postal_id")
-	private Long pagadorPostalId;
-	@Column(name = "pagador_cie_id")
-	private Long pagadorCieId;
+//	@Column(name = "pagador_postal_id")
+//	private Long pagadorPostalId;
+//	@Column(name = "pagador_cie_id")
+//	private Long pagadorCieId;
 
 	// Registre
 	@Column(name = "registre_env_intent")
@@ -147,8 +147,8 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 		this.estat = notificacioEntity.getEstat();
 		this.estatDate = notificacioEntity.getEstatDate();
 		this.motiu = notificacioEntity.getMotiu();
-		this.pagadorPostalId = notificacioEntity.getPagadorPostal() != null ? notificacioEntity.getPagadorPostal().getId() : null;
-		this.pagadorCieId = notificacioEntity.getPagadorCie() != null ? notificacioEntity.getPagadorCie().getId() : null;
+//		this.pagadorPostalId = notificacioEntity.getPagadorPostal() != null ? notificacioEntity.getPagadorPostal().getId() : null;
+//		this.pagadorCieId = notificacioEntity.getPagadorCie() != null ? notificacioEntity.getPagadorCie().getId() : null;
 		this.registreEnviamentIntent = notificacioEntity.getRegistreEnviamentIntent();
 		this.registreNumero = notificacioEntity.getRegistreNumero();
 		this.registreNumeroFormatat = notificacioEntity.getRegistreNumeroFormatat();

@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
@@ -132,7 +133,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
                         assertNotNull(notificacioCreated);
 
                         // Given: Un enviament qualsevol
-                        NotificacioEnviamentDtoV2 enviament = notificacioCreated.getEnviaments().get(0);
+                        NotEnviamentDatabaseDto enviament = notificacioCreated.getEnviaments().get(0);
 
                         // When: Actualitzam l'estat de l'enviament
                         try {

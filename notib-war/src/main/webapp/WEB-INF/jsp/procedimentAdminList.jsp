@@ -53,6 +53,16 @@ pageContext.setAttribute(
 		});
 		
 		loadOrgans();
+
+
+		$('#btn-entregaCieActiva').click(function() {
+			let entregaCieActiva = !$(this).hasClass('active');
+			$('#entregaCieActiva').val(entregaCieActiva);
+		})
+		$('#btn-comu').click(function() {
+			let entregaCieActiva = !$(this).hasClass('active');
+			$('#comu').val(entregaCieActiva);
+		})
 	});
 	var organsGestors = [];
 	organsGestors.push({id:"", text:"", estat:"VIGENT"});
@@ -95,14 +105,24 @@ pageContext.setAttribute(
 			<div class="col-md-4">
 				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
-			<div class="col-md-5">
-				<label for="comuBtn"><spring:message code="procediment.filter.form.camp.comu"/>:</label>
-				<form:checkbox path="comu" id="comuBtn" disabled="false"/>
-			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="btn-group" role="group">
+					<button id="btn-comu" title="" class="btn btn-default <c:if test="${procedimentFiltreCommand.comu}">active</c:if>" data-toggle="button">
+						<span class="fa fa-globe"></span> <spring:message code="procediment.filter.form.camp.comu"/>
+					</button>
+					<not:inputHidden name="comu"/>
+					<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${procedimentFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
+						<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
+					</button>
+					<not:inputHidden name="entregaCieActiva"/>
 				</div>
 			</div>
 		</div>

@@ -6,8 +6,6 @@ import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import es.caib.notib.core.entity.cie.PagadorCieEntity;
-import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import lombok.*;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Index;
@@ -118,17 +116,17 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_entitat_notificacio_fk")
 	protected EntitatEntity entitat;
 	
-	/*pagador a Postal*/
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "pagador_postal_id")
-	@ForeignKey(name = "not_pagador_postal_not_fk")
-	protected PagadorPostalEntity pagadorPostal;
-	
-	/*pagador CIE*/
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "pagador_cie_id")
-	@ForeignKey(name = "not_pagador_cie_not_fk")
-	protected PagadorCieEntity pagadorCie;
+//	/*pagador a Postal*/
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "pagador_postal_id")
+//	@ForeignKey(name = "not_pagador_postal_not_fk")
+//	protected PagadorPostalEntity pagadorPostal;
+//
+//	/*pagador CIE*/
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "pagador_cie_id")
+//	@ForeignKey(name = "not_pagador_cie_not_fk")
+//	protected PagadorCieEntity pagadorCie;
 	
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)

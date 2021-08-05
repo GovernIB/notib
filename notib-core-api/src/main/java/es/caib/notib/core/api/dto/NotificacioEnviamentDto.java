@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.dto;
 
+import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
 import lombok.Getter;
 import lombok.Setter;
