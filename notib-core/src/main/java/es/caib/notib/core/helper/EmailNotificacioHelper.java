@@ -31,7 +31,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				for (UsuariDto usuariDto : destinataris) {
 					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
 						String email = usuariDto.getEmail().replaceAll("\\s+","");
-						sendEmailBustiaPendentContingut(
+						sendEmailNotificacio(
 								email,
 								notificacio);
 					}

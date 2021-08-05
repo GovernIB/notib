@@ -44,7 +44,7 @@ public abstract class EmailHelper<T> {
         String resposta = null;
         try {
             email = email.replaceAll("\\s+","");
-            sendEmailBustiaPendentContingut(
+            sendEmailNotificacio(
                     email,
                     item);
         } catch (Exception ex) {
@@ -54,13 +54,13 @@ public abstract class EmailHelper<T> {
         }
         return resposta;
     }
-    protected void sendEmailBustiaPendentContingut(
+    protected void sendEmailNotificacio(
             String emailDestinatari, T item) throws MessagingException {
-        sendEmailBustiaPendentContingut(emailDestinatari, item ,null);
+        sendEmailNotificacio(emailDestinatari, item ,null);
     }
-    protected void sendEmailBustiaPendentContingut(
+    protected void sendEmailNotificacio(
             String emailDestinatari, T item, List<Attachment> files) throws MessagingException {
-        log.debug("Enviament emails nou contenidor a bústies");
+        log.debug("Enviament emails notificació");
 
         MimeMessage missatge = mailSender.createMimeMessage();
         missatge.setHeader("Content-Type", "text/html charset=UTF-8");

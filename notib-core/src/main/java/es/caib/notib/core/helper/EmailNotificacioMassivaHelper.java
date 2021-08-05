@@ -28,7 +28,7 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 		try {
 			email = email.replaceAll("\\s+","");
 
-			sendEmailBustiaPendentContingut(email, item, Arrays.asList(new Attachment("resum.csv", fileResumContent),
+			sendEmailNotificacio(email, item, Arrays.asList(new Attachment("resum.csv", fileResumContent),
 					new Attachment("errors.csv", fileErrorsContent)));
 		} catch (Exception ex) {
 			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
