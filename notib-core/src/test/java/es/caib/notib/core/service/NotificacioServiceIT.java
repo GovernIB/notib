@@ -1,26 +1,32 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.EnviamentTableEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.cie.EntregaPostalEntity;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.repository.EnviamentTableRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.test.data.ConfigTest;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.core.test.data.EntitatItemTest;
 import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.core.test.data.ProcedimentItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -40,7 +47,7 @@ import static org.junit.Assert.*;
 @Transactional
 public class NotificacioServiceIT extends BaseServiceTestV2 {
 	
-	private static final int NUM_DESTINATARIS = 2;
+	private static final int NUM_ENVIAMENTS = 2;
 	
 	@Autowired
 	PermisosHelper permisosHelper;
@@ -49,412 +56,466 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Autowired
 	NotificacioRepository notificacioRepository;
 	@Autowired
+	PagadorCieRepository cieRepository;
+	@Autowired
+	PagadorPostalRepository operadorPostalRepository;
+	@Autowired
 	NotificacioTableViewRepository notificacioTableViewRepository;
 
 	EntitatDto entitatCreate;
 
 	@Autowired
-	ProcedimentItemTest procedimentCreate;
+	ProcedimentItemTest procedimentCreator;
 	@Autowired
-	NotificacioItemTest notificacioCreate;
+	NotificacioItemTest notificacioCreator;
 	@Autowired
 	EnviamentTableRepository enviamentTableRepository;
 
+	private ElementsCreats database;
+
 	@Before
-	public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {		addConfig("es.caib.notib.metriques.generar", "false");
+	public void setUp() throws Exception {
 		setDefaultConfigs();
 		configureMockGestioDocumentalPlugin();
 
 		entitatCreate = EntitatItemTest.getRandomInstance();
 
-//		organGestorCreate.setItemIdentifier("organGestor");
+		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "", new Date(0), null).build());
+		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
+				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
+				null).build());
 
-		procedimentCreate.addObject("procediment", procedimentCreate.getRandomInstance());
+		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
+		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
 
-		notificacioCreate.addObject("notificacio", notificacioCreate.getRandomInstance());
-		notificacioCreate.addRelated("notificacio", "procediment", procedimentCreate);
+		notificacioCreator.addObject("notificacio", notificacioCreator.getRandomInstance());
+		notificacioCreator.addRelated("notificacio", "procediment", procedimentCreator);
 
-		notificacioCreate.addObject("notificacioError", notificacioCreate.getRandomInstance());
-		notificacioCreate.addRelated("notificacioError", "procediment", procedimentCreate);
+		notificacioCreator.addObject("notificacioCIE", notificacioCreator.getRandomInstance(1));
+		notificacioCreator.addRelated("notificacioCIE", "procedimentCIE", procedimentCreator);
 
-	}
-	
-	@Test
-	public void create() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(ElementsCreats elementsCreats) throws Exception {
-					configureMockRegistrePlugin();
-					configureMockDadesUsuariPlugin();
+		notificacioCreator.addObject("notificacioCIE", notificacioCreator.getRandomInstance(1));
+		notificacioCreator.addRelated("notificacioCIE", "procedimentCIE", procedimentCreator);
 
-					authenticationTest.autenticarUsuari("admin");
+		NotificacioDatabaseDto notificacioCIEAmbEntregaPostal = notificacioCreator.getRandomInstance(1);
+		NotEnviamentDatabaseDto enviament = notificacioCIEAmbEntregaPostal.getEnviaments().get(0);
+		EntregaPostalDto entregaPostal = getEntregaPostalDtoRandomData();
+		enviament.setEntregaPostal(entregaPostal);
 
-					EntitatDto entitatCreate = elementsCreats.entitat;
-					ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-					assertNotNull(procedimentCreate);
-					assertNotNull(procedimentCreate.getId());
-					assertNotNull(entitatCreate);
-					assertNotNull(entitatCreate.getId());
+		notificacioCreator.addObject("notificacioCIEAmbEntregaPostal", notificacioCIEAmbEntregaPostal);
+		notificacioCreator.addRelated("notificacioCIEAmbEntregaPostal", "procedimentCIE", procedimentCreator);
 
-					NotificacioDatabaseDto notificacio = notificacioCreate.getRandomInstance();
-					notificacio.setProcediment(procedimentCreate);
-
-					NotificacioDatabaseDto notificacioCreated = notificacioService.create(
-							entitatCreate.getId(),
-							notificacio);
-					try {
-						// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
-						assertNotNull(notificacioCreated);
-						assertEquals(notificacio.getProcediment().getId(), notificacioCreated.getProcediment().getId());
-						assertEquals(notificacio.getOrganGestorCodi(), notificacioCreated.getOrganGestorCodi());
-//					assertEquals(notificacio.getGrup().getId(), notificacioCreated.getGrup().getId()); // de moment no l'hem posat
-						assertEquals(notificacio.getUsuariCodi(), notificacioCreated.getUsuariCodi());
-						assertEquals(notificacio.getEmisorDir3Codi(), notificacioCreated.getEmisorDir3Codi());
-						assertEquals(notificacio.getEnviamentTipus(), notificacioCreated.getEnviamentTipus());
-						assertEquals(notificacio.getConcepte(), notificacioCreated.getConcepte());
-						assertEquals(notificacio.getDescripcio(), notificacioCreated.getDescripcio());
-						assertEquals(notificacio.getEnviamentDataProgramada(), notificacioCreated.getEnviamentDataProgramada());
-						assertEquals(notificacio.getRetard(), notificacioCreated.getRetard());
-						assertEquals(notificacio.getCaducitat(), notificacioCreated.getCaducitat());
-						assertEquals(notificacio.getNumExpedient(), notificacioCreated.getNumExpedient());
-						assertEquals(notificacio.getIdioma(), notificacioCreated.getIdioma());
-
-						assertEquals(notificacio.getDocument().getArxiuNom(), notificacioCreated.getDocument().getArxiuNom());
-						assertEquals(notificacio.getDocument().getMediaType(), notificacioCreated.getDocument().getMediaType());
-						assertEquals(notificacio.getDocument().getMida(), notificacioCreated.getDocument().getMida());
-						if (notificacio.getDocument().getContingutBase64() != null) {
-							assertNull(notificacioCreated.getDocument().getContingutBase64());
-//							assertNotNull(notificacioCreated.getDocument().getArxiuGestdocId()); // El mockito del plugin de gestió documental està mal configurat, sempre retorna null
-						}
-
-//						assertEquals(notificacio.getDocument().getHash(), notificacioCreated.getDocument().getHash()); // no sé que fa
-						assertEquals(notificacio.getDocument().getUrl(), notificacioCreated.getDocument().getUrl());
-						assertEquals(notificacio.getDocument().isNormalitzat(), notificacioCreated.getDocument().isNormalitzat());
-						assertEquals(notificacio.getDocument().isGenerarCsv(), notificacioCreated.getDocument().isGenerarCsv());
-						assertEquals(notificacio.getDocument().getUuid(), notificacioCreated.getDocument().getUuid());
-						assertEquals(notificacio.getDocument().getCsv(), notificacioCreated.getDocument().getCsv());
-						assertEquals(notificacio.getDocument().getOrigen(), notificacioCreated.getDocument().getOrigen());
-						assertEquals(notificacio.getDocument().getValidesa(), notificacioCreated.getDocument().getValidesa());
-						assertEquals(notificacio.getDocument().getTipoDocumental(), notificacioCreated.getDocument().getTipoDocumental());
-						assertEquals(notificacio.getDocument().getModoFirma(), notificacioCreated.getDocument().getModoFirma());
-
-						for (int i = 0; i < NUM_DESTINATARIS; i ++ ) {
-							NotificacioEnviamentDtoV2 enviament = notificacio.getEnviaments().get(i);
-							NotificacioEnviamentDtoV2 enviamentCreat = notificacioCreated.getEnviaments().get(i);
-							assertEquals(enviament.getServeiTipus(), enviamentCreat.getServeiTipus());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-							assertEquals(enviament.getTitular().getLlinatge1(), enviamentCreat.getTitular().getLlinatge1());
-							assertEquals(enviament.getTitular().getLlinatge2(), enviamentCreat.getTitular().getLlinatge2());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-
-							// TODO: Check destinataris
-						}
-					}finally {
-
-						notificacioService.delete(entitatCreate.getId(), notificacioCreated.getId());
-					}
-
-				}
-			}, 
-			"Create Notificació",
-			entitatCreate,
-			procedimentCreate);
+		database = createDatabase(EntitatItemTest.getRandomInstance(),
+				procedimentCreator,
+				notificacioCreator
+		);
 	}
 
+	@After
+	public final void tearDown() {
+		destroyDatabase(database.getEntitat().getId(),
+				notificacioCreator,
+				procedimentCreator
+		);
+	}
 	@Test
-	public void delete() {
+	public void whenCreate_thenAllFieldsFilledCorrectly() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
+		configureMockRegistrePlugin();
+		configureMockDadesUsuariPlugin();
+
+		authenticationTest.autenticarUsuari("admin");
+
+		EntitatDto entitatCreate = database.entitat;
+		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		assertNotNull(procedimentCreate);
+		assertNotNull(procedimentCreate.getId());
+		assertNotNull(entitatCreate);
+		assertNotNull(entitatCreate.getId());
+
+		NotificacioDatabaseDto notificacio = NotificacioItemTest.getRandomInstance();
+		notificacio.setProcediment(procedimentCreate);
+
+		NotificacioDatabaseDto notificacioCreatedDto = notificacioService.create(
+				entitatCreate.getId(),
+				notificacio);
+		assertNotNull(notificacioCreatedDto);
+
+		NotificacioEntity notificacioCreated = notificacioRepository.findById(notificacioCreatedDto.getId());
+		assertNotNull(notificacioCreated);
+		try {
+			assertEqualsNotificacions(notificacio, notificacioCreated, NUM_ENVIAMENTS);
+		}finally {
+			notificacioService.delete(entitatCreate.getId(), notificacioCreatedDto.getId());
+		}
+
 	}
 
-	@Test
-	public void update() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						configureMockGestioDocumentalPlugin();
-
-						EntitatDto entitatCreate = elementsCreats.entitat;
-						ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-						NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-
-
-						NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
-						notificacioEdicio.setOrganGestorCodi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
-						notificacioEdicio.setConcepte("concepte edicio");
-						notificacioEdicio.setRetard(2);
-
-						NotificacioDatabaseDto notificacioEditada = notificacioService.update(entitatCreate.getId(),
-								notificacioEdicio,
-								true
-								);
-
-						// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
-						assertNotNull(notificacioEditada);
-						assertEquals(notificacioCreate.getId(), notificacioEditada.getId());
-						assertEquals(notificacioCreate.getProcediment().getId(), notificacioEditada.getProcediment().getId());
-
-						// TODO: per a l'òrgan gestor hi ha diverses casuïstiques a tenir en compte en un altre test
-//						assertNotEquals(notificacioCreate.getOrganGestorCodi(),notificacioEditada.getOrganGestorCodi());
-						assertNotEquals(notificacioCreate.getConcepte(), notificacioEditada.getConcepte());
-						assertEquals((Integer) 2, notificacioEditada.getRetard());
-
-						for (int i = 0; i < NUM_DESTINATARIS; i ++ ) {
-							NotificacioEnviamentDtoV2 enviament = notificacioCreate.getEnviaments().get(i);
-							NotificacioEnviamentDtoV2 enviamentCreat = notificacioEditada.getEnviaments().get(i);
-							assertEquals(enviament.getServeiTipus(), enviamentCreat.getServeiTipus());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-							assertEquals(enviament.getTitular().getLlinatge1(), enviamentCreat.getTitular().getLlinatge1());
-							assertEquals(enviament.getTitular().getLlinatge2(), enviamentCreat.getTitular().getLlinatge2());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-
-							// TODO: Check destinataris
-						}
-
-					}
-				},
-				"Update Notificació",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
+	private EntregaPostalDto getEntregaPostalDtoRandomData() {
+		return EntregaPostalDto.builder()
+				.domiciliConcretTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL)
+				.viaTipus(NotificaDomiciliViaTipusEnumDto.VIA)
+				.viaNom("Via Asima")
+				.numeroCasa("4")
+				.provincia("07")
+				.municipiCodi("337")
+				.codiPostal("07500")
+				.build();
 	}
-
-
 	@Test
-	public void whenCreateNotificacio_thenCreateTableItems() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(ElementsCreats elementsCreats) throws Exception {
-					configureMockRegistrePlugin();
-					configureMockDadesUsuariPlugin();
-					configureMockGestioDocumentalPlugin();
+	public void whenCreateAmbProcedimentCIEAmbEntregaPostal_thenAllFieldsFilledCorrectly() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
+		configureMockRegistrePlugin();
+		configureMockDadesUsuariPlugin();
 
-					authenticationTest.autenticarUsuari("admin");
-					// Given: Notificacio no creada
-					EntitatDto entitatCreate = elementsCreats.entitat;
-					ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-					assertNotNull(procedimentCreate);
-					assertNotNull(procedimentCreate.getId());
-					assertNotNull(entitatCreate);
-					assertNotNull(entitatCreate.getId());
+		authenticationTest.autenticarUsuari("admin");
 
-					NotificacioDatabaseDto notificacio = notificacioCreate.getRandomInstance();
-					notificacio.setProcediment(procedimentCreate);
-					assertEquals(2, notificacio.getEnviaments().size());
+		// Given
+		EntitatDto entitatCreate = database.entitat;
+		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procedimentCIE");
+		assertNotNull(procedimentCreate);
+		assertNotNull(procedimentCreate.getId());
 
-					// When: Registram la notificacio a la Base de dades
-					NotificacioDatabaseDto notificacioCreated = notificacioService.create(
-							entitatCreate.getId(),
-							notificacio);
+		NotificacioDatabaseDto notificacio = NotificacioItemTest.getRandomInstance(1);
+		notificacio.setProcediment(procedimentCreate);
 
-					// Then: S'ha creat un registre amb el mateix id a la taula de la vista de les notificacions.
-					//		 S'han creat els dos enviaments, i s'han afegit els registres respectius a la taula de la vista de enviaments.
-					try {
-						// S'ha creat la fila de la notificació
-						assertNotNull(
-							notificacioTableViewRepository.findOne(notificacioCreated.getId())
-						);
+		NotEnviamentDatabaseDto enviament = notificacio.getEnviaments().get(0);
+		EntregaPostalDto entregaPostal = getEntregaPostalDtoRandomData();
+		enviament.setEntregaPostal(entregaPostal);
+		enviament.setEntregaPostalActiva(true);
 
-						// S'han creat les files dels enviaments
-						for (NotificacioEnviamentDtoV2 enviament : notificacioCreated.getEnviaments()) {
-							assertNotNull(
-								enviamentTableRepository.findOne(enviament.getId())
-							);
-						}
-					}finally {
-						notificacioService.delete(entitatCreate.getId(), notificacioCreated.getId());
-					}
-				}
-			},
-			"Al crear una nova notificació es registra el seu registre corresponent a la taula de la vista",
-			entitatCreate,
-			procedimentCreate,
-			notificacioCreate);
+		// When
+		NotificacioDatabaseDto notificacioCreatedDto = notificacioService.create(
+				entitatCreate.getId(),
+				notificacio);
+		assertNotNull(notificacioCreatedDto);
+		try {
+			// Then
+			NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreatedDto.getId());
+			assertNotNull(notificacioEntity);
+
+			NotificacioEnviamentEntity env = notificacioEntity.getEnviaments().iterator().next();
+			assertNotNull(env.getEntregaPostal());
+
+			EntregaPostalEntity entregaPostalEntity = env.getEntregaPostal();
+			assertEquals(entregaPostal.getDomiciliConcretTipus(), entregaPostalEntity.getDomiciliConcretTipus());
+			assertEquals(entregaPostal.getViaTipus(), entregaPostalEntity.getDomiciliViaTipus());
+			assertEquals(entregaPostal.getViaNom(), entregaPostalEntity.getDomiciliViaNom());
+			assertEquals(entregaPostal.getNumeroCasa(), entregaPostalEntity.getDomiciliNumeracioNumero());
+			assertEquals(entregaPostal.getProvincia(), entregaPostalEntity.getDomiciliProvinciaCodi());
+			assertEquals(entregaPostal.getMunicipiCodi(), entregaPostalEntity.getDomiciliMunicipiCodiIne());
+			assertEquals(entregaPostal.getCodiPostal(), entregaPostalEntity.getDomiciliCodiPostal());
+		}finally {
+			notificacioService.delete(entitatCreate.getId(), notificacioCreatedDto.getId());
+		}
 	}
 
 	@Test
-	public void whenUpdateNotificacio_thenUpdateTableItems() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						configureMockGestioDocumentalPlugin();
+	public void whenCreateAmbProcedimentCIESenseEntregaPostal_thenProcessedCorrectly() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
+		configureMockRegistrePlugin();
+		configureMockDadesUsuariPlugin();
 
-						String nouValor = "String valor edicio";
-						authenticationTest.autenticarUsuari("admin");
-						// Given: Notificacio existent
-						EntitatDto entitat = elementsCreats.entitat;
-						NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-						assertNotNull(
-								notificacioTableViewRepository.findOne(notificacio.getId())
-						);
-						notificacio.setConcepte(nouValor);
-						notificacio.setNumExpedient(nouValor);
-						// Actualitzam un enviament
-						String nouValorEdicioEnviament = "Nom titular editat";
-						NotificacioEnviamentDtoV2 enviamentEditat = notificacio.getEnviaments().get(0);
-						enviamentEditat.getTitular().setNom(nouValorEdicioEnviament);
+		authenticationTest.autenticarUsuari("admin");
 
-						// Afegim un nou enviament
-						NotificacioEnviamentDtoV2 enviamentCreat = notificacioCreate.getRandomEnviament(5);
-						notificacio.getEnviaments().add(enviamentCreat);
+		// Given
+		EntitatDto entitatCreate = database.entitat;
+		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procedimentCIE");
+		assertNotNull(procedimentCreate);
+		assertNotNull(procedimentCreate.getId());
 
-						// When: Actualizam la notificacio a la Base de dades
-						NotificacioDatabaseDto notificacioUpdated = notificacioService.update(
-								entitat.getId(),
-								notificacio,
-								true);
+		NotificacioDatabaseDto notificacio = NotificacioItemTest.getRandomInstance(1);
+		notificacio.setProcediment(procedimentCreate);
 
-						// Then: S'ha actualitzat registre amb el mateix id a la taula de la vista de les notificacions
-						NotificacioTableEntity tableRow = notificacioTableViewRepository.findOne(
-								notificacio.getId());
-						assertNotNull(tableRow);
-						assertEquals(nouValor, tableRow.getConcepte());
-						assertEquals(nouValor, tableRow.getNumExpedient());
+		// When
+		NotificacioDatabaseDto notificacioCreatedDto = notificacioService.create(
+				entitatCreate.getId(),
+				notificacio);
+		assertNotNull(notificacioCreatedDto);
+		try {
+			// Then
+			NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreatedDto.getId());
+			assertNotNull(notificacioEntity);
 
-						// Also: S'ha creat el nou enviament i s'ha editat l'altre a la taula de les vistes
-						assertEquals(notificacio.getEnviaments().size(),
-								notificacioRepository.findOne(notificacio.getId()).getEnviaments().size());
+			// Comprovam que l'enviament no té cap entregapostal asociada
+			NotificacioEnviamentEntity env = notificacioEntity.getEnviaments().iterator().next();
+			assertNull(env.getEntregaPostal());
 
-						for (NotificacioEnviamentDtoV2 enviament : notificacioUpdated.getEnviaments()) {
-							EnviamentTableEntity tableEnvRow = enviamentTableRepository.findOne(enviament.getId());
-							assertNotNull(tableEnvRow);
-							if (tableEnvRow.getId().equals(enviamentEditat.getId())) {
-								assertEquals(nouValorEdicioEnviament, tableEnvRow.getTitularNom());
-							}
-						}
-					}
-				},
-				"Al crear una nova notificació es registra el seu registre corresponent a la taula de la vista",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
+		}finally {
+			notificacioService.delete(entitatCreate.getId(), notificacioCreatedDto.getId());
+		}
+
 	}
 
 	@Test
-	public void whenDeleteNotificacio_thenDeleteTableViewItem() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						configureMockRegistrePlugin();
-						configureMockDadesUsuariPlugin();
+	public void whenUpdate_thenAllFieldsFilledCorrectly() throws SistemaExternException, RegistreNotificaException {
+		configureMockGestioDocumentalPlugin();
 
-						authenticationTest.autenticarUsuari("admin");
-						// Given: Notificacio existent
-						EntitatDto entitat = elementsCreats.entitat;
-						NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-						assertNotNull(
-								notificacioTableViewRepository.findOne(notificacio.getId())
-						);
+		EntitatDto entitatCreate = database.entitat;
+		NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) database.get("notificacio");
 
-						// When: eliminam la notificacio a la Base de dades
-						notificacioService.delete(
-								entitat.getId(),
-								notificacio.getId());
+		NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
+		notificacioEdicio.setNumExpedient("FFF000");
+		notificacioEdicio.setConcepte("concepte edicio");
+		notificacioEdicio.setRetard(2);
 
-						// Then: S'ha eliminat el registre amb el mateix id a la taula de la vista de les notificacions
-						assertNull(
-								notificacioTableViewRepository.findOne(notificacio.getId())
-						);
+		NotificacioDatabaseDto notificacioEditada = notificacioService.update(entitatCreate.getId(),
+				notificacioEdicio,
+				true
+				);
 
-						notificacioCreate.setAsDeleted("notificacio");
+		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
+		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioEditada.getId());
+		assertNotNull(notificacioEntity);
 
-					}
-				},
-				"Al crear una nova notificació es registra el seu registre corresponent a la taula de la vista",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
+		assertEqualsNotificacions(notificacioEdicio, notificacioEntity, NUM_ENVIAMENTS);
 	}
 
 	@Test
-	public void whenUptateNotificacio_thenResetRegistreEnviamentIntent() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						configureMockGestioDocumentalPlugin();
+	public void whenUpdateAmbProcedimentCIEAmbEntregaPostal_thenAllFieldsFilledCorrectly() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
+		configureMockGestioDocumentalPlugin();
 
-						NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+		// Given
+		EntitatDto entitatCreate = database.entitat;
+		NotificacioDatabaseDto notificacioDto = (NotificacioDatabaseDto) database.get("notificacioCIE");
+		NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioDto);
+		notificacioEdicio.setNumExpedient("FFF000");
+		notificacioEdicio.setConcepte("concepte edicio");
+		notificacioEdicio.setRetard(2);
 
-						// Given: notificacio pendent registrar amb nombre màxim de reintents
-						NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
-						notEntity.setRegistreEnviamentIntent(pluginHelper.getRegistreReintentsMaxProperty());
-						notEntity.updateEstat(NotificacioEstatEnumDto.PENDENT);
-						notificacioRepository.saveAndFlush(notEntity);
+		NotEnviamentDatabaseDto enviament = notificacioEdicio.getEnviaments().get(0);
+		EntregaPostalDto entregaPostal = getEntregaPostalDtoRandomData();
+		enviament.setEntregaPostal(entregaPostal);
+		enviament.setEntregaPostalActiva(true);
 
-						// When
-						NotificacioDatabaseDto notificacioEditadaDto = notificacioService.update(elementsCreats.entitat.getId(),
-								notificacioError,
-								true
-						);
+		// When
+		NotificacioDatabaseDto notificacioEditada = notificacioService.update(entitatCreate.getId(),
+				notificacioEdicio,
+				true
+		);
 
-						// Then
-						NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
-						assertEquals(0, notEditada.getRegistreEnviamentIntent());
+		// Then
+
+		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioEditada.getId());
+		assertNotNull(notificacioEntity);
+
+		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
+		assertEqualsNotificacions(notificacioEdicio, notificacioEntity, 1);
+
+		NotificacioEnviamentEntity env = notificacioEntity.getEnviaments().iterator().next();
+		assertNotNull(env.getEntregaPostal());
+
+	}
+
+	public void whenUpdateAmbProcedimentCIESenseEntregaPostal_thenProcessedCorrectly() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
+		configureMockGestioDocumentalPlugin();
+
+		// Given
+		EntitatDto entitatCreate = database.entitat;
+		NotificacioDatabaseDto notificacioDto = (NotificacioDatabaseDto) database.get("notificacioCIEAmbEntregaPostal");
+		NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioDto);
+		notificacioEdicio.setNumExpedient("FFF000");
+		notificacioEdicio.setConcepte("concepte edicio");
+		notificacioEdicio.setRetard(2);
+
+		NotEnviamentDatabaseDto enviament = notificacioEdicio.getEnviaments().get(0);
+		enviament.setEntregaPostal(null);
+
+		// When
+		NotificacioDatabaseDto notificacioEditada = notificacioService.update(entitatCreate.getId(),
+				notificacioEdicio,
+				true
+		);
+
+		// Then
+
+		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioEditada.getId());
+		assertNotNull(notificacioEntity);
+
+		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
+		assertEqualsNotificacions(notificacioEdicio, notificacioEntity, NUM_ENVIAMENTS);
+
+		NotificacioEnviamentEntity env = notificacioEntity.getEnviaments().iterator().next();
+		assertNull(env.getEntregaPostal());
+	}
 
 
-					}
-				},
-				"Test registre notificació",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
+	@Test
+	public void whenCreateNotificacio_thenCreateTableItems() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
+		configureMockRegistrePlugin();
+		configureMockDadesUsuariPlugin();
+		configureMockGestioDocumentalPlugin();
+
+		authenticationTest.autenticarUsuari("admin");
+		// Given: Notificacio no creada
+		EntitatDto entitatCreate = database.entitat;
+		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		assertNotNull(procedimentCreate);
+		assertNotNull(procedimentCreate.getId());
+		assertNotNull(entitatCreate);
+		assertNotNull(entitatCreate.getId());
+
+		NotificacioDatabaseDto notificacio = notificacioCreator.getRandomInstance();
+		notificacio.setProcediment(procedimentCreate);
+		assertEquals(2, notificacio.getEnviaments().size());
+
+		// When: Registram la notificacio a la Base de dades
+		NotificacioDatabaseDto notificacioCreated = notificacioService.create(
+				entitatCreate.getId(),
+				notificacio);
+
+		// Then: S'ha creat un registre amb el mateix id a la taula de la vista de les notificacions.
+		//		 S'han creat els dos enviaments, i s'han afegit els registres respectius a la taula de la vista de enviaments.
+		try {
+			// S'ha creat la fila de la notificació
+			assertNotNull(
+				notificacioTableViewRepository.findOne(notificacioCreated.getId())
+			);
+
+			// S'han creat les files dels enviaments
+			for (NotEnviamentDatabaseDto enviament : notificacioCreated.getEnviaments()) {
+				assertNotNull(
+					enviamentTableRepository.findOne(enviament.getId())
+				);
+			}
+		}finally {
+			notificacioService.delete(entitatCreate.getId(), notificacioCreated.getId());
+		}
 	}
 
 	@Test
-	public void whenUptateNotificacio_thenResetNotificaEnviamentIntent() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						configureMockGestioDocumentalPlugin();
+	public void whenUpdateNotificacio_thenUpdateTableItems() throws SistemaExternException, RegistreNotificaException {
+		configureMockGestioDocumentalPlugin();
 
-						NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+		String nouValor = "String valor edicio";
+		authenticationTest.autenticarUsuari("admin");
+		// Given: Notificacio existent
+		EntitatDto entitat = database.entitat;
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacio");
+		assertNotNull(
+				notificacioTableViewRepository.findOne(notificacio.getId())
+		);
+		notificacio.setConcepte(nouValor);
+		notificacio.setNumExpedient(nouValor);
+		// Actualitzam un enviament
+		String nouValorEdicioEnviament = "Nom titular editat";
+		NotEnviamentDatabaseDto enviamentEditat = notificacio.getEnviaments().get(0);
+		enviamentEditat.getTitular().setNom(nouValorEdicioEnviament);
 
-						// Given: notificacio pendent registrar amb nombre màxim de reintents
-						NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
-						notEntity.setNotificaEnviamentIntent(pluginHelper.getNotificaReintentsMaxProperty());
-						notEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
-						notificacioRepository.saveAndFlush(notEntity);
+		// Afegim un nou enviament
+		NotEnviamentDatabaseDto enviamentCreat = notificacioCreator.getRandomEnviament(5);
+		notificacio.getEnviaments().add(enviamentCreat);
 
-						// When
-						NotificacioDatabaseDto notificacioEditadaDto = notificacioService.update(elementsCreats.entitat.getId(),
-								notificacioError,
-								true
-						);
+		// When: Actualizam la notificacio a la Base de dades
+		NotificacioDatabaseDto notificacioUpdated = notificacioService.update(
+				entitat.getId(),
+				notificacio,
+				true);
 
-						// Then
-						NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
-						assertEquals(0, notEditada.getNotificaEnviamentIntent());
+		// Then: S'ha actualitzat registre amb el mateix id a la taula de la vista de les notificacions
+		NotificacioTableEntity tableRow = notificacioTableViewRepository.findOne(
+				notificacio.getId());
+		assertNotNull(tableRow);
+		assertEquals(nouValor, tableRow.getConcepte());
+		assertEquals(nouValor, tableRow.getNumExpedient());
 
-						List pendents = notificacioService.getNotificacionsPendentsEnviar();
+		// Also: S'ha creat el nou enviament i s'ha editat l'altre a la taula de les vistes
+		assertEquals(notificacio.getEnviaments().size(),
+				notificacioRepository.findOne(notificacio.getId()).getEnviaments().size());
 
+		for (NotEnviamentDatabaseDto enviament : notificacioUpdated.getEnviaments()) {
+			EnviamentTableEntity tableEnvRow = enviamentTableRepository.findOne(enviament.getId());
+			assertNotNull(tableEnvRow);
+			if (tableEnvRow.getId().equals(enviamentEditat.getId())) {
+				assertEquals(nouValorEdicioEnviament, tableEnvRow.getTitularNom());
+			}
+		}
+	}
 
-					}
-				},
-				"Test registre notificació",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
+	@Test
+	public void whenDeleteNotificacio_thenDeleteTableViewItem() throws IOException, RegistrePluginException, SistemaExternException {
+		configureMockRegistrePlugin();
+		configureMockDadesUsuariPlugin();
+
+		authenticationTest.autenticarUsuari("admin");
+		// Given: Notificacio existent
+		EntitatDto entitat = database.entitat;
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacio");
+		assertNotNull(
+				notificacioTableViewRepository.findOne(notificacio.getId())
+		);
+
+		// When: eliminam la notificacio a la Base de dades
+		notificacioService.delete(
+				entitat.getId(),
+				notificacio.getId());
+
+		// Then: S'ha eliminat el registre amb el mateix id a la taula de la vista de les notificacions
+		assertNull(
+				notificacioTableViewRepository.findOne(notificacio.getId())
+		);
+
+		notificacioCreator.setAsDeleted("notificacio");
+
+	}
+
+	@Test
+	public void whenUptateNotificacio_thenResetRegistreEnviamentIntent() throws SistemaExternException, RegistreNotificaException {
+		configureMockGestioDocumentalPlugin();
+
+		NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) database.get("notificacio");
+
+		// Given: notificacio pendent registrar amb nombre màxim de reintents
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
+		notEntity.setRegistreEnviamentIntent(pluginHelper.getRegistreReintentsMaxProperty());
+		notEntity.updateEstat(NotificacioEstatEnumDto.PENDENT);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		// When
+		NotificacioDatabaseDto notificacioEditadaDto = notificacioService.update(database.entitat.getId(),
+				notificacioError,
+				true
+		);
+
+		// Then
+		NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
+		assertEquals(0, notEditada.getRegistreEnviamentIntent());
+
+	}
+
+	@Test
+	public void whenUptateNotificacio_thenResetNotificaEnviamentIntent() throws SistemaExternException, RegistreNotificaException {
+		configureMockGestioDocumentalPlugin();
+
+		NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) database.get("notificacio");
+
+		// Given: notificacio pendent registrar amb nombre màxim de reintents
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
+		notEntity.setNotificaEnviamentIntent(pluginHelper.getNotificaReintentsMaxProperty());
+		notEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		// When
+		NotificacioDatabaseDto notificacioEditadaDto = notificacioService.update(database.entitat.getId(),
+				notificacioError,
+				true
+		);
+
+		// Then
+		NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
+		assertEquals(0, notEditada.getNotificaEnviamentIntent());
+
+		List pendents = notificacioService.getNotificacionsPendentsEnviar();
+
 	}
 
 //	@Test
-	public void notificacioRegistrar() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(ElementsCreats elementsCreats) throws Exception {
-					EntitatDto entitatCreate = elementsCreats.entitat;
-					ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-					NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+	public void notificacioRegistrar() throws SistemaExternException, IOException, RegistrePluginException, RegistreNotificaException {
+		EntitatDto entitatCreate = database.entitat;
+		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) database.get("notificacio");
 
-					configureMockUnitatsOrganitzativesPlugin();
-					configureMockRegistrePlugin();
-					Mockito.mock(SchedulledServiceImpl.class);
-					notificacioService.notificacioRegistrar(notificacioCreate.getId());
+		configureMockUnitatsOrganitzativesPlugin();
+		configureMockRegistrePlugin();
+		Mockito.mock(SchedulledServiceImpl.class);
+		notificacioService.notificacioRegistrar(notificacioCreate.getId());
 
 //						NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
 //						notificacioEdicio.setOrganGestorCodi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
@@ -465,16 +526,74 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 //								notificacioEdicio,
 //								true
 //						);
-				}
-			},
-			"Test registre notificació",
-			entitatCreate,
-			procedimentCreate,
-			notificacioCreate);
 	}
 
 //	@Test
 	public void notificacioEnviar() {
+	}
+
+	private void assertEqualsNotificacions(NotificacioDatabaseDto notificacioDto, NotificacioEntity notificacioEntity, int numEnviaments) {
+		// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
+		assertEquals(notificacioDto.getProcediment().getId(), notificacioEntity.getProcediment().getId());
+		assertEquals(notificacioDto.getOrganGestorCodi(), notificacioEntity.getOrganGestor().getCodi());
+//			assertEquals(notificacio.getGrup().getCodi(), notificacioEntity.getGrupCodi());
+		assertNull(notificacioDto.getGrup());
+		assertEquals(notificacioDto.getUsuariCodi(), notificacioEntity.getUsuariCodi());
+		assertEquals(notificacioDto.getEmisorDir3Codi(), notificacioEntity.getEmisorDir3Codi());
+		assertEquals(notificacioDto.getEnviamentTipus(), notificacioEntity.getEnviamentTipus());
+		assertEquals(notificacioDto.getConcepte(), notificacioEntity.getConcepte());
+		assertEquals(notificacioDto.getDescripcio(), notificacioEntity.getDescripcio());
+		assertEquals(notificacioDto.getEnviamentDataProgramada(), notificacioEntity.getEnviamentDataProgramada());
+		assertEquals(notificacioDto.getRetard(), notificacioEntity.getRetard());
+		assertEquals(notificacioDto.getCaducitat(), notificacioEntity.getCaducitat());
+		assertEquals(notificacioDto.getNumExpedient(), notificacioEntity.getNumExpedient());
+		assertEquals(notificacioDto.getIdioma(), notificacioEntity.getIdioma());
+
+		assertEquals(notificacioDto.getDocument().getArxiuNom(), notificacioEntity.getDocument().getArxiuNom());
+		assertEquals(notificacioDto.getDocument().getMediaType(), notificacioEntity.getDocument().getMediaType());
+		assertEquals(notificacioDto.getDocument().getMida(), notificacioEntity.getDocument().getMida());
+		if (notificacioDto.getDocument().getContingutBase64() != null) {
+			assertNull(notificacioEntity.getDocument().getContingutBase64());
+//							assertNotNull(notificacioEntity.getDocument().getArxiuGestdocId()); // El mockito del plugin de gestió documental està mal configurat, sempre retorna null
+		}
+
+//						assertEquals(notificacio.getDocument().getHash(), notificacioEntity.getDocument().getHash()); // no sé que fa
+		assertEquals(notificacioDto.getDocument().getUrl(), notificacioEntity.getDocument().getUrl());
+		assertEquals(notificacioDto.getDocument().isNormalitzat(), notificacioEntity.getDocument().getNormalitzat());
+//			assertEquals(notificacio.getDocument().isGenerarCsv(), notificacioEntity.getDocument().isGenerarCsv());
+		assertEquals(notificacioDto.getDocument().getUuid(), notificacioEntity.getDocument().getUuid());
+		assertEquals(notificacioDto.getDocument().getCsv(), notificacioEntity.getDocument().getCsv());
+		assertEquals(notificacioDto.getDocument().getOrigen(), notificacioEntity.getDocument().getOrigen());
+		assertEquals(notificacioDto.getDocument().getValidesa(), notificacioEntity.getDocument().getValidesa());
+		assertEquals(notificacioDto.getDocument().getTipoDocumental(), notificacioEntity.getDocument().getTipoDocumental());
+		assertEquals(notificacioDto.getDocument().getModoFirma(), notificacioEntity.getDocument().getModoFirma());
+
+		for (int i = 0; i < numEnviaments; i ++ ) {
+			NotEnviamentDatabaseDto enviament = notificacioDto.getEnviaments().get(i);
+			NotEnviamentDatabaseDto enviamentCreat = notificacioDto.getEnviaments().get(i);
+			assertEquals(enviament.getServeiTipus(), enviamentCreat.getServeiTipus());
+			assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
+			assertEquals(enviament.getTitular().getLlinatge1(), enviamentCreat.getTitular().getLlinatge1());
+			assertEquals(enviament.getTitular().getLlinatge2(), enviamentCreat.getTitular().getLlinatge2());
+			assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
+
+			if (enviament.getDestinataris() != null && enviament.getDestinataris().size() != 0) {
+				for (int j = 0; j < enviament.getDestinataris().size(); j ++ ) {
+					PersonaDto destinatari = enviament.getDestinataris().get(j);
+					PersonaDto destinatariCreat = enviamentCreat.getDestinataris().get(j);
+
+					assertEquals(destinatari.getNom(), destinatariCreat.getNom());
+					assertEquals(destinatari.getLlinatge1(), destinatariCreat.getLlinatge1());
+					assertEquals(destinatari.getLlinatge2(), destinatariCreat.getLlinatge2());
+					assertEquals(destinatari.getEmail(), destinatariCreat.getEmail());
+					assertEquals(destinatari.getDir3Codi(), destinatariCreat.getDir3Codi());
+					assertEquals(destinatari.getInteressatTipus(), destinatariCreat.getInteressatTipus());
+					assertEquals(destinatari.getTelefon(), destinatariCreat.getTelefon());
+					assertEquals(destinatari.getRaoSocial(), destinatariCreat.getRaoSocial());
+
+				}
+			}
+		}
 	}
 
 }

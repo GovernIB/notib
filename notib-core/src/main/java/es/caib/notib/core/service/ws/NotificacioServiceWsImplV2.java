@@ -1056,28 +1056,24 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			Enviament enviament) {
 
 		ServeiTipusEnumDto serveiTipus = getServeiTipus(enviament);
-		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
 		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
-			logger.debug(">> [ALTA] Entrega postal");
-			tipusConcret = getDomiciliTipusConcret(enviament);
-			numeracioTipus = getDomiciliNumeracioTipus(enviament);
+			if (enviament.getEntregaPostal().getTipus() == null) {
+				throw new ValidationException(
+						"ENTREGA_POSTAL",
+						"L'entrega postal te el camp tipus buit");
+			}
 		}
 
 		PersonaEntity titular = saveTitular(enviament);
 		List<PersonaEntity> destinataris = getDestinataris(enviament);
-		EntregaPostalViaTipusEnum viaTipus = getViaTipus(enviament);
 
 		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(
 				entitat,
 				notificacioGuardada,
 				enviament,
 				serveiTipus,
-				numeracioTipus,
-				tipusConcret,
 				titular,
-				destinataris,
-				viaTipus);
+				destinataris);
 		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
 		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
 		if (titular.getInteressatTipus() != InteressatTipusEnumDto.ADMINISTRACIO)
@@ -1086,15 +1082,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			enviamentReferencia.setTitularNif(titular.getDir3Codi().toUpperCase());
 		notificacioGuardada.addEnviament(enviamentSaved);
 		return enviamentReferencia;
-	}
-
-	private EntregaPostalViaTipusEnum getViaTipus(Enviament enviament) {
-		EntregaPostalViaTipusEnum viaTipus = null;
-
-		if (enviament.getEntregaPostal() != null) {
-			viaTipus = enviament.getEntregaPostal().getViaTipus();
-		}
-		return viaTipus;
 	}
 
 	private List<PersonaEntity> getDestinataris(Enviament enviament) {
@@ -1133,45 +1120,45 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return titular;
 	}
 
-	private NotificaDomiciliNumeracioTipusEnumDto getDomiciliNumeracioTipus(Enviament enviament) {
-		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus;
-		if (enviament.getEntregaPostal().getNumeroCasa() != null) {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
-		} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
-		} else if (enviament.getEntregaPostal().getPuntKm() != null) {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
-		} else {
-			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
-		}
-		return numeracioTipus;
-	}
+//	private NotificaDomiciliNumeracioTipusEnumDto getDomiciliNumeracioTipus(Enviament enviament) {
+//		NotificaDomiciliNumeracioTipusEnumDto numeracioTipus;
+//		if (enviament.getEntregaPostal().getNumeroCasa() != null) {
+//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
+//		} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
+//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
+//		} else if (enviament.getEntregaPostal().getPuntKm() != null) {
+//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
+//		} else {
+//			numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
+//		}
+//		return numeracioTipus;
+//	}
 
-	private NotificaDomiciliConcretTipusEnumDto getDomiciliTipusConcret(
-			Enviament enviament) {
-		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-		if (enviament.getEntregaPostal().getTipus() != null) {
-			switch (enviament.getEntregaPostal().getTipus()) {
-				case APARTAT_CORREUS:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
-					break;
-				case ESTRANGER:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
-					break;
-				case NACIONAL:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-					break;
-				case SENSE_NORMALITZAR:
-					tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-					break;
-			}
-		} else {
-			throw new ValidationException(
-					"ENTREGA_POSTAL",
-					"L'entrega postal te el camp tipus buit");
-		}
-		return tipusConcret;
-	}
+//	private NotificaDomiciliConcretTipusEnumDto getDomiciliTipusConcret(
+//			Enviament enviament) {
+//		NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
+//		if (enviament.getEntregaPostal().getTipus() != null) {
+//			switch (enviament.getEntregaPostal().getTipus()) {
+//				case APARTAT_CORREUS:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+//					break;
+//				case ESTRANGER:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+//					break;
+//				case NACIONAL:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+//					break;
+//				case SENSE_NORMALITZAR:
+//					tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+//					break;
+//			}
+//		} else {
+//			throw new ValidationException(
+//					"ENTREGA_POSTAL",
+//					"L'entrega postal te el camp tipus buit");
+//		}
+//		return tipusConcret;
+//	}
 
 	private ServeiTipusEnumDto getServeiTipus(Enviament enviament) {
 		ServeiTipusEnumDto serveiTipus = null;

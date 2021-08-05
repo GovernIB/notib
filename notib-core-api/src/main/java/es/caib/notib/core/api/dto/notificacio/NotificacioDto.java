@@ -4,7 +4,7 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
+import es.caib.notib.core.api.dto.notenviament.EnviamentDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,12 +28,12 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private Date enviamentDataProgramada;
 	private String concepte;
-	private String pagadorCorreusCodiDir3;
-	private String pagadorCorreusContracteNum;
-	private String pagadorCorreusCodiClientFacturacio;
-	private Date pagadorCorreusDataVigencia;
-	private String pagadorCieCodiDir3;
-	private Date pagadorCieDataVigencia;
+//	private String pagadorCorreusCodiDir3;
+//	private String pagadorCorreusContracteNum;
+//	private String pagadorCorreusCodiClientFacturacio;
+//	private Date pagadorCorreusDataVigencia;
+//	private String pagadorCieCodiDir3;
+//	private Date pagadorCieDataVigencia;
 	private String procedimentDescripcioSia;
 	private String documentArxiuNom;
 	private String documentArxiuId;
@@ -62,7 +62,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private String registreTipusAssumpte;
 	private String registreRefExterna;
 	private String numExpedient;
-	private OperadorPostalDto pagadorPostal;
+//	private OperadorPostalDto pagadorPostal;
 	private String usuariCodi;
 	private String registreObservacions;
 	private Date registreData;
@@ -80,7 +80,6 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean usuariActualNotificacio;
 	private boolean usuariActualAdministration;
 	private boolean errorLastCallback;
-	private boolean errorLastEvent;
 	private boolean hasEnviamentsPendents;
 	private boolean hasEnviamentsPendentsRegistre;
 	

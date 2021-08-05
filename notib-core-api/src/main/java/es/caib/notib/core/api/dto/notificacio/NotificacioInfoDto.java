@@ -1,7 +1,9 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.cie.CieDataDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -16,21 +18,21 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class NotificacioDtoV2 extends AuditoriaDto {
+public class NotificacioInfoDto extends AuditoriaDto {
 
 	private Long id;
-	private String emisorDir3Codi;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private String concepte;
 	private String descripcio;
-	private String organGestor;
+
+	private String organGestorCodi;
 	private String organGestorNom;
+
 	private Date enviamentDataProgramada;
 	private Integer retard;
 	protected int notificaEnviamentIntent;
 	private Date caducitat;
 	private String csv_uuid;
-	private ProcedimentDto procediment;
 	private String procedimentCodiNotib;
 	private GrupDto grup;
 	private String grupCodi;
@@ -39,23 +41,28 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String serveiTipus;
-	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
+	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
 	private String usuariCodi;
 	private String motiu;
 	private String numExpedient;
-	private boolean permisProcessar;
-	private EntitatDto entitat;
+
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
 	private Date notificaEnviamentData;
 	private Date notificaEnviamentNotificaData;
 	private IdiomaEnumDto idioma;
 
+	// Documents de la notificació
 	private DocumentDto document;
 	private DocumentDto document2;
 	private DocumentDto document3;
 	private DocumentDto document4;
 	private DocumentDto document5;
+
+	// Dades del procediment
+	private ProcedimentDataDto procediment;
+	private OperadorPostalDataDto operadorPostal;
+	private CieDataDto cie;
 
 	private boolean hasEnviamentsPendents;
 
@@ -66,12 +73,6 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
-	
-	public String getOrganGestorDesc() {
-		if (organGestorNom != null && !organGestorNom.isEmpty())
-			return organGestor + " - " + organGestorNom;
-		return organGestor;
-	}
 
 	@Override
 	public String toString() {
@@ -79,5 +80,4 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

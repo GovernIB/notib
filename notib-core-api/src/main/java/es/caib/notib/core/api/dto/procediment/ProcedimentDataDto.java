@@ -10,6 +10,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * DTO per a crear i editar procediments.
+ *
+ */
 @Getter @Setter
 public class ProcedimentDataDto extends AuditoriaDto implements Serializable {
 

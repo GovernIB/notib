@@ -3,10 +3,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
@@ -1156,7 +1153,7 @@ public class NotificacioController extends BaseUserController {
             HttpServletRequest request,
             String pipellaActiva,
             Model model) {
-        NotificacioDtoV2 notificacio = notificacioService.findAmbId(
+        NotificacioInfoDto notificacio = notificacioService.findNotificacioInfo(
                 notificacioId,
                 isAdministrador(request));
 

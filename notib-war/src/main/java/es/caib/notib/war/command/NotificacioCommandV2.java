@@ -4,6 +4,7 @@
 package es.caib.notib.war.command;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
@@ -73,7 +74,7 @@ public class NotificacioCommandV2 {
 	private ServeiTipusEnumDto serveiTipus;
 	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
 	@Valid @NotEmpty
-	private List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
+	private List<EnviamentCommand> enviaments = new ArrayList<>();
 
 	// Document 1
 	private DocumentCommand[] documents = new DocumentCommand[5];
@@ -112,73 +113,6 @@ public class NotificacioCommandV2 {
 
 		return command;
 	}
-	public static NotificacioDtoV2 asDto(NotificacioCommandV2 command) {
-		if (command == null) {
-			return null;
-		}
-		NotificacioDtoV2 dto = ConversioTipusHelper.convertir(
-				command,
-				NotificacioDtoV2.class);
-		
-		ProcedimentDto procedimentDto = new ProcedimentDto();
-		procedimentDto.setId(command.getProcedimentId());
-		dto.setProcediment(procedimentDto);
-		
-		GrupDto grupDto = new GrupDto();
-		grupDto.setId(command.getGrupId());
-		dto.setGrup(grupDto);
-
-//		// Documents
-//		DocumentDto document = new DocumentDto();
-//		document.setArxiuGestdocId(dto.getDocument().getArxiuGestdocId());
-//		document.setArxiuNom(dto.getDocument().getArxiuNom());
-//		document.setContingutBase64(dto.getDocument().getContingutBase64());
-//		document.setCsv(dto.getDocument().getCsv());
-//		document.setHash(dto.getDocument().getHash());
-//		document.setId(dto.getDocument().getId());
-//		document.setUuid(dto.getDocument().getUuid());
-//		document.setUrl(dto.getDocument().getUrl());
-//		document.setNormalitzat(dto.getDocument().isNormalitzat());
-//		document.setGenerarCsv(dto.getDocument().isGenerarCsv());
-////		for (int i = 0; i < command.getDocument().getMetadadesKeys().size(); i++) {
-////			document.getMetadades().put(command.getDocument().getMetadadesKeys().get(i), command.getDocument().getMetadadesValues().get(i));
-////		}
-//		dto.setDocument(document);
-		
-		// Format de municipi i província
-		if (dto.getEnviaments() != null) {
-			for (NotificacioEnviamentDtoV2 enviament: dto.getEnviaments()) {
-				if (enviament.getEntregaPostal() != null) {
-					String codiProvincia = enviament.getEntregaPostal().getProvincia();
-					if (codiProvincia != null && !codiProvincia.isEmpty()) {
-						try {
-							codiProvincia = String.format("%02d", Integer.parseInt(codiProvincia));
-							enviament.getEntregaPostal().setProvincia(codiProvincia);
-							String codiMunicipi = enviament.getEntregaPostal().getMunicipiCodi();
-							if (codiMunicipi != null && !codiMunicipi.isEmpty()) {
-								codiMunicipi = codiProvincia + String.format("%04d", Integer.parseInt(codiMunicipi));
-								enviament.getEntregaPostal().setMunicipiCodi(codiMunicipi);
-							}
-						} catch (Exception e) {
-							logger.error("Error al donar format a la provincia: '" + enviament.getEntregaPostal().getProvincia() + 
-									"' i al municipi '" + enviament.getEntregaPostal().getMunicipiCodi() + "'");
-						}
-					}
-				}
-				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
-					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
-				
-				if (enviament.getDestinataris() != null) {
-					for (PersonaDto destinatari : enviament.getDestinataris()) {
-						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())
-							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+",""));
-					}
-				}
-			}
-		}
-		return dto;
-	}
-
 	public NotificacioDatabaseDto asDatabaseDto() {
 		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(
 				this,
@@ -193,24 +127,7 @@ public class NotificacioCommandV2 {
 
 		// Format de municipi i província
 		if (dto.getEnviaments() != null) {
-			for (NotificacioEnviamentDtoV2 enviament: dto.getEnviaments()) {
-				if (enviament.getEntregaPostal() != null) {
-					String codiProvincia = enviament.getEntregaPostal().getProvincia();
-					if (codiProvincia != null && !codiProvincia.isEmpty()) {
-						try {
-							codiProvincia = String.format("%02d", Integer.parseInt(codiProvincia));
-							enviament.getEntregaPostal().setProvincia(codiProvincia);
-							String codiMunicipi = enviament.getEntregaPostal().getMunicipiCodi();
-							if (codiMunicipi != null && !codiMunicipi.isEmpty()) {
-								codiMunicipi = codiProvincia + String.format("%04d", Integer.parseInt(codiMunicipi));
-								enviament.getEntregaPostal().setMunicipiCodi(codiMunicipi);
-							}
-						} catch (Exception e) {
-							logger.error("Error al donar format a la provincia: '" + enviament.getEntregaPostal().getProvincia() +
-									"' i al municipi '" + enviament.getEntregaPostal().getMunicipiCodi() + "'");
-						}
-					}
-				}
+			for (NotEnviamentDatabaseDto enviament: dto.getEnviaments()) {
 				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
 					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
 				

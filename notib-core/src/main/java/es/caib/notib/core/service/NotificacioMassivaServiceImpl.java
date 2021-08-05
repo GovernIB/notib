@@ -2,6 +2,8 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
@@ -506,7 +508,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 documentsProcessatsMassiu);
 
         log.debug("[NOT-MASSIVA] Alta notificació de nova notificacio massiva");
-        notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, notificacio.getEnviaments());
+        notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
         notMassiva.joinNotificacio(notificacioEntity);
     }
 
@@ -609,8 +611,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
         log.debug("[NOT-MASSIVA] Construeix notificació de les dades del fitxer CSV");
         NotificacioDatabaseDto notificacio = new NotificacioDatabaseDto();
-        NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
-        List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
+        NotEnviamentDatabaseDto enviament = new NotEnviamentDatabaseDto();
+        List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
         DocumentDto document = new DocumentDto();
 
         notificacio.setCaducitat(caducitat);
@@ -706,12 +708,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (entitat.getEntregaCie() != null && linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
                 linia[14] != null && !linia[14].isEmpty()) {
             enviament.setEntregaPostalActiva(true);
-            EntregaPostalDto entregaPostal = new EntregaPostalDto();
-            entregaPostal.setActiva(true);
-            entregaPostal.setLinea1(linia[12]);
-            entregaPostal.setLinea2(linia[13]);
-            entregaPostal.setCodiPostal(linia[14]);
-            entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR);
+            EntregaPostalDto entregaPostal = EntregaPostalDto.builder()
+                    .domiciliConcretTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)
+                    .linea1(linia[12])
+                    .linea2(linia[13])
+                    .codiPostal(linia[14])
+                    .build();
             enviament.setEntregaPostal(entregaPostal);
         } else {
             enviament.setEntregaPostalActiva(false);

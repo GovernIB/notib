@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import lombok.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -37,7 +38,7 @@ public class NotificacioDatabaseDto extends AuditoriaDto {
 	private String numExpedient;
 	private IdiomaEnumDto idioma;
 
-	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
+	private List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
 
 	private DocumentDto document;
 	private DocumentDto document2;

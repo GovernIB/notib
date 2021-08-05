@@ -70,4 +70,13 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
         return procedimentCreate;
     }
 
+    public ProcedimentDto getRandomInstanceAmbEntregaCie(Long cieId, Long operadorPostalId) {
+        ProcedimentDto procedimentCreate = getRandomInstance();
+        procedimentCreate.setCodi("2222222");
+        procedimentCreate.setEntregaCieActiva(true);
+        procedimentCreate.setCieId(cieId);
+        procedimentCreate.setOperadorPostalId(operadorPostalId);
+        return procedimentCreate;
+    }
+
 }

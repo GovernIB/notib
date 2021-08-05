@@ -52,12 +52,13 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
 var notificacioApp = "${notificacio.tipusUsuari == 'APLICACIO'}";
 $(document).ready(function() {
-	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
+	let $tableEvents = $('#table-events');
+	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
 			$(td).empty();
 			$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
 	});
-	$('#events').on('draw.dt', function(e, settings) {
+	$tableEvents.on('draw.dt', function(e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
 			var data = this.data();
@@ -66,6 +67,7 @@ $(document).ready(function() {
 			}
 		});
 	});
+
 	$(document.body).on('hidden.bs.modal', function () {
 		$('.tab-content').load(location.href + " .tab-content");
 	});
@@ -177,7 +179,7 @@ $(document).ready(function() {
 						<tr>
 							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
 							<td>${notificacio.organGestorNom}<br>
-							<small>${notificacio.organGestor}</small></td>
+							<small>${notificacio.organGestorCodi}</small></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.concepte" /></strong></td>
@@ -355,10 +357,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 			</c:if>
-			<%-- TODO: quedan comentados pagadorPostal y pagadorCie porque faltan cosas por acabar aquí en relación
-					   a la issue #549 --%>
-			<%-- 
-			<c:if test="${not empty notificacio.procediment.pagadorpostal}">
+			<c:if test="${not empty notificacio.operadorPostal}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -368,27 +367,27 @@ $(document).ready(function() {
 					<table class="table table-bordered" style="width: 100%">
 						<tbody>
 							<c:if
-								test="${not empty notificacio.procediment.pagadorpostal.dir3codi}">
+								test="${not empty notificacio.operadorPostal.organismePagadorCodi}">
 								<tr>
 									<td width="30%"><strong><spring:message
 												code="notificacio.info.pagador.correus.codi.dir3" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.dir3codi}</td>
+									<td>${notificacio.operadorPostal.organismePagadorCodi}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.contracte" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.contracteNum}</td>
+									<td>${notificacio.operadorPostal.contracteNum}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.client" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.facturacioClientCodi}</td>
+									<td>${notificacio.operadorPostal.facturacioClientCodi}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.vigencia" /></strong></td>
 									<td>
-									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.procediment.pagadorpostal.contracteDataVig}" />
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.operadorPostal.contracteDataVig}" />
 									</td>
 								</tr>
 							</c:if>
@@ -396,7 +395,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
-				<c:if test="${not empty notificacio.procediment.pagadorcie}">
+				<c:if test="${not empty notificacio.cie}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -405,17 +404,17 @@ $(document).ready(function() {
 					</div>
 					<table class="table table-bordered" style="width: 100%">
 						<tbody>
-							<c:if test="${not empty notificacio.procediment.pagadorcie.dir3codi}">
+							<c:if test="${not empty notificacio.cie.organismePagadorCodi}">
 								<tr>
 									<td width="30%"><strong><spring:message
 												code="notificacio.info.pagador.cie.codi.dir3" /></strong></td>
-									<td>${notificacio.procediment.pagadorcie.dir3codi}</td>
+									<td>${notificacio.cie.organismePagadorCodi}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.cie.vigencia" /></strong></td>
 									<td>
-									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.procediment.pagadorcie.contracteDataVig}" />
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.cie.contracteDataVig}" />
 									</td>
 								</tr>
 							</c:if>
@@ -423,7 +422,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
-				--%>
+
 				<c:if test="${not empty notificacio.enviaments}">
 				
 					<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
@@ -548,7 +547,6 @@ $(document).ready(function() {
 							    			</c:choose>
 							    		</tr>
 										<c:if test="${enviament.registreEstatFinal}">
-<%--										<c:if test="true">--%>
 											<tr>
 												<td colspan="2">
 													<a href="<c:url value="/notificacio/${enviament.id}/justificant/sir"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">
@@ -640,7 +638,7 @@ $(document).ready(function() {
 		<div role="tabpanel"
 			class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"
 			id="events">
-			<table id="events" data-toggle="datatable"
+			<table id="table-events" data-toggle="datatable"
 				data-url="<c:url value="/notificacio/${notificacio.id}/event"/>"
 				data-search-enabled="false" data-paging="false" data-info="false"
 				data-row-info="true" class="table table-striped table-bordered"
@@ -801,7 +799,7 @@ $(document).ready(function() {
 		<div role="tabpanel"
 			 class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"
 			 id="historic">
-			<table id="historic"
+			<table id="table-historic"
 				   data-toggle="datatable"
 				   data-url="<c:url value="/notificacio/${notificacio.id}/historic"/>"
 				   data-search-enabled="false"

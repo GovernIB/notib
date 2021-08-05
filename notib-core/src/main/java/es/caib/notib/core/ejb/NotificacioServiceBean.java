@@ -43,6 +43,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador) {
+		return delegate.findNotificacioInfo(id, isAdministrador);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long entitatId,

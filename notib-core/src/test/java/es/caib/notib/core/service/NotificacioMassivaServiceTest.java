@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
 import es.caib.notib.core.entity.*;
@@ -154,10 +155,10 @@ public class NotificacioMassivaServiceTest {
 		notificacioMassivaService.create(entitatId, usuariCodi, notificacioMassiu);
 
 		// Then
-		Mockito.verify(notificacioHelper, Mockito.times(4)).altaNotificacioWeb(
+		Mockito.verify(notificacioHelper, Mockito.times(4)).altaEnviamentsWeb(
 				Mockito.any(EntitatEntity.class),
 				Mockito.any(NotificacioEntity.class),
-				Mockito.<List<NotificacioEnviamentDtoV2>>any()
+				Mockito.<List<NotEnviamentDatabaseDto>>any()
 		);
 	}
 
@@ -184,10 +185,10 @@ public class NotificacioMassivaServiceTest {
 		notificacioMassivaService.create(entitatId, usuariCodi, notificacioMassiu);
 
 		// Then
-		Mockito.verify(notificacioHelper, Mockito.times(0)).altaNotificacioWeb(
+		Mockito.verify(notificacioHelper, Mockito.times(0)).altaEnviamentsWeb(
 				Mockito.any(EntitatEntity.class),
 				Mockito.any(NotificacioEntity.class),
-				Mockito.<List<NotificacioEnviamentDtoV2>>any()
+				Mockito.<List<NotEnviamentDatabaseDto>>any()
 		);
 	}
 

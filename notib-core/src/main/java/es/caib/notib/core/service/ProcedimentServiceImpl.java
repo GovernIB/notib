@@ -747,7 +747,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			PaginaDto<ProcedimentFormDto> procedimentsPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor"});
-//			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestorNom"}); //{"organGestor", "organGestorNom"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			List<String> organsFills = new ArrayList<String>();
@@ -793,7 +792,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
-							filtre.getComu()== null ? false : filtre.getComu(),
+							filtre.isComu(),
+							filtre.isEntregaCieActiva(),
 							pageable);
 					
 					procedimentsPage = paginacioHelper.toPaginaDto(
@@ -808,7 +808,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
-							filtre.getComu()== null ? false : filtre.getComu(),
+							filtre.isComu(),
+							filtre.isEntregaCieActiva(),
 							pageable);
 					
 					procedimentsPage =  paginacioHelper.toPaginaDto(
@@ -824,7 +825,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
 							organsFills,
-							filtre.getComu()== null ? false : filtre.getComu(),
+							filtre.isComu(),
+							filtre.isEntregaCieActiva(),
 							pageable);
 					
 					procedimentsPage =  paginacioHelper.toPaginaDto(

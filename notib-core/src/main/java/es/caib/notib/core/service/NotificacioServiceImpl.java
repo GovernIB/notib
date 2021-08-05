@@ -6,6 +6,9 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
+import es.caib.notib.core.api.dto.cie.CieDataDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -16,6 +19,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
@@ -126,12 +130,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
+			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio,
+					false);
 			// Dades generals de la notificació
 			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
 
 
-			notificacioHelper.altaNotificacioWeb(entitat, notificacioEntity, notificacio.getEnviaments());
+			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 
 			return conversioTipusHelper.convertir(
 				notificacioEntity,
@@ -227,7 +232,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			List<Long> enviamentsIds = new ArrayList<Long>();
 			List<Long> destinatarisIds = new ArrayList<Long>();
 			List<NotificacioEnviamentEntity> nousEnviaments = new ArrayList<NotificacioEnviamentEntity>();
-			for(NotificacioEnviamentDtoV2 enviament: notificacio.getEnviaments()) {
+			for(NotEnviamentDatabaseDto enviament: notificacio.getEnviaments()) {
 				if (enviament.getEntregaPostal() != null) {
 					if (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
 						enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
@@ -253,35 +258,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						break;
 					}
 				}
-				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-				if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
-					if (enviament.getEntregaPostal().getTipus() != null) {
-						switch (enviament.getEntregaPostal().getTipus()) {
-						case APARTAT_CORREUS:
-							tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
-							break;
-						case ESTRANGER:
-							tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
-							break;
-						case NACIONAL:
-							tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-							break;
-						case SENSE_NORMALITZAR:
-							tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-							break;
-						}
-					}
-					if (enviament.getEntregaPostal().getNumeroCasa() != null) {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
-					} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
-					} else if (enviament.getEntregaPostal().getPuntKm() != null) {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
-					} else {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
-					}
-				}
+
 				PersonaEntity titular = null;
 				if (enviament.getTitular().getId() != null) {
 					titular = personaHelper.update(enviament.getTitular(),  enviament.getTitular().isIncapacitat());
@@ -306,11 +283,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						}
 					}
 				}
-				EntregaPostalViaTipusEnum viaTipus = null;
 
-				if (enviament.getEntregaPostal() != null) {
-					viaTipus = enviament.getEntregaPostal().getViaTipus();
-				}
 //					### Actualitzar les dades d'un enviament existent o crear un de nou
 				if (enviament.getId() != null) {
 					NotificacioEnviamentEntity enviamentEntity = auditEnviamentHelper.updateEnviament(
@@ -318,10 +291,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							notificacioEntity,
 							enviament,
 							serveiTipus,
-							numeracioTipus,
-							tipusConcret,
-							titular,
-							viaTipus);
+//							numeracioTipus,
+//							tipusConcret,
+							titular);
 					enviamentEntity.getDestinataris().addAll(nousDestinataris);
 				} else {
 					NotificacioEnviamentEntity nouEnviament = auditEnviamentHelper.desaEnviament(
@@ -329,11 +301,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							notificacioEntity,
 							enviament,
 							serveiTipus,
-							numeracioTipus,
-							tipusConcret,
 							titular,
-							nousDestinataris,
-							viaTipus);
+							nousDestinataris);
 					nousEnviaments.add(nouEnviament);
 					enviamentsIds.add(nouEnviament.getId());
 				}
@@ -392,32 +361,67 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
 			NotificacioEntity notificacio = notificacioRepository.findById(id);
-			
+			if(notificacio == null) {
+				return null;
+			}
 			entityComprovarHelper.comprovarPermisos(
 					null,
 					false,
 					false,
 					false);
-			
-			if(notificacio != null) {
-				if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
-					notificacio.setPermisProcessar(
-							entityComprovarHelper.hasPermisProcediment(
-									notificacio.getProcediment().getId(),
-									PermisEnum.PROCESSAR));
-				}
-				
-				List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
-				if (enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty()) {
-					notificacio.setHasEnviamentsPendents(true);
-				}
-				
-				pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+
+			if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+				notificacio.setPermisProcessar(
+						entityComprovarHelper.hasPermisProcediment(
+								notificacio.getProcediment().getId(),
+								PermisEnum.PROCESSAR));
 			}
-			
+
+			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
+
+			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+
 			return conversioTipusHelper.convertir(
 					notificacio,
 					NotificacioDtoV2.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+
+	@Transactional(readOnly = true)
+	@Override
+	public NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
+			NotificacioEntity notificacio = notificacioRepository.findById(id);
+			if(notificacio == null) {
+				return null;
+			}
+
+			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
+
+			// Emplena els atributs registreLlibreNom i registreOficinaNom
+			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
+
+			NotificacioInfoDto dto = conversioTipusHelper.convertir(
+					notificacio,
+					NotificacioInfoDto.class);
+
+			// Emplena dades del procediment
+			ProcedimentEntity procedimentEntity = notificacio.getProcediment();
+			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
+				EntregaCieEntity entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
+				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(),
+						OperadorPostalDataDto.class));
+				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(),
+						CieDataDto.class));
+			}
+			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

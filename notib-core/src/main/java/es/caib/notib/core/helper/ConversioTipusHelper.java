@@ -10,13 +10,11 @@ import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.auditoria.NotificacioEnviamentAudit;
-import es.caib.notib.core.entity.cie.PagadorCieEntity;
-import es.caib.notib.core.entity.cie.PagadorCieFormatFullaEntity;
-import es.caib.notib.core.entity.cie.PagadorCieFormatSobreEntity;
-import es.caib.notib.core.entity.cie.PagadorPostalEntity;
+import es.caib.notib.core.entity.cie.*;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
@@ -67,7 +65,39 @@ public class ConversioTipusHelper {
 //			exclude("destinataris").
 //			byDefault().
 //			register();
-		
+		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class).
+				field("organGestor.codi", "organGestorCodi").
+				field("organGestor.nom", "organGestorNom").
+				byDefault().
+				register();
+
+		mapperFactory.classMap(EntregaPostalEntity.class, EntregaPostalDto.class).
+				field("domiciliViaTipus", "viaTipus").
+				field("domiciliViaNom", "viaNom").
+				field("domiciliNumeracioNumero", "numeroCasa").
+				field("domiciliNumeracioQualificador", "numeroQualificador").
+				field("domiciliNumeracioPuntKm", "puntKm").
+				field("domiciliApartatCorreus", "apartatCorreus").
+				field("domiciliPortal", "portal").
+				field("domiciliEscala", "escala").
+				field("domiciliPlanta", "planta").
+				field("domiciliPorta", "porta").
+				field("domiciliBloc", "bloc").
+				field("domiciliComplement", "complement").
+				field("domiciliCodiPostal", "codiPostal").
+//				field("", "codiPostalNorm").
+				field("domiciliPoblacio", "poblacio").
+				field("domiciliMunicipiCodiIne", "municipiCodi").
+				field("domiciliProvinciaCodi", "provincia").
+				field("domiciliPaisCodiIso", "paisCodi").
+				field("domiciliLinea1", "linea1").
+				field("domiciliLinea2", "linea2").
+				field("formatSobre", "formatSobre").
+				field("formatFulla", "formatFulla").
+				field("domiciliCie", "cie").
+//				field("", "activa").
+				byDefault().
+				register();
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioDtoV2.class).
 			field("organGestor.codi", "organGestor").
 			field("organGestor.nom", "organGestorNom").
@@ -108,7 +138,12 @@ public class ConversioTipusHelper {
 				customize(new NotificacioEnviamentEntitytoDatatableMapper()).
 				byDefault().
 				register();
-		
+
+		mapperFactory.classMap(EntregaPostalDto.class, EntregaPostal.class).
+				field("domiciliConcretTipus", "tipus").
+				byDefault().
+				register();
+
 		mapperFactory.classMap(AplicacioEntity.class, AplicacioDto.class).
 			field("entitat.id", "entitatId").
 			byDefault().
@@ -155,7 +190,6 @@ public class ConversioTipusHelper {
 				})
 				.byDefault()
 				.register();
-		
 		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").

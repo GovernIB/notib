@@ -50,7 +50,8 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
-			" and (pro.comu = :isComu or pro.comu = true)")
+			" and (:isComu = false or pro.comu = true)" +
+			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ProcedimentFormEntity> findAmbEntitatAndFiltre(
 			@Param("entitatId") Long entitatId,
 			@Param("isCodiNull") boolean isCodiNull,
@@ -60,6 +61,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("isOrganGestorNull") boolean isOrganGestorNull,
 			@Param("organ") String organGestor,
 			@Param("isComu") boolean isComu,
+			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			Pageable paginacio);
 	
 	@Query(	"from " +
@@ -67,8 +69,9 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
 			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
-			" and (pro.comu = :isComu or pro.comu = true)")
-	public Page<ProcedimentFormEntity> findAmbFiltre(
+			" and (:isComu = false or pro.comu = true)" +
+			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
+	Page<ProcedimentFormEntity> findAmbFiltre(
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
 			@Param("isNomNull") boolean isNomNull,
@@ -76,6 +79,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("isOrganGestorNull") boolean isOrganGestorNull,
 			@Param("organ") String organGestor,
 			@Param("isComu") boolean isComu,
+			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			Pageable paginacio);
 
 	@Query(	"from " +
@@ -85,8 +89,8 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
 			" and ((pro.organGestor in (:organsGestors)) or pro.comu = true)" +
-			" and (pro.comu = :isComu or pro.comu = true)"
-			)
+			" and (:isComu = false or pro.comu = true)" +
+			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ProcedimentFormEntity> findAmbOrganGestorOrComuAndFiltre(
 			@Param("entitatId") Long entitatId,
 			@Param("isCodiNull") boolean isCodiNull,
@@ -97,6 +101,7 @@ public interface ProcedimentFormRepository extends JpaRepository<ProcedimentForm
 			@Param("organ") String organGestor,
 			@Param("organsGestors") List<String> organsGestors,
 			@Param("isComu") boolean isComu,
+			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			Pageable paginacio);
 
 }

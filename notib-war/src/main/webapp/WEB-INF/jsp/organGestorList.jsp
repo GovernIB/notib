@@ -73,13 +73,6 @@
 	<%-- 				<not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionMinimumResultsForSearch="0"/> --%>
 				</div>
 			</c:if>
-			<div class="col-md-2">
-<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
-				<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${entregaCieActiva}">active</c:if>" data-toggle="button">
-					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
-				</button>
-				<not:inputHidden name="entregaCieActiva"/>
-			</div>
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -87,6 +80,15 @@
 				</div>
 			</div>
 		</div>
+	<div class="row">
+		<div class="col-md-2">
+				<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
+			<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
+				<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
+			</button>
+			<not:inputHidden name="entregaCieActiva"/>
+		</div>
+	</div>
 	</form:form>
 
 	<table

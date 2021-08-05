@@ -1,4 +1,5 @@
-package es.caib.notib.core.api.dto;
+package es.caib.notib.core.api.dto.notenviament;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -9,15 +10,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Informació d'un destinatari d'una anotació.
+ * DTO per a crear o editar un enviament d'una notificació a la base de dades
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
+public class NotEnviamentDatabaseDto extends AuditoriaDto {
 
 	private Long id;
-	//private NotificacioDtoV2 notificacio;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 	private EntregaPostalDto entregaPostal;
@@ -62,6 +62,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private Date sirRegDestiData;
 	private int registreNumero;
 	private Date registreData;
+
 	//Notific@
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;

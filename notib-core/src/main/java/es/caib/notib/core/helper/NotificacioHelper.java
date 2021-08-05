@@ -1,6 +1,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -61,15 +62,16 @@ public class NotificacioHelper {
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 
-	public NotificacioEntity altaNotificacioWeb(EntitatEntity entitat,
-												NotificacioEntity notificacioEntity,
-												List<NotificacioEnviamentDtoV2> enviamentsDto) throws RegistreNotificaException {
+	public NotificacioEntity altaEnviamentsWeb(EntitatEntity entitat,
+											   NotificacioEntity notificacioEntity,
+											   List<NotEnviamentDatabaseDto> enviamentsDto) throws RegistreNotificaException {
 
 		log.trace("Alta Notificació web - Preparam enviaments");
 		List<Enviament> enviaments = new ArrayList<>();
-		for(NotificacioEnviamentDtoV2 enviament: enviamentsDto) {
-			if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()))
+		for(NotEnviamentDatabaseDto enviament: enviamentsDto) {
+			if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty())) {
 				enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
+			}
 			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 		}
 		List<NotificacioEnviamentEntity> enviamentsCreats = new ArrayList<NotificacioEnviamentEntity>();
@@ -87,35 +89,7 @@ public class NotificacioHelper {
 							break;
 					}
 				}
-				NotificaDomiciliNumeracioTipusEnumDto numeracioTipus = null;
-				NotificaDomiciliConcretTipusEnumDto tipusConcret = null;
-				if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
-					if (enviament.getEntregaPostal().getTipus() != null) {
-						switch (enviament.getEntregaPostal().getTipus()) {
-							case APARTAT_CORREUS:
-								tipusConcret = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
-								break;
-							case ESTRANGER:
-								tipusConcret = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
-								break;
-							case NACIONAL:
-								tipusConcret = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-								break;
-							case SENSE_NORMALITZAR:
-								tipusConcret = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-								break;
-						}
-					}
-					if (enviament.getEntregaPostal().getNumeroCasa() != null) {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.NUMERO;
-					} else if (enviament.getEntregaPostal().getApartatCorreus() != null) {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.APARTAT_CORREUS;
-					} else if (enviament.getEntregaPostal().getPuntKm() != null) {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC;
-					} else {
-						numeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
-					}
-				}
+
 				PersonaEntity titular = personaHelper.create(enviament.getTitular(),enviament.getTitular().isIncapacitat());
 
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
@@ -128,22 +102,14 @@ public class NotificacioHelper {
 						}
 					}
 				}
-				EntregaPostalViaTipusEnum viaTipus = null;
-
-				if (enviament.getEntregaPostal() != null) {
-					viaTipus = enviament.getEntregaPostal().getViaTipus();
-				}
 				// Rellenar dades enviament titular
 				enviamentsCreats.add(auditEnviamentHelper.desaEnviament(
 						entitat,
 						notificacioEntity,
 						enviament,
 						serveiTipus,
-						numeracioTipus,
-						tipusConcret,
 						titular,
-						destinataris,
-						viaTipus));
+						destinataris));
 			}
 		}
 		notificacioEntity.getEnviaments().addAll(enviamentsCreats);

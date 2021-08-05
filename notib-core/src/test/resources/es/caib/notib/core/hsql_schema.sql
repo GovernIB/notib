@@ -94,20 +94,28 @@ INSERT INTO NOT_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES
 
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.metriques.generar', 'false');
 
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.registre.enviaments.periode', '60');
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.registre.enviaments.retard.inicial', '60');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasques.actives', 'false');
 
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.notifica.enviaments.periode', '60');
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.notifica.enviaments.retard.inicial', '60');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.registre.enviaments.periode', '300000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.registre.enviaments.retard.inicial', '3000000');
 
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.periode', '60');
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial', '60');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.notifica.enviaments.periode', '300000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.notifica.enviaments.retard.inicial', '3000000');
 
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode', '60');
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial', '60');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.periode', '300000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial', '3000000');
+
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode', '300000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial', '3000000');
 
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.actualitzacio.procediments.cron', '0 53 16 * * *');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.refrescar.notificacions.expirades.cron', '0 0 0 * * ?');
 
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.periode', '60');
-INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.retard.inicial', '60');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.periode', '300000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.retard.inicial', '3000000');
+
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.periode', '300000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.retard.inicial', '3000000');
+
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.periode', '432000000');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.retard.inicial', '3000000');

@@ -1,6 +1,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
@@ -120,7 +121,7 @@ public class NotificacioHelperTest {
                 .enviamentDataProgramada(new Date())
                 .retard(5)
                 .caducitat(caducitat)
-                .enviaments(new ArrayList<NotificacioEnviamentDtoV2>())
+                .enviaments(new ArrayList<NotEnviamentDatabaseDto>())
                 .usuariCodi("admin")
                 .numExpedient("EXPEDIENTEX")
                 .idioma(IdiomaEnumDto.CA)

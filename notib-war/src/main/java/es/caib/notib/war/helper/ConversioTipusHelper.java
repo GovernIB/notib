@@ -5,19 +5,12 @@ package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
-import es.caib.notib.core.api.dto.PersonaDto;
-import es.caib.notib.war.command.DocumentCommand;
-import es.caib.notib.war.command.EnviamentCommand;
-import es.caib.notib.war.command.NotificacioCommandV2;
-import es.caib.notib.war.command.PersonaCommand;
-import ma.glasnost.orika.CustomConverter;
-import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
+import es.caib.notib.war.command.*;
+import ma.glasnost.orika.*;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
@@ -75,11 +68,23 @@ public class ConversioTipusHelper {
         })
 		.register();
 		
-		mapperFactory.classMap(EnviamentCommand.class, NotificacioEnviamentDtoV2.class)
-		.field("entregaPostal.activa", "entregaPostalActiva")
-		.field("entregaDeh.activa", "entregaDehActiva")
-		.byDefault()
-		.register();
+		mapperFactory.classMap(EnviamentCommand.class, NotEnviamentDatabaseDto.class)
+			.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
+			.field("entregaDeh.activa", "entregaDehActiva")
+			.byDefault()
+			.customize(new CustomMapper<EnviamentCommand, NotEnviamentDatabaseDto>() {
+				@Override
+				public void mapAtoB(EnviamentCommand command, NotEnviamentDatabaseDto dto, MappingContext context) {
+
+				}
+				@Override
+				public void mapBtoA(NotEnviamentDatabaseDto dto, EnviamentCommand command, MappingContext context) {
+					EntregapostalCommand epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
+					epCommand.setActiva(dto.getEntregaPostal() != null);
+					command.setEntregaPostal(epCommand);
+				}
+			})
+			.register();
 
 		mapperFactory.classMap(NotificacioDtoV2.class, NotificacioCommandV2.class)
 				.byDefault()

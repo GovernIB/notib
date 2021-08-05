@@ -86,16 +86,16 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 //			+ " end)")
 //	private boolean entregaCieActivaAlgunNivell;
 
-	public boolean getEntregaCieActivaAlgunNivell() {
+	public boolean isEntregaCieActivaAlgunNivell() {
 		if (entregaCie != null) {
 			return true;
 		}
 
-		if (organGestor.getEntregaCie() != null) {
+		if (organGestor != null && organGestor.getEntregaCie() != null) {
 			return true;
 		}
 
-		if (entitat.getEntregaCie() != null) {
+		if (entitat != null && entitat.getEntregaCie() != null) {
 			return true;
 		}
 
@@ -107,11 +107,11 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			return entregaCie;
 		}
 
-		if (organGestor.getEntregaCie() != null) {
+		if (organGestor != null && organGestor.getEntregaCie() != null) {
 			return organGestor.getEntregaCie();
 		}
 
-		if (entitat.getEntregaCie() != null) {
+		if (entitat != null && entitat.getEntregaCie() != null) {
 			return entitat.getEntregaCie();
 		}
 
