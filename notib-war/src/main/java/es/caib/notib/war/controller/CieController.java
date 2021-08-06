@@ -119,7 +119,7 @@ public class CieController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:cie",
-					"pagadorCie.controller.modificat.ok");
+					"cie.controller.modificat.ok");
 		//if it is new	
 		} else {
 			CieDataDto dto = cieCommand.asDto();
@@ -133,7 +133,7 @@ public class CieController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:cie",
-					"pagadorCie.controller.creat.ok");
+					"cie.controller.creat.ok");
 		}
 	}
 	
@@ -173,13 +173,13 @@ public class CieController extends BaseUserController{
 			return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../cie",
-						"pagadorCie.controller.esborrat.ora.ko");
+						"cie.controller.esborrat.ora.ko");
 		}
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../cie",
-				"pagadorCie.controller.esborrat.ok");
+				"cie.controller.esborrat.ok");
 	}
 	
 	private CieFiltreCommand getFiltreCommand(

@@ -76,7 +76,7 @@ pageContext.setAttribute(
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}operadorPostal/new" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="operadorpostal.list.boto.nou.pagadorpostal"/></a></p>
+		<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}operadorPostal/new" data-toggle="modal" data-height="400px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="operadorpostal.list.boto.nou.operadorpostal"/></a></p>
 	</script>
 	
 </body>

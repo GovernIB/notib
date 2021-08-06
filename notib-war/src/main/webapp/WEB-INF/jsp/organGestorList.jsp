@@ -126,7 +126,7 @@
 					<th data-col-name="oficinaNom"><spring:message code="organgestor.list.columna.oficina"/></th>
 				</c:if>
 
-				<th data-col-name="estat" data-template="#cellEstatTemplate"  width="100px">
+				<th data-col-name="estat" data-template="#cellEstatTemplate">
 					<spring:message code="organgestor.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'VIGENT'}}

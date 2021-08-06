@@ -112,7 +112,7 @@ public class CieFormatsController extends BaseUserController{
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../cie/" + pagadorCieId + "/formats/fulla",
-				"pagadorcie.format.fulla.controller.esborrat.ok");
+				"cie.format.fulla.controller.esborrat.ok");
 	}
 	
 	@RequestMapping(value = "/{pagadorCieId}/formats/fulla/newOrModify", method = RequestMethod.POST)
@@ -137,7 +137,7 @@ public class CieFormatsController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
-					"pagadorcie.format.fulla.controller.modificat.ok");
+					"cie.format.fulla.controller.modificat.ok");
 		} else {
 			pagadorCieFormatFullaService.create(
 					pagadorCieId, 
@@ -146,7 +146,7 @@ public class CieFormatsController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
-					"pagadorcie.format.fulla.controller.creat.ok");
+					"cie.format.fulla.controller.creat.ok");
 		}
 	}
 
@@ -199,7 +199,7 @@ public class CieFormatsController extends BaseUserController{
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../cie/" + pagadorCieId + "/formats/sobre",
-				"pagadorcie.format.sobre.controller.esborrat.ok");
+				"cie.format.sobre.controller.esborrat.ok");
 	}
 	
 	@RequestMapping(value = "/{pagadorCieId}/formats/sobre/newOrModify", method = RequestMethod.POST)
@@ -223,7 +223,7 @@ public class CieFormatsController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
-					"pagadorcie.format.sobre.controller.modificat.ok");
+					"cie.format.sobre.controller.modificat.ok");
 		} else {
 			pagadorCieFormatSobreService.create(
 					pagadorCieId, 
@@ -232,7 +232,7 @@ public class CieFormatsController extends BaseUserController{
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:pagadorsCie",
-					"pagadorcie.format.sobre.controller.creat.ok");
+					"cie.format.sobre.controller.creat.ok");
 		}
 	}
 	

@@ -6,8 +6,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:choose>
-	<c:when test="${empty pagadorCieFormatFullaCommand.id}"><c:set var="titol"><spring:message code="pagadorcie.form.format.fulla.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="pagadorcie.form.format.fulla.titol.modificar"/></c:set></c:otherwise>
+	<c:when test="${empty pagadorCieFormatFullaCommand.id}"><c:set var="titol"><spring:message code="cie.form.format.fulla.titol.crear"/></c:set></c:when>
+	<c:otherwise><c:set var="titol"><spring:message code="cie.form.format.fulla.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -36,7 +36,7 @@
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputText name="codi" textKey="pagadorcie.form.format.fulla.camp.codi" required="true"/>
+				<not:inputText name="codi" textKey="cie.form.format.fulla.camp.codi" required="true"/>
 			</div>
 			<div id="modal-botons">
 				<button id="addPagadorCieButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

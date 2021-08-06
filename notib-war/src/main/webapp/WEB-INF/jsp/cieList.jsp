@@ -90,7 +90,7 @@ pageContext.setAttribute(
 	</table>
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
-		<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}cie/new" data-toggle="modal" data-height="350px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="cie.list.boto.nou.pagadorcie"/></a></p>
+		<p style="text-align:right"><a class="btn btn-default" href="${unitatCodiUrlPrefix}cie/new" data-toggle="modal" data-height="350px" data-custom="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="cie.list.boto.nou.cie"/></a></p>
 	</script>
 	
 	
