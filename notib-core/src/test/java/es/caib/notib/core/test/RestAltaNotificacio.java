@@ -1,33 +1,22 @@
 package es.caib.notib.core.test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
-import es.caib.notib.core.api.ws.notificacio.DocumentV2;
-import es.caib.notib.core.api.ws.notificacio.EntregaDeh;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
-import es.caib.notib.core.api.ws.notificacio.PagadorCie;
-import es.caib.notib.core.api.ws.notificacio.PagadorPostal;
-import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.*;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class RestAltaNotificacio {
 
@@ -193,17 +182,15 @@ public class RestAltaNotificacio {
 			int numDestinataris,
 			boolean ambEnviamentPostal) throws IOException, DecoderException {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
-		NotificacioV2 notificacio = new NotificacioV2();
-		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.setConcepte(
-				"concepte_" + notificacioId);
-		notificacio.setDescripcio(
-				"descripcio_" + notificacioId);
-		notificacio.setEnviamentDataProgramada(null);
-		notificacio.setRetard(5);
-		notificacio.setCaducitat(
-				new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
+		NotificacioV2 notificacio = NotificacioV2.builder()
+			.emisorDir3Codi(ENTITAT_DIR3CODI)
+			.enviamentTipus(EnviamentTipusEnum.COMUNICACIO)
+				.concepte("concepte_" + notificacioId)
+				.descripcio("descripcio_" + notificacioId)
+				.enviamentDataProgramada(null)
+				.retard(5)
+				.caducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000))
+			.build();
 		DocumentV2 document = new DocumentV2();
 //		document.setCsv("4edd743942cec762cdf9389dc626ee01209fd30e6884aca9845c9573a57f2df3");
 //		document.setUuid("614841f4-a93f-4307-8009-32970cf01632");

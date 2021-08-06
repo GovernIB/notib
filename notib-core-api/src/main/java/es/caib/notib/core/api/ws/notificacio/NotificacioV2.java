@@ -5,8 +5,7 @@ package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -22,6 +21,9 @@ import java.util.List;
 @JsonAutoDetect
 @XmlRootElement
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class NotificacioV2 {
 
 	private String emisorDir3Codi;

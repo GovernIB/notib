@@ -195,7 +195,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			fetch = FetchType.LAZY,
 			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},
 			orphanRemoval = true)
-	protected Set<NotificacioEventEntity> events = new LinkedHashSet<NotificacioEventEntity>();
+	protected Set<NotificacioEventEntity> events = new LinkedHashSet<>();
 
 	@Setter
 	@Column(name = "registre_oficina_nom")
