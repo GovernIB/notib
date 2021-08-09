@@ -490,10 +490,10 @@ SELECT 1 FROM DUAL;
 
 INSERT ALL
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.destinatari.multiple', 'false',
-                                                                                       'Permetre múltiples destinataris',
+                                                                                       'Permetre múltiples representants',
                                                                                        'BOOL', 'FORM_REMESES' )
 INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (1, 'es.caib.notib.titular.incapacitat', 'true',
-                                                                                   'Permetre titular amb discapacitat',
+                                                                                   'Permetre interessat amb discapacitat',
                                                                                    'BOOL', 'FORM_REMESES' )
 SELECT 1 FROM DUAL;
 
