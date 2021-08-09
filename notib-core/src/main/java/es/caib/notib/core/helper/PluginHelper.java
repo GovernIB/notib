@@ -2195,6 +2195,12 @@ public class PluginHelper {
 			}
 		}
 	}
+
+	/**
+	 * Esborra les properties del grup indicat per paràmetre de la memòria.
+	 *
+	 * @param codeProperties Codi del grup de propietats que vols esborrar de memòria.
+	 */
 	public void reloadProperties(String codeProperties) {
 		if (propertiesLoaded.containsKey(codeProperties))
 			propertiesLoaded.put(codeProperties, false);

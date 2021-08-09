@@ -48,8 +48,10 @@ public class ConfigHelper {
             outProperties.put(config.getKey(), getConfig(config));
         }
 
-        for (ConfigGroupEntity child : configGroup.getInnerConfigs()) {
-            fillGroupProperties(child, outProperties);
+        if (configGroup.getInnerConfigs() != null) {
+            for (ConfigGroupEntity child : configGroup.getInnerConfigs()) {
+                fillGroupProperties(child, outProperties);
+            }
         }
     }
 

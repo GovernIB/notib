@@ -7,6 +7,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -61,10 +62,10 @@ public class ConfigEntity {
      * @return El llistat de possibles valors que pot prendre la propietat
      */
     public List<String> getValidValues() {
-       return type.getValidValues();
+       return type == null ? Collections.<String>emptyList() : type.getValidValues();
     }
     public String getTypeCode() {
-        return type.getCode();
+        return type == null ? "" : type.getCode();
     }
 
     public void update(String value) {

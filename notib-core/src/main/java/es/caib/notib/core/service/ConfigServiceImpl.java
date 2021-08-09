@@ -28,7 +28,6 @@ public class ConfigServiceImpl implements ConfigService {
     private ConfigGroupRepository configGroupRepository;
     @Autowired
     private ConfigRepository configRepository;
-
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired

@@ -1,6 +1,9 @@
 package es.caib.notib.core.entity.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -8,6 +11,9 @@ import java.util.Set;
 @Getter
 @Entity
 @Table(	name = "NOT_CONFIG_GROUP")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ConfigGroupEntity {
 
     @Id
