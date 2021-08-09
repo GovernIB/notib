@@ -150,7 +150,7 @@ SELECT 1 FROM DUAL;
 
 INSERT ALL
     INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.email.jndi', 1, 'JNDI email', 'EMAIL' )
-    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.email.remitent', 'bgalmes@limit.es', 'Remitent dels correus electrònics', 'EMAIL' )
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.email.remitent', '', 'Remitent dels correus electrònics (correu electrònic)', 'EMAIL' )
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.email.footer', ' Notib - Govern de les Illes Balears', 'Text del peu dels correus electrònics', 'EMAIL' )
 SELECT 1 FROM DUAL;
 
@@ -530,10 +530,10 @@ SELECT 1 FROM DUAL;
 
 INSERT ALL
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.destinatari.multiple', 'false',
-                                                                                       'Permetre múltiples destinataris',
+                                                                                       'Permetre múltiples representants',
                                                                                        'BOOL', 'FORM_REMESES' )
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (1, 'es.caib.notib.titular.incapacitat', 'true',
-                                                                                       'Permetre titular amb discapacitat',
+                                                                                       'Permetre interessat amb discapacitat',
                                                                                        'BOOL', 'FORM_REMESES' )
 SELECT 1 FROM DUAL;
 
