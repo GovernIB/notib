@@ -9,18 +9,21 @@ import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class ConfigServiceImpl implements ConfigService {
 
@@ -36,6 +39,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
+        log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
         configEntity.update(property.getValue());
         pluginHelper.reloadProperties(configEntity.getGroupCode());
@@ -45,6 +49,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional(readOnly = true)
     public List<ConfigGroupDto> findAll() {
+        log.debug("Consulta totes les propietats");
         List<ConfigGroupDto> configGroupDtoList =  conversioTipusHelper.convertirList(
                 configGroupRepository.findByParentCodeIsNull(new Sort(Sort.Direction.ASC, "position")),
                 ConfigGroupDto.class);
@@ -53,6 +58,20 @@ public class ConfigServiceImpl implements ConfigService {
             processPropertyValues(cGroup);
         }
         return configGroupDtoList;
+    }
+
+    public void syncFromJBossProperties() {
+        log.debug("Sincronitzant les propietats amb JBoss");
+        Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
+        for (String key : properties.stringPropertyNames()) {
+            String value = properties.getProperty(key);
+            log.trace(key + " : " + value);
+            ConfigEntity configEntity = configRepository.findOne(key);
+            if (configEntity != null) {
+                configEntity.update(value);
+                pluginHelper.reloadProperties(configEntity.getGroupCode());
+            }
+        }
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {
