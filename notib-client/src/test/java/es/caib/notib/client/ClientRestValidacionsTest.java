@@ -1030,8 +1030,15 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		notificacio.setProcedimentCodi("000000");
 		enviaNotificacioError(notificacio, "1330");
 	}
-	
-	
+
+	@Test
+	public void test1029() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(),
+				1, true);
+		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
+		notificacio.setOrganGestor(ORGAN_CODI);
+		enviaNotificacioError(notificacio, "1029");
+	}
 	
 	
 	private void enviaNotificacioError(NotificacioV2 notificacio, String codiError) {

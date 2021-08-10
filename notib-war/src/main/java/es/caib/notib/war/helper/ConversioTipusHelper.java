@@ -5,6 +5,7 @@ package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
@@ -85,7 +86,23 @@ public class ConversioTipusHelper {
 				}
 			})
 			.register();
+		mapperFactory.classMap(EnviamentCommand.class, NotificacioEnviamentDtoV2.class)
+				.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
+				.field("entregaDeh.activa", "entregaDehActiva")
+				.byDefault()
+				.customize(new CustomMapper<EnviamentCommand, NotificacioEnviamentDtoV2>() {
+					@Override
+					public void mapAtoB(EnviamentCommand command, NotificacioEnviamentDtoV2 dto, MappingContext context) {
 
+					}
+					@Override
+					public void mapBtoA(NotificacioEnviamentDtoV2 dto, EnviamentCommand command, MappingContext context) {
+						EntregapostalCommand epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
+						epCommand.setActiva(dto.getEntregaPostal() != null);
+						command.setEntregaPostal(epCommand);
+					}
+				})
+				.register();
 		mapperFactory.classMap(NotificacioDtoV2.class, NotificacioCommandV2.class)
 				.byDefault()
 				.customize(new CustomMapper<NotificacioDtoV2, NotificacioCommandV2>() {

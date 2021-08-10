@@ -3,16 +3,6 @@
  */
 package es.caib.notib.war.validation;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.EntitatService;
@@ -20,6 +10,15 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla que no es repeteixi
@@ -73,6 +72,22 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 					valid = false;
 					context.disableDefaultConstraintViolation();
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("organgestor.validation.llibre.buit")).addConstraintViolation();
+				}
+			}
+
+			if (command.isEntregaCieActiva()) {
+				if (command.getOperadorPostalId() == null) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+							.addNode("operadorPostalId").addConstraintViolation();
+				}
+
+				if (command.getCieId() == null) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+							.addNode("cieId").addConstraintViolation();
 				}
 			}
 			

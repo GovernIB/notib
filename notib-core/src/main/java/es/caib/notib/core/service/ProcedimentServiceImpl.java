@@ -238,7 +238,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.getCodi(),
 						procediment.getNom(),
 						entitat,
-						entregaCie,
+						procediment.isEntregaCieActiva() ? entregaCie : null,
 						procediment.getRetard(),
 						procediment.getCaducitat(),
 						procediment.isAgrupar(),
@@ -250,7 +250,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						procediment.isComu(),
 						procediment.isRequireDirectPermission());
 			procedimentRepository.save(procedimentEntity);
-			
+
+			if (!procediment.isEntregaCieActiva() && entregaCie != null) {
+				entregaCieRepository.delete(entregaCie);
+			}
 			// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (2)
 			if (organGestorAntic != null) {
 				List<ProcedimentEntity> procedimentsOrganGestorAntic = procedimentRepository.findByOrganGestorId(organGestorAntic.getId());

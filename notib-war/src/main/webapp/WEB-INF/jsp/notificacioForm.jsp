@@ -165,7 +165,6 @@
   	top: 55%;
 }
 .avis-metodo-envio {
-	margin-top: 2%;
 	text-align: center;
 	color: #373737;
 	padding: 1% 0 0 0;
@@ -1612,7 +1611,7 @@
 							<div class="col-md-12 separacio"></div>
 							
 							<div class="metodeEntrega">
-								<div class="col-md-12 title-envios entrega-activa">
+								<div class="col-md-12 title-envios">
 									<div class="title-container entrega">
 										<label> ${metodeEntrega} </label>
 									</div>

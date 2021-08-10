@@ -3,21 +3,20 @@
  */
 package es.caib.notib.war.validation;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.war.command.EntitatCommand;
+import es.caib.notib.war.helper.MessageHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.war.command.EntitatCommand;
-import es.caib.notib.war.helper.MessageHelper;
-import es.caib.notib.war.helper.MissatgesHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla que no es repeteixi
@@ -82,6 +81,21 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 				if (!valid) {
 					context.disableDefaultConstraintViolation();
 					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty")).addNode("oficina").addConstraintViolation();
+				}
+			}
+			if (entitatCommand.isEntregaCieActiva()) {
+				if (entitatCommand.getOperadorPostalId() == null) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+							.addNode("operadorPostalId").addConstraintViolation();
+				}
+
+				if (entitatCommand.getCieId() == null) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+							.addNode("cieId").addConstraintViolation();
 				}
 			}
 			return valid;

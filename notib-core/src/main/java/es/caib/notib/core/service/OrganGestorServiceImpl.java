@@ -179,7 +179,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				}
 			}
 
-			organGestor.updateEntregaCie(entregaCie);
+			organGestor.updateEntregaCie(dto.isEntregaCieActiva() ? entregaCie : null);
+			if (!dto.isEntregaCieActiva() && entregaCie != null) {
+				entregaCieRepository.delete(entregaCie);
+			}
 
 			return conversioTipusHelper.convertir(
 					organGestor,

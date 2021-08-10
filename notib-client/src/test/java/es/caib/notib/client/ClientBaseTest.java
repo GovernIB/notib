@@ -28,11 +28,14 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 //	protected static final String ENTITAT_DIR3CODI = "A04013511";
 	protected static final String ORGAN_SIR_CODI = "E03141701";
-	protected static final String ORGAN_CODI = "A04003003";
+//	protected static final String ORGAN_CODI = "A04003003";
+	protected static final String ORGAN_CODI = "A04035948";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; // DEV
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; // DEV
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
+	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
 	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
@@ -54,7 +57,7 @@ public class ClientBaseTest {
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
-		notificacio.setOrganGestor(ORGAN_CODI);
+		notificacio.setOrganGestor(ambEnviamentPostal ? ORGAN_CODI_CIE : ORGAN_CODI);
 		notificacio.setConcepte("concepte_" + notificacioId);
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
@@ -73,7 +76,7 @@ public class ClientBaseTest {
 //		document.setGenerarCsv(false);
 		
 		notificacio.setDocument(document);
-		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
+		notificacio.setProcedimentCodi(ambEnviamentPostal ? IDENTIFICADOR_PROCEDIMENT_CIE : IDENTIFICADOR_PROCEDIMENT);
 		for (int i = 0; i < numDestinataris; i++) {
 			Enviament enviament = new Enviament();
 			Persona titular = new Persona();
@@ -123,7 +126,7 @@ public class ClientBaseTest {
 					entregaPostal.setProvincia("07");
 					entregaPostal.setPaisCodi("ES");
 				}
-				entregaPostal.setCie(new Integer(0));
+				entregaPostal.setCie(0);
 				enviament.setEntregaPostal(entregaPostal);
 				enviament.setEntregaPostalActiva(true);
 			}
@@ -532,7 +535,7 @@ public class ClientBaseTest {
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
-		notificacio.setOrganGestor(ORGAN_CODI);
+		notificacio.setOrganGestor(ambEnviamentPostal ? ORGAN_CODI_CIE : ORGAN_CODI);
 		notificacio.setConcepte(concepte);
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
@@ -552,7 +555,7 @@ public class ClientBaseTest {
 
 		notificacio.setDocument(document);
 
-		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
+		notificacio.setProcedimentCodi(ambEnviamentPostal ? IDENTIFICADOR_PROCEDIMENT_CIE : IDENTIFICADOR_PROCEDIMENT);
 
 		for (int i = 0; i < numEnviaments; i++) {
 			Enviament enviament = new Enviament();

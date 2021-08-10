@@ -57,6 +57,22 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
 				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("procediment.validation.nom.repetit")).addNode("nom").addConstraintViolation();
 				valid = false;
 			}
+
+			if (command.isEntregaCieActiva()) {
+				if (command.getOperadorPostalId() == null) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+							.addNode("operadorPostalId").addConstraintViolation();
+				}
+
+				if (command.getCieId() == null) {
+					valid = false;
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+							.addNode("cieId").addConstraintViolation();
+				}
+			}
 			
         } catch (final Exception ex) {
 			LOGGER.error("S'ha produït un error inesperat al validar el procediment. "

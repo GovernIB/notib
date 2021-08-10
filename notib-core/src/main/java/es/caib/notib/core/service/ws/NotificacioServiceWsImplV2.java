@@ -159,7 +159,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 					if (procediment != null) {
 						logger.debug(">> [ALTA] procediment: " + procediment.getNom());
-						
+
+						if (!procediment.isEntregaCieActivaAlgunNivell()) {
+							for (Enviament enviament : notificacio.getEnviaments()) {
+								if (enviament.isEntregaPostalActiva()) {
+									String errorDescripcio = "[1029] No es pot donar d'alta un enviament amb entrega postal activa pel procediment indicat.";
+									integracioHelper.addAccioError(info, errorDescripcio);
+									return setRespostaError(errorDescripcio);
+								}
+							}
+						}
 						// Grups de notificació
 						String errorDescripcio = getGrupNotificacio(notificacio, entitat, procediment);
 						if (errorDescripcio != null) {
@@ -1462,6 +1471,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1213 | El camp 'dir3codi' de l'administració destinatària d'un enviament no disposa d'oficina SIR. És obligatori per a comunicacions
 	// 1214 | El camp 'dir3codi' de l'administració destinatària d'un enviament fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat
 	// 1220 | En una notificació, com a mínim un dels interessats ha de tenir el Nif informat
+	// 1029 | No es pot donar d'alta un enviament amb entrega postal activa pel procediment indicat
 	// 1230 | El camp 'entregaPostalTipus' no pot ser null
 	// 1231 | El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal)
 	// 1232 | El camp 'viaNom' de l'entrega postal no pot contenir més de 50 caràcters
