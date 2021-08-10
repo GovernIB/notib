@@ -26,8 +26,8 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"(:esNullFiltreOrganismePagador = true or b.organismePagadorCodi = :organismePagadorCodi) " +
-			"and (:esNullFiltreNumContracte = true or b.contracteNum = :numContracte) " + 
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and b.entitat = :entitat")
 	Page<PagadorPostalEntity> findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
 			@Param("esNullFiltreOrganismePagador") boolean esNullFiltreOrganismePagador,
@@ -40,8 +40,8 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"(:esNullFiltreOrganismePagador = true or b.organismePagadorCodi = :organismePagadorCodi) " +
-			"and (:esNullFiltreNumContracte = true or b.contracteNum = :numContracte) " + 
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and (b.organGestor.codi in (:organsGestors)) " +
 			"and b.entitat = :entitat")
 	Page<PagadorPostalEntity> findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(

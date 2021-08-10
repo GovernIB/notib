@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter @Setter
 public class OperadorPostalFiltreDto {
 	
-	private String dir3codi;
+	private String organismePagador;
 	private String contracteNum;
 	private Long organGestorId;
 	

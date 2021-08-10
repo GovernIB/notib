@@ -173,8 +173,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 						organGestor.getCodi());
 				
 				pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(
-						filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
-						filtre.getDir3codi(),
+						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
+						filtre.getOrganismePagador(),
 						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
 						filtre.getContracteNum(),
 						organsFills,
@@ -182,8 +182,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
 			}else {
 				pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
-						filtre.getDir3codi() == null || filtre.getDir3codi().isEmpty(),
-						filtre.getDir3codi(),
+						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
+						filtre.getOrganismePagador(),
 						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
 						filtre.getContracteNum(),
 						entitat,
