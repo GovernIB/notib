@@ -338,67 +338,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			
 			//Cas d'Administrador d'Entitat
 			//	Tots els organs fills de l'Entitat
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+					entitatId);
 			if (organActualCodiDir3 == null) {
-				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId); 
-//						false, 
-//						true, 
-//						false);
-			
-				if (filtre == null) {
-					organs = organGestorRepository.findByEntitat(
-							entitat,
-							pageable);
-				} else {
-					OrganGestorEstatEnum estat = filtre.getEstat();
-					boolean isEstatNull = estat == null;
-					organs = organGestorRepository.findByEntitatAndFiltre(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
-							filtre.getCodi() == null ? "" : filtre.getCodi(),
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom() == null ? "" : filtre.getNom(),
-							filtre.getOficina() == null || filtre.getOficina().isEmpty(),
-							filtre.getOficina() == null ? "" : filtre.getOficina(),
-							isEstatNull,
-							estat,
-							filtre.isEntregaCieActiva(),
-							pageable);
-				}
+				organs = findAmbFiltrePaginatByAdminEntitat(entitat, filtre, pageable);
+
 			//Cas d'Administrador d'Organ
 			//	Només el l'Organ de l'administrador, i els seus fills (tant de primer nivell com següents)
 			}else{
-				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId); 
-//						true, 
-//						false, 
-//						false);
-				
-				//Comprovació permisos organ
-				entityComprovarHelper.comprovarPermisosOrganGestor(organActualCodiDir3);
-				//OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat,organActualId);
-				List<String> organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActualCodiDir3);
-				if (filtre == null) {
-					organs = organGestorRepository.findByEntitatAndOrganGestor(
-							entitat,
-							organGestorsListCodisDir3,
-							pageable);
-				} else {
-					OrganGestorEstatEnum estat = filtre.getEstat();
-					boolean isEstatNull = estat == null;
-					organs = organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
-							entitat,
-							organGestorsListCodisDir3,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
-							filtre.getCodi() == null ? "" : filtre.getCodi(),
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom() == null ? "" : filtre.getNom(),
-							filtre.getOficina() == null || filtre.getOficina().isEmpty(),
-							filtre.getOficina() == null ? "" : filtre.getOficina(),
-							isEstatNull,
-							estat,
-							pageable);
-				}
+				organs = findAmbFiltrePaginatByAdminOrgan(entitat, organActualCodiDir3, filtre, pageable);
 			}
 			
 			PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(
@@ -416,8 +364,61 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	//List<String> obtenirCodisDir3Fills(organGestor)
+	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminEntitat(EntitatEntity entitat, OrganGestorFiltreDto filtre,
+																Pageable pageable) {
+		logger.debug("Consulta taula òrgans gestors per administrador d'entitat");
+		if (filtre == null) {
+			return organGestorRepository.findByEntitat(
+					entitat,
+					pageable);
+		} else {
+			OrganGestorEstatEnum estat = filtre.getEstat();
+			boolean isEstatNull = estat == null;
+			return organGestorRepository.findByEntitatAndFiltre(
+					entitat,
+					filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+					filtre.getCodi() == null ? "" : filtre.getCodi(),
+					filtre.getNom() == null || filtre.getNom().isEmpty(),
+					filtre.getNom() == null ? "" : filtre.getNom(),
+					filtre.getOficina() == null || filtre.getOficina().isEmpty(),
+					filtre.getOficina() == null ? "" : filtre.getOficina(),
+					isEstatNull,
+					estat,
+					filtre.isEntregaCieActiva(),
+					pageable);
+		}
+	}
+	private Page<OrganGestorEntity> findAmbFiltrePaginatByAdminOrgan(EntitatEntity entitat,
+																	 String organActualCodiDir3,
+																	 OrganGestorFiltreDto filtre,
+																	   Pageable pageable) {
+		logger.debug("Consulta taula òrgans gestors per administrador d'òrgan");
+		//Comprovació permisos organ
+		entityComprovarHelper.comprovarPermisosOrganGestor(organActualCodiDir3);
+		//OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat,organActualId);
+		List<String> organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActualCodiDir3);
+		if (filtre == null) {
+			return organGestorRepository.findByEntitatAndOrganGestor(
+					entitat,
+					organGestorsListCodisDir3,
+					pageable);
+		} else {
+			OrganGestorEstatEnum estat = filtre.getEstat();
+			boolean isEstatNull = estat == null;
+			return organGestorRepository.findByEntitatAndOrganGestorAndFiltre(
+					entitat,
+					organGestorsListCodisDir3,
+					filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+					filtre.getCodi() == null ? "" : filtre.getCodi(),
+					filtre.getNom() == null || filtre.getNom().isEmpty(),
+					filtre.getNom() == null ? "" : filtre.getNom(),
+					filtre.getOficina() == null || filtre.getOficina().isEmpty(),
+					filtre.getOficina() == null ? "" : filtre.getOficina(),
+					isEstatNull,
+					estat,
+					pageable);
+		}
+	}
 	
 	@Transactional
 	@Override

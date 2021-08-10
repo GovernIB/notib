@@ -96,7 +96,7 @@
 		data-toggle="datatable"
 		data-url="<c:url value="/organgestor/datatable"/>"
 		data-search-enabled="false"
-		data-default-order="1"
+		data-default-order="2"
 		data-default-dir="desc"
 		class="table table-striped table-bordered"
 		style="width:100%"
@@ -107,7 +107,6 @@
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="estat" data-visible="false"></th>
 				<th data-col-name="codi" data-template="#cellOrganGestorTemplate"><spring:message code="organgestor.list.columna.codi"/>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:codi}}
