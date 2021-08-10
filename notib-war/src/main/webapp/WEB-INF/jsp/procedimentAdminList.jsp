@@ -85,7 +85,7 @@ pageContext.setAttribute(
 		var select2Options = {
 				theme: 'bootstrap',
 				width: 'auto',
-				tags: organsGestors,
+				data: organsGestors,
 				templateResult: formatState
 		};
 		
