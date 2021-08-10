@@ -229,7 +229,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query(	"from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
-			"	and domiciliCodiPostal is not null" +
+			"	and entregaPostal is not null" +
+			"	and entregaPostal.domiciliCodiPostal is not null" +
 			"	and cieCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentEntity> findByCIEAndEstatFinal(
