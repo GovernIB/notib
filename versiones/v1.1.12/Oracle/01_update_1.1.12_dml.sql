@@ -2,18 +2,19 @@
 
 INSERT ALL
     INTO NOT_CONFIG_TYPE (CODE) VALUES ('BOOL')
-INTO NOT_CONFIG_TYPE (CODE) VALUES ('TEXT')
-INTO NOT_CONFIG_TYPE (CODE) VALUES ('INT')
-INTO NOT_CONFIG_TYPE (CODE) VALUES ('FLOAT')
-INTO NOT_CONFIG_TYPE (CODE) VALUES ('CRON')
-INTO NOT_CONFIG_TYPE (CODE) VALUES ('CREDENTIALS')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('TIPUS_COMUNICACIO', 'ASINCRON,SINCRON')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('NOTIFICA_VERSION', '0,1,2')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('API_PROTOCOL', 'REST,SOAP')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('PRIORITAT_ENVIAMENT_MASSIU', 'ALTA,BAIXA')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('REGISTRE_CLASS', 'es.caib.notib.plugin.registre.RegistrePluginRegweb3Impl,es.caib.notib.plugin.registre.RegistrePluginMockImpl')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('FIRMA_CLASS', 'es.caib.notib.plugin.firmaservidor.FirmaServidorPluginPortafib,es.caib.notib.plugin.firmaservidor.FirmaServidorPluginMock')
-INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('USUARIS_CLASS', 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock')
+	INTO NOT_CONFIG_TYPE (CODE) VALUES ('TEXT')
+	INTO NOT_CONFIG_TYPE (CODE) VALUES ('INT')
+	INTO NOT_CONFIG_TYPE (CODE) VALUES ('FLOAT')
+	INTO NOT_CONFIG_TYPE (CODE) VALUES ('CRON')
+	INTO NOT_CONFIG_TYPE (CODE) VALUES ('CREDENTIALS')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('TIPUS_COMUNICACIO', 'ASINCRON,SINCRON')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('NOTIFICA_VERSION', '0,1,2')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('API_PROTOCOL', 'REST,SOAP')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('PRIORITAT_ENVIAMENT_MASSIU', 'ALTA,BAIXA')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('REGISTRE_CLASS', 'es.caib.notib.plugin.registre.RegistrePluginRegweb3Impl,es.caib.notib.plugin.registre.RegistrePluginMockImpl')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('FIRMA_CLASS', 'es.caib.notib.plugin.firmaservidor.FirmaServidorPluginPortafib,es.caib.notib.plugin.firmaservidor.FirmaServidorPluginMock')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('USUARIS_CLASS', 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('TIPUS_DOCUMENT_ENVIAR', 'CSV,BINARI,TOT')
 SELECT 1 FROM DUAL;
 
 INSERT ALL
@@ -310,22 +311,25 @@ SELECT 1 FROM DUAL;
 INSERT ALL
     INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.registre.class', 'es.caib.notib.plugin.registre.RegistrePluginRegweb3Impl',
                                                                                        'Classe Registre', 'REGISTRE_CLASS', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.registre.namespaceuri', 'urn:es:caib:regweb:ws:v1:services',
-                                                                        'URI del namespace del registre', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (2, 'es.caib.notib.plugin.registre.service.name', 'RegwebFacadeService',
-                                                                        'Nom del servei del registre', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (3, 'es.caib.notib.plugin.registre.port.name', 'RegwebFacade',
-                                                                        'Nom del port del registre', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (4, 'es.caib.notib.plugin.registre.segons.entre.peticions', '30',
-                                                                                   'Especificar el nombre mínim de segons que hi pot haver entre peticions per obtenir justificant al registre',
-                                                                                   'INT', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (5, 'es.caib.notib.plugin.registre.documents.enviar', 'true',
-                                                                                   'Indicar si s''han d''enviar els documents al registre',
-                                                                                   'BOOL', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (6, 'es.caib.notib.plugin.regweb.mock.sequencia', 1,
-                                                                                 'Ruta a un arxiu de text amb la sequencia per al mock del registre', 'REGISTRE' )
-INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (7, 'es.caib.notib.plugin.regweb.mock.justificant', 1,
-                                                                                 'Ruta a un arxiu pdf amb el justificant per al mock del registre', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (1, 'es.caib.notib.plugin.registre.namespaceuri', 'urn:es:caib:regweb:ws:v1:services',
+	                                                                        'URI del namespace del registre', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (2, 'es.caib.notib.plugin.registre.service.name', 'RegwebFacadeService',
+	                                                                        'Nom del servei del registre', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (3, 'es.caib.notib.plugin.registre.port.name', 'RegwebFacade',
+	                                                                        'Nom del port del registre', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (4, 'es.caib.notib.plugin.registre.segons.entre.peticions', '30',
+	                                                                                   'Especificar el nombre mínim de segons que hi pot haver entre peticions per obtenir justificant al registre',
+	                                                                                   'INT', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (5, 'es.caib.notib.plugin.registre.documents.enviar', 'true',
+	                                                                                   'Indicar si s''han d''enviar els documents al registre',
+	                                                                                   'BOOL', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (6, 'es.caib.notib.plugin.regweb.mock.sequencia', 1,
+	                                                                                 'Ruta a un arxiu de text amb la sequencia per al mock del registre', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (7, 'es.caib.notib.plugin.regweb.mock.justificant', 1,
+	                                                                                 'Ruta a un arxiu pdf amb el justificant per al mock del registre', 'REGISTRE' )
+	INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (8, 'es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar', 'BINARI',
+                                                                            'Enviar document com binari, CSV o ambdós per a enviaments SIR', 
+                                                                            'TIPUS_DOCUMENT_ENVIAR', 'REGISTRE' )
 SELECT 1 FROM DUAL;
 
 
