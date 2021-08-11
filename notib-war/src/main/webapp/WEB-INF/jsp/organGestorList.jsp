@@ -35,6 +35,7 @@
 				}
 			});
 			$('#btn-entregaCieActiva').removeClass('active');
+			$('#entregaCieActiva').val(false);
 			$('#form-filtre').submit();
 		});
 		$('#btn-entregaCieActiva').click(function() {

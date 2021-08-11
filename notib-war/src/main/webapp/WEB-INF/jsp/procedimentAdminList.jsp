@@ -50,6 +50,10 @@ pageContext.setAttribute(
 				}
 			});
 			$('#form-filtre').submit();
+			$('#btn-entregaCieActiva').removeClass('active');
+			$('#entregaCieActiva').val(false);
+			$('#btn-comu').removeClass('active');
+			$('#comu').val(false);
 		});
 		
 		loadOrgans();
