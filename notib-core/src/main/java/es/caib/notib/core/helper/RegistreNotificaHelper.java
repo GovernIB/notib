@@ -220,7 +220,8 @@ public class RegistreNotificaHelper {
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
 					notificacioEntity,
 					enviament,
-					inclouDocuments);
+					inclouDocuments,
+					true); // Es comunicacio SIR: Este método crearAssentamentRegistralPerEnviament solo se llama para comunicaciones SIR.
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,

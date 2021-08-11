@@ -43,7 +43,7 @@ public class RegistreNotificaHelperTest {
 	@Before
 	public void setUp() throws RegistrePluginException {
 		Mockito.when(
-				pluginHelper.notificacioToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>any(), Mockito.anyBoolean())
+				pluginHelper.notificacioToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>any(), Mockito.anyBoolean(), Mockito.anyBoolean())
 		).thenReturn(new AsientoRegistralBeanDto());
 		Mockito.when(
 				pluginHelper.notificacioEnviamentsToAsientoRegistralBean(Mockito.any(NotificacioEntity.class), Mockito.<NotificacioEnviamentEntity>anySet(), Mockito.anyBoolean())
@@ -76,6 +76,7 @@ public class RegistreNotificaHelperTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).notificacioToAsientoRegistralBean(
 				Mockito.eq(notificacio),
 				Mockito.eq(enviament),
+				Mockito.eq(true),
 				Mockito.eq(true)
 		);
 

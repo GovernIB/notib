@@ -53,7 +53,8 @@ INSERT ALL
     INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('PRIORITAT_ENVIAMENT_MASSIU', 'ALTA,BAIXA')
     INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('REGISTRE_CLASS', 'es.caib.notib.plugin.registre.RegistrePluginRegweb3Impl,es.caib.notib.plugin.registre.RegistrePluginMockImpl')
     INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('FIRMA_CLASS', 'es.caib.notib.plugin.firmaservidor.FirmaServidorPluginPortafib,es.caib.notib.plugin.firmaservidor.FirmaServidorPluginMock')
-    INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('USUARIS_CLASS', 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('USUARIS_CLASS', 'es.caib.notib.plugin.usuari.DadesUsuariPluginJdbc,es.caib.notib.plugin.usuari.DadesUsuariPluginLdap,es.caib.notib.plugin.usuari.DadesUsuariPluginMock')
+	INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('TIPUS_DOCUMENT_ENVIAR', 'CSV,BINARI,TOT')
 SELECT 1 FROM DUAL;
 
 INSERT ALL
@@ -366,6 +367,9 @@ INSERT ALL
                                                                             'Ruta a un arxiu de text amb la sequencia per al mock del registre', 'REGISTRE' )
     INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (7, 'es.caib.notib.plugin.regweb.mock.justificant', 1,
                                                                             'Ruta a un arxiu pdf amb el justificant per al mock del registre', 'REGISTRE' )
+    INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (8, 'es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar', 'BINARI',
+                                                                            'Enviar document com binari, CSV o ambdós per a enviaments SIR', 
+                                                                            'TIPUS_DOCUMENT_ENVIAR', 'REGISTRE' )
 SELECT 1 FROM DUAL;
 
 

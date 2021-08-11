@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
@@ -1468,12 +1469,22 @@ public class PluginHelper {
 		return annex;
 	}
 	
-	private AnexoWsDto documentToAnexoWs(DocumentEntity document, int idx) {
+	private AnexoWsDto documentToAnexoWs(DocumentEntity document, int idx, boolean isComunicacioSir) {
 		try {
 			if (HibernateHelper.isProxy(document))
 				document = HibernateHelper.deproxy(document);
 			AnexoWsDto annex = null;
 			Path path = null;
+			
+			boolean enviarCsv = !isComunicacioSir ||
+					(isComunicacioSir && (EnviamentSirTipusDocumentEnviarEnumDto.TOT.equals(getEnviamentSirTipusDocumentEnviar()) ||
+							EnviamentSirTipusDocumentEnviarEnumDto.CSV.equals(getEnviamentSirTipusDocumentEnviar())));
+			
+			boolean enviarContingut = !isComunicacioSir ||
+					(isComunicacioSir && (EnviamentSirTipusDocumentEnviarEnumDto.TOT.equals(getEnviamentSirTipusDocumentEnviar()) ||
+							EnviamentSirTipusDocumentEnviarEnumDto.BINARI.equals(getEnviamentSirTipusDocumentEnviar())));
+			
+			boolean enviarTipoMIMEFicheroAnexado = Boolean.TRUE;
 
 			// Metadades per defecte (per si no estan emplenades (notificacions antigues)
 			Integer origen = document.getOrigen() != null ? document.getOrigen().getValor() : OrigenEnum.ADMINISTRACIO.getValor();
@@ -1491,7 +1502,7 @@ public class PluginHelper {
 					id = document.getUuid();
 					docDetall = arxiuDocumentConsultar(id, null, true, true);
 					doc = docDetall.getContingut();
-					if (docDetall != null) {
+					if (docDetall != null && enviarCsv) {
 						// Recuperar csv
 						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
 						if (metadadesAddicionals != null) {
@@ -1502,16 +1513,23 @@ public class PluginHelper {
 						}
 					}
 				} else {
-					id = document.getCsv();
-					docDetall = arxiuDocumentConsultar(id, null, true, false);
-					if (docDetall != null)
-						doc = docDetall.getContingut();
-
-					annex.setCsv(document.getCsv());
+					if (enviarContingut) {
+						id = document.getCsv();
+						docDetall = arxiuDocumentConsultar(id, null, true, false);
+						if (docDetall != null)
+							doc = docDetall.getContingut();
+					}
+					if (enviarCsv)
+						annex.setCsv(document.getCsv());
 				}
-
-				annex.setFicheroAnexado(doc.getContingut());
-				annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				
+				if (enviarContingut) {
+					annex.setFicheroAnexado(doc.getContingut());
+					annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				} else {
+					enviarTipoMIMEFicheroAnexado = Boolean.FALSE;
+				}
+					
 				if (docDetall != null) {
 					if (docDetall.getMetadades().getTipusDocumental() != null) {
 						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
@@ -1524,12 +1542,14 @@ public class PluginHelper {
 					annex.setModoFirma(getModeFirma(docDetall, doc.getArxiuNom()));
 				}
 				
-				path = new File(doc.getArxiuNom()).toPath();
+				if (enviarTipoMIMEFicheroAnexado) {
+					path = new File(doc.getArxiuNom()).toPath();
+				}
 			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
-
+				
 				//Metadades
 				annex.setTipoDocumental(tipoDocumental);
 				annex.setOrigenCiudadanoAdmin(origen);
@@ -1539,11 +1559,13 @@ public class PluginHelper {
 				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
 			}else if(document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 				annex = new AnexoWsDto();
+				
 				ByteArrayOutputStream output = new ByteArrayOutputStream();
 				gestioDocumentalGet(
 						document.getArxiuGestdocId(),
 						GESDOC_AGRUPACIO_NOTIFICACIONS,
 						output);
+		
 				annex.setFicheroAnexado(output.toByteArray());
 				annex.setNombreFicheroAnexado(document.getArxiuNom());
 
@@ -1556,10 +1578,13 @@ public class PluginHelper {
 
 				path = new File(document.getArxiuNom()).toPath();
 			}
-			try {
-				annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
-			} catch (IOException e) {
-				e.printStackTrace();
+			
+			if (enviarTipoMIMEFicheroAnexado) {
+				try {
+					annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			annex.setTitulo("Annex " + idx);
 			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
@@ -1638,8 +1663,9 @@ public class PluginHelper {
 	public AsientoRegistralBeanDto notificacioToAsientoRegistralBean(
 			NotificacioEntity notificacio,
 			NotificacioEnviamentEntity enviament,
-			boolean inclou_documents) throws RegistrePluginException {
-		AsientoRegistralBeanDto registre = notificacioToAsientoRegistralBean(notificacio, inclou_documents);
+			boolean inclou_documents,
+			boolean isComunicacioSir) throws RegistrePluginException {
+		AsientoRegistralBeanDto registre = notificacioToAsientoRegistralBean(notificacio, inclou_documents, isComunicacioSir);
 		registre.getInteresados().add(enviamentToRepresentanteEInteresadoWs(enviament));
 		return registre;
 	}
@@ -1651,9 +1677,15 @@ public class PluginHelper {
 		}
 		return personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari);
 	}
+	
+	private AsientoRegistralBeanDto notificacioToAsientoRegistralBean(NotificacioEntity notificacio,
+			  boolean inclou_documents) throws RegistrePluginException {
+		return notificacioToAsientoRegistralBean(notificacio, inclou_documents, false);
+	}
 
 	private AsientoRegistralBeanDto notificacioToAsientoRegistralBean(NotificacioEntity notificacio,
-																	  boolean inclou_documents) throws RegistrePluginException {
+																	  boolean inclou_documents, 
+																	  boolean isComunicacioSir) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
 		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
@@ -1756,19 +1788,19 @@ public class PluginHelper {
 
 		if (inclou_documents) {
 			if (notificacio.getDocument() != null) {
-				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1, isComunicacioSir));
 			}
 			if (notificacio.getDocument2() != null) {
-				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2, isComunicacioSir));
 			}
 			if (notificacio.getDocument3() != null) {
-				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3, isComunicacioSir));
 			}
 			if (notificacio.getDocument4() != null) {
-				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4, isComunicacioSir));
 			}
 			if (notificacio.getDocument5() != null) {
-				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5, isComunicacioSir));
 			}
 		}
 		return registre;
@@ -2318,6 +2350,21 @@ public class PluginHelper {
 		gc.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
 	}
+	
+	private EnviamentSirTipusDocumentEnviarEnumDto getEnviamentSirTipusDocumentEnviar() {
+		EnviamentSirTipusDocumentEnviarEnumDto tipus = EnviamentSirTipusDocumentEnviarEnumDto.TOT;
+		
+		try {
+			String tipusStr = configHelper.getConfig("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar");
+			if (tipusStr != null && !tipusStr.isEmpty())
+				tipus = EnviamentSirTipusDocumentEnviarEnumDto.valueOf(tipusStr);
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut obtenir el tipus de document a enviar per a l'enviament SIR per defecte. S'utilitzarà el tipus TOT (CSV i binari).");
+		}
+				
+		return tipus;
+	}
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 
