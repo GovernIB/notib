@@ -159,6 +159,8 @@ pageContext.setAttribute(
 							<span class="fa fa-warning text-danger" title="<spring:message code='procediment.list.columna.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
 				</th>
+				<th data-col-name="retard"><spring:message code="procediment.list.columna.retard"/></th>
+				<th data-col-name="caducitat"><spring:message code="procediment.list.columna.caducitat"/></th>
 				<th data-col-name="entregaCieActiva" data-template="#cellActivaTemplate">
 					<spring:message code="organgestor.list.columna.cie"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">

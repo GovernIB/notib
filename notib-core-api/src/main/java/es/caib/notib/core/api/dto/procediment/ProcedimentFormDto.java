@@ -22,6 +22,7 @@ public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
 	private OrganGestorEstatEnum organGestorEstat;
 	private boolean agrupar;
 	private Integer retard;
+	protected Integer caducitat;
 	private List<PermisDto> permisos;
 	private List<GrupDto> grups;
 	private boolean comu;

@@ -27,6 +27,7 @@ import javax.persistence.*;
 		+ "			og.llibre as llibre, "
 		+ "			ent.oficina as oficina, "
 		+ "         pro.agrupar as agrupar, "
+		+ "         pro.caducitat as caducitat, "
 		+ "         CASE "
 		+ "				WHEN pro.ENTREGA_CIE_ID is not null then 1 "
 		+ "				WHEN og.ENTREGA_CIE_ID is not null then 2 "
@@ -91,6 +92,9 @@ public class ProcedimentFormEntity {
 	
 	@Column(name = "comu")
 	protected boolean comu;
+
+	@Column(name = "caducitat")
+	protected Integer caducitat;
 
 	// 0 (Inactiva) / 1 (Activa per procediment) / 2 (Activa per òrgan gestor) / 3 (Activa per entitat)
 	@Column(name = "entregaCieActiva")
