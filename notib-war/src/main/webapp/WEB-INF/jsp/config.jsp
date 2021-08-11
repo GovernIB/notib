@@ -34,6 +34,48 @@
     <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 </head>
 <body>
+<script>
+    $(document).ready(function() {
+        $("#btn-sync").on("click", function () {
+            $.get('<c:url value="/config/sync"/>', function( data ) {
+                $('#syncModal-body').html(
+                    '<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
+                    '	<span class="fa fa-circle-o-notch fa-spin fa-3x"></span> <br>' +
+                    '   Sincronitzant propietats de l\'aplicació ' +
+                    '</div>');
+                if (data.status) {
+                    let message = "S'han actualitzat satisfactoriament les següents propietats: ";
+                    data.editedProperties.forEach( element => message += element + ", ");
+                    alert(message);
+                    document.location.reload();
+                } else {
+                    alert("Error actualitzant les propietats desde JBoss.");
+                }
+            });
+        });
+    });
+</script>
+<div class="text-right" data-toggle="botons-titol">
+    <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
+</div>
+<div id="syncModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Sincronitzant propietats</h4>
+            </div>
+            <div id="syncModal-body" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Tanca</button>
+            </div>
+        </div>
+
+    </div>
+</div>
     <div class="row">
         <div class="col-md-3">
             <ul class="nav nav-pills nav-stacked">

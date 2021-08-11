@@ -4,6 +4,8 @@ import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.war.command.ConfigCommand;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -26,6 +29,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/config")
 public class ConfigController extends BaseUserController{
+
     @Autowired
     private ConfigService configService;
 
@@ -65,6 +69,24 @@ public class ConfigController extends BaseUserController{
                 msg);
     }
 
+    @ResponseBody
+    @RequestMapping(value="/sync", method = RequestMethod.GET)
+    public SyncResponse sync(
+            HttpServletRequest request,
+            Model model) {
+        try {
+            List<String> editedProperties = configService.syncFromJBossProperties();
+            return SyncResponse.builder()
+                    .status(true)
+                    .editedProperties(editedProperties)
+                    .build();
+        } catch (Exception e) {
+            return SyncResponse.builder()
+                    .status(false)
+                    .build();
+        }
+    }
+
     private void fillFormsModel(ConfigGroupDto cGroup, Model model){
         for (ConfigDto config: cGroup.getConfigs()) {
             model.addAttribute("config_" + config.getKey().replace('.', '_'),
@@ -76,5 +98,11 @@ public class ConfigController extends BaseUserController{
         for (ConfigGroupDto child : cGroup.getInnerConfigs()){
             fillFormsModel(child, model);
         }
+    }
+
+    @Builder @Getter
+    public static class SyncResponse {
+        private boolean status;
+        private List<String> editedProperties;
     }
 }

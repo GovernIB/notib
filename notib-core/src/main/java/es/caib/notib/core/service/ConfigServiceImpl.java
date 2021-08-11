@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -60,9 +61,12 @@ public class ConfigServiceImpl implements ConfigService {
         return configGroupDtoList;
     }
 
-    public void syncFromJBossProperties() {
+    @Override
+    @Transactional
+    public List<String> syncFromJBossProperties() {
         log.debug("Sincronitzant les propietats amb JBoss");
         Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
+        List<String> editedProperties = new ArrayList<>();
         for (String key : properties.stringPropertyNames()) {
             String value = properties.getProperty(key);
             log.trace(key + " : " + value);
@@ -70,8 +74,10 @@ public class ConfigServiceImpl implements ConfigService {
             if (configEntity != null) {
                 configEntity.update(value);
                 pluginHelper.reloadProperties(configEntity.getGroupCode());
+                editedProperties.add(configEntity.getKey());
             }
         }
+        return editedProperties;
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {

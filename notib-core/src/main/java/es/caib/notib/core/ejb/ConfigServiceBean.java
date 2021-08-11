@@ -37,4 +37,10 @@ public class ConfigServiceBean implements ConfigService {
 	public List<ConfigGroupDto> findAll(){
 		return delegate.findAll();
 	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public List<String> syncFromJBossProperties(){
+		return delegate.syncFromJBossProperties();
+	}
 }
