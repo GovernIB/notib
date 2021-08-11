@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -171,6 +173,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRED)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		try {
@@ -183,6 +186,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return enviament;
 	}
 
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRED)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
@@ -191,23 +195,22 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@UpdateEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	private NotificacioEnviamentEntity enviamentRefrescarEstat(NotificacioEnviamentEntity enviament, boolean raiseExceptions) throws Exception {
-		
+
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_NOTIFICA, 
-				"Consultar estat d'un enviament", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				IntegracioHelper.INTCODI_NOTIFICA,
+				"Consultar estat d'un enviament",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
 
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
-//		enviament.setNotificacio(notificacio);
 		Date dataUltimDatat = enviament.getNotificaDataCreacio();
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 
 		enviament.updateNotificaDataRefrescEstat();
 		enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
-		
+
 		String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (" +
 				"notificacioId=" + notificacio.getId() + ", " +
 				"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
@@ -227,7 +230,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());
 
 			startTime = System.nanoTime();
-			String apiKey = enviament.getNotificacio().getEntitat().getApiKey();
+			String apiKey = notificacio.getEntitat().getApiKey();
 			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaWs(apiKey).infoEnvioV2(infoEnvio);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
 			logger.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");

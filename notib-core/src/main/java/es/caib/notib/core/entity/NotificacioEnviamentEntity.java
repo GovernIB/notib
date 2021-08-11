@@ -34,10 +34,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "NOT_NOTIFICACIO_NOTENV_FK")
 	@NotFound(action = NotFoundAction.IGNORE)
 	protected NotificacioEntity notificacio;
-	
-//	@Column(name="notificacio_id", insertable=false, updatable=false)
-//	protected Long notificacioId;
-	
+
 	/* Titular */
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "titular_id")

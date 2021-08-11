@@ -39,30 +39,10 @@ public class EnviamentHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
-	public void enviamentRefrescarEstat(
-			Long enviamentId, 
-			ProgresActualitzacioCertificacioDto progres,
-			IntegracioInfo info) {
-		log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
-		try {
-			String msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
-			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
-			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
-			notificaHelper.enviamentRefrescarEstat(enviamentId, true);
-			String msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
-			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
-			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdated));
-		} catch (Exception ex) {
-			throw new RuntimeException(ex); 
-		}
-	}
-
 	public void refrescarEnviamentsExpirats() {
 		refrescarEnviamentsExpirats(new ProgresActualitzacioCertificacioDto());
 	}
 
-	@Transactional(propagation = Propagation.REQUIRED)
 	public void refrescarEnviamentsExpirats(@NonNull ProgresActualitzacioCertificacioDto progres) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth == null ? "schedulled" : auth.getName();
@@ -109,5 +89,27 @@ public class EnviamentHelper {
 	public void updateCIECertNovaConsulta(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		enviament.updateCIECertNovaConsulta(configHelper.getAsInt(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE));
+	}
+
+	private void enviamentRefrescarEstat(
+			Long enviamentId,
+			ProgresActualitzacioCertificacioDto progres,
+			IntegracioInfo info) {
+		long t0 = System.currentTimeMillis();
+		log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
+		try {
+			String msgInfoUpdating = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant", new Object[] {enviamentId});
+			progres.addInfo(TipusActInfo.INFO, msgInfoUpdating);
+			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdating + " [" + progres.getProgres() + "%]"));
+			notificaHelper.enviamentRefrescarEstat(enviamentId, true);
+			String msgInfoUpdated = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.actualitzant.ok", new Object[] {enviamentId});
+			progres.addInfo(TipusActInfo.SUB_INFO, msgInfoUpdated);
+			info.getParams().add(new AccioParam("Msg. procés:", msgInfoUpdated));
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		} finally {
+			log.debug(String.format("Fi intent actualització estat de la notificació de Notific@ (enviamentId=%d). Temps = %.1f s",
+					enviamentId, (System.currentTimeMillis() - t0) / 1e3));
+		}
 	}
 }

@@ -275,7 +275,7 @@ $(document).ready(function() {
 					</c:if>
 				</c:forEach>
 			</div>
-			<c:if test="${not empty enviament.entregaPostal.ConcretTipus}">
+			<c:if test="${not empty enviament.entregaPostal.domiciliConcretTipus}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -286,11 +286,11 @@ $(document).ready(function() {
 					<tbody>
 						<tr>
 							<td width="30%"><strong><spring:message code="enviament.info.domicili.tipus"/></strong></td>
-							<td>${enviament.entregaPostal.tipus}</td>
+							<td>${enviament.entregaPostal.domiciliConcretTipus}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.tipus.concret"/></strong></td>
-							<td>${enviament.entregaPostal.concretTipus}</td>
+							<td>${enviament.entregaPostal.domiciliConcretTipus}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.via"/></strong></td>
@@ -299,9 +299,9 @@ $(document).ready(function() {
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.numeracio"/></strong></td>
 							<td>
-								${enviament.entregaPostal.numeracioTipus}
-								${enviament.entregaPostal.numeracioNumero}
-								${enviament.entregaPostal.numeracioPuntKm}
+<%--								${enviament.entregaPostal.numeracioTipus}--%>
+								${enviament.entregaPostal.numeroCasa}
+								${enviament.entregaPostal.puntKm}
 								${enviament.entregaPostal.apartatCorreus}
 							</td>
 						</tr>
@@ -337,18 +337,18 @@ $(document).ready(function() {
 							<td><strong><spring:message code="enviament.info.domicili.codi.postal"/></strong></td>
 							<td>${enviament.entregaPostal.codiPostal}</td>
 						</tr>
-						<tr>
-							<td><strong><spring:message code="enviament.info.domicili.municipi"/></strong></td>
-							<td>${enviament.entregaPostal.municipiNom} (${enviament.entregaPostal.MunicipiCodiIne})</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="enviament.info.domicili.provincia"/></strong></td>
-							<td>${enviament.entregaPostal.provinciaNom} (${enviament.entregaPostal.ProvinciaCodi})</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="enviament.info.domicili.pais"/></strong></td>
-							<td>${enviament.entregaPostal.paisNom} (${enviament.entregaPostal.PaisCodiIso})</td>
-						</tr>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="enviament.info.domicili.municipi"/></strong></td>--%>
+<%--							<td>${enviament.entregaPostal.municipiNom} (${enviament.entregaPostal.municipiCodi})</td>--%>
+<%--						</tr>--%>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="enviament.info.domicili.provincia"/></strong></td>--%>
+<%--							<td>${enviament.entregaPostal.provinciaNom} (${enviament.entregaPostal.provincia})</td>--%>
+<%--						</tr>--%>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="enviament.info.domicili.pais"/></strong></td>--%>
+<%--							<td>${enviament.entregaPostal.paisNom} (${enviament.entregaPostal.paisCodi})</td>--%>
+<%--						</tr>--%>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.linea1"/></strong></td>
 							<td>${enviament.entregaPostal.linea1}</td>
@@ -409,7 +409,7 @@ $(document).ready(function() {
 								<c:if test="${not empty enviament.notificaDatatErrorDescripcio}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
-										<td>${enviament.notificaEstatDescripcio}</td>
+										<td>${enviament.notificaDatatErrorDescripcio}</td>
 									</tr>
 								</c:if>
 								<c:if test="${not empty enviament.notificaDatatOrigen}">
