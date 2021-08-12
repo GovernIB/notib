@@ -760,29 +760,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			}
 
 			if (filtre == null) {
-				
 				if (isUsuariEntitat) {
 					procediments = procedimentFormRepository.findAmbEntitatActual(
 							entitatActual.getId(),
 							pageable);
-					procedimentsPage =  paginacioHelper.toPaginaDto(
-							procediments,
-							ProcedimentFormDto.class);
 				} else if (isAdministrador) {
-					procediments = procedimentFormRepository.findAmbEntitatActiva(
-							entitatsActivaId,
-							pageable);
-					procedimentsPage =  paginacioHelper.toPaginaDto(
-							procediments,
-							ProcedimentFormDto.class);
+					procediments = procedimentFormRepository.findAmbEntitatActiva(entitatsActivaId, pageable);
 				} else if (organGestorActual != null) { // Administrador d'òrgan
 					procediments = procedimentFormRepository.findAmbOrganGestorActualOrComu(
 							entitatActual.getId(),
 							organsFills,
 							pageable);
-					procedimentsPage =  paginacioHelper.toPaginaDto(
-							procediments,
-							ProcedimentFormDto.class);
 				}
 			} else {
 			
@@ -798,11 +786,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							pageable);
-					
-					procedimentsPage = paginacioHelper.toPaginaDto(
-							procediments, 
-							ProcedimentFormDto.class);
-					
+
 				} else if (isAdministrador) {
 					procediments = procedimentFormRepository.findAmbFiltre(
 							filtre.getCodi() == null || filtre.getCodi().isEmpty(), 
@@ -814,10 +798,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							pageable);
-					
-					procedimentsPage =  paginacioHelper.toPaginaDto(
-							procediments,
-							ProcedimentFormDto.class);
+
 				} else if (organGestorActual != null) { // Administrador d'òrgan
 					procediments = procedimentFormRepository.findAmbOrganGestorOrComuAndFiltre(
 							entitatActual.getId(),
@@ -831,12 +812,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							pageable);
-					
-					procedimentsPage =  paginacioHelper.toPaginaDto(
-							procediments,
-							ProcedimentFormDto.class);
+
 				}
 			}
+//			if (procediments != null) {
+				procedimentsPage = paginacioHelper.toPaginaDto(procediments, ProcedimentFormDto.class);
+//			}
 			assert procedimentsPage != null;
 			for (ProcedimentFormDto procediment: procedimentsPage.getContingut()) {
 				List<PermisDto> permisos = permisosHelper.findPermisos(

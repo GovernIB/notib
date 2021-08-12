@@ -38,6 +38,7 @@ import javax.persistence.*;
 //		+ "			postal.dir3_codi as pagadorpostal, "
 		+ "			pro.retard as retard, "
 		+ "			pro.comu as comu, "
+		+ "         pro.DIRECT_PERMISSION_REQUIRED as requireDirectPermission, "
 		+ "         pro.entitat as entitat_id"
 		+ " from	not_procediment pro "
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
@@ -99,4 +100,7 @@ public class ProcedimentFormEntity {
 	// 0 (Inactiva) / 1 (Activa per procediment) / 2 (Activa per òrgan gestor) / 3 (Activa per entitat)
 	@Column(name = "entregaCieActiva")
 	protected int entregaCieActiva;
+
+	@Column(name = "requireDirectPermission")
+	protected boolean requireDirectPermission;
 }

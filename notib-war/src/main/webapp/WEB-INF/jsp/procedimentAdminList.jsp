@@ -176,7 +176,12 @@ pageContext.setAttribute(
 						{{if comu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				
+				<th data-col-name="requireDirectPermission" data-template="#cellrRequireDirectPermissionTemplate">
+					<spring:message code="procediment.list.columna.requireDirectPermission"/>
+					<script id="cellrRequireDirectPermissionTemplate" type="text/x-jsrender">
+						{{if requireDirectPermission}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
 			
 				<th data-col-name="grupsCount" data-template="#cellGrupsTemplate" data-orderable="false" width="10%">
