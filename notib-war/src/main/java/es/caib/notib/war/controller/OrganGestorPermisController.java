@@ -1,13 +1,19 @@
 package es.caib.notib.war.controller;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.xml.bind.ValidationException;
-
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.war.command.PermisCommand;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,20 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.war.command.PermisCommand;
-import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.RolHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.xml.bind.ValidationException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Controlador per el mantinemnt de permisos de organs gestors.
@@ -191,7 +189,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../organgestor/" + organGestorId + "/permis",
-				"procediment.controller.permis.modificat.ok");
+				"organgestor.controller.permis.modificat.ok");
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis/{permisId}/delete", method = RequestMethod.GET)
@@ -208,12 +206,6 @@ public class OrganGestorPermisController extends BaseUserController{
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../organgestor/" + organGestorId + "/permis",
-				"procediment.controller.permis.esborrat.ok");
+				"organgestor.controller.permis.esborrat.ok");
 	}
-	
-//	private boolean isAdministrador(
-//			HttpServletRequest request) {
-//		return RolHelper.isUsuariActualAdministrador(request);
-//	}
-	
 }

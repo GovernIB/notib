@@ -195,6 +195,7 @@ public class OrganGestorController extends BaseUserController{
 					"redirect:../organgestor",
 					"organgestor.controller.update.nom.error");
 		} catch (Exception e) {
+			logger.error(String.format("Excepció intentant actualitzar l'òrgan gestor (Id=%d):", organGestorId), e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../organgestor",
@@ -218,6 +219,7 @@ public class OrganGestorController extends BaseUserController{
 					"redirect:../../organgestor",
 					"organgestor.controller.update.nom.ok");
 		} catch (Exception e) {
+			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../organgestor",
@@ -243,6 +245,7 @@ public class OrganGestorController extends BaseUserController{
 					"redirect:../organgestor",
 					"organgestor.controller.update.nom.tots.ok");
 		} catch (Exception e) {
+			logger.error("Excepció intentant actualitzar tots els òrgans gestors", e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../organgestor",
@@ -280,11 +283,11 @@ public class OrganGestorController extends BaseUserController{
 						"organgestor.controller.esborrat.ko");
 			}
 		} catch (Exception e) {
+			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../procediment",
-					"organgestor.controller.esborrat.ko",
-					e);
+					"organgestor.controller.esborrat.ko");
 		}
 	}
 	
