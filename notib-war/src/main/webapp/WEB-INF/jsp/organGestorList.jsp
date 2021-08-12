@@ -136,7 +136,7 @@
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="entregaCieActiva" data-template="#cellActivaTemplate">
+				<th data-col-name="entregaCieActiva" data-orderable="false" data-template="#cellActivaTemplate">
 					<spring:message code="organgestor.list.columna.cie"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
 						{{if entregaCieActiva}}<span class="fa fa-check"></span>{{/if}}

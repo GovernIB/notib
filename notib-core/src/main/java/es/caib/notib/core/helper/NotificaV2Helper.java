@@ -173,7 +173,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRED)
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		try {
@@ -186,7 +186,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return enviament;
 	}
 
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRED)
+	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
