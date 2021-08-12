@@ -1401,6 +1401,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1022 | El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment
 	// 1023 | El camp 'organ gestor' no es correspon a cap Òrgan Gestor de l'entitat especificada
 	// 1024 | El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment
+	// 1029 | No es pot donar d'alta un enviament amb entrega postal activa pel procediment indicat
 	// 1030 | El concepte de la notificació no pot ser null
 	// 1031 | El concepte de la notificació no pot tenir una longitud superior a 255 caràcters
 	// 1032 | El format del camp concepte no és correcte. (Inclou caràcters no permesos)
@@ -1471,7 +1472,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1213 | El camp 'dir3codi' de l'administració destinatària d'un enviament no disposa d'oficina SIR. És obligatori per a comunicacions
 	// 1214 | El camp 'dir3codi' de l'administració destinatària d'un enviament fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat
 	// 1220 | En una notificació, com a mínim un dels interessats ha de tenir el Nif informat
-	// 1029 | No es pot donar d'alta un enviament amb entrega postal activa pel procediment indicat
 	// 1230 | El camp 'entregaPostalTipus' no pot ser null
 	// 1231 | El camp 'codiPostal' no pot ser null (indicar 00000 en cas de no disposar del codi postal)
 	// 1232 | El camp 'viaNom' de l'entrega postal no pot contenir més de 50 caràcters
