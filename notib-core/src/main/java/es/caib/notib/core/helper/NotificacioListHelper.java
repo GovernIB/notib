@@ -5,8 +5,10 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -37,6 +39,8 @@ public class NotificacioListHelper {
     private ProcedimentRepository procedimentRepository;
     @Autowired
     private OrganGestorRepository organGestorRepository;
+    @Autowired
+    private OrganGestorService organGestorService;
 
     public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
         Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
@@ -70,9 +74,22 @@ public class NotificacioListHelper {
             }
         }
 
+        List<String> codisOrgansProcessables = new ArrayList<String>();
+        List<OrganGestorDto> organsProcessables = organGestorService.findOrgansGestorsWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        if (organsProcessables != null)
+            for (OrganGestorDto organ : organsProcessables) {
+            	codisOrgansProcessables.add(organ.getCodi());
+            }
+        
         for (NotificacioTableEntity notificacio : notificacions) {
-            if (notificacio.getProcedimentCodi() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+            if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
                 notificacio.setPermisProcessar(codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi()));
+            }
+            // Las comunicaciones pueden no tener procedimiento
+            if ((notificacio.getProcedimentCodi() == null || notificacio.getProcedimentCodi().isEmpty())
+            		&& NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())
+            		&& NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus())) {
+            	notificacio.setPermisProcessar(codisOrgansProcessables.contains(notificacio.getOrganCodi()));
             }
 
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
