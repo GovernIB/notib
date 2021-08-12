@@ -90,6 +90,7 @@ pageContext.setAttribute(
 				theme: 'bootstrap',
 				width: 'auto',
 				data: organsGestors,
+				allowClear: true,
 				templateResult: formatState
 		};
 		

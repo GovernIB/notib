@@ -311,6 +311,7 @@
                 success: function(data) {
                     var select2Options = {
                         theme: 'bootstrap',
+                        allowClear: true,
                         width: 'auto'};
                     // Procediments
                     var procediments = data;
@@ -379,6 +380,7 @@
             theme: 'bootstrap',
             width: 'auto',
             data: organsGestors,
+            allowClear: true,
             templateResult: formatState
         };
 

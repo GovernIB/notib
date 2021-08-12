@@ -70,7 +70,7 @@
 							inline="true"
 							emptyOption="true"
 							optionMinimumResultsForSearch="2"
-							emptyOptionTextKey="organgestor.form.camp.oficina.select"/>
+							placeholderKey="organgestor.form.camp.oficina.select"/>
 	<%-- 				<not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionMinimumResultsForSearch="0"/> --%>
 				</div>
 			</c:if>

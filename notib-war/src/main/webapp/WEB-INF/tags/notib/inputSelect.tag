@@ -17,7 +17,7 @@
 <%@ attribute name="optionTextKeyAttribute" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionNivellAttribute" required="false" rtexprvalue="true"%>
 <%@ attribute name="optionEnum" required="false" rtexprvalue="true"%>
-<%@ attribute name="emptyOption" required="false" rtexprvalue="true"%>
+<%@ attribute name="emptyOption" required="false" rtexprvalue="true" description="Permet seleccionar un element buid" %>
 <%@ attribute name="emptyOptionText" required="false" rtexprvalue="true"%>
 <%@ attribute name="emptyOptionTextKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
