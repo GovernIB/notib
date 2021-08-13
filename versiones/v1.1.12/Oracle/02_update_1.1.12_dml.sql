@@ -2,16 +2,6 @@ INSERT ALL
     INTO NOT_CONFIG_TYPE (CODE) VALUES ('PASSWORD')
 SELECT 1 FROM DUAL;
 
-
---
--- UPDATE NOT_CONFIG
--- SET TYPE_CODE = 'TEXT'
--- WHERE KEY IN (
---               'es.caib.notib.plugin.unitats.dir3.username',
---               'es.caib.notib.plugin.arxiu.caib.conversio.imprimible.usuari',
---               'es.caib.notib.plugin.arxiu.caib.usuari',
---               'es.caib.notib.plugin.gesconadm.username');
-
 UPDATE NOT_CONFIG
 SET POSITION=0
 WHERE KEY='es.caib.notib.notifica.url';
@@ -33,7 +23,7 @@ SET POSITION=4
 WHERE KEY='es.caib.notib.notifica.apikey';
 
 UPDATE NOT_CONFIG
-SET POSITION=5
+SET POSITION=5, TYPE_CODE='PASSWORD', JBOSS_PROPERTY=1
 WHERE KEY='es.caib.notib.notifica.clau.xifrat.ids';
 
 UPDATE NOT_CONFIG
