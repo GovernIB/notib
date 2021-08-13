@@ -196,23 +196,25 @@
 			<bean class="es.caib.notib.war.interceptor.PermisosInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
-			<mvc:mapping path="/grup**"/>
-			<mvc:mapping path="/grup/**"/>
-			<mvc:exclude-mapping path="/notificacio/refrescarEstatNotifica/estat"/>
-			<bean class="es.caib.notib.war.interceptor.AccesGrupsInterceptor"/>
-		</mvc:interceptor>
-		<mvc:interceptor>
 			<mvc:mapping path="/cie**"/>
 			<mvc:mapping path="/cie/**"/>
 			<mvc:mapping path="/operadorPostal**"/>
 			<mvc:mapping path="/operadorPostal/**"/>
 			<bean class="es.caib.notib.war.interceptor.AccesPagadorsInterceptor"/>
 		</mvc:interceptor>
+
+		<!-- Rutes només accessibles amb el rol d'administrador d'organ o d'entitat -->
 		<mvc:interceptor>
 			<mvc:mapping path="/organgestor**"/>
 			<mvc:mapping path="/organgestor/**"/>
-			<bean class="es.caib.notib.war.interceptor.AccesOrgansInterceptor"/>
+			<mvc:mapping path="/procediment**"/>
+			<mvc:mapping path="/procediment/**"/>
+			<mvc:mapping path="/grup**"/>
+			<mvc:mapping path="/grup/**"/>
+			<bean class="es.caib.notib.war.interceptor.AccesAdminInterceptor"/>
 		</mvc:interceptor>
+
+		<!-- Rutes només accessibles amb el rol de superusuari -->
 		<mvc:interceptor>
 			<mvc:mapping path="/avis**"/>
 			<mvc:mapping path="/avis/**"/>
@@ -222,6 +224,15 @@
 			<mvc:mapping path="/config/**"/>
 			<bean class="es.caib.notib.war.interceptor.AccesSuperInterceptor"/>
 		</mvc:interceptor>
+
+
+		<!-- Rutes NO accessibles amb el rol de usuari -->
+		<mvc:interceptor>
+			<mvc:mapping path="/entitat**"/>
+			<mvc:mapping path="/entitat/**"/>
+			<bean class="es.caib.notib.war.interceptor.AccesUsuariInterceptor"/>
+		</mvc:interceptor>
+
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
 			<mvc:exclude-mapping path="/js/**"/>
