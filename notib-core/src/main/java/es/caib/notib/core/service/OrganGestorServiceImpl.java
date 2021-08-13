@@ -479,14 +479,19 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
 				updateNom(entitat, organGestor);
+				logger.info("Fi - updateNom del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 
 				updateLlibre(entitat, organGestor);
+				logger.info("Fi - updateLlibre del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 
 				updateOficina(entitat, organGestor, arbreUnitats);
+				logger.info("Fi - updateOficina del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 
 				updateEstat(organGestor, arbreUnitats);
+				logger.info("Fi - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 
 			}
+			logger.info("Antes de Update de las tablas correspondientes a las datatables");
 			// Update de las tablas correspondientes a las datatables de notificaciones y envíos
 			notificacioTableViewRepository.updateOrganGestorEstat();
 			enviamentTableRepository.updateOrganGestorEstat();
@@ -558,6 +563,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	private boolean updateEstat(OrganGestorEntity organGestor,
 								Map<String, NodeDir3> arbreUnitats) {
+		logger.info("Ini - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 		if (!arbreUnitats.containsKey(organGestor.getCodi())){
 			return false;
 		}

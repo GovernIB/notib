@@ -991,6 +991,7 @@ public class PluginHelper {
 	// /////////////////////////////////////////////////////////////////////////////////////
 
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
+		logger.info("Obtenir l'organigrama per entitat");
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_UNITATS, 
@@ -1004,8 +1005,10 @@ public class PluginHelper {
 		String filenameOrgans = getOrganGestorsFile();
 		try {
 			if ("SOAP".equalsIgnoreCase(protocol)) {
+				logger.info("Obtenir l'organigrama per entitat SOAP");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(entitatcodi, null, null);
 			} else {
+				logger.info("Obtenir l'organigrama per entitat REST");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
 			}
 			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
@@ -1015,6 +1018,7 @@ public class PluginHelper {
 
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
+			logger.info("Error al obtenir l'organigrama per entitat");
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
@@ -1031,6 +1035,7 @@ public class PluginHelper {
 						}
 						return organigrama;
 					} catch (IOException e) {
+						logger.info("Error al procesar map l'organigrama per entitat");
 						e.printStackTrace();
 					}
 				}

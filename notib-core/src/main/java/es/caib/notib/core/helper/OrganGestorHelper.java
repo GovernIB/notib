@@ -12,6 +12,9 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
@@ -146,8 +149,11 @@ public class OrganGestorHelper {
 	 */
 	public OrganGestorEstatEnum getEstatOrgan(NodeDir3 nodeOrgan) {
 		if (nodeOrgan == null){
+			logger.info("getEstatOrgan - nodeOrgan null");
 			return OrganGestorEstatEnum.ALTRES;
 		}
+		
+		logger.info("getEstatOrgan - nodeOrgan: " + nodeOrgan.getEstat());
 
 		if (nodeOrgan.getEstat().toUpperCase().startsWith("VIGENT")) {
 			return OrganGestorEstatEnum.VIGENT;
@@ -172,4 +178,6 @@ public class OrganGestorHelper {
 		}
 		return denominacio;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 }
