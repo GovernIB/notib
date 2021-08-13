@@ -218,6 +218,8 @@
 			<mvc:mapping path="/avis/**"/>
 			<mvc:mapping path="/cache**"/>
 			<mvc:mapping path="/cache/**"/>
+			<mvc:mapping path="/config**"/>
+			<mvc:mapping path="/config/**"/>
 			<bean class="es.caib.notib.war.interceptor.AccesSuperInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>

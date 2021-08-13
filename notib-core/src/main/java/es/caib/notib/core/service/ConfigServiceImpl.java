@@ -82,7 +82,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     private void processPropertyValues(ConfigGroupDto cGroup) {
         for (ConfigDto config: cGroup.getConfigs()) {
-            if (config.isJbossProperty()) {
+            if ("PASSWORD".equals(config.getTypeCode())){
+                config.setValue("*****");
+            } else if (config.isJbossProperty()) {
                 // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
                 config.setValue(ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey(), config.getValue()));
             }

@@ -53,6 +53,8 @@
                 }
             });
         });
+
+        $('.a-config-group:first').tab('show');
     });
 </script>
 <div class="text-right" data-toggle="botons-titol">
@@ -78,9 +80,11 @@
 </div>
     <div class="row">
         <div class="col-md-3">
-            <ul class="nav nav-pills nav-stacked">
+            <ul id="tab-list" class="nav nav-pills nav-stacked">
                 <c:forEach items="${config_groups}" var="group" varStatus="status_group">
-                    <li role="presentation"><a data-toggle="tab" href="#group-${group.key}">${group.description}</a></li>
+                    <li role="presentation">
+                        <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
+                    </li>
                 </c:forEach>
             </ul>
         </div>

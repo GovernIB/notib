@@ -62,9 +62,11 @@
                         <span class="help-block">${config.key}</span>
                     </div>
                     <div class="col-sm-1">
-                        <button class="btn btn-success"<c:if test="${config.jbossProperty}"> disabled</c:if>>
+                        <c:if test="${not config.jbossProperty}">
+                        <button class="btn btn-success">
                             <i class="fa fa-edit"></i>
                         </button>
+                        </c:if>
                     </div>
                 </div>
             </form:form>
