@@ -48,10 +48,12 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "proc_codi_notib", length = 9)
 	private String procedimentCodiNotib;
+
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_organ_id")
 	private ProcedimentOrganEntity procedimentOrgan;
+
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	private String usuariCodi;
 	@Column(name = "grup_codi", length = 64)
@@ -74,8 +76,6 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	 */
 	@Column(name = "tipus_usuari")
 	private TipusUsuariEnumDto tipusUsuari;
-//	@Column(name = "callback_error")
-//	private boolean errorLastCallback;
 	@Column(name = "NOTIFICA_ERROR_DATE")
 	private Date notificaErrorData;
 	@Column(name = "NOTIFICA_ERROR_DESCRIPCIO")
@@ -88,8 +88,6 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String numExpedient;
 	@Column(name = "registre_env_intent")
 	private int registreEnviamentIntent;
-//	@Column(name = "REGISTRE_HAS_ENVS_PENDENTS")
-//	private boolean hasEnviamentsPendentsRegistre;
 
 	@Column(name = "concepte", length = 255, nullable = false)
 	private String concepte;
@@ -109,6 +107,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private String procedimentNom;
 	@Column(name = "PROCEDIMENT_IS_COMU")
 	private boolean procedimentIsComu;
+	@Column(name = "PROCEDIMENT_REQUIRE_PERMISSION")
+	private boolean procedimentRequirePermission;
 	@Column(name = "ORGAN_CODI")
 	private String organCodi;
 	@Column(name = "ORGAN_NOM")

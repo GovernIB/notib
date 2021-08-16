@@ -44,8 +44,8 @@ public interface EnviamentService {
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
 	 * 
-	 * @param entitat
-	 * 			Entitat de la que es vol consultar els enviaments
+	 * @param entitatId
+	 * 			Identificador de l'entitat de la que es vol consultar els enviaments
 	 * @param filtre
 	 * 			Filtre per a la consulta
 	 * @param paginacio
@@ -55,13 +55,8 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			EntitatDto entitat,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdminOrgan,
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
+			Long entitatId,
+			RolEnumDto rol,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,

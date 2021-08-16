@@ -23,6 +23,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,11 +80,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
 	@Autowired
-	private PersonaRepository personaRepository;
-	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ProcedimentHelper procedimentHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -352,13 +357,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Transactional
 	@Override
 	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			EntitatDto entitat,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdminOrgan,
-			List<String> procedimentsCodisNotib,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
+			Long entitatId,
+			RolEnumDto rol,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
@@ -366,10 +366,28 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta els enviaments de les notificacións que te una entitat");
-			
-			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
+			boolean isUsuari = RolEnumDto.tothom.equals(rol);
+			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+			EntitatEntity entitatEntity= entityComprovarHelper.comprovarEntitat(
+					entitatId,
+					false,
+					isUsuariEntitat,
+					false);
+
+
+			List<String> codisProcedimentsDisponibles = new ArrayList<String>();
+			List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
+
+			if (isUsuari) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
+				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
+			}
+			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
-			boolean esProcedimentsOrgansCodisNotibNull = (codisProcedimentOrgansDisponibles == null || codisProcedimentOrgansDisponibles.isEmpty());
 
 			Date dataEnviamentInici = null,
 				 dataEnviamentFi = null,
@@ -379,7 +397,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 				 dataRegistreFi = null,
 				 dataCaducitatInici = null,
 				 dataCaducitatFi = null;
-			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitat.getId());
 			
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici()));
@@ -505,11 +522,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(dataRegistreFi == null),
 						dataRegistreFi,
 						esProcedimentsCodisNotibNull,
-						esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+						esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 						esOrgansGestorsCodisNotibNull,
 						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
-						esProcedimentsOrgansCodisNotibNull,
-						esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 						aplicacioService.findRolsUsuariActual(),
 						usuariCodi,
 						nomesAmbErrors,
@@ -655,7 +670,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 
 			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
-			if (entitat.isLlibreEntitat()) {
+			if (entitatEntity.isLlibreEntitat()) {
 				for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
 						tableItem.setLlibre(entitatEntity.getLlibre());
 				}

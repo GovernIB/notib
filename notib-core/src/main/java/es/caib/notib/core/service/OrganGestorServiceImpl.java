@@ -17,13 +17,11 @@ import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.acls.model.Permission;
@@ -889,7 +887,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "organsPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
 	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -901,60 +898,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					false);
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
-			// 1. Obtenim els òrgans gestors amb permisos
-			List<OrganGestorEntity> organsDisponibles;
-			if (!PermisEnum.CONSULTA.equals(permis)){
-				organsDisponibles = organGestorRepository.findByEntitatAndEstat(entitat, OrganGestorEstatEnum.VIGENT);
-			} else {
-				organsDisponibles = organGestorRepository.findByEntitat(entitat);
-			}
+			return conversioTipusHelper.convertirList(
+					permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos),
+					OrganGestorDto.class);
 
-			permisosHelper.filterGrantedAny(
-					organsDisponibles,
-					new ObjectIdentifierExtractor<OrganGestorEntity>() {
-						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-							return organGestor.getId();
-						}
-					},
-					OrganGestorEntity.class,
-					permisos,
-					auth);
-			
-			List<OrganGestorDto> organsGestorsDto = conversioTipusHelper.convertirList(
-					organsDisponibles, 
-					OrganGestorDto.class); 
-
-			if (organsGestorsDto != null && !organsGestorsDto.isEmpty()) {
-				Set<OrganGestorDto> organsGestorsAmbPermis = new HashSet<OrganGestorDto>(organsGestorsDto);
-				
-				// 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-				if (!organsDisponibles.isEmpty()) {
-					for (OrganGestorEntity organGestorEntity : organsDisponibles) {
-						List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-										entitat.getDir3Codi(), 
-										organGestorEntity.getCodi());
-						if (organsFills != null)
-							for(String organCodi: organsFills) {
-								OrganGestorDto organ = findByCodi(entitatId, organCodi);
-								if (PermisEnum.CONSULTA.equals(permis) || organ.getEstat() == OrganGestorEstatEnum.VIGENT) {
-									organsGestorsAmbPermis.add(organ);
-								}
-							}
-										
-					}
-				}
-				
-				organsGestorsDto = new ArrayList<OrganGestorDto>(organsGestorsAmbPermis);
-				Collections.sort(organsGestorsDto, new Comparator<OrganGestorDto>() {
-					@Override
-					public int compare(OrganGestorDto o1, OrganGestorDto o2) {
-						return o1.getCodi().compareTo(o2.getCodi());
-					}
-				});
-			}
-			
-			return organsGestorsDto;
-	
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

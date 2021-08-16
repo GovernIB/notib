@@ -2,10 +2,12 @@ package es.caib.notib.core.cacheable;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -18,11 +20,9 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utilitat per a accedir a les caches dels permisos. Els mètodes cacheables es
@@ -45,6 +45,8 @@ public class PermisosCacheable {
     private EntityComprovarHelper entityComprovarHelper;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private OrganigramaHelper organigramaHelper;
 
     @Cacheable(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
     public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
@@ -154,6 +156,66 @@ public class PermisosCacheable {
             return resposta;
         }
 
+    }
+
+
+    @Transactional(readOnly = true)
+    @Cacheable(value = "organsPermis", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
+    public List<OrganGestorEntity> findOrgansGestorsWithPermis(EntitatEntity entitat,
+                                                               Authentication auth,
+                                                               Permission[] permisos) {
+
+        // 1. Obtenim els òrgans gestors amb permisos
+        List<OrganGestorEntity> organsDisponibles;
+        if (!ExtendedPermission.READ.equals(permisos[0])){
+            organsDisponibles = organGestorRepository.findByEntitatAndEstat(entitat, OrganGestorEstatEnum.VIGENT);
+        } else {
+            organsDisponibles = organGestorRepository.findByEntitat(entitat);
+        }
+
+        permisosHelper.filterGrantedAny(
+                organsDisponibles,
+                new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
+                    public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+                        return organGestor.getId();
+                    }
+                },
+                OrganGestorEntity.class,
+                permisos,
+                auth);
+
+
+        List<OrganGestorEntity> resultats = new ArrayList<>(organsDisponibles);
+        if (organsDisponibles != null && !organsDisponibles.isEmpty()) {
+            Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
+
+            // 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
+            if (!organsDisponibles.isEmpty()) {
+                for (OrganGestorEntity organGestorEntity : organsDisponibles) {
+                    List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+                            entitat.getDir3Codi(),
+                            organGestorEntity.getCodi());
+                    if (organsFills != null)
+                        for(String organCodi: organsFills) {
+                            OrganGestorEntity organ = organGestorRepository.findByEntitatAndCodi(entitat, organCodi);
+                            if (ExtendedPermission.READ.equals(permisos[0]) || organ.getEstat() == OrganGestorEstatEnum.VIGENT) {
+                                organsGestorsAmbPermis.add(organ);
+                            }
+                        }
+
+                }
+            }
+
+            resultats = new ArrayList<>(organsGestorsAmbPermis);
+            Collections.sort(resultats, new Comparator<OrganGestorEntity>() {
+                @Override
+                public int compare(OrganGestorEntity o1, OrganGestorEntity o2) {
+                    return o1.getCodi().compareTo(o2.getCodi());
+                }
+            });
+        }
+
+        return resultats;
     }
 
     @CacheEvict(value = "entitatsUsuari", allEntries = true)

@@ -303,7 +303,6 @@
         });
         function omplirProcediments() {
             var organGestor = $("#organGestor");
-            var selProcediments = $("#procedimentId");
             let organId = $(organGestor).val() == undefined ? "" : $(organGestor).val();
             $.ajax({
                 type: 'GET',
@@ -427,7 +426,8 @@
         </div>
         <div class="col-md-6">
             <not:inputSelect name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio"
-                             placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+                             placeholderKey="notificacio.list.filtre.camp.procediment"
+                             inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
     <div class="row">

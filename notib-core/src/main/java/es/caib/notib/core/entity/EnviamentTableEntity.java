@@ -119,6 +119,9 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "PROCEDIMENT_PROCORGAN_ID")
 	protected Long procedimentOrganId;
 
+	@Column(name = "PROCEDIMENT_REQUIRE_PERMISSION")
+	private boolean procedimentRequirePermission;
+
 
 	// //
 	// REGISTRE

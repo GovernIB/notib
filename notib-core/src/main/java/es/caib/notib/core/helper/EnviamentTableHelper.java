@@ -54,6 +54,7 @@ public class EnviamentTableHelper {
 
                 .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
                 .procedimentOrganId(notificacio.getProcedimentOrgan() != null ? notificacio.getProcedimentOrgan().getId() : null)
+                .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
 
                 .registreNumero(notificacio.getRegistreNumero())
                 .registreData(notificacio.getRegistreData())
@@ -110,6 +111,7 @@ public class EnviamentTableHelper {
 
         tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());
         tableViewItem.setProcedimentOrganId(notificacio.getProcedimentOrgan() != null ? notificacio.getProcedimentOrgan().getId() : null);
+        tableViewItem.setProcedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission());
 
         tableViewItem.setRegistreNumero(notificacio.getRegistreNumero());
         tableViewItem.setRegistreData(notificacio.getRegistreData());

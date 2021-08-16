@@ -3,6 +3,7 @@ package es.caib.notib.core.repository;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EnviamentTableEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,9 +54,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
 			"and ((:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
-			"	or (:esOrgansGestorsCodisNotib = false and nenv.organCodi is not null and nenv.organCodi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
-			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" +
-			"   or (:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentOrganId is not null and nenv.procedimentOrganId in (:procedimentOrgansIdsNotib))) " +	// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"	or (:isOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
+			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
+			"		) " + // Té permís sobre l'òrgan
+			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
 			"	(:hasZeronotificaEnviamentIntent = true and nenv.registreEnviamentIntent = 0) or " +
@@ -117,10 +120,8 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("dataRegistreFi") Date dataRegistreFi,
 			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
-			@Param("esOrgansGestorsCodisNotib") boolean esOrgansGestorsCodisNotib,
+			@Param("isOrgansGestorsCodisNotibNull") boolean isOrgansGestorsCodisNotibNull,
 			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
-			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
-			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("usuariCodi") String usuariCodi,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
@@ -321,4 +322,14 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
 			"where et.organCodi is not null")
 	void updateOrganGestorEstat();
+
+	@Modifying
+	@Query("update EnviamentTableEntity nt " +
+			"set " +
+			" nt.procedimentIsComu = :procedimentComu, " +
+			" nt.procedimentRequirePermission = :procedimentRequirePermission " +
+			"where nt.procedimentCodiNotib = :procedimentCodi ")
+	void updateProcediment(@Param("procedimentComu") boolean procedimentComu,
+						   @Param("procedimentRequirePermission") boolean procedimentRequireDirectPermission,
+						   @Param("procedimentCodi") String procedimentCodi);
 }
