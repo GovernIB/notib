@@ -50,7 +50,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) "+
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) "+
-			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like lower('%'||:notificaReferencia||'%')) "+
+			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') "+
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
 			"and ((:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
@@ -159,7 +159,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) " +
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) " +
-			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like lower('%'||:notificaReferencia||'%')) " +
+			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') " +
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
 			"and (nenv.organCodi is not null and nenv.organCodi in (:organs)) " +
@@ -256,7 +256,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) " +
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) " +
-			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like lower('%'||:notificaReferencia||'%')) " +
+			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') " +
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi)" +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
