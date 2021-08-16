@@ -101,6 +101,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private ConfigHelper configHelper;
 	@Autowired
 	private EntregaCieRepository entregaCieRepository;
+	@Autowired
+	private EnviamentTableRepository enviamentTableRepository;
+	@Autowired
+	private NotificacioTableViewRepository notificacioTableViewRepository;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -261,6 +265,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					organGestorRepository.delete(organGestorAntic);
 				}
 			}
+
+			notificacioTableViewRepository.updateProcediment(procedimentEntity.isComu(),
+					procedimentEntity.getNom(),
+					procedimentEntity.isRequireDirectPermission(),
+					procedimentEntity.getCodi());
+			enviamentTableRepository.updateProcediment(procedimentEntity.isComu(),
+					procedimentEntity.isRequireDirectPermission(),
+					procedimentEntity.getCodi());
 
 			return conversioTipusHelper.convertir(
 					procedimentEntity, 
@@ -981,14 +993,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					entitat,
 					permisos);
 
-			// 6. Ordenam els procediments
-			Collections.sort(procediments, new Comparator<ProcedimentEntity>() {
-				@Override
-				public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
-					return (p1.getNom()==null?"":p1.getNom()).compareTo(p2.getNom()==null?"":p2.getNom());
-				}
-			});
-			
 			// 7. Convertim els procediments a dto
 			return conversioTipusHelper.convertirList(
 					procediments,

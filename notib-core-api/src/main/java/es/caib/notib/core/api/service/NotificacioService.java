@@ -108,9 +108,6 @@ public interface NotificacioService {
 	PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,

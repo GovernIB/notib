@@ -9,8 +9,6 @@ import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.*;
@@ -31,9 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 /**
  * Controlador per el mantinement d'enviaments.
@@ -143,18 +139,9 @@ public class EnviamentController extends BaseUserController {
 			Model model) throws ParseException {
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
-		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
-		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
-
-		List<ProcedimentSimpleDto> procedimentsDisponibles;
-		List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
-		List<ProcedimentOrganDto> procedimentOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
-		List<String> codisProcedimentsDisponibles = new ArrayList<String>();
-		List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
-		List<Long> codisProcedimentOrgansDisponibles = new ArrayList<Long>();
 
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
@@ -163,34 +150,14 @@ public class EnviamentController extends BaseUserController {
 
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-			if (isUsuari) {
-				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-				organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-				procedimentOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-				for(ProcedimentSimpleDto procediment: procedimentsDisponibles) {
-					if (!procediment.isComu())
-						codisProcedimentsDisponibles.add(procediment.getCodi());
-				}
-				for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
-					codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());
-				}
-				for (ProcedimentOrganDto procedimentOrganDto : procedimentOrgansDisponibles) {
-					codisProcedimentOrgansDisponibles.add(procedimentOrganDto.getId());
-				}
-			}
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
 			}
 
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(
-					entitatActual,
-					isUsuari,
-					isUsuariEntitat,
-					isAdminOrgan,
-					codisProcedimentsDisponibles,
-					codisOrgansGestorsDisponibles,
-					codisProcedimentOrgansDisponibles,
+					entitatActual.getId(),
+					RolEnumDto.valueOf(RolHelper.getRolActual(request)),
 					organGestorCodi,
 					usuariActual.getCodi(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),

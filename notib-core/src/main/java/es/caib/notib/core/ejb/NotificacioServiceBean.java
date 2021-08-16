@@ -9,8 +9,6 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -164,9 +162,6 @@ public class NotificacioServiceBean implements NotificacioService {
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
@@ -174,9 +169,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.findAmbFiltrePaginat(
 				entitatId,
 				rol,
-				codisProcedimentsDisponibles,
-				codisOrgansGestorsDisponibles,
-				codisProcedimentOrgansDisponibles,
 				organGestorCodi,
 				usuariCodi,
 				filtre,

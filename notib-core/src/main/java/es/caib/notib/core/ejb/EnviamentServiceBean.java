@@ -46,26 +46,15 @@ public class EnviamentServiceBean implements EnviamentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			EntitatDto entitat, 
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdminOrgan, 
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
+			Long entitatId,
+			RolEnumDto rol,
 			String organGestorCodi,
 			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre, 
-			PaginacioParamsDto paginacio)
-			throws ParseException {
+			NotificacioEnviamentFiltreDto filtre,
+			PaginacioParamsDto paginacio) throws ParseException {
 		return delegate.enviamentFindByEntityAndFiltre(
-				entitat, 
-				isUsuari, 
-				isUsuariEntitat, 
-				isAdminOrgan,
-				codisProcedimentsDisponibles,
-				codisOrgansGestorsDisponibles,
-				codisProcedimentOrgansDisponibles,
+				entitatId,
+				rol,
 				organGestorCodi,
 				usuariCodi,
 				filtre, 

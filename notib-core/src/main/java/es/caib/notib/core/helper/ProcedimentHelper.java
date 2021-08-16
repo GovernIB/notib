@@ -1,11 +1,15 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -40,8 +44,6 @@ public class ProcedimentHelper {
 	@Autowired
 	private ProcedimentUpdateHelper procedimentUpdateHelper;
 	@Autowired
-	private CacheHelper cacheHelper;
-	@Autowired
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
@@ -53,7 +55,38 @@ public class ProcedimentHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private MessageHelper messageHelper;
-	
+	@Resource
+	private ProcedimentsCacheable procedimentsCacheable;
+
+	public List<String> findCodiProcedimentsWithPermis(Authentication auth,
+														EntitatEntity entitat,
+														Permission[] permisos) {
+
+		// Procediments comuns amb permís a un òrgan gestor
+		List<ProcedimentEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
+				auth.getName(),
+				entitat,
+				permisos);
+		Set<String> codis = new HashSet<>();
+		for (ProcedimentEntity procediment : procediments) {
+			// ignoram els procediments comuns que no requereixen permís directe
+			if (!procediment.isComu() || procediment.isRequireDirectPermission())
+				codis.add(procediment.getCodi());
+		}
+
+		// Procediments comuns amb permís directe
+		List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
+				auth.getName(),
+				auth,
+				entitat,
+				permisos);
+		for (ProcedimentOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
+			codis.add(procedimentOrganEntity.getProcediment().getCodi());
+		}
+
+		return new ArrayList<>(codis);
+	}
+
 	public void omplirPermisos(
 			ProcedimentDto procediment,
 			boolean ambLlistaPermisos) {

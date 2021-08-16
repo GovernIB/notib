@@ -405,47 +405,22 @@ public class NotificacioController extends BaseUserController {
         boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
         boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
         String organGestorCodi = null;
-        List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
-        List<ProcedimentSimpleDto> procedimentsDisponibles;
-        List<ProcedimentOrganDto> procedimentOrgansDisponibles = new ArrayList<ProcedimentOrganDto>();
-        List<String> codisProcedimentsDisponibles = new ArrayList<String>();
-        List<Long> codisProcedimentOrgansDisponibles = new ArrayList<Long>();
-        List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
+
         try {
             if (isUsuariEntitat) {
                 if (filtre != null) {
                     filtre.setEntitatId(entitatActual.getId());
                 }
             }
-            if (isUsuari && entitatActual != null) {
-                procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-                organsGestorsDisponibles = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-                procedimentOrgansDisponibles = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.CONSULTA);
-                for (ProcedimentSimpleDto procediment : procedimentsDisponibles) {
-                    if (!procediment.isComu())
-                        codisProcedimentsDisponibles.add(procediment.getCodi());
-                }
-                for (OrganGestorDto organGestorDto : organsGestorsDisponibles) {
-                    codisOrgansGestorsDisponibles.add(organGestorDto.getCodi());
-                }
-                for (ProcedimentOrganDto procedimentOrganDto : procedimentOrgansDisponibles) {
-                    codisProcedimentOrgansDisponibles.add(procedimentOrganDto.getId());
-                }
-            }
+
             if (isAdminOrgan && entitatActual != null) {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
-                procedimentsDisponibles = procedimentService.findByOrganGestorIDescendents(entitatActual.getId(), organGestorActual);
-                for (ProcedimentSimpleDto procediment : procedimentsDisponibles) {
-                    codisProcedimentsDisponibles.add(procediment.getCodi());
-                }
+
             }
             notificacions = notificacioService.findAmbFiltrePaginat(
                     entitatActual != null ? entitatActual.getId() : null,
                     RolEnumDto.valueOf(RolHelper.getRolActual(request)),
-                    codisProcedimentsDisponibles,
-                    codisOrgansGestorsDisponibles,
-                    codisProcedimentOrgansDisponibles,
                     organGestorCodi,
                     usuariActual.getCodi(),
                     filtre,

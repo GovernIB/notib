@@ -75,7 +75,6 @@
 	<!-- # ### -->
 	es.caib.notib.notifica.versio=NOTIFICA_VERSIO
 	es.caib.notib.notifica.url=NOTIFICA_URL/ws/notificaWsV21
-	es.caib.notib.notifica.apikey=NOTIFICA_APIKEY
 	es.caib.notib.notifica.sede.url=NOTIFICA_URL/ws/soap/SedeWs
 
 	<!-- # ### -->

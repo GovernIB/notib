@@ -7,12 +7,12 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,6 @@ import java.util.*;
 @Slf4j
 @Component
 public class OrganGestorHelper {
-	
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -45,6 +44,8 @@ public class OrganGestorHelper {
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private PermisosCacheable permisosCacheable;
 
 	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
 	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
@@ -76,6 +77,20 @@ public class OrganGestorHelper {
 		}
 
 		return organsDisponibles;
+	}
+
+	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth,
+														EntitatEntity entitat,
+														Permission[] permisos) {
+		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
+				entitat,
+				auth,
+				permisos);
+		List<String> codis = new ArrayList<>();
+		for (OrganGestorEntity organGestorDto : organs) {
+			codis.add(organGestorDto.getCodi());
+		}
+		return codis;
 	}
 
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {

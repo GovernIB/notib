@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -117,6 +118,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private NotificacioListHelper notificacioListHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ProcedimentHelper procedimentHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -440,14 +445,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
-			List<String> procedimentsCodisNotib,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
@@ -468,21 +471,33 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Page<NotificacioTableEntity> notificacions = null;
 			Pageable pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
 
-			boolean esProcedimentsCodisNotibNull = (procedimentsCodisNotib == null || procedimentsCodisNotib.isEmpty());
+			List<String> codisProcedimentsDisponibles = new ArrayList<>();
+			List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+
+			if (isUsuari && entitatActual != null) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, permisos);
+				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, permisos);
+
+			} else if (isAdminOrgan && entitatActual != null) {
+				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+						entitatActual.getDir3Codi(),
+						organGestorCodi);
+			}
+
+			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
-			boolean esProcedimentsOrgansCodisNotibNull = (codisProcedimentOrgansDisponibles == null || codisProcedimentOrgansDisponibles.isEmpty());
 
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
-							esProcedimentsOrgansCodisNotibNull,
-							esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 							entitatActual,
 							usuariCodi,
 							pageable);
@@ -501,7 +516,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 							entitatActual,
 							organs,
 							pageable);
@@ -515,12 +530,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getEntitatId().isNull(),
 							filtreNetejat.getEntitatId().getField(),
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
-							esProcedimentsOrgansCodisNotibNull,
-							esProcedimentsOrgansCodisNotibNull ? null : codisProcedimentOrgansDisponibles,
 							filtreNetejat.getEnviamentTipus().isNull(),
 							filtreNetejat.getEnviamentTipus().getField(),
 							filtreNetejat.getConcepte().isNull(),
@@ -604,7 +617,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getEntitatId().isNull(),
 							filtreNetejat.getEntitatId().getField(),
 							esProcedimentsCodisNotibNull,
-							esProcedimentsCodisNotibNull ? null : procedimentsCodisNotib,
+							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 							filtreNetejat.getEnviamentTipus().isNull(),
 							filtreNetejat.getEnviamentTipus().getField(),
 							filtreNetejat.getConcepte().isNull(),

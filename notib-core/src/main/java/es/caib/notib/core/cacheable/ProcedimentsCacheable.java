@@ -4,7 +4,10 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.OrganGestorHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +17,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Utilitat per a accedir a les caches dels procediments. Els mètodes cacheables es
@@ -71,9 +71,18 @@ public class ProcedimentsCacheable {
         List<ProcedimentEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
 
         // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-        List<ProcedimentEntity> setProcediments = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
-        setProcediments.addAll(procedimentsAmbPermisOrgan);
-        return setProcediments;
+        List<ProcedimentEntity> procedimentsList = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
+        procedimentsList.addAll(procedimentsAmbPermisOrgan);
+
+        // 6. Ordenam els procediments
+        Collections.sort(procedimentsList, new Comparator<ProcedimentEntity>() {
+            @Override
+            public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
+                return (p1.getNom()==null?"":p1.getNom()).compareTo(p2.getNom()==null?"":p2.getNom());
+            }
+        });
+
+        return procedimentsList;
     }
 
     private List<ProcedimentEntity> getProcedimentsAmbPermisDirecte(EntitatEntity entitat,
