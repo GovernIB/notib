@@ -230,6 +230,8 @@
 		<mvc:interceptor>
 			<mvc:mapping path="/entitat**"/>
 			<mvc:mapping path="/entitat/**"/>
+			<mvc:exclude-mapping path="/entitat/getEntitatLogoCap"/>
+			<mvc:exclude-mapping path="/entitat/getEntitatLogoPeu"/>
 			<bean class="es.caib.notib.war.interceptor.AccesUsuariInterceptor"/>
 		</mvc:interceptor>
 
