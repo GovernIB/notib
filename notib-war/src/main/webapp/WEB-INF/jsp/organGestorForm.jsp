@@ -218,7 +218,7 @@ $(document).ready(function() {
 			<form:hidden path="nom"/>
 			<c:if test="${!isModificacio}">
 				<div class="form-group">
-					<label class="control-label col-xs-2" for="selLlibres"><spring:message code="organgestor.form.camp.llibre"/>:</label>
+					<label class="control-label col-xs-2" for="selLlibres"><spring:message code="organgestor.form.camp.organisme"/>:</label>
 					<div class="controls col-xs-10">
 						<select id="selOrganismes" data-placeholder="<spring:message code="organgestor.form.camp.organisme"/>"></select>
 					</div>

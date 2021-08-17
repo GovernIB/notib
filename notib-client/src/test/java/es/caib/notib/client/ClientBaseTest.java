@@ -23,28 +23,28 @@ import java.util.*;
  */
 public class ClientBaseTest {
 
-
-//	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ENTITAT_DIR3CODI = "A04013511";
 	protected static final String ORGAN_SIR_CODI = "E03141701";
-//	protected static final String ORGAN_CODI = "A04003003";
-	protected static final String ORGAN_CODI = "A04035948";
 	protected static final String LLIBRE = "L16";
 	protected static final String OFICINA = "O00009390";
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "847185"; // DEV
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
-	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
-	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
 	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-//	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
-	
+
+	// LOCAL data
+//	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
+//	protected static final String ENTITAT_DIR3CODI = "A04003003";
+//	protected static final String ORGAN_CODI = "A04035948";
+//	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
+//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
+
+
 	// DEV data
-	// protected static final String ENTITAT_DIR3CODI = "A04003003";
-	// protected static final String ORGAN_CODI = "A04013529";
-	// protected static final String IDENTIFICADOR_PROCEDIMENT = "874106";
+	protected static final String ENTITAT_DIR3CODI = "A04003003";
+	protected static final String ORGAN_CODI = "A04013529";
+	protected static final String ORGAN_CODI_CIE = "A04013529";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105";
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
 
 
 	protected NotificacioV2 generarNotificacioV2(

@@ -284,12 +284,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					} catch (NoMetadadesException me) {
 						logger.error("Error al obtenir les metadades del document " + numDoc, me);
 						String errorDescripcio = "[1066] No s'han pogut obtenir les metadades del document " + numDoc + ": " + me.getMessage();
-						integracioHelper.addAccioError(info, errorDescripcio);
+						integracioHelper.addAccioError(info, errorDescripcio, me);
 						return setRespostaError(errorDescripcio);
 					} catch (Exception e) {
 						logger.error("Error al obtenir el document " + numDoc, e);
 						String errorDescripcio = "[1064] No s'ha pogut obtenir el document " + numDoc + ": " + e.getMessage();
-						integracioHelper.addAccioError(info, errorDescripcio);
+						integracioHelper.addAccioError(info, errorDescripcio, e);
 						return setRespostaError(errorDescripcio);
 					}
 					// Mida dels documents
