@@ -60,7 +60,7 @@ public abstract class EmailHelper<T> {
     }
     protected void sendEmailNotificacio(
             String emailDestinatari, T item, List<Attachment> files) throws MessagingException {
-        log.debug("Enviament emails notificació");
+        log.debug("Enviament correu notificació");
 
         MimeMessage missatge = mailSender.createMimeMessage();
         missatge.setHeader("Content-Type", "text/html charset=UTF-8");

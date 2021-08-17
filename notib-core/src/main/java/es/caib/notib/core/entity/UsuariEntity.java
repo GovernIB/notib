@@ -3,17 +3,11 @@
  */
 package es.caib.notib.core.entity;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
-
+import lombok.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import lombok.Getter;
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
@@ -22,6 +16,9 @@ import lombok.Getter;
  */
 @Entity
 @Getter
+@Builder(builderMethodName = "hiddenBuilder")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "not_usuari")
 public class UsuariEntity implements Serializable {
 
@@ -37,8 +34,10 @@ public class UsuariEntity implements Serializable {
 	@Column(name = "email", length = 200)
 	private String email;
 	@Column(name = "rebre_emails")
+	@Builder.Default
 	private boolean rebreEmailsNotificacio = true;
 	@Column(name = "rebre_emails_creats")
+	@Builder.Default
 	private boolean rebreEmailsNotificacioCreats = false;
 	@Column(name = "ultim_rol", length = 40)
 	private String ultimRol;
@@ -83,41 +82,14 @@ public class UsuariEntity implements Serializable {
 	}
 
 	
-	public static Builder getBuilder(
+	public static UsuariEntityBuilder getBuilder(
 			String codi,
 			String email,
 			String idioma) {
-		return new Builder(
-				codi,
-				email,
-				idioma);
-	}
-
-	public static class Builder {
-		UsuariEntity built;
-		Builder(String codi,
-				String email,
-				String idioma) {
-			built = new UsuariEntity();
-			built.codi = codi;
-			built.email = email;
-			built.idioma = idioma;
-		}
-		public Builder nom(String nom) {
-			built.nom = nom;
-			return this;
-		}
-		public Builder llinatges(String llinatges) {
-			built.llinatges = llinatges;
-			return this;
-		}
-		public Builder nomSencer(String nomSencer) {
-			built.nomSencer = nomSencer;
-			return this;
-		}
-		public UsuariEntity build() {
-			return built;
-		}
+		return hiddenBuilder()
+				.codi(codi)
+				.email(email)
+				.idioma(idioma);
 	}
 
 	@Override

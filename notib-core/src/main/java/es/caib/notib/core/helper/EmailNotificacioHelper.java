@@ -31,12 +31,16 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				for (UsuariDto usuariDto : destinataris) {
 					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
 						String email = usuariDto.getEmail().replaceAll("\\s+","");
+						log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 						sendEmailNotificacio(
 								email,
 								notificacio);
 					}
 				}
-			}	
+
+			} else {
+				log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
+			}
 		} catch (Exception ex) {
 			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
 			log.error(errorDescripció);
