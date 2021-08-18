@@ -35,7 +35,13 @@ pageContext.setAttribute(
 	function isRolActualAdministradorEntitat() {
 		return ${isRolActualAdministradorEntitat};
 	}
-	
+
+	var organsGestors = [];
+	organsGestors.push({id:"", text:"", estat:"VIGENT"});
+	<c:forEach items="${organsGestors}" var="organGestor">
+	organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
+	</c:forEach>
+
 	$(document).ready(function() {
 		$('#nomesAmbErrors').val(false);
 		$('#btnNetejar').click(function() {
@@ -55,8 +61,8 @@ pageContext.setAttribute(
 			$('#btn-comu').removeClass('active');
 			$('#comu').val(false);
 		});
-		
-		loadOrgans();
+
+		loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
 
 
 		$('#btn-entregaCieActiva').click(function() {
@@ -68,34 +74,6 @@ pageContext.setAttribute(
 			$('#comu').val(entregaCieActiva);
 		})
 	});
-	var organsGestors = [];
-	organsGestors.push({id:"", text:"", estat:"VIGENT"});
-	<c:forEach items="${organsGestors}" var="organGestor">
-		organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
-	</c:forEach>
-
-	function formatState(organ) {
-		let msgObsolet = "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>";
-		if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
-			return organ.text;
-		}
-		return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
-	}
-
-	function loadOrgans(){
-		var listaOrganos = $('#organGestor');
-		listaOrganos.empty();
-
-		var select2Options = {
-				theme: 'bootstrap',
-				width: 'auto',
-				data: organsGestors,
-				allowClear: true,
-				templateResult: formatState
-		};
-		
-		listaOrganos.select2(select2Options);
-	}
 	</script>
 </head>
 <body>

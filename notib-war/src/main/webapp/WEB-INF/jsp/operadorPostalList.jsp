@@ -23,12 +23,30 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			let $selectOrgan = $('#organismePagador');
+			loadOrgans($selectOrgan, organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+		});
+
+		var organsGestors = [];
+		let organData;
+		organsGestors.push({id:"", text:"", estat:"VIGENT"});
+		<c:forEach items="${organsGestors}" var="organGestor">
+		organData = {id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"}
+		<c:if test="${operadorPostalFiltreCommand.organismePagador == organGestor.codi}">
+			organData['selected'] = true;
+		</c:if>
+		organsGestors.push(organData);
+		</c:forEach>
+	</script>
 </head>
 <body>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="operadorPostalFiltreCommand">
 		<div class="row">
 			<div class="col-md-3">
-				<not:inputText name="organismePagador" inline="true" placeholderKey="operadorpostal.list.columna.organismePagador"/>
+				<not:inputSelect name="organismePagador" placeholderKey="operadorpostal.list.columna.organismePagador"
+								 inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-3">
 				<not:inputText name="contracteNum" inline="true" placeholderKey="operadorpostal.list.columna.contracteNum"/>
@@ -55,7 +73,7 @@ pageContext.setAttribute(
 		data-filter="#filtre">
 		<thead>
 			<tr>
-				<th data-col-name="organismePagadorCodi"><spring:message code="operadorpostal.list.columna.organismePagador"/></th>
+				<th data-col-name="organismePagador"><spring:message code="operadorpostal.list.columna.organismePagador"/></th>
 				<th data-col-name="nom"><spring:message code="operadorpostal.list.columna.nom"/></th>
 				<th data-col-name="contracteNum"><spring:message code="operadorpostal.list.columna.contracteNum"/></th>
 				<th data-col-name="contracteDataVig" data-type="date" data-converter="date"><spring:message code="operadorpostal.list.columna.contracteDataVig"/></th>

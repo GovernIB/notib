@@ -7,6 +7,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
 import es.caib.notib.core.api.dto.cie.CieFiltreDto;
+import es.caib.notib.core.api.dto.cie.CieTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,8 +79,8 @@ public interface PagadorCieService {
 	 *            	Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors cie.
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<CieDto> findAmbFiltrePaginat(
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
+	PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			CieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);

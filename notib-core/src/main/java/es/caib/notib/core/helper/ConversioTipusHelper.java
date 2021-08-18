@@ -202,11 +202,39 @@ public class ConversioTipusHelper {
 			field("organGestor.id", "organGestorId").
 			byDefault().
 			register();
-		
+
+		mapperFactory.classMap(PagadorCieEntity.class, CieTableItemDto.class)
+			.customize(
+				new CustomMapper<PagadorCieEntity, CieTableItemDto>() {
+					public void mapAtoB(PagadorCieEntity a, CieTableItemDto b, MappingContext context) {
+						if (a.getOrganismePagador() == null) {
+							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - ORGAN GESTOR NO TROBAT");
+						} else {
+							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - " + a.getOrganismePagador().getNom());
+						}
+					}
+				})
+			.byDefault()
+			.register();
+
 		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalDto.class).
 			field("entitat.id", "entitatId").
 			byDefault().
 			register();
+
+		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalTableItemDto.class)
+			.customize(
+				new CustomMapper<PagadorPostalEntity, OperadorPostalTableItemDto>() {
+					public void mapAtoB(PagadorPostalEntity a, OperadorPostalTableItemDto b, MappingContext context) {
+						if (a.getOrganismePagador() == null) {
+							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - ORGAN GESTOR NO TROBAT");
+						} else {
+							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - " + a.getOrganismePagador().getNom());
+						}
+					}
+				})
+			.byDefault()
+			.register();
 
 		mapperFactory.classMap(PagadorCieFormatFullaEntity.class, CieFormatFullaDto.class).
 			field("pagadorCie.id", "pagadorCieId").
@@ -221,7 +249,6 @@ public class ConversioTipusHelper {
 				.customize(
 				new CustomMapper<PagadorPostalEntity, IdentificadorTextDto>() {
 					public void mapAtoB(PagadorPostalEntity a, IdentificadorTextDto b, MappingContext context) {
-						// add your custom mapping code here
 						b.setText(a.getNom() + " - " + a.getContracteNum());
 					}
 				})

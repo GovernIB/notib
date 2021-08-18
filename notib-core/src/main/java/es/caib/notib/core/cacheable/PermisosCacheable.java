@@ -197,12 +197,11 @@ public class PermisosCacheable {
                             organGestorEntity.getCodi());
                     if (organsFills != null)
                         for(String organCodi: organsFills) {
-                            OrganGestorEntity organ = organGestorRepository.findByEntitatAndCodi(entitat, organCodi);
+                            OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
                             if (ExtendedPermission.READ.equals(permisos[0]) || organ.getEstat() == OrganGestorEstatEnum.VIGENT) {
                                 organsGestorsAmbPermis.add(organ);
                             }
                         }
-
                 }
             }
 

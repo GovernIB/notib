@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
-import es.caib.notib.core.api.dto.cie.OperadorPostalTableRowDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -49,8 +49,11 @@ public class OperadorPostalController extends BaseUserController{
 	public String get(
 			HttpServletRequest request,
 			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OperadorPostalFiltreCommand operadorPostalFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("operadorPostalFiltreCommand", operadorPostalFiltreCommand);
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalList";
 	}
 	
@@ -59,7 +62,7 @@ public class OperadorPostalController extends BaseUserController{
 	public DatatablesResponse datatable( 
 			HttpServletRequest request ) {
 		OperadorPostalFiltreCommand operadorPostalFiltreCommand = getFiltreCommand(request);
-		PaginaDto<OperadorPostalTableRowDto> pagadorsPostals = null;
+		PaginaDto<OperadorPostalTableItemDto> pagadorsPostals = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		if (organGestorActual != null) {
@@ -91,12 +94,15 @@ public class OperadorPostalController extends BaseUserController{
 			HttpServletRequest request,
 			OperadorPostalFiltreCommand command,
 			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request, 
 				PAGADOR_POSTAL_FILTRE, 
 				command);
-		
+
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalList";
 	}
 	

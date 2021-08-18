@@ -699,3 +699,23 @@ function resetSessionTimeout(){
 		sessionTimeoutMessage(timeout_margin_ms);
 	}, session_timeout_ms - timeout_margin_ms); // un minut abans de que finalitzi la sessió
 }
+
+function loadOrgans($selector, organsGestors, missatgeObsolets){
+	function formatState(organ) {
+		let msgObsolet = missatgeObsolets;
+		if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
+			return organ.text;
+		}
+		return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
+	}
+
+	$selector.empty();
+	var select2Options = {
+		theme: 'bootstrap',
+		width: 'auto',
+		data: organsGestors,
+		allowClear: true,
+		templateResult: formatState
+	};
+	$selector.select2(select2Options);
+}

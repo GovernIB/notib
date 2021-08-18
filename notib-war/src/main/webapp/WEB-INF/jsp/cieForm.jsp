@@ -44,7 +44,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			let $selectOrgan = $('#organismePagadorCodi')
-			loadOrgans($selectOrgan);
+			loadOrgans($selectOrgan, organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
 		});
 
 		var organsGestors = [];
@@ -57,27 +57,6 @@
 			</c:if>
 			organsGestors.push(organData);
 		</c:forEach>
-
-		function formatState(organ) {
-			let msgObsolet = "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>";
-			if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
-				return organ.text;
-			}
-			return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
-		}
-
-		function loadOrgans($selectOrgan){
-			$selectOrgan.empty();
-
-			var select2Options = {
-				theme: 'bootstrap',
-				width: 'auto',
-				data: organsGestors,
-				templateResult: formatState
-			};
-
-			$selectOrgan.select2(select2Options);
-		}
 	</script>
 </head>
 <body>

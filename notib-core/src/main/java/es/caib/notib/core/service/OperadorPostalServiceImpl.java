@@ -8,7 +8,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalFiltreDto;
-import es.caib.notib.core.api.dto.cie.OperadorPostalTableRowDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OperadorPostalService;
@@ -20,6 +20,7 @@ import es.caib.notib.core.repository.PagadorPostalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,8 +151,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<OperadorPostalTableRowDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre,
-																	 PaginacioParamsDto paginacioParams) {
+	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre,
+																	  PaginacioParamsDto paginacioParams) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarPermisos(
@@ -161,7 +162,9 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 					true);
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-			Page<PagadorPostalEntity> pagadorPostal = null;
+			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+			Page<PagadorPostalEntity> pageOpearadorsPostals;
 	
 			List<String> organsFills = null;
 			if (filtre.getOrganGestorId() != null) {
@@ -172,27 +175,27 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 						entitat.getDir3Codi(), 
 						organGestor.getCodi());
 				
-				pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(
+				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(
 						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
 						filtre.getOrganismePagador(),
 						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
 						filtre.getContracteNum(),
 						organsFills,
 						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+						pageable);
 			}else {
-				pagadorPostal = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
+				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
 						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
 						filtre.getOrganismePagador(),
 						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
 						filtre.getContracteNum(),
 						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+						pageable);
 			}
 			
 			return paginacioHelper.toPaginaDto(
-					pagadorPostal,
-					OperadorPostalTableRowDto.class);
+					pageOpearadorsPostals,
+					OperadorPostalTableItemDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

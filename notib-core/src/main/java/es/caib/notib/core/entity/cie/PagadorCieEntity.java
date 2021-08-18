@@ -46,6 +46,12 @@ public class PagadorCieEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_pagcie_organ_fk")
 	protected OrganGestorEntity organGestor;
 
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "dir3_codi", referencedColumnName = "codi", insertable = false, updatable = false)
+//	@ForeignKey(name = "not_not_organ_fk") // TODO: Definir FK
+	private OrganGestorEntity organismePagador;
+
+
 	public void update(
 			String organismePagador,
 			Date contracteDataVig) {

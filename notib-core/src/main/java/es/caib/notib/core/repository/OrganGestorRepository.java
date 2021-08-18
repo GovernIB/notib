@@ -26,8 +26,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	OrganGestorEntity findByCodi(String codi);
 
-	OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
-
 	@Modifying
 	@Query( " update " +
 			"    OrganGestorEntity og " +

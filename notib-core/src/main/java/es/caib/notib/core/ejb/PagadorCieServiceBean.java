@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
 import es.caib.notib.core.api.dto.cie.CieFiltreDto;
+import es.caib.notib.core.api.dto.cie.CieTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -60,7 +61,7 @@ public class PagadorCieServiceBean implements PagadorCieService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<CieDto> findAmbFiltrePaginat(
+	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			CieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {

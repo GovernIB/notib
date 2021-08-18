@@ -10,7 +10,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalFiltreDto;
-import es.caib.notib.core.api.dto.cie.OperadorPostalTableRowDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OperadorPostalService;
@@ -65,7 +65,7 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<OperadorPostalTableRowDto> findAmbFiltrePaginat(
+	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			OperadorPostalFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {

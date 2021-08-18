@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
+import es.caib.notib.core.api.dto.cie.CieTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -47,8 +48,11 @@ public class CieController extends BaseUserController{
 	public String get(
 			HttpServletRequest request,
 			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		CieFiltreCommand cieFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("cieFiltreCommand", cieFiltreCommand);
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		model.addAttribute("organsGestors", organsGestors);
 		return "cieList";
 	}
 	
@@ -57,7 +61,6 @@ public class CieController extends BaseUserController{
 	public DatatablesResponse datatable( 
 			HttpServletRequest request ) {
 		CieFiltreCommand cieFiltreCommand = getFiltreCommand(request);
-		PaginaDto<CieDto> pagadorsCie = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		if (organGestorActual != null) {
@@ -65,10 +68,10 @@ public class CieController extends BaseUserController{
 		} else {
 			cieFiltreCommand.setOrganGestorId(null);
 		}
-			
-		pagadorsCie = pagadorCieService.findAmbFiltrePaginat(
+
+		PaginaDto<CieTableItemDto> pagadorsCie = pagadorCieService.findAmbFiltrePaginat(
 							entitat.getId(),
-				cieFiltreCommand.asDto(),
+							cieFiltreCommand.asDto(),
 							DatatablesHelper.getPaginacioDtoFromRequest(request));
 		
 		return DatatablesHelper.getDatatableResponse(
@@ -90,12 +93,14 @@ public class CieController extends BaseUserController{
 			HttpServletRequest request,
 			CieFiltreCommand command,
 			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		RequestSessionHelper.actualitzarObjecteSessio(
 				request, 
 				PAGADOR_CIE_FILTRE, 
 				command);
-		
+		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		model.addAttribute("organsGestors", organsGestors);
 		return "cieList";
 	}
 	

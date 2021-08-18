@@ -29,10 +29,6 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 	@Column(name = "dir3_codi", length = 9)
 	private String organismePagadorCodi;
 
-//	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "dir3_codi", referencedColumnName = "codi")
-//	protected OrganGestorEntity organismePagador;
-
 	@Column(name = "contracte_num", length = 20)
 	private String contracteNum;
 
@@ -56,6 +52,10 @@ public class PagadorPostalEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_pagpostal_organ_fk")
 	protected OrganGestorEntity organGestor;
 
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "dir3_codi", referencedColumnName = "codi", insertable = false, updatable = false)
+//	@ForeignKey(name = "not_not_organ_fk") // TODO: Definir FK
+	private OrganGestorEntity organismePagador;
 
 	public void update(
 			String organismePagadorCodi,

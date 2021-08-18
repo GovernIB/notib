@@ -115,19 +115,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_entitat_notificacio_fk")
 	protected EntitatEntity entitat;
-	
-//	/*pagador a Postal*/
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "pagador_postal_id")
-//	@ForeignKey(name = "not_pagador_postal_not_fk")
-//	protected PagadorPostalEntity pagadorPostal;
-//
-//	/*pagador CIE*/
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "pagador_cie_id")
-//	@ForeignKey(name = "not_pagador_cie_not_fk")
-//	protected PagadorCieEntity pagadorCie;
-	
+
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_id")

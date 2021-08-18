@@ -114,6 +114,11 @@
         return ${isRolActualAdministradorOrgan};
     }
 
+    var organsGestors = [];
+    organsGestors.push({id:"", text:"", estat:"VIGENT"});
+    <c:forEach items="${organsGestorsPermisLectura}" var="organGestor">
+    organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
+    </c:forEach>
 
     function returnEnviamentsStatusDiv(notificacioId) {
         var content = "";
@@ -354,37 +359,8 @@
         }
 
         omplirProcediments();
-        loadOrgans();
+        loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
     });
-
-    var organsGestors = [];
-    organsGestors.push({id:"", text:"", estat:"VIGENT"});
-    <c:forEach items="${organsGestorsPermisLectura}" var="organGestor">
-    organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
-    </c:forEach>
-
-    function formatState(organ) {
-        let msgObsolet = "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>";
-        if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
-            return organ.text;
-        }
-        return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
-    }
-
-    function loadOrgans(){
-        var listaOrganos = $('#organGestor');
-        listaOrganos.empty();
-
-        var select2Options = {
-            theme: 'bootstrap',
-            width: 'auto',
-            data: organsGestors,
-            allowClear: true,
-            templateResult: formatState
-        };
-
-        listaOrganos.select2(select2Options);
-    }
 </script>
 <form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
     <div class="row">

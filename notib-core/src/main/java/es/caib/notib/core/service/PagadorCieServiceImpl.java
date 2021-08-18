@@ -8,6 +8,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
 import es.caib.notib.core.api.dto.cie.CieFiltreDto;
+import es.caib.notib.core.api.dto.cie.CieTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -19,6 +20,7 @@ import es.caib.notib.core.repository.PagadorCieRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,7 +147,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<CieDto> findAmbFiltrePaginat(
+	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			CieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
@@ -157,9 +159,12 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 					true,
 					true);
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			Page<PagadorCieEntity> pagadorCie = null;
-	
+
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+
 			List<String> organsFills = null;
 			if (filtre.getOrganGestorId() != null) {
 				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
@@ -174,20 +179,20 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 						filtre.getOrganismePagadorCodi(),
 						organsFills,
 						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+						pageable);
 			}else{
 				pagadorCie = pagadorCieReposity.findByCodiDir3NotNullFiltrePaginatAndEntitat(
 						filtre.getOrganismePagadorCodi() == null || filtre.getOrganismePagadorCodi().isEmpty(),
 						filtre.getOrganismePagadorCodi(),
 						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio));
+						pageable);
 			}
 			
 			
 			
 			return paginacioHelper.toPaginaDto(
 					pagadorCie,
-					CieDto.class);
+					CieTableItemDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

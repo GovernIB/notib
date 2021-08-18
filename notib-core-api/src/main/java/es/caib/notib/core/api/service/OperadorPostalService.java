@@ -7,7 +7,7 @@ import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalFiltreDto;
-import es.caib.notib.core.api.dto.cie.OperadorPostalTableRowDto;
+import es.caib.notib.core.api.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -79,7 +79,7 @@ public interface OperadorPostalService {
 	 * @return La pàgina amb els pagadors postals.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<OperadorPostalTableRowDto> findAmbFiltrePaginat(
+	PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			OperadorPostalFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
