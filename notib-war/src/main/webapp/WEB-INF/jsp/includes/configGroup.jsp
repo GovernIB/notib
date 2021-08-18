@@ -46,13 +46,21 @@
                                 </label>
                             </div>
                             </c:when>
-                            <c:when test="${config.validValues != null and fn:length(config.validValues) > 0}">
+                            <c:when test="${config.validValues != null and fn:length(config.validValues) > 2}">
                                 <form:select path="value" cssClass="form-control" id="config_${config.key}" disabled="${config.jbossProperty}" style="width:100%" data-toggle="select2"
                                              data-placeholder="${config.description}">
                                     <c:forEach var="opt" items="${config.validValues}">
                                         <form:option value="${opt}"/>
                                     </c:forEach>
                                 </form:select>
+                            </c:when>
+                            <c:when test="${config.validValues != null and fn:length(config.validValues) == 2}">
+                                <label class="radio-inline">
+                                    <form:radiobutton path="value" value="${config.validValues[0]}"/> ${config.validValues[0]}
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton path="value" value="${config.validValues[1]}"/> ${config.validValues[1]}
+                                </label>
                             </c:when>
                             <c:otherwise>
                                 <form:input  id="config_${config.key}" cssClass="form-control" path="value" placeholder="${config.key}"
