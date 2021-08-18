@@ -1104,23 +1104,26 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			List<CodiValorComuDto> procedimentsOrgan = new ArrayList<>();
 			List<ProcedimentEntity> procediments = new ArrayList<>();
-			String organGestor = null;
+			String organFiltreCodi = null;
 
 			if (organFiltre != null) {
 				OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organFiltre);
 				if (organGestorEntity != null)
-					organGestor = organGestorEntity.getCodi();
+					organFiltreCodi = organGestorEntity.getCodi();
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				procediments = recuperarProcedimentAmbPermis(entitat, permis, organGestor);
+				procediments = recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi);
+				Set<ProcedimentEntity> auxSet = procedimentRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
+				auxSet.addAll(procediments);
+				procediments = new ArrayList<>(auxSet);
 			} else {
 
-				if (organGestor != null) {
+				if (organFiltreCodi != null) {
 					List<ProcedimentEntity> procedimentsDisponibles = procedimentRepository.findByEntitat(entitat);
 					if (procedimentsDisponibles != null) {
 						for (ProcedimentEntity proc : procedimentsDisponibles) {
-							if (proc.isComu() || (proc.getOrganGestor() != null && organGestor.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
+							if (proc.isComu() || (proc.getOrganGestor() != null && organFiltreCodi.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
 								procediments.add(proc);
 							}
 						}
@@ -1242,12 +1245,27 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 						results.add(procediment);
 				}
 			}
-		} else {
-			results = addProcedimentsOrgan(procediments, procedimentsOrgans, organFiltre);
-		}
 
-		return results;
+			return results;
+
+		} else {
+
+			Set<ProcedimentEntity> setProcediments = new HashSet<>();
+			if (procediments != null)
+				setProcediments = new HashSet<>(procediments);
+
+			if (procedimentsOrgans == null || procedimentsOrgans.isEmpty()) {
+				return new ArrayList<>(setProcediments);
+			}
+
+			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgans) {
+				setProcediments.add(procedimentOrgan.getProcediment());
+			}
+
+			return new ArrayList<>(setProcediments);
+		}
 	}
+
 	private boolean hasPermisProcedimentsComuns(String codiEntitat, String codiOrgan) {
 		List<String> organsPares = organGestorCachable.getCodisAncestors(codiEntitat, codiOrgan);
 		for (String codiDir3 : organsPares) {
@@ -1269,7 +1287,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			String organFiltre) {
 
 		Set<ProcedimentEntity> setProcediments = new HashSet<>();
-
 		if (organFiltre != null) {
 			if (procediments != null) {
 				for (ProcedimentEntity proc : procediments) {
@@ -1278,14 +1295,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					}
 				}
 			}
-			if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
-				for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgans) {
-					setProcediments.add(procedimentOrgan.getProcediment());
-				}
-			}
-		} else {
-			if (procediments != null)
-				setProcediments = new HashSet<>(procediments);
 			if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
 				for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgans) {
 					setProcediments.add(procedimentOrgan.getProcediment());

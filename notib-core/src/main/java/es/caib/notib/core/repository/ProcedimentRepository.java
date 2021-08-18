@@ -1,15 +1,15 @@
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -98,6 +98,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	public List<ProcedimentEntity> findByComuTrue();
 
 	List<ProcedimentEntity> findByEntitatAndComuTrue(EntitatEntity entitat);
+
+	Set<ProcedimentEntity> findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(EntitatEntity entitat);
 
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	
