@@ -2,12 +2,12 @@ package es.caib.notib.core.repository;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,7 +39,9 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"												and (ntf.procedimentCodiNotib is null or (ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false)) " + // comunicacions o procediments comuns
 			"												and ntf.organCodi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
 			"   or 	((ntf.procedimentCodiNotib is null or ntf.procedimentIsComu = true) and ntf.usuariCodi = :usuariCodi) " +										// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
-//			"   or 	(:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentOrgan is not null and ntf.procedimentOrgan.id in (:procedimentOrgansIdsNotib)) " +	// Procediment comú amb permís de procediment-òrgan
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentCodiNotib is not null and " +
+			"			CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:procedimentOrgansIdsNotib)" +
+			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			"	) " +
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (ntf.entitat = :entitat) " )
@@ -49,8 +51,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("grupsProcedimentCodisNotib") List<? extends String> grupsProcedimentCodisNotib,
 			@Param("esOrgansGestorsCodisNotibNull") boolean esOrgansGestorsCodisNotibNull,
 			@Param("organsGestorsCodisNotib") List<? extends String> organsGestorsCodisNotib,
-//			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
-//			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("usuariCodi") String usuariCodi,
 			Pageable paginacio);
@@ -116,6 +118,9 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"			(ntf.procedimentCodiNotib is null or (ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false)) and ntf.organCodi in (:organsGestorsCodisNotib)" +
 			"		) " + // Té permís sobre l'òrgan
 			"   or 	((ntf.procedimentCodiNotib is null or ntf.procedimentIsComu = true) and ntf.usuariCodi = :usuariCodi) " +								// És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and ntf.procedimentCodiNotib is not null and " +
+			"			CONCAT(ntf.procedimentCodiNotib, '-', ntf.organCodi) in (:procedimentOrgansIdsNotib)" +
+			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			"	) " +
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
@@ -158,8 +163,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("isOrgansGestorsCodisNotibNull") boolean isOrgansGestorsCodisNotibNull,
 			@Param("organsGestorsCodisNotib") List<? extends String> organsGestorsCodisNotib,
-//			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
-//			@Param("procedimentOrgansIdsNotib") List<Long> procedimentOrgansIdsNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
 			@Param("isEnviamentTipusNull") boolean isEnviamentTipusNull,
 			@Param("enviamentTipus") NotificaEnviamentTipusEnumDto enviamentTipus,
 			@Param("isConcepteNull") boolean isConcepteNull,

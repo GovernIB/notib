@@ -59,6 +59,9 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
 			"		) " + // Té permís sobre l'òrgan
 			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
+			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
+			"		) " +	// Procediment comú amb permís de procediment-òrgan
 			") " +
 			"and (nenv.grupCodi = null or (nenv.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
@@ -125,6 +128,8 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
 			@Param("isOrgansGestorsCodisNotibNull") boolean isOrgansGestorsCodisNotibNull,
 			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
 			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
 			@Param("usuariCodi") String usuariCodi,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,

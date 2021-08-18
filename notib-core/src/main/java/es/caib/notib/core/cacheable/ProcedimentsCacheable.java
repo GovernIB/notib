@@ -110,16 +110,16 @@ public class ProcedimentsCacheable {
                 permisos);
 
         // 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-        List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
+        List<String> organsGestorsCodisAmbPermis = new ArrayList<>();
         if (!organsGestorsAmbPermis.isEmpty()) {
-            Set<String> codisOrgansAmbDescendents = new HashSet<String>();
+            Set<String> codisOrgansAmbDescendents = new HashSet<>();
             for (OrganGestorEntity organGestorEntity : organsGestorsAmbPermis) {
                 codisOrgansAmbDescendents.addAll(
                         organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
                                 entitat.getDir3Codi(),
                                 organGestorEntity.getCodi()));
             }
-            organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
+            organsGestorsCodisAmbPermis = new ArrayList<>(codisOrgansAmbDescendents);
         }
 
         // Si no te permís a cap organ gestor

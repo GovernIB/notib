@@ -209,7 +209,15 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ProcedimentEntity{" +
+				"codi='" + codi + '\'' +
+				", nom='" + nom + '\'' +
+				'}';
+	}
+
 	private static final long serialVersionUID = 458331024861203562L;
 
 }

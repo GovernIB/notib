@@ -117,7 +117,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	private Boolean procedimentIsComu;
 
 	@Column(name = "PROCEDIMENT_PROCORGAN_ID")
-	protected Long procedimentOrganId;
+	protected Long procedimentOrganId; // TODO: useless
 
 	@Column(name = "PROCEDIMENT_REQUIRE_PERMISSION")
 	private boolean procedimentRequirePermission;

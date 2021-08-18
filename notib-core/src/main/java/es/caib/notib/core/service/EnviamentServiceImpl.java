@@ -370,24 +370,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
 			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-			EntitatEntity entitatEntity= entityComprovarHelper.comprovarEntitat(
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					false,
 					isUsuariEntitat,
 					false);
 
 
-			List<String> codisProcedimentsDisponibles = new ArrayList<String>();
-			List<String> codisOrgansGestorsDisponibles = new ArrayList<String>();
-
-			if (isUsuari) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
-				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
-				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
-			}
-			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
-			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
 
 			Date dataEnviamentInici = null,
 				 dataEnviamentFi = null,
@@ -470,6 +459,28 @@ public class EnviamentServiceImpl implements EnviamentService {
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
+				List<String> codisProcedimentsDisponibles = new ArrayList<>();
+				List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+				List<String> codisProcedimentsOrgans = new ArrayList<>();
+
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+				// Procediments accessibles per qualsevol òrgan gestor
+				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
+
+				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
+				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
+
+				// Procediments comuns que es poden consultar per a òrgans gestors concrets
+				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(
+						auth,
+						entitatEntity,
+						permisos);
+
+				boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+				boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+				boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+
 				pageEnviaments = enviamentTableRepository.find4UserRole(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
@@ -527,6 +538,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
 						esOrgansGestorsCodisNotibNull,
 						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+						esProcedimentOrgansAmbPermisNull,
+						esProcedimentOrgansAmbPermisNull ? null : codisProcedimentsOrgans,
 						aplicacioService.findRolsUsuariActual(),
 						usuariCodi,
 						nomesAmbErrors,

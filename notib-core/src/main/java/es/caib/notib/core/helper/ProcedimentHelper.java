@@ -16,6 +16,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class ProcedimentHelper {
 	
@@ -58,6 +60,14 @@ public class ProcedimentHelper {
 	@Resource
 	private ProcedimentsCacheable procedimentsCacheable;
 
+	/**
+	 * Retorna el codi de tots els procediments que tenen un determinat permís per a totes les notificacions.
+	 *
+	 * @param auth
+	 * @param entitat
+	 * @param permisos
+	 * @return
+	 */
 	public List<String> findCodiProcedimentsWithPermis(Authentication auth,
 														EntitatEntity entitat,
 														Permission[] permisos) {
@@ -69,22 +79,34 @@ public class ProcedimentHelper {
 				permisos);
 		Set<String> codis = new HashSet<>();
 		for (ProcedimentEntity procediment : procediments) {
-			// ignoram els procediments comuns que no requereixen permís directe
-			if (!procediment.isComu() || procediment.isRequireDirectPermission())
-				codis.add(procediment.getCodi());
+			codis.add(procediment.getCodi());
 		}
 
-		// Procediments comuns amb permís directe
+		return new ArrayList<>(codis);
+	}
+
+	/**
+	 * Retorna un codi únic per a totes les tuples organ-procediment que tenen el permís indicat per paràmetre.
+	 *
+	 * @param auth
+	 * @param entitat
+	 * @param permisos
+	 * @return
+	 */
+	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth,
+													   EntitatEntity entitat,
+													   Permission[] permisos) {
 		List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
 				auth.getName(),
 				auth,
 				entitat,
 				permisos);
+		List<String> codisProcedimentsOrgans = new ArrayList<>();
 		for (ProcedimentOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
-			codis.add(procedimentOrganEntity.getProcediment().getCodi());
+			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcediment().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
 		}
 
-		return new ArrayList<>(codis);
+		return codisProcedimentsOrgans;
 	}
 
 	public void omplirPermisos(

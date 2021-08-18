@@ -17,6 +17,7 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -445,6 +446,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	@Resource
+	private ProcedimentsCacheable procedimentsCacheable;
 
 	@Transactional(readOnly = true)
 	@Override
@@ -473,12 +476,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			List<String> codisProcedimentsDisponibles = new ArrayList<>();
 			List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
+			List<String> codisProcedimentsOrgans = new ArrayList<>();
 
 			if (isUsuari && entitatActual != null) {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+				// Procediments accessibles per qualsevol òrgan gestor
 				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, permisos);
+
+				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
 				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, permisos);
+
+				// Procediments comuns que es poden consultar per a òrgans gestors concrets
+				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(
+						auth,
+						entitatActual,
+						permisos);
 
 			} else if (isAdminOrgan && entitatActual != null) {
 				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
@@ -488,6 +501,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
 
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
@@ -498,6 +512,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esProcedimentOrgansAmbPermisNull,
+							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
 							entitatActual,
 							usuariCodi,
 							pageable);
@@ -534,6 +550,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							aplicacioService.findRolsUsuariActual(),
 							esOrgansGestorsCodisNotibNull,
 							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esProcedimentOrgansAmbPermisNull,
+							esProcedimentOrgansAmbPermisNull ?  null : codisProcedimentsOrgans,
 							filtreNetejat.getEnviamentTipus().isNull(),
 							filtreNetejat.getEnviamentTipus().getField(),
 							filtreNetejat.getConcepte().isNull(),

@@ -52,7 +52,7 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_organ_id")
-	private ProcedimentOrganEntity procedimentOrgan;
+	private ProcedimentOrganEntity procedimentOrgan; // TODO: useless
 
 	@Column(name = "usuari_codi", length = 64, nullable = false)
 	private String usuariCodi;
