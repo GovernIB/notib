@@ -1,10 +1,15 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
 import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
+import es.caib.notib.core.test.data.CieFormatFullaItemTest;
+import es.caib.notib.core.test.data.CieItemTest;
+import es.caib.notib.core.test.data.EntitatItemTest;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,173 +18,140 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import static org.junit.Assert.*;
 
 
+@Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
+public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 
-public class PagadorCieFormatFullaServiceTest extends BaseServiceTest{
-
-	private EntitatDto entitatCreate;
-	private PermisDto permisAdmin;
-	private CieDto createPagadorCie;
 	private CieFormatFullaDto createPagadorCieFormatFulla;
 	private CieFormatFullaDto updatePagadorCieFormatFulla;
-	
 
 	@Autowired
-	PermisosHelper permisosHelper;
-	
+	protected PagadorCieFormatFullaService cieFormatFullaService;
+
+	private ElementsCreats database;
+	@Autowired
+	private CieItemTest cieCreator;
+
+	@Autowired
+	private CieFormatFullaItemTest cieFormatFullaCreator;
+
 	@Before
-	public void setUp() {
+	public void setUp()throws Exception {
 		addConfig("es.caib.notib.metriques.generar", "false");
-		entitatCreate = new EntitatDto();
-		entitatCreate.setCodi("LIMIT");
-		entitatCreate.setNom("Limit Tecnologies");
-		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-		entitatCreate.setDir3Codi("23599770E");
-		entitatCreate.setApiKey("123abc");
-		entitatCreate.setAmbEntregaDeh(true);
-//		entitatCreate.setAmbEntregaCie(true);
-		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-		entitatCreate.setTipusDocDefault(tipusDocDefault);
-		
-		permisAdmin = new PermisDto();
-		permisAdmin.setAdministration(true);
-		permisAdmin.setAdministradorEntitat(true);
-		permisAdmin.setTipus(TipusEnumDto.USUARI);
-		permisAdmin.setPrincipal("admin");
-		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
-		
-		createPagadorCie=new CieDto();
-		createPagadorCie.setOrganismePagadorCodi("A04027005");
-		createPagadorCie.setContracteDataVig(new Date());
-		
+
+		CieDataDto cieDto = CieItemTest.getRandomInstance();
+		cieCreator.addObject("cie", cieDto);
+
+		database = createDatabase(EntitatItemTest.getRandomInstance(),
+				cieCreator,
+				cieFormatFullaCreator
+		);
+
+
+		CieDto cieCreated = (CieDto) database.get("cie");
 		createPagadorCieFormatFulla=new CieFormatFullaDto();
 		createPagadorCieFormatFulla.setCodi("122");
-		
+		createPagadorCieFormatFulla.setPagadorCieId(cieCreated.getId());
+		cieFormatFullaCreator.addObject("fulla1", createPagadorCieFormatFulla);
+
 		updatePagadorCieFormatFulla=new CieFormatFullaDto();
 		updatePagadorCieFormatFulla.setCodi("12333");
+		updatePagadorCieFormatFulla.setPagadorCieId(cieCreated.getId());
+		cieFormatFullaCreator.addObject("fulla2", updatePagadorCieFormatFulla);
+
+		cieFormatFullaCreator.createAll(database.organ.getId());
+		database.elementsCreats.putAll(cieFormatFullaCreator.getObjects());
 	}
-	
-	
+
+	@After
+	public final void tearDown() {
+		destroyDatabase(database.getEntitat().getId(),
+				cieCreator,
+				cieFormatFullaCreator
+		);
+		log.info("-------------------------------------------------------------------");
+		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
+		log.info("-------------------------------------------------------------------");
+	}
+
 	@Test
 	public void create() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws Exception {
-					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
-					CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto)elementsCreats.get(2);
-					
-					assertNotNull(formatFullaCreada);
-					assertNotNull(formatFullaCreada.getId());
-					comprobarPagadorCieFormatFulla(
-							createPagadorCieFormatFulla,
-							formatFullaCreada);
-					assertEquals(pagadorCieCreat.getId(), formatFullaCreada.getPagadorCieId());
-				}
-			}, 
-			"Create FORMAT FULLA", 
-			entitatCreate,
-			createPagadorCie,
-			createPagadorCieFormatFulla);
+		currentTestDescription = "Create FORMAT FULLA";
+		CieDto cie = (CieDto) database.get("cie");
+		CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
+
+		assertNotNull(formatFullaCreada);
+		assertNotNull(formatFullaCreada.getId());
+		comprobarPagadorCieFormatFulla(
+				createPagadorCieFormatFulla,
+				formatFullaCreada);
+		assertEquals(cie.getId(), formatFullaCreada.getPagadorCieId());
 	}
 	
 	
 	
 	@Test
 	public void update() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
-					CieFormatFullaDto formatCreat = (CieFormatFullaDto)elementsCreats.get(2);
-					autenticarUsuari("admin");
+		currentTestDescription = "Update FORMAT FULLA";
+		CieDto cie = (CieDto) database.get("cie");
+		CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
+		authenticationTest.autenticarUsuari("admin");
 
-					updatePagadorCieFormatFulla.setId(formatCreat.getId());
-					CieFormatFullaDto formatModificat = pagadorCieFormatFullaService.update(
-							updatePagadorCieFormatFulla);	
-					
-					assertNotNull(formatModificat);
-					assertNotNull(formatModificat.getId());
-					assertEquals(
-							formatCreat.getId(), 
-							formatModificat.getId());
-					
-					comprobarPagadorCieFormatFulla(
-							updatePagadorCieFormatFulla,
-							formatModificat);
-					assertEquals(pagadorCieCreat.getId(), formatModificat.getPagadorCieId());
-				}
-			},
-			"Update FORMAT FULLA",
-			entitatCreate,
-			createPagadorCie,
-			createPagadorCieFormatFulla);
+		updatePagadorCieFormatFulla.setId(formatFullaCreada.getId());
+		CieFormatFullaDto formatModificat = cieFormatFullaService.update(
+				updatePagadorCieFormatFulla);
+
+		assertNotNull(formatModificat);
+		assertNotNull(formatModificat.getId());
+		assertEquals(
+				formatFullaCreada.getId(),
+				formatModificat.getId());
+
+		comprobarPagadorCieFormatFulla(
+				updatePagadorCieFormatFulla,
+				formatModificat);
+		assertEquals(cie.getId(), formatModificat.getPagadorCieId());
 	}
 	
 	@Test
 	public void delete() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					CieFormatFullaDto formatCreat = (CieFormatFullaDto)elementsCreats.get(2);
-					autenticarUsuari("admin");
+		currentTestDescription = "Delete FORMAT FULLA";
+		CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
+		authenticationTest.autenticarUsuari("admin");
 
-					CieFormatFullaDto formatBorrat = pagadorCieFormatFullaService.delete(
-							formatCreat.getId());
-					comprobarPagadorCieFormatFulla(
-							createPagadorCieFormatFulla,
-							formatBorrat);
-					try {						
-						pagadorCieFormatFullaService.findById(formatCreat.getId());
-						fail("El format esborrat no s'hauria d'haver trobat");												
-					}catch(NotFoundException expected) {
-					}
-					elementsCreats.remove(formatCreat);
-				}
-			},
-			"Delete FORMAT FULLA",
-			entitatCreate,
-			createPagadorCie,
-			createPagadorCieFormatFulla);
+		CieFormatFullaDto formatBorrat = cieFormatFullaService.delete(
+				formatFullaCreada.getId());
+		comprobarPagadorCieFormatFulla(
+				createPagadorCieFormatFulla,
+				formatBorrat);
+		try {
+			cieFormatFullaService.findById(formatFullaCreada.getId());
+			fail("El format esborrat no s'hauria d'haver trobat");
+		}catch(NotFoundException expected) {
+		}
+
 	}
 				
 	
 	@Test
 	public void findById() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats)throws NotFoundException{
-					autenticarUsuari("admin");
-					CieFormatFullaDto formatCreat = (CieFormatFullaDto)elementsCreats.get(2);
-					
-					CieFormatFullaDto formatTrobat = pagadorCieFormatFullaService.findById(
-							formatCreat.getId());
-					
-					assertNotNull(formatTrobat);
-					assertNotNull(formatTrobat.getId());
-					comprobarPagadorCieFormatFulla(
-							createPagadorCieFormatFulla,
-							formatTrobat);
-				}
-			},
-			"FindById FORMAT FULLA",
-			entitatCreate,
-			createPagadorCie,
-			createPagadorCieFormatFulla);
+		currentTestDescription = "FindById FORMAT FULLA";
+		authenticationTest.autenticarUsuari("admin");
+		CieFormatFullaDto formatCreat = (CieFormatFullaDto) database.get("fulla1");
+
+		CieFormatFullaDto formatTrobat = cieFormatFullaService.findById(
+				formatCreat.getId());
+
+		assertNotNull(formatTrobat);
+		assertNotNull(formatTrobat.getId());
+		comprobarPagadorCieFormatFulla(
+				createPagadorCieFormatFulla,
+				formatTrobat);
 	}
 
 	private void comprobarPagadorCieFormatFulla(

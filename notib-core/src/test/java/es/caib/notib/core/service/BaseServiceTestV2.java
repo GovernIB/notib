@@ -73,6 +73,8 @@ public class BaseServiceTestV2 {
 	private IArxiuPlugin arxiuPluginMock;
 	protected UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
 
+	protected String currentTestDescription = "";
+
 	@Autowired
 	OrganGestorItemTest organGestorCreate;
 

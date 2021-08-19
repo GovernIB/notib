@@ -1,9 +1,14 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.api.service.OperadorPostalService;
+import es.caib.notib.core.test.data.ConfigTest;
+import es.caib.notib.core.test.data.EntitatItemTest;
+import es.caib.notib.core.test.data.OperadorPostalItemTest;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,176 +18,136 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.*;
 
 
+@Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
-public class OperadorPostalServiceTest extends BaseServiceTest{
+public class OperadorPostalServiceTest extends BaseServiceTestV2 {
 
-	
-	private EntitatDto entitatCreate;
-	private PermisDto permisAdmin;
 	private OperadorPostalDto crearPagadorPostal;
 	private OperadorPostalDto updatePagadorPostal;
-	
+
 
 	@Autowired
-	PermisosHelper permisosHelper;
+	protected OperadorPostalService operadorPostalService;
+
+
+	private ElementsCreats database;
+	@Autowired
+	private OperadorPostalItemTest operadorPostalCreator;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		addConfig("es.caib.notib.metriques.generar", "false");
-		entitatCreate = new EntitatDto();
-		entitatCreate.setCodi("LIMIT");
-		entitatCreate.setNom("Limit Tecnologies");
-		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-		entitatCreate.setDir3Codi("23599770E");
-		entitatCreate.setApiKey("123abc");
-		entitatCreate.setAmbEntregaDeh(true);
-//		entitatCreate.setAmbEntregaCie(true);
-		
-		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-		entitatCreate.setTipusDocDefault(tipusDocDefault);
-		
-		permisAdmin = new PermisDto();
-		permisAdmin.setAdministration(true);
-		permisAdmin.setAdministradorEntitat(true);
-		permisAdmin.setTipus(TipusEnumDto.USUARI);
-		permisAdmin.setPrincipal("admin");
-		
-		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
-		
+
 		crearPagadorPostal = new OperadorPostalDto();
-		crearPagadorPostal.setOrganismePagadorCodi("A04027005");
+		crearPagadorPostal.setOrganismePagadorCodi(ConfigTest.DEFAULT_ORGAN_DIR3);
 		crearPagadorPostal.setContracteNum("00000001");
-		
+		operadorPostalCreator.addObject("operador1", crearPagadorPostal);
+
 		updatePagadorPostal=new OperadorPostalDto();
-		updatePagadorPostal.setOrganismePagadorCodi("A04026968");
+		updatePagadorPostal.setOrganismePagadorCodi(ConfigTest.DEFAULT_ORGAN_DIR3);
 		updatePagadorPostal.setContracteNum("00000002");
-	
+		operadorPostalCreator.addObject("operador2", updatePagadorPostal);
+
+		database = createDatabase(EntitatItemTest.getRandomInstance(),
+			operadorPostalCreator
+		);
 	}
-	
+
+	@After
+	public final void tearDown() {
+		destroyDatabase(database.getEntitat().getId(),
+			operadorPostalCreator
+		);
+		log.info("-------------------------------------------------------------------");
+		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
+		log.info("-------------------------------------------------------------------");
+	}
+
 	@Test
 	public void create() throws NotFoundException, Exception {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws Exception {
-					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-					OperadorPostalDto pagadorPostalCreat = (OperadorPostalDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-					assertNotNull(pagadorPostalCreat);
-					assertNotNull(pagadorPostalCreat.getId());
-					comprobarPagadorPostal(
-							crearPagadorPostal,
-							pagadorPostalCreat);
-					assertEquals(entitatCreate.getId(), pagadorPostalCreat.getEntitatId());
-				}
-			}, 
-			"Create PAGADOR POSTAL", 
-			entitatCreate,
-			crearPagadorPostal);
+		currentTestDescription = "Create PAGADOR POSTAL";
+		EntitatDto entitatCreada = database.getEntitat();
+		OperadorPostalDto operadorPostalCreat = (OperadorPostalDto) database.get("operador1");
+		authenticationTest.autenticarUsuari("admin");
+
+		assertNotNull(operadorPostalCreat);
+		assertNotNull(operadorPostalCreat.getId());
+		comprobarPagadorPostal(
+				crearPagadorPostal,
+				operadorPostalCreat);
+		assertEquals(entitatCreada.getId(), operadorPostalCreat.getEntitatId());
 	}
 	
 	@Test
 	public void update() throws NotFoundException, Exception {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					OperadorPostalDto pagadorPostalCreat = (OperadorPostalDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-					
-					updatePagadorPostal.setId(pagadorPostalCreat.getId());
-					OperadorPostalDto pagadorModificat = operadorPostalService.update(updatePagadorPostal);
-					assertNotNull(pagadorModificat);
-					assertNotNull(pagadorModificat.getId());
-					assertEquals(pagadorPostalCreat.getId(), pagadorModificat.getId());
-					comprobarPagadorPostal(
-							updatePagadorPostal,
-							pagadorModificat);
-					assertEquals(entitatCreada.getId(), pagadorModificat.getEntitatId());
-				}
-			},
-			"Update PAGADOR POSTAL",
-			entitatCreate,
-			crearPagadorPostal);
+		currentTestDescription = "Update PAGADOR POSTAL";
+		EntitatDto entitatCreada = database.getEntitat();
+		OperadorPostalDto operadorPostalCreat = (OperadorPostalDto) database.get("operador1");
+		authenticationTest.autenticarUsuari("admin");
+
+		updatePagadorPostal.setId(operadorPostalCreat.getId());
+		OperadorPostalDto pagadorModificat = operadorPostalService.update(updatePagadorPostal);
+		assertNotNull(pagadorModificat);
+		assertNotNull(pagadorModificat.getId());
+		assertEquals(operadorPostalCreat.getId(), pagadorModificat.getId());
+		comprobarPagadorPostal(
+				updatePagadorPostal,
+				pagadorModificat);
+		assertEquals(entitatCreada.getId(), pagadorModificat.getEntitatId());
 	}
 
 	@Test
 	public void delete() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-//					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					OperadorPostalDto pagadorCreat = (OperadorPostalDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-					OperadorPostalDto esborrada = operadorPostalService.delete(pagadorCreat.getId());
-					comprobarPagadorPostal(
-							crearPagadorPostal,
-							esborrada);
-					try {
-						operadorPostalService.findById(pagadorCreat.getId());
-						fail("El Pagador postal esborrat no s'hauria d'haver trobat");
-					}catch(NotFoundException expected) {
-					}
-					elementsCreats.remove(pagadorCreat);
-				}	
-			},
-			"Delete PAGADOR POSTAL",
-			entitatCreate,
-			crearPagadorPostal);
+		currentTestDescription = "Delete PAGADOR POSTAL";
+		OperadorPostalDto operadorPostalCreat = (OperadorPostalDto) database.get("operador1");
+		authenticationTest.autenticarUsuari("admin");
+		OperadorPostalDto esborrada = operadorPostalService.delete(operadorPostalCreat.getId());
+		comprobarPagadorPostal(
+				crearPagadorPostal,
+				esborrada);
+		try {
+			operadorPostalService.findById(operadorPostalCreat.getId());
+			fail("El Pagador postal esborrat no s'hauria d'haver trobat");
+		}catch(NotFoundException expected) {
+		}
 	}
 				
 	@Test
 	public void findById() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats)throws NotFoundException{
-//					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					OperadorPostalDto pagadorCreat = (OperadorPostalDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-					
-					OperadorPostalDto trobat = operadorPostalService.findById(pagadorCreat.getId());
-					
-					assertNotNull(trobat);
-					assertNotNull(trobat.getId());
-					comprobarPagadorPostal(
-							crearPagadorPostal,
-							trobat);
-				}
-			},
-			"FindById PAGADOR POSTAL",
-			entitatCreate,
-			crearPagadorPostal);
+		currentTestDescription = "FindById PAGADOR POSTAL";
+		OperadorPostalDto operadorPostalCreat = (OperadorPostalDto) database.get("operador1");
+		authenticationTest.autenticarUsuari("admin");
+
+		OperadorPostalDto trobat = operadorPostalService.findById(operadorPostalCreat.getId());
+
+		assertNotNull(trobat);
+		assertNotNull(trobat.getId());
+		comprobarPagadorPostal(
+				crearPagadorPostal,
+				trobat);
 	
 	}
 
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
-		autenticarUsuari("apl");
-		operadorPostalService.create(entitatCreate.getId(),crearPagadorPostal);
+		authenticationTest.autenticarUsuari("apl");
+		operadorPostalService.create(database.getEntitat().getId(),crearPagadorPostal);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplUpdate() {
-		autenticarUsuari("apl");
+		authenticationTest.autenticarUsuari("apl");
 		operadorPostalService.update(crearPagadorPostal);
 	}
 
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
-		autenticarUsuari("apl");
+		authenticationTest.autenticarUsuari("apl");
 		operadorPostalService.delete(crearPagadorPostal.getId());
 	}
 

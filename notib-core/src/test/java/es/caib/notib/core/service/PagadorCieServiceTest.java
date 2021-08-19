@@ -1,9 +1,14 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
 import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.core.test.data.CieItemTest;
+import es.caib.notib.core.test.data.EntitatItemTest;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,195 +18,150 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import static org.junit.Assert.*;
 
-
+@Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
-public class PagadorCieServiceTest extends BaseServiceTest{
-
+public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	@Autowired
-	PermisosHelper permisosHelper;
-//	@Autowired
-//	private EntityManager entityManager;
-	
-	private PermisDto permisAdmin;
-	private EntitatDto entitatCreate;
-	private CieDto createPagadorCie;
-	private CieDto updatePagadorCie;
-	
+	private PagadorCieService pagadorCieService;
+
+
+	private CieDataDto createPagadorCie;
+	private CieDataDto updatePagadorCie;
+
+
+	private ElementsCreats database;
+	@Autowired
+	private CieItemTest cieCreator;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		addConfig("es.caib.notib.metriques.generar", "false");
-		entitatCreate = new EntitatDto();
-		entitatCreate.setCodi("LIMIT");
-		entitatCreate.setNom("Limit Tecnologies");
-		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-		entitatCreate.setDir3Codi("23599770E");
-		entitatCreate.setApiKey("123abc");
-		entitatCreate.setAmbEntregaDeh(true);
-//		entitatCreate.setAmbEntregaCie(true);
-		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-		entitatCreate.setTipusDocDefault(tipusDocDefault);
-		
-		permisAdmin = new PermisDto();
-		permisAdmin.setAdministration(true);
-		permisAdmin.setAdministradorEntitat(true);
-		permisAdmin.setTipus(TipusEnumDto.USUARI);
-		permisAdmin.setPrincipal("admin");
-		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
-		
-		createPagadorCie=new CieDto();
-		createPagadorCie.setOrganismePagadorCodi("A04027005");
-		createPagadorCie.setContracteDataVig(new Date());
-		
-		updatePagadorCie=new CieDto();
-		updatePagadorCie.setOrganismePagadorCodi("A04026968");
-		updatePagadorCie.setContracteDataVig(new Date());
+
+		createPagadorCie = CieItemTest.getRandomInstance();
+		cieCreator.addObject("cie", createPagadorCie);
+		database = createDatabase(EntitatItemTest.getRandomInstance(),
+			cieCreator
+		);
+
+		updatePagadorCie = CieItemTest.getRandomInstance();
 	}
-	
+
+
+	@After
+	public final void tearDown() {
+		destroyDatabase(database.getEntitat().getId(),
+			cieCreator
+		);
+		log.info("-------------------------------------------------------------------");
+		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
+		log.info("-------------------------------------------------------------------");
+	}
 
 	@Test
 	public void create() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws Exception {
-					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-					CieDto pagadorCreateCie=(CieDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-					assertNotNull(pagadorCreateCie);
-					assertNotNull(pagadorCreateCie.getId());
-					
-					compararPagadorCie(
-							createPagadorCie,
-							pagadorCreateCie);
-					assertEquals(entitatCreate.getId(), pagadorCreateCie.getEntitatId());
-				}
-			}, 
-			"Create PAGADOR CIE", 
-			entitatCreate,
-			createPagadorCie);
+		currentTestDescription = "Create PAGADOR CIE";
+		EntitatDto entitatCreada = database.getEntitat();
+		CieDto pagadorCreateCie = (CieDto) database.get("cie");
+		authenticationTest.autenticarUsuari("admin");
+		assertNotNull(pagadorCreateCie);
+		assertNotNull(pagadorCreateCie.getId());
+
+		compararPagadorCie(
+				createPagadorCie,
+				pagadorCreateCie);
+		assertEquals(entitatCreada.getId(), pagadorCreateCie.getEntitatId());
 	}
 	
 	
 	@Test
 	public void update() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);	
-					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-				
-					updatePagadorCie.setId(pagadorCieCreat.getId());
-					CieDto pagadorCieModificat = pagadorCieService.update(updatePagadorCie);
-					
-					assertNotNull(pagadorCieModificat);
-					assertNotNull(pagadorCieModificat.getId());
-					
-					assertEquals(
-							pagadorCieCreat.getId(),
-							pagadorCieModificat.getId());
-					compararPagadorCie(
-							updatePagadorCie,
-							pagadorCieModificat);
-					assertEquals(entitatCreada.getId(), pagadorCieModificat.getEntitatId());
-				}
-			},
-			"Update PAGADOR CIE",
-			entitatCreate,
-			createPagadorCie);
+		currentTestDescription = "Update PAGADOR CIE";
+		EntitatDto entitatCreada = database.getEntitat();
+		CieDto cieCreat = (CieDto) database.get("cie");
+		authenticationTest.autenticarUsuari("admin");
+
+		updatePagadorCie.setId(cieCreat.getId());
+		CieDto pagadorCieModificat = pagadorCieService.update(updatePagadorCie);
+
+		assertNotNull(pagadorCieModificat);
+		assertNotNull(pagadorCieModificat.getId());
+
+		assertEquals(
+				cieCreat.getId(),
+				pagadorCieModificat.getId());
+		compararPagadorCie(
+				updatePagadorCie,
+				pagadorCieModificat);
+		assertEquals(entitatCreada.getId(), pagadorCieModificat.getEntitatId());
 	}
 	
 	
 	@Test
 	public void delete() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats) throws NotFoundException{
-					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-							
-					CieDto esborrada = pagadorCieService.delete(pagadorCieCreat.getId());
-					compararPagadorCie(
-							createPagadorCie,
-							esborrada);
-					try{
-						pagadorCieService.findById(pagadorCieCreat.getId());
-						fail("El Pagador esborrat no s'hauria d'haver trobat");		
-					}catch(NotFoundException expected) {
-					}
-					elementsCreats.remove(pagadorCieCreat);
-				}
-			},
-			"Delete PAGADOR CIE",
-			entitatCreate,
-			createPagadorCie);
+		currentTestDescription = "Delete PAGADOR CIE";
+		EntitatDto entitatCreada = database.getEntitat();
+		CieDto cieCreat = (CieDto) database.get("cie");
+		authenticationTest.autenticarUsuari("admin");
+
+		CieDto esborrada = pagadorCieService.delete(cieCreat.getId());
+		compararPagadorCie(
+				createPagadorCie,
+				esborrada);
+		try{
+			pagadorCieService.findById(cieCreat.getId());
+			fail("El Pagador esborrat no s'hauria d'haver trobat");
+		}catch(NotFoundException expected) {
+		}
 	}
 	
 	@Test
 	public void findById() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats)throws NotFoundException{
-					CieDto pagadorCieCreat = (CieDto)elementsCreats.get(1);
-					autenticarUsuari("admin");
-					
-					CieDto trobat= pagadorCieService.findById(
-							pagadorCieCreat.getId());
-					
-					assertNotNull(trobat);
-					assertNotNull(trobat.getId());
-					compararPagadorCie(
-							createPagadorCie,
-							trobat);
-				}
-			},
-			"FindById PAGADOR CIE",
-			entitatCreate,
-			createPagadorCie);
-	
+		currentTestDescription = "FindById PAGADOR CIE";
+		EntitatDto entitatCreada = database.getEntitat();
+		CieDto cieCreat = (CieDto) database.get("cie");
+		authenticationTest.autenticarUsuari("admin");
+
+		CieDto trobat= pagadorCieService.findById(
+				cieCreat.getId());
+
+		assertNotNull(trobat);
+		assertNotNull(trobat.getId());
+		compararPagadorCie(
+				createPagadorCie,
+				trobat);
 	}
 	
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
-		autenticarUsuari("apl");
+		authenticationTest.autenticarUsuari("apl");
 		pagadorCieService.create(1L, createPagadorCie);
 	}
 	
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplUpdate() {
-		autenticarUsuari("apl");
+		authenticationTest.autenticarUsuari("apl");
 		pagadorCieService.update(createPagadorCie);
 	}
 
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {
-		autenticarUsuari("apl");
+		authenticationTest.autenticarUsuari("apl");
 		pagadorCieService.delete(1L);
 	}
 	
 	private void compararPagadorCie(
-			CieDto original,
-			CieDto perComprovar) {
+			CieDataDto original,
+			CieDataDto perComprovar) {
 		assertEquals(
 				original.getOrganismePagadorCodi(),
 				perComprovar.getOrganismePagadorCodi());
 	}
-	
+
 }
 
 

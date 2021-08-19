@@ -42,7 +42,6 @@ public class OrganGestorServiceIT extends BaseServiceTestV2 {
 
 	private Collection<OrganGestorDto> organGestorsDatabase;
 
-	private String currentTestDescription = "";
 	OrganGestorDto organVigent;
 
 	private ElementsCreats database;
