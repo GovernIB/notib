@@ -440,8 +440,8 @@ INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.c
                                                                         'Path del fitxer on vols guardar l''organigrama DIR3 per evitar consultes innecessaries. ' ||
                                                                         'Si no s''especifica sempre que no estigui a cache es consultarà a la API de DIR3.',
                                                                         'DIR3' )
-INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.unitats.dir3.protocol', '',
-                                                                                   'REST',
+INTO NOT_CONFIG (POSITION, KEY, VALUE, DESCRIPTION, TYPE_CODE, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.unitats.dir3.protocol', 'REST',
+                                                                                   'API protocol',
                                                                                    'API_PROTOCOL',
                                                                                    'DIR3' )
 INTO NOT_CONFIG (POSITION, KEY, JBOSS_PROPERTY, DESCRIPTION, GROUP_CODE) VALUES (0, 'es.caib.notib.plugin.unitats.dir3.url', 1,

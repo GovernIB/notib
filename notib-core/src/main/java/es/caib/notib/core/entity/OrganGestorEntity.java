@@ -115,6 +115,20 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 				.oficinaNom(oficinaNom)
 				.estat(estat);
 	}
+
+	@Override
+	public String toString() {
+		return "OrganGestorEntity{" +
+				"codi='" + codi + '\'' +
+				", nom='" + nom + '\'' +
+				", llibre='" + llibre + '\'' +
+				", llibreNom='" + llibreNom + '\'' +
+				", oficina='" + oficina + '\'' +
+				", oficinaNom='" + oficinaNom + '\'' +
+				", estat=" + estat +
+				'}';
+	}
+
 	private static final long serialVersionUID = 458331024861203562L;
 
 }

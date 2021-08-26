@@ -454,7 +454,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 
-	@Transactional(timeout = 1200)
+	@Transactional
 	@Override
 	public void updateAll(Long entitatId, String organActualCodiDir3) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -473,21 +473,33 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						organGestorsListCodisDir3);
 			}
 
-			organGestorRepository.updateAllStatus(OrganGestorEstatEnum.ALTRES);
+//			organGestorRepository.updateAllStatus(OrganGestorEstatEnum.ALTRES);
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
-				updateNom(entitat, organGestor);
-				logger.info("Fi - updateNom del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
+				boolean status = updateNom(entitat, organGestor);
+				logger.info("Fi - updateNom del òrgan gestor: " + organGestor);
+				if (!status) {
+					logger.error(String.format("Actualització òrgan (%s): Error actualitzant nom ", organGestor.getCodi()));
+				}
+				status = updateLlibre(entitat, organGestor);
+				logger.info("Fi - updateLlibre del òrgan gestor: " + organGestor);
+				if (!status) {
+					logger.error(String.format("Actualització òrgan (%s): Error actualitzant llibre ", organGestor.getCodi()));
+				}
 
-				updateLlibre(entitat, organGestor);
-				logger.info("Fi - updateLlibre del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
+				status = updateOficina(entitat, organGestor, arbreUnitats);
+				logger.info("Fi - updateOficina del òrgan gestor: " + organGestor);
+				if (!status) {
+					logger.error(String.format("Actualització òrgan (%s): Error actualitzant oficina ", organGestor.getCodi()));
+				}
 
-				updateOficina(entitat, organGestor, arbreUnitats);
-				logger.info("Fi - updateOficina del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
+				status = updateEstat(organGestor, arbreUnitats);
+				logger.info("Fi - updateEstat del òrgan gestor: " + organGestor);
+				if (!status) {
+					logger.error(String.format("Actualització òrgan (%s): Error actualitzant estat ", organGestor.getCodi()));
+				}
 
-				updateEstat(organGestor, arbreUnitats);
-				logger.info("Fi - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
-
+				organGestorRepository.saveAndFlush(organGestor);
 			}
 			logger.info("Antes de Update de las tablas correspondientes a las datatables");
 			// Update de las tablas correspondientes a las datatables de notificaciones y envíos
@@ -562,7 +574,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private boolean updateEstat(OrganGestorEntity organGestor,
 								Map<String, NodeDir3> arbreUnitats) {
 		logger.info("Ini - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
-		if (!arbreUnitats.containsKey(organGestor.getCodi())){
+		if (!arbreUnitats.containsKey(organGestor.getCodi())) {
+			logger.trace(String.format("Organ Gestor (%s) no trobat a l'organigrama", organGestor.getCodi()));
+			organGestor.updateEstat(OrganGestorEstatEnum.ALTRES);
 			return false;
 		}
 		NodeDir3 nodeOrgan = arbreUnitats.get(organGestor.getCodi());
