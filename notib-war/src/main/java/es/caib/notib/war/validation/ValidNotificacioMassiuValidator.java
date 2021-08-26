@@ -2,21 +2,25 @@ package es.caib.notib.war.validation;
 
 import es.caib.notib.war.command.NotificacioMassivaCommand;
 import es.caib.notib.war.helper.MessageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 public class ValidNotificacioMassiuValidator  implements ConstraintValidator<ValidNotificacioMassiu, NotificacioMassivaCommand> {
 	// Validació de documents
 	Long csvFileMaxSize = 2097152L; //2MB
 	Long zipFileMaxSize = 15728640L; // 15MB
-	List<String> formatsZipDisponibles = Arrays.asList(new String[] {"application/zip", "application/x-zip-compressed"});
-	List<String> formatsCsvDisponibles = Arrays.asList(new String[] {"application/octet-stream", "text/csv"});
-	List<String> extensionsZipDisponibles = Arrays.asList(new String[] {"zip"});;
-	List<String> extensionsCsvDisponibles = Arrays.asList(new String[] {"csv"});;
+	List<String> formatsZipDisponibles = Arrays.asList("application/zip", "application/x-zip-compressed");
+	List<String> formatsCsvDisponibles = Arrays.asList("application/octet-stream", "text/csv");
+	List<String> extensionsZipDisponibles = Collections.singletonList("zip");
+	List<String> extensionsCsvDisponibles = Collections.singletonList("csv");
 
 	@Override
 	public void initialize(final ValidNotificacioMassiu constraintAnnotation) {
@@ -59,21 +63,23 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 			return null;
 		}
 
-		if (((notificacioMassivaCommand.getFicheroCsv() == null || notificacioMassivaCommand.getFicheroCsv().getSize() == 0))) {
+		MultipartFile fitxerCSV = notificacioMassivaCommand.getFicheroCsv();
+		if (fitxerCSV == null || fitxerCSV.getSize() == 0) {
 			return "NotEmpty";
 		}
-		if ((notificacioMassivaCommand.getFicheroCsv() != null && notificacioMassivaCommand.getFicheroCsv().getSize() != 0)) {
-			String extensio = FilenameUtils.getExtension(notificacioMassivaCommand.getFicheroCsv().getOriginalFilename());
-			if (!extensionsCsvDisponibles.contains(extensio)) {
-				return "notificacio.form.valid.document.format";
-			}
-			if (!formatsCsvDisponibles.contains(notificacioMassivaCommand.getFicheroCsv().getContentType())) {
-				return "notificacio.form.valid.document.format";
-			}
-			Long fileSize = notificacioMassivaCommand.getFicheroCsv().getSize();
-			if (fileSize > csvFileMaxSize) {
-				return "notificacio.form.valid.document.size";
-			}
+
+		String extensio = FilenameUtils.getExtension(fitxerCSV.getOriginalFilename());
+		if (!extensionsCsvDisponibles.contains(extensio)) {
+			log.debug("Error validacio CSV enviament massiu. Extensió fitxer incorrecte: " + extensio);
+			return "notificacio.form.valid.document.format";
+		}
+		if (!formatsCsvDisponibles.contains(fitxerCSV.getContentType())) {
+			log.debug("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerCSV.getContentType());
+			return "notificacio.form.valid.document.format";
+		}
+		Long fileSize = fitxerCSV.getSize();
+		if (fileSize > csvFileMaxSize) {
+			return "notificacio.form.valid.document.size";
 		}
 		return null;
 	}
@@ -89,15 +95,18 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 			return null;
 		}
 
-		if ((notificacioMassivaCommand.getFicheroZip() != null && notificacioMassivaCommand.getFicheroZip().getSize() != 0)) {
-			String extensio = FilenameUtils.getExtension(notificacioMassivaCommand.getFicheroZip().getOriginalFilename());
+		MultipartFile fitxerZIP = notificacioMassivaCommand.getFicheroZip();
+		if (fitxerZIP != null && fitxerZIP.getSize() != 0) {
+			String extensio = FilenameUtils.getExtension(fitxerZIP.getOriginalFilename());
 			if (!extensionsZipDisponibles.contains(extensio)) {
+				log.debug("Error validacio ZIP enviament massiu. Extensió fitxer incorrecte: " + extensio);
 				return "notificacio.form.valid.document.format";
 			}
-			if (!formatsZipDisponibles.contains(notificacioMassivaCommand.getFicheroZip().getContentType())) {
+			if (!formatsZipDisponibles.contains(fitxerZIP.getContentType())) {
+				log.debug("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerZIP.getContentType());
 				return "notificacio.form.valid.document.format";
 			}
-			Long fileSize = notificacioMassivaCommand.getFicheroZip().getSize();
+			Long fileSize = fitxerZIP.getSize();
 			if (fileSize > zipFileMaxSize) {
 				return "notificacio.form.valid.document.size";
 			}

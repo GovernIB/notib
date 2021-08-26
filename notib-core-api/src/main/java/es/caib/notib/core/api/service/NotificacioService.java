@@ -334,7 +334,6 @@ public interface NotificacioService {
 	
 
 	// Mètodes per cridar des de l'schedulled
-	void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException;
 	void notificacioEnviar(Long notificacioId);
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long enviamentId);

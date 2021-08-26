@@ -1135,7 +1135,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
-			List<RegistreIdDto> registresIdDto = new ArrayList<RegistreIdDto>();
+			List<RegistreIdDto> registresIdDto = new ArrayList<>();
 			NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
 			logger.info(" [REG] Inici registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 
@@ -1286,18 +1286,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	@Transactional
-	@Override
-	public void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			registrarNotificar(notificacioId);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Transactional
 	@Override

@@ -185,4 +185,9 @@ public interface RegistrePlugin {
 	 */
 	public List<Organisme> llistarOrganismes(
 			String entitatCodi) throws RegistrePluginException;
+
+	public static class TipusOperacio {
+		public static final long NOTIFIFICACIO = 1L;
+		public static final long COMUNICACIO = 2L;
+	}
 }

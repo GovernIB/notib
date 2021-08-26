@@ -515,7 +515,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		configureMockUnitatsOrganitzativesPlugin();
 		configureMockRegistrePlugin();
 		Mockito.mock(SchedulledServiceImpl.class);
-		notificacioService.notificacioRegistrar(notificacioCreate.getId());
+		notificacioService.registrarNotificar(notificacioCreate.getId());
 
 //						NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
 //						notificacioEdicio.setOrganGestorCodi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);

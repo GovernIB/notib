@@ -71,7 +71,7 @@ public class RegistreNotificaHelper {
 					try {
 						//Només crea assentament registral sense notificar
 						long startTime2 = System.nanoTime();
-						crearAssentamentRegistralPerEnviament(
+						crearAssentamentRegistralEnviamentComunicacioSIR(
 								notificacioEntity, 
 								notificacioEntity.getEntitat().getDir3CodiReg() != null ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi(), 
 								totsAdministracio, 
@@ -203,7 +203,7 @@ public class RegistreNotificaHelper {
 		return enviarANotifica;
 	}
 
-	private void crearAssentamentRegistralPerEnviament(
+	private void crearAssentamentRegistralEnviamentComunicacioSIR(
 			NotificacioEntity notificacioEntity, 
 			String dir3Codi,
 			boolean totsAdministracio, 

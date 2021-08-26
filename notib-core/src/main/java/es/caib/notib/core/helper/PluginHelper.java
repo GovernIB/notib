@@ -2242,6 +2242,15 @@ public class PluginHelper {
 		if (propertiesLoaded.containsKey(codeProperties))
 			propertiesLoaded.put(codeProperties, false);
 	}
+	public void resetPlugins() {
+		registrePlugin = null;
+		gestorDocumentalAdministratiuPlugin = null;
+		dadesUsuariPlugin = null;
+		unitatsOrganitzativesPlugin = null;
+		arxiuPlugin = null;
+		gestioDocumentalPlugin = null;
+		firmaServidorPlugin = null;
+	}
 	private String getPropertyPluginUnitats() {
 		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");
 	}

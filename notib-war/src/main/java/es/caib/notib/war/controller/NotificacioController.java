@@ -1369,7 +1369,8 @@ public class NotificacioController extends BaseUserController {
         model.addAttribute("errors", bindingResult.getAllErrors());
 
         for (int i = 0; i < 5; i++) {
-            if (notificacioCommand.getDocuments()[i].getArxiuGestdocId().isEmpty() && 
+            DocumentCommand documentCommand = notificacioCommand.getDocuments()[i];
+            if (documentCommand.getArxiuGestdocId().isEmpty() &&
             		notificacioCommand.getTipusDocument()[i] != null && 
             		(notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) && 
             		notificacioCommand.getTipusDocument()[i] == TipusDocumentEnumDto.ARXIU) {
@@ -1380,22 +1381,23 @@ public class NotificacioController extends BaseUserController {
                 } catch (Exception ex) {
                     log.error("No s'ha pogut codificar els bytes de l'arxiu: " + ex.getMessage());
                 }
-                notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
-                notificacioCommand.getDocuments()[i].setNormalitzat(notificacioCommand.getDocuments()[i].isNormalitzat());
+                documentCommand.setContingutBase64(contingutBase64);
+                documentCommand.setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
+                documentCommand.setNormalitzat(notificacioCommand.getDocuments()[i].isNormalitzat());
 //                notificacioCommand.getDocument()[i].setMetadadesKeys(notificacioCommand.getDocument()[i].getMetadadesKeys());
 //                notificacioCommand.getDocument()[i].setMetadadesValues(notificacioCommand.getDocument()[i].getMetadadesValues());
-                notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
-                notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+                documentCommand.setMediaType(notificacioCommand.getArxiu()[i].getContentType());
+                documentCommand.setMida(notificacioCommand.getArxiu()[i].getSize());
 
                 arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(notificacioCommand.getDocuments()[i].getContingutBase64());
 
                 notificacioCommand.getDocuments()[i].setArxiuGestdocId(arxiuGestdocId);
                 model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
 
-
+            } else if (documentCommand.getArxiuNom() != null && !documentCommand.getArxiuNom().isEmpty()) {
+                model.addAttribute("nomDocument_" + i, documentCommand.getArxiuNom());
             } else {
-                model.addAttribute("nomDocument_" + i, !notificacioCommand.getDocuments()[i].getArxiuNom().isEmpty() ? notificacioCommand.getDocuments()[i].getArxiuNom() : notificacioCommand.getArxiu()[i].getOriginalFilename());
+                model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
             }
         }
         model.addAttribute("document", notificacioCommand.getDocuments());

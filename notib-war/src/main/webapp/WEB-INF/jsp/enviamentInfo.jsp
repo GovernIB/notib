@@ -521,7 +521,7 @@ $(document).ready(function() {
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.estat.registre.no.enviada"/>
 				</div>
-				<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
+				<c:if test="${enviament.notificacio.estat != 'PENDENT'}"><%-- TODO: Els dos botons que hi ha a continuació es poden eliminar --%>
 					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
 						<p class="well well-sm text-right" style="margin-top: 1em">
 							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">

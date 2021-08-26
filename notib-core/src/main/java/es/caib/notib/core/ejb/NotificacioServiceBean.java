@@ -215,11 +215,6 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.getNotificacionsPendentsRegistrar();
 	}
 
-	@Override
-	public void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException {
-		delegate.notificacioRegistrar(notificacioId);		
-	}
-	
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List getNotificacionsPendentsEnviar() {

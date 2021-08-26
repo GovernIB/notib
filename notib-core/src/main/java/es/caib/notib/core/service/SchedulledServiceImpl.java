@@ -61,7 +61,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 				logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
 				for (NotificacioEntity pendent : (List<NotificacioEntity>)pendents) {
 					logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-					notificacioService.notificacioRegistrar(pendent.getId());
+					notificacioService.registrarNotificar(pendent.getId());
 				}
 			} else {
 				logger.info("[REG] No hi ha notificacions pendents de registrar");
