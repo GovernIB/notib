@@ -688,7 +688,9 @@ function sessionTimeoutMessage(timeout_margin_ms){
 }
 
 function pingServer(){
-	jQuery.ajax({url: webutilContextPath() + "/usuari/refresh", type: "HEAD", complete: function (XMLHttpRequest, textStatus) {}});
+	jQuery.ajax({url: webutilContextPath() + "/usuari/refresh", type: "HEAD", complete: function (XMLHttpRequest, textStatus) {
+		alert("La sessió s'ha extés satisfactòriament");
+	}});
 }
 
 function resetSessionTimeout(){
