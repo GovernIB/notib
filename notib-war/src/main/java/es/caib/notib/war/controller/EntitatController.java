@@ -117,6 +117,10 @@ public class EntitatController extends BaseController {
 			BindingResult bindingResult,
 			Model model) throws NotFoundException, IOException {
 		if (bindingResult.hasErrors()) {
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			model.addAttribute("operadorPostalList", operadorPostalList);
+			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			model.addAttribute("cieList", cieList);
 			model.addAttribute("errors", bindingResult.getAllErrors());
 			return "entitatForm";
 		}
