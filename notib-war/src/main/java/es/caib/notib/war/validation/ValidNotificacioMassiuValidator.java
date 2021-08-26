@@ -70,11 +70,11 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 
 		String extensio = FilenameUtils.getExtension(fitxerCSV.getOriginalFilename());
 		if (!extensionsCsvDisponibles.contains(extensio)) {
-			log.debug("Error validacio CSV enviament massiu. Extensió fitxer incorrecte: " + extensio);
+			log.info("Error validacio CSV enviament massiu. Extensió fitxer incorrecte: " + extensio);
 			return "notificacio.form.valid.document.format";
 		}
 		if (!formatsCsvDisponibles.contains(fitxerCSV.getContentType())) {
-			log.debug("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerCSV.getContentType());
+			log.info("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerCSV.getContentType());
 			return "notificacio.form.valid.document.format";
 		}
 		Long fileSize = fitxerCSV.getSize();
@@ -99,11 +99,11 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 		if (fitxerZIP != null && fitxerZIP.getSize() != 0) {
 			String extensio = FilenameUtils.getExtension(fitxerZIP.getOriginalFilename());
 			if (!extensionsZipDisponibles.contains(extensio)) {
-				log.debug("Error validacio ZIP enviament massiu. Extensió fitxer incorrecte: " + extensio);
+				log.info("Error validacio ZIP enviament massiu. Extensió fitxer incorrecte: " + extensio);
 				return "notificacio.form.valid.document.format";
 			}
 			if (!formatsZipDisponibles.contains(fitxerZIP.getContentType())) {
-				log.debug("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerZIP.getContentType());
+				log.info("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerZIP.getContentType());
 				return "notificacio.form.valid.document.format";
 			}
 			Long fileSize = fitxerZIP.getSize();
