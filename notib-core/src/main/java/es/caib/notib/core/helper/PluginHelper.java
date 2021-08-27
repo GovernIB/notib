@@ -2041,25 +2041,24 @@ public class PluginHelper {
 			return false;
 		}
 	}
-	
 
-	private boolean dadesUsuariPluginConfiguracioProvada = false;
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 		loadPluginProperties("USUARIS");
-		if (dadesUsuariPlugin == null && !dadesUsuariPluginConfiguracioProvada) {
-			dadesUsuariPluginConfiguracioProvada = true;
+		if (dadesUsuariPlugin == null) {
 			String pluginClass = getPropertyPluginDadesUsuari();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					dadesUsuariPlugin = (DadesUsuariPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_USUARIS,
 							"Error al crear la instància del plugin de dades d'usuari",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin d'usuari no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_USUARIS,
 						"La classe del plugin de dades d'usuari no està configurada");
@@ -2068,23 +2067,23 @@ public class PluginHelper {
 		return dadesUsuariPlugin;
 	}
 
-	private boolean gestioDocumentalPluginConfiguracioProvada = false;
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 		loadPluginProperties("GES_DOC");
-		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
-			gestioDocumentalPluginConfiguracioProvada = true;
+		if (gestioDocumentalPlugin == null) {
 			String pluginClass = getPropertyPluginGestioDocumental();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de gestió documental (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_GESDOC,
 							"Error al crear la instància del plugin de gestió documental",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin de gestió documental no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_USUARIS,
 						"La classe del plugin de gestió documental no està configurada");
@@ -2093,23 +2092,23 @@ public class PluginHelper {
 		return gestioDocumentalPlugin;
 	}
 
-	private boolean registrePluginConfiguracioProvada = false;
 	private RegistrePlugin getRegistrePlugin() {
 		loadPluginProperties("REGISTRE");
-		if (registrePlugin == null && !registrePluginConfiguracioProvada) {
-			registrePluginConfiguracioProvada = true;
+		if (registrePlugin == null) {
 			String pluginClass = getPropertyPluginRegistre();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					registrePlugin = (RegistrePlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de registre (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_REGISTRE,
 							"Error al crear la instància del plugin de registre",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin de registre no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_REGISTRE,
 						"La classe del plugin de registre no està configurada");
@@ -2137,12 +2136,14 @@ public class PluginHelper {
 								ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
 					}
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin d'arxiu digital (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_ARXIU,
 							"Error al crear la instància del plugin d'arxiu digital",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin d'arxiu digital no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_ARXIU,
 						"No està configurada la classe per al plugin d'arxiu digital");
@@ -2160,15 +2161,17 @@ public class PluginHelper {
 					Class<?> clazz = Class.forName(pluginClass);
 					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de DIR3 (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_REGISTRE,
-							"Error al crear la instància del plugin de registre",
+							"Error al crear la instància del plugin de DIR3",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin de DIR3 no està configurada");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_REGISTRE,
-						"La classe del plugin de registre no està configurada");
+						"La classe del plugin de DIR3 no està configurada");
 			}
 		}
 		
@@ -2184,12 +2187,14 @@ public class PluginHelper {
 					Class<?> clazz = Class.forName(pluginClass);
 					gestorDocumentalAdministratiuPlugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de gestor documental administratiu (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_GESCONADM,
 							"Error al crear la instància del plugin de gestor documental administratiu",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin del gestor documental administratiu no està configurada");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_GESCONADM,
 						"La classe del plugin del gestor documental administratiu no està configurada");
@@ -2207,12 +2212,14 @@ public class PluginHelper {
 					Class<?> clazz = Class.forName(pluginClass);
 					firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de firma en servidor (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_FIRMASERV,
 							"Error al crear la instància del plugin de firma en servidor",
 							ex);
 				}
 			} else {
+				logger.error("No està configurada la classe per al plugin de firma en servidor");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_FIRMASERV,
 						"No està configurada la classe per al plugin de firma en servidor");
