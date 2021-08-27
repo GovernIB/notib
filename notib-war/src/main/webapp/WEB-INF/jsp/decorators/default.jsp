@@ -329,18 +329,18 @@ body {
 							
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
-<%-- 								<c:if test="${isRolActualUsuari and permisNotificacio}"> --%>
 									<div class="btn-group">
-<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
-										<a class="btn btn-primary" href="<c:url value="/notificacio/new"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+										<div class="btn-group">
+											<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
+											</button>
+											<ul class="dropdown-menu">
+												<li><a href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+												<li><a href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
+												<li><a href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
+											</ul>
+										</div>
 									</div>
-<%-- 								</c:if> --%>
-							
-<%-- 								<c:if test="${permisNotificacio}"> --%>
-<!-- 									<div class="btn-group"> -->
-<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
-<!-- 									</div> -->
-<%-- 								</c:if> --%>
 									<div class="btn-group">
 										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
 										<ul class="dropdown-menu">

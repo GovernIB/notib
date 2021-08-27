@@ -664,20 +664,19 @@ function loadOrgansGestors(urlCercaUnitats){
                 $("#resultatsTotal").removeClass('hidden');
                 if (data.length > 0) {
                     $.each(data, function(i, item) {
-                        var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+                        var enviamentTipus = $('input#enviamentTipus').val();
                         var local = $('#organigrama').val().indexOf(item.codi) != -1;
                         var clase = (i%2 == 0 ? 'even' : 'odd');
                         var socSir = (item.sir ? textMessages['comu.si'] : textMessages['comu.no']);
-                        var comSir = enviamentTipus == 'COMUNICACIO' && !local && item.sir;
-                        var comLocal = enviamentTipus == 'COMUNICACIO' && local;
-                        if (enviamentTipus != 'NOTIFICACIO' && !comSir) {
+                        var comSir = enviamentTipus === 'COMUNICACIO_SIR' && !local && item.sir;
+                        if (enviamentTipus === 'COMUNICACIO_SIR' && !comSir) {
                             clase += ' unselectable';
                         }
                         list_html += '<tr class="'+clase+'" data-codi="' + item.codi +'" data-denominacio="' + item.nom +'" data-cif="' + item.cif + '">' +
                             '<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
                             '<td>'+(socSir)+'</td>' +
                             '<td>';
-                        if (enviamentTipus == 'NOTIFICACIO' || comSir) {
+                        if (enviamentTipus === 'NOTIFICACIO' || comSir) {
                             list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
                         }
                         list_html += '</td></tr>';
@@ -688,7 +687,6 @@ function loadOrgansGestors(urlCercaUnitats){
 
                 $("#rOrgans").html(list_html);
                 $("#total").text(data.length);
-// 				$("#rOrgans").append('<tfoot><tr><th id="total" colspan="2"><spring:message code="comu.resultats"/></th><td>'+data.length+'</td></tr></tfoot>');
                 $(".loading-screen").hide();
             },
             error: function() {
@@ -815,6 +813,31 @@ function actualitzarEntrega(j, urlPaisos, urlProvincies, urlLocalitats) {
 
 }
 
+
+function addDestinatari(enviament_id, isMultipleDestinatarisActiu, destinatariHTMLTemplate) {
+    var isMultiple = isMultipleDestinatarisActiu;
+    var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
+    var num_destinatari = $('div.destenv_' + num_enviament).size();
+
+    let htmlTemplate = destinatariHTMLTemplate; // feim una còpia de la plantilla
+    htmlTemplate = replaceAll(htmlTemplate, "#num_enviament#", num_enviament);
+    htmlTemplate = replaceAll(htmlTemplate, "#num_destinatari#", num_destinatari);
+
+    $('div.newDestinatari_' + num_enviament).append(htmlTemplate);
+    $('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
+
+    if (!isMultiple) {
+        $("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
+    }
+    $('.interessat').trigger('change');
+
+    inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
+    inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
+    inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
+    inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
+    inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
+}
+
 function comptarCaracters(idCamp) {
     var fieldConcepte = $('#' + idCamp);
     if (fieldConcepte.val().length != 0) {
@@ -828,4 +851,10 @@ function comptarCaracters(idCamp) {
     //	var size = $(this).val().length;
     //	$('.inputCurrentLength').text(size);
     //});
+}
+
+function clearDocuments(numDocuments) {
+    for (var i = numDocuments - 1; i > 0; i--) {
+        $('#tipusDocument_' + i).val('').trigger('change');
+    }
 }

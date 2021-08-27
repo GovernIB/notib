@@ -7,19 +7,40 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 
-
+<c:set var="enviamentTipus">${notificacioCommandV2.enviamentTipus}</c:set>
 <c:choose>
-    <c:when test="${empty notificacioCommandV2.id}"><c:set var="titol"><spring:message code="notificacio.form.titol.crear"/></c:set></c:when>
+    <c:when test="${empty notificacioCommandV2.id}"><c:set var="titol">
+		<c:choose>
+			<c:when test="${enviamentTipus == 'COMUNICACIO'}">
+				<spring:message code="notificacio.form.titol.crear.comunicacio"/>
+			</c:when>
+			<c:when test="${enviamentTipus == 'COMUNICACIO_SIR'}">
+				<spring:message code="notificacio.form.titol.crear.comunicacio.sir"/>
+			</c:when>
+			<c:otherwise>
+				<spring:message code="notificacio.form.titol.crear.notificacio"/>
+			</c:otherwise>
+		</c:choose>
+	</c:set>
+	</c:when>
     <c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <c:set var="dadesGenerals"><spring:message code="notificacio.form.titol.dadesgenerals"/></c:set>
 <c:set var="document"><spring:message code="notificacio.form.titol.document"/></c:set>
 <c:set var="parametresRegistre"><spring:message code="notificacio.form.titol.parametresregistre"/></c:set>
 <c:set var="enviaments"><spring:message code="notificacio.form.titol.enviaments"/></c:set>
-<c:set var="titular"><spring:message code="notificacio.form.titol.enviaments.titular"/></c:set>
-<c:set var="titularComunicacioSir"><spring:message code="notificacio.form.titol.enviaments.titularComunicacioSir"/></c:set>
-<c:set var="destinatarisTitol"><spring:message code="notificacio.form.titol.enviaments.destinataris"/></c:set>
-<c:set var="destinatarisTitolComunicacioSir"><spring:message code="notificacio.form.titol.enviaments.destinatarisComunicacioSir"/></c:set>
+<c:choose>
+	<c:when test="${enviamentTipus != 'COMUNICACIO_SIR'}">
+		<c:set var="titular"><spring:message code="notificacio.form.titol.enviaments.titular"/></c:set>
+		<c:set var="destinatarisTitol" scope="request"><spring:message code="notificacio.form.titol.enviaments.destinataris"/></c:set>
+		<c:set var="documentAvisKey">notificacio.for.camp.document.avis</c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="titular"><spring:message code="notificacio.form.titol.enviaments.titularComunicacioSir"/></c:set>
+		<c:set var="destinatarisTitol" scope="request"><spring:message code="notificacio.form.titol.enviaments.destinatarisComunicacioSir"/></c:set>
+		<c:set var="documentAvisKey">notificacio.for.camp.document.avis.sir</c:set>
+	</c:otherwise>
+</c:choose>
 <c:set var="metodeEntrega"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega"/></c:set>
 <c:set var="entregaPostal"><spring:message code="notificacio.form.titol.entregapostal"/></c:set>
 <c:set var="entregaPostalDades"><spring:message code="notificacio.form.titol.entregapostal.dades"/></c:set>
@@ -27,14 +48,14 @@
 <c:set var="entitatDir3Codi">${entitat.dir3Codi}</c:set>
 
 
-<c:url value="/notificacio/nivellsAdministracions" 	var="urlNivellAdministracions"/>
-<c:url value="/notificacio/comunitatsAutonomes" 	var="urlComunitatsAutonomes"/>
+<c:url value="/notificacio/nivellsAdministracions" 	var="urlNivellAdministracions" scope="request"/>
+<c:url value="/notificacio/comunitatsAutonomes" 	var="urlComunitatsAutonomes" scope="request"/>
 <c:url value="/notificacio/provincies" 				var="urlProvincies"/>
 <c:url value="/notificacio/localitats" 				var="urlLocalitats"/>
-<c:url value="/notificacio/cercaUnitats"			var="urlCercaUnitats"/>
+<c:url value="/notificacio/cercaUnitats"			var="urlCercaUnitats" scope="request"/>
 <c:url value="/notificacio/paisos"					var="urlPaisos"/>
 <c:url value="/notificacio/cercaUnitats"			var="urlCercaUnitats"/>
-
+<c:url value="/entitat/organigrama/" 				var="urlOrganigrama" scope="request"/>
 
 <html>
 <head>
@@ -201,7 +222,7 @@
 </style>
 </head>
 <body>
-<c:url var="urlOrganigrama" value="/entitat/organigrama/"/>
+
 <script type="text/javascript">
 	var viewModel = {
 		ambEntregaCIEInternal: 10,
@@ -262,8 +283,6 @@
 	<c:forEach items="${interessatTipus}" var="it" varStatus="status">
 	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
 	</c:forEach>
-	var msgInfoDoc = "<spring:message code='notificacio.for.camp.document.avis'/>";
-	var msgInfoDocSir = "<spring:message code='notificacio.for.camp.document.avis.sir'/>";
 	var locale = "${requestLocale}";
 	var consultarFocusout = true;
 	var personaMaxSizes = {
@@ -282,12 +301,7 @@
 		"comu.boto.seleccionar": "<spring:message code="comu.boto.seleccionar"/>",
 	};
 
-	function addDestinatari(enviament_id, isMultipleDestinatarisActiu) {
-		var isMultiple = isMultipleDestinatarisActiu;
-		var num_enviament = parseInt(enviament_id.substring(enviament_id.indexOf( '[' ) + 1, enviament_id.indexOf( ']' )));
-		var num_destinatari = $('div.destenv_' + num_enviament).size();
-
-		var destinatari =' \
+	var destinatariHTMLTemplate =' \
     <div class="col-md-12 destinatariForm destenv_#num_enviament# personaForm_#num_enviament#_#num_destinatari#"> \
 		<div class="col-md-3"> \
 			<div class="form-group"> \
@@ -408,24 +422,6 @@
 		</div> \
 	</div>';
 
-		destinatari = replaceAll(destinatari, "#num_enviament#", num_enviament);
-		destinatari = replaceAll(destinatari, "#num_destinatari#", num_destinatari);
-
-		$('div.newDestinatari_' + num_enviament).append(destinatari);
-		$('#enviaments\\[' + num_enviament + '\\]\\.destinataris\\[' + num_destinatari + '\\]\\.interessatTipus').select2({theme: 'bootstrap', width: 'auto', minimumResultsForSearch: Infinity});
-
-		if (!isMultiple) {
-			$("div[class*=' personaForm_" + num_enviament + "']").closest('div.destinatari').find('.addDestinatari').addClass('hidden');
-		}
-		$('.interessat').trigger('change');
-
-		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].nom');
-		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge1');
-		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].llinatge2');
-		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].telefon');
-		inputFieldAddCharsCounter('enviaments[' + num_enviament + '].destinataris[' + num_destinatari + '].email');
-	}
-
 
 	$(document).ready(function() {
 		$(document).on('change','select.paisos', function() {
@@ -541,111 +537,56 @@
 			activarCampsMetadades(indexId);
 		});
 
-		
-		var document_0_arxiuNom = $('input[name="documents\\[0\\].arxiuNom"').val();
-		var document_1_arxiuNom = $('input[name="documents\\[1\\].arxiuNom"').val();
-		var document_2_arxiuNom = $('input[name="documents\\[2\\].arxiuNom"').val();
-		var document_3_arxiuNom = $('input[name="documents\\[3\\].arxiuNom"').val();
-		var document_4_arxiuNom = $('input[name="documents\\[4\\].arxiuNom"').val();
-
-		var tipusDocumentDefault = [
-			$('#tipusDocumentDefault0').val(),
-			$('#tipusDocumentDefault1').val(),
-			$('#tipusDocumentDefault2').val(),
-			$('#tipusDocumentDefault3').val(),
-			$('#tipusDocumentDefault4').val(),
-		];
-
-		var tipusDocumentSelected = [
-			$('#tipusDocumentSelected_0').val(),
-			$('#tipusDocumentSelected_1').val(),
-			$('#tipusDocumentSelected_2').val(),
-			$('#tipusDocumentSelected_3').val(),
-			$('#tipusDocumentSelected_4').val()
-		];
 
 		$('.customSelect').webutilInputSelect2(null);
+		let i = 0;
+		let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
+		let tipusDocumentSelected = $('#tipusDocumentSelected_0').val();
 
-		if (tipusDocumentSelected[0] != '') {
-			$("#tipusDocument_0").val(tipusDocumentSelected[0]).trigger("change");
+		if (tipusDocumentSelected !== '') {
+			$("#tipusDocument_0").val(tipusDocumentSelected).trigger("change");
 			$("#document").removeClass("hidden");
-		} else if (tipusDocumentDefault[0] != '') {
-			$("#tipusDocument_0").val(tipusDocumentDefault[0]).trigger("change");
-			if (tipusDocumentDefault[0] == 'CSV') {
+		} else if (tipusDocumentDefault !== '') {
+			$("#tipusDocument_0").val(tipusDocumentDefault).trigger("change");
+			if (tipusDocumentDefault === 'CSV') {
 				$('#documentArxiuCsv\\[0\\]').val("${nomDocument_0}");
-			} else if (tipusDocumentDefault[0] == 'UUID') {
+			} else if (tipusDocumentDefault === 'UUID') {
 				$('#documentArxiuUuid\\[0\\]').val("${nomDocument_0}");
-			} else if (tipusDocumentDefault[0] == 'URL') {
+			} else if (tipusDocumentDefault === 'URL') {
 				$('#documentArxiuUrl\\[0\\]').val("${nomDocument_0}");
 			}
 		}
+		var nom_documents = [
+			"${nomDocument_0}",
+			"${nomDocument_1}",
+			"${nomDocument_2}",
+			"${nomDocument_3}",
+			"${nomDocument_4}",
+		];
+		for (let i = 1; i < 4; i++) {
+			let document_arxiuNom = $('input[name="documents\\[' + i + '\\].arxiuNom"]').val();
+			let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
+			let tipusDocumentSelected = $('#tipusDocumentSelected_' + i).val();
+			if (tipusDocumentSelected !== '') {
+				$("#tipusDocument_" + i).val(tipusDocumentSelected[i]).trigger("change");
+				$("#document" + (i+1)).removeClass("hidden");
+				numDocuments++;
+			} else if (tipusDocumentDefault !== '' && document_arxiuNom !== '') {
+				$("#tipusDocument_" + i).val(tipusDocumentDefault).trigger("change");
+				if (tipusDocumentDefault === 'CSV') {
+					$('#documentArxiuCsv_' + i).val(nom_documents[i]);
+				} else if (tipusDocumentDefault === 'UUID') {
+					$('#documentArxiuUuid_' + i).val(nom_documents[i]);
+				} else if (tipusDocumentDefault === 'URL') {
+					$('#documentArxiuUrl_' + i).val(nom_documents[i]);
+				}
 
-		if (tipusDocumentSelected[1] != '') {
-			$("#tipusDocument_1").val(tipusDocumentSelected[1]).trigger("change");
-			$("#document2").removeClass("hidden");
-			numDocuments = 2;
-		} else if (tipusDocumentDefault[1] != '' && document_1_arxiuNom != '') {
-			$("#tipusDocument_1").val(tipusDocumentDefault[1]).trigger("change");
-			if (tipusDocumentDefault[1] == 'CSV') {
-				$('#documentArxiuCsv_1').val("${nomDocument_1}");
-			} else if (tipusDocumentDefault[1] == 'UUID') {
-				$('#documentArxiuUuid_1').val("${nomDocument_1}");
-			} else if (tipusDocumentDefault[1] == 'URL') {
-				$('#documentArxiuUrl_1').val("${nomDocument_1}");
+				$("#tipusDocument_" + i).val(tipusDocumentDefault[i]).trigger("change");
+				$("#document" + (i+1)).removeClass("hidden");
+				numDocuments++;
 			}
+		}
 
-			$("#tipusDocument_1").val(tipusDocumentDefault[1]).trigger("change");
-			$("#document2").removeClass("hidden");
-			numDocuments = 2;
-		}
-		if (tipusDocumentSelected[2] != '') {
-			$("#tipusDocument_2").val(tipusDocumentSelected[2]).trigger("change");
-			$("#document3").removeClass("hidden");
-			numDocuments = 3;
-		} else if (tipusDocumentDefault[2] != '' && document_2_arxiuNom != '') {
-			if (tipusDocumentDefault[2] == 'CSV') {
-				$('#documentArxiuCsv_2').val("${nomDocument_2}");
-			} else if (tipusDocumentDefault[2] == 'UUID') {
-				$('#documentArxiuUuid_2').val("${nomDocument_2}");
-			} else if (tipusDocumentDefault[2] == 'URL') {
-				$('#documentArxiuUrl_2').val("${nomDocument_2}");
-			}
-			$("#tipusDocument_2").val(tipusDocumentDefault[2]).trigger("change");
-			$("#document3").removeClass("hidden");
-			numDocuments = 3;
-		}
-		if (tipusDocumentSelected[3] != '') {
-			$("#tipusDocument_3").val(tipusDocumentSelected[3]).trigger("change");
-			$("#document4").removeClass("hidden");
-			numDocuments = 4;
-		} else if (tipusDocumentDefault[3] != '' && document_3_arxiuNom != '') {
-			if (tipusDocumentDefault[3] == 'CSV') {
-				$('#documentArxiuCsv_3').val("${nomDocument_3}");
-			} else if (tipusDocumentDefault[3] == 'UUID') {
-				$('#documentArxiuUuid_3').val("${nomDocument_3}");
-			} else if (tipusDocumentDefault[3] == 'URL') {
-				$('#documentArxiuUrl_3').val("${nomDocument_3}");
-			}
-			$("#tipusDocument_3").val(tipusDocumentDefault[3]).trigger("change");
-			$("#document4").removeClass("hidden");
-			numDocuments = 4;
-		}
-		if (tipusDocumentSelected[4] != '') {
-			$("#tipusDocument_4").val(tipusDocumentSelected[4]).trigger("change");
-			$("#document5").removeClass("hidden");
-			numDocuments = 5;
-		} else if (tipusDocumentDefault[4] != '' && document_4_arxiuNom != '') {
-			if (tipusDocumentDefault[4] == 'CSV') {
-				$('#documentArxiuCsv_4').val("${nomDocument_4}");
-			} else if (tipusDocumentDefault[4] == 'UUID') {
-				$('#documentArxiuUuid_4').val("${nomDocument_4}");
-			} else if (tipusDocumentDefault[4] == 'URL') {
-				$('#documentArxiuUrl_4').val("${nomDocument_4}");
-			}
-			$("#tipusDocument_4").val(tipusDocumentDefault[4]).trigger("change");
-			$("#document5").removeClass("hidden");
-			numDocuments = 5;
-		}
 
 		$('#addDocument').click(function() {
 			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault[numDocuments]).trigger("change");
@@ -1004,33 +945,7 @@
 		});
 
 		$('#organGestor').trigger('change');
-		//Add metadata
-		var count = 0;
-		// $('#add').on('click', function () {
-		//     //Input to add
-		//     var metadataInput =
-		//         "<div class='form-group'>" +
-		//             "<label class='control-label col-xs-2'></label>" +
-		//             "<div class='col-xs-10'>" +
-		//                 "<div class='input-group'>" +
-		//                 "<input name='document.metadadesKeys' id='document.metadadesKeys' type='text' class='form-control width50 add grupKey_" + count + "' readonly/>" +
-		//                 "<input name='document.metadadesValues' id='document.metadadesValues' type='text' class='form-control width50 add grupVal_" + count + "' readonly/>" +
-		//                 "<span class='input-group-addon' id='remove'><span class='fa fa-remove'></span></span>" +
-		//                 "</div>" +
-		//             "</div>" +
-		//         "</div>";
-		//
-		//     var keyVal = $(".input-add").children().val();
-		//     var val = $(".input-add").children().eq(1).val();
-		//     if (keyVal != '') {
-		//         $("#list").prepend(metadataInput);
-		//         $(".grupKey_" + count).attr("value", keyVal);
-		//         $(".grupVal_" + count).attr("value", val);
-		//         $("#list").find("#remove").addClass("grupVal_" + count);
-		//         count++;
-		//     }
-		//     webutilModalAdjustHeight();
-		// });
+
 		//Eliminar grups
 		$(document).on('click', "#remove", function () {
 			var grupId = $(this).parent().children().attr('id');
@@ -1102,106 +1017,10 @@
 				$(dir3codi).find('.help-block').removeClass('hidden')
 				$(dir3codi).find('.form-group').addClass('has-error')
 			}
-			comprovarTitularComunicacio();
-//			var dir3Codi = closest.find("input[name='enviaments[" + index + "].titular.dir3Codi']");
-//			var sir = $('#organigrama').val().indexOf(dir3Codi.val());
-//			if($('#organigrama').val() != '' && dir3Codi != '' && sir != -1){
-//				document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0].value = '';
-//				$(dir3Codi).val("");
-//				closest.find("input[name='enviaments[" + index + "].titular.nom']").val("");
-// 			}
 
+			clearDocuments(numDocuments);
 
 		});
-
-		$(document).on('change', 'input[type=radio][name=enviamentTipus]', function (event) {
-
-			comprovarTitularComunicacio();
-
-			let enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-			if (enviamentTipus === 'COMUNICACIO') {
-				netejaFormularisPersonesAdministracio();
-			}
-
-			$('.interessat').trigger('change');
-
-		});
-
-		function netejaFormularisPersonesAdministracio() {
-			let $formEnviaments = $(".enviamentsForm");
-			$formEnviaments.each(function (i_enviament) {
-				setPersonaAdministracio("Tit", i_enviament, null, null, null, null);
-				let $formDestinataris = $($formEnviaments[i_enviament]).find(".destinatariForm");
-				$formDestinataris.each(function (i_destinatari) {
-					setPersonaAdministracio(i_enviament, i_destinatari, null, null, null, null);
-				});
-			});
-		}
-
-		function comprovarTitularComunicacio() {
-			var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
-			var tipusInteressatTitular = document.getElementById("enviaments[0].titular.interessatTipus").value;
-			var comunicacioAdministracio = false;
-			var notificacio = true;
-			if(enviamentTipus === 'COMUNICACIO') { //&& (tipusInteressatTitular == 'JURIDICA' || tipusInteressatTitular == 'FISICA')){
-				notificacio = false;
-				$('#rowRetard').addClass('hidden');
-				$('#rowDataProgramada').addClass('hidden');
-				$('#rowCaducitat').addClass('hidden');
-				if (tipusInteressatTitular === 'ADMINISTRACIO') {
-					$('#normalitzat').addClass('hidden');
-					$('#docs-addicionals').removeClass('hidden');
-					$('#btn-documents').removeClass('hidden');
-					comunicacioAdministracio = true;
-					$('#labelTitular').text('${titularComunicacioSir}');
-					$('#labelDestinataris').text('${destinatarisTitolComunicacioSir}');
-				} else {
-					$('#normalitzat').removeClass('hidden');
-					$('#docs-addicionals').addClass('hidden');
-					$('#btn-documents').addClass('hidden');
-					$('#labelTitular').text('${titular}');
-					$('#labelDestinataris').text('${destinatarisTitol}');
-				}
-
-			}else{
-				$('#rowRetard').removeClass('hidden');
-				$('#rowDataProgramada').removeClass('hidden');
-				$('#rowCaducitat').removeClass('hidden');
-				$('#normalitzat').removeClass('hidden');
-				$('#docs-addicionals').addClass('hidden');
-				$('#btn-documents').addClass('hidden');
-				$('#labelTitular').text('${titular}');
-				$('#labelDestinataris').text('${destinatarisTitol}');
-			}
-
-			if (!comunicacioAdministracio) {
-				for (var i = numDocuments - 1; i > 0; i--) {
-					$('#tipusDocument_' + i).val('').trigger('change');
-				}
-			}
-			$("#documents\\[0\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
-			$("#documents\\[0\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
-			$("#documents\\[1\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
-			$("#documents\\[1\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
-			$("#documents\\[2\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
-			$("#documents\\[2\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
-			$("#documents\\[3\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
-			$("#documents\\[3\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
-			$("#documents\\[4\\]\\.validesa>option[value='COPIA']").prop('disabled', notificacio);
-			$("#documents\\[4\\]\\.validesa").select2({theme: 'bootstrap', width: 'auto'});
-
-			$("p.comentari").each(function() {
-				if (comunicacioAdministracio) {
-					if (this.innerText.endsWith('ZIP.')) {
-						this.innerText = msgInfoDocSir;
-					}
-				} else if (this.innerText.endsWith('CSV.')) {
-					this.innerText = msgInfoDoc;
-				}
-
-			})
-
-		}
 
 		$(document).on('input', ".titularNif", function () {
 			$(this).closest('.enviamentsForm').find('.nifemisor').val($(this).val());
@@ -1273,8 +1092,6 @@
 		});
 		
 		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
-	
-
 	});
 
 </script>
@@ -1288,7 +1105,8 @@
 	</div>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
     <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
-    	<input type="hidden" name="id" value="${notificacioCommandV2.id}">
+		<form:hidden path="enviamentTipus" id="enviamentTipus"/>
+		<input type="hidden" name="id" value="${notificacioCommandV2.id}">
 		<div class="container-fluid">
 			<div class="title">
 				<span class="fa fa-address-book"></span>
@@ -1329,6 +1147,7 @@
 						emptyOptionTextKey="notificacio.form.camp.organ.select"/>
 				</div>
 			</div>
+
 			<!-- PROCEDIMENT -->
 			<div class="row">
 				<div class="col-md-12">
@@ -1352,48 +1171,28 @@
 					<not:inputSelect name="grupId" textKey="notificacio.form.camp.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" />
 				</div>
 			</div>
-			
-			
-			<!-- TIPUS D'ENVIAMENT -->
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label class="control-label col-xs-4" for="enviamentTipus"><spring:message code="notificacio.form.camp.enviamenttipus" /></label>
-						<div class="controls col-xs-8">
-							<div class="col-xs-6">
-								<form:radiobutton path="enviamentTipus" value="NOTIFICACIO" checked="checked"/>
-								<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO" />
-							</div>
-							<div class="col-xs-6">
-								<form:radiobutton path="enviamentTipus" value="COMUNICACIO" />
-								<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO" />
-							</div>
-						</div>
+			<c:if test="${enviamentTipus == 'NOTIFICACIO'}">
+				<!-- DATA ENVIAMENT PROGRAMADA -->
+				<div class="row" id="rowDataProgramada">
+					<div class="col-md-12">
+						<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.dataProgramada" info="true" messageInfo="notificacio.form.camp.dataProgramada.info" labelSize="2" inputSize="6" />
 					</div>
 				</div>
-			</div>
-			
-			<!-- DATA ENVIAMENT PROGRAMADA -->
-			<div class="row" id="rowDataProgramada">
-				<div class="col-md-12">
-					<not:inputDate name="enviamentDataProgramada" textKey="notificacio.form.camp.dataProgramada" info="true" messageInfo="notificacio.form.camp.dataProgramada.info" labelSize="2" inputSize="6" />
+
+				<!-- RETARD -->
+				<div class="row" id="rowRetard">
+					<div class="col-md-12">
+						<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="10" labelSize="2" inputSize="6"/>
+					</div>
 				</div>
-			</div>
-			
-			<!-- RETARD -->
-			<div class="row" id="rowRetard">
-				<div class="col-md-12">
-					<not:inputText name="retard" textKey="notificacio.form.camp.retard" info="true" messageInfo="notificacio.form.camp.retard.info" value="10" labelSize="2" inputSize="6"/>
+
+				<!-- CADUCITAT -->
+				<div class="row" id="rowCaducitat">
+					<div class="col-md-12">
+						<not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" info="true" messageInfo="notificacio.form.camp.caducitat.info" orientacio="bottom" labelSize="2" inputSize="6" required="true" />
+					</div>
 				</div>
-			</div>
-			
-			<!-- CADUCITAT -->
-			<div class="row" id="rowCaducitat">
-				<div class="col-md-12">
-					<not:inputDate name="caducitat" textKey="notificacio.form.camp.caducitat" info="true" messageInfo="notificacio.form.camp.caducitat.info" orientacio="bottom" labelSize="2" inputSize="6" required="true" />
-				</div>
-			</div>
-			
+			</c:if>
 			<!-- NÚMERO D'EXPEDIENT -->
 			<div class="row">
 				<div class="col-md-12">
@@ -1432,7 +1231,7 @@
 			<div class="container-envios">
 				<div class="newEnviament">
 				<c:forEach items="${envios}" var="enviament" varStatus="status">
-					<c:set var="j" value="${status.index}" />
+					<c:set var="j" value="${status.index}" scope="request"/>
 					<c:set var="k" value="${status.index + 1}" />
 						<div class="row enviamentsForm formEnviament enviamentForm_${j}">
 							<div class="col-md-12">
@@ -1529,86 +1328,11 @@
 							</div>
 							
 							<!-- DESTINATARIS -->
-							<div class="destinatari">
-								<div class="col-md-12 title-envios">
-									<div class="title-container">
-										<label id="labelDestinataris"> ${destinatarisTitol} </label>
-									</div>
-									<hr/>
-								</div>
-								<div class="newDestinatari_${j} dest">
-									<c:if test="${!empty enviament.destinataris}">
-										<c:set value="${enviament.destinataris}" var="destinataris"></c:set>
-										<c:forEach items="${destinataris}" var="destinatari" varStatus="status">
-											<c:set var="i" value="${status.index}" />
-											<div class="col-md-12 destinatariForm destenv_${j} personaForm_${j}_${i}">
-<%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
-													<input type="hidden" name="enviaments[${j}].destinataris[${i}].id" value="${destinatari.id}"/>
-													<!-- TIPUS INTERESSAT -->
-													<div class="col-md-3 interessatTipus">
-														<not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
-													</div>
-													<!-- NIF -->
-													<div class="col-md-3 nif">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" />
-													</div>
-													<!-- NOM / RAÓ SOCIAL -->
-													<div class="col-md-3 rao">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" inputMaxLength="${concepteSize}" showsize="true"/>
-													</div>
-													<!-- PRIMER LLINATGE -->
-													<div class="col-md-3 llinatge1">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1"
-																	   textKey="notificacio.form.camp.titular.llinatge1"
-																	   labelSize="12" inputSize="12" required="true"
-																	   inputMaxLength="${concepteSize}" showsize="true"/>
-													</div>
-													<!-- SEGON LLINATGE -->
-													<div class="col-md-3 llinatge2">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
-													</div>
-													<!-- TELÈFON -->
-													<div class="col-md-3">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].telefon" textKey="notificacio.form.camp.titular.telefon" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
-													</div>
-													<!-- EMAIL -->
-													<div class="col-md-4">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].email" textKey="notificacio.form.camp.titular.email" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
-													</div>
-													<!-- CODI DIR3 -->
-													<div class="col-md-3 dir3Codi hidden">
-														<not:inputTextSearch  funcio="obrirModalOrganismesDestinatari(${j},${i}, '${urlOrganigrama}', '${urlComunitatsAutonomes}','${urlNivellAdministracions}','${urlCercaUnitats}')" searchButton="searchOrgan${j}${i}" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12" readonly="true" value="${destinatari.dir3Codi}-${destinatari.nom}"/>
-													</div>						
-													<div class="col-md-3 hidden">
-														<not:inputText name="enviaments[${j}].destinataris[${i}].dir3Codi" textKey="notificacio.form.camp.titular.dir3codi" labelSize="12" inputSize="12"/>
-													</div>
-													<!-- ELIMINAR DESTINATARI -->
-													<div class="col-md-2 offset-col-md-2">
-														<div class="float-right">
-															<input type="button" class="btn btn-danger btn-group delete" name="destinatarisDelete[${j}][${i}]" onclick="destinatarisDelete(this.id)" id="destinatarisDelete[${j}][${i}]" value="<spring:message code="notificacio.form.boto.eliminar.destinatari"/>"/>
-														</div>
-													</div>
-													<div class="col-md-12">
-														<hr style="border-top: 1px dotted #BBB">
-													</div>
-											</div>
-										</c:forEach>
-									</c:if>
-								</div>
-									
-								<c:set var="addHidden" value="${isMultiplesDestinataris || empty enviament.destinataris}"/>
-								<!-- AFEGIR NOU DESTINATARI -->
-								<div class="col-md-12">
-									<div class="text-left">	
-										<input type="button" class="btn btn-default addDestinatari<c:if test="addHidden"> hidden</c:if>"
-											   name="enviaments[${j}]" id="enviaments[${j}]"
-											   onclick="addDestinatari(this.id, ${isMultiplesDestinataris})"
-											   value="<spring:message code="notificacio.form.boto.nou.destinatari"/>" />
-									</div>
-								</div>
-							
-							</div>
-							<div class="col-md-12 separacio"></div>
+							<c:if test="${tipusEnviament != 'comunicacioSir'}">
+								<c:set var="enviament" value="${enviament}" scope="request" />
+								<c:import url="includes/destinatariForm.jsp"/>
+								<div class="col-md-12 separacio"></div>
+							</c:if>
 							
 							<div class="metodeEntrega">
 								<div class="col-md-12 title-envios">
@@ -1833,10 +1557,10 @@
 					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 						<c:choose>
 							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="test"/>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="test"/>
 							</c:when>
 							<c:otherwise>
-								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_0}"/>
+								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_0}"/>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -1899,10 +1623,10 @@
 						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_1}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_1}"/>
+									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_1}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -1963,10 +1687,10 @@
 						<div id="input-origen-arxiu_2" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_2}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_2}"/>
+									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_2}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2027,10 +1751,10 @@
 						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_3}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_3}"/>
+									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_3}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2091,10 +1815,10 @@
 						<div id="input-origen-arxiu_4" class="col-md-6 hidden">
 							<c:choose>
 								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
-									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_4}"/>
 								</c:when>
 								<c:otherwise>
-									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="notificacio.for.camp.document.avis" fileName="${nomDocument_4}"/>
+									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_4}"/>
 								</c:otherwise>
 							</c:choose>
 						</div>
@@ -2115,20 +1839,22 @@
 						<hr/>
 					</div>
 				</div>
-	
+
+				<c:if test="${enviamentTipus == 'COMUNICACIO_SIR'}">
 				<div id="btn-documents" class="text-left vt10 hidden">
-	<%--				<div class="btn-group">--%>
-						<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
-						<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
-	<%--				</div>--%>
+					<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
+					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
 				</div>
+				</c:if>
 	
 				<!--  DOCUMENT NOTMALITZAT -->
+				<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
 				<div id="normalitzat" class="row">
 					<div class="col-md-12">
 						<not:inputCheckbox name="documents[0].normalitzat" textKey="notificacio.form.camp.normalitzat" info="true" messageInfo="notificacio.form.camp.normalitzat.info" labelSize="2" />
 					</div>
 				</div>
+				</c:if>
 			</div>
 
 			<div class="col-md-12">

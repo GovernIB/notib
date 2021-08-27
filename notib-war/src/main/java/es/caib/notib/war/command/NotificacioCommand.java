@@ -8,6 +8,7 @@ import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidNotificacio;
@@ -35,7 +36,7 @@ import java.util.List;
  */	
 @Getter @Setter
 @ValidNotificacio
-public class NotificacioCommandV2 {
+public class NotificacioCommand {
 
 	private Long id;
 	@NotEmpty @Size(max=9)
@@ -43,7 +44,7 @@ public class NotificacioCommandV2 {
 	@NotEmpty
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
+	private TipusEnviamentEnumDto enviamentTipus;
 	@Size(min=3, max=240)
 	private String concepte;
 	@Size(max=1000)
@@ -99,16 +100,34 @@ public class NotificacioCommandV2 {
 		return null;
 	}
 
-	public static NotificacioCommandV2 asCommand(NotificacioDtoV2 dto) {
+	public static NotificacioCommand asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {
 			return null;
 		}
-		NotificacioCommandV2 command = ConversioTipusHelper.convertir(dto, NotificacioCommandV2.class);
+		NotificacioCommand command = ConversioTipusHelper.convertir(dto, NotificacioCommand.class);
 		
 		if (dto.getProcediment() != null) {
 			command.setProcedimentId(dto.getProcediment().getId());
 		}
 
+		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
+			boolean aAdministracio = false;
+			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
+				if (InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+					aAdministracio = true;
+					break;
+				}
+			}
+			if (aAdministracio) {
+				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
+
+			} else {
+				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
+
+			}
+		} else {
+			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
+		}
 		// Documents
 
 		return command;
@@ -247,6 +266,6 @@ public class NotificacioCommandV2 {
 	
 	public interface NotificacioCaducitat {}
 	
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioCommandV2.class);
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioCommand.class);
 
 }

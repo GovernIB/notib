@@ -12,7 +12,7 @@ public class NotificacioEnviamentCommand {
 	
 	private Long id;
 	private Date dataEnviament;
-	private NotificacioCommandV2 notificacio;
+	private NotificacioCommand notificacio;
 	private String codiNotifica;
 	private String codiProcediment;
 	private String usuari;
@@ -131,10 +131,10 @@ public class NotificacioEnviamentCommand {
 	public void setEstat(String estat) {
 		this.estat = estat;
 	}	
-	public NotificacioCommandV2 getNotificacio() {
+	public NotificacioCommand getNotificacio() {
 		return notificacio;
 	}
-	public void setNotificacio(NotificacioCommandV2 notificacio) {
+	public void setNotificacio(NotificacioCommand notificacio) {
 		this.notificacio = notificacio;
 	}
 	

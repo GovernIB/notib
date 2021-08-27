@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.api.dto.notificacio;
 
 /**

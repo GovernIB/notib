@@ -3,14 +3,14 @@ package es.caib.notib.war.validation;
 
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.EnviamentCommand;
-import es.caib.notib.war.command.NotificacioCommandV2;
+import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
 import org.apache.commons.io.FilenameUtils;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ValidNotificacioValidator implements ConstraintValidator<ValidNotificacio, NotificacioCommandV2> {
+public class ValidNotificacioValidator implements ConstraintValidator<ValidNotificacio, NotificacioCommand> {
 
 	@Autowired
 	private AplicacioService aplicacioService;
@@ -41,7 +41,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(final NotificacioCommandV2 notificacio, final ConstraintValidatorContext context) {
+	public boolean isValid(final NotificacioCommand notificacio, final ConstraintValidatorContext context) {
 		boolean valid = true;
 		boolean comunicacioAmbAdministracio = false;
 		boolean comunicacioSenseAdministracio = false;
@@ -70,7 +70,9 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 						
 			//Validar si és comunicació
-			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
+			// TODO: Aquesta validació no té molt de sentit ara que hem dividit els formularis
+			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO ||
+					notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR) {
 				if (notificacio.getEnviaments() != null) {
 					for (EnviamentCommand enviament : notificacio.getEnviaments()) {
 						if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
@@ -90,7 +92,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 			
 			// Procediment
-			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
+			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
 				if (notificacio.getProcedimentId() == null) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
@@ -111,7 +113,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 			
 			// Validació caducitat
-			if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO) {
+			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
 				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(new Date())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
