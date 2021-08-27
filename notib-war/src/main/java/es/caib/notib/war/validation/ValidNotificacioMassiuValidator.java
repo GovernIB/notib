@@ -18,7 +18,7 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 	Long csvFileMaxSize = 2097152L; //2MB
 	Long zipFileMaxSize = 15728640L; // 15MB
 	List<String> formatsZipDisponibles = Arrays.asList("application/zip", "application/x-zip-compressed");
-	List<String> formatsCsvDisponibles = Arrays.asList("application/octet-stream", "text/csv");
+//	List<String> formatsCsvDisponibles = Arrays.asList("application/octet-stream", "text/csv");
 	List<String> extensionsZipDisponibles = Collections.singletonList("zip");
 	List<String> extensionsCsvDisponibles = Collections.singletonList("csv");
 
@@ -73,10 +73,10 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 			log.info("Error validacio CSV enviament massiu. Extensió fitxer incorrecte: " + extensio);
 			return "notificacio.form.valid.document.format";
 		}
-		if (!formatsCsvDisponibles.contains(fitxerCSV.getContentType())) {
-			log.info("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerCSV.getContentType());
-			return "notificacio.form.valid.document.format";
-		}
+//		if (!formatsCsvDisponibles.contains(fitxerCSV.getContentType())) {
+//			log.info("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerCSV.getContentType());
+//			return "notificacio.form.valid.document.format";
+//		}
 		Long fileSize = fitxerCSV.getSize();
 		if (fileSize > csvFileMaxSize) {
 			return "notificacio.form.valid.document.size";
