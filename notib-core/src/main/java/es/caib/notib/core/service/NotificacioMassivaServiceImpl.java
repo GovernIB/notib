@@ -312,8 +312,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             } catch (IOException e) {
                 log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.");
                 e.printStackTrace();
-            } catch (Exception e) {
+            } catch (Exception|Error e) {
                 log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.");
+                e.printStackTrace();
             }
 
             writeCsvClose(listWriterErrors);
