@@ -303,7 +303,7 @@ public class ClientRestTest extends ClientBaseTest {
 
 		int numDestinataris = 1;
 		int numEnviaments = 1;
-		boolean ambEnviamentPostal = false;
+		boolean ambEnviamentPostal = true;
 		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
 		boolean ambEnviamentDEH = true;
 		boolean ambEnviamentDEHObligat = true;
