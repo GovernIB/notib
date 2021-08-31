@@ -432,9 +432,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						"No s'ha pogut obtenir la denominació de l'organ gestor");
 			}
 			if (!updateLlibre(entitat, organGestor)) {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_UNITATS,
-						"No s'ha pogut obtenir el llibre de l'organ gestor");
+				logger.debug(String.format(
+						"No s'ha pogut actualitzar el llibre de l'òrgan gestor %s, segurament l'òrgan no estigui donat d'alta al registre",
+						organGestorCodi));
 			}
 
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
@@ -560,7 +560,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			if (oficinesSIR != null && !oficinesSIR.isEmpty())
 				organGestor.updateOficina(oficinesSIR.get(0).getCodi(), oficinesSIR.get(0).getNom());
 			else
-				return false;
+				logger.debug(String.format("L'òrgan gestor %s no disposa de cap oficina", organGestor.getCodi()));
 		} catch (Exception e) {
 			logger.error(String.format("L'oficina de l'òrgan gestor %s de l'entitat %s no s'ha pogut actualitzar",
 					organGestor.getCodi(),
@@ -577,7 +577,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (!arbreUnitats.containsKey(organGestor.getCodi())) {
 			logger.trace(String.format("Organ Gestor (%s) no trobat a l'organigrama", organGestor.getCodi()));
 			organGestor.updateEstat(OrganGestorEstatEnum.ALTRES);
-			return false;
+			return true;
 		}
 		NodeDir3 nodeOrgan = arbreUnitats.get(organGestor.getCodi());
 		organGestor.updateEstat(organGestorHelper.getEstatOrgan(nodeOrgan));
