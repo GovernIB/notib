@@ -1237,10 +1237,11 @@
 							<div class="col-md-12">
 								<label class="envio[${k}] badge badge-light">Enviament ${k}</label>
 							</div>
-							<div>
+							<cdiv>
 							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
 						
 							<!-- TIPUS DE SERVEI -->
+							<c:if test="${tipusEnviament != 'comunicacioSir'}">
 							<div class="col-md-6">
 								<div class="form-group">
 									<label class="control-label col-xs-4" for="enviaments[${j}].serveiTipus"><spring:message code="notificacio.form.camp.serveitipus" /></label>
@@ -1256,6 +1257,7 @@
 									</div>
 								</div>
 							</div>
+							</c:if>
 							
 							<!-- TITULAR -->
 							<div class="titular">
@@ -1297,14 +1299,16 @@
 										</div>
 										
 										<!-- EMAIL -->
+										<c:if test="${tipusEnviament != 'comunicacioSir'}">
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
+										</c:if>
 										
 										<!-- TELÈFON -->
-										<div class="col-md-6">
-											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" inputMaxLength="${telefonSize}" showsize="true"/>
-										</div>
+<%--										<div class="col-md-6">--%>
+<%--											<not:inputText name="enviaments[${j}].titular.telefon" textKey="notificacio.form.camp.titular.telefon" inputMaxLength="${telefonSize}" showsize="true"/>--%>
+<%--										</div>--%>
 										
 										<!-- CODI DIR3 -->
 										<div class="col-md-6 dir3Codi hidden">
@@ -1500,13 +1504,15 @@
 						</div>
 				</c:forEach>
 				</div>
-			</div>
-			<div class="text-left vt10">
-				<div class="btn-group">
-					<input type="button" class="btn btn-default" id="addEnviament"
-						   onclick="addEnvio('${urlOrganigrama}', '${urlComunitatsAutonomes}', '${urlNivellAdministracions}', '${urlCercaUnitats}', '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}', personaMaxSizes)"
-						   value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
-				</div>
+				<c:if test="${tipusEnviament != 'comunicacioSir'}">
+					<div class="text-left vt10">
+						<div class="btn-group">
+							<input type="button" class="btn btn-default" id="addEnviament"
+								   onclick="addEnvio('${urlOrganigrama}', '${urlComunitatsAutonomes}', '${urlNivellAdministracions}', '${urlCercaUnitats}', '${urlPaisos}', '${urlProvincies}', '${urlLocalitats}', personaMaxSizes)"
+								   value="<spring:message code="notificacio.form.boto.nou.enviament"/>" />
+						</div>
+					</div>
+				</c:if>
 			</div>
 
 			<!-- DOCUMENT -->
