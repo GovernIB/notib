@@ -1,9 +1,9 @@
 package es.caib.notib.core.api.dto;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.Getter;
 
 @Getter
 public class IntegracioInfo {
@@ -27,7 +27,11 @@ public class IntegracioInfo {
 		for (AccioParam param: params)
 			this.params.add(param);
 	}
-	
+
+	public void addParam(String key, String value) {
+		this.params.add(new AccioParam(key, value));
+	}
+
 	public Long getTempsResposta() {
 		return System.currentTimeMillis() - tempsInici;
 	}
