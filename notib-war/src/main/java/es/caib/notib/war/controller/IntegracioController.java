@@ -14,6 +14,7 @@ import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -59,12 +60,12 @@ public class IntegracioController extends BaseUserController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		return getAmbCodi(request, null, model);
+		return getAmbCodi(request, "USUARIS", model);
 	}
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(
 			HttpServletRequest request,
-			@PathVariable String codi,
+			@PathVariable @NonNull String codi,
 			Model model) {
 		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
 		for (IntegracioDto integracio: integracions) {
@@ -80,17 +81,12 @@ public class IntegracioController extends BaseUserController {
 		model.addAttribute(
 				"integracions",
 				integracions);
-		if (codi != null) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					codi);
-		} else if (integracions.size() > 0) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					integracions.get(0).getCodi());
-		}
+
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_FILTRE,
+				codi);
+
 		model.addAttribute(
 				"codiActual",
 				RequestSessionHelper.obtenirObjecteSessio(

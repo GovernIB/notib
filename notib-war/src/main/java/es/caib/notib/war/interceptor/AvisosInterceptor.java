@@ -3,6 +3,7 @@ package es.caib.notib.war.interceptor;
 import es.caib.notib.core.api.service.AvisService;
 import es.caib.notib.war.helper.AvisHelper;
 import es.caib.notib.war.helper.RolHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class AvisosInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
@@ -26,7 +28,7 @@ public class AvisosInterceptor extends HandlerInterceptorAdapter {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-
+		log.info("[AVISOS] Executant interceptor");
 		List<String> rols = RolHelper.getRolsUsuariActual(request);
 		// Si es un usuari que no només té accés d'aplicació
 		if (rols.contains(RolHelper.ROLE_USUARI) ||

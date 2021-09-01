@@ -58,7 +58,7 @@ public class RolHelper {
 			}
 		}
 	}
-	
+
 	private static void updateUltimRol(
 			HttpServletRequest request,
 			AplicacioService aplicacioService,
@@ -74,9 +74,7 @@ public class RolHelper {
 		return getRolActual(request, null);
 	}
 	
-	public static String getRolActual(
-			HttpServletRequest request,
-			AplicacioService aplicacioService) {
+	public static String getRolActual(HttpServletRequest request, AplicacioService aplicacioService) {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		if (rolActual == null && aplicacioService != null) {

@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -30,37 +31,35 @@ public class SessioHelper {
 			HttpServletResponse response,
 			AplicacioService aplicacioService,
 			EntitatService entitatService) {
+		HttpSession session =  request.getSession();
 		if (request.getUserPrincipal() != null) {
-			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_AUTH_PROCESSADA);
-			if (autenticacioProcessada == null) {
+			Boolean autenticacioProcessada = (Boolean) session.getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA);
+			if (autenticacioProcessada == null) { // Authenticam usuari
 				aplicacioService.processarAutenticacioUsuari();
-				request.getSession().setAttribute(
-						SESSION_ATTRIBUTE_AUTH_PROCESSADA,
-						new Boolean(true));
+				session.setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, Boolean.TRUE);
 			}
 		}
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		String idioma_usuari = usuari.getIdioma();
 		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-        
-		request.getSession().setAttribute(
+
+		session.setAttribute(
 				"SessionHelper.capsaleraCapLogo", 
 				aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
-		request.getSession().setAttribute(
+		session.setAttribute(
 				"SessionHelper.capsaleraPeuLogo", 
 				aplicacioService.propertyGet("es.caib.notib.peu.logo"));
-		request.getSession().setAttribute(
+		session.setAttribute(
 				"SessionHelper.capsaleraColorFons", 
 				aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
-		request.getSession().setAttribute(
+		session.setAttribute(
 				"SessionHelper.capsaleraColorLletra", 
 				aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
-		
-		request.getSession().setAttribute(
+
+		session.setAttribute(
 				SESSION_ATTRIBUTE_IDIOMA_USUARI, 
 				idioma_usuari);
-		request.getSession().setAttribute(
+		session.setAttribute(
 				"dadesUsuariActual", 
 				usuari);
 		// Assegurem que l'entitat i rol actual s'hagin carregat correctament

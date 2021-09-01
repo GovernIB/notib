@@ -88,7 +88,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 							DadesUsuari.class);
 				}
 			} else {
-				logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
+				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
 				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (dadesUsuari != null) {
 					if (dadesUsuari.getNomSencer() != null) {

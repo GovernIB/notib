@@ -4,12 +4,12 @@
 package es.caib.notib.war.security;
 
 import es.caib.notib.core.api.service.AplicacioService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.authority.mapping.MappableAttributesRetriever;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,17 +19,15 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class RolesBasedMappableAttributesRetriever implements MappableAttributesRetriever, ApplicationContextAware {
 
 	private Set<String> defaultMappableAttributes;
 	private Set<String> mappableAttributes = new HashSet<String>();
-	private long refrescarTimestamp = 0;
-
 	private ApplicationContext applicationContext;
 
-
-
 	public Set<String> getMappableAttributes() {
+		// Aquest mètode es crida cada vegada que un usuari s'autentica
 		refrescarMappableAttributes();
 		return mappableAttributes;
 	}
@@ -41,29 +39,20 @@ public class RolesBasedMappableAttributesRetriever implements MappableAttributes
 		this.applicationContext = applicationContext;
 	}
 
-
-
 	private void refrescarMappableAttributes() {
-		if (refrescarTimestamp < System.currentTimeMillis()) {
-			LOGGER.debug("Refrescant el llistat de rols per mapejar");
-			mappableAttributes.clear();
-			if (defaultMappableAttributes != null) {
-				mappableAttributes.addAll(defaultMappableAttributes);
-			}
-			try {
-				AplicacioService aplicacioService = applicationContext.getBean(AplicacioService.class);
-				List<String> rolsPermisos = aplicacioService.permisosFindRolsDistinctAll();
-				mappableAttributes.addAll(rolsPermisos);
-				// Refrescam els rols disponibles cada hora
-				refrescarTimestamp = System.currentTimeMillis() + (60 * 60 * 1000);
-//				String rolsPerMostrar = Arrays.toString(mappableAttributes.toArray(new String[mappableAttributes.size()]));
-//				LOGGER.debug("Rols disponibles: " + rolsPerMostrar);
-			} catch (RuntimeException ex) {
-				throw ex;
-			}
+		log.info("Refrescant el llistat de rols per mapejar");
+		mappableAttributes.clear();
+		if (defaultMappableAttributes != null) {
+			mappableAttributes.addAll(defaultMappableAttributes);
+		}
+		try {
+			AplicacioService aplicacioService = applicationContext.getBean(AplicacioService.class);
+			List<String> rolsPermisos = aplicacioService.permisosFindRolsDistinctAll();
+			mappableAttributes.addAll(rolsPermisos);
+			String rolsPerMostrar = Arrays.toString(mappableAttributes.toArray(new String[0]));
+			log.info("Rols disponibles: " + rolsPerMostrar);
+		} catch (RuntimeException ex) {
+			throw ex;
 		}
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RolesBasedMappableAttributesRetriever.class);
-
 }
