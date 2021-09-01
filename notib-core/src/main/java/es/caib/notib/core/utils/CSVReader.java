@@ -22,6 +22,9 @@ public class CSVReader {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(fitxer);
             String detectedCharset = UniversalDetector.detectCharset(bais);
+            if(detectedCharset == null) {
+                detectedCharset = "UTF-8";
+            }
             Reader reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
             listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
             List<String> linia;
@@ -45,6 +48,9 @@ public class CSVReader {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(fitxer);
             String detectedCharset = UniversalDetector.detectCharset(bais);
+            if(detectedCharset == null) {
+                detectedCharset = "UTF-8";
+            }
             Reader reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
             listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
             List<String> res = listReader.read();
