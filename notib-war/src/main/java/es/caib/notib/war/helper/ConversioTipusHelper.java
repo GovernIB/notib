@@ -150,6 +150,7 @@ public class ConversioTipusHelper {
 				})
 				.register();
 		mapperFactory.classMap(NotificacioDatabaseDto.class, NotificacioCommand.class)
+				.exclude("enviamentTipus")
 				.byDefault()
 				.customize(new CustomMapper<NotificacioDatabaseDto, NotificacioCommand>() {
 					@Override
@@ -163,6 +164,18 @@ public class ConversioTipusHelper {
 						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
 						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
 						notificacioCommand.setDocuments(documents);
+						if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacioDto.getEnviamentTipus())){
+							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
+						} else {
+							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
+							if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
+									notificacioDto.getEnviaments().get(0).getTitular()!= null){
+								PersonaDto titular = notificacioDto.getEnviaments().get(0).getTitular();
+								if (InteressatTipusEnumDto.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
+									notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
+								}
+							}
+						}
 					}
 					@Override
 					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDatabaseDto notificacioDto, MappingContext context) {
@@ -189,6 +202,11 @@ public class ConversioTipusHelper {
 						notificacioDto.setDocument4(documents.size() > 3 ? documents.get(3) : null);
 						notificacioDto.setDocument5(documents.size() > 4 ? documents.get(4) : null);
 						notificacioDto.setOrganGestorCodi(notificacioCommand.getOrganGestor());
+						if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacioCommand.getEnviamentTipus())){
+							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
+						} else {
+							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+						}
 					}
 				})
 				.register();

@@ -339,6 +339,7 @@ public class NotificacioController extends BaseUserController {
                 log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
             }
 
+            model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
 
@@ -375,6 +376,7 @@ public class NotificacioController extends BaseUserController {
                     bindingResult,
                     tipusDocumentEnumDto,
                     model);
+            model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");

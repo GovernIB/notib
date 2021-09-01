@@ -1,6 +1,9 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
@@ -10,10 +13,7 @@ import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
+import es.caib.notib.core.repository.*;
 import es.caib.plugins.arxiu.api.Document;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,8 @@ import java.util.Map;
 @Slf4j
 @Component
 public class NotificacioHelper {
-
+	@Autowired
+	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private ProcedimentOrganRepository procedimentOrganRepository;
 	@Autowired
@@ -61,6 +63,39 @@ public class NotificacioHelper {
 	private NotificaHelper notificaHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+
+	@Transactional
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
+		log.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
+		List<RegistreIdDto> registresIdDto = new ArrayList<>();
+		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
+		log.info(" [REG] Inici registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
+
+		long startTime = System.nanoTime();
+		double elapsedTime;
+		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+			log.info("Comprovant estat actual notificació (id: " + notificacioEntity.getId() + ")...");
+			NotificacioEstatEnumDto estatActual = notificacioEntity.getEstat();
+			log.info("Estat notificació [Id:" + notificacioEntity.getId() + ", Estat: "+ estatActual + "]");
+
+			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
+				long startTime2 = System.nanoTime();
+				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
+				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
+				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
+				if (notificar){
+					startTime2 = System.nanoTime();
+					notificaHelper.notificacioEnviar(notificacioEntity.getId());
+					elapsedTime = (System.nanoTime() - startTime2) / 10e6;
+					log.info(" [TIMER-REG] Notificació enviar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
+				}
+			}
+		}
+		elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
+		log.info(" [REG] Fi registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
+		return registresIdDto;
+	}
 
 	public NotificacioEntity altaEnviamentsWeb(EntitatEntity entitat,
 											   NotificacioEntity notificacioEntity,

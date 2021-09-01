@@ -1134,35 +1134,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
-			List<RegistreIdDto> registresIdDto = new ArrayList<>();
-			NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
-			logger.info(" [REG] Inici registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-
-			long startTime = System.nanoTime();
-			double elapsedTime;
-			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-				logger.info("Comprovant estat actual notificació (id: " + notificacioEntity.getId() + ")...");
-				NotificacioEstatEnumDto estatActual = notificacioEntity.getEstat();
-				logger.info("Estat notificació [Id:" + notificacioEntity.getId() + ", Estat: "+ estatActual + "]");
-				
-				if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
-					long startTime2 = System.nanoTime();
-					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
-					elapsedTime = (System.nanoTime() - startTime2) / 10e6;
-					logger.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
-					if (notificar){
-						startTime2 = System.nanoTime();
-						notificaHelper.notificacioEnviar(notificacioEntity.getId());
-						elapsedTime = (System.nanoTime() - startTime2) / 10e6;
-						logger.info(" [TIMER-REG] Notificació enviar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
-					}
-				}
-			}
-			elapsedTime = (System.nanoTime() - startTime) / 10e6;
-			logger.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
-			logger.info(" [REG] Fi registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-			return registresIdDto;
+			return notificacioHelper.registrarNotificar(notificacioId);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1302,7 +1274,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public void notificacioEnviar(Long notificacioId) {

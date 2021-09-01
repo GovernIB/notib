@@ -37,6 +37,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
+	private NotificacioHelper notificacioHelper;
+	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
 	private EntitatService entitatService;
@@ -61,7 +63,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 				logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
 				for (NotificacioEntity pendent : (List<NotificacioEntity>)pendents) {
 					logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-					notificacioService.registrarNotificar(pendent.getId());
+					notificacioHelper.registrarNotificar(pendent.getId());
 				}
 			} else {
 				logger.info("[REG] No hi ha notificacions pendents de registrar");
@@ -97,6 +99,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
 	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -265,8 +268,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 		
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
-		
-	
+
+
 	private boolean isNotificaEnviamentsActiu() {
 		return configHelper.getAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");
 	}

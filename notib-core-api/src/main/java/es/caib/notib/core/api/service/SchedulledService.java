@@ -17,7 +17,7 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.
 	 */
-	public void notificaEnviamentsRegistrats();
+	void notificaEnviamentsRegistrats();
 	
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents

@@ -965,7 +965,7 @@
 			var closest = $(this).closest('.destinatariForm, .personaForm');
 			var llinatge1 = closest.find('.llinatge1');
 			var llinatge2 = closest.find('.llinatge2');
-			var enviamentTipus = $('input[name=enviamentTipus]:checked').val();
+			var enviamentTipus = $('input#enviamentTipus').val();
 			var nif = closest.find('.nif');
 			var nifLabel = nif.find('label');
 			var dir3codi = closest.find('.dir3Codi');
@@ -977,6 +977,7 @@
 			var dir3Desc = closest.find('.codiDir3 input').val();
 			console.log($(this));
 			console.log("Formulari destinatari: " + $(this).val());
+			console.log(enviamentTipus)
 			if ($(this).val() == 'ADMINISTRACIO') {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');

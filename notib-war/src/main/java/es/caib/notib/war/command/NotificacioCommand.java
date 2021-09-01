@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -51,7 +50,6 @@ public class NotificacioCommand {
 	private String descripcio;
 	private Date enviamentDataProgramada;
 	private int retard;
-	@NotNull
 	private Date caducitat;
 	private Long procedimentId;
 	private String procedimentNom;

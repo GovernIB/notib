@@ -114,7 +114,12 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			
 			// Validació caducitat
 			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
-				if (notificacio.getCaducitat() != null && !notificacio.getCaducitat().after(new Date())) {
+				if (notificacio.getCaducitat() == null) {
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotNull"))
+							.addNode("caducitat")
+							.addConstraintViolation();
+				}
+				else if (!notificacio.getCaducitat().after(new Date())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.caducitat"))
