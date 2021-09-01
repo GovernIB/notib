@@ -1,6 +1,7 @@
 package es.caib.notib.core.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mozilla.universalchardet.UniversalDetector;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.prefs.CsvPreference;
@@ -19,7 +20,9 @@ public class CSVReader {
         List<String[]> linies = new ArrayList<String[]>();
         ICsvListReader listReader = null;
         try {
-            Reader reader = new InputStreamReader(new ByteArrayInputStream(fitxer));
+            ByteArrayInputStream bais = new ByteArrayInputStream(fitxer);
+            String detectedCharset = UniversalDetector.detectCharset(bais);
+            Reader reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
             listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
             List<String> linia;
             int index = 0;
@@ -40,7 +43,9 @@ public class CSVReader {
     public static List<String> readHeader(byte[] fitxer) {
         ICsvListReader listReader = null;
         try {
-            Reader reader = new InputStreamReader(new ByteArrayInputStream(fitxer));
+            ByteArrayInputStream bais = new ByteArrayInputStream(fitxer);
+            String detectedCharset = UniversalDetector.detectCharset(bais);
+            Reader reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
             listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
             List<String> res = listReader.read();
             listReader.close();
