@@ -100,7 +100,7 @@ public class NotificaWsTestIntegracio {
 	@Before
 	public void setUp() throws IOException, DecoderException {
 		es.caib.notib.core.helper.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
-		es.caib.notib.plugin.utils.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+		es.caib.notib.plugin.PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 		notificaHelper.setModeTest(true);
 		entitat = new EntitatDto();
 		entitat.setCodi("DGTIC");

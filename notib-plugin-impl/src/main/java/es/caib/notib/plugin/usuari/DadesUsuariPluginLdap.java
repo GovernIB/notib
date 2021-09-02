@@ -4,7 +4,6 @@
 package es.caib.notib.plugin.usuari;
 
 import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

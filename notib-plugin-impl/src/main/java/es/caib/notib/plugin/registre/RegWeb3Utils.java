@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.regweb3.ws.api.v3.*;
 import org.apache.commons.io.IOUtils;
 
@@ -34,18 +35,18 @@ public abstract class RegWeb3Utils {
 
 
 	public static String getEndPoint(String api) {
-		String url = System.getProperties().getProperty("es.caib.notib.plugin.registre.url");
+		String url = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.url");
 		if (!url.endsWith("/"))
 			url = url + "/";
 		return url + api;
 	}
 
 	public static String getAppUserName() {
-		return System.getProperties().getProperty("es.caib.notib.plugin.registre.usuari");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.usuari");
 	}
 
 	public static String getAppPassword() {
-		return System.getProperties().getProperty("es.caib.notib.plugin.registre.password");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.password");
 	}
 
 	public static void configAddressUserPassword(

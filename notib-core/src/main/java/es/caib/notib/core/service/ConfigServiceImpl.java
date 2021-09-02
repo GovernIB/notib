@@ -4,6 +4,7 @@ import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.PluginHelper;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -36,6 +38,8 @@ public class ConfigServiceImpl implements ConfigService {
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private PluginHelper pluginHelper;
+    @Autowired
+    private CacheHelper cacheHelper;
 
     @Override
     @Transactional
@@ -47,6 +51,7 @@ public class ConfigServiceImpl implements ConfigService {
         if (property.getKey().endsWith(".class")){
             pluginHelper.resetPlugins();
         }
+        cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
 
@@ -70,7 +75,9 @@ public class ConfigServiceImpl implements ConfigService {
         log.debug("Sincronitzant les propietats amb JBoss");
         Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
         List<String> editedProperties = new ArrayList<>();
-        for (String key : properties.stringPropertyNames()) {
+        List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
+        Collections.sort(propertiesList);
+        for (String key : propertiesList) {
             String value = properties.getProperty(key);
             log.trace(key + " : " + value);
             ConfigEntity configEntity = configRepository.findOne(key);

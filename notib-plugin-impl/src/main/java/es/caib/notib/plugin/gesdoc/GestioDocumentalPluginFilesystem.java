@@ -1,5 +1,6 @@
 package es.caib.notib.plugin.gesdoc;
 
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -149,7 +150,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	}
 
 	private String getBaseDir(String agrupacio) {
-		String baseDir = System.getProperties().getProperty(
+		String baseDir = PropertiesHelper.getProperties().getProperty(
 				"es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		if (baseDir != null) {
 			if (baseDir.endsWith("/")) {

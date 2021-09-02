@@ -1,7 +1,7 @@
 package es.caib.notib.plugin.gesdoc;
 
 import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.utils.PropertiesHelper;
+import es.caib.notib.plugin.PropertiesHelper;
 import junit.framework.TestCase;
 import org.junit.Before;
 
@@ -19,7 +19,7 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
 
     @Before
     public void setUp() throws Exception {
-        PropertiesHelper.getProperties().setLlegirSystem(false);
+//        PropertiesHelper.getProperties().setLlegirSystem(false);
         PropertiesHelper.getProperties().setProperty(
                 "es.caib.notib.plugin.gesdoc.filesystem.base.dir",
                 BASE_DIR);

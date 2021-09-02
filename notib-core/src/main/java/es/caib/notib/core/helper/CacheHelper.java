@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.LlibreDto;
@@ -216,6 +213,12 @@ public class CacheHelper {
 	
 	public void clearCache(String cacheName) {
 		cacheManager.getCache(cacheName).clear();
+	}
+
+	public void clearAllCaches() {
+		for(String cacheName : cacheManager.getCacheNames()) {
+			clearCache(cacheName);
+		}
 	}
 
 	public long getCacheSize(String cacheName)

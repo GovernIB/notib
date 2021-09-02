@@ -12,6 +12,7 @@ import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.exception.DocumentNotFoundException;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
@@ -2235,7 +2236,7 @@ public class PluginHelper {
 			Map<String, String> pluginProps = configHelper.getGroupProperties(codeProperties);
 			for (Map.Entry<String, String> entry : pluginProps.entrySet() ) {
 				String value = entry.getValue() == null ? "" : entry.getValue();
-				System.setProperty(entry.getKey(), value);
+				PropertiesHelper.getProperties().setProperty(entry.getKey(), value);
 			}
 		}
 	}

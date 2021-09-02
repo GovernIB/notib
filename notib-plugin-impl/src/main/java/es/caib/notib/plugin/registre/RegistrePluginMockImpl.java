@@ -2,7 +2,7 @@ package es.caib.notib.plugin.registre;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.plugin.utils.PropertiesHelper;
+import es.caib.notib.plugin.PropertiesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

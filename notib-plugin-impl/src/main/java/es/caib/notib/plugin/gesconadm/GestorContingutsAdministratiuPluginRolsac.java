@@ -6,6 +6,7 @@ import com.sun.jersey.api.client.*;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.Setter;
@@ -341,7 +342,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	
 	private String getBaseUrl() {
 		if (baseUrl == null || baseUrl.isEmpty()) {
-			baseUrl = System.getProperties().getProperty("es.caib.notib.plugin.gesconadm.base.url");
+			baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.base.url");
 			if (baseUrl != null && !baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
 				baseUrl = baseUrl + "/";
 			}
@@ -350,15 +351,15 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	}
 	
 	private String getUsernameServiceUrl() {
-		return System.getProperties().getProperty("es.caib.notib.plugin.gesconadm.username");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.username");
 	}
 
 	private String getPasswordServiceUrl() {
-		return System.getProperties().getProperty("es.caib.notib.plugin.gesconadm.password");
+		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.password");
 	}
 	
 	private boolean isServiceBasicAuthentication() {
-		String isBasicAuth = System.getProperties().getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
+		String isBasicAuth = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
 		if (isBasicAuth == null || isBasicAuth.isEmpty()) {
 			return true;
 		} else {

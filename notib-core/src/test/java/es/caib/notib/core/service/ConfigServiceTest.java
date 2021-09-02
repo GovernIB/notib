@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
@@ -28,6 +29,8 @@ public class ConfigServiceTest {
     private ConversioTipusHelper conversioTipusHelper;
     @Mock
     private PluginHelper pluginHelper;
+    @Mock
+    private CacheHelper cacheHelper;
 
     @InjectMocks
     private ConfigServiceImpl configService;
