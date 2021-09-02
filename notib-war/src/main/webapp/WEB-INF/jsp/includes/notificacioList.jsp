@@ -527,9 +527,10 @@
 						{{/if}}
 						{{if estat == 'PROCESSADA' && estatDate != ''}}
 							<br>
-							<p class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</p>
+							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</span>
+							<br>
 						{{/if}}
-						{{if estat == 'FINALITZADA'}}
+						{{if estat == 'FINALITZADA' ||  estat == 'PROCESSADA'}}
 							{{:~recuperarEstatEnviament(id)}}
 							<p class="estat_{{:id}}"  style="display:inline"></p>
 						{{/if}}
