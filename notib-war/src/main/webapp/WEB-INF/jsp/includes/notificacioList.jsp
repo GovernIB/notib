@@ -120,6 +120,45 @@
     organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
     </c:forEach>
 
+    var notificacioEstats = [];
+    <c:forEach var="estat" items="${notificacioEstats}">
+    notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+    </c:forEach>
+    var notificacioEnviamentEstats = [];
+    <c:forEach var="estat" items="${notificacioEnviamentEstats}">
+    notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
+    </c:forEach>
+    var comunicacioTipus = [];
+    <c:forEach var="tipus" items="${notificacioComunicacioTipus}">
+    comunicacioTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+    </c:forEach>
+    var enviamentTipus = [];
+    <c:forEach var="tipus" items="${notificacioEnviamentTipus}">
+    enviamentTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
+    </c:forEach>
+
+
+    function formatDate(data) {
+        //Añadir ceros a los numeros de un dígito
+        Number.prototype.padLeft = function(base,chr){
+            var  len = (String(base || 10).length - String(this).length)+1;
+            return len > 0? new Array(len).join(chr || '0')+this : this;
+        }
+        if (data !== null) {
+            //dd/MM/yyyy HH:mm:SS
+            var procesDate = new Date(data),
+                procesDateFormat = [procesDate.getDate().padLeft(),
+                        (procesDate.getMonth()+1).padLeft(),
+                        procesDate.getFullYear()].join('/') +' ' +
+                    [procesDate.getHours().padLeft(),
+                        procesDate.getMinutes().padLeft(),
+                        procesDate.getSeconds().padLeft()].join(':');
+            return procesDateFormat;
+        } else {
+            return null;
+        }
+    }
+
     function returnEnviamentsStatusDiv(notificacioId) {
         var content = "";
         var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
@@ -149,138 +188,137 @@
         });
     });
 
-    function formatDate(data) {
-        //Añadir ceros a los numeros de un dígito
-        Number.prototype.padLeft = function(base,chr){
-            var  len = (String(base || 10).length - String(this).length)+1;
-            return len > 0? new Array(len).join(chr || '0')+this : this;
-        }
-        if (data !== null) {
-            //dd/MM/yyyy HH:mm:SS
-            var procesDate = new Date(data),
-                procesDateFormat = [procesDate.getDate().padLeft(),
-                        (procesDate.getMonth()+1).padLeft(),
-                        procesDate.getFullYear()].join('/') +' ' +
-                    [procesDate.getHours().padLeft(),
-                        procesDate.getMinutes().padLeft(),
-                        procesDate.getSeconds().padLeft()].join(':');
-            return procesDateFormat;
-        } else {
-            return null;
-        }
-    }
+    function mostraEnviamentsNotificacio(td, rowData) {
+        var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
+        $.get(getUrl).done(function(data) {
+            $(td).empty();
+            $(td).append(
+                '<table class="table table-striped table-bordered table-enviaments">' +
+                '<caption><spring:message code="notificacio.list.enviament.list.titol"/></caption>' +
+                '<thead>' +
+                '<tr>' +
+                '<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' +
+                '<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
+                '<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
+                '<th></th>' +
+                '</tr>' +
+                '</thead><tbody></tbody></table>');
+            contingutTbody = '';
+            for (i = 0; i < data.length; i++) {
+                var nomTitular = '', llinatge1 = '', llinatge2 = '', destinataris = '', nif = '';
 
-    var notificacioEstats = [];
-    <c:forEach var="estat" items="${notificacioEstats}">
-    notificacioEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
-    </c:forEach>
-    var notificacioEnviamentEstats = [];
-    <c:forEach var="estat" items="${notificacioEnviamentEstats}">
-    notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
-    </c:forEach>
-    var comunicacioTipus = [];
-    <c:forEach var="tipus" items="${notificacioComunicacioTipus}">
-    comunicacioTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
-    </c:forEach>
-    var enviamentTipus = [];
-    <c:forEach var="tipus" items="${notificacioEnviamentTipus}">
-    enviamentTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
-    </c:forEach>
-    $(document).ready(function() {
-        $('#notificacio').on('rowinfo.dataTable', function(e, td, rowData) {
-            var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
-            $.get(getUrl).done(function(data) {
-                $(td).empty();
-                $(td).append(
-                    '<table class="table teble-striped table-bordered">' +
-                    '<caption><spring:message code="notificacio.list.enviament.list.titol"/></caption>' +
-                    '<thead>' +
-                    '<tr>' +
-                    '<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' +
-                    '<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
-                    '<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
-                    '<th></th>' +
-                    '</tr>' +
-                    '</thead><tbody></tbody></table>');
-                contingutTbody = '';
-                for (i = 0; i < data.length; i++) {
-                    var nomTitular = '', llinatge1 = '', llinatge2 = '', destinataris = '', nif = '';
-
-                    if (data[i].titular.nom != null) {
-                        nomTitular = data[i].titular.nom;
-                    } else if (data[i].titular.raoSocial != null){
-                        nomTitular = data[i].titular.raoSocial;
-                    }
-                    if (data[i].titular.llinatge1 != null) {
-                        llinatge1 = data[i].titular.llinatge1;
-                    }
-                    if (data[i].titular.llinatge2 != null) {
-                        llinatge2 = data[i].titular.llinatge2;
-                    }
-
-                    $.each(data[i].destinataris, function (index, destinatari) {
-                        var nomDest = '', llinatge1Dest = '', llinatge2Dest = '';
-                        if (destinatari.nom != null) {
-                            nomDest = destinatari.nom;
-                        } else if (destinatari.raoSocial != null){
-                            nomDest = destinatari.raoSocial;
-                        }
-                        if (destinatari.llinatge1 != null) {
-                            llinatge1Dest = destinatari.llinatge1;
-                        }
-                        if (destinatari.llinatge2 != null) {
-                            llinatge2Dest = destinatari.llinatge2;
-                        }
-                        if (destinatari.nif != null) {
-                            nif = destinatari.nif;
-                        } else {
-                            nif = destinatari.dir3Codi;
-                        }
-                        destinataris += nomDest + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + nif + '), ';
-                    });
-                    if (data[i].titular.nif != null) {
-                        nif = data[i].titular.nif;
-                    } else {
-                        nif = data[i].titular.dir3Codi;
-                    }
-                    contingutTbody += '<tr data-toggle="modal" data-href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" style="cursor: pointer;">';
-                    contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
-                    if (destinataris != ''){
-                        //Remove last white space
-                        destinataris = destinataris.substr(0, destinataris.length-1);
-                        //Remove last comma
-                        destinataris = destinataris.substr(0, destinataris.length-1);
-                    } else {
-                        destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
-                    }
-                    contingutTbody += '<td>' + destinataris + '</td>';
-                    contingutTbody += '<td>';
-                    contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
-                    if (data[i].notificacioError) {
-                        var errorTitle = '';
-                        if (data[i].notificacioErrorDescripcio) {
-                            errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                        } else {
-                            errorTitle = "Descripció de l'error no registrada";
-                        }
-                        contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
-                    }
-                    contingutTbody += '</td>';
-                    contingutTbody += '<td width="114px">';
-                    if (data[i].notificaCertificacioData != null) {
-                        contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
-                    } else if (data[i].notificacioEstat == 'REGISTRADA' &&
-                        (data[i].registreEstat && (data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN'  || data[i].registreEstat == 'OFICI_SIR')) || (data[i].registreData && data[i].registreNumeroFormatat != '')){
-                        contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
-                    }
-                    contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
-                    contingutTbody += '</td>';
-                    contingutTbody += '</tr>';
+                if (data[i].titular.nom != null) {
+                    nomTitular = data[i].titular.nom;
+                } else if (data[i].titular.raoSocial != null){
+                    nomTitular = data[i].titular.raoSocial;
                 }
-                $('table tbody', td).append(contingutTbody);
-                $('table tbody td').webutilModalEval();
+                if (data[i].titular.llinatge1 != null) {
+                    llinatge1 = data[i].titular.llinatge1;
+                }
+                if (data[i].titular.llinatge2 != null) {
+                    llinatge2 = data[i].titular.llinatge2;
+                }
+
+                $.each(data[i].destinataris, function (index, destinatari) {
+                    var nomDest = '', llinatge1Dest = '', llinatge2Dest = '';
+                    if (destinatari.nom != null) {
+                        nomDest = destinatari.nom;
+                    } else if (destinatari.raoSocial != null){
+                        nomDest = destinatari.raoSocial;
+                    }
+                    if (destinatari.llinatge1 != null) {
+                        llinatge1Dest = destinatari.llinatge1;
+                    }
+                    if (destinatari.llinatge2 != null) {
+                        llinatge2Dest = destinatari.llinatge2;
+                    }
+                    if (destinatari.nif != null) {
+                        nif = destinatari.nif;
+                    } else {
+                        nif = destinatari.dir3Codi;
+                    }
+                    destinataris += nomDest + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + nif + '), ';
+                });
+                if (data[i].titular.nif != null) {
+                    nif = data[i].titular.nif;
+                } else {
+                    nif = data[i].titular.dir3Codi;
+                }
+                contingutTbody += '<tr data-toggle="modal" data-href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" style="cursor: pointer;">';
+                contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
+                if (destinataris != ''){
+                    //Remove last white space
+                    destinataris = destinataris.substr(0, destinataris.length-1);
+                    //Remove last comma
+                    destinataris = destinataris.substr(0, destinataris.length-1);
+                } else {
+                    destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
+                }
+                contingutTbody += '<td>' + destinataris + '</td>';
+                contingutTbody += '<td>';
+                contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
+                if (data[i].notificacioError) {
+                    var errorTitle = '';
+                    if (data[i].notificacioErrorDescripcio) {
+                        errorTitle = data[i].notificacioErrorDescripcio.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    } else {
+                        errorTitle = "Descripció de l'error no registrada";
+                    }
+                    contingutTbody += ' <span class="fa fa-warning text-danger" title="' + errorTitle + '"></span>';
+                }
+                contingutTbody += '</td>';
+                contingutTbody += '<td width="114px">';
+                if (data[i].notificaCertificacioData != null) {
+                    contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/certificacioDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.certificacio"/>"><span class="fa fa-download"></span></a>';
+                } else if (data[i].notificacioEstat == 'REGISTRADA' &&
+                    (data[i].registreEstat && (data[i].registreEstat == 'DISTRIBUIT' || data[i].registreEstat == 'OFICI_EXTERN'  || data[i].registreEstat == 'OFICI_SIR')) || (data[i].registreData && data[i].registreNumeroFormatat != '')){
+                    contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '/justificantDescarregar"/>" class="btn btn-default btn-sm fileDownloadSimpleRichExperience" title="<spring:message code="enviament.info.accio.descarregar.justificant"/>"><span class="fa fa-download"></span></a>';
+                }
+                contingutTbody += '<a href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" data-toggle="modal" class="btn btn-default btn-sm"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>';
+                contingutTbody += '</td>';
+                contingutTbody += '</tr>';
+            }
+            $('table tbody', td).append(contingutTbody);
+            $('table tbody td').webutilModalEval();
+        });
+    }
+    $(document).ready(function() {
+        let $taula = $('#notificacio');
+        $taula.on('rowinfo.dataTable', function(e, td, rowData) {
+            mostraEnviamentsNotificacio(td, rowData)
+        });
+
+        $taula.on('init.dt', function () {
+            let $btnDesplegarEnvs = $('#btn-desplegar-envs');
+            $btnDesplegarEnvs.on('click', function() {
+                var shown = $btnDesplegarEnvs.find("span").hasClass('fa-caret-up');
+                $taula.dataTable().api().rows().every( function ( rowIdx, tableLoop, rowLoop ) {
+                    var rowData = this.data();
+                    let $parentTr = $("#" + this.id());
+                    let isCollapsed = $parentTr.find("td:last span").hasClass('fa-caret-up')
+                    // debugger;
+                    if (!shown && !isCollapsed) {
+                        $('<tr data-row-info="true"><td colspan="' + $parentTr.children().length + '"></td></tr>').insertAfter($parentTr);
+                        mostraEnviamentsNotificacio($('td', $parentTr.next()), rowData)
+                    } else if (shown) {
+                        // accedim d'aquesta manera als tr per no haver de modificar el codi de webutil.datatable
+                        $(".table-enviaments").closest("tr").remove();
+                    }
+                });
+                // debugger
+                if (!shown) {
+                    $btnDesplegarEnvs.find("span").toggleClass('fa-caret-up');
+                    $(".btn-rowInfo").find("span").removeClass('fa-caret-down');
+                    $(".btn-rowInfo").find("span").addClass('fa-caret-up');
+                } else {
+                    $btnDesplegarEnvs.find("span").removeClass('fa-caret-up');
+                    $btnDesplegarEnvs.find("span").addClass('fa-caret-down');
+                    $(".btn-rowInfo").find("span").removeClass('fa-caret-up');
+                    $(".btn-rowInfo").find("span").addClass('fa-caret-down');
+                }
             });
         });
+
         $('#btnNetejar').click(function() {
             $(':input', $('#filtre')).each (function() {
                 var type = this.type, tag = this.tagName.toLowerCase();
@@ -438,6 +476,13 @@
         </div>
     </div>
 </form:form>
+<script id="botonsTemplate" type="text/x-jsrender">
+    <div class="text-right">
+        <div class="btn-group">
+            <button id="btn-desplegar-envs" class="btn btn-default"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
+        </div>
+    </div>
+</script>
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <table
         id="notificacio"
@@ -453,6 +498,7 @@
         data-save-state="true"
         data-mantenir-paginacio="true"
         data-rowhref-template="#rowhrefTemplate"
+        data-botons-template="#botonsTemplate"
         data-rowhref-toggle="modal">
     <thead>
     <tr>

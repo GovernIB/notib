@@ -142,7 +142,7 @@
 						$('td:last-child', row).html('<a href="' + deleteUrl + '" class="btn btn-default btn-sm"><i class="fa fa-trash-o"></i></a>')
 					}
 					if (plugin.settings.rowInfo) {
-						$('td:last-child', row).html('<a href="#" class="btn btn-default btn-sm"><span class="fa fa-caret-down"></span></a>')
+						$('td:last-child', row).html('<a href="#" class="btn btn-default btn-sm btn-rowInfo"><span class="fa fa-caret-down"></span></a>')
 					}
 					if (plugin.settings.rowhrefTemplate) {
 						if (plugin.settings.rowhrefToggle) {
