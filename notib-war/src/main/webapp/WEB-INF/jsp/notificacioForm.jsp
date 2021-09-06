@@ -1580,7 +1580,9 @@
 						<not:inputSelect name="documents[0].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 					</div>
 					<div class="col-md-4 col-md-offset-2">
-						<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+						<not:inputSelect name="documents[0].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4"
+										 optionItems="${tipusDocumentals}" optionMinimumResultsForSearch="2"
+										 optionValueAttribute="value" optionTextKeyAttribute="text" />
 					</div>
 					<div class="col-md-4 col-md-offset-2">
 						<not:inputCheckbox name="documents[0].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />
@@ -1710,7 +1712,9 @@
 							<not:inputSelect name="documents[2].validesa" textKey="notificacio.form.camp.validesa" labelSize="4" optionItems="${valideses}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 						</div>
 						<div class="col-md-4 col-md-offset-2">
-							<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4" optionItems="${tipusDocumentals}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+							<not:inputSelect name="documents[2].tipoDocumental" textKey="notificacio.form.camp.tipoDocumental" labelSize="4"
+											 optionItems="${tipusDocumentals}" optionMinimumResultsForSearch="2"
+											 optionValueAttribute="value" optionTextKeyAttribute="text" />
 						</div>
 						<div class="col-md-4 col-md-offset-2">
 							<not:inputCheckbox name="documents[2].modoFirma" textKey="notificacio.form.camp.modoFirma"  labelSize="4" />

@@ -1537,10 +1537,11 @@ public class NotificacioController extends BaseUserController {
                         "es.caib.notib.core.api.ws.notificacio.ValidesaEnum.",
                         valideses));
 
-        model.addAttribute("tipusDocumentals",
-                EnumHelper.getOptionsForEnum(
-                        TipusDocumentalEnum.class,
-                        "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum."));
+        List<EnumHelper.HtmlOption> tipusDocumentals = EnumHelper.getOptionsForEnum(
+                TipusDocumentalEnum.class,
+                "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum.");
+        Collections.sort(tipusDocumentals);
+        model.addAttribute("tipusDocumentals", tipusDocumentals);
     }
 
 
