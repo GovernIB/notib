@@ -1352,12 +1352,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		transmissio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
 		transmissio.setDataEstat(enviament.getNotificacio().getEstatDate());
-		Document document = Document.builder()
-				.nom(enviament.getNotificacio().getDocument().getArxiuNom())
-				.mediaType(enviament.getNotificacio().getDocument().getMediaType())
-				.mida(enviament.getNotificacio().getDocument().getMida())
-				.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
-		transmissio.setDocument(document);
+		if (enviament.getNotificacio().getDocument() != null) {
+			Document document = Document.builder()
+					.nom(enviament.getNotificacio().getDocument().getArxiuNom())
+					.mediaType(enviament.getNotificacio().getDocument().getMediaType())
+					.mida(enviament.getNotificacio().getDocument().getMida())
+					.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
+			transmissio.setDocument(document);
+		}
 		transmissio.setTitular(toPersona(enviament.getTitular()));
 		List<Persona> destinataris = new ArrayList<Persona>();
 		if (enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty()) {

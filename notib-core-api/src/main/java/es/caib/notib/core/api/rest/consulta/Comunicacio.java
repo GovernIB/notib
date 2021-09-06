@@ -3,14 +3,14 @@
  */
 package es.caib.notib.core.api.rest.consulta;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'una anotació.
@@ -60,12 +60,14 @@ public class Comunicacio {
 		comunicacio.setDataEnviament(enviament.getNotificacio().getEnviamentDataProgramada());
 		comunicacio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
 		comunicacio.setDataEstat(enviament.getNotificacio().getEstatDate());
-		Document document = Document.builder()
-				.nom(enviament.getNotificacio().getDocument().getArxiuNom())
-				.mediaType(enviament.getNotificacio().getDocument().getMediaType())
-				.mida(enviament.getNotificacio().getDocument().getMida())
-				.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
-		comunicacio.setDocument(document);
+		if (enviament.getNotificacio().getDocument() != null) {
+			Document document = Document.builder()
+					.nom(enviament.getNotificacio().getDocument().getArxiuNom())
+					.mediaType(enviament.getNotificacio().getDocument().getMediaType())
+					.mida(enviament.getNotificacio().getDocument().getMida())
+					.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
+			comunicacio.setDocument(document);
+		}
 		comunicacio.setTitular(toPersona(enviament.getTitular()));
 		List<Persona> destinataris = new ArrayList<Persona>();
 		if (enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty()) {
