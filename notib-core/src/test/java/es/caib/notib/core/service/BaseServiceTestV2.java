@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
@@ -9,19 +6,20 @@ import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import es.caib.notib.core.test.AuthenticationTest;
 import es.caib.notib.core.test.data.DatabaseItemTest;
 import es.caib.notib.core.test.data.EntitatItemTest;
 import es.caib.notib.core.test.data.OrganGestorItemTest;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
 import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
@@ -80,7 +78,7 @@ public class BaseServiceTestV2 {
 
 	@BeforeClass
 	public static void beforeClass() {
-		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+		ConfigHelper.JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 	}
 
 	@AfterClass
