@@ -447,7 +447,7 @@ public class NotificacioHelper {
 				|| documentArxiu.getMetadades().getEstatElaboracio() == null
 				|| (documentArxiu.getMetadades().getTipusDocumental() == null  && documentArxiu.getMetadades().getTipusDocumentalAddicional() == null)
 				|| documentArxiu.getContingut().getArxiuNom() == null) {
-			if (document.getOrigen() == null || document.getValidesa() == null || document.getTipoDocumental() == null || document.getModoFirma()) {
+			if (document.getOrigen() == null || document.getValidesa() == null || document.getTipoDocumental() == null || document.getModoFirma() == null) {
 				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
 			} else {
 				return false; // metadades de CSV o del formulario de alta web (no masiva)
