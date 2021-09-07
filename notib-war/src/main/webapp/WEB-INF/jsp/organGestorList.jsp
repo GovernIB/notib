@@ -152,6 +152,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
+								<li><a href="procediment/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;Procediments</a></li>
 								<c:if test="${setOficina}">
 									<li><a href="organgestor/{{:id}}" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								</c:if>

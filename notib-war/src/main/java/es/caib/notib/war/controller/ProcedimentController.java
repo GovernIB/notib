@@ -44,7 +44,10 @@ import java.util.List;
 public class ProcedimentController extends BaseUserController{
 	
 	private final static String PROCEDIMENTS_FILTRE = "procediments_filtre";
-	
+	private final static String PROCEDIMENTS_FILTRE_MODAL = "procediments_filtre_modal";
+
+	private String currentFiltre = PROCEDIMENTS_FILTRE;
+
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
@@ -61,30 +64,49 @@ public class ProcedimentController extends BaseUserController{
 	private PagadorCieService cieService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		this.currentFiltre = PROCEDIMENTS_FILTRE;
+		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
+		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
+		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		
+		return "procedimentListPage";
+	}
+
+	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
+	public String getByOrganGestor(HttpServletRequest request,
+								   @PathVariable String organCodi,
+								   Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		this.currentFiltre = PROCEDIMENTS_FILTRE_MODAL;
+		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
+		procedimentFiltreCommand.setOrganGestor(organCodi);
+		model.addAttribute("organCodi", organCodi);
+		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
+		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		return "procedimentListModal";
+	}
+
+	private List<CodiValorEstatDto> findOrgansGestorsAccessibles (EntitatDto entitatActual, OrganGestorDto organGestorActual) {
 
 		List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 		if (organGestorActual == null) {
-			organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+			organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		} else {
-			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitat.getId(), organGestorActual.getCodi());
+			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(),
+					organGestorActual.getCodi());
 			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
+				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(),
+						organ.getEstat()));
 			}
 		}
-		ProcedimentFiltreCommand procedimentFiltreCommand = getFiltreCommand(request);
-		model.addAttribute("procedimentFiltreCommand", procedimentFiltreCommand);
-		model.addAttribute("organsGestors", organsGestors);
-		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		
-		return "procedimentAdminList";
+		return organsGestors;
 	}
-	
-	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable( 
@@ -136,11 +158,11 @@ public class ProcedimentController extends BaseUserController{
 			Model model) {
 		
 		RequestSessionHelper.actualitzarObjecteSessio(
-				request, 
-				PROCEDIMENTS_FILTRE, 
+				request,
+				this.currentFiltre,
 				command);
 		
-		return "procedimentAdminList";
+		return "procedimentListPage";
 	}
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
@@ -296,12 +318,12 @@ public class ProcedimentController extends BaseUserController{
 		ProcedimentFiltreCommand procedimentFiltreCommand = (
 				ProcedimentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
 						request,
-						PROCEDIMENTS_FILTRE);
+						this.currentFiltre);
 		if (procedimentFiltreCommand == null) {
 			procedimentFiltreCommand = new ProcedimentFiltreCommand();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
-					PROCEDIMENTS_FILTRE,
+					this.currentFiltre,
 					procedimentFiltreCommand);
 		}
 		return procedimentFiltreCommand;

@@ -651,6 +651,15 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	$(document).ready(function() {
 		$(this).webutilTogglesEval();
 
+		$('form input, form select').on('keypress', function (e) {
+			if (e.which && e.which == 13) {
+				$(this).parents('form').submit();
+				return false;
+			} else {
+				return true;
+			}
+		});
+		
 		// Esborram tots els espais en blanc introduïts al principi i al final dels inputs de formulari
 		let $body = $('body');
 		$body.on('change', 'input', function() {
