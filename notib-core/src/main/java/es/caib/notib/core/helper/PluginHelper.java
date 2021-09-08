@@ -24,6 +24,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -650,6 +651,7 @@ public class PluginHelper {
 		
 		try {
 			List<String> rols = getDadesUsuariPlugin().consultarRolsAmbCodi(usuariCodi);
+			info.addParam("Rols Consultats: ", StringUtils.join(rols, ","));
 			integracioHelper.addAccioOk(info, false);
 			return rols;
 		} catch (Exception ex) {

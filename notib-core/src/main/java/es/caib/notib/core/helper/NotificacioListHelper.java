@@ -82,15 +82,16 @@ public class NotificacioListHelper {
             }
         
         for (NotificacioTableEntity notificacio : notificacions) {
+            boolean permisProcessar = false;
             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
-                notificacio.setPermisProcessar(codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi()));
+                permisProcessar = codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi());
             }
-            // Las comunicaciones pueden no tener procedimiento
-            if ((notificacio.getProcedimentCodi() == null || notificacio.getProcedimentCodi().isEmpty())
-            		&& NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())
-            		&& NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus())) {
-            	notificacio.setPermisProcessar(codisOrgansProcessables.contains(notificacio.getOrganCodi()));
+
+            // Si no te permís de processar per procediment, mirar si té permís de processar per òrgan gestor
+            if (!permisProcessar && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
+                permisProcessar = codisOrgansProcessables.contains(notificacio.getOrganCodi());
             }
+            notificacio.setPermisProcessar(permisProcessar);
 
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
             if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {

@@ -512,12 +512,12 @@
         <th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
 
             <script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
-						{{if enviamentTipus == 'NOTIFICACIO'}}
-							<div class="not-icon-o" title="<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO"/>">N</div>
-						{{else}}
-							<div class="com-icon-o" title="<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO"/>">C</div>
-						{{/if}}
-					</script>
+                {{if enviamentTipus == 'NOTIFICACIO'}}
+                    <div class="not-icon-o" title="<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.NOTIFICACIO"/>">N</div>
+                {{else}}
+                    <div class="com-icon-o" title="<spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.COMUNICACIO"/>">C</div>
+                {{/if}}
+            </script>
         </th>
         <%-- <th data-col-name="notificaEnviamentData" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>--%>
         <th data-col-name="createdDate" data-converter="datetime" width="${ampladaEnviament}"><spring:message code="notificacio.list.columna.enviament.data"/></th>
