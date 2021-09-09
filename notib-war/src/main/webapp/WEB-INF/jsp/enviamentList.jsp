@@ -51,84 +51,12 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
-<style type="text/css">
+	<script src="<c:url value="/js/datatable.accions-massives.js"/>"></script>
+	<link href="<c:url value="/css/datatable-accions-massives.css"/>" rel="stylesheet"/>
 
-thead input {
-	width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    color: #555;
-    padding: 4px 7px;
-}
-table.dataTable thead tr:nth-child(2) .sorting:after {
-    opacity: 0.2;
-    content: "\e150";
-}
-thead tr:nth-child(2) {
-	background-color: #eceaec;
-}
-
-#enviament tbody tr {
-	min-height: 35px;
-}
-div.dataTables_wrapper {
-        width: 100%;
-}
-table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-	background-color: #fcf8e3;
-	color: #666666;
-}
-table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
-	cursor: pointer;
-}
-.buit {
-	color: #8e8e8e;
-}
-.input-group-addon {
-	padding: 0;
-}
-#loading-screen {
-	width: 100%;
-	height: 100%;
-	top: 100px;
-	left: 0;
-	position: fixed;
-	display: none;
-	opacity: 0.7;
-	background-color: #fff;
-	z-index: 99;
-	text-align: center;
-	}
-#processing-icon {
-	position: relative;
-	top: 240px;
-	z-index: 100;
-}
-div.dataTables_wrapper {
-	overflow-x: auto;
-}
-#btnFiltrar {
-	padding: 2px 6px;
-	margin: 8px;
-}
-</style>
 <script>
 
 $(document).ready(function() {
-	
-	<%--$('#notificacio').select2({--%>
-	<%--	width: '100%',--%>
-    <%--    allowClear:true,--%>
-    <%--    placeholder: 'Selecciona una opció'//'${placeholderText}'--%>
-    <%--});--%>
-    <%--$('#notificacio').on('select2:select', function (e) {--%>
-    <%--	$("#enviament").dataTable().api().ajax.reload();--%>
-	<%--});--%>
-	<%--$('#notificacio').on('select2:unselect', function (e) {--%>
-    <%--	$("#enviament").dataTable().api().ajax.reload();--%>
-	<%--});--%>
 
 	var $estatColumn = $('#estat');
 	var $enviamentTipusColumn = $('#enviamentTipus');
@@ -175,109 +103,16 @@ $(document).ready(function() {
 		todayHighlight: true,
 		language: "${requestLocale}"
 	});
-	
-	$('#enviament').on('selectionchange.dataTable', function (e, accio, ids) {
-		$.get(
-				"enviament/" + accio,
-				{ids: ids},
-				function(data) {
-					$(".seleccioCount").html(data);
-				}
-		);
-	});
-	
-	$('#enviament').on('init.dt', function () {
-		$('#seleccioAll').on('click', function() {
-			$.get(
-					"enviament/select",
-					function(data) {
-						$(".seleccioCount").html(data);
-						$('#enviament').webutilDatatable('refresh');
-					}
-			);
-			return false;
-		});
-		$('#seleccioNone').on('click', function() {
-			$.get(
-					"enviament/deselect",
-					function(data) {
-						$(".seleccioCount").html(data);
-						$('#enviament').webutilDatatable('select-none');
-						$('#enviament').webutilDatatable('refresh');
-					}
-			);
-			return false;
-		});
-		$('#btnNetejar').click(function() {
-			$(':input').val('');
-			event.preventDefault();
-	        $("#btnFiltrar").first().click();
-		});
 
-		$('#reintentarNotificacio').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>")){
-				$.get(
-					"enviament/reintentar/notificacio",
-					function(data) {
-						$('#enviament').DataTable().ajax.reload(null, false);
-				        webutilRefreshMissatges();
-					}
-				);
-			}
-			return false;
-		});
+	let eventMessages = {
+		'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
+		'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
+		'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
+		'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
+		'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+	};
 
-		$('#reactivarConsulta').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>")){
-				$.get(
-					"enviament/reactivar/consulta",
-					function(data) {
-						$('#enviament').DataTable().ajax.reload(null, false);
-				        webutilRefreshMissatges();
-					}
-				);
-			}
-			return false;
-		});
-
-		$('#reactivarSir').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>")){
-				$.get(
-					"enviament/reactivar/sir",
-					function(data) {
-						$('#enviament').DataTable().ajax.reload(null, false);
-				        webutilRefreshMissatges();
-					}
-				);
-			}
-			return false;
-		});
-		$('#updateEstat').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>")){
-				$.get(
-						"enviament/actualitzarestat",
-						function(data) {
-					        $('#enviament').DataTable().ajax.reload(null, false);
-					        webutilRefreshMissatges();
-						}
-				);
-			}
-			return false;
-		});
-
-		$('#reactivarCallback').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>")){
-				$.get(
-						"enviament/reactivar/callback",
-						function(data) {
-							$('#enviament').DataTable().ajax.reload(null, false);
-					        webutilRefreshMissatges();
-						}
-				);
-			}
-			return false;
-		});
-	});
+	initEvents($('#enviament'), 'enviament', eventMessages)
 
 	$("#enviament th").last().empty();
 	$("#enviament th").last().css("padding", 0);
@@ -289,40 +124,6 @@ $(document).ready(function() {
 	    }
 	});
 });
-
-function guardarFilesSeleccionades(table) {
-	var idsSelectedRows = sessionStorage.getItem('rowIdsStore');
-	if (!(idsSelectedRows))
-		return;
-	
-	var rowids = JSON.parse(idsSelectedRows);
-	for (var id in rowids) {
-		var selectedRowId = document.getElementById(id);
-		var $cell = $('td:first', $(selectedRowId));
-		$(selectedRowId).addClass('selected');
-		$cell.empty().append('<span class="fa fa-check-square-o"></span>');
-	}
-}
-
-function seleccionarFila(id) {
-	var isSelected = $(document.getElementById(id)).hasClass('selected')
-	var idsSelectedRows = sessionStorage.getItem('rowIdsStore');
-	if (!(idsSelectedRows)) {
-		clearSeleccio();
-	}
-	var rowKeys = JSON.parse(idsSelectedRows);
-	if (isSelected === false && rowKeys.hasOwnProperty(id)) {
-		delete rowKeys[id];
-	} else if (isSelected) {
-		rowKeys[id] = true;
-	}
-	sessionStorage.setItem('rowIdsStore', JSON.stringify(rowKeys));
-}
-
-
-function clearSeleccio() {
-	sessionStorage.setItem('rowIdsStore', "{}");
-}
 
 
 function setCookie(cname,cvalue) {

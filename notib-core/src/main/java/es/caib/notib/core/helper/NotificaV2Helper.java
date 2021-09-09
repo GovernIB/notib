@@ -175,6 +175,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+		logger.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		try {
 			return enviamentRefrescarEstat(enviament, false);

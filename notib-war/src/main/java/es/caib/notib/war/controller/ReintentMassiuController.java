@@ -237,7 +237,6 @@ public class ReintentMassiuController extends BaseUserController {
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				 "id",
 				 SESSION_ATTRIBUTE_SELECCIO);
-		
 	}
 	
 	@SuppressWarnings("unchecked")

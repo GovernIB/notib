@@ -70,6 +70,12 @@ public class EnviamentServiceBean implements EnviamentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds) {
+		return delegate.findIdsByNotificacioIds(notificacionsIds);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		return delegate.enviamentFindAmbId(enviamentId);
 	}
@@ -117,14 +123,12 @@ public class EnviamentServiceBean implements EnviamentService {
 	public FitxerDto exportacio(
 			Long entitatId, 
 			Collection<Long> enviamentIds, 
-			String format,
-			NotificacioEnviamentFiltreDto filtre)
+			String format)
 			throws IOException, NotFoundException, ParseException {
 		return delegate.exportacio(
 				entitatId, 
 				enviamentIds, 
-				format, 
-				filtre);
+				format);
 	}
 
 	@Override

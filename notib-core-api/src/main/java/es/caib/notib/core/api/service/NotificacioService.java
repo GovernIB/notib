@@ -112,7 +112,13 @@ public interface NotificacioService {
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
-	
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	List<Long> findIdsAmbFiltre(Long entitatId,
+								RolEnumDto rol,
+								String organGestorCodi,
+								String usuariCodi,
+								NotificacioFiltreDto filtre);
 	
 	/**
 	 * Consulta els nivells d'administració disponibles dins DIR3.
@@ -301,7 +307,7 @@ public interface NotificacioService {
 	 * @throws MessagingException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public String marcarComProcessada(
+	String marcarComProcessada(
 			Long notificacioId,
 			String motiu) throws Exception;
 	

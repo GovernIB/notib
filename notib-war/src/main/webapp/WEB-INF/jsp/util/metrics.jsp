@@ -18,9 +18,6 @@
 	<script src="<c:url value='/js/metrics/chartjs-plugin-annotation.min.js'/>"></script>
 	<script src="<c:url value='/js/metrics/chartjs-plugin-datalabels.min.js'/>"></script>
 	<script src="<c:url value='/js/metrics/metrics.js'/>"></script>
-<%-- 	<link href="<c:url value="/css/select2.css"/>" rel="stylesheet" /> --%>
-<%-- 	<link href="<c:url value="/css/select2-bootstrap.css"/>" rel="stylesheet" /> --%>
-<%-- 	<script src="<c:url value="/js/select2.min.js"/>"></script> --%>
 
 <style type="text/css">	
 .progress-title {

@@ -32,15 +32,6 @@
 <c:set var="nomesAmbErrors" value="${nomesAmbErrors}" scope="request"/>
 <c:set var="mostrarColumnaNumExpedient" value="${mostrarColumnaNumExpedient}" scope="request"/>
 <c:set var="organsGestorsPermisLectura" value="${organsGestorsPermisLectura}" scope="request"/>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
-<%--<c:set var="mostraEntitat" value="${attribute}" scope="request"/>--%>
 
 <c:url var="urlDatatable" value="/notificacio/massiva/${notificacioMassivaId}/remeses/datatable" scope="request"/>
 
@@ -61,6 +52,7 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/js/datatable.accions-massives.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>

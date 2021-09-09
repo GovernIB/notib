@@ -3,15 +3,15 @@
  */
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.war.command.ColumnesCommand;
 import es.caib.notib.war.command.NotificacioEnviamentCommand;
 import es.caib.notib.war.command.NotificacioEnviamentFiltreCommand;
@@ -22,15 +22,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 /**
  * Controlador per el mantinement d'enviaments.
  *
@@ -38,7 +39,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/enviament")
-public class EnviamentController extends BaseUserController {
+public class EnviamentController extends TableAccionsMassivesController {
 
 	private static final String ENVIAMENTS_FILTRE = "enviaments_filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "EnviamentController.session.seleccio";
@@ -48,12 +49,18 @@ public class EnviamentController extends BaseUserController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private EnviamentService enviamentService;
-	@Autowired
-	private NotificacioService notificacioService;
-	@Autowired
-	private ProcedimentService procedimentService;
-	@Autowired
-	private OrganGestorService organGestorService;
+
+
+	public EnviamentController() {
+		super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
+	}
+
+	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
+
+		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
+	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -178,379 +185,6 @@ public class EnviamentController extends BaseUserController {
 				SESSION_ATTRIBUTE_SELECCIO);
 	}
 
-	@RequestMapping(value = "/select", method = RequestMethod.GET)
-	@ResponseBody
-	public int select(
-			HttpServletRequest request,
-			@RequestParam(value="ids[]", required = false) Long[] ids) {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		if (seleccio == null) {
-			seleccio = new HashSet<Long>();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_SELECCIO,
-					seleccio);
-		}
-		if (ids != null) {
-			for (Long id: ids) {
-				if(!seleccio.contains(id)) {
-					seleccio.add(id);
-				}
-			}
-		} else {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
-			try {
-
-				for(Long id: enviamentService.findIdsAmbFiltre(entitatActual.getId(),NotificacioEnviamentFiltreCommand.asDto(filtreCommand))) {
-					if(!seleccio.contains(id)) {
-						seleccio.add(id);
-					}
-				}
-			} catch (NotFoundException | ParseException e) {
-				e.printStackTrace();
-			}
-		}
-		return seleccio.size();
-	}
-
-	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
-	@ResponseBody
-	public int deselect(
-			HttpServletRequest request,
-			@RequestParam(value="ids[]", required = false) Long[] ids) {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		if (seleccio == null) {
-			seleccio = new HashSet<Long>();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_SELECCIO,
-					seleccio);
-		}
-		if (ids != null) {
-			for (Long id: ids) {
-				seleccio.remove(id);
-			}
-		} else {
-			seleccio.clear();
-		}
-		return seleccio.size();
-	}
-
-	@RequestMapping(value = "/export/{format}", method = RequestMethod.GET)
-	public String export(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable String format) throws IOException {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		NotificacioEnviamentFiltreCommand filtreCommand;
-		NotificacioEnviamentFiltreCommand command = getFiltreCommand(request);
-		if (seleccio == null || seleccio.isEmpty() || command == null) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.exportacio.seleccio.buida"));
-			return "redirect:../../enviament";
-		} else {
-			filtreCommand = (NotificacioEnviamentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-					request,
-					ENVIAMENTS_FILTRE);
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			FitxerDto fitxer;
-			try {
-				fitxer = enviamentService.exportacio(
-						entitatActual.getId(),
-						seleccio,
-						format,
-						NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
-				writeFileToResponse(
-						fitxer.getNom(),
-						fitxer.getContingut(),
-						response);
-			} catch (NotFoundException | ParseException e) {
-				e.printStackTrace();
-			}
-
-			return null;
-		}
-	}
-
-	@RequestMapping(value = "/reintentar/notificacio", method = RequestMethod.GET)
-	@ResponseBody
-	public String reintentarNotificacio(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException, RegistreNotificaException {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		String resposta = "";
-		if (seleccio == null || seleccio.isEmpty()) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.notificacio.seleccio.buida"));
-			resposta = "error";
-		} else {
-			Set<Long> notificacioIds = new HashSet<Long>();
-			for(Long id: seleccio) {
-				NotificacioEnviamentDtoV2 e = enviamentService.getOne(id);
-				if(!notificacioIds.contains(e.getNotificacioId())) {
-					notificacioIds.add(e.getNotificacioId());
-				}
-			}
-			Integer notificacionsNoRegistrades = 0;
-			Integer notificacionsError = 0;
-
-			for(Long notificacioId: notificacioIds) {
-				NotificacioDtoV2 notificacio = notificacioService.findAmbId(
-						notificacioId,
-						isAdministrador(request));
-				if(notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-					try {
-						notificacioService.registrarNotificar(notificacioId);
-					} catch (Exception e) {
-						notificacionsError++;
-						mostraErrorReintentarNotificacio(request, notificacioId, notificacio, e);
-					}
-				}else if (notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)) {
-					try {
-						notificacioService.notificacioEnviar(notificacioId);
-					} catch (Exception e) {
-						notificacionsError++;
-						mostraErrorReintentarNotificacio(request, notificacioId, notificacio, e);
-					}
-				}else{
-					notificacionsNoRegistrades++;
-				}
-			}
-
-			if(notificacionsNoRegistrades.equals((Integer)notificacioIds.size())) {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reintent." + (notificacionsNoRegistrades == 1 ? "notificacio" : "notificacions" )+ ".pendents.KO"));
-			} else if(notificacionsError.equals((Integer)notificacioIds.size())) {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reintent." + (notificacionsNoRegistrades == 1 ? "notificacio" : "notificacions" )+ ".pendents.error"));
-			} else if (notificacionsError > 0) {
-				MissatgesHelper.warning(
-						request,
-						notificacionsError + " " + getMessage(request, "enviament.controller.reintent.notificacions.pendents.error.alguna"));
-			} else {
-				MissatgesHelper.info(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reintent." + (notificacioIds.size() == 1 ? "notificacio" : "notificacions") + ".pendents.OK"));
-			}
-			resposta = "ok";
-		}
-		return resposta;
-	}
-
-	private void mostraErrorReintentarNotificacio(HttpServletRequest request, Long notificacioId, NotificacioDtoV2 notificacio, Exception e) {
-		String errorMessage = "";
-		if (e.getMessage() != null && !e.getMessage().isEmpty())
-			errorMessage = e.getMessage();
-		else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty())
-			errorMessage = e.getCause().getMessage();
-		if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
-			errorMessage += "<br/>";
-			errorMessage += e.getStackTrace()[0] + "<br/>";
-			errorMessage += e.getStackTrace()[1] + "<br/>";
-			errorMessage += e.getStackTrace()[2] + "<br/>...";
-		}
-		MissatgesHelper.error(
-				request,
-				getMessage(
-						request,
-						"enviament.controller.reintent.notificacio.pendents.error",
-						new String[] {
-								notificacioId.toString(),
-								notificacio.getCreatedDateAmbFormat(),
-								notificacio.getConcepte(),
-								errorMessage})
-		);
-	}
-
-	@RequestMapping(value = "/reactivar/consulta", method = RequestMethod.GET)
-	@ResponseBody
-	public String reactivarConsulta(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		String resposta = "";
-		if (seleccio == null || seleccio.isEmpty()) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.reactivar.seleccio.buida"));
-			resposta = "error";
-		} else {
-			try {
-				enviamentService.reactivaConsultes(seleccio);
-				MissatgesHelper.info(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reactivar.consultes.OK"));
-				resposta = "ok";
-			} catch (Exception e) {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reactivar.consultes.KO"));
-			}
-		}
-		return resposta;
-	}
-
-	@RequestMapping(value = "/reactivar/sir", method = RequestMethod.GET)
-	@ResponseBody
-	public String reactivarSir(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		String resposta = "";
-		if (seleccio == null || seleccio.isEmpty()) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.reactivar.seleccio.buida"));
-			resposta = "error";
-		} else {
-			try {
-				enviamentService.reactivaSir(seleccio);
-				MissatgesHelper.info(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reactivar.sir.OK"));
-				resposta = "ok";
-			} catch (Exception e) {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reactivar.sir.KO"));
-			}
-		}
-		return resposta;
-	}
-
-	@RequestMapping(value = "/reactivar/callback", method = RequestMethod.GET)
-	@ResponseBody
-	public String reactivarCallbacks(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		String resposta = "";
-		if (seleccio == null || seleccio.isEmpty()) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.reactivar.callback.buida"));
-
-		}
-
-		boolean hasErrors = false;
-		for(Long enviamentId : seleccio) {
-			try {
-				enviamentService.activarCallback(enviamentId);
-			} catch (Exception e) {
-				hasErrors = true;
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.reactivar.callback.KO"));
-			}
-		}
-
-		if (hasErrors) {
-			return "error";
-		}
-
-		MissatgesHelper.info(
-				request,
-				getMessage(
-						request,
-						"enviament.controller.reactivar.callback.OK"));
-		return "ok";
-	}
-
-	@RequestMapping(value = "/actualitzarestat", method = RequestMethod.GET)
-	@ResponseBody
-	public String actualitzarEstat(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		String resposta = "";
-		if (seleccio == null || seleccio.isEmpty()) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.actualitzarestat.buida"));
-			resposta = "error";
-		} else {
-			boolean hasErrors = false;
-			for(Long enviamentId : seleccio) {
-				try {
-					enviamentService.actualitzarEstat(enviamentId);
-				} catch (Exception e) {
-					hasErrors = true;
-					MissatgesHelper.error(
-							request,
-							getMessage(
-									request,
-									"enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
-				}
-			}
-			if (!hasErrors) {
-				MissatgesHelper.info(
-						request,
-						getMessage(
-								request,
-								"enviament.controller.actualitzarestat.OK"));
-				resposta = "ok";
-			}
-		}
-		return resposta;
-	}
-
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(
 			HttpServletRequest request,
@@ -593,10 +227,6 @@ public class EnviamentController extends BaseUserController {
 				request,
 				"redirect:enviament",
 				"enviament.controller.modificat.ok");
-	}
-
-	private boolean isAdministrador(HttpServletRequest request) {
-		return RolHelper.isUsuariActualAdministrador(request);
 	}
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(

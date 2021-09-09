@@ -1,0 +1,60 @@
+
+thead input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    color: #555;
+    padding: 4px 7px;
+}
+table.dataTable thead tr:nth-child(2) .sorting:after {
+    opacity: 0.2;
+    content: "\e150";
+}
+thead tr:nth-child(2) {
+    background-color: #eceaec;
+}
+
+#enviament tbody tr {
+    min-height: 35px;
+}
+div.dataTables_wrapper {
+    width: 100%;
+}
+table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+    background-color: #fcf8e3;
+    color: #666666;
+}
+table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
+    cursor: pointer;
+}
+.buit {
+    color: #8e8e8e;
+}
+.input-group-addon {
+    padding: 0;
+}
+#loading-screen {
+    width: 100%;
+    height: 100%;
+    top: 100px;
+    left: 0;
+    position: fixed;
+    display: none;
+    opacity: 0.7;
+    background-color: #fff;
+    z-index: 99;
+    text-align: center;
+}
+#processing-icon {
+    position: relative;
+    top: 240px;
+    z-index: 100;
+}
+div.dataTables_wrapper {
+    overflow-x: auto;
+}
+#btnFiltrar {
+    padding: 2px 6px;
+    margin: 8px;
+}

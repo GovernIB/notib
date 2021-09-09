@@ -398,6 +398,15 @@
 
         omplirProcediments();
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
+
+        let eventMessages = {
+            'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
+            'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
+            'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
+            'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
+            'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+        };
+        initEvents($('#notificacio'), 'notificacio', eventMessages)
     });
 </script>
 <form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
@@ -477,19 +486,43 @@
     </div>
 </form:form>
 <script id="botonsTemplate" type="text/x-jsrender">
-    <div class="text-right">
-        <div class="btn-group">
-            <button id="btn-desplegar-envs" class="btn btn-default"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
-        </div>
-    </div>
-</script>
+		<div class="text-right">
+			<div class="btn-group">
+                <button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
+				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
+				<div class="btn-group">
+					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="<c:url value="notificacio/export/ODS"/>"><spring:message code="notificacio.list.accio.massiva.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li>
+						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
+						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
+                        <li><a href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
+                        <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
+
+                        <c:if test="${isRolActualAdministradorEntitat}">
+                            <li><a href="<c:url value="/notificacio/reintentar/registre"/>"><spring:message code="notificacio.list.accio.massiva.reintentar.registre"/></a></li>
+                            <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
+                            <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
+                            <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
+                        </c:if>
+					</ul>
+				</div>
+			</div>
+			<div class="btn-group">
+				 <button id="btn-desplegar-envs" class="btn btn-default"><spring:message code="notificacio.list.boto.desplegar"/> <span class="fa fa-caret-down"></span></button>
+			</div>
+		</div>
+	</script>
+
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <table
         id="notificacio"
         data-toggle="datatable"
         data-url="${urlDatatable}"
         data-search-enabled="false"
-        data-default-order="8"
+        data-default-order="0"
         data-default-dir="desc"
         class="table table-striped table-bordered"
         style="width:100%"
@@ -497,9 +530,12 @@
         data-filter="#filtre"
         data-save-state="true"
         data-mantenir-paginacio="true"
-        data-rowhref-template="#rowhrefTemplate"
+        data-paging-style-x="true"
+<%--        data-rowhref-template="#rowhrefTemplate"--%>
         data-botons-template="#botonsTemplate"
-        data-rowhref-toggle="modal">
+        data-selection-enabled="true"
+<%--        data-rowhref-toggle="modal"--%>
+>
     <thead>
     <tr>
         <th data-col-name="id" data-visible="false">#</th>

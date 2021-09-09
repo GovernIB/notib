@@ -70,8 +70,16 @@ public interface EnviamentService {
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(
-			Long notificacioId);
+	List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId);
+
+	/**
+	 * Consulta els identificadors dels enviaments d'un conjunt de notificacions
+	 *
+	 * @param notificacionsIds  Atribut id de la notificació.
+	 * @return els identificadors dels enviaments.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds);
 
 	/**
 	 * Consulta d'un enviament donat el seu id.
@@ -81,8 +89,7 @@ public interface EnviamentService {
 	 * @return el destinatari trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioEnviamentDto enviamentFindAmbId(
-			Long enviamentId);
+	NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId);
 
 	/**
 	 * Consulta dels events d'una notificació.
@@ -92,8 +99,7 @@ public interface EnviamentService {
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public List<NotificacioEventDto> eventFindAmbNotificacio(
-			Long notificacioId);
+	List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId);
 	
 	/**
 	 * Reintenta un callback fallat
@@ -103,18 +109,13 @@ public interface EnviamentService {
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public boolean reintentarCallback(
-			Long eventId);
+	boolean reintentarCallback(Long eventId);
 
 	/**
 	 * Genera un fitxer d'exportació amb la informació dels expedients.
 	 * 
 	 * @param entitatId 
 	 *            Atribut id de l'entitat.
-	 * @param metaExpedientId 
-	 *            Atribut id del meta-expedient.
-	 * @param expedientIds
-	 *            Atribut id dels expedients a exportar.
 	 * @param format
 	 *            Format pel fitxer d'exportació ("ODS" o "CSV").
 	 * @return El fitxer resultant de l'exportació.
@@ -124,11 +125,10 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public FitxerDto exportacio(
+	FitxerDto exportacio(
 			Long entitatId,
 			Collection<Long> enviamentIds,
-			String format,
-			NotificacioEnviamentFiltreDto filtreCommand) throws IOException, NotFoundException, ParseException;
+			String format) throws IOException, NotFoundException, ParseException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar

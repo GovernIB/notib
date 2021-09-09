@@ -44,6 +44,7 @@ public class EnviamentHelper {
 	}
 
 	public void refrescarEnviamentsExpirats(@NonNull ProgresActualitzacioCertificacioDto progres) {
+		log.info("Execució procés actualització enviaments expirats");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String username = auth == null ? "schedulled" : auth.getName();
 		IntegracioInfo info = new IntegracioInfo(

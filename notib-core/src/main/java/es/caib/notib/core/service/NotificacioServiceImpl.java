@@ -17,7 +17,6 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.ws.notificacio.*;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -357,7 +356,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 
-
+//	@Autowired
+//	private PermisosHelper permisosHelper;
 	@Transactional(readOnly = true)
 	@Override
 	public NotificacioDtoV2 findAmbId(
@@ -376,12 +376,30 @@ public class NotificacioServiceImpl implements NotificacioService {
 					false,
 					false);
 
+			// TODO: Això no està bé, també pot tenir permís per a òrgan gestor
 			if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
 				notificacio.setPermisProcessar(
 						entityComprovarHelper.hasPermisProcediment(
 								notificacio.getProcediment().getId(),
 								PermisEnum.PROCESSAR));
 			}
+//			notificacio.setPermisProcessar(isAdministrador && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA);
+//			if (!notificacio.isPermisProcessar() && notificacio.getProcediment() != null &&
+//					notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+//				notificacio.setPermisProcessar(
+//						entityComprovarHelper.hasPermisProcediment(
+//								notificacio.getProcediment().getId(),
+//								PermisEnum.PROCESSAR));
+//			}
+//
+//			if (!notificacio.isPermisProcessar() && notificacio.getOrganGestor() != null &&
+//					notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
+//				notificacio.setPermisProcessar(
+//						permisosHelper.hasPermission(notificacio.getOrganGestor().getId(),
+//								OrganGestorEntity.class,
+//								entityComprovarHelper.getPermissionsFromName(PermisEnum.PROCESSAR)
+//								));
+//			}
 
 			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
@@ -445,9 +463,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
-	@Resource
-	private ProcedimentsCacheable procedimentsCacheable;
 
 	@Transactional(readOnly = true)
 	@Override
@@ -674,6 +689,27 @@ public class NotificacioServiceImpl implements NotificacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Long> findIdsAmbFiltre(Long entitatId,
+									   RolEnumDto rol,
+									   String organGestorCodi,
+									   String usuariCodi,
+									   NotificacioFiltreDto filtre) {
+		PaginacioParamsDto paginacioParamsDto = new PaginacioParamsDto();
+		paginacioParamsDto.setPaginaNum(0);
+		paginacioParamsDto.setPaginaTamany(notificacioEnviamentRepository.findAll().size());
+		PaginaDto<NotificacioTableItemDto> pagina = findAmbFiltrePaginat(entitatId, rol, organGestorCodi,
+				usuariCodi,
+				filtre,
+				paginacioParamsDto);
+		List<Long> idsNotificacions = new ArrayList<>();
+		for (NotificacioTableItemDto notificacio: pagina.getContingut()) {
+			idsNotificacions.add(notificacio.getId());
+		}
+		return idsNotificacions;
 	}
 
 	@Override
@@ -1175,7 +1211,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String resposta = null;
 			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
 					null,
-					notificacioId); 
+					notificacioId);
+			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
+				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
+			}
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {

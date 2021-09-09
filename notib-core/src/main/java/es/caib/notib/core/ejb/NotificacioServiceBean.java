@@ -174,7 +174,21 @@ public class NotificacioServiceBean implements NotificacioService {
 				filtre,
 				paginacioParams);
 	}
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public List<Long> findIdsAmbFiltre(Long entitatId,
+									   RolEnumDto rol,
+									   String organGestorCodi,
+									   String usuariCodi,
+									   NotificacioFiltreDto filtre) {
+		return delegate.findIdsAmbFiltre(
+				entitatId,
+				rol,
+				organGestorCodi,
+				usuariCodi,
+				filtre);
+	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public String marcarComProcessada(
