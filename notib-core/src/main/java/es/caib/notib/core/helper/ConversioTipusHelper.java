@@ -6,6 +6,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
+import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;

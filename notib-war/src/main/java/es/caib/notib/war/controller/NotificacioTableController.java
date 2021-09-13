@@ -1,6 +1,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
@@ -406,8 +407,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             HttpServletRequest request,
             Model model,
             @PathVariable Long notificacioId) {
-        List<NotificacioEnviamentDatatableDto> destinataris = enviamentService.enviamentFindAmbNotificacio(notificacioId);
-        return destinataris;
+        return enviamentService.enviamentFindAmbNotificacio(notificacioId);
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}", method = RequestMethod.GET)

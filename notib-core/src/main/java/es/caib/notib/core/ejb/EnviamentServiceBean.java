@@ -6,6 +6,7 @@ package es.caib.notib.core.ejb;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
+import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.rest.consulta.Resposta;
 import es.caib.notib.core.api.service.EnviamentService;

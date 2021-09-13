@@ -3,6 +3,7 @@ package es.caib.notib.core.api.dto.notificacio;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
+import es.caib.notib.core.api.dto.notenviament.EnviamentInfoDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +42,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String serveiTipus;
-	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
+	private List<EnviamentInfoDto> enviaments = new ArrayList<>();
 	private String usuariCodi;
 	private String motiu;
 	private String numExpedient;

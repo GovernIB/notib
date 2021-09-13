@@ -467,6 +467,27 @@ $(document).ready(function() {
 							    			</c:choose>
 							    			</td>
 							    		</tr>
+										<tr>
+											<th><spring:message code="notificacio.list.enviament.list.estat"/></th>
+											<td>
+												<c:if test="${not empty enviament.notificaEstat}">
+													<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+												</c:if>
+												<c:if test="${enviament.notificacioError}">
+													<c:set var="errorTitle">
+														<c:choose>
+														<c:when test="${not empty enviament.notificacioErrorDescripcio}">
+															${enviament.notificacioErrorDescripcio}
+														</c:when>
+														<c:otherwise>
+															Descripció de l'error no registrada
+														</c:otherwise>
+														</c:choose>
+													</c:set>
+													<span class="fa fa-warning text-danger" title="${errorTitle}"></span>
+												</c:if>
+											</td>
+										</tr>
 						    			<tr>
 							    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
 							    			<%--<td>

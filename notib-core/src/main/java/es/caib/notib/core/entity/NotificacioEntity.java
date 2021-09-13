@@ -1,8 +1,6 @@
 package es.caib.notib.core.entity;
 
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
@@ -524,6 +522,19 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 
 	public boolean isTipusUsuariAplicacio() {
 		return this.tipusUsuari != null && this.tipusUsuari.equals(TipusUsuariEnumDto.APLICACIO);
+	}
+
+	public boolean isComunicacioSir() { // Per al mapping al DTO
+		if (!NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(this.getEnviamentTipus())) {
+			return false;
+		}
+
+		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@PreRemove

@@ -1,8 +1,11 @@
 /**
  * 
  */
-package es.caib.notib.core.api.dto;
+package es.caib.notib.core.api.dto.notenviament;
 
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,9 +26,7 @@ public class NotificacioEnviamentDatatableDto {
 
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
-//	private String titularNomLlinatge;
 
-//	private NotificacioDto notificacio;
 	private NotificacioEnviamentEstatEnumDto notificaEstat;
 	private Date notificaEstatData;
 

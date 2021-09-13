@@ -420,17 +420,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 						CieDataDto.class));
 			}
 
-			if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
-				dto.setComunicacioSir(true);
-				for(NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
-					if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
-						dto.setComunicacioSir(false);
-						break;
-					}
-				}
-			} else {
-				dto.setComunicacioSir(false);
-			}
+//			if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
+//				dto.setComunicacioSir(true);
+//				for(NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
+//					if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+//						dto.setComunicacioSir(false);
+//						break;
+//					}
+//				}
+//			} else {
+//				dto.setComunicacioSir(false);
+//			}
 
 			return dto;
 		} finally {
