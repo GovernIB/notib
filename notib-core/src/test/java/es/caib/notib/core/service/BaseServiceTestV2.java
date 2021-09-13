@@ -1,18 +1,17 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import es.caib.notib.core.test.AuthenticationTest;
+import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.DatabaseItemTest;
 import es.caib.notib.core.test.data.EntitatItemTest;
-import es.caib.notib.core.test.data.OrganGestorItemTest;
 import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -37,6 +36,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -74,7 +74,9 @@ public class BaseServiceTestV2 {
 	protected String currentTestDescription = "";
 
 	@Autowired
-	OrganGestorItemTest organGestorCreate;
+	protected OrganGestorService organGestorService;
+	@Autowired
+	protected EntitatService entitatService;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -116,24 +118,36 @@ public class BaseServiceTestV2 {
 
 	protected ElementsCreats createDatabase (EntitatDto entitatDto,
 											 DatabaseItemTest... elements) throws Exception {
-		EntitatDto entitatCreada = entitatItemTest.create(entitatDto);
-
-		organGestorCreate.addObject("organ_default", organGestorCreate.getRandomInstance());
-		organGestorCreate.createAll(entitatCreada.getId());
-		OrganGestorDto organ = organGestorCreate.getObject("organ_default");
+		EntitatDto entitat = getAndConfigureDefaultEntitat();
+		authenticationTest.autenticarUsuari("admin");
+		OrganGestorDto organ = getAndConfigureDefaultOrganGestor(entitat);
 
 		Map<String, Object> elementsCreats = new HashMap<>();
 		for (DatabaseItemTest<?> element: elements) {
 			log.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
 			element.relateElements();
-			element.createAll(entitatCreada.getId());
+			element.createAll(entitat.getId());
 			for(String key : element.getObjects().keySet()) {
 				elementsCreats.put(key, element.getObject(key));
 				log.debug("...objecte amb la clau: '" + key + "' creat correctament.");
 			}
 
 		}
-		return new ElementsCreats(entitatCreada, organ, elementsCreats);
+		return new ElementsCreats(entitat, organ, elementsCreats);
+	}
+
+	private OrganGestorDto getAndConfigureDefaultOrganGestor(EntitatDto entitat) throws ValidationException {
+		authenticationTest.autenticarUsuari("admin");
+
+		OrganGestorDto organ = organGestorService.findByCodi(entitat.getId(), ConfigTest.DEFAULT_ORGAN_DIR3);
+		return organ;
+	}
+
+	private EntitatDto getAndConfigureDefaultEntitat() throws ValidationException {
+		authenticationTest.autenticarUsuari("super");
+
+		EntitatDto entitatDto = entitatService.findByCodi("ENTITAT_TESTS");
+		return entitatDto;
 	}
 	protected void destroyDatabase (Long entitatId,
 									DatabaseItemTest... elements) {
@@ -147,12 +161,9 @@ public class BaseServiceTestV2 {
 				System.out.println("...error esborrant objecte de tipus " + element.getClass().getSimpleName() + ".");
 				System.out.println(e);
 			}
-
 		}
 
 		try {
-			organGestorCreate.delete(entitatId, "organ_default");
-			entitatItemTest.delete(entitatId);
 			removeAllConfigs();
 
 		} catch (Exception e) {

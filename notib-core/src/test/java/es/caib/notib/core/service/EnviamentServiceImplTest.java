@@ -9,6 +9,7 @@ import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
@@ -45,6 +46,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
     NotificacioEnviamentRepository enviamentRepository;
     @Autowired
     NotificacioItemTest notificacioCreate;
+
     EntitatDto entitatCreate;
     ProcedimentDto procedimentCreate;
     OrganGestorDto organGestorCreate;
@@ -82,7 +84,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
         List<PermisDto> permisosOrgan = new ArrayList<PermisDto>();
         organGestorCreate = new OrganGestorDto();
-        organGestorCreate.setCodi("A00000000");
+        organGestorCreate.setCodi(ConfigTest.ORGAN_DIR3);
         organGestorCreate.setNom("Òrgan prova");
         PermisDto permisOrgan = new PermisDto();
         permisOrgan.setAdministrador(true);
@@ -95,7 +97,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         procedimentCreate = new ProcedimentDto();
         procedimentCreate.setCodi("216076");
         procedimentCreate.setNom("Procedimiento 1");
-        procedimentCreate.setOrganGestor("A00000000");
+        procedimentCreate.setOrganGestor(ConfigTest.ORGAN_DIR3);
         PermisDto permisNotificacio = new PermisDto();
         permisNotificacio.setNotificacio(true);
         permisNotificacio.setTipus(TipusEnumDto.USUARI);

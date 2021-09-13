@@ -1,9 +1,6 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
@@ -11,15 +8,14 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.entity.EnviamentTableEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.cie.EntregaPostalEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.*;
+import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.EntitatItemTest;
 import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.core.test.data.ProcedimentItemTest;
@@ -58,18 +54,22 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	@Autowired
 	PagadorCieRepository cieRepository;
 	@Autowired
+	EntitatRepository entitatRepository;
+	@Autowired
+	OrganGestorRepository organGestorRepository;
+	@Autowired
 	PagadorPostalRepository operadorPostalRepository;
 	@Autowired
 	NotificacioTableViewRepository notificacioTableViewRepository;
-
-	EntitatDto entitatCreate;
-
-	@Autowired
-	ProcedimentItemTest procedimentCreator;
-	@Autowired
-	NotificacioItemTest notificacioCreator;
 	@Autowired
 	EnviamentTableRepository enviamentTableRepository;
+	@Autowired
+	ProcedimentService procedimentService;
+
+	@Autowired
+	private ProcedimentItemTest procedimentCreator;
+	@Autowired
+	private NotificacioItemTest notificacioCreator;
 
 	private ElementsCreats database;
 
@@ -78,26 +78,32 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		setDefaultConfigs();
 		configureMockGestioDocumentalPlugin();
 
-		entitatCreate = EntitatItemTest.getRandomInstance();
-
-		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "", new Date(0), null).build());
+		EntitatEntity entitatEntity = entitatRepository.findByCodi("ENTITAT_TESTS");
+		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "CIE NOM", new Date(0), entitatEntity).build());
 		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
 				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
 				null).build());
 
 		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
 		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
+		procedimentCreator.addObject("procedimentSensePermis", ProcedimentItemTest.getRandomProcedimentSensePermis());
 
-		notificacioCreator.addObject("notificacio", notificacioCreator.getRandomInstance());
+		notificacioCreator.addObject("notificacio", NotificacioItemTest.getRandomInstance());
 		notificacioCreator.addRelated("notificacio", "procediment", procedimentCreator);
 
-		notificacioCreator.addObject("notificacioCIE", notificacioCreator.getRandomInstance(1));
+		notificacioCreator.addObject("notificacioCIE", NotificacioItemTest.getRandomInstance(1));
 		notificacioCreator.addRelated("notificacioCIE", "procedimentCIE", procedimentCreator);
 
-		notificacioCreator.addObject("notificacioCIE", notificacioCreator.getRandomInstance(1));
+		notificacioCreator.addObject("notificacioCIE", NotificacioItemTest.getRandomInstance(1));
 		notificacioCreator.addRelated("notificacioCIE", "procedimentCIE", procedimentCreator);
 
-		NotificacioDatabaseDto notificacioCIEAmbEntregaPostal = notificacioCreator.getRandomInstance(1);
+		NotificacioDatabaseDto notificacioSensePermisos = NotificacioItemTest.getRandomInstance(1);
+		notificacioSensePermisos.setOrganGestorCodi(ConfigTest.ORGAN_DIR3_SENSE_PERMISOS);
+		notificacioCreator.addObject("notificacioSensePermisos", notificacioSensePermisos);
+		notificacioCreator.addRelated("notificacioSensePermisos", "procedimentSensePermis", procedimentCreator);
+
+
+		NotificacioDatabaseDto notificacioCIEAmbEntregaPostal = NotificacioItemTest.getRandomInstance(1);
 		NotEnviamentDatabaseDto enviament = notificacioCIEAmbEntregaPostal.getEnviaments().get(0);
 		EntregaPostalDto entregaPostal = getEntregaPostalDtoRandomData();
 		enviament.setEntregaPostal(entregaPostal);
@@ -161,6 +167,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 				.codiPostal("07500")
 				.build();
 	}
+
 	@Test
 	public void whenCreateAmbProcedimentCIEAmbEntregaPostal_thenAllFieldsFilledCorrectly() throws IOException, RegistrePluginException, SistemaExternException, RegistreNotificaException {
 		configureMockRegistrePlugin();
@@ -506,7 +513,115 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 	}
 
-//	@Test
+	@Test(expected=Exception.class)
+	public void givenNotificacioNoFinalitzada_whenMarcarComProcessada_thenRaiseException() throws Exception {
+
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacio");
+		// Given: notificacio amb estat distint a finalitzada
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacio.getId());
+		notEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		//When
+		notificacioService.marcarComProcessada(notEntity.getId(), "motiu", false);
+
+	}
+
+	@Test
+	public void givenNotificacioPermisProcessarProcediment_whenMarcarComProcessada() throws Exception {
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacioSensePermisos");
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacio.getId());
+		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		// Given: notificacio amb permis processar procediment
+		ProcedimentDto procediment = notificacio.getProcediment();
+		PermisDto permisProcessar = new PermisDto();
+		permisProcessar.setProcessar(true);
+		permisProcessar.setTipus(TipusEnumDto.USUARI);
+		permisProcessar.setPrincipal("user");
+
+		procedimentService.permisUpdate(database.entitat.getId(), null, procediment.getId(),
+				permisProcessar);
+
+		assertEquals(NotificacioEstatEnumDto.FINALITZADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+
+		//When
+		authenticationTest.autenticarUsuari("user");
+		notificacioService.marcarComProcessada(notificacio.getId(), "motiu", false);
+		assertEquals(NotificacioEstatEnumDto.PROCESSADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+	}
+
+	@Test
+	public void givenNotificacioPermisProcessarOrgan_whenMarcarComProcessada() throws Exception {
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacioSensePermisos");
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacio.getId());
+		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		// Given: notificacio amb permis processar òrgan
+		Long organGestorId = organGestorRepository.findByCodi(notificacio.getOrganGestorCodi()).getId();
+		PermisDto permis = new PermisDto();
+		permis.setProcessar(true);
+		permis.setTipus(TipusEnumDto.USUARI);
+		permis.setPrincipal("user");
+		organGestorService.permisUpdate(
+				database.entitat.getId(),
+				organGestorId,
+				false,
+				permis);
+
+		assertEquals(NotificacioEstatEnumDto.FINALITZADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+
+		//When
+		authenticationTest.autenticarUsuari("user");
+		notificacioService.marcarComProcessada(notificacio.getId(), "motiu", false);
+		assertEquals(NotificacioEstatEnumDto.PROCESSADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+
+	}
+
+	@Test
+	public void givenNotificacioPermisProcessarProcedimentOrgan_whenMarcarComProcessada() throws Exception {
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacioSensePermisos");
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacio.getId());
+		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		// Given: notificacio amb permis processar procediment per a l'òrgan gestor
+		Long organGestorId = organGestorRepository.findByCodi(notificacio.getOrganGestorCodi()).getId();
+		ProcedimentDto procediment = notificacio.getProcediment();
+		PermisDto permisProcessar = new PermisDto();
+		permisProcessar.setProcessar(true);
+		permisProcessar.setTipus(TipusEnumDto.USUARI);
+		permisProcessar.setPrincipal("user");
+
+		procedimentService.permisUpdate(database.entitat.getId(), organGestorId, procediment.getId(),
+				permisProcessar);
+
+		assertEquals(NotificacioEstatEnumDto.FINALITZADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+
+		//When
+		authenticationTest.autenticarUsuari("user");
+		notificacioService.marcarComProcessada(notificacio.getId(), "motiu", false);
+		assertEquals(NotificacioEstatEnumDto.PROCESSADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+
+	}
+
+	@Test(expected=Exception.class)
+	public void givenNotificacioSenseCapPermis_whenMarcarComProcessada() throws Exception {
+		NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) database.get("notificacioSensePermisos");
+		NotificacioEntity notEntity = notificacioRepository.findOne(notificacio.getId());
+		notEntity.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioRepository.saveAndFlush(notEntity);
+
+		assertEquals(NotificacioEstatEnumDto.FINALITZADA, notificacioRepository.findOne(notificacio.getId()).getEstat());
+
+		//When
+		authenticationTest.autenticarUsuari("user");
+		notificacioService.marcarComProcessada(notificacio.getId(), "motiu", false);
+	}
+
+	//	@Test
 	public void notificacioRegistrar() throws SistemaExternException, IOException, RegistrePluginException, RegistreNotificaException {
 		EntitatDto entitatCreate = database.entitat;
 		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");

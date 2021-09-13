@@ -294,7 +294,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("admin");
 					
-					ProcedimentFiltreDto procedimentFiltreCreado = buildProcedimentFiltreDto(null);
+					ProcedimentFiltreDto procedimentFiltreCreado = buildProcedimentFiltreDto(false);
 					
 					PaginacioParamsDto paginacioParamsDto = getPaginacioDtoFromRequest(null, null);
 					
@@ -376,7 +376,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 			);
 	}
 	
-	private ProcedimentFiltreDto buildProcedimentFiltreDto(Boolean nomesComuns) {
+	private ProcedimentFiltreDto buildProcedimentFiltreDto(boolean nomesComuns) {
 		ProcedimentFiltreDto procedimentFiltreCreado = new ProcedimentFiltreDto();
 		procedimentFiltreCreado.setCodi(null);
 //		procedimentFiltreCreado.setCodi("962793");

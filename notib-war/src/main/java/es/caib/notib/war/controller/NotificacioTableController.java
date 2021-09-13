@@ -235,7 +235,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             }
             String resposta = notificacioService.marcarComProcessada(
                     notificacioId,
-                    command.getMotiu());
+                    command.getMotiu(),
+                    isAdministrador(request));
 
             if (resposta != null) {
                 MissatgesHelper.warning(request, resposta);
@@ -759,7 +760,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             try {
                 String resposta = notificacioService.marcarComProcessada(
                         notificacioId,
-                        command.getMotiu());
+                        command.getMotiu(),
+                        isAdministrador(request));
 
                 if (resposta != null) {
                     MissatgesHelper.warning(request, resposta);

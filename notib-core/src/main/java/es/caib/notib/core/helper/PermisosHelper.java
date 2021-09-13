@@ -46,6 +46,8 @@ public class PermisosHelper {
 	private AclSidRepository aclSidRepository;
 	@Resource
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
+	@Autowired
+	private AclCache aclCache;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -756,7 +758,7 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.NOTIFICACIO);
 		if (permis.isComuns())
 			permissions.add(ExtendedPermission.COMUNS);
-		
+
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
 
@@ -778,6 +780,7 @@ public class PermisosHelper {
 			permisDto.revocaPermisos();
 			updatePermis(objectIdentifier, clazz, permisDto);
 		}
+		aclCache.clearCache();
 	}
 
 	public interface ObjectIdentifierExtractor<T> {

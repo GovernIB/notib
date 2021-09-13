@@ -193,10 +193,12 @@ public class NotificacioServiceBean implements NotificacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public String marcarComProcessada(
 			Long enviamentId,
-			String motiu) throws Exception {
+			String motiu,
+			boolean isAdministrador) throws Exception {
 		return delegate.marcarComProcessada(
 				enviamentId,
-				motiu);
+				motiu,
+				isAdministrador);
 	}
 
 	@Override

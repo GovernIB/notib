@@ -321,7 +321,7 @@ public class EntitatServiceIT extends BaseServiceTestV2 {
 		EntitatDto creada = (EntitatDto) database.get("entitatCreate");
 		try {
 			EntitatDto entitatSameDir3 = (EntitatDto)SerializationUtils.clone(creada);
-			entitatSameDir3.setCodi("LIMIT0");
+			entitatSameDir3.setCodi("LIMIT2");
 			entitatService.create(entitatSameDir3);
 			fail("L'execució no ha donat l'error de violació d'integritat per clau única repetida");
 		} catch (DataIntegrityViolationException ex) {

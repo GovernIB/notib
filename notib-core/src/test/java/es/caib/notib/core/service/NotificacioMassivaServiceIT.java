@@ -55,11 +55,10 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
 
     @Before
     public void setUp() throws Exception {
+        setDefaultConfigs();
         addConfig("es.caib.notib.metriques.generar", "false");
         addConfig("es.caib.notib.emprar.sir", "true");
         addConfig("es.caib.notib.plugin.registre.documents.enviar", "false");
-        addConfig("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
-        addConfig("es.caib.notib.plugin.unitats.fitxer", "");
         addConfig("es.caib.notib.tasca.registre.enviaments.periode", "60000");
         addConfig("es.caib.notib.notificacio.document.size", "10485760");
         addConfig("es.caib.notib.notificacio.document.total.size", "15728640");

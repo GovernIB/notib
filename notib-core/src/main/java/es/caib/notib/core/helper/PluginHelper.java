@@ -1589,6 +1589,8 @@ public class PluginHelper {
 			
 			if (enviarTipoMIMEFicheroAnexado) {
 				try {
+					/*  TODO: Revisar perque amb els tests unitaris Files.exists(path) es false en Tomcat
+					 *	(Això causa que fallin els tests en Tomcat) */
 					annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
 				} catch (IOException e) {
 					e.printStackTrace();

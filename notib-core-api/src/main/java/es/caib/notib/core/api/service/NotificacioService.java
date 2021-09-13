@@ -303,14 +303,15 @@ public interface NotificacioService {
 	 *            	Atribut id de la notificació que es vol processar.
 	 * @param motiu
 	 *         		el motiu per el que es vol marcar la notificació com a processada.
+	 * @param isAdministrador Indica si l'usuari actual és administrador d'entitat
 	 * @return l'estat de l'enviament.
 	 * @throws MessagingException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	String marcarComProcessada(
 			Long notificacioId,
-			String motiu) throws Exception;
-	
+			String motiu,
+			boolean isAdministrador) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	PaginaDto<NotificacioDto> findWithCallbackError(
@@ -421,4 +422,5 @@ public interface NotificacioService {
 	
 	@PreAuthorize("hasRole('tothom')")
 	public boolean validarIdCsv (String idCsv);
+
 }

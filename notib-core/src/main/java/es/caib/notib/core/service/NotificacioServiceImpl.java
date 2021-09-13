@@ -122,6 +122,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ProcedimentHelper procedimentHelper;
+	@Autowired
+	private ProcedimentOrganRepository procedimentOrganRepository;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -355,9 +357,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-
-//	@Autowired
-//	private PermisosHelper permisosHelper;
 	@Transactional(readOnly = true)
 	@Override
 	public NotificacioDtoV2 findAmbId(
@@ -375,31 +374,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 					false,
 					false,
 					false);
-
-			// TODO: Això no està bé, també pot tenir permís per a òrgan gestor
-			if (notificacio.getProcediment() != null && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
-				notificacio.setPermisProcessar(
-						entityComprovarHelper.hasPermisProcediment(
-								notificacio.getProcediment().getId(),
-								PermisEnum.PROCESSAR));
-			}
-//			notificacio.setPermisProcessar(isAdministrador && notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA);
-//			if (!notificacio.isPermisProcessar() && notificacio.getProcediment() != null &&
-//					notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
-//				notificacio.setPermisProcessar(
-//						entityComprovarHelper.hasPermisProcediment(
-//								notificacio.getProcediment().getId(),
-//								PermisEnum.PROCESSAR));
-//			}
-//
-//			if (!notificacio.isPermisProcessar() && notificacio.getOrganGestor() != null &&
-//					notificacio.getEstat() != NotificacioEstatEnumDto.PROCESSADA) {
-//				notificacio.setPermisProcessar(
-//						permisosHelper.hasPermission(notificacio.getOrganGestor().getId(),
-//								OrganGestorEntity.class,
-//								entityComprovarHelper.getPermissionsFromName(PermisEnum.PROCESSAR)
-//								));
-//			}
 
 			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
@@ -1203,7 +1177,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public String marcarComProcessada(
 			Long notificacioId,
-			String motiu) throws Exception {
+			String motiu,
+			boolean isAdministrador) throws Exception {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
@@ -1215,6 +1190,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
+			if (!isAdministrador && !hasPermisNotificacio(notificacioEntity)) {
+				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
+			}
+
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
@@ -1231,6 +1210,40 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
+	/**
+	 * Comprova si l'usuari actual té un determinat permís sobre una notificació
+	 *
+	 * @param notificacio Notificació a comprovar
+	 * @return boleà indicant si l'usuari té el permís
+	 */
+	private boolean hasPermisNotificacio(NotificacioEntity notificacio) {
+		boolean hasPermis = false;
+		ProcedimentEntity procedimentNotificacio = notificacio.getProcediment();
+		if (procedimentNotificacio != null) {
+			hasPermis = entityComprovarHelper.hasPermisProcediment(
+					notificacio.getProcediment().getId(),
+					PermisEnum.PROCESSAR);
+		}
+
+		// Si no té permís otorgat a nivell de procediment, en els casos en que l'òrgan gestor no vé fix pel procediment l'hem de comprovar
+		if (!hasPermis && (procedimentNotificacio == null || procedimentNotificacio.isComu())) {
+			hasPermis = entityComprovarHelper.hasPermisOrganGestor(
+					notificacio.getOrganGestor(),
+					PermisEnum.PROCESSAR);
+		}
+
+		// En cas de procediments comuns també es pot tenir permís per a la tupla procediment-organ
+		if (!hasPermis && procedimentNotificacio != null && procedimentNotificacio.isComu()) {
+			ProcedimentOrganEntity procedimentOrganEntity = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(
+					procedimentNotificacio.getId(),
+					notificacio.getOrganGestor().getId());
+			hasPermis = entityComprovarHelper.hasPermisProcedimentOrgan(
+					procedimentOrganEntity,
+					PermisEnum.PROCESSAR);
+		}
+
+		return hasPermis;
+	}
 	@Transactional
 	@Override
 	public boolean reactivarConsulta(Long notificacioId) {
