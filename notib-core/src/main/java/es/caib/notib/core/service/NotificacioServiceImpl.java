@@ -395,7 +395,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
-			NotificacioEntity notificacio = notificacioRepository.findById(id);
+			NotificacioEntity notificacio = notificacioRepository.findOne(id);
 			if(notificacio == null) {
 				return null;
 			}
@@ -420,18 +420,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 						CieDataDto.class));
 			}
 
-//			if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
-//				dto.setComunicacioSir(true);
-//				for(NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
-//					if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
-//						dto.setComunicacioSir(false);
-//						break;
-//					}
-//				}
-//			} else {
-//				dto.setComunicacioSir(false);
-//			}
-
+			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
+			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
+			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -38,9 +38,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private GrupDto grup;
 	private String grupCodi;
 	private NotificacioEstatEnumDto estat;
-	private Date notificaErrorData;
-	private String notificaErrorDescripcio;
-	private NotificacioErrorTipusEnumDto notificaErrorTipus;
+	protected Date estatDate;
 	private String serveiTipus;
 	private List<EnviamentInfoDto> enviaments = new ArrayList<>();
 	private String usuariCodi;
@@ -49,8 +47,6 @@ public class NotificacioInfoDto extends AuditoriaDto {
 
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
-	private Date notificaEnviamentData;
-	private Date notificaEnviamentNotificaData;
 	private IdiomaEnumDto idioma;
 
 	// Documents de la notificació
@@ -71,9 +67,21 @@ public class NotificacioInfoDto extends AuditoriaDto {
 
 	private String registreLlibreNom;
 	private String registreOficinaNom;
+	private int registreEnviamentIntent;
+
+	private Date notificaEnviamentData;
+	private Date notificaEnviamentNotificaData;
+
+	private Date notificaErrorData;
+	private String notificaErrorDescripcio;
+//	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
+	}
+
+	public boolean isEnviant() {
+		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && registreEnviamentIntent == 0 && !isNotificaError();
 	}
 
 	@Override

@@ -192,7 +192,57 @@ $(document).ready(function() {
 						<c:if test="${notificacio.estat != null && notificacio.estat != ''}">
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.estat" /></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
+							<td>
+								<c:choose>
+									<c:when test="${notificacio.enviant}">
+										<span class="fa fa-clock-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'PENDENT'}">
+										<span class="fa fa-clock-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'ENVIADA'}">
+										<span class="fa fa-send-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'FINALITZADA'}">
+										<span class="fa fa-check"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'REGISTRADA'}">
+										<span class="fa fa-file-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'PROCESSADA'}">
+										<span class="fa fa-check-circle"></span>
+									</c:when>
+								</c:choose>
+								<c:choose>
+									<c:when test="${notificacio.enviant}">
+										<spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>
+									</c:when>
+									<c:otherwise>
+										<spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" />
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${notificacio.notificaError}">
+									<span class="fa fa-warning text-danger" title="${notificacio.notificaErrorDescripcio}"></span>
+								</c:if>
+<%--								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastEvent}">--%>
+<%--									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
+<%--								</c:if>--%>
+								<c:if test="${notificacio.estat == 'PROCESSADA' and not empty notificacio.estatDate}">
+									<br>
+									<span class="horaProcessat"><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></span>
+									<br>
+								</c:if>
+								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
+									<p style="display:inline">(
+									<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
+										<c:if test="${not empty enviament.notificaEstat}">
+											<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+											${!status.last ? ', ' : ''}
+										</c:if>
+									</c:forEach>
+									)</p>
+								</c:if>
+							</td>
 						</tr>
 						</c:if>
 						<tr>

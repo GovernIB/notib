@@ -320,7 +320,7 @@
         });
 
         $('#btnNetejar').click(function() {
-            $(':input', $('#filtre')).each (function() {
+            $(':input', $('#form-filtre')).each (function() {
                 var type = this.type, tag = this.tagName.toLowerCase();
                 if (type == 'text' || type == 'password' || tag == 'textarea') {
                     this.value = '';
@@ -409,7 +409,7 @@
         initEvents($('#notificacio'), 'notificacio', eventMessages)
     });
 </script>
-<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
+<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
     <div class="row">
         <c:if test="${mostraEntitat}">
             <div class="col-md-3">
@@ -527,7 +527,7 @@
         class="table table-striped table-bordered"
         style="width:100%"
         data-row-info="true"
-        data-filter="#filtre"
+        data-filter="#form-filtre"
         data-save-state="true"
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
