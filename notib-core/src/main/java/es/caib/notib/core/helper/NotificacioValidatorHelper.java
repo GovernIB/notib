@@ -11,6 +11,7 @@ import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -71,11 +72,13 @@ public class NotificacioValidatorHelper {
 			if (notificacio.getConcepte().length() > 240) {
 				errors.add("[1031] El concepte de la notificació no pot tenir una longitud superior a 240 caràcters.");
 			}
-			if (!validFormat(notificacio.getConcepte()).isEmpty()) {
+			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
+			if (!caractersNoValids.isEmpty()) {
 				errors.add("[1032] El format del camp concepte no és correcte. Inclou els caràcters (" +
-						listToString(validFormat(notificacio.getConcepte())) +") que no són correctes");
+						StringUtils.join(caractersNoValids, ',') + ") que no són correctes");
 			}
 		}
+
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
 			errors.add("[1050] El tipus d'enviament de la notificació no pot ser null.");
@@ -359,13 +362,6 @@ public class NotificacioValidatorHelper {
 		return charsNoValids;
 	}
 
-	private StringBuilder listToString(ArrayList<?> list) {
-		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < list.size(); i++) {
-			str.append(list.get(i));
-		}
-		return str;
-	}
 
 	private boolean isEmailValid(String email) {
 		boolean valid = true;
