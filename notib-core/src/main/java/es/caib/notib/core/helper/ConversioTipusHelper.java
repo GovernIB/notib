@@ -5,6 +5,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.*;
+import es.caib.notib.core.api.dto.notenviament.EnviamentInfoDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.*;
@@ -137,6 +138,11 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEnviamentEntity.class, NotificacioEnviamentDatatableDto.class).
 				field("notificacio.estat", "notificacioEstat").
 				customize(new NotificacioEnviamentEntitytoDatatableMapper()).
+				byDefault().
+				register();
+		mapperFactory.classMap(NotificacioEnviamentEntity.class, EnviamentInfoDto.class).
+				field("notificacio.estat", "notificacioEstat").
+				customize(new NotificacioEnviamentEntitytoInfoMapper()).
 				byDefault().
 				register();
 
@@ -388,7 +394,21 @@ public class ConversioTipusHelper {
 			}
 		}
 	}
-
+	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {
+		@Override
+		public void mapAtoB(
+				NotificacioEnviamentEntity notificacioEnviamentEntity,
+				EnviamentInfoDto notificacioEnviamentDto,
+				MappingContext context) {
+			if (notificacioEnviamentEntity.isNotificaError()) {
+				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+				if (event != null) {
+					notificacioEnviamentDto.setNotificacioErrorData(event.getData());
+					notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
+				}
+			}
+		}
+	}
 	public class NotificacioEnviamentEntitytoDtoV2Mapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDtoV2> {
 		@Override
 		public void mapAtoB(
