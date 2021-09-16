@@ -148,30 +148,38 @@ public class ProcedimentHelper {
 	public Set<String> findUsuarisAmbPermisReadPerProcediment(
 			ProcedimentEntity procediment) {
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
-		List<PermisDto> permisos = new ArrayList<PermisDto>();
+		List<PermisDto> permisos;
 		permisos = permisosHelper.findPermisos(
 				procediment.getId(),
 				ProcedimentEntity.class);
-		
+
+		if (!procediment.isComu() && procediment.getOrganGestor() != null ) {
+			List<PermisDto> permisosOrgan = permisosHelper.findPermisos(
+					procediment.getOrganGestor().getId(),
+					OrganGestorEntity.class);
+			permisos.addAll(permisosOrgan);
+		}
 		Set<String> usuaris = new HashSet<String>();
 		for (PermisDto permis: permisos) {
-			switch (permis.getTipus()) {
-			case USUARI:
-				usuaris.add(permis.getPrincipal());
-				sb.append(" usuari ").append(permis.getPrincipal());
-				break;
-			case ROL:
-				List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
-						permis.getPrincipal());
-				sb.append(" rol ").append(permis.getPrincipal()).append(" (");
-				if (usuarisGrup != null) {
-					for (DadesUsuari usuariGrup: usuarisGrup) {
-						usuaris.add(usuariGrup.getCodi());
-						sb.append(" ").append(usuariGrup.getCodi());
-					}
+			if (permis.isRead()) {
+				switch (permis.getTipus()) {
+					case USUARI:
+						usuaris.add(permis.getPrincipal());
+						sb.append(" usuari ").append(permis.getPrincipal());
+						break;
+					case ROL:
+						List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
+								permis.getPrincipal());
+						sb.append(" rol ").append(permis.getPrincipal()).append(" (");
+						if (usuarisGrup != null) {
+							for (DadesUsuari usuariGrup : usuarisGrup) {
+								usuaris.add(usuariGrup.getCodi());
+								sb.append(" ").append(usuariGrup.getCodi());
+							}
+						}
+						sb.append(")");
+						break;
 				}
-				sb.append(")");
-				break;
 			}
 		}
 		logger.debug(sb.toString());
