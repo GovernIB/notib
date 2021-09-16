@@ -54,11 +54,13 @@ public class EnviamentHelper {
 				new AccioParam("Usuari encarregat: ", username));
 		List<Long> enviamentsIds = notificacioEnviamentRepository.findIdExpiradesAndNotificaCertificacioDataNull();
 		if (enviamentsIds == null || enviamentsIds.isEmpty()) {
+			log.debug("No s'han trobat enviaments expirats.");
 			String msgInfoEnviamentsEmpty = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.empty");
 			progres.addInfo(TipusActInfo.WARNING, msgInfoEnviamentsEmpty);
 			info.getParams().add(new AccioParam("Msg. Títol:", msgInfoEnviamentsEmpty));
 			progres.setProgres(100);
 		} else {
+			log.debug(String.format("Actualitzant %d enviaments expirats", enviamentsIds.size()));
 			String msgInfoInici = messageHelper.getMessage("procediment.actualitzacio.auto.processar.enviaments.expirats.inici");
 			progres.setNumEnviamentsExpirats(enviamentsIds.size());
 			progres.addInfo(TipusActInfo.TITOL, msgInfoInici);

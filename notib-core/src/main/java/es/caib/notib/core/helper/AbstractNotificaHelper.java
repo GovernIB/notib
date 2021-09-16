@@ -41,24 +41,21 @@ import java.util.*;
 public abstract class AbstractNotificaHelper {
 	
 	@Autowired
-	AuditNotificacioHelper auditNotificacioHelper;
+	protected AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
-	private ConfigHelper configHelper;
+	protected ConfigHelper configHelper;
+	@Autowired
+	protected NotificacioRepository notificacioRepository;
 	@Autowired 
 	private EmailNotificacioHelper emailNotificacioHelper;
-	@Autowired
-	private NotificacioRepository notificacioRepository;
 	
 	private boolean modeTest;
 	
-	public abstract NotificacioEntity notificacioEnviar(
-			Long notificacioId);
+	public abstract NotificacioEntity notificacioEnviar(Long notificacioId);
 
-	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(
-			Long enviamentId) throws SistemaExternException;
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException;
 
-	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(
-			Long enviamentId, boolean raiseExceptions) throws Exception;
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception;
 
 	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return xifrarId(notificacioDestinatari.getId());
@@ -120,7 +117,7 @@ public abstract class AbstractNotificaHelper {
 			auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
 			
 			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
-			NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
+			NotificacioEntity notificacio = enviament.getNotificacio();
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
 				long startTime = System.nanoTime();
 				
@@ -187,8 +184,8 @@ public abstract class AbstractNotificaHelper {
 			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
 			NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO,
 			NotificacioEnviamentEstatEnumDto.ANULADA};
-	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(
-			String estatCodi) {
+
+	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(String estatCodi) {
 		for (int i = 0; i < estatsNotifica.length; i++) {
 			if (estatCodi.equalsIgnoreCase(estatsNotifica[i])) {
 				return estatsNotib[i];

@@ -650,6 +650,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return "notificacioInfo";
     }
 
+    ////
+    // Actualització enviaments expirats
+    ////
+
     @RequestMapping(value = "/refrescarEstatNotifica", method = RequestMethod.GET)
     public String refrescarEstatNotificaGet(HttpServletRequest request, Model model) {
         return "enviamentsExpiratsActualitzacioForm";
