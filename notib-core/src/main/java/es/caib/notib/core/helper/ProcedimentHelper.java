@@ -382,13 +382,17 @@ public class ProcedimentHelper {
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update"));
 				
 				// UPDATE
-				if (!procediment.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor()) ||
+				OrganGestorEntity organProcediment = procediment.getOrganGestor();
+				boolean haCanviatOrgan = (organProcediment == null && procedimentGda.getOrganGestor() != null) ||
+						(organProcediment != null && !organProcediment.getCodi().equals(procedimentGda.getOrganGestor()));
+				if (haCanviatOrgan ||
 					!procediment.getNom().equals(procedimentGda.getNom()) || 
 					procediment.isComu() != procedimentGda.isComu()) {
+
 					// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
-					if (!procediment.getOrganGestor().getCodi().equals(procedimentGda.getOrganGestor())) {
+					if (haCanviatOrgan) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.organ"));
-						organsGestorsModificats.add(procediment.getOrganGestor());
+						organsGestorsModificats.add(organProcediment);
 					}
 					if (!procediment.getNom().equals(procedimentGda.getNom())) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.nom"));
