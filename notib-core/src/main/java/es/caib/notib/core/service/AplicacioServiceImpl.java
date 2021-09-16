@@ -292,7 +292,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<String> permisosFindRolsDistinctAll() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels rols definits a les ACLs");
+			logger.info("Consulta dels rols definits a les ACLs");
 			return aclSidRepository.findSidByPrincipalFalse();
 		} finally {
 			metricsHelper.fiMetrica(timer);

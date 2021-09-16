@@ -651,7 +651,7 @@ public class PluginHelper {
 		
 		try {
 			List<String> rols = getDadesUsuariPlugin().consultarRolsAmbCodi(usuariCodi);
-			info.addParam("Rols Consultats: ", StringUtils.join(rols, ","));
+			info.addParam("Rols Consultats: ", StringUtils.join(rols, ", "));
 			integracioHelper.addAccioOk(info, false);
 			return rols;
 		} catch (Exception ex) {

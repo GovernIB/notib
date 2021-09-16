@@ -15,6 +15,7 @@ import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.*;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -443,12 +444,13 @@ public class NotificacioHelper {
 		if (documentArxiu == null) {
 			throw new NoDocumentException("No s'ha pogut obtenir el document de l'arxiu.");
 		}
-		if (documentArxiu.getMetadades() == null || documentArxiu.getMetadades().getOrigen() == null 
-				|| documentArxiu.getMetadades().getEstatElaboracio() == null
-				|| (documentArxiu.getMetadades().getTipusDocumental() == null  && documentArxiu.getMetadades().getTipusDocumentalAddicional() == null)
+		DocumentMetadades metadades = documentArxiu.getMetadades();
+		if (metadades == null || metadades.getOrigen() == null
+				|| metadades.getEstatElaboracio() == null
+				|| (metadades.getTipusDocumental() == null  && metadades.getTipusDocumentalAddicional() == null)
 				|| documentArxiu.getContingut().getArxiuNom() == null) {
 			if (document.getOrigen() == null || document.getValidesa() == null || document.getTipoDocumental() == null || document.getModoFirma() == null) {
-				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
+				throw new NoMetadadesException("No s'han obtingut metadades de la consulta a l'arxiu ni del fitxer CSV de càrrega.");
 			} else {
 				return false; // metadades de CSV o del formulario de alta web (no masiva)
 			}
