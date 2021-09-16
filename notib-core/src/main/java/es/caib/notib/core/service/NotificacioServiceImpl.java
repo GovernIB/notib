@@ -423,6 +423,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
 			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
 			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
+
+			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

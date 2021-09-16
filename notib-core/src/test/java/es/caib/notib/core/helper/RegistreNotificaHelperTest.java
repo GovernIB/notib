@@ -50,7 +50,7 @@ public class RegistreNotificaHelperTest {
 		).thenReturn(new AsientoRegistralBeanDto());
 		Mockito.when(
 				pluginHelper.crearAsientoRegistral(
-						Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyString(), Mockito.anyBoolean()
+						Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.nullable(long.class), Mockito.anyLong(), Mockito.anyString(), Mockito.anyBoolean()
 				)
 		).thenReturn(new RespostaConsultaRegistre());
 		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
@@ -119,7 +119,7 @@ public class RegistreNotificaHelperTest {
 		Mockito.verify(pluginHelper, Mockito.times(1)).crearAsientoRegistral(
 				Mockito.anyString(),
 				Mockito.any(AsientoRegistralBeanDto.class),
-				Mockito.anyLong(),
+				Mockito.nullable(long.class),
 				Mockito.anyLong(),
 				Mockito.anyString(),
 				Mockito.eq(false)
