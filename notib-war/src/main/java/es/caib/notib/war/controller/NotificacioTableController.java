@@ -168,6 +168,69 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 SESSION_ATTRIBUTE_SELECCIO);
     }
 
+
+    /**
+     * Obté el llistat de procediments que es pot consultar les seves notificacions.
+     *
+     * @param request
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/procedimentsOrgan", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorComuDto> getProcediments(
+            HttpServletRequest request,
+            Model model) {
+        Long entitatId = EntitatHelper.getEntitatActual(request).getId();
+        String organCodi = null;
+        PermisEnum permis = PermisEnum.CONSULTA;
+        OrganGestorDto organGestor = getOrganGestorActual(request);
+        if (organGestor != null)
+            organCodi = organGestor.getCodi();
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+
+        return procedimentService.getProcedimentsOrgan(
+                entitatId,
+                organCodi,
+                null,
+                rol,
+                permis
+        );
+    }
+
+    /**
+     * Obté el llistat de procediments de l'òrgan gestor indicat que es pot consultar les seves notificacions.
+     *
+     * @param request
+     * @param organGestor
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/procedimentsOrgan/{organGestor}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorComuDto> getProcedimentByOrganGestor(
+            HttpServletRequest request,
+            @PathVariable Long organGestor,
+            Model model) {
+
+        Long entitatId = EntitatHelper.getEntitatActual(request).getId();
+        String organCodi = null;
+        String organFiltre = null;
+        PermisEnum permis = PermisEnum.CONSULTA;
+        OrganGestorDto organActual = getOrganGestorActual(request);
+        if (organActual != null)
+            organCodi = organActual.getCodi();
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+
+        return procedimentService.getProcedimentsOrgan(
+                entitatId,
+                organCodi,
+                organGestor,
+                rol,
+                permis
+        );
+    }
+
     @RequestMapping(value = "/{notificacioId}/info", method = RequestMethod.GET)
     public String info(
             HttpServletRequest request,

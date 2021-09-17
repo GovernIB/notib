@@ -77,7 +77,7 @@ public interface OrganGestorService {
 	List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<OrganGestorDto> findByProcedimentIdsAndEstat(List<Long> procedimentIds, OrganGestorEstatEnum estat);
+	List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<OrganGestorDto> findDescencentsByCodi(

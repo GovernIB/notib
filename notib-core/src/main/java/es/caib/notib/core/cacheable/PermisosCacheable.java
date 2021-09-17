@@ -158,7 +158,6 @@ public class PermisosCacheable {
 
     }
 
-
     @Transactional(readOnly = true)
     @Cacheable(value = "organsPermis", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
     public List<OrganGestorEntity> findOrgansGestorsWithPermis(EntitatEntity entitat,
@@ -173,7 +172,7 @@ public class PermisosCacheable {
             organsDisponibles = organGestorRepository.findByEntitat(entitat);
         }
 
-        permisosHelper.filterGrantedAny(
+        permisosHelper.filterGrantedAll(
                 organsDisponibles,
                 new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
                     public Long getObjectIdentifier(OrganGestorEntity organGestor) {

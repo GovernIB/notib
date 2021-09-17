@@ -99,8 +99,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<OrganGestorDto> findByProcedimentIdsAndEstat(List<Long> procedimentIds, OrganGestorEstatEnum estat) {
-		return delegate.findByProcedimentIdsAndEstat(procedimentIds, estat);
+	public List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat) {
+		return delegate.findByCodisAndEstat(codisOrgans, estat);
 	}
 
 	@Override

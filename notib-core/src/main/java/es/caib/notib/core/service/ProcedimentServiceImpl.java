@@ -17,6 +17,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -105,6 +106,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private EnviamentTableRepository enviamentTableRepository;
 	@Autowired
 	private NotificacioTableViewRepository notificacioTableViewRepository;
+	@Autowired
+	private PermisosCacheable permisosCacheable;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 	
@@ -1177,6 +1180,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 
 		return procedimentsToCodiValorOrganGestorComuDto(procediments);
+	}
+
+	@Override
+	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Permission[] permisos = new Permission[]{
+				ExtendedPermission.COMUNS,
+				ExtendedPermission.NOTIFICACIO
+		};
+
+		List<OrganGestorEntity> organGestorsAmbPermis = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
+		return organGestorsAmbPermis != null && !organGestorsAmbPermis.isEmpty();
 	}
 
 	private List<CodiValorOrganGestorComuDto> procedimentsToCodiValorOrganGestorComuDto(List<ProcedimentEntity> procediments) {

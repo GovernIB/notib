@@ -358,6 +358,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	@RolesAllowed({"tothom"})
+	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId) {
+		return delegate.hasProcedimentsComunsAndNotificacioPermission(entitatId);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);

@@ -288,11 +288,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<OrganGestorDto> findByProcedimentIdsAndEstat(List<Long> procedimentIds, OrganGestorEstatEnum estat) {
+	public List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			return conversioTipusHelper.convertirList(
-					organGestorRepository.findByEstatAndProcedimentIds(procedimentIds, estat),
+					organGestorRepository.findByEstatAndCodiIn(codisOrgans, estat),
 					OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

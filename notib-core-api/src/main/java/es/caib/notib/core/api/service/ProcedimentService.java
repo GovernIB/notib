@@ -408,6 +408,14 @@ public interface ProcedimentService {
 			RolEnumDto rol);
 
 	/**
+	 * Consulta si l'usuari té permís de notificació a tots els procediments comuns per a algún òrgan gestor.
+	 *
+	 * @param entitatId Identificador de l'entitat actual
+	 * @return boleà indicant si es te permis de procediments comuns a algun òrgan
+	 */
+	boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId);
+
+	/**
 	 * Actualitza els procediments de la entitat indicada amb la informació dels procediments actual
 	 * retornada pel plugin Gestor Documental Administratiu (GDA)
 	 *
