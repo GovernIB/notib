@@ -3,8 +3,7 @@ package es.caib.notib.core.api.dto.procediment;
 import es.caib.notib.core.api.dto.AuditoriaDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +13,9 @@ import java.util.List;
  * DTO per a crear i editar procediments.
  *
  */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter @Setter
 public class ProcedimentDataDto extends AuditoriaDto implements Serializable {
 

@@ -1,6 +1,6 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
@@ -28,7 +28,7 @@ public class ProcedimentUpdateHelper {
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.UPDATE)
 	public ProcedimentEntity updateProcediment(
-			ProcedimentDto procedimentGda,
+			ProcedimentDataDto procedimentGda,
 			ProcedimentEntity procediment,
 			OrganGestorEntity organGestor) {
 		procediment.update(
@@ -40,7 +40,7 @@ public class ProcedimentUpdateHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE)
-	public ProcedimentEntity nouProcediment(ProcedimentDto procedimentGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
+	public ProcedimentEntity nouProcediment(ProcedimentDataDto procedimentGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
 		ProcedimentEntity procediment;
 		procediment = ProcedimentEntity.getBuilder(
 				procedimentGda.getCodi(),

@@ -468,16 +468,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					for (ProcedimentDto procedimentGda: procedimentsGda) {
 						//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava, 
 						//i també d'aquesta forma els que s'han carregat ja es guardan.
+						progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment", new Object[] {i, procedimentGda.getNom()}));
 						procedimentHelper.actualitzarProcedimentFromGda(
 								progres,
-								procedimentGda, 
-								entitatDto, 
+								procedimentGda,
 								entitat,
-								null, //oficinaVirtual  
 								organigramaEntitat,  
 								modificar,
-								organsGestorsModificats,  
-								i);
+								organsGestorsModificats);
 						i++;
 					}
 					

@@ -67,7 +67,16 @@ public class ProcedimentServiceTest {
 		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
 		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 	}
-	
+
+	@After
+	public void tearDown() {
+		Mockito.reset(entityComprovarHelper);
+		Mockito.reset(entitatRepository);
+		Mockito.reset(paginacioHelper);
+		Mockito.reset(permisosHelper);
+		Mockito.reset(grupService);
+	}
+
 	//
 	@Test
 	public void whenFindAmbFiltrePaginatAdminEntitatWithFiltre_thenReturn() {
@@ -166,16 +175,7 @@ public class ProcedimentServiceTest {
 	
 	// TODO: Falta generar más casos de test para admin d'organ y para superusuari con sus listas de permisos, etc. También sin filtre.
 	// Los Mocks comentados en el test anterior no han sido borrados porque servirán para estos casos de pruebas futuros.
-	
-	@After
-	public void tearDown() {
-		Mockito.reset(entityComprovarHelper);
-		Mockito.reset(entitatRepository);
-		Mockito.reset(paginacioHelper);
-		Mockito.reset(permisosHelper);
-		Mockito.reset(grupService);		
-	}
-		
+
 	private PaginaDto<ProcedimentFormDto> initProcedimentsPage() {
 		
 		PaginaDto<ProcedimentFormDto> procedimentsPage = new PaginaDto<ProcedimentFormDto>();

@@ -1,11 +1,10 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -263,7 +262,7 @@ public class ProcedimentHelper {
 	 * @return Si el procediment s'ha d'actualitzar
 	 */
 	private boolean hasToBeUpdated(
-			ProcedimentDto procedimentGda,
+			ProcedimentDataDto procedimentGda,
 			ProcedimentEntity procedimentEntity,
 			Map<String, OrganismeDto> organigramaEntitat,
 			ProgresActualitzacioDto progres
@@ -307,19 +306,15 @@ public class ProcedimentHelper {
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarProcedimentFromGda(
 			ProgresActualitzacioDto progres,
-			ProcedimentDto procedimentGda, 
-			EntitatDto entitatDto, 
+			ProcedimentDataDto procedimentGda,
 			EntitatEntity entitat,
-			OficinaDto oficinaVirtual, 
 			Map<String, OrganismeDto> organigramaEntitat, 
 			boolean modificar,
-			List<OrganGestorEntity> organsGestorsModificats, 
-			int i) {
+			List<OrganGestorEntity> organsGestorsModificats) {
 		
 		Long t1 = System.currentTimeMillis();
 //		logger.debug(">>>> " + i + ". Processant procediment: " + procedimentGda.getNom());
 //		logger.debug(">>>> ..........................................................................");
-		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment", new Object[] {i, procedimentGda.getNom()}));
 
 		ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
 
