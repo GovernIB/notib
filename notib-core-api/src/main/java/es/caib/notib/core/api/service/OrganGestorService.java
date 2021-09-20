@@ -122,14 +122,6 @@ public interface OrganGestorService {
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<OrganismeDto> findOrganismes(EntitatDto entitat, OrganGestorDto organGestor);
-	
-	/**
-	 * Recupera la denominació d'un organime.
-	 * 
-	 * @return La denominació de l'organisme.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public String findDenominacioOrganisme(String codiDir3);
 
 	/**
 	 * Recupera el llibre d'un òrgan gestor (anomenat organisme dins Regweb)

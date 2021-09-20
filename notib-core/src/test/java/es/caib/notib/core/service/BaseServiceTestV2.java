@@ -448,6 +448,11 @@ public class BaseServiceTestV2 {
 		Mockito.when(unitatsOrganitzativesPluginMock.localitats(Mockito.anyString())).thenReturn(localitats);
 		Map<String, NodeDir3> organigramaEntitat = new HashMap<String, NodeDir3>();
 		organigramaEntitat.put("E04975701", new NodeDir3());
+		NodeDir3 nodeOrganDefault = new NodeDir3();
+		nodeOrganDefault.setCodi(ConfigTest.DEFAULT_ORGAN_DIR3);
+		nodeOrganDefault.setDenominacio("Òrgan default");
+		nodeOrganDefault.setEstat("Vigent");
+		organigramaEntitat.put(ConfigTest.DEFAULT_ORGAN_DIR3, nodeOrganDefault);
 		Mockito.when(unitatsOrganitzativesPluginMock.organigramaPerEntitat(Mockito.anyString())).thenReturn(organigramaEntitat);
 		pluginHelper.setUnitatsOrganitzativesPlugin(unitatsOrganitzativesPluginMock);
 	}

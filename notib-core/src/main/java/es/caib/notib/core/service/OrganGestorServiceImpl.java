@@ -849,26 +849,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	@Override
-	public String findDenominacioOrganisme(String codiDir3) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			String denominacio = null;
-			try {
-				denominacio = cacheHelper.findDenominacioOrganisme(codiDir3);
-			} catch (Exception e) {
-				String errorMessage = "No s'ha pogut recuperar la denominació de l'organismes: " + codiDir3;
-				logger.error(
-						errorMessage, 
-						e.getMessage());
-			}
-			return denominacio;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public LlibreDto getLlibreOrganisme(
