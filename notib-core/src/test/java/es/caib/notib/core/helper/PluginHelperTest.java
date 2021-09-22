@@ -1,21 +1,8 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.AnexoWsDto;
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.FitxerDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.entity.DocumentEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.plugin.conversio.ConversioPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
@@ -25,26 +12,7 @@ import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.DocumentTipus;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
-
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.UUID;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import es.caib.plugins.arxiu.api.*;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,6 +22,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.IOException;
+import java.util.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PluginHelperTest {
@@ -120,7 +94,7 @@ public class PluginHelperTest {
             timeSpend = (lastTime - iniTime) / 1e9;
         }while (resposta2.getErrorDescripcio() == null && timeSpend < secondsBetweenCalls + 2);
 
-        Assert.assertTrue(timeSpend >= secondsBetweenCalls);
+        Assert.assertTrue(timeSpend >= secondsBetweenCalls - 2);
     }
     
     @Test

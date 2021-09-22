@@ -6,7 +6,6 @@
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
 		<version>${revision}</version>
-<!-- 		<version>1.1</version> -->
 	</parent>
 	<artifactId>notib-core</artifactId>
 	<packaging>ejb</packaging>
@@ -410,6 +409,36 @@
 					</systemPropertyVariables>
 				</configuration>
             </plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>${liquibase.version}</version>
+				<configuration>
+					<propertyFile>liquibase/liquibase.properties</propertyFile>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-core</artifactId>
+						<version>${liquibase.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.liquibase.ext</groupId>
+						<artifactId>liquibase-hibernate5</artifactId>
+						<version>${liquibase.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.springframework.data</groupId>
+						<artifactId>spring-data-jpa</artifactId>
+						<version>${spring-data-jpa.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>jakarta.validation</groupId>
+						<artifactId>jakarta.validation-api</artifactId>
+						<version>2.0.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>

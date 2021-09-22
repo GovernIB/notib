@@ -27,6 +27,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arxiu.api.version>2.0.5</arxiu.api.version>
 		<lombok.version>1.18.12</lombok.version>
+	  	<liquibase.version>4.4.3</liquibase.version>
 		<apache.poi.version>4.1.2</apache.poi.version>
 		<xdocreport.version>2.0.2</xdocreport.version>
 		<itext.pdf.version>5.4.3</itext.pdf.version>
