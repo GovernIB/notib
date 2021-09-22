@@ -1,0 +1,54 @@
+databaseChangeLog:
+- changeSet:
+    id: init-sequence-1
+    author: limit (generated)
+    changes:
+    - createSequence:
+        sequenceName: NOT_ACL_SID_SEQ
+        startValue: 1
+
+- changeSet:
+    id: init-sequence-2
+    author: limit (generated)
+    changes:
+    - createSequence:
+        sequenceName: NOT_ACL_OBJECT_IDENTITY_SEQ
+        startValue: 1
+- changeSet:
+    id: init-sequence-3
+    author: limit (generated)
+    changes:
+    - createSequence:
+        sequenceName: NOT_ACL_ENTRY_SEQ
+        startValue: 1
+
+- changeSet:
+    id: init-sequence-4
+    author: limit (generated)
+    changes:
+    - createSequence:
+        sequenceName: NOT_ACL_CLASS_SEQ
+        startValue: 1
+- changeSet:
+    id: init-sequence-5
+    author: limit (generated)
+    changes:
+    - createSequence:
+        cacheSize: 0
+        maxValue: 999999999
+        sequenceName: EVENT_IDENTIFIERS
+        startValue: 1
+- changeSet:
+    id: init-sequence-6
+    author: limit (generated)
+    changes:
+    - createSequence:
+        sequenceName: NOT_HIBERNATE_SEQ
+        startValue: 1
+- changeSet:
+      id: init-sequence-7
+      author: limit (generated)
+      changes:
+          - createSequence:
+                sequenceName: HIBERNATE_SEQUENCE
+                startValue: 1

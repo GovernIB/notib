@@ -1,0 +1,17 @@
+databaseChangeLog:
+    - changeSet:
+          id: lob-1
+          author: limit (generated)
+          context: caib
+          changes:
+              - sql:
+                    dbms: oracle
+                    sql: ALTER TABLE NOT_ENTITAT MOVE LOB(LOGO_PEU) STORE AS NOT_ENTITAT_LOGO_PEU_LOB(TABLESPACE notib_lob INDEX NOT_ENTITAT_LOGO_PEU_LOB_I);
+    - changeSet:
+          id: lob-2
+          author: limit (generated)
+          context: caib
+          changes:
+              - sql:
+                    dbms: oracle
+                    sql: ALTER TABLE NOT_ENTITAT MOVE LOB(LOGO_CAP) STORE AS NOT_ENTITAT_LOGO_CAP_LOB(TABLESPACE notib_lob INDEX NOT_ENTITAT_LOGO_CAP_LOB_I);

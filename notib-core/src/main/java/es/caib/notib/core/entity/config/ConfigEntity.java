@@ -1,6 +1,5 @@
 package es.caib.notib.core.entity.config;
 
-import es.caib.notib.core.entity.UsuariEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
@@ -8,7 +7,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,12 +43,12 @@ public class ConfigEntity {
 
     @Column(name = "POSITION")
     private int position;
-
-    @ManyToOne
-    private UsuariEntity lastModifiedBy;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastModifiedDate;
+//
+//    @ManyToOne
+//    private UsuariEntity lastModifiedBy;
+//
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date lastModifiedDate;
 
     public ConfigEntity(String key, String value) {
         this.key = key;

@@ -57,10 +57,10 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
-	@Lob
+//	@Lob
 	@Column(name = "logo_cap")
 	private byte[] logoCapBytes;
-	@Lob
+//	@Lob
 	@Column(name = "logo_peu")
 	private byte[] logoPeuBytes;
 	@Column(name = "color_fons", length = 1024)

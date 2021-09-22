@@ -1,0 +1,1247 @@
+databaseChangeLog:
+- changeSet:
+    id: init-constraint-1
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: CODI
+        constraintName: NOT_ORGAN_GESTOR_UK
+        tableName: NOT_ORGAN_GESTOR
+- changeSet:
+    id: init-constraint-2
+    author: limit (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: CODI
+        constraintName: NOT_ENTITAT_CODI_UK
+        tableName: NOT_ENTITAT
+- changeSet:
+    id: init-constraint-3
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_APLICACIO
+        constraintName: NOT_APLICACIO_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-4
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_APLICACIO
+        constraintName: NOT_APLICACIO_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-5
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_APLICACIO
+        constraintName: NOT_APLICACIO_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-6
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_COLUMNES
+        constraintName: NOT_COLUMNES_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-7
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_COLUMNES
+        constraintName: NOT_COLUMNES_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-8
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_COLUMNES
+        constraintName: NOT_COLUMNES_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-9
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: USUARI_CODI
+        baseTableName: NOT_COLUMNES
+        constraintName: NOT_COLUMNES_USUARI_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-10
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GROUP_CODE
+        baseTableName: NOT_CONFIG
+        constraintName: NOT_CONFIG_GROUP_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODE
+        referencedTableName: NOT_CONFIG_GROUP
+        validate: true
+- changeSet:
+    id: init-constraint-11
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: DOCUMENT_ID
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_DOCUMENT_NOTIFICACIO_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_DOCUMENT
+        validate: true
+- changeSet:
+    id: init-constraint-12
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_DOCUMENT
+        constraintName: NOT_DOCUMENT_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-13
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_DOCUMENT
+        constraintName: NOT_DOCUMENT_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-14
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTREGA_CIE_ID
+        baseTableName: NOT_ENTITAT
+        constraintName: NOT_ENTITAT_ENTREGA_CIE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTREGA_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-15
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT
+        baseTableName: NOT_PROCEDIMENT
+        constraintName: NOT_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-16
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT
+        baseTableName: NOT_GRUP
+        constraintName: NOT_ENTITAT_GRUP_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-17
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_ENTITAT_NOTIFICACIO_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-18
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_ENTITAT_TIPUS_DOC
+        constraintName: NOT_ENTITAT_TIPUS_DOC_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-19
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_ENTITAT
+        constraintName: NOT_ENTITAT_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-20
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_ENTITAT
+        constraintName: NOT_ENTITAT_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-21
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CIE_ID
+        baseTableName: NOT_ENTREGA_CIE
+        constraintName: NOT_ENTREGA_CIE_CIE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-22
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: OPERADOR_POSTAL_ID
+        baseTableName: NOT_ENTREGA_CIE
+        constraintName: NOT_ENTREGA_CIE_OPERADOR_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_POSTAL
+        validate: true
+- changeSet:
+    id: init-constraint-23
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_ENTITAT_TIPUS_DOC
+        constraintName: NOT_ENTTIPDOC_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-24
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_ENTITAT_TIPUS_DOC
+        constraintName: NOT_ENTTIPDOC_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-25
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_FORMATS_FULLA
+        constraintName: NOT_FORMATFULLA_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-26
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_FORMATS_SOBRE
+        constraintName: NOT_FORMATSOBRE_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-27
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PAGADOR_CIE_ID
+        baseTableName: NOT_FORMATS_FULLA
+        constraintName: NOT_FORMATS_FULLA_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-28
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PAGADOR_CIE_ID
+        baseTableName: NOT_FORMATS_SOBRE
+        constraintName: NOT_FORMATS_SOBRE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-29
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_GESTOR
+        baseTableName: NOT_GRUP
+        constraintName: NOT_GRUP_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-30
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: GRUP
+        baseTableName: NOT_PRO_GRUP
+        constraintName: NOT_GRUP_PRO_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_GRUP
+        validate: true
+- changeSet:
+    id: init-constraint-31
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_GRUP
+        constraintName: NOT_GRUP_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-32
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_GRUP
+        constraintName: NOT_GRUP_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-33
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_HIST_ENVIAMENTS
+        constraintName: NOT_HIST_ENVI_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-34
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_ID
+        baseTableName: NOT_HIST_ENVIAMENTS
+        constraintName: NOT_HIST_ENVI_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-35
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT_ID
+        baseTableName: NOT_HIST_ENVIAMENTS
+        constraintName: NOT_HIST_ENVI_PROCEDIMENT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PROCEDIMENT
+        validate: true
+- changeSet:
+    id: init-constraint-36
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_HIST_NOTIF
+        constraintName: NOT_HIST_NOTIF_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-37
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_ID
+        baseTableName: NOT_HIST_NOTIF
+        constraintName: NOT_HIST_NOTIF_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-38
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT_ID
+        baseTableName: NOT_HIST_NOTIF
+        constraintName: NOT_HIST_NOTIF_PROCEDIMENT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PROCEDIMENT
+        validate: true
+- changeSet:
+    id: init-constraint-39
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_HIST_ORGAN
+        constraintName: NOT_HIST_ORGANENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-40
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_ID
+        baseTableName: NOT_HIST_ORGAN
+        constraintName: NOT_HIST_ORGAN_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-41
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_HIST_PROCEDIMENT
+        constraintName: NOT_HIST_PROC_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-42
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_ID
+        baseTableName: NOT_HIST_PROCEDIMENT
+        constraintName: NOT_HIST_PROC_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-43
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT_ID
+        baseTableName: NOT_HIST_PROCEDIMENT
+        constraintName: NOT_HIST_PROC_PROCEDIMENT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PROCEDIMENT
+        validate: true
+- changeSet:
+    id: init-constraint-44
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT_ID
+        baseTableName: NOT_NOTIFICACIO_MASSIVA
+        constraintName: NOT_MASSIVA_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-45
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PAGADOR_POSTAL_ID
+        baseTableName: NOT_NOTIFICACIO_MASSIVA
+        constraintName: NOT_MASSIVA_PAGADOR_POSTAL_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_POSTAL
+        validate: true
+- changeSet:
+    id: init-constraint-46
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOTIFICACIO_ENV_ID
+        baseTableName: NOT_NOTIFICACIO_EVENT
+        constraintName: NOT_NOTENV_NOTEVE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_NOTIFICACIO_ENV
+        validate: true
+- changeSet:
+    id: init-constraint-47
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOTIFICA_ERROR_EVENT_ID
+        baseTableName: NOT_NOTIFICACIO_ENV
+        constraintName: NOT_NOTEVE_NOTERR_NOTENV_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: SET NULL
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_NOTIFICACIO_EVENT
+        validate: true
+- changeSet:
+    id: init-constraint-48
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_NOTIFICACIO_ENV
+        constraintName: NOT_NOTIFENV_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-49
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_NOTIFICACIO_ENV
+        constraintName: NOT_NOTIFENV_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-50
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_NOTIFICACIO_EVENT
+        constraintName: NOT_NOTIFEVENT_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-51
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_NOTIFICACIO_EVENT
+        constraintName: NOT_NOTIFEVENT_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-52
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOTIFICACIO_ID
+        baseTableName: NOT_NOTIFICACIO_ENV
+        constraintName: NOT_NOTIFICACIO_NOTENV_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_NOTIFICACIO
+        validate: true
+- changeSet:
+    id: init-constraint-53
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_NOTIFICACIO_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-54
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_NOTIFICACIO_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-55
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOTIFICACIO_ID
+        baseTableName: NOT_NOTIFICACIO_EVENT
+        constraintName: NOT_NOTIFI_NOTEVE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_NOTIFICACIO
+        validate: true
+- changeSet:
+    id: init-constraint-56
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_GESTOR
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_NOT_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-57
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT
+        baseTableName: NOT_ORGAN_GESTOR
+        constraintName: NOT_ORGAN_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-58
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTREGA_CIE_ID
+        baseTableName: NOT_ORGAN_GESTOR
+        constraintName: NOT_ORGAN_ENTREGA_CIE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTREGA_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-59
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT_ID
+        baseTableName: NOT_PRO_ORGAN
+        constraintName: NOT_ORGAN_PRO_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PROCEDIMENT
+        validate: true
+- changeSet:
+    id: init-constraint-60
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_PAGADOR_CIE
+        constraintName: NOT_PAGADORCIE_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-61
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT
+        baseTableName: NOT_PAGADOR_CIE
+        constraintName: NOT_PAGADOR_CIE_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-62
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PAGADOR_CIE_ID
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_PAGADOR_CIE_NOT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-63
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_PAGADOR_CIE
+        constraintName: NOT_PAGADOR_CIE_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-64
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTITAT
+        baseTableName: NOT_PAGADOR_POSTAL
+        constraintName: NOT_PAGADOR_POSTAL_ENTITAT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTITAT
+        validate: true
+- changeSet:
+    id: init-constraint-65
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PAGADOR_POSTAL_ID
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_PAGADOR_POSTAL_NOT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PAGADOR_POSTAL
+        validate: true
+- changeSet:
+    id: init-constraint-66
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_GESTOR
+        baseTableName: NOT_PAGADOR_CIE
+        constraintName: NOT_PAGCIE_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-67
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGAN_GESTOR
+        baseTableName: NOT_PAGADOR_POSTAL
+        constraintName: NOT_PAGPOSTAL_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-68
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_PAGADOR_POSTAL
+        constraintName: NOT_PAGPOSTAL_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-69
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_PAGADOR_POSTAL
+        constraintName: NOT_PAGPOSTAL_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-70
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: TITULAR_ID
+        baseTableName: NOT_NOTIFICACIO_ENV
+        constraintName: NOT_PERSONA_NOTIFICACIO_ENV_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PERSONA
+        validate: true
+- changeSet:
+    id: init-constraint-71
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: NOTIFICACIO_ENV_ID
+        baseTableName: NOT_PERSONA
+        constraintName: NOT_PERSONA_NOT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_NOTIFICACIO_ENV
+        validate: true
+- changeSet:
+    id: init-constraint-72
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_PERSONA
+        constraintName: NOT_PERSONA_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-73
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_PERSONA
+        constraintName: NOT_PERSONA_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-74
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ENTREGA_CIE_ID
+        baseTableName: NOT_PROCEDIMENT
+        constraintName: NOT_PROCEDIMENT_ENTREGA_CIE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: CASCADE
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ENTREGA_CIE
+        validate: true
+- changeSet:
+    id: init-constraint-75
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT_ID
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_PROCEDIMENT_NOT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PROCEDIMENT
+        validate: true
+- changeSet:
+    id: init-constraint-76
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT_ORGAN_ID
+        baseTableName: NOT_NOTIFICACIO
+        constraintName: NOT_PROCORGAN_NOT_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PRO_ORGAN
+        validate: true
+- changeSet:
+    id: init-constraint-77
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_PROCEDIMENT
+        constraintName: NOT_PROC_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-78
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_PROCEDIMENT
+        constraintName: NOT_PROC_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-79
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_PRO_GRUP
+        constraintName: NOT_PROGRUP_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-80
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_PRO_GRUP
+        constraintName: NOT_PROGRUP_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-81
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: PROCEDIMENT
+        baseTableName: NOT_PRO_GRUP
+        constraintName: NOT_PRO_GRUP_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_PROCEDIMENT
+        validate: true
+- changeSet:
+    id: init-constraint-82
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: ORGANGESTOR_ID
+        baseTableName: NOT_PRO_ORGAN
+        constraintName: NOT_PRO_ORGAN_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: ID
+        referencedTableName: NOT_ORGAN_GESTOR
+        validate: true
+- changeSet:
+    id: init-constraint-83
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: LASTMODIFIEDBY_CODI
+        baseTableName: NOT_FORMATS_FULLA
+        constraintName: NOT_FORMATFULLA_USRMODIF_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
+- changeSet:
+    id: init-constraint-84
+    author: limit (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: CREATEDBY_CODI
+        baseTableName: NOT_FORMATS_SOBRE
+        constraintName: NOT_FORMATSOBRE_USRCREATE_FK
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: CODI
+        referencedTableName: NOT_USUARI
+        validate: true
