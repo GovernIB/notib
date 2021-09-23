@@ -1,6 +1,8 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EnviamentTableEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -38,12 +40,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isDataProgramadaDisposicioFiNull = true or nenv.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
 			"and (:isDataCaducitatIniciNull = true or nenv.notificaDataCaducitat >= :dataCaducitatInici) " +
 			"and (:isDataCaducitatFiNull = true or nenv.notificaDataCaducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or lower(nenv.tipusEnviament) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isTipusEnviamentNull = true or nenv.tipusEnviament = :tipusEnviament) " +
 			"and (:isCsvNull = true or lower(nenv.csv_uuid) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(nenv.estat) like lower('%'||:estat||'%') " +
-			"						  or nenv.notificaEstat like lower('%'||:notificaEstat||'%'))" +
+			"and (:isEstatNull = true or nenv.estat = :estat or nenv.notificaEstat = :notificaEstat)" +
 			"and (:esCodiNotificaNull = true or lower(nenv.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
-			"and (:esCreatedbyNull = true or lower(nenv.createdBy) like lower('%'||:createdBy||'%')) " +
+			"and (:esCreatedbyNull = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:createdByCodi||'%')) " +
 			"and (:esNifTitularNull = true or lower(nenv.titularNif) like lower('%'||:nifTitular||'%')) " +
 			"and (:esNomTitularNull = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or nenv.titularEmail = :emailTitular) " +
@@ -89,11 +90,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") int tipusEnviament,
+			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") int estat,
+			@Param("estat") NotificacioEstatEnumDto estat,
 			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
@@ -103,7 +104,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("esCodiNotificaNull") boolean esCodiNotificaNull,
 			@Param("codiNotifica") String codiNotifica,
 			@Param("esCreatedbyNull") boolean esCreatedbyNull,
-			@Param("createdBy") UsuariEntity createdBy,
+			@Param("createdByCodi") String createdByCodi,
 			@Param("esNifTitularNull") boolean esNifTitularNull,
 			@Param("nifTitular") String nifTitular,
 			@Param("esNomTitularNull") boolean esNomTitularNull,
@@ -152,12 +153,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:isDataProgramadaDisposicioFiNull = true or nenv.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
 			"and (:isDataCaducitatIniciNull = true or nenv.notificaDataCaducitat >= :dataCaducitatInici) " +
 			"and (:isDataCaducitatFiNull = true or nenv.notificaDataCaducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or lower(nenv.tipusEnviament) like lower('%'||:tipusEnviament||'%')) " +
+			"and (:isTipusEnviamentNull = true or nenv.tipusEnviament = :tipusEnviament) " +
 			"and (:isCsvNull = true or lower(nenv.csv_uuid) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(nenv.estat) like lower('%'||:estat||'%') " +
-			"						  or nenv.notificaEstat like lower('%'||:notificaEstat||'%'))" +
+			"and (:isEstatNull = true or nenv.estat = :estat or nenv.notificaEstat = :notificaEstat)" +
 			"and (:esCodiNotificaNull = true or lower(nenv.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
-			"and (:esCreatedbyNull = true or lower(nenv.createdBy) like lower('%'||:createdBy||'%')) " +
+			"and (:esCreatedbyNull = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:createdByCodi||'%')) " +
 			"and (:esNifTitularNull = true or lower(nenv.titularNif) like lower('%'||:nifTitular||'%')) " +
 			"and (:esNomTitularNull = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or nenv.titularEmail = :emailTitular) " +
@@ -194,11 +194,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") int tipusEnviament,
+			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") int estat,
+			@Param("estat") NotificacioEstatEnumDto estat,
 			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
@@ -208,7 +208,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("esCodiNotificaNull") boolean esCodiNotificaNull,
 			@Param("codiNotifica") String codiNotifica,
 			@Param("esCreatedbyNull") boolean esCreatedbyNull,
-			@Param("createdBy") UsuariEntity createdBy,
+			@Param("createdByCodi") String createdByCodi,
 			@Param("esNifTitularNull") boolean esNifTitularNull,
 			@Param("nifTitular") String nifTitular,
 			@Param("esNomTitularNull") boolean esNomTitularNull,
@@ -229,11 +229,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("dataRegistreInici") Date dataRegistreInici,
 			@Param("esDataRegistreFiNull") boolean esDataRegistreFiNull,
 			@Param("dataRegistreFi") Date dataRegistreFi,
-			@Param("organs") List<String> organs,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("organs") List<String> organs,
 			Pageable pageable);
 
 	@Query( "from " +
@@ -241,24 +241,24 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"where " +
 			"    (:entitat = nenv.entitat) " +
 			"and (:esDataEnviamentIniciNull = true or nenv.createdDate >= :dataEnviamentInici) " +
-			"and (:isCodiProcedimentNull = true or lower(nenv.procedimentCodiNotib) like lower('%'||:codiProcediment||'%')) " +
-			"and (:isGrupNull = true or lower(nenv.grupCodi) like lower('%'||:grup||'%')) " +
+			"and (:isCodiProcedimentNull = true or lower(CASE WHEN nenv.procedimentCodiNotib is null THEN '' ELSE nenv.procedimentCodiNotib END) like lower('%'||:codiProcediment||'%')) " +
+			"and (:isGrupNull = true or lower(CASE WHEN nenv.grupCodi is null THEN '' ELSE nenv.grupCodi END) like lower('%'||:grup||'%')) " +
 			"and (:isConcepteNull = true or lower(nenv.concepte) like lower('%'||:concepte||'%')) " +
 			"and (:isDescripcioNull = true or lower(nenv.descripcio) like lower('%'||:descripcio||'%')) " +
 			"and (:isDataProgramadaDisposicioIniciNull = true or nenv.enviamentDataProgramada >= :dataProgramadaDisposicioInici) " +
 			"and (:isDataProgramadaDisposicioFiNull = true or nenv.enviamentDataProgramada <= :dataProgramadaDisposicioFi) " +
 			"and (:isDataCaducitatIniciNull = true or nenv.notificaDataCaducitat >= :dataCaducitatInici) " +
 			"and (:isDataCaducitatFiNull = true or nenv.notificaDataCaducitat <= :dataCaducitatFi) " +
-			"and (:isTipusEnviamentNull = true or lower(nenv.tipusEnviament) like lower('%'||:tipusEnviament||'%')) " +
-			"and (:isCsvNull = true or lower(nenv.csv_uuid) like lower('%'||:csv||'%')) " +
-			"and (:isEstatNull = true or lower(nenv.estat) like lower('%'||:estat||'%') or nenv.notificaEstat like lower('%'||:notificaEstat||'%'))" +
+			"and (:isTipusEnviamentNull = true or nenv.tipusEnviament = :tipusEnviament) " +
+			"and (:isCsvNull = true or lower(CASE WHEN nenv.csv_uuid is null THEN '' ELSE nenv.csv_uuid END) like lower('%'||:csv||'%')) " +
+			"and (:isEstatNull = true or nenv.estat = :estat or nenv.notificaEstat = :notificaEstat)" +
 			"and (:esDataEnviamentFiNull = true or nenv.createdDate <= :dataEnviamentFi) " +
-			"and (:esCodiNotificaNull = true or lower(nenv.notificaIdentificador) like lower('%'||:codiNotifica||'%')) " +
-			"and (:esCreatedbyNull = true or lower(nenv.createdBy.codi) like lower('%'||:createdByCodi||'%')) " +
-			"and (:esNifTitularNull = true or lower(nenv.titularNif) like lower('%'||:nifTitular||'%')) " +
+			"and (:esCodiNotificaNull = true or lower(CASE WHEN nenv.notificaIdentificador is null THEN '' ELSE nenv.notificaIdentificador END) like lower('%'||:codiNotifica||'%')) " +
+			"and (:esCreatedbyNull = true or lower(CASE WHEN nenv.createdBy.codi is null THEN '' ELSE nenv.createdBy.codi END) like lower('%'||:createdByCodi||'%')) " +
+			"and (:esNifTitularNull = true or lower(CASE WHEN nenv.titularNif is null THEN '' ELSE nenv.titularNif END) like lower('%'||:nifTitular||'%')) " +
 			"and (:esNomTitularNull = true or lower(concat('[', nenv.titularLlinatge1, ' ', nenv.titularLlinatge2, ', ', nenv.titularNom,']')) like lower('%'||:nomTitular||'%')) " +
 			"and (:esEmailTitularNull = true or nenv.titularEmail = :emailTitular) " +
-			"and (:esDir3CodiNull = true or lower(nenv.organCodi) like lower('%'||:dir3Codi||'%')) " +
+			"and (:esDir3CodiNull = true or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) " +
 			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) " +
@@ -290,11 +290,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isDataCaducitatFiNull") boolean dataCaducitatFiNull,
 			@Param("dataCaducitatFi") Date dataCaducitatFi,
 			@Param("isTipusEnviamentNull") boolean isTipusEnviamentNull,
-			@Param("tipusEnviament") int tipusEnviament,
+			@Param("tipusEnviament") NotificaEnviamentTipusEnumDto tipusEnviament,
 			@Param("isCsvNull") boolean isCsvNull,
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") int estat,
+			@Param("estat") NotificacioEstatEnumDto estat,
 			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
@@ -304,7 +304,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("esCodiNotificaNull") boolean esCodiNotificaNull,
 			@Param("codiNotifica") String codiNotifica,
 			@Param("esCreatedbyNull") boolean esCreatedbyNull,
-			@Param("createdByCodi") String createdBy,
+			@Param("createdByCodi") String createdByCodi,
 			@Param("esNifTitularNull") boolean esNifTitularNull,
 			@Param("nifTitular") String nifTitular,
 			@Param("esNomTitularNull") boolean esNomTitularNull,

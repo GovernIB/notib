@@ -6,6 +6,8 @@ import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.FiltreHelper.FiltreField;
+import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
@@ -231,23 +233,23 @@ public class NotificacioMassivaServiceTest {
 		Mockito.when(notificacioListHelper.getFiltre(
 				Mockito.any(NotificacioFiltreDto.class)))
 				.thenReturn( NotificacioListHelper.NotificacioFiltre.builder()
-						.entitatId(new NotificacioListHelper.FiltreField<Long>(entitatId))
-						.comunicacioTipus(new NotificacioListHelper.FiltreField<NotificacioComunicacioTipusEnumDto>(null))
-						.enviamentTipus(new NotificacioListHelper.FiltreField<NotificaEnviamentTipusEnumDto>(null))
-						.estat(new NotificacioListHelper.FiltreField<NotificacioEstatEnumDto>(null))
-						.concepte(new NotificacioListHelper.FiltreField<String>(null))
-						.dataInici(new NotificacioListHelper.FiltreField<Date>(null))
-						.dataFi(new NotificacioListHelper.FiltreField<Date>(null))
-						.titular(new NotificacioListHelper.FiltreField<String>(null))
-						.organGestor(new NotificacioListHelper.FiltreField<OrganGestorEntity>(null))
-						.procediment(new NotificacioListHelper.FiltreField<ProcedimentEntity>(null))
-						.tipusUsuari(new NotificacioListHelper.FiltreField<TipusUsuariEnumDto>(null))
-						.numExpedient(new NotificacioListHelper.FiltreField<String>(null))
-						.creadaPer(new NotificacioListHelper.FiltreField<String>(null))
-						.identificador(new NotificacioListHelper.FiltreField<String>(null))
-						.nomesAmbErrors(new NotificacioListHelper.FiltreField<Boolean>(false))
-						.nomesSenseErrors(new NotificacioListHelper.FiltreField<Boolean>(false))
-						.hasZeronotificaEnviamentIntent(new NotificacioListHelper.FiltreField<Boolean>(false))
+						.entitatId(new FiltreField<Long>(entitatId))
+						.comunicacioTipus(new FiltreField<NotificacioComunicacioTipusEnumDto>(null))
+						.enviamentTipus(new FiltreField<NotificaEnviamentTipusEnumDto>(null))
+						.estat(new FiltreField<NotificacioEstatEnumDto>(null))
+						.concepte(new StringField(null))
+						.dataInici(new FiltreField<Date>(null))
+						.dataFi(new FiltreField<Date>(null))
+						.titular(new StringField(null))
+						.organGestor(new FiltreField<OrganGestorEntity>(null))
+						.procediment(new FiltreField<ProcedimentEntity>(null))
+						.tipusUsuari(new FiltreField<TipusUsuariEnumDto>(null))
+						.numExpedient(new StringField(null))
+						.creadaPer(new StringField(null))
+						.identificador(new StringField(null))
+						.nomesAmbErrors(new FiltreField<Boolean>(false))
+						.nomesSenseErrors(new FiltreField<Boolean>(false))
+						.hasZeronotificaEnviamentIntent(new FiltreField<Boolean>(false))
 						.build()); // ho ignorarem per a la prova
 			Mockito.when(notificacioListHelper.complementaNotificacions(
 					Mockito.eq(entitatMock),

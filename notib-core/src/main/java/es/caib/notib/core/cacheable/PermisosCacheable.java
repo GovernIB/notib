@@ -101,7 +101,7 @@ public class PermisosCacheable {
     public List<EntitatDto> findEntitatsAccessiblesUsuari(
             String usuariCodi,
             String rolActual) {
-        log.debug("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ")");
+        log.info("Consulta entitats accessibles (usuariCodi=" + usuariCodi + ", rol=" + rolActual + ")");
 
         if (rolActual != null && rolActual.equals("NOT_ADMIN_ORGAN")) {
             Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
@@ -121,9 +121,11 @@ public class PermisosCacheable {
 
             return resposta;
         } else {
-            Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
+            Permission[] permisos;
             if (rolActual != null && rolActual.equals("tothom")) {
                 permisos = new Permission[] {ExtendedPermission.USUARI};
+            } else {
+                permisos = new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT};
             }
 
             List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,

@@ -11,10 +11,11 @@ import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.FiltreHelper.FiltreField;
+import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -133,16 +134,16 @@ public class NotificacioListHelper {
                 .comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
                 .enviamentTipus(new FiltreField<>(filtreDto.getEnviamentTipus()))
                 .estat(new FiltreField<>(estat, isEstatNull))
-                .concepte(new FiltreField<>(filtreDto.getConcepte(), filtreDto.getConcepte() == null || filtreDto.getConcepte().isEmpty()))
-                .dataInici(new FiltreField<>(toIniciDia(filtreDto.getDataInici())))
-                .dataFi(new FiltreField<>(toFiDia(filtreDto.getDataFi())))
-                .titular(new FiltreField<>(filtreDto.getTitular(), filtreDto.getTitular() == null || filtreDto.getTitular().isEmpty()))
+                .concepte(new StringField(filtreDto.getConcepte()))
+                .dataInici(new FiltreField<>(FiltreHelper.toIniciDia(filtreDto.getDataInici())))
+                .dataFi(new FiltreField<>(FiltreHelper.toFiDia(filtreDto.getDataFi())))
+                .titular(new StringField(filtreDto.getTitular()))
                 .organGestor(new FiltreField<>(organGestor))
                 .procediment(new FiltreField<>(procediment))
                 .tipusUsuari(new FiltreField<>(filtreDto.getTipusUsuari()))
-                .numExpedient(new FiltreField<>(filtreDto.getNumExpedient()))
-                .creadaPer(new FiltreField<>(filtreDto.getCreadaPer()))
-                .identificador(new FiltreField<>(filtreDto.getIdentificador()))
+                .numExpedient(new StringField(filtreDto.getNumExpedient()))
+                .creadaPer(new StringField(filtreDto.getCreadaPer()))
+                .identificador(new StringField(filtreDto.getIdentificador()))
                 .nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
                 .nomesSenseErrors(new FiltreField<>(nomesSenseErrors))
                 .hasZeronotificaEnviamentIntent(new FiltreField<>(hasZeronotificaEnviamentIntent))
@@ -157,65 +158,19 @@ public class NotificacioListHelper {
         private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
         private FiltreField<NotificaEnviamentTipusEnumDto> enviamentTipus;
         private FiltreField<NotificacioEstatEnumDto> estat;
-        private FiltreField<String> concepte;
+        private StringField concepte;
         private FiltreField<Date> dataInici;
         private FiltreField<Date> dataFi;
-        private FiltreField<String> titular;
+        private StringField titular;
         private FiltreField<OrganGestorEntity> organGestor;
         private FiltreField<ProcedimentEntity> procediment;
         private FiltreField<TipusUsuariEnumDto> tipusUsuari;
-        private FiltreField<String> numExpedient;
-        private FiltreField<String> creadaPer;
-        private FiltreField<String> identificador;
+        private StringField numExpedient;
+        private StringField creadaPer;
+        private StringField identificador;
         private FiltreField<Boolean> nomesAmbErrors;
         private FiltreField<Boolean> nomesSenseErrors;
         private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class FiltreField<T>{
-        private T field;
-        private Boolean isNull = null;
-
-        public FiltreField(T field) {
-            this.field = field;
-        }
-
-        public boolean isNull() {
-            if (isNull == null) {
-                if (field instanceof String){
-                  return ((String) field).isEmpty();
-                }
-                return field == null;
-            }
-            return isNull;
-        }
-    }
-    public Date toIniciDia(Date data) {
-        if (data != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(data);
-            cal.set(Calendar.HOUR, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            data = cal.getTime();
-        }
-        return data;
-    }
-
-    public Date toFiDia(Date data) {
-        if (data != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(data);
-            cal.set(Calendar.HOUR, 23);
-            cal.set(Calendar.MINUTE, 59);
-            cal.set(Calendar.SECOND, 59);
-            cal.set(Calendar.MILLISECOND, 999);
-            data = cal.getTime();
-        }
-        return data;
     }
 
 }

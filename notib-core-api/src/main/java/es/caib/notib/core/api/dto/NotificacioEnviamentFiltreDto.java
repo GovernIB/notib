@@ -16,7 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Getter @Setter
 public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 
-	private Long id;
+//	private Long id;
 	private String dataEnviamentInici;
 	private String dataEnviamentFi;
 	private String dataProgramadaDisposicioInici;
