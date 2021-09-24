@@ -2,13 +2,11 @@ package es.caib.notib.core.cacheable;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -42,11 +40,11 @@ public class PermisosCacheable {
     @Autowired
     private PermisosHelper permisosHelper;
     @Autowired
-    private EntityComprovarHelper entityComprovarHelper;
-    @Autowired
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private OrganigramaHelper organigramaHelper;
+    @Autowired
+    private ConfigHelper configHelper;
 
     @Cacheable(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
     public Map<RolEnumDto, Boolean> getPermisosEntitatsUsuariActual(Authentication auth) {
@@ -78,7 +76,7 @@ public class PermisosCacheable {
         hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
         hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, hasPermisAdminOrgan);
 
-        if (entityComprovarHelper.getGenerarLogsPermisosOrgan()) {
+        if (getGenerarLogsPermisosOrgan()) {
             log.info("### PERMISOS - Obtenir Permisos ###########################################");
             log.info("### -----------------------------------------------------------------------");
             log.info("### Usuari: " + auth.getName());
@@ -160,6 +158,38 @@ public class PermisosCacheable {
 
     }
 
+    @Cacheable(value = "organsGestorsUsuari", key="#auth.name")
+    public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
+        List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
+        Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
+
+        permisosHelper.filterGrantedAny(
+                organsGestors,
+                new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
+                    public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+                        return organGestor.getId();
+                    }
+                },
+                OrganGestorEntity.class,
+                permisos,
+                auth);
+
+        if (getGenerarLogsPermisosOrgan()) {
+            log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");
+            log.info("### -----------------------------------------------------------------------");
+            log.info("### Usuari: " + auth.getName());
+            log.info("### Òrgans: ");
+            if (organsGestors != null)
+                for (OrganGestorEntity organGestor : organsGestors) {
+                    log.info("### # " + organGestor.getCodi() + " - " + organGestor.getNom());
+                }
+            log.info("### -----------------------------------------------------------------------");
+        }
+        return conversioTipusHelper.convertirList(
+                organsGestors,
+                OrganGestorDto.class);
+    }
+
     @Transactional(readOnly = true)
     @Cacheable(value = "organsPermis", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
     public List<OrganGestorEntity> findOrgansGestorsWithPermis(EntitatEntity entitat,
@@ -224,5 +254,9 @@ public class PermisosCacheable {
 
     @CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
     public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
+    }
+
+    public boolean getGenerarLogsPermisosOrgan() {
+        return configHelper.getAsBoolean("es.caib.notib.permisos.organ.logs");
     }
 }

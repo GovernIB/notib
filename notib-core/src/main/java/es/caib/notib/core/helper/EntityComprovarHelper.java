@@ -69,8 +69,6 @@ public class EntityComprovarHelper {
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private ProcedimentOrganRepository procedimentOrganRepository;
-	@Autowired
-	private ConfigHelper configHelper;
 
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
@@ -745,8 +743,4 @@ public class EntityComprovarHelper {
 		return null;
 	}
 
-	public boolean getGenerarLogsPermisosOrgan() {
-		return configHelper.getAsBoolean("es.caib.notib.permisos.organ.logs");
-	}
-	
 }

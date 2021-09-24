@@ -659,27 +659,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
-		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return cacheHelper.findOrgansGestorsAccessiblesUsuari(auth);
-
-//		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
-//		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-//		
-//		permisosHelper.filterGrantedAny(
-//				organsGestors,
-//				new ObjectIdentifierExtractor<OrganGestorEntity>() {
-//					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-//						return organGestor.getId();
-//					}
-//				},
-//				OrganGestorEntity.class,
-//				permisos,
-//				auth);
-//		
-//		return conversioTipusHelper.convertirList(
-//				organsGestors, 
-//				OrganGestorDto.class);
+		return permisosCacheable.findOrgansGestorsAccessiblesUsuari(auth);
 	}
 	
 	@Transactional

@@ -3,10 +3,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -16,8 +13,6 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -51,39 +46,6 @@ public class CacheHelper {
 
 	public static String appVersion;
 
-
-	@Cacheable(value = "organsGestorsUsuari", key="#auth.name")
-	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
-		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
-		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-		
-		permisosHelper.filterGrantedAny(
-				organsGestors,
-				new ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-						return organGestor.getId();
-					}
-				},
-				OrganGestorEntity.class,
-				permisos,
-				auth);
-
-		if (entityComprovarHelper.getGenerarLogsPermisosOrgan()) {
-			log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");
-			log.info("### -----------------------------------------------------------------------");
-			log.info("### Usuari: " + auth.getName());
-			log.info("### Òrgans: ");
-			if (organsGestors != null)
-				for (OrganGestorEntity organGestor : organsGestors) {
-					log.info("### # " + organGestor.getCodi() + " - " + organGestor.getNom());
-				}
-			log.info("### -----------------------------------------------------------------------");
-		}
-		return conversioTipusHelper.convertirList(
-				organsGestors, 
-				OrganGestorDto.class);
-	}
-	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(
 			String usuariCodi) {
