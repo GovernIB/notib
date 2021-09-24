@@ -148,6 +148,11 @@ function getCookie(cname) {
     return "";
 }
 </script>
+	<style>
+		.div-filter-data-sep {
+			padding: 0;
+		}
+	</style>
 </head>
 <body>
 	<div id="loading-screen" class="loading-screen" >
@@ -221,7 +226,7 @@ function getCookie(cname) {
 						<div class="from-group">
 							<div class="input-group vdivide">
     							<input name="dataEnviamentInici" value="${filtreEnviaments.dataEnviamentInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon"></div>
+    							<div class="input-group-addon div-filter-data-sep"></div>
     							<input name="dataEnviamentFi" value="${filtreEnviaments.dataEnviamentFi}" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
@@ -240,7 +245,7 @@ function getCookie(cname) {
 						<div class="from-group input-daterange" data-provide="daterangepicker">
 							<div class="input-group vdivide">
     							<input name="dataProgramadaDisposicioInici" value="${filtreEnviaments.dataProgramadaDisposicioInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon"></div>
+    							<div class="input-group-addon div-filter-data-sep"></div>
     							<input name="dataProgramadaDisposicioFi" value="${filtreEnviaments.dataProgramadaDisposicioFi}" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
