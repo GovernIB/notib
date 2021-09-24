@@ -129,9 +129,16 @@ public class PermisosCacheable {
             List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
                     permisos);
             List<EntitatDto> resposta;
+
+            List<EntitatEntity> entitatsDisponibles;
             if (!entitatsIds.isEmpty()){
+                entitatsDisponibles = entitatRepository.findByIdsAndActiva(entitatsIds, true);
+            } else {
+                entitatsDisponibles = new ArrayList<>();
+            }
+            if (!entitatsDisponibles.isEmpty()){
                 resposta = conversioTipusHelper.convertirList(
-                        entitatRepository.findByIdsAndActiva(entitatsIds, true),
+                        entitatsDisponibles,
                         EntitatDto.class);
             } else {
                 resposta = new ArrayList<>();
