@@ -957,7 +957,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     private boolean isAdministrador(HttpServletRequest request) {
-        return RolHelper.isUsuariActualAdministrador(request);
+        return RolHelper.isUsuariActualAdministradorEntitat(request);
     }
 
     @InitBinder
