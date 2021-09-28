@@ -243,7 +243,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void refrescarNotificacionsExpirades() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.info("[NOT] Refrescant notificacions expirades");
+			logger.info("[EXPIRATS] Refrescant notificacions expirades");
 			addAdminAuthentication();
 			enviamentHelper.refrescarEnviamentsExpirats();
 		} finally {

@@ -3,16 +3,14 @@
  */
 package es.caib.notib.war.helper;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Utilitat per a gestionar les entitats de l'usuari actual.
@@ -40,6 +38,7 @@ public class EntitatHelper {
 		List<EntitatDto> entitats = (List<EntitatDto>)request.getAttribute(
 				REQUEST_ATTRIBUTE_ENTITATS);
 		if (entitats == null && entitatService != null) {
+			PermisosHelper.comprovarPermisosEntitatsUsuariActual(request, entitatService);
 			String rolActual = RolHelper.getRolActual(request, aplicacioService);
 			if (rolActual == null)
 				rolActual = "";
