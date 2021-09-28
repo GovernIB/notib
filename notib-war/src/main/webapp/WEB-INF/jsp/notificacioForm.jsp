@@ -7,9 +7,9 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 
-<c:set var="enviamentTipus">${notificacioCommandV2.enviamentTipus}</c:set>
+<c:set var="enviamentTipus">${notificacioCommand.enviamentTipus}</c:set>
 <c:choose>
-    <c:when test="${empty notificacioCommandV2.id}"><c:set var="titol">
+    <c:when test="${empty notificacioCommand.id}"><c:set var="titol">
 		<c:choose>
 			<c:when test="${enviamentTipus == 'COMUNICACIO'}">
 				<spring:message code="notificacio.form.titol.crear.comunicacio"/>
@@ -272,8 +272,8 @@
 	//////
 	//////
 
-	if ('${notificacioCommandV2 != null && notificacioCommandV2.procedimentId != null}') {
-		var procedimentIdAux = '${notificacioCommandV2.procedimentId}';
+	if ('${notificacioCommand != null && notificacioCommand.procedimentId != null}') {
+		var procedimentIdAux = '${notificacioCommand.procedimentId}';
 	} else {
 		var procedimentIdAux = null;
 	}
@@ -840,8 +840,8 @@
 
 						let numProcediments = $('#procedimentId').children('option').length - 1;
 						if (numProcediments > 1) {
-							if ('${notificacioCommandV2 != null && procedimentIdAux != null}') {
-								$("#procedimentId").val('${notificacioCommandV2.procedimentId}');
+							if ('${notificacioCommand != null && procedimentIdAux != null}') {
+								$("#procedimentId").val('${notificacioCommand.procedimentId}');
 								$('#procedimentId').trigger('change');
 								procedimentIdAux = null;
 							}
@@ -1105,9 +1105,9 @@
 		</div>
 	</div>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
-    <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommandV2" enctype="multipart/form-data">
+    <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommand" enctype="multipart/form-data">
 		<form:hidden path="enviamentTipus" id="enviamentTipus"/>
-		<input type="hidden" name="id" value="${notificacioCommandV2.id}">
+		<input type="hidden" name="id" value="${notificacioCommand.id}">
 		<div class="container-fluid">
 			<div class="title">
 				<span class="fa fa-address-book"></span>
@@ -1228,7 +1228,7 @@
 				<label><spring:message code="notificacio.form.titol.enviaments" /></label>
 				<hr/>
 			</div>
-			<c:set var="envios" value="${notificacioCommandV2.enviaments}"/>
+			<c:set var="envios" value="${notificacioCommand.enviaments}"/>
 			<div class="container-envios">
 				<div class="newEnviament">
 				<c:forEach items="${envios}" var="enviament" varStatus="status">
@@ -1540,11 +1540,11 @@
 							</div>
 						</div>
 					</div>
-					<input type="hidden" name="documents[0].id" value="${notificacioCommandV2.documents[0].id}">
-					<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommandV2.documents[0].arxiuGestdocId}">
-					<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommandV2.documents[0].arxiuNom}">
-					<input type="hidden" name="documents[0].mediaType" value="${notificacioCommandV2.documents[0].mediaType}">
-					<input type="hidden" name="documents[0].mida" value="${notificacioCommandV2.documents[0].mida}">
+					<input type="hidden" name="documents[0].id" value="${notificacioCommand.documents[0].id}">
+					<input type="hidden" name="documents[0].arxiuGestdocId" value="${notificacioCommand.documents[0].arxiuGestdocId}">
+					<input type="hidden" name="documents[0].arxiuNom" value="${notificacioCommand.documents[0].arxiuNom}">
+					<input type="hidden" name="documents[0].mediaType" value="${notificacioCommand.documents[0].mediaType}">
+					<input type="hidden" name="documents[0].mida" value="${notificacioCommand.documents[0].mida}">
 					<!-- CSV -->
 					<div id="input-origen-csv_0" class="col-md-6">
 						<not:inputText name="documentArxiuCsv[0]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1563,7 +1563,7 @@
 					<!-- FITXER -->
 					<div id="input-origen-arxiu_0" class="col-md-6 hidden">
 						<c:choose>
-							<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+							<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
 								<not:inputFile name="arxiu[0]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="test"/>
 							</c:when>
 							<c:otherwise>
@@ -1608,11 +1608,11 @@
 								</div>
 							</div>
 						</div>
-						<input type="hidden" name="documents[1].id" value="${notificacioCommandV2.documents[1].id}">
-						<input type="hidden" name="documents[1].arxiuGestdocId" value="${notificacioCommandV2.documents[1].arxiuGestdocId}">
-						<input type="hidden" name="documents[1].arxiuNom" value="${notificacioCommandV2.documents[1].arxiuNom}">
-						<input type="hidden" name="documents[1].mediaType" value="${notificacioCommandV2.documents[1].mediaType}">
-						<input type="hidden" name="documents[1].mida" value="${notificacioCommandV2.documents[1].mida}">
+						<input type="hidden" name="documents[1].id" value="${notificacioCommand.documents[1].id}">
+						<input type="hidden" name="documents[1].arxiuGestdocId" value="${notificacioCommand.documents[1].arxiuGestdocId}">
+						<input type="hidden" name="documents[1].arxiuNom" value="${notificacioCommand.documents[1].arxiuNom}">
+						<input type="hidden" name="documents[1].mediaType" value="${notificacioCommand.documents[1].mediaType}">
+						<input type="hidden" name="documents[1].mida" value="${notificacioCommand.documents[1].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_1" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[1]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1631,7 +1631,7 @@
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_1" class="col-md-6 hidden">
 							<c:choose>
-								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
 									<not:inputFile name="arxiu[1]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_1}"/>
 								</c:when>
 								<c:otherwise>
@@ -1672,11 +1672,11 @@
 								</div>
 							</div>
 						</div>
-						<input type="hidden" name="documents[2].id" value="${notificacioCommandV2.documents[2].id}">
-						<input type="hidden" name="documents[2].arxiuGestdocId" value="${notificacioCommandV2.documents[2].arxiuGestdocId}">
-						<input type="hidden" name="documents[2].arxiuNom" value="${notificacioCommandV2.documents[2].arxiuNom}">
-						<input type="hidden" name="documents[2].mediaType" value="${notificacioCommandV2.documents[2].mediaType}">
-						<input type="hidden" name="documents[2].mida" value="${notificacioCommandV2.documents[2].mida}">
+						<input type="hidden" name="documents[2].id" value="${notificacioCommand.documents[2].id}">
+						<input type="hidden" name="documents[2].arxiuGestdocId" value="${notificacioCommand.documents[2].arxiuGestdocId}">
+						<input type="hidden" name="documents[2].arxiuNom" value="${notificacioCommand.documents[2].arxiuNom}">
+						<input type="hidden" name="documents[2].mediaType" value="${notificacioCommand.documents[2].mediaType}">
+						<input type="hidden" name="documents[2].mida" value="${notificacioCommand.documents[2].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_2" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[2]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1695,7 +1695,7 @@
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_2" class="col-md-6 hidden">
 							<c:choose>
-								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
 									<not:inputFile name="arxiu[2]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_2}"/>
 								</c:when>
 								<c:otherwise>
@@ -1738,11 +1738,11 @@
 								</div>
 							</div>
 						</div>
-						<input type="hidden" name="documents[3].id" value="${notificacioCommandV2.documents[3].id}">
-						<input type="hidden" name="documents[3].arxiuGestdocId" value="${notificacioCommandV2.documents[3].arxiuGestdocId}">
-						<input type="hidden" name="documents[3].arxiuNom" value="${notificacioCommandV2.documents[3].arxiuNom}">
-						<input type="hidden" name="documents[3].mediaType" value="${notificacioCommandV2.documents[3].mediaType}">
-						<input type="hidden" name="documents[3].mida" value="${notificacioCommandV2.documents[3].mida}">
+						<input type="hidden" name="documents[3].id" value="${notificacioCommand.documents[3].id}">
+						<input type="hidden" name="documents[3].arxiuGestdocId" value="${notificacioCommand.documents[3].arxiuGestdocId}">
+						<input type="hidden" name="documents[3].arxiuNom" value="${notificacioCommand.documents[3].arxiuNom}">
+						<input type="hidden" name="documents[3].mediaType" value="${notificacioCommand.documents[3].mediaType}">
+						<input type="hidden" name="documents[3].mida" value="${notificacioCommand.documents[3].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_3" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[3]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1761,7 +1761,7 @@
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_3" class="col-md-6 hidden">
 							<c:choose>
-								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
 									<not:inputFile name="arxiu[3]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_3}"/>
 								</c:when>
 								<c:otherwise>
@@ -1802,11 +1802,11 @@
 								</div>
 							</div>
 						</div>
-						<input type="hidden" name="documents[4].id" value="${notificacioCommandV2.documents[4].id}">
-						<input type="hidden" name="documents[4].arxiuGestdocId" value="${notificacioCommandV2.documents[4].arxiuGestdocId}">
-						<input type="hidden" name="documents[4].arxiuNom" value="${notificacioCommandV2.documents[4].arxiuNom}">
-						<input type="hidden" name="documents[4].mediaType" value="${notificacioCommandV2.documents[4].mediaType}">
-						<input type="hidden" name="documents[4].mida" value="${notificacioCommandV2.documents[4].mida}">
+						<input type="hidden" name="documents[4].id" value="${notificacioCommand.documents[4].id}">
+						<input type="hidden" name="documents[4].arxiuGestdocId" value="${notificacioCommand.documents[4].arxiuGestdocId}">
+						<input type="hidden" name="documents[4].arxiuNom" value="${notificacioCommand.documents[4].arxiuNom}">
+						<input type="hidden" name="documents[4].mediaType" value="${notificacioCommand.documents[4].mediaType}">
+						<input type="hidden" name="documents[4].mida" value="${notificacioCommand.documents[4].mida}">
 						<!-- CSV -->
 						<div id="input-origen-csv_4" class="col-md-6">
 							<not:inputText name="documentArxiuCsv[4]" generalClass="docArxiu" textKey="notificacio.form.camp.csvuuid" labelSize="3" info="true" messageInfo="notificacio.for.camp.document.avis" />
@@ -1825,7 +1825,7 @@
 						<!-- FITXER -->
 						<div id="input-origen-arxiu_4" class="col-md-6 hidden">
 							<c:choose>
-								<c:when test="${notificacioCommandV2.tipusDocumentDefault == 'ARXIU'}">
+								<c:when test="${notificacioCommand.tipusDocumentDefault == 'ARXIU'}">
 									<not:inputFile name="arxiu[4]" textKey="notificacio.form.camp.arxiu" labelSize="3"  info="true" messageInfo="${documentAvisKey}" fileName="${nomDocument_4}"/>
 								</c:when>
 								<c:otherwise>
