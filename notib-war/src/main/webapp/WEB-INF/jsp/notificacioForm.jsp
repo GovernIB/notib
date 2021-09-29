@@ -1852,7 +1852,7 @@
 				</div>
 
 				<c:if test="${enviamentTipus == 'COMUNICACIO_SIR'}">
-				<div id="btn-documents" class="text-left vt10 hidden">
+				<div id="btn-documents" class="text-left vt10">
 					<input type="button" class="btn btn-default" id="addDocument" value="<spring:message code="notificacio.form.boto.nou.document"/>" />
 					<input type="button" class="btn btn-danger hidden" id="removeDocument" value="<spring:message code="notificacio.form.boto.remove.document"/>" />
 				</div>
