@@ -1155,7 +1155,7 @@
 					<not:inputSelect 
 						name="procedimentId" 
 						textKey="notificacio.form.camp.procediment" 
-						required="false" 
+						required="${enviamentTipus == 'NOTIFICACIO'}"
 						optionItems="${procediments}" 
 						optionValueAttribute="codi"
 						optionTextAttribute="codi"
@@ -2021,8 +2021,4 @@
 			</div>
 		</div>
 	</div>
-
-
-	
-
 </body> 
