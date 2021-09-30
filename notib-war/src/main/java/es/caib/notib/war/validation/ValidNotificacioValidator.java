@@ -148,7 +148,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 										.addNode("arxiu[" + i + "]")
 										.addConstraintViolation();
 							}
-							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0)) {
+//							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0)) {
 								if (comunicacioAmbAdministracio) {
 									String extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
 									if (!extensionsDisponibles.contains(extensio)) {
@@ -165,7 +165,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 												.addConstraintViolation();
 									}
 								}
-							}
+//							}
 							Long fileSize = notificacio.getArxiu()[i].getSize();
 							fileTotalSize += fileSize;
 							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) && fileSize > fileMaxSize) {
