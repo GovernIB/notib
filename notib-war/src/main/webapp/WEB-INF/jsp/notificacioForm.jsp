@@ -984,7 +984,7 @@
 				$(dir3codi).removeClass('hidden');
 				$(incapacitat).addClass('hidden');
 				$(raoSocial).addClass('hidden');
-				if(enviamentTipus == 'COMUNICACIO'){
+				if(enviamentTipus == 'COMUNICACIO_SIR'){
 					$(nifLabel).text(nifLabelText);
 					$(nif).addClass('hidden');
 				}else{
@@ -1275,7 +1275,7 @@
 									<div>
 										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
-										<div class="col-md-6 interessatTipus">
+										<div class="col-md-6 interessatTipus<c:if test="${tipusEnviament == 'comunicacioSir'}"> hidden</c:if>">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
 										
