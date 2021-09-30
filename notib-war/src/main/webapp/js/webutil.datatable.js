@@ -124,7 +124,7 @@
 						$(row).addClass('selectable');
 						var $cell = $('td:first', row);
 						$cell.empty().append('<span class="fa fa-square-o"></span>');
-						$('span', $cell).click(function() {
+						$('span', $cell).off('click').on('click', function() {
 							$(this).parent().trigger('click');
 						});
 					}
@@ -145,13 +145,23 @@
 						$('td:last-child', row).html('<a href="#" class="btn btn-default btn-sm btn-rowInfo"><span class="fa fa-caret-down"></span></a>')
 					}
 					if (plugin.settings.rowhrefTemplate) {
-						if (plugin.settings.rowhrefToggle) {
-							$(row).attr('data-toggle', plugin.settings.rowhrefToggle);
+						let columns = $(row).find('td');
+						if (plugin.settings.selectionEnabled) {
+							delete columns[0];
 						}
-						$(row).attr(
-							'data-href',
-							$(plugin.settings.rowhrefTemplate).render(data));
-						$(row).css('cursor', 'pointer');
+						columns.each(function(index) {
+							var colDef = $('thead th', $taula)[index];
+							if(!$(colDef).data('disableEvents')) {
+								if (plugin.settings.rowhrefToggle) {
+									$(this).attr('data-toggle', plugin.settings.rowhrefToggle);
+								}
+								$(this).attr(
+									'data-href',
+									$(plugin.settings.rowhrefTemplate).render(data));
+								$(this).css('cursor', 'pointer');
+							}
+						});
+
 					}
 					if (data['DT_RowSelected']) {
 						$taula.dataTable().api().row(row).select();

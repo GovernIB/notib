@@ -485,6 +485,7 @@
         </div>
     </div>
 </form:form>
+<c:if test="${empty notificacioMassivaId}">
 <script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -515,7 +516,7 @@
 			</div>
 		</div>
 	</script>
-
+</c:if>
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <table
         id="notificacio"
@@ -531,10 +532,10 @@
         data-save-state="true"
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
-<%--        data-rowhref-template="#rowhrefTemplate"--%>
-        data-botons-template="#botonsTemplate"
-        data-selection-enabled="true"
-<%--        data-rowhref-toggle="modal"--%>
+        data-rowhref-template="#rowhrefTemplate"
+        <c:if test="${empty notificacioMassivaId}">data-botons-template="#botonsTemplate"</c:if>
+        data-selection-enabled="${empty notificacioMassivaId}"
+        data-rowhref-toggle="modal"
 >
     <thead>
     <tr>
@@ -622,7 +623,7 @@
         <%-- 				<th data-col-name="notificaEstat"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th> --%>
         <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
         <th data-col-name="permisProcessar" data-visible="false">
-        <th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="60px">
+        <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
                     <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
