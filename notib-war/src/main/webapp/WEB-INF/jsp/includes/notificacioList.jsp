@@ -93,7 +93,6 @@
     }
 </style>
 <script type="text/javascript">
-
     var myHelpers = {
         recuperarEstatEnviament: returnEnviamentsStatusDiv,
         hlpIsUsuari: isRolActualUsuari,
@@ -177,16 +176,6 @@
             error: console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId)
         })
     }
-
-    $(function() {
-        $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
-            $.fileDownload($(this).attr('href'), {
-                preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
-                failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
-            });
-            return false;
-        });
-    });
 
     function mostraEnviamentsNotificacio(td, rowData) {
         var getUrl = "<c:url value="/notificacio/"/>" + rowData.id + "/enviament";
@@ -282,6 +271,17 @@
             $('table tbody td').webutilModalEval();
         });
     }
+
+    $(function() {
+        $(document).on("click", "a.fileDownloadSimpleRichExperience", function() {
+            $.fileDownload($(this).attr('href'), {
+                preparingMessageHtml: "Estam preparant la descàrrega, per favor esperi...",
+                failMessageHtml: "<strong style='color:red'>Ho sentim.<br/>S'ha produït un error intentant descarregar el document.</strong>"
+            });
+            return false;
+        });
+    });
+
     $(document).ready(function() {
         let $taula = $('#notificacio');
         $taula.on('rowinfo.dataTable', function(e, td, rowData) {
@@ -319,7 +319,7 @@
             });
         });
 
-        $('#btnNetejar').click(function() {
+        $('#btn-netejar-filtre').click(function() {
             $(':input', $('#form-filtre')).each (function() {
                 var type = this.type, tag = this.tagName.toLowerCase();
                 if (type == 'text' || type == 'password' || tag == 'textarea') {
@@ -370,6 +370,9 @@
                                 procedimentsOrgan.push(val);
                             }
                         });
+
+                        console.debug(procedimentsComuns);
+                        console.debug(procedimentsOrgan);
                         if (procedimentsComuns.length > 0) {
                             selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
                             $.each(procedimentsComuns, function(index, val) {
@@ -384,14 +387,13 @@
                             });
                             selProcediments.append("</optgroup>");
                         }
-
                     } else {
                         selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
                     }
                     selProcediments.select2(select2Options);
                 },
                 error: function() {
-                    console.log("error obtenint els procediments de l'òrgan gestor...");
+                    console.error("error obtenint els procediments de l'òrgan gestor...");
                 }
             });
         }
@@ -419,7 +421,7 @@
             </div>
         </c:if>
         <div class="col-md-2">
-            <not:inputSelect name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value"
+            <not:inputSelect id="enviamentTipus" name="enviamentTipus" optionItems="${notificacioEnviamentTipus}" optionValueAttribute="value"
                              optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.enviament.tipus" inline="true"/>
         </div>
             <%--div class="col-md-2">
@@ -429,7 +431,7 @@
             <not:inputText name="concepte" inline="true"  placeholderKey="notificacio.list.filtre.camp.concepte"/>
         </div>
         <div class="col-md-2">
-            <not:inputSelect name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"
+            <not:inputSelect id="estat" name="estat" optionItems="${notificacioEstats}" optionValueAttribute="value"
                              optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
         </div>
         <div class="col-md-2">
@@ -444,18 +446,18 @@
             <not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
         </div>
         <div class="col-md-4">
-            <not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor"
+            <not:inputSelect id="organGestor" name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor"
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
         <div class="col-md-6">
-            <not:inputSelect name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio"
+            <not:inputSelect id="procedimentId" name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio"
                              placeholderKey="notificacio.list.filtre.camp.procediment"
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
     <div class="row">
         <div class="col-md-2">
-            <not:inputSelect name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
+            <not:inputSelect id="tipusUsuari" name="tipusUsuari" optionItems="${tipusUsuari}" optionValueAttribute="value" optionTextKeyAttribute="text"  emptyOption="true"  placeholderKey="notificacio.list.filtre.camp.tipususuari" inline="true" />
         </div>
         <div class="col-md-4">
             <c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
@@ -480,7 +482,7 @@
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
             <not:inputHidden name="nomesAmbErrors"/>
-            <button id="btnNetejar" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+            <button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
             <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
         </div>
     </div>
