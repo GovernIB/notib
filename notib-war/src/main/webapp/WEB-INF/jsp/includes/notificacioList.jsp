@@ -498,7 +498,7 @@
   						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="<c:url value="notificacio/export/ODS"/>"><spring:message code="notificacio.list.accio.massiva.exportar"/> a <spring:message code="enviament.list.user.exportar.EXCEL"/></a></li>
+						<li><a href="<c:url value="notificacio/export/ODS"/>"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
                         <li><a href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
