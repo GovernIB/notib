@@ -88,7 +88,6 @@ public class NotificacioFormController extends BaseUserController {
     @RequestMapping(value = "/new/comunicacioSIR")
     public String altaComunicacioSIR(HttpServletRequest request, Model model) {
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO_SIR);
-        model.addAttribute("tipusEnviament", "comunicacioSir");
         return "notificacioForm";
     }
 

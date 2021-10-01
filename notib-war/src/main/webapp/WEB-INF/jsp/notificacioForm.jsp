@@ -1244,7 +1244,7 @@
 							<input type="hidden" name="enviaments[${j}].id" value="${enviament.id}"/>
 						
 							<!-- TIPUS DE SERVEI -->
-							<c:if test="${tipusEnviament != 'comunicacioSir'}">
+							<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
 							<div class="col-md-6">
 								<div class="form-group">
 									<label class="control-label col-xs-4" for="enviaments[${j}].serveiTipus"><spring:message code="notificacio.form.camp.serveitipus" /></label>
@@ -1277,7 +1277,7 @@
 									<div>
 										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
-										<div class="col-md-6 interessatTipus<c:if test="${tipusEnviament == 'comunicacioSir'}"> hidden</c:if>">
+										<div class="col-md-6 interessatTipus<c:if test="${enviamentTipus == 'COMUNICACIO_SIR'}"> hidden</c:if>">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
 										
@@ -1302,7 +1302,7 @@
 										</div>
 										
 										<!-- EMAIL -->
-										<c:if test="${tipusEnviament != 'comunicacioSir'}">
+										<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
 										<div class="col-md-6">
 											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
@@ -1335,7 +1335,7 @@
 							</div>
 							
 							<!-- DESTINATARIS -->
-							<c:if test="${tipusEnviament != 'comunicacioSir'}">
+							<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
 								<c:set var="enviament" value="${enviament}" scope="request" />
 								<c:import url="includes/destinatariForm.jsp"/>
 								<div class="col-md-12 separacio"></div>
@@ -1507,7 +1507,7 @@
 						</div>
 				</c:forEach>
 				</div>
-				<c:if test="${tipusEnviament != 'comunicacioSir'}">
+				<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
 					<div class="text-left vt10">
 						<div class="btn-group">
 							<input type="button" class="btn btn-default" id="addEnviament"
