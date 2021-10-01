@@ -589,7 +589,9 @@
 
 
 		$('#addDocument').click(function() {
-			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault[numDocuments]).trigger("change");
+			let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
+			console.debug(tipusDocumentDefault);
+			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault).trigger("change");
 			$('#document' + (numDocuments + 1)).removeClass('hidden');
 			numDocuments++;
 			if (numDocuments == 5)
@@ -1590,7 +1592,7 @@
 					<hr/>
 				</div>
 	
-				<div id="docs-addicionals" class="hidden">
+				<div id="docs-addicionals"<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}"> class="hidden"</c:if>>
 					<!-- DOCUMENT 2 -->
 					<div id="document2" class="row hidden">
 						<div class="col-md-6">
