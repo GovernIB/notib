@@ -39,13 +39,16 @@ function clearSeleccio() {
 function initEvents($table, url_prefix, eventMessages) {
 
     $table.on('selectionchange.dataTable', function (e, accio, ids) {
-        $.get(
-            url_prefix + "/" + accio,
-            {ids: ids},
-            function(data) {
-                $(".seleccioCount").html(data);
-            }
-        );
+        console.debug(accio);
+        if (accio === "select" || accio === "deselect") {
+            $.get(
+                url_prefix + "/" + accio,
+                {ids: ids},
+                function (data) {
+                    $(".seleccioCount").html(data);
+                }
+            );
+        }
     });
 
     $table.on('init.dt', function () {
