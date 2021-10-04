@@ -172,7 +172,9 @@ public class ProcedimentsCacheable {
     private CacheManager cacheManager;
 
     public void clearAuthenticationProcedimentsCaches(Authentication auth) {
-        Permission[] permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.ADMINISTRADORENTITAT};
+        Permission[] permisos = new Permission[] {ExtendedPermission.USUARI,
+                ExtendedPermission.APLICACIO,
+                ExtendedPermission.ADMINISTRADORENTITAT};
 
         List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
                 permisos);

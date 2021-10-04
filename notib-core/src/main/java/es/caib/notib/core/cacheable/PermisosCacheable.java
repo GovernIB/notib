@@ -265,6 +265,7 @@ public class PermisosCacheable {
 
     public void clearAuthenticationPermissionsCaches(Authentication auth) {
         Permission[] permisos = new Permission[] {ExtendedPermission.USUARI,
+                ExtendedPermission.APLICACIO,
                 ExtendedPermission.ADMINISTRADORENTITAT};
 
         List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
