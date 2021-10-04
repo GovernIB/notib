@@ -269,12 +269,16 @@ public class PermisosCacheable {
 
         List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
                 permisos);
-        List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
-        for(EntitatEntity entitatEntity : entitatsAccessibles) {
-            String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
-            cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
-            cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
-            cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+        if (entitatsIds != null && !entitatsIds.isEmpty()) {
+            List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
+            if (entitatsAccessibles != null) {
+                for (EntitatEntity entitatEntity : entitatsAccessibles) {
+                    String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+                    cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+                    cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+                    cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+                }
+            }
         }
         cacheManager.getCache("organsGestorsUsuari").evict(auth.getName());
         cacheManager.getCache("getPermisosEntitatsUsuariActual").evict(auth.getName());
