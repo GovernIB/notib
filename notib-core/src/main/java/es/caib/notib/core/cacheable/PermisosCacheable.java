@@ -6,12 +6,16 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
@@ -20,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -255,12 +260,47 @@ public class PermisosCacheable {
         return resultats;
     }
 
-    @CacheEvict(value = "entitatsUsuari", allEntries = true)
-    public void evictFindEntitatsAccessiblesUsuari() {
+    @Resource
+    private CacheManager cacheManager;
+
+    public void clearAuthenticationPermissionsCaches(Authentication auth) {
+        Permission[] permisos = new Permission[] {ExtendedPermission.USUARI,
+                ExtendedPermission.ADMINISTRADORENTITAT};
+
+        List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
+                permisos);
+        List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
+        for(EntitatEntity entitatEntity : entitatsAccessibles) {
+            String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+            cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+            cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+            cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+        }
+        evictFindOrgansGestorsAccessiblesUsuari(auth);
+        evictGetPermisosEntitatsUsuariActual(auth);
+
+        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_SUPER.name()));
+        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_ADMIN.name()));
+        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.tothom.name()));
+        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_APL.name()));
+        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_ADMIN_ORGAN.name()));
+
     }
 
+    @CacheEvict(value = "entitatsUsuari", allEntries = true)
+    public void evictAllFindEntitatsAccessiblesUsuari() {
+    }
+    @CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
+    public void evictAllPermisosEntitatsUsuariActual() {
+    }
     @CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
     public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
+    }
+    @CacheEvict(value = "organsGestorsUsuari", allEntries = true)
+    public void evictAllFindOrgansGestorsAccessiblesUsuari() {
+    }
+    @CacheEvict(value = "organsGestorsUsuari", key="#auth.name")
+    public void evictFindOrgansGestorsAccessiblesUsuari(Authentication auth) {
     }
 
     public boolean getGenerarLogsPermisosOrgan() {

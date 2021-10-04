@@ -1233,7 +1233,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				entitat,
 				permisos);
 		List<ProcedimentOrganEntity> procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(
-				auth.getName(),
 				auth,
 				entitat,
 				permisos);
@@ -1380,7 +1379,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 
 			List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
-					usuariCodi,
 					auth,
 					entitat,
 					permisos);

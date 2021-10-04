@@ -31,11 +31,11 @@ $(document).ready(function() {
 		<not:inputText name="nif" textKey="usuari.form.camp.nif" disabled="true"/>
 		<not:inputText name="email" textKey="usuari.form.camp.email" disabled="true"/>
 		<not:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
-		<label class="control-label col-xs-4"></label>
-		<div class="col-xs-8">
-			<a id="btn-refresh-roles" data-user-codi="${codi}" class="btn btn-default" >
-				<span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="usuari.form.boto.refrescar.rols"/></a>
-		</div>
+<%--		<label class="control-label col-xs-4"></label>--%>
+<%--		<div class="col-xs-8">--%>
+<%--			<a id="btn-refresh-roles" data-user-codi="${codi}" class="btn btn-default" >--%>
+<%--				<span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="usuari.form.boto.refrescar.rols"/></a>--%>
+<%--		</div>--%>
 		<not:inputCheckbox name="rebreEmailsNotificacio" textKey="usuari.form.camp.rebre.emails.notificacio"/>
 		<not:inputCheckbox name="rebreEmailsNotificacioCreats" textKey="usuari.form.camp.rebre.emails.notificacio.creats"/>
 		<not:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>

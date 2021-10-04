@@ -744,11 +744,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					id,
 					OrganGestorEntity.class,
 					permisDto);
-			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
-			permisosCacheable.evictFindEntitatsAccessiblesUsuari();
+			permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
+			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
-			cacheHelper.evictAllPermisosEntitatsUsuariActual();
+			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -781,11 +781,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					id,
 					OrganGestorEntity.class,
 					permisId);
-			cacheHelper.evictFindOrgansGestorsAccessiblesUsuari();
-			permisosCacheable.evictFindEntitatsAccessiblesUsuari();
+			permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
+			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 			cacheHelper.evictFindProcedimentsWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
-			cacheHelper.evictAllPermisosEntitatsUsuariActual();
+			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -981,7 +981,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				entitat,
 				permisos);
 		List<ProcedimentOrganEntity> procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(
-				usuari,
 				auth,
 				entitat,
 				permisos);

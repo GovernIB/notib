@@ -96,7 +96,6 @@ public class ProcedimentHelper {
 													   EntitatEntity entitat,
 													   Permission[] permisos) {
 		List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
-				auth.getName(),
 				auth,
 				entitat,
 				permisos);

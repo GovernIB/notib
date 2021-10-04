@@ -160,14 +160,6 @@ public class CacheHelper {
 	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
-	
-	@CacheEvict(value = "organsGestorsUsuari", allEntries = true)
-	public void evictFindOrgansGestorsAccessiblesUsuari() {
-	}
-
-	@CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
-	public void evictAllPermisosEntitatsUsuariActual() {
-	}
 
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)
 	public void evictUnitatPerCodi() {

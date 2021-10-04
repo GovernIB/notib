@@ -1,5 +1,6 @@
 package es.caib.notib.core.cacheable;
 
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -8,15 +9,19 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -30,6 +35,8 @@ import java.util.*;
 @Slf4j
 @Component
 public class ProcedimentsCacheable {
+    @Autowired
+    private EntitatRepository entitatRepository;
     @Autowired
     private PermisosHelper permisosHelper;
     @Autowired
@@ -134,20 +141,18 @@ public class ProcedimentsCacheable {
     /**
      * Consulta un llistat dels permisos de procediments donats a un òrgan gestor concret.
      *
-     * @param usuariCodi El codi de l'usuari de la sessió
      * @param auth Objecte de l'autentificació de la sessió actual
      * @param entitat Entitat de la sessió
      * @param permisos Permisos que volem que tinguin els procediments
      * @return Retorna una llista de tuples procediment-organ amb tots els permisos a un organ gestor de tots els procediments.
      */
-    @Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+    @Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
     public List<ProcedimentOrganEntity> getProcedimentOrganWithPermis(
-            String usuariCodi,
             Authentication auth,
             EntitatEntity entitat,
             Permission[] permisos) {
         // 1. Obtenim els procediments amb permisos per procediment
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
         List<ProcedimentOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
         List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcedimentOrganEntity>(procedimentOrgans);
         permisosHelper.filterGrantedAny(
@@ -161,5 +166,33 @@ public class ProcedimentsCacheable {
                 permisos,
                 auth);
         return procedimentOrgansAmbPermis;
+    }
+
+    @Resource
+    private CacheManager cacheManager;
+
+    public void clearAuthenticationProcedimentsCaches(Authentication auth) {
+        Permission[] permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.ADMINISTRADORENTITAT};
+
+        List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
+                permisos);
+        List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
+        for(EntitatEntity entitatEntity : entitatsAccessibles) {
+            String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+            cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+            cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+            cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+
+            cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+            cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+            cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+            cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+
+            // La funció de la caché esta definida emb els serveis dels procediments
+            cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+            cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
+            cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
+            cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
+        }
     }
 }
