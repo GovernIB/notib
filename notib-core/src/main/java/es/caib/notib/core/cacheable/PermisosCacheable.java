@@ -276,8 +276,8 @@ public class PermisosCacheable {
             cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
             cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
         }
-        evictFindOrgansGestorsAccessiblesUsuari(auth);
-        evictGetPermisosEntitatsUsuariActual(auth);
+        cacheManager.getCache("organsGestorsUsuari").evict(auth.getName());
+        cacheManager.getCache("getPermisosEntitatsUsuariActual").evict(auth.getName());
 
         cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_SUPER.name()));
         cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_ADMIN.name()));
@@ -293,14 +293,8 @@ public class PermisosCacheable {
     @CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
     public void evictAllPermisosEntitatsUsuariActual() {
     }
-    @CacheEvict(value = "getPermisosEntitatsUsuariActual", key="#auth.name")
-    public void evictGetPermisosEntitatsUsuariActual(Authentication auth) {
-    }
     @CacheEvict(value = "organsGestorsUsuari", allEntries = true)
     public void evictAllFindOrgansGestorsAccessiblesUsuari() {
-    }
-    @CacheEvict(value = "organsGestorsUsuari", key="#auth.name")
-    public void evictFindOrgansGestorsAccessiblesUsuari(Authentication auth) {
     }
 
     public boolean getGenerarLogsPermisosOrgan() {
