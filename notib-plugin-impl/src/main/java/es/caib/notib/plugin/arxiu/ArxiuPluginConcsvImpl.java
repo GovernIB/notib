@@ -54,8 +54,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			Document response = new Document();
 			if (ambContingut)
 				response.setContingut(documentImprimibleCsv(identificador));
-			
-			response.setMetadades(consultaDocumentMetadadesCsv(identificador));
+
+			try {
+				Map<String,Object> result = documentMetadadesCsv(identificador);
+				response.setMetadades(toDocumentMetadades(result));
+				if (result.containsKey("eni:tipoFirma"))
+					response.setFirmes(Collections.singletonList(new Firma()));
+				else
+					response.setFirmes(null);
+			} catch(Exception e) {
+				log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador);
+				response.setMetadades(null);
+			}
 			
 			return response;
 		} catch (Exception var12) {
@@ -69,7 +79,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (ambContingut)
 				response.setContingut(documentImprimibleUuid(identificador));
 
-			response.setMetadades(consultaDocumentMetadadesUuid(identificador));
+			try {
+				Map<String,Object> result = documentMetadadesUuid(identificador);
+				response.setMetadades(toDocumentMetadades(result));
+				if (result.containsKey("eni:tipoFirma"))
+					response.setFirmes(Collections.singletonList(new Firma()));
+				else
+					response.setFirmes(null);
+			}
+			catch(Exception e) {
+				log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador);
+				response.setMetadades(null);
+			}
 
 			return response;
 		} catch (Exception var12) {
@@ -159,18 +180,8 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 					ex);
 		}
 	}
-	
-	private DocumentMetadades consultaDocumentMetadadesUuid(String identificador) {	
-		try {
-			return documentMetadadesUuid(identificador);
-		}
-		catch(Exception e) {
-			log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador);
-		}
-		return null;
-	}
-	
-	private DocumentMetadades documentMetadadesUuid(String identificador) {
+
+	private Map<String,Object> documentMetadadesUuid(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
 		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
@@ -189,9 +200,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
 			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
-			Map<String,Object> result =
-					new ObjectMapper().readValue(jsonData, HashMap.class);
-			return toDocumentMetadades(result);
+			return new ObjectMapper().readValue(jsonData, HashMap.class);
 
 		} catch (Exception ex) {
 			log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador,
@@ -201,18 +210,8 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 					ex);
 		}
 	}
-	
-	private DocumentMetadades consultaDocumentMetadadesCsv(String identificador) {	
-		try {
-			return documentMetadadesCsv(identificador);
-		}
-		catch(Exception e) {
-			log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador);
-		}
-		return null;
-	}
-	
-	private DocumentMetadades documentMetadadesCsv(String identificador) {
+
+	private Map<String,Object> documentMetadadesCsv(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
 		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
@@ -231,9 +230,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
 			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
-			Map<String,Object> result =
-					new ObjectMapper().readValue(jsonData, HashMap.class);
-			return toDocumentMetadades(result);
+			return new ObjectMapper().readValue(jsonData, HashMap.class);
 
 		} catch (Exception ex) {
 			log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador,
