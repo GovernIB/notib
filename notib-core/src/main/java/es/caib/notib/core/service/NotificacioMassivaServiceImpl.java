@@ -643,7 +643,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
         notificacio.setGrup(null);
         notificacio.setIdioma(null);
-        notificacio.setNumExpedient(null);
+        // TODO: #641 - Els enviaments massius encara que s'ompli el camp de "Referencia Emisor" al csv no es mostra al llistat de remeses al camp "Número expedient"
+        notificacio.setNumExpedient((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null);
         notificacio.setUsuariCodi(usuariCodi);
         notificacio.setRetard(Integer.valueOf(linia[15]));
 
