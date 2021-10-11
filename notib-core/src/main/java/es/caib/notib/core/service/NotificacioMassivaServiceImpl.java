@@ -204,7 +204,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return notificacioListHelper.complementaNotificacions(entitatActual, auth.getName(), notificacions);
     }
 
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor=Exception.class, timeout = 900)
     @Override
     public NotificacioMassivaDataDto create(
             Long entitatId,
@@ -240,6 +240,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 if (linia.length < numberRequiredColumns()) {
                     break;
                 }
+                linia = trim(linia);
                 NotificacioDatabaseDto notificacio = csvToNotificaDatabaseDto(
                         linia,
                         notificacioMassiva.getCaducitat(),
@@ -254,7 +255,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 }
 
                 List<String> errors = notificacioValidatorHelper.validarNotificacioMassiu(
-                        notificacio, entitat,
+                        notificacio,
+                        entitat,
                         documentsProcessatsMassiu);
                 try {
                     ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat);
@@ -272,7 +274,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 if (errors.size() == 0) {
                     try {
                         crearNotificacio(entitat, notificacio, notificacioMassivaEntity, documentsProcessatsMassiu);
-                    } catch (DocumentNotFoundException|NoDocumentException ex) {
+                    } catch (DocumentNotFoundException | NoDocumentException ex) {
                         errors.add("[1064] No s'ha pogut obtenir el document de l'arxiu.");
                     } catch (NoMetadadesException ex) {
                         errors.add("[1066] Error en les metadades del document. No s'han obtingut de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
@@ -281,12 +283,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
                 if (errors.size() > 0) {
                     log.debug("[NOT-MASSIVA] Alta errònea de la notificació de la nova notificacio massiva");
-                    writeCsvLinia(listWriterErrors,linia, errors);
-                    writeCsvLinia(listWriterInforme,linia, errors);
+                    writeCsvLinia(listWriterErrors, linia, errors);
+                    writeCsvLinia(listWriterInforme, linia, errors);
                 } else {
                     log.debug("[NOT-MASSIVA] Alta satisfactoria de la notificació de la nova notificacio massiva");
                     List<String> ok = Collections.singletonList("OK");
-                    writeCsvLinia(listWriterInforme,linia, ok);
+                    writeCsvLinia(listWriterInforme, linia, ok);
                     numAltes++;
                 }
             }
@@ -312,7 +314,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             } catch (IOException e) {
                 log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.");
                 e.printStackTrace();
-            } catch (Exception|Error e) {
+            } catch (Exception | Error e) {
                 log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.");
                 e.printStackTrace();
             }
@@ -325,10 +327,21 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             }
 
             return conversioTipusHelper.convertir(notificacioMassivaEntity, NotificacioMassivaDataDto.class);
+        } catch (Throwable t) {
+            log.error("[NOT-MASSIVA] Error no controlat en l'enviament massiu", t);
+            throw t;
         } finally {
             metricsHelper.fiMetrica(timer);
         }
     }
+
+    private String[] trim(String[] linia) {
+        for(int i = 0; i < linia.length; i++) {
+            linia[i] = linia[i] != null ? linia[i].trim() : null;
+        }
+        return linia;
+    }
+
     @Override
     public void delete(
             Long entitatId,
@@ -741,10 +754,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         } else if (NifHelper.isValidNifNie(linia[9])) {
             titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
         } else {
-            List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(linia[9]);
-            if (lista != null && lista.size() > 0) {
-                titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-            }
+            try {
+                List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(linia[9]);
+                if (lista != null && lista.size() > 0) {
+                    titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+                }
+            } catch (Exception e) {}
         }
         enviament.setTitular(titular);
         enviaments.add(enviament);

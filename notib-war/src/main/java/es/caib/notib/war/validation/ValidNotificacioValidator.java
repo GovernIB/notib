@@ -10,6 +10,7 @@ import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class ValidNotificacioValidator implements ConstraintValidator<ValidNotificacio, NotificacioCommand> {
 
 	@Autowired
@@ -149,22 +151,34 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 										.addConstraintViolation();
 							}
 //							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0)) {
+								log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
+								boolean formatValid = true;
 								if (comunicacioAmbAdministracio) {
 									String extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
+									log.info("NOTIFICACIO-VAL: > Extensió: '{}'", extensio);
 									if (!extensionsDisponibles.contains(extensio)) {
+										log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
+										formatValid = false;
 										valid = false;
 										context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format"))
 												.addNode("arxiu[" + i + "]")
 												.addConstraintViolation();
 									}
 								} else {
-									if (!formatsDisponibles.contains(notificacio.getArxiu()[i].getContentType())) {
+									String contentType = notificacio.getArxiu()[i].getContentType();
+									log.info("NOTIFICACIO-VAL: > ContentType: '{}'", contentType);
+									if (!formatsDisponibles.contains(contentType)) {
+										log.info("NOTIFICACIO-VAL: > ContentType no vàlid!!");
+										formatValid = false;
 										valid = false;
 										context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format"))
 												.addNode("arxiu[" + i + "]")
 												.addConstraintViolation();
 									}
 								}
+								if (formatValid)
+									log.info("NOTIFICACIO-VAL: > Format de document vàlid");
+
 //							}
 							Long fileSize = notificacio.getArxiu()[i].getSize();
 							fileTotalSize += fileSize;
