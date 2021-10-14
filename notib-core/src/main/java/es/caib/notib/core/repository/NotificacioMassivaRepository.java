@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,7 @@ public interface NotificacioMassivaRepository extends JpaRepository<NotificacioM
 			"	and nm.createdBy.codi = :createdByCodi" +
 			"	and (:isDataIniciNull = true or nm.createdDate >= :dataInici) " +
 			"	and (:isDataFiNull = true or nm.createdDate <= :dataFi) " +
-			"	and (:isEstatNull = true or :estat = nm.estat) " +
+			"	and (:isEstatNull = true or :estatProces = nm.estatProces) " +
 			"")
 	Page<NotificacioMassivaEntity> findUserRolePage(
 			@Param("entitat") EntitatEntity entitat,
@@ -37,7 +38,7 @@ public interface NotificacioMassivaRepository extends JpaRepository<NotificacioM
 			@Param("isDataFiNull") boolean isDataFiNull,
 			@Param("dataFi") Date dataFi,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") String estat,
+			@Param("estatProces") NotificacioMassivaEstatDto estatProces,
 			Pageable pageable);
 
 	@Query(	"from " +
@@ -47,7 +48,7 @@ public interface NotificacioMassivaRepository extends JpaRepository<NotificacioM
 			"	and (:isCreatedByCodiNull = true or nm.createdBy.codi = :createdByCodi)" +
 			"	and (:isDataIniciNull = true or nm.createdDate >= :dataInici) " +
 			"	and (:isDataFiNull = true or nm.createdDate <= :dataFi) " +
-			"	and (:isEstatNull = true or :estat = nm.estat) " +
+			"	and (:isEstatNull = true or :estatProces = nm.estatProces) " +
 			"")
 	Page<NotificacioMassivaEntity> findEntitatAdminRolePage(
 			@Param("entitat") EntitatEntity entitat,
@@ -56,7 +57,7 @@ public interface NotificacioMassivaRepository extends JpaRepository<NotificacioM
 			@Param("isDataFiNull") boolean isDataFiNull,
 			@Param("dataFi") Date dataFi,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") String estat,
+			@Param("estatProces") NotificacioMassivaEstatDto estatProces,
 			@Param("isCreatedByCodiNull") boolean isCreatedByCodiNull,
 			@Param("createdByCodi") String createdByCodi,
 			Pageable pageable);

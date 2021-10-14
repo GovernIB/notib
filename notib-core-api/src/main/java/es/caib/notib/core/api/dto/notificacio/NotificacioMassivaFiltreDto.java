@@ -14,7 +14,8 @@ import java.util.Date;
 public class NotificacioMassivaFiltreDto implements Serializable {
     private Date dataInici;
     private Date dataFi;
-    private NotificacioMassivaEstatDto estat;
+    private NotificacioMassivaEstatDto estatValidacio;
+    private NotificacioMassivaEstatDto estatProces;
     private String createdByCodi;
     private boolean nomesAmbErrors;
 }

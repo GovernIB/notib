@@ -1,11 +1,13 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,13 @@ public class NotificacioTableHelper {
     @Autowired
     private NotificacioEventRepository notificacioEventRepository;
 
+    @Autowired
+    private NotificacioMassivaRepository notificacioMassivaRepository;
+
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
+
         NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                 .notificacio(notificacio)
                 .entitat(notificacio.getEntitat())
@@ -68,6 +74,10 @@ public class NotificacioTableHelper {
             return;
         }
 
+        // Si pertany a una notificació massiva necessitam l'estat actual i error
+        NotificacioEstatEnumDto estatActual = tableViewItem.getEstat();
+        boolean hasErrorActual = tableViewItem.getNotificaErrorData() != null;
+
         tableViewItem.setEntitat(notificacio.getEntitat());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
         tableViewItem.setProcedimentOrgan(notificacio.getProcedimentOrgan());
@@ -101,8 +111,76 @@ public class NotificacioTableHelper {
         tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
         tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
         tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
-        
+
         notificacioTableViewRepository.saveAndFlush(tableViewItem);
+
+        if (notificacio.getNotificacioMassivaEntity() != null) {
+            updateMassiva(notificacio.getNotificacioMassivaEntity(),
+                    estatActual,
+                    hasErrorActual,
+                    tableViewItem.getEstat(),
+                    tableViewItem.getNotificaErrorData() != null);
+        }
+        notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
+
+    }
+
+    public void updateMassiva(
+            NotificacioMassivaEntity notificacioMassiva,
+            NotificacioEstatEnumDto originalEstat,
+            boolean originalHasError,
+            NotificacioEstatEnumDto destiEstat,
+            boolean destiHasError) {
+
+        log.info("[PROCES MASSIU] updateMassiva");
+
+        // Canvi d'estat
+        if (!destiEstat.equals(originalEstat)) {
+            // Estat inicial --> Estat processat
+            if (isEstatInicial(originalEstat) && !isEstatInicial(destiEstat)) {
+
+                if (originalHasError) {
+                    // Passar de processada amb error a processada
+                    if (!destiHasError) {
+                        notificacioMassiva.updateErrorToProcessada();
+                    }
+                } else {
+                    // Actualitzam com a processada
+                    notificacioMassiva.updateToProcessada();
+                }
+
+                // Estat processat --> Estat processat
+            } else if (!isEstatInicial(originalEstat)) {
+                // Passar de processada amb error a processada
+                if(originalHasError && !destiHasError) {
+                    notificacioMassiva.updateErrorToProcessada();
+                    // Passar de processada a processada amb error
+                } else if (!originalHasError && destiHasError) {
+                    notificacioMassiva.updateProcessadaToError();
+                }
+                // Estat inicial --> Estat inicial
+            } else {
+                // Actialitzar com a processada amb error
+                if (!originalHasError && destiHasError) {
+                    notificacioMassiva.updateToError();
+                }
+            }
+
+            // No canvia l'estat
+        } else if (!originalHasError && destiHasError) {
+            // Actialitzar com a processada amb error
+            if (isEstatInicial(destiEstat)) {
+                notificacioMassiva.updateToError();
+                // Passar de processada a processada amb error
+            } else {
+                notificacioMassiva.updateProcessadaToError();
+            }
+        }
+    }
+
+    private boolean isEstatInicial(NotificacioEstatEnumDto estat) {
+        return NotificacioEstatEnumDto.PENDENT.equals(estat) ||
+                NotificacioEstatEnumDto.ENVIANT.equals(estat);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

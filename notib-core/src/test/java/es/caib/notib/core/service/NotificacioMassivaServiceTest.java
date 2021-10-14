@@ -316,7 +316,7 @@ public class NotificacioMassivaServiceTest {
 				Mockito.anyBoolean(),
 				Mockito.nullable(Date.class),
 				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
+				Mockito.nullable(NotificacioMassivaEstatDto.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(String.class),
 				Mockito.nullable(Pageable.class)
@@ -338,7 +338,7 @@ public class NotificacioMassivaServiceTest {
 				Mockito.anyBoolean(),
 				Mockito.nullable(Date.class),
 				Mockito.anyBoolean(),
-				Mockito.nullable(String.class),
+				Mockito.nullable(NotificacioMassivaEstatDto.class),
 				Mockito.nullable(Pageable.class)
 		);
 	}

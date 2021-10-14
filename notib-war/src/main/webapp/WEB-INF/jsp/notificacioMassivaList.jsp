@@ -39,9 +39,10 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 <style type="text/css">
-	#nomesAmbErrorsBtn {
-		margin-right: 10%;
-	}
+	#nomesAmbErrorsBtn {margin-right: 10%;}
+	.label-warning {background-color: #e67e22;}
+	.estat_info {font-size: 9px}
+	.btn-dwl {padding: 2px 6px;}
 </style>
 <script type="text/javascript">
 
@@ -84,8 +85,11 @@
 			<div class="col-md-2">
 				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
 			</div>
+<%--			<div class="col-md-2">--%>
+<%--				<not:inputSelect name="estatValidacio" optionItems="${notificacioMassivaEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.massiva.list.estat.validacio" inline="true"/>--%>
+<%--			</div>--%>
 			<div class="col-md-2">
-				<not:inputSelect name="estat" optionItems="${notificacioMassivaEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+				<not:inputSelect name="estatProces" optionItems="${notificacioMassivaEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.massiva.list.estat.proces" inline="true"/>
 			</div>
 			<c:if test="${isRolActualAdministradorEntitat}">
 			<div class="col-md-3">
@@ -127,52 +131,97 @@
 			<tr>
 				<th data-col-name="id" data-visible="false">#</th>
 				<th data-col-name="progress" data-visible="false"></th>
-				<th data-col-name="createdDate" data-converter="datetime"><spring:message code="notificacio.massiva.list.columna.data"/></th>
+				<th data-col-name="createdDate" data-converter="datetime" width="120px"><spring:message code="notificacio.massiva.list.columna.data"/></th>
 				<th data-col-name="csvFilename" data-template="#cellCSV">
 					<spring:message code="notificacio.massiva.list.columna.notificacions"/>
 					<script id="cellCSV" type="text/x-jsrender">
 						{{:csvFilename }}
-						<a id="download-csv" title="Descarregar fitxer csv" class="btn btn-default pull-right"
-							href="<c:url value="/notificacio/massiva/{{:id}}/csv/download"/>" target="_blank">
+						<a id="download-csv" title="Descarregar fitxer csv" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/csv/download"/>" target="_blank">
 							<span class="fa fa-download"></span>
 						</a>
 					</script>
 				</th>
-				<th data-col-name="zipFilename" data-template="#cellZip"  width="120px">
+				<th data-col-name="zipFilename" data-template="#cellZip"  width="350px">
 					<spring:message code="notificacio.massiva.list.columna.Documents"/>
 					<script id="cellZip" type="text/x-jsrender">
 						{{if zipFilename }}
 							{{:zipFilename }}
-							<a id="download-zip" title="Descarregar fitxer zip" class="btn btn-default pull-right"
-								href="<c:url value="/notificacio/massiva/{{:id}}/zip/download"/>" target="_blank">
+							<a id="download-zip" title="Descarregar fitxer zip" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/zip/download"/>" target="_blank">
 								<span class="fa fa-download"></span>
 							</a>
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="estat" data-template="#cellEstatTemplate" width="120px">
-					<spring:message code="notificacio.massiva.list.columna.estat"/>
-					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'PENDENT'}}
+				<th data-col-name="totalNotificacions" data-visible="false"></th>
+				<th data-col-name="notificacionsValidades" data-visible="false"></th>
+				<th data-col-name="notificacionsProcessades" data-visible="false"></th>
+				<th data-col-name="notificacionsProcessadesAmbError" data-visible="false"></th>
+				<th data-col-name="estatValidacio" data-template="#cellEstatValidacioTemplate" width="200px">
+					<spring:message code="notificacio.massiva.list.columna.estat.validacio"/>
+					<script id="cellEstatValidacioTemplate" type="text/x-jsrender">
+						{{if estatValidacio == 'PENDENT'}}
+							<span class="label label-default">
+								{{:~eval('notificacioMassivaEstats["' + estatValidacio + '"]')}}
+								<span class="estat_info">[{{:totalNotificacions}}]</span>
+							</span>
+						{{else estatValidacio == 'FINALITZAT_AMB_ERRORS'}}
 							<span class="label label-warning">
-								{{:~eval('notificacioMassivaEstats["' + estat + '"]')}}
+								{{:~eval('notificacioMassivaEstats["' + estatValidacio + '"]')}}
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsValidades}} / <span class="fa fa-times"></span> {{:totalNotificacions - notificacionsValidades}}]</span>
 							</span>
-						{{else estat == 'EN_PROCES'}}
-							<span class="label label-info">
-								{{:~eval('notificacioMassivaEstats["' + estat + '"]')}} ({{:progress}} %)
-							</span>
-						{{else estat == 'FINALITZAT'}}
+							<a id="download-zip" title="Descarregar csv errors" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/errors/download"/>" target="_blank">
+								<span class="fa fa-download"></span>
+							</a>
+						{{else estatValidacio == 'FINALITZAT'}}
 							<span class="label label-success">
-								{{:~eval('notificacioMassivaEstats["' + estat + '"]')}}
+								{{:~eval('notificacioMassivaEstats["' + estatValidacio + '"]')}}
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsValidades}}]</span>
 							</span>
-						{{else estat == 'ERRONIA'}}
+						{{else estatValidacio == 'ERRONIA'}}
 							<span class="label label-danger">
-								{{:~eval('notificacioMassivaEstats["' + estat + '"]')}}
+								{{:~eval('notificacioMassivaEstats["' + estatValidacio + '"]')}}
+								<span class="estat_info">[<span class="fa fa-times"></span> {{:totalNotificacions}}]</span>
+							</span>
+							<a id="download-zip" title="Descarregar csv errors" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/errors/download"/>" target="_blank">
+								<span class="fa fa-download"></span>
+							</a>
+						{{/if}}
+					</script>
+				</th>
+				<th data-col-name="estatProces" data-template="#cellEstatProcesTemplate" width="100px">
+					<spring:message code="notificacio.massiva.list.columna.estat.proces"/>
+					<script id="cellEstatProcesTemplate" type="text/x-jsrender">
+						{{if estatProces == 'PENDENT'}}
+							<span class="label label-default">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
+								<span class="estat_info">[{{:notificacionsValidades}}]</span>
+							</span>
+						{{else estatProces == 'EN_PROCES'}}
+							<span class="label label-info">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}} ({{:progress}} %)
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsProcessades}}]</span>
+							</span>
+						{{else estatProces == 'EN_PROCES_AMB_ERRORS'}}
+							<span class="label label-warning">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}} ({{:progress}} %)
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsProcessades}} / <span class="fa fa-times"></span> {{:notificacionsProcessadesAmbError}}]</span>
+							</span>
+						{{else estatProces == 'FINALITZAT'}}
+							<span class="label label-success">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsProcessades}}]</span>
+							</span>
+						{{else estatProces == 'FINALITZAT_AMB_ERRORS'}}
+							<span class="label label-warning">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsProcessades}} / <span class="fa fa-times"></span> {{:notificacionsProcessadesAmbError}}]</span>
+							</span>
+						{{else estatProces == 'ERRONIA'}}
+							<span class="label label-danger">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
+								<span class="estat_info">[<span class="fa fa-times"></span> {{:notificacionsValidades}}]</span>
 							</span>
 						{{/if}}
-
-						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
-
 					</script>
 				</th>
 				<c:if test="${isRolActualAdministradorEntitat}">

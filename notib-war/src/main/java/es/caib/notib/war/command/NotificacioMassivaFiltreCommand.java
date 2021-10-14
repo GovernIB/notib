@@ -11,7 +11,8 @@ import java.util.Date;
 public class NotificacioMassivaFiltreCommand {
     private Date dataInici;
     private Date dataFi;
-    private NotificacioMassivaEstatDto estat;
+    private NotificacioMassivaEstatDto estatValidacio;
+    private NotificacioMassivaEstatDto estatProces;
     private String createdByCodi;
     private boolean nomesAmbErrors;
 

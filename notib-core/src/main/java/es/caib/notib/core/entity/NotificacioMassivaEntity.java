@@ -1,13 +1,30 @@
 package es.caib.notib.core.entity;
 
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaEstatDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Formula;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,10 +33,15 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Slf4j
 @Entity
 @Table(name="NOT_NOTIFICACIO_MASSIVA")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioMassivaEntity extends NotibAuditable<Long> {
+
+    @Transient
+    private final Object procesLock = new Object();
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITAT_ID")
     @ForeignKey(name = "NOT_MASSIVA_ENTITAT_FK")
@@ -62,19 +84,95 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
     @JoinColumn(name = "NOTIFICACIO_MASSIVA_ID") // we need to duplicate the physical information
     protected List<NotificacioEntity> notificacions;
 
-    @Formula("(case  when progress < 0 then " +
-            "           'ERRONIA' " +
-            "        when progress = 0 then " +
-            "           'PENDENT' " +
-            "        when progress < 100 then " +
-            "           'EN_PROCES' " +
-            "        else" +
-            "           'FINALITZAT' " +
-            " end)")
-    private String estat;
 
-    public void updateProgress(int progress) {
-        this.progress = progress;
+    @Column(name = "estat_validacio", length = 32)
+    @Enumerated(EnumType.STRING)
+    private NotificacioMassivaEstatDto estatValidacio;
+
+    @Column(name = "estat_proces", length = 32)
+    @Enumerated(EnumType.STRING)
+    private NotificacioMassivaEstatDto estatProces;
+
+    @Column(name = "num_notificacions")
+    private Integer totalNotificacions;
+    @Column(name = "num_validades")
+    private Integer notificacionsValidades;
+    @Column(name = "num_processades")
+    private Integer notificacionsProcessades;
+    @Column(name = "num_error")
+    private Integer notificacionsProcessadesAmbError;
+
+//    @Formula("(case  when progress < 0 then " +
+//            "           'ERRONIA' " +
+//            "        when progress = 0 then " +
+//            "           'PENDENT' " +
+//            "        when progress < 100 then " +
+//            "           'EN_PROCES' " +
+//            "        else" +
+//            "           'FINALITZAT' " +
+//            " end)")
+//    private String estat;
+
+//    public void updateProgress(int progress) {
+//        this.progress = progress;
+//    }
+
+    public void updateEstatValidacio(Integer notificacionsValidades) {
+        this.notificacionsValidades = notificacionsValidades;
+        if (notificacionsValidades == 0) {
+            this.estatValidacio = NotificacioMassivaEstatDto.ERRONIA;
+        } else if (notificacionsValidades < totalNotificacions) {
+            this.estatValidacio = NotificacioMassivaEstatDto.FINALITZAT_AMB_ERRORS;
+        } else {
+            this.estatValidacio = NotificacioMassivaEstatDto.FINALITZAT;
+        }
+    }
+
+    public void updateProcessadaToError() {
+        log.info("[PROCES MASSIU] updateProcessadaToError");
+        this.notificacionsProcessadesAmbError++;
+        this.notificacionsProcessades--;
+        updateProgres();
+    }
+
+    public void updateErrorToProcessada() {
+        log.info("[PROCES MASSIU] updateErrorToProcessada");
+        this.notificacionsProcessades++;
+        this.notificacionsProcessadesAmbError--;
+        updateProgres();
+    }
+
+    public void updateToProcessada() {
+        log.info("[PROCES MASSIU] updateToProcessada");
+        this.notificacionsProcessades++;
+        updateProgres();
+    }
+
+    public void updateToError() {
+        log.info("[PROCES MASSIU] updateToError");
+        this.notificacionsProcessadesAmbError++;
+        updateProgres();
+    }
+
+    private void updateProgres() {
+        this.progress = ((notificacionsProcessades + notificacionsProcessadesAmbError) * 100) / notificacionsValidades;
+        log.info("[PROCES MASSIU] updateProgres (" + this.progress + ") - validades: " + notificacionsValidades + ", processades: " + notificacionsProcessades + ", error: " + notificacionsProcessadesAmbError);
+
+        if ((notificacionsProcessades + notificacionsProcessadesAmbError) == 0) {
+            this.estatProces = NotificacioMassivaEstatDto.PENDENT;
+        } else if ((notificacionsProcessades + notificacionsProcessadesAmbError) == notificacionsValidades) {
+            if (notificacionsProcessadesAmbError > 0) {
+                this.estatProces = NotificacioMassivaEstatDto.FINALITZAT_AMB_ERRORS;
+            } else {
+                this.estatProces = NotificacioMassivaEstatDto.FINALITZAT;
+            }
+        } else {
+            if (notificacionsProcessadesAmbError > 0) {
+                this.estatProces = NotificacioMassivaEstatDto.EN_PROCES_AMB_ERRORS;
+            } else {
+                this.estatProces = NotificacioMassivaEstatDto.EN_PROCES;
+            }
+        }
     }
 
     public void joinNotificacio(NotificacioEntity notificacioEntity) {

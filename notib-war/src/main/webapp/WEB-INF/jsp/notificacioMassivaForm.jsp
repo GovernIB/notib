@@ -28,7 +28,14 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
-	<script src="<c:url value="/js/webutil.common.js"/>"></script>	
+	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$('#form').on("submit", function(){
+				$('.loading').fadeIn();
+			});
+		});
+	</script>
 </head>
 <body>
 <style>
@@ -53,7 +60,44 @@
 		border-radius:50%;
 		color:#fff;
 	}
+	.loading {
+		background: rgba( 255, 255, 255, 0.8 );
+		display: none;
+		height: 100%;
+		position: fixed;
+		width: 100%;
+		z-index: 9999;
+		left: 0;
+		top: 0;
+	}
+	.loading-gif {
+		left: 50%;
+		margin-left: -32px;
+		margin-top: -32px;
+		position: absolute;
+		top: 50%;
+		width: 4%;
+	}
+	.loading-gif img {
+		width: 45%;
+	}
+	.loading-text {
+		left: 47%;
+		margin-left: -32px;
+		margin-top: -32px;
+		position: absolute;
+		top: 55%;
+	}
 </style>
+
+<div class="loading">
+	<div class="loading-gif">
+		<img src="<c:url value="/img/ajax-loader.gif"/>"/>
+	</div>
+	<div class="loading-text">
+		<p><spring:message code="notificacio.form.loading"/></p>
+	</div>
+</div>
 
 <div class="alert alert-info">
 	<strong><spring:message code="notificacio.massiva.form.info.titol"/></strong>

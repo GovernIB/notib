@@ -19,8 +19,16 @@ public class NotificacioMassivaTableItemDto implements Serializable {
 	private String zipFilename;
 	private String createdByNom;
 	private String createdByCodi;
-	private NotificacioMassivaEstatDto estat;
+//	private NotificacioMassivaEstatDto estat;
 	private Integer progress;
+
+	private NotificacioMassivaEstatDto estatValidacio;
+	private NotificacioMassivaEstatDto estatProces;
+
+	private Integer totalNotificacions;
+	private Integer notificacionsValidades;
+	private Integer notificacionsProcessades;
+	private Integer notificacionsProcessadesAmbError;
 
 	public String getCreatedByComplet() {
 		String nomComplet = "";

@@ -1,8 +1,6 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioMassivaEntity;
-import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +18,7 @@ import java.util.List;
 @Component
 public class NotificacioMassivaHelper {
 	@Autowired
-	private NotificacioMassivaRepository notificacioMassivaRepository;
-	@Autowired
 	private NotificacioRepository notificacioRepository;
-
-	@Transactional
-	public void updateProgress(Long notificacioMassivaId) {
-		NotificacioMassivaEntity notificacioMassiva = notificacioMassivaRepository.findOne(notificacioMassivaId);
-		int numProcessades = notificacioMassivaRepository.countNotificacionsNoPendents(notificacioMassiva);
-		int progress = (int) (((double) numProcessades / (double) notificacioMassiva.getNotificacions().size()) * 100);
-		notificacioMassiva.updateProgress(progress);
-	}
 
 	@Transactional
 	public void posposarNotificacions(Long notificacioMassivaId) {

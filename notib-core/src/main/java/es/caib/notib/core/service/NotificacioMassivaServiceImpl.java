@@ -210,7 +210,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             Long entitatId,
             @NonNull String usuariCodi,
             @NonNull NotificacioMassivaDto notificacioMassiva) throws RegistreNotificaException {
-
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
             log.info("[NOT-MASSIVA] Alta de nova notificacio massiva (usuari: {}). Fitxer csv: {}",
@@ -235,7 +234,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             writeCsvHeader(listWriterInforme, csvHeader.toArray(new String[]{}));
 
             int numAltes = 0;
-            NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva);
+            NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva, linies.size());
             for (String[] linia : linies) {
                 if (linia.length < numberRequiredColumns()) {
                     break;
@@ -292,9 +291,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     numAltes++;
                 }
             }
-            if (numAltes == 0) {
-                notificacioMassivaEntity.updateProgress(-1);
-            }
+            notificacioMassivaEntity.updateEstatValidacio(numAltes);
 
             try {
                 listWriterInforme.flush();
@@ -540,8 +537,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtre.getDataInici(),
                 filtre.getDataFi() == null,
                 filtre.getDataFi(),
-                filtre.getEstat() == null,
-                filtre.getEstat() == null ? "" : filtre.getEstat().name(),
+                filtre.getEstatProces() == null,
+                filtre.getEstatProces(),
+//                filtre.getEstatProces() == null ? "" : filtre.getEstatProces().name(),
                 paginacioHelper.toSpringDataPageable(paginacioParams)
         );
         return pageNotificacionsMassives;
@@ -558,8 +556,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtre.getDataInici(),
                 filtre.getDataFi() == null,
                 filtre.getDataFi(),
-                filtre.getEstat() == null,
-                filtre.getEstat() == null ? "" : filtre.getEstat().name(),
+                filtre.getEstatProces() == null,
+                filtre.getEstatProces(),
+//                filtre.getEstatProces() == null ? "" : filtre.getEstatProces().name(),
                 filtre.getCreatedByCodi() == null || filtre.getCreatedByCodi().isEmpty(),
                 filtre.getCreatedByCodi(),
                 paginacioHelper.toSpringDataPageable(paginacioParams)
@@ -578,7 +577,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return true;
     }
 
-    private NotificacioMassivaEntity registrarNotificacioMassiva(EntitatEntity entitat, NotificacioMassivaDto notMassivaDto) {
+    private NotificacioMassivaEntity registrarNotificacioMassiva(EntitatEntity entitat, NotificacioMassivaDto notMassivaDto, int size) {
         String csvGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_CSV,
                 notMassivaDto.getFicheroCsvBytes());
         String zipGesdocId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ZIP,
@@ -601,6 +600,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 .pagadorPostal(pagadorPostal)
                 .resumGesdocId(informeGesdocId)
                 .errorsGesdocId(errorsGesdocId)
+                .estatValidacio(NotificacioMassivaEstatDto.PENDENT)
+                .estatProces(NotificacioMassivaEstatDto.PENDENT)
+                .totalNotificacions(size)
+                .notificacionsValidades(0)
+                .notificacionsProcessades(0)
+                .notificacionsProcessadesAmbError(0)
                 .build();
         notificacioMassivaRepository.saveAndFlush(notMassiva);
         return notMassiva;
