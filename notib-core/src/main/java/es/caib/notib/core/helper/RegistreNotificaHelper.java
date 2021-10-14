@@ -37,8 +37,8 @@ public class RegistreNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
-	@Autowired
-	private NotificacioMassivaHelper notificacioMassivaHelper;
+//	@Autowired
+//	private NotificacioMassivaHelper notificacioMassivaHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 
@@ -331,10 +331,10 @@ public class RegistreNotificaHelper {
 		if (arbResposta != null) {
 
 			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
-			// Actualitzar progrés notificació massiva.
-			if (notificacioEntity.getNotificacioMassivaEntity() != null) {
-				notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
-			}
+//			// Actualitzar progrés notificació massiva.
+//			if (notificacioEntity.getNotificacioMassivaEntity() != null) {
+//				notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
+//			}
 
 			String registreNum = arbResposta.getRegistreNumeroFormatat();
 			Date registreData = arbResposta.getRegistreData();
