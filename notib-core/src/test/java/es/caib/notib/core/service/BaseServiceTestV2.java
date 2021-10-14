@@ -1,23 +1,22 @@
-/**
- * 
- */
 package es.caib.notib.core.service;
 
-import es.caib.loginModule.util.Base64.InputStream;
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.PluginHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.repository.config.ConfigRepository;
 import es.caib.notib.core.test.AuthenticationTest;
+import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.DatabaseItemTest;
-import es.caib.notib.core.test.data.OrganGestorItemTest;
+import es.caib.notib.core.test.data.EntitatItemTest;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.CodiValorPais;
-import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
+import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.Document;
@@ -25,18 +24,21 @@ import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayInputStream;
+import javax.xml.bind.ValidationException;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -51,45 +53,34 @@ import static org.junit.Assert.fail;
 public class BaseServiceTestV2 {
 
 	@Autowired
-	protected UsuariAplicacioService usuariAplicacioService;
-	@Autowired
-	protected EntitatService entitatService;
-	@Autowired
-	protected ProcedimentService procedimentService;
-	@Autowired
-	protected OrganGestorService organGestorService;
-	@Autowired
-	protected GrupService grupService;
-	@Autowired
-	protected PagadorPostalService pagadorPostalService;
-	@Autowired
-	protected PagadorCieService pagadorCieService;
-	@Autowired
-	protected PagadorCieFormatFullaService pagadorCieFormatFullaService;
-	@Autowired
-	protected PagadorCieFormatSobreService pagadorCieFormatSobreService;
-	@Autowired
-	protected NotificacioService notificacioService;
+	protected EntitatItemTest entitatItemTest;
 
 	@Autowired
 	protected AuthenticationTest authenticationTest;
 
-	
 	@Autowired
 	protected  PluginHelper pluginHelper;
+	@Autowired
+	protected ConfigRepository configRepository;
 
 	private DadesUsuariPlugin dadesUsuariPluginMock;
-	private GestioDocumentalPlugin gestioDocumentalPluginMock;
+	@Mock
+	protected GestioDocumentalPlugin gestioDocumentalPluginMock;
+
 	private RegistrePlugin registrePluginMock;
 	private IArxiuPlugin arxiuPluginMock;
-	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
+	protected UnitatsOrganitzativesPlugin unitatsOrganitzativesPluginMock;
+
+	protected String currentTestDescription = "";
 
 	@Autowired
-	OrganGestorItemTest organGestorCreate;
+	protected OrganGestorService organGestorService;
+	@Autowired
+	protected EntitatService entitatService;
 
 	@BeforeClass
 	public static void beforeClass() {
-		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+		ConfigHelper.JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 	}
 
 	@AfterClass
@@ -107,59 +98,17 @@ public class BaseServiceTestV2 {
 		log.info("-------------------------------------------------------------------");
 		Long entitatId = null;
 		try {
-			authenticationTest.autenticarUsuari("super");
-			EntitatDto entitatCreada = entitatService.create(entitatDto);
-			entitatId = entitatCreada.getId();
-			if (entitatDto.getPermisos() != null) {
-				for (PermisDto permis: entitatDto.getPermisos()) {
-					entitatService.permisUpdate(
-							entitatCreada.getId(),
-							permis);
-				}
-			}
-			organGestorCreate.addObject("organ_default", organGestorCreate.getRandomInstance());
-			organGestorCreate.createAll(entitatId);
-			OrganGestorDto organ = organGestorCreate.getObject("organ_default");
+			ElementsCreats database = createDatabase(entitatDto, elements);
+			entitatId = database.entitat.getId();
 
-			Map<String, Object> elementsCreats = new HashMap<>();
-			for (DatabaseItemTest<?> element: elements) {
-				log.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
-				element.relateElements();
-				element.createAll(entitatId);
-				for(String key : element.getObjects().keySet()) {
-					elementsCreats.put(key, element.getObject(key));
-					log.debug("...objecte amb la clau: '" + key + "' creat correctament.");
-				}
-
-			}
 			log.debug("Executant accions del test...");
-			test.executar(new ElementsCreats(entitatCreada, organ, elementsCreats));
+			test.executar(database);
 			log.debug("...accions del test executades.");
 		} catch (Exception ex) {
 			log.error("L'execució del test ha produït una excepció", ex);
 			fail("L'execució del test ha produït una excepció");
 		} finally {
-			for(int counter=elements.length-1; counter >= 0;counter--){
-				DatabaseItemTest<?> element = elements[counter];
-				log.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
-				try {
-					element.deleteAll(entitatId);
-					System.out.println("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
-				} catch (Exception e) {
-					System.out.println("...error esborrant objecte de tipus " + element.getClass().getSimpleName() + ".");
-					System.out.println(e);
-				}
-
-			}
-
-			try {
-				organGestorCreate.delete(entitatId, "organ_default");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			authenticationTest.autenticarUsuari("super");
-			entitatService.delete(entitatId);
+			destroyDatabase(entitatId, elements);
 
 			log.info("-------------------------------------------------------------------");
 			log.info("-- ...test \"" + descripcio + "\" executat.");
@@ -167,6 +116,60 @@ public class BaseServiceTestV2 {
 		}
 	}
 
+	protected ElementsCreats createDatabase (EntitatDto entitatDto,
+											 DatabaseItemTest... elements) throws Exception {
+		EntitatDto entitat = getAndConfigureDefaultEntitat();
+		authenticationTest.autenticarUsuari("admin");
+		OrganGestorDto organ = getAndConfigureDefaultOrganGestor(entitat);
+
+		Map<String, Object> elementsCreats = new HashMap<>();
+		for (DatabaseItemTest<?> element: elements) {
+			log.debug("Creant objecte de tipus " + element.getClass().getSimpleName() + "...");
+			element.relateElements();
+			element.createAll(entitat.getId());
+			for(String key : element.getObjects().keySet()) {
+				elementsCreats.put(key, element.getObject(key));
+				log.debug("...objecte amb la clau: '" + key + "' creat correctament.");
+			}
+
+		}
+		return new ElementsCreats(entitat, organ, elementsCreats);
+	}
+
+	private OrganGestorDto getAndConfigureDefaultOrganGestor(EntitatDto entitat) throws ValidationException {
+		authenticationTest.autenticarUsuari("admin");
+
+		OrganGestorDto organ = organGestorService.findByCodi(entitat.getId(), ConfigTest.DEFAULT_ORGAN_DIR3);
+		return organ;
+	}
+
+	private EntitatDto getAndConfigureDefaultEntitat() throws ValidationException {
+		authenticationTest.autenticarUsuari("super");
+
+		EntitatDto entitatDto = entitatService.findByCodi("ENTITAT_TESTS");
+		return entitatDto;
+	}
+	protected void destroyDatabase (Long entitatId,
+									DatabaseItemTest... elements) {
+		for(int counter=elements.length-1; counter >= 0;counter--){
+			DatabaseItemTest<?> element = elements[counter];
+			log.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");
+			try {
+				element.deleteAll(entitatId);
+				System.out.println("...objecte de tipus " + element.getClass().getSimpleName() + " esborrat correctament.");
+			} catch (Exception e) {
+				System.out.println("...error esborrant objecte de tipus " + element.getClass().getSimpleName() + ".");
+				System.out.println(e);
+			}
+		}
+
+		try {
+			removeAllConfigs();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	protected void testCreantElements(
 			final TestAmbElementsCreats test,
 			Object... elements) {
@@ -178,6 +181,7 @@ public class BaseServiceTestV2 {
 				ElementsCreats elementsCreats) throws Exception;
 	}
 
+	@Getter
 	@AllArgsConstructor
 	protected static class ElementsCreats {
 		EntitatDto entitat;
@@ -188,8 +192,21 @@ public class BaseServiceTestV2 {
 			return this.elementsCreats.get(key);
 		}
 	}
-	
-	
+
+	@Transactional
+	protected void addConfig(String key, String value) {
+		ConfigEntity configEntity = new ConfigEntity(key, value);
+		configRepository.save(configEntity);
+	}
+	protected void setDefaultConfigs() {
+		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
+		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
+			addConfig(entry.getKey().toString(), entry.getValue().toString());
+		}
+	}
+	protected void removeAllConfigs() {
+		configRepository.deleteAll();
+	}
 	// PLUGINS
 	// ///////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -213,20 +230,21 @@ public class BaseServiceTestV2 {
 	}
 	
 	//	GestioDocumentalPlugin
-	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException, IOException {
+	protected void configureMockGestioDocumentalPlugin() throws SistemaExternException {
+		// TODO: Amb el mock activat quan s'executen tots els tests falla
 		gestioDocumentalPluginMock = Mockito.mock(GestioDocumentalPlugin.class);
 		Mockito.when(gestioDocumentalPluginMock.create(Mockito.anyString(), Mockito.any(InputStream.class))).thenReturn(Integer.toString(ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE)));
-		Mockito.doNothing().when(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class));
-		Mockito.doNothing().when(gestioDocumentalPluginMock).delete(Mockito.anyString(), Mockito.anyString());
-		Mockito.doAnswer(new Answer<Void>() {
-			public Void answer(InvocationOnMock invocation) throws IOException {
-				Object[] args = invocation.getArguments();
-				FitxerDto fitxer = getFitxerPdfDeTest();
-				byte[] contingut = fitxer.getContingut();
-				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
-				return null;
-			}
-		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
+//		Mockito.doNothing().when(gestioDocumentalPluginMock).update(Mockito.anyString(), Mockito.anyString(), Mockito.any(InputStream.class));
+//		Mockito.doNothing().when(gestioDocumentalPluginMock).delete(Mockito.anyString(), Mockito.anyString());
+//		Mockito.doAnswer(new Answer<Void>() {
+//			public Void answer(InvocationOnMock invocation) throws IOException {
+//				Object[] args = invocation.getArguments();
+//				FitxerDto fitxer = getFitxerPdfDeTest();
+//				byte[] contingut = fitxer.getContingut();
+//				IOUtils.copy(new ByteArrayInputStream(contingut), (OutputStream)args[2]);
+//				return null;
+//			}
+//		}).when(gestioDocumentalPluginMock).get(Mockito.anyString(), Mockito.anyString(), Mockito.any(OutputStream.class));
 		pluginHelper.setGestioDocumentalPlugin(gestioDocumentalPluginMock);
 	}
 	
@@ -264,7 +282,9 @@ public class BaseServiceTestV2 {
 				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
 				return resposta;
 			}
-		}).when(registrePluginMock).salidaAsientoRegistral(Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong());
+		}).when(registrePluginMock).salidaAsientoRegistral(
+				Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.anyLong(), Mockito.anyBoolean()
+		);
 		
 		// obtenerAsientoRegistral
 		Mockito.doAnswer(new Answer<RespostaConsultaRegistre>() {
@@ -426,6 +446,14 @@ public class BaseServiceTestV2 {
 		Mockito.when(unitatsOrganitzativesPluginMock.paisos()).thenReturn(paisos);
 		Mockito.when(unitatsOrganitzativesPluginMock.provincies()).thenReturn(provincies);
 		Mockito.when(unitatsOrganitzativesPluginMock.localitats(Mockito.anyString())).thenReturn(localitats);
+		Map<String, NodeDir3> organigramaEntitat = new HashMap<String, NodeDir3>();
+		organigramaEntitat.put("E04975701", new NodeDir3());
+		NodeDir3 nodeOrganDefault = new NodeDir3();
+		nodeOrganDefault.setCodi(ConfigTest.DEFAULT_ORGAN_DIR3);
+		nodeOrganDefault.setDenominacio("Òrgan default");
+		nodeOrganDefault.setEstat("Vigent");
+		organigramaEntitat.put(ConfigTest.DEFAULT_ORGAN_DIR3, nodeOrganDefault);
+		Mockito.when(unitatsOrganitzativesPluginMock.organigramaPerEntitat(Mockito.anyString())).thenReturn(organigramaEntitat);
 		pluginHelper.setUnitatsOrganitzativesPlugin(unitatsOrganitzativesPluginMock);
 	}
 	

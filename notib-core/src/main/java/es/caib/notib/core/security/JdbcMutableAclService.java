@@ -14,12 +14,7 @@
  */
 package es.caib.notib.core.security;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import es.caib.notib.core.helper.ConfigHelper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.security.acls.domain.AccessControlEntryImpl;
@@ -27,22 +22,16 @@ import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.AccessControlEntry;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.AclCache;
-import org.springframework.security.acls.model.AlreadyExistsException;
-import org.springframework.security.acls.model.ChildrenExistException;
-import org.springframework.security.acls.model.MutableAcl;
-import org.springframework.security.acls.model.MutableAclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Sid;
+import org.springframework.security.acls.model.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-import es.caib.notib.core.helper.PropertiesHelper;
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
 
 /**
@@ -491,6 +480,6 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
 	}
 
 	private String getHibernateDialect() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.hibernate.dialect");
+		return ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.notib.hibernate.dialect");
 	}
 }

@@ -1,23 +1,28 @@
 package es.caib.notib.core.cacheable;
 
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcedimentOrganEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.OrganGestorHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentOrganRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * Utilitat per a accedir a les caches dels procediments. Els mètodes cacheables es
@@ -31,6 +36,8 @@ import java.util.Set;
 @Component
 public class ProcedimentsCacheable {
     @Autowired
+    private EntitatRepository entitatRepository;
+    @Autowired
     private PermisosHelper permisosHelper;
     @Autowired
     private CacheHelper cacheHelper;
@@ -43,66 +50,109 @@ public class ProcedimentsCacheable {
     @Autowired
     private ProcedimentOrganRepository procedimentOrganRepository;
 
+    /**
+     * Obté un llistat de tots els procediments sobre els que l'usuari actual té els permisos indicats.
+     * - L'usuari té el permís directament al procediment o
+     * - Si el procediment no requereix permís directe:
+     *    * L'usuari té el permís sobre l'òrgan gestor del procediment o
+     *    * L'usuari té el permís a un òrgan pare del procediment
+     *
+     * @param usuariCodi El codi de l'usuari de la sessió
+     * @param entitat Entitat de la sessió
+     * @param permisos Permisos que volem que tinguin els procediments
+     *
+     * @return Llista dels procediments amb el permís indicat
+     */
     @Cacheable(value = "procedimentEntitiesPermis",
             key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
     public List<ProcedimentEntity> getProcedimentsWithPermis(
             String usuariCodi,
             EntitatEntity entitat,
             Permission[] permisos) {
+        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
 
         // 1. Obtenim els procediments amb permisos per procediment
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+        List<ProcedimentEntity> procedimentsAmbPermis = getProcedimentsAmbPermisDirecte(entitat, permisos, grups);
+
+        // 2. Consulta els procediments amb permís per òrgan gestor
+        List<ProcedimentEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
+
+        // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
+        List<ProcedimentEntity> procedimentsList = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
+        procedimentsList.addAll(procedimentsAmbPermisOrgan);
+
+        // 6. Ordenam els procediments
+        Collections.sort(procedimentsList, new Comparator<ProcedimentEntity>() {
+            @Override
+            public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
+                return (p1.getNom()==null?"":p1.getNom()).compareTo(p2.getNom()==null?"":p2.getNom());
+            }
+        });
+
+        return procedimentsList;
+    }
+
+    private List<ProcedimentEntity> getProcedimentsAmbPermisDirecte(EntitatEntity entitat,
+                                                                    Permission[] permisos,
+                                                                    List<String> grups) {
         List<Long> procedimentsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(
                 ProcedimentEntity.class,
                 permisos
         );
-        // selecciona els expedients amb permisos per procediment de l'entitat i dels grups
 
-        List<ProcedimentEntity> procedimentsAmbPermis;
+        // Filtre els procediments amb permisos per procediment de l'entitat i dels grups
         if (procedimentsAmbPermisIds.isEmpty()){
-            procedimentsAmbPermis = new ArrayList<>();
-        } else {
-            procedimentsAmbPermis = procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
-                    grups,
-                    procedimentsAmbPermisIds);
+            return new ArrayList<>();
         }
+
+        return  procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
+                grups,
+                procedimentsAmbPermisIds);
+    }
+    private List<ProcedimentEntity> getProcedimentsAmbPermisOrganGestor(EntitatEntity entitat,
+                                                                        Permission[] permisos,
+                                                                        List<String> grups) {
         // 2. Obtenim els òrgans gestors amb permisos
         List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.findOrganismesEntitatAmbPermis(entitat,
                 permisos);
 
         // 3. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-        List<String> organsGestorsCodisAmbPermis = new ArrayList<String>();
+        List<String> organsGestorsCodisAmbPermis = new ArrayList<>();
         if (!organsGestorsAmbPermis.isEmpty()) {
-            Set<String> codisOrgansAmbDescendents = new HashSet<String>();
+            Set<String> codisOrgansAmbDescendents = new HashSet<>();
             for (OrganGestorEntity organGestorEntity : organsGestorsAmbPermis) {
                 codisOrgansAmbDescendents.addAll(
                         organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
                                 entitat.getDir3Codi(),
                                 organGestorEntity.getCodi()));
             }
-            organsGestorsCodisAmbPermis = new ArrayList<String>(codisOrgansAmbDescendents);
+            organsGestorsCodisAmbPermis = new ArrayList<>(codisOrgansAmbDescendents);
+        }
+
+        // Si no te permís a cap organ gestor
+        if (organsGestorsCodisAmbPermis.isEmpty()) {
+            return new ArrayList<>();
         }
 
         // 4. Obtenim els procediments amb permisos per òrgan gestor
-        List<ProcedimentEntity> procedimentsAmbPermisOrgan = new ArrayList<ProcedimentEntity>();
-        if (!organsGestorsCodisAmbPermis.isEmpty()) {
-            procedimentsAmbPermisOrgan = procedimentRepository.findByOrganGestorCodiInAndGrup(organsGestorsCodisAmbPermis, grups);
-        }
-
-        // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-        List<ProcedimentEntity> setProcediments = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
-        setProcediments.addAll(procedimentsAmbPermisOrgan);
-        return setProcediments;
+        return procedimentRepository.findProcedimentsAccesiblesPerOrganGestor(organsGestorsCodisAmbPermis, grups);
     }
 
-    @Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+    /**
+     * Consulta un llistat dels permisos de procediments donats a un òrgan gestor concret.
+     *
+     * @param auth Objecte de l'autentificació de la sessió actual
+     * @param entitat Entitat de la sessió
+     * @param permisos Permisos que volem que tinguin els procediments
+     * @return Retorna una llista de tuples procediment-organ amb tots els permisos a un organ gestor de tots els procediments.
+     */
+    @Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
     public List<ProcedimentOrganEntity> getProcedimentOrganWithPermis(
-            String usuariCodi,
             Authentication auth,
             EntitatEntity entitat,
             Permission[] permisos) {
         // 1. Obtenim els procediments amb permisos per procediment
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
         List<ProcedimentOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
         List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcedimentOrganEntity>(procedimentOrgans);
         permisosHelper.filterGrantedAny(
@@ -116,5 +166,39 @@ public class ProcedimentsCacheable {
                 permisos,
                 auth);
         return procedimentOrgansAmbPermis;
+    }
+
+    @Resource
+    private CacheManager cacheManager;
+
+    public void clearAuthenticationProcedimentsCaches(Authentication auth) {
+        Permission[] permisos = new Permission[] {ExtendedPermission.USUARI,
+                ExtendedPermission.APLICACIO,
+                ExtendedPermission.ADMINISTRADORENTITAT};
+
+        List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
+                permisos);
+        if (entitatsIds != null && !entitatsIds.isEmpty()) {
+            List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
+            if (entitatsAccessibles != null) {
+                for (EntitatEntity entitatEntity : entitatsAccessibles) {
+                    String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+                    cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+                    cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+                    cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+
+                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+                    cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+                    cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+                    cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+
+                    // La funció de la caché esta definida emb els serveis dels procediments
+                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
+                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
+                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
+                }
+            }
+        }
     }
 }

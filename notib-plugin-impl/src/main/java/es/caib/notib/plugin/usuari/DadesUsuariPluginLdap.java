@@ -3,9 +3,9 @@
  */
 package es.caib.notib.plugin.usuari;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
+import es.caib.notib.plugin.SistemaExternException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -16,12 +16,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.utils.PropertiesHelper;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.
@@ -223,34 +220,34 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	}
 
 	private String getLdapServerUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.server.url");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.server.url");
 	}
 	private String getLdapPrincipal() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.principal");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.principal");
 	}
 	private String getLdapCredentials() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.credentials");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.credentials");
 	}
 	private String getLdapSearchBase() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.search.base");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.search.base");
 	}
 	private String getLdapAtributs() {
 		// Exemple: cn,givenName,sn,mail,departmentNumber,memberOf
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.atributs");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.atributs");
 	}
 	private String getLdapFiltreCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.codi");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.codi");
 	}
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.grup");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.filtre.grup");
 	}
 	private String getLdapExcloureGrup() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.grup");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.grup");
 	}
 	private String getLdapExcloureMembre() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.membre");
+		return System.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.ldap.excloure.membre");
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginLdap.class);

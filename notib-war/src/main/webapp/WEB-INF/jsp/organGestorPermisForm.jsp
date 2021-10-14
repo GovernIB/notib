@@ -24,6 +24,33 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<not:modalHead/>
 <script>
+
+	//Reset de errores de validación
+	function resetErrors() {
+		$("#id_error").remove();
+		$("#principal").parent().closest('.form-group').removeClass('has-error');
+	}
+	
+	function errorRolTothomPerAdminOrgan() {
+		if ($("#tipus").val().toUpperCase() == "ROL" && $("#principal").val().trim().toLowerCase() == 'tothom' && isRolActualAdministradorOrgan) {
+			$("#principal").parent().closest('.form-group').addClass('has-error');
+			$("#principal").parent().append('<div id="id_error"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="procediment.permis.form.camp.principal.error"/></p></div>');
+			return true;
+		}
+		return false;
+	}
+	
+	function formatRolUsuari() {
+		if ($("#tipus").val().toUpperCase() == "ROL") { 
+			if ($("#principal").val().trim().toLowerCase() == "tothom")
+				$("#principal").val($("#principal").val().trim().toLowerCase());
+			else
+				$("#principal").val($("#principal").val().trim().toUpperCase());
+		} else { // "USUARI"
+			$("#principal").val($("#principal").val().trim().toLowerCase());
+		}
+	}
+	
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
@@ -45,6 +72,21 @@ pageContext.setAttribute(
 			});
 			$("#selectAll").prop('checked', totsSeleccionats);
 		});
+		
+		$("#principal").on('change', function() {
+			resetErrors();
+			
+			if (errorRolTothomPerAdminOrgan())
+				return;
+	
+			formatRolUsuari();
+		});
+		
+		$("#tipus").on('change', function() {
+			resetErrors();
+			errorRolTothomPerAdminOrgan();
+			formatRolUsuari();
+		});
 	});
 </script>
 <style>
@@ -54,13 +96,17 @@ pageContext.setAttribute(
 
 </head>
 <body>
+	<script>
+		var isRolActualAdministradorOrgan = ${isRolActualAdministradorOrgan};
+	</script>
 	<c:set var="formAction"><not:modalUrl value="/organgestor/${organGestor.id}/permis"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
 		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
-		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"/>
+		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
+			inputMaxLength="${principalSize}" showsize="true"/>
 		<div class="row">
 			<div class="col-xs-6">
 				<not:inputCheckbox name="selectAll" labelSize="8" textKey="procediment.permis.form.camp.all"/>

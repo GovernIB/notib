@@ -2,7 +2,7 @@ package es.caib.notib.plugin.registre;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.plugin.utils.PropertiesHelper;
+import es.caib.notib.plugin.PropertiesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
 			AsientoRegistralBeanDto arb, 
-			Long tipusOperacio) {
+			Long tipusOperacio,
+			boolean generarJustificant) {
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		logger.info(arb.toString());
 //		System.out.println(">>> DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -49,7 +50,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 	        resposta.setRegistreData(data);
 	        resposta.setRegistreNumero(String.valueOf(registre[1]));
 	        resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-	        resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUIT);
+	        resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
 	        
 	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 	        	resposta.setSirRecepecioData(data);
@@ -77,16 +78,20 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
 			 respostaConsultaRegistre.setSirRecepecioData(data);
-		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
+		 if (respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT) ||
+				 respostaConsultaRegistre.getEstat().equals(NotificacioRegistreEstatEnumDto.REBUTJAT))
 			 respostaConsultaRegistre.setSirRegistreDestiData(data);
-	        
+
 		respostaConsultaRegistre.setEntitatCodi("A04003003");
 		respostaConsultaRegistre.setEntitatDenominacio("CAIB");
 		if (respostaAmbError) {
 			respostaConsultaRegistre.setErrorCodi("500");
 			respostaConsultaRegistre.setErrorDescripcio("Simular error");
 		}
-		
+		respostaConsultaRegistre.setNumeroRegistroDestino("NUMERO REG. DESTINO");
+		respostaConsultaRegistre.setMotivo("motiu per el qual s’ha reenviat o rebutjat l’assentament en destí");
+		respostaConsultaRegistre.setCodigoEntidadRegistralProcesado("A04026906"); // Codi oficina que ha acceptat/rebutjat
+		respostaConsultaRegistre.setDecodificacionEntidadRegistralProcesado("Nom oficina que ha acceptat/rebutjat ");
 		return respostaConsultaRegistre;
 	}
 	

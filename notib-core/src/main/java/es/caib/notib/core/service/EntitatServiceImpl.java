@@ -5,6 +5,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusObjecte;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
@@ -14,10 +15,12 @@ import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EntitatTipusDocRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +73,16 @@ public class EntitatServiceImpl implements EntitatService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private EntregaCieRepository entregaCieRepository;
 
-	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Transactional
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public EntitatDto create(EntitatDto entitat) {
+	public EntitatDto create(EntitatDataDto entitat) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
@@ -84,8 +91,8 @@ public class EntitatServiceImpl implements EntitatService {
 					true,
 					false,
 					false );
-			
-			EntitatEntity entity = EntitatEntity.getBuilder(
+
+			EntitatEntity.EntitatEntityBuilder entitatBuilder = EntitatEntity.getBuilder(
 					entitat.getCodi(),
 					entitat.getNom(),
 					entitat.getTipus(),
@@ -93,7 +100,6 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getDir3CodiReg(),
 					entitat.getApiKey(),
 					entitat.isAmbEntregaDeh(),
-					entitat.isAmbEntregaCie(),
 					entitat.getLogoCapBytes(),
 					entitat.getLogoPeuBytes(),
 					entitat.getColorFons(),
@@ -105,11 +111,13 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getLlibre(),
 					entitat.getLlibreNom(),
 					entitat.isOficinaEntitat()).
-					descripcio(entitat.getDescripcio()).
-					build();
-			
-			EntitatEntity entitatSaved = entitatRepository.save(entity);
-			
+					descripcio(entitat.getDescripcio());
+			if (entitat.isEntregaCieActiva()) {
+				EntregaCieEntity entregaCie = new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId());
+				entitatBuilder.entregaCie(entregaCieRepository.save(entregaCie));
+			}
+
+			EntitatEntity entitatSaved = entitatRepository.save(entitatBuilder.build());
 			if (entitat.getTipusDoc() != null) {
 				for (TipusDocumentDto tipusDocument : entitat.getTipusDoc()) {
 					EntitatTipusDocEntity tipusDocEntity = EntitatTipusDocEntity.getBuilder(
@@ -127,10 +135,10 @@ public class EntitatServiceImpl implements EntitatService {
 		}
 	}
 
-	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Transactional
+	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.UPDATE, returnType = TipusObjecte.DTO)
 	@Override
-	public EntitatDto update(EntitatDto entitat) {
+	public EntitatDto update(EntitatDataDto entitat) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
@@ -188,7 +196,17 @@ public class EntitatServiceImpl implements EntitatService {
 					logoPeuActual = entity.getLogoPeuBytes();
 				}
 			}
-			
+			EntregaCieEntity entregaCie = entity.getEntregaCie();
+			if (entitat.isEntregaCieActiva()) {
+				if (entregaCie == null) {
+					entregaCie = entregaCieRepository.save(
+							new EntregaCieEntity(entitat.getCieId(), entitat.getOperadorPostalId())
+					);
+				} else {
+					entregaCie.update(entitat.getCieId(), entitat.getOperadorPostalId());
+				}
+			}
+
 			entity.update(
 					entitat.getCodi(),
 					entitat.getNom(),
@@ -197,7 +215,7 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getDir3CodiReg(),
 					entitat.getApiKey(),
 					entitat.isAmbEntregaDeh(),
-					entitat.isAmbEntregaCie(),
+					entitat.isEntregaCieActiva() ? entregaCie : null,
 					entitat.getDescripcio(),
 					logoCapActual,
 					logoPeuActual,
@@ -210,6 +228,10 @@ public class EntitatServiceImpl implements EntitatService {
 					entitat.getLlibre(),
 					entitat.getLlibreNom(),
 					entitat.isOficinaEntitat());
+
+			if (!entitat.isEntregaCieActiva() && entregaCie != null) {
+				entregaCieRepository.delete(entregaCie);
+			}
 			return conversioTipusHelper.convertir(
 					entity,
 					EntitatDto.class);
@@ -464,6 +486,19 @@ public class EntitatServiceImpl implements EntitatService {
 			logger.debug("Modificació com a superusuari del permis de l'entitat (" +
 					"entitatId=" + entitatId + ", " +
 					"permis=" + permis + ")");
+			
+			if (TipusEnumDto.ROL.equals(permis.getTipus())) {
+				if (permis.getPrincipal().equalsIgnoreCase("tothom")) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());					
+				} else {
+					permis.setPrincipal(permis.getPrincipal().toUpperCase());
+				}
+			} else {
+				if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
+					permis.setPrincipal(permis.getPrincipal().toLowerCase());
+				}
+			}
+			
 			entityComprovarHelper.comprovarEntitat(
 					entitatId,
 					true,
@@ -607,7 +642,7 @@ public class EntitatServiceImpl implements EntitatService {
 	public byte[] getCapLogo() throws NoSuchFileException, IOException{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.capsalera.logo");
+			String filePath = configHelper.getConfig("es.caib.notib.capsalera.logo");
 			Path path = Paths.get(filePath);
 			
 			return Files.readAllBytes(path);
@@ -621,7 +656,7 @@ public class EntitatServiceImpl implements EntitatService {
 	public byte[] getPeuLogo() throws NoSuchFileException, IOException{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String filePath = PropertiesHelper.getProperties().getProperty("es.caib.notib.peu.logo");
+			String filePath = configHelper.getConfig("es.caib.notib.peu.logo");
 			Path path = Paths.get(filePath);
 			
 			return Files.readAllBytes(path);

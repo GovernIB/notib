@@ -5,9 +5,12 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.repository.NotificacioRepository;
+
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,28 +41,24 @@ import java.util.*;
 public abstract class AbstractNotificaHelper {
 	
 	@Autowired
-	AuditNotificacioHelper auditNotificacioHelper;
-
+	protected AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	protected ConfigHelper configHelper;
+	@Autowired
+	protected NotificacioRepository notificacioRepository;
+	@Autowired 
+	private EmailNotificacioHelper emailNotificacioHelper;
+	
 	private boolean modeTest;
 	
-	public abstract NotificacioEntity notificacioEnviar(
-			Long notificacioId);
+	public abstract NotificacioEntity notificacioEnviar(Long notificacioId);
 
-	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(
-			Long enviamentId) throws SistemaExternException;
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException;
+
+	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception;
 
 	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
 		return xifrarId(notificacioDestinatari.getId());
-	}
-
-	public boolean isAdviserActiu() {
-		String actiu = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.adviser.actiu");
-		if (actiu != null) {
-			return new Boolean(actiu).booleanValue();
-		} else {
-			return true;
-		}
 	}
 
 	public boolean isConnexioNotificaDisponible() {
@@ -79,7 +78,7 @@ public abstract class AbstractNotificaHelper {
 			String notificaDatatReceptorNom,
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
-			NotificacioEnviamentEntity enviament) {
+			NotificacioEnviamentEntity enviament) throws Exception {
 		boolean estatFinal = 
 				NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
@@ -89,7 +88,9 @@ public abstract class AbstractNotificaHelper {
 				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
 				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat);
+				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.DESCONEGUT.equals(notificaEstat) ||
+				NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO.equals(notificaEstat);
 		enviament.updateNotificaDatat(
 				notificaEstat,
 				notificaEstatData,
@@ -114,7 +115,22 @@ public abstract class AbstractNotificaHelper {
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsFinals) {
 			auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
-
+			
+			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
+			NotificacioEntity notificacio = enviament.getNotificacio();
+			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
+				long startTime = System.nanoTime();
+				
+				try {
+					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
+				} catch (Exception ex) {
+					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
+				}
+				
+				double elapsedTime = (System.nanoTime() - startTime) / 10e6;
+				logger.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
+			}
+			
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 //			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
 //				logger.info("Marcant notificació com processada per ser usuari aplicació...");
@@ -168,8 +184,8 @@ public abstract class AbstractNotificaHelper {
 			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
 			NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO,
 			NotificacioEnviamentEstatEnumDto.ANULADA};
-	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(
-			String estatCodi) {
+
+	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(String estatCodi) {
 		for (int i = 0; i < estatsNotifica.length; i++) {
 			if (estatCodi.equalsIgnoreCase(estatsNotifica[i])) {
 				return estatsNotib[i];
@@ -379,86 +395,21 @@ public abstract class AbstractNotificaHelper {
 		}
 		return llinatges.toString();
 	}
-	/*private String[] separarLlinatges(
-			String llinatges) {
-		int indexEspai = llinatges.indexOf(" ");
-		if (indexEspai != -1) {
-			return new String[] {
-					llinatges.substring(0, indexEspai),
-					llinatges.substring(indexEspai + 1)};
-		} else {
-			return new String[] {
-					llinatges,
-					null};
-		}
-	}*/
-
-//	private SedeWsPortType getSedeWs() throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
-//		SedeWsPortType port = new WsClientHelper<SedeWsPortType>().generarClientWs(
-//				getClass().getResource("/es/caib/notib/core/wsdl/SedeWs.wsdl"),
-//				getSedeUrlProperty(),
-//				new QName(
-//						"https://administracionelectronica.gob.es/notifica/ws/notifica/1.0/",
-//						"SedeWsService"),
-//				getUsernameProperty(),
-//				getPasswordProperty(),
-//				SedeWsPortType.class,
-//				new ApiKeySOAPHandler(getApiKeyProperty()),
-//				new WsClientHelper.SOAPLoggingHandler(AbstractNotificaHelper.class));
-//		return port;
-//	}
-
-	protected String getNotificaUrlProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.url");
+	public boolean isAdviserActiu() {
+		return configHelper.getAsBoolean("es.caib.notib.adviser.actiu");
 	}
-//	protected String getSedeUrlProperty() {
-//		return PropertiesHelper.getProperties().getProperty(
-//				"es.caib.notib.notifica.sede.url");
-//	}
+	protected String getNotificaUrlProperty() {
+		return configHelper.getConfig("es.caib.notib.notifica.url");
+	}
 	protected String getUsernameProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.username");
+		return configHelper.getConfig("es.caib.notib.notifica.username");
 	}
 	protected String getPasswordProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.password");
+		return configHelper.getConfig("es.caib.notib.notifica.password");
 	}
 	protected String getClauXifratIdsProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.clau.xifrat.ids",
-				"P0rt4FI8");
+		return configHelper.getConfig("es.caib.notib.notifica.clau.xifrat.ids");
 	}
-	/*private String getKeystorePathProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.keystore.path");
-	}
-	private String getKeystoreTypeProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.keystore.type");
-	}
-	private String getKeystorePasswordProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.keystore.password");
-	}
-	private String getKeystoreCertAliasProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.keystore.cert.alias");
-	}
-	private String getKeystoreCertPasswordProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.keystore.cert.password");
-	}
-	private Boolean useNotificaAdviser() {
-		String useAdviser = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.use.adviser");
-		return "true".equalsIgnoreCase(useAdviser);
-	}
-	private Boolean sendToNotificaOnAlta() {
-		String sendToNotifica = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.send.alta");
-		return !"false".equalsIgnoreCase(sendToNotifica);
-	}*/
 
 	public class ApiKeySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 		private final String apiKey;
@@ -503,106 +454,6 @@ public abstract class AbstractNotificaHelper {
 			return new TreeSet<QName>();
 		}
 	}
-
-//	public class FirmaSOAPHandler implements SOAPHandler<SOAPMessageContext> {
-//		private String keystoreLocation;
-//		private String keystoreType;
-//		private String keystorePassword;
-//		private String keystoreCertAlias;
-//		private String keystoreCertPassword;
-//		public FirmaSOAPHandler(
-//				String keystoreLocation,
-//				String keystoreType,
-//				String keystorePassword,
-//				String keystoreCertAlias,
-//				String keystoreCertPassword) {
-//			this.keystoreLocation = keystoreLocation;
-//			this.keystoreType = keystoreType;
-//			this.keystorePassword = keystorePassword;
-//			this.keystoreCertAlias = keystoreCertAlias;
-//			this.keystoreCertPassword = keystoreCertPassword;
-//		}
-//		@Override
-//		public boolean handleMessage(SOAPMessageContext context) {
-//			Boolean outboundProperty = (Boolean)context.get(
-//					MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-//			if (outboundProperty.booleanValue()) {
-//				try {
-//					Document document = toDocument(context.getMessage());
-//					Properties cryptoProperties = getCryptoProperties();
-//			        WSSecHeader header = new WSSecHeader();
-//			        header.setMustUnderstand(false);
-//			        header.insertSecurityHeader(document);
-//					WSSecSignature signer = new WSSecSignature();
-//					signer.setUserInfo(keystoreCertAlias, keystoreCertPassword);
-//					Crypto crypto = CryptoFactory.getInstance(cryptoProperties);
-//					Document signedDoc = signer.build(
-//							document,
-//							crypto,
-//							header);
-//					context.getMessage().getSOAPPart().setContent(
-//							new DOMSource(signedDoc));
-//				} catch (Exception ex) {
-//					throw new RuntimeException(
-//							"No s'ha pogut firmar el missatge SOAP",
-//							ex);
-//				}
-//				@SuppressWarnings("unchecked")
-//				Map<String, List<String>> headers = (Map<String, List<String>>)context.get(
-//						MessageContext.HTTP_REQUEST_HEADERS);
-//				if (headers != null) {
-//					for (String header: headers.keySet()) {
-//						List<String> values = headers.get(header);
-//						System.out.println(">>> " + header);
-//						for (String value: values) {
-//							System.out.println(">>>      " + value);
-//						}
-//					}
-//				}
-//			}
-//			return true;
-//		}
-//		@Override
-//		public boolean handleFault(SOAPMessageContext context) {
-//			return false;
-//		}
-//		@Override
-//		public void close(MessageContext context) {
-//		}
-//		@Override
-//		public Set<QName> getHeaders() {
-//			return new TreeSet<QName>();
-//		}
-//		private Properties getCryptoProperties() {
-//			Properties cryptoProperties = new Properties();
-//			cryptoProperties.put(
-//					"org.apache.ws.security.crypto.provider",
-//					"org.apache.ws.security.components.crypto.Merlin");
-//			cryptoProperties.put(
-//					"org.apache.ws.security.crypto.merlin.file",
-//					keystoreLocation);
-//			cryptoProperties.put(
-//					"org.apache.ws.security.crypto.merlin.keystore.type",
-//					keystoreType);
-//			if (keystorePassword != null && !keystorePassword.isEmpty()) {
-//				cryptoProperties.put(
-//						"org.apache.ws.security.crypto.merlin.keystore.password",
-//						keystorePassword);
-//			}
-//			cryptoProperties.put(
-//					"org.apache.ws.security.crypto.merlin.keystore.alias",
-//					keystoreCertAlias);
-//			return cryptoProperties;
-//		}
-//		private Document toDocument(SOAPMessage soapMsg) throws SOAPException, TransformerException {
-//			Source src = soapMsg.getSOAPPart().getContent();
-//			TransformerFactory tf = TransformerFactory.newInstance();
-//			Transformer transformer = tf.newTransformer();
-//			DOMResult result = new DOMResult();
-//			transformer.transform(src, result);
-//			return (Document) result.getNode();
-//		}
-//	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractNotificaHelper.class);
 

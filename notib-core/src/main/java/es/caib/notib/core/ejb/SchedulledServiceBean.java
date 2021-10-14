@@ -3,15 +3,14 @@
  */
 package es.caib.notib.core.ejb;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
+import es.caib.notib.core.api.exception.RegistreNotificaException;
+import es.caib.notib.core.api.service.SchedulledService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.service.SchedulledService;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 
 /**
  * Implementació de Schedulled Service com a EJB que empra una clase
@@ -54,6 +53,22 @@ public class SchedulledServiceBean implements SchedulledService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void actualitzarProcediments() {
 		delegate.actualitzarProcediments();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public void refrescarNotificacionsExpirades() {
+		delegate.refrescarNotificacionsExpirades();
+	}
+
+	@Override
+	public void enviamentRefrescarEstatDEH() {
+		delegate.enviamentRefrescarEstatDEH();
+	}
+
+	@Override
+	public void enviamentRefrescarEstatCIE() {
+		delegate.enviamentRefrescarEstatCIE();
 	}
 
 }

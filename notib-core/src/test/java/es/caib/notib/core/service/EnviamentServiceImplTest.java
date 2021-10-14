@@ -1,10 +1,16 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.test.data.ConfigTest;
+import es.caib.notib.core.test.data.NotificacioItemTest;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import org.apache.commons.codec.DecoderException;
@@ -38,12 +44,16 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
     EnviamentService enviamentService;
     @Autowired
     NotificacioEnviamentRepository enviamentRepository;
+    @Autowired
+    NotificacioItemTest notificacioCreate;
+
     EntitatDto entitatCreate;
     ProcedimentDto procedimentCreate;
     OrganGestorDto organGestorCreate;
 
     @Before
     public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
+        setDefaultConfigs();
         List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
         entitatCreate = new EntitatDto();
         entitatCreate.setCodi("LIMIT");
@@ -53,7 +63,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         entitatCreate.setDir3Codi(ENTITAT_DGTIC_DIR3CODI);
         entitatCreate.setApiKey(ENTITAT_DGTIC_KEY);
         entitatCreate.setAmbEntregaDeh(true);
-        entitatCreate.setAmbEntregaCie(true);
+//        entitatCreate.setAmbEntregaCie(true);
         TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
         tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
         entitatCreate.setTipusDocDefault(tipusDocDefault);
@@ -74,7 +84,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
         List<PermisDto> permisosOrgan = new ArrayList<PermisDto>();
         organGestorCreate = new OrganGestorDto();
-        organGestorCreate.setCodi("A00000000");
+        organGestorCreate.setCodi(ConfigTest.ORGAN_DIR3);
         organGestorCreate.setNom("Òrgan prova");
         PermisDto permisOrgan = new PermisDto();
         permisOrgan.setAdministrador(true);
@@ -87,7 +97,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         procedimentCreate = new ProcedimentDto();
         procedimentCreate.setCodi("216076");
         procedimentCreate.setNom("Procedimiento 1");
-        procedimentCreate.setOrganGestor("A00000000");
+        procedimentCreate.setOrganGestor(ConfigTest.ORGAN_DIR3);
         PermisDto permisNotificacio = new PermisDto();
         permisNotificacio.setNotificacio(true);
         permisNotificacio.setTipus(TipusEnumDto.USUARI);
@@ -117,29 +127,28 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
                         assertNotNull(entitatCreate);
                         assertNotNull(entitatCreate.getId());
                         String notificacioId = new Long(System.currentTimeMillis()).toString();
-                        NotificacioDtoV2 notificacio = generarNotificacio(
-                                notificacioId,
-                                procedimentCreate,
-                                entitatCreate,
-                                ENTITAT_DGTIC_DIR3CODI,
-                                NUM_DESTINATARIS,
-                                false);
+                        NotificacioDatabaseDto notificacio = notificacioCreate.getRandomInstance();
 
-                        NotificacioDtoV2 notificacioCreated = notificacioService.create(
+                        NotificacioDatabaseDto notificacioCreated = notificacioService.create(
                                 entitatCreate.getId(),
                                 notificacio);
                         assertNotNull(notificacioCreated);
 
                         // Given: Un enviament qualsevol
-                        NotificacioEnviamentDtoV2 enviament = notificacioCreated.getEnviaments().get(0);
+                        NotEnviamentDatabaseDto enviament = notificacioCreated.getEnviaments().get(0);
 
                         // When: Actualitzam l'estat de l'enviament
-                        enviamentService.actualitzarEstat(enviament.getId());
+                        try {
+                            enviamentService.actualitzarEstat(enviament.getId());
 
-                        // Then: Comptadors d'intents a 0
-                        NotificacioEnviamentEntity envEntity = enviamentRepository.findOne(enviament.getId());
-                        assertEquals(0, envEntity.getNotificaIntentNum());
-                        assertEquals(0, envEntity.getSirConsultaIntent());
+                            // Then: Comptadors d'intents a 0
+                            NotificacioEnviamentEntity envEntity = enviamentRepository.findOne(enviament.getId());
+                            assertEquals(0, envEntity.getNotificaIntentNum());
+                            assertEquals(0, envEntity.getSirConsultaIntent());
+
+                        }finally {
+                            notificacioService.delete(entitatCreate.getId(), notificacioCreated.getId());
+                        }
                     }
                 },
                 "Create Notificació",

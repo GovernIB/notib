@@ -1,14 +1,12 @@
 package es.caib.notib.war.security;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.Attributes2GrantedAuthoritiesMapper;
+
+import java.util.*;
 
 
 /**
@@ -16,6 +14,7 @@ import org.springframework.security.core.authority.mapping.Attributes2GrantedAut
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @SuppressWarnings("rawtypes")
 public class RolesBasedAttributes2GrantedAuthoritiesMapper implements Attributes2GrantedAuthoritiesMapper {
 
@@ -42,6 +41,12 @@ public class RolesBasedAttributes2GrantedAuthoritiesMapper implements Attributes
 				gaList.add(new SimpleGrantedAuthority(attribute));
 			}
 		}
+		log.info("Mapeig dels rols a GrantedAuthority");
+		String rolsStr = Arrays.toString(attributes.toArray());
+		log.info("Rols de l'aplicació: " + rolsStr);
+
+		rolsStr =  StringUtils.join(gaList, ",");
+		log.info(String.format("Rols mapejats: %s", rolsStr));
 		return gaList;
 	}
 

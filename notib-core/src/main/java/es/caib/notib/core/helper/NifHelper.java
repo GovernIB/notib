@@ -9,7 +9,7 @@ public class NifHelper {
 	private static final String LLETRA_CIF = "KPQRSNW";
 	
 	public static boolean isvalid(String nif) {
-		if (nif == null || nif.length() < 8)
+		if (nif == null || nif.length() < 9)
 			return false;
 		
         nif = nif.toUpperCase();
@@ -24,21 +24,51 @@ public class NifHelper {
         }
     }
 	
+	public static boolean isValidNifNie(String nif) {
+		if (nif == null || nif.length() < 9)
+			return false;
+		
+        nif = nif.toUpperCase();
+        String primerCaracter = nif.substring(0, 1);
+
+        if (LLETRES_CIF.contains(primerCaracter)) {
+            return false;
+        } else if (LLETRES_NIE.contains(primerCaracter)) {
+            return isNieValid(nif);
+        } else {
+            return isDniValid(nif);
+        }
+    }
+	
+	public static boolean isValidCif(String nif) {
+		if (nif == null || nif.length() < 9)
+			return false;
+		
+        nif = nif.toUpperCase();
+        String primerCaracter = nif.substring(0, 1);
+
+        if (LLETRES_CIF.contains(primerCaracter)) {
+            return isCifValid(nif);
+        } else {
+            return false;
+        }
+    }
+	
 	private static boolean isCifValid(String cif) {
         String aux = cif.substring(0, 8);
         aux = calculaCif(aux);
 
         return cif.equals(aux);
     }
-	
-	private static boolean isNieValid(String nie) {
+
+    private static boolean isNieValid(String nie) {
         String aux = nie.substring(0, 8);
         aux = calculaNie(aux);
 
         return nie.equals(aux);
     }
-	
-	private static boolean isDniValid(String dni) {
+
+    private static boolean isDniValid(String dni) {
         String aux = dni.substring(0, 8);
         aux = calculaDni(aux);
 

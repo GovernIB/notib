@@ -44,6 +44,9 @@ function refreshProgres() {
 			getProgres(); 
 		}, 10);
 }
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 function getProgres() {
 	console.log("getProgres");
@@ -68,8 +71,9 @@ function getProgres() {
 					}
 				}
 				writtenLines = index;
-				if (data.progres == 100) {
+				if (data.progres >= 100) {
 					clearInterval(itervalProgres);
+					sleep(5000).then(() => { window.parent.location.reload(); });
 				}
 			}
 		},

@@ -2,14 +2,17 @@ package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
-import es.caib.notib.plugin.conversio.ConversioArxiu;
-import es.caib.notib.plugin.conversio.ConversioPlugin;
+import es.caib.notib.core.exception.DocumentNotFoundException;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
@@ -21,6 +24,7 @@ import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +55,10 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_CERTIFICACIONS = "certificacions";
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
 	public static final String GESDOC_AGRUPACIO_TEMPORALS = "tmp";
-	
+	public static final String GESDOC_AGRUPACIO_MASSIUS_CSV = "massius_csv";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_ZIP = "massius_zip";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_ERRORS = "massius_errors";
+	public static final String GESDOC_AGRUPACIO_MASSIUS_INFORMES = "massius_informes";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
@@ -59,14 +66,14 @@ public class PluginHelper {
 	private IArxiuPlugin arxiuPlugin;
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
 	private GestorContingutsAdministratiuPlugin gestorDocumentalAdministratiuPlugin;
-	private ConversioPlugin conversioPlugin;
 	private FirmaServidorPlugin firmaServidorPlugin;
 	
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	
+	@Autowired
+	private ConfigHelper configHelper;
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
@@ -75,7 +82,8 @@ public class PluginHelper {
 			AsientoRegistralBeanDto arb,
 			Long tipusOperacio,
 			Long notificacioId,
-			String enviamentIds) {
+			String enviamentIds,
+			boolean generarJustificant) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -92,7 +100,8 @@ public class PluginHelper {
 			resposta = getRegistrePlugin().salidaAsientoRegistral(
 					codiDir3Entitat, 
 					arb, 
-					tipusOperacio);
+					tipusOperacio,
+					generarJustificant);
 			
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
@@ -154,7 +163,7 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	private Set<String> blockedObtenirJustificant = null;
+	private static Set<String> blockedObtenirJustificant = null;
 	private void initObtenirJustificant(){
 		blockedObtenirJustificant = new HashSet<>();
 		final ScheduledExecutorService exec = Executors.newSingleThreadScheduledExecutor();
@@ -165,11 +174,24 @@ public class PluginHelper {
 			}
 		};
 
-		exec.scheduleAtFixedRate(clearBlockedRunnable , 0, getSegonsEntreReintentRegistreProperty(),
+		exec.scheduleAtFixedRate(
+				clearBlockedRunnable ,
+				getSegonsEntreReintentRegistreProperty(),
+				getSegonsEntreReintentRegistreProperty(),
 				TimeUnit.SECONDS);
 
 	}
 
+	/**
+	 * Recupera el justificant.
+	 * L'execució del mètode està controlat per la property "es.caib.notib.plugin.registre.segons.entre.peticions"
+	 * que impedeix que es facin peticions consecutives amb intervals de temps inferiors al temps expecificat en segons.
+	 *
+	 * @param codiDir3Entitat	codi DIR3 de l'entitat
+	 * @param numeroRegistreFormatat	número de l'assentament que es vol recuperar
+	 * @return
+	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
+	 */
 	public RespostaJustificantRecepcio obtenirJustificant(
 			String codiDir3Entitat, 
 			String numeroRegistreFormatat) {
@@ -629,6 +651,7 @@ public class PluginHelper {
 		
 		try {
 			List<String> rols = getDadesUsuariPlugin().consultarRolsAmbCodi(usuariCodi);
+			info.addParam("Rols Consultats: ", StringUtils.join(rols, ", "));
 			integracioHelper.addAccioOk(info, false);
 			return rols;
 		} catch (Exception ex) {
@@ -703,7 +726,7 @@ public class PluginHelper {
 			String identificador,
 			String versio,
 			boolean ambContingut,
-			boolean isUuid) {
+			boolean isUuid) throws DocumentNotFoundException{
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_ARXIU,
@@ -721,12 +744,12 @@ public class PluginHelper {
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al plugin d'arxiu digital: no s'ha pogut obtenir el codument amb identificador: " + identificador;
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_ARXIU,
-					errorDescripcio,
+			DocumentNotFoundException ex1 = new DocumentNotFoundException(
+					isUuid ? "UUID" : "CSV",
+					identificador,
 					ex);
+			integracioHelper.addAccioError(info, ex1.getMessage(), ex1);
+			throw ex1;
 		}
 	}
 	
@@ -971,6 +994,7 @@ public class PluginHelper {
 	// /////////////////////////////////////////////////////////////////////////////////////
 
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
+		logger.info("Obtenir l'organigrama per entitat");
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_UNITATS, 
@@ -978,26 +1002,29 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
 
-		String protocol = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.dir3.protocol", "REST");
+		String protocol = configHelper.getConfig("es.caib.notib.plugin.unitats.dir3.protocol");
 		
 		Map<String, NodeDir3> organigrama = null;
 		String filenameOrgans = getOrganGestorsFile();
 		try {
 			if ("SOAP".equalsIgnoreCase(protocol)) {
+				logger.info("Obtenir l'organigrama per entitat SOAP");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(entitatcodi, null, null);
 			} else {
+				logger.info("Obtenir l'organigrama per entitat REST");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
 			}
-			if (filenameOrgans != null) {
+			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.writeValue(new File(filenameOrgans), organigrama);
 			}
 
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
+			logger.info("Error al obtenir l'organigrama per entitat");
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			if (filenameOrgans != null) {
+			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
 				File file = new File(filenameOrgans);
 				if (file.exists()) {
 					try {
@@ -1011,6 +1038,7 @@ public class PluginHelper {
 						}
 						return organigrama;
 					} catch (IOException e) {
+						logger.info("Error al procesar map l'organigrama per entitat");
 						e.printStackTrace();
 					}
 				}
@@ -1021,10 +1049,6 @@ public class PluginHelper {
 					ex);
 		}
 		return organigrama;
-	}
-
-	public String getOrganGestorsFile() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.fitxer", null);
 	}
 
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
@@ -1095,7 +1119,10 @@ public class PluginHelper {
 		List<NodeDir3> organismesNodeDir3 = null;
 		List<OrganGestorDto> organismes = null;
 		try {
-			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio.replaceAll(" ", "%20"), nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			if (denominacio != null) {
+				denominacio = denominacio.replaceAll(" ", "%20");
+			}
+			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
@@ -1283,45 +1310,7 @@ public class PluginHelper {
 		
 		return localitats;
 	}
-	
-	public FitxerDto conversioConvertirPdf(
-			FitxerDto original,
-			String urlPerEstampar) {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_CONVERT, 
-				"Conversió de document a PDF", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("arxiuOriginalNom", original.getNom()),
-				new AccioParam("arxiuOriginalTamany", new Integer(original.getContingut().length).toString()));
-		try {
-			ConversioArxiu convertit = getConversioPlugin().convertirPdfIEstamparUrl(
-					new ConversioArxiu(
-							original.getNom(),
-							original.getContingut()),
-					urlPerEstampar);
-			
-			info.getParams().add(new AccioParam("arxiuConvertitNom", convertit.getArxiuNom()));
-			info.getParams().add(new AccioParam("arxiuConvertitTamany", new Integer(convertit.getArxiuContingut().length).toString()));
-			integracioHelper.addAccioOk(info);
-			FitxerDto resposta = new FitxerDto();
-			resposta.setNom(
-					convertit.getArxiuNom());
-			resposta.setContingut(
-					convertit.getArxiuContingut());
-			return resposta;
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de conversió de documents";
-			integracioHelper.addAccioError(
-					info,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_CONVERT,
-					errorDescripcio,
-					ex);
-		}
-	}
-	
+
 	public byte[] firmaServidorFirmar(
 			NotificacioEntity notificacio,
 			FitxerDto fitxer,
@@ -1488,12 +1477,22 @@ public class PluginHelper {
 		return annex;
 	}
 	
-	private AnexoWsDto documentToAnexoWs(DocumentEntity document, int idx) {
+	private AnexoWsDto documentToAnexoWs(DocumentEntity document, int idx, boolean isComunicacioSir) {
 		try {
 			if (HibernateHelper.isProxy(document))
 				document = HibernateHelper.deproxy(document);
 			AnexoWsDto annex = null;
 			Path path = null;
+			
+			boolean enviarCsv = !isComunicacioSir ||
+					(isComunicacioSir && (EnviamentSirTipusDocumentEnviarEnumDto.TOT.equals(getEnviamentSirTipusDocumentEnviar()) ||
+							EnviamentSirTipusDocumentEnviarEnumDto.CSV.equals(getEnviamentSirTipusDocumentEnviar())));
+			
+			boolean enviarContingut = !isComunicacioSir ||
+					(isComunicacioSir && (EnviamentSirTipusDocumentEnviarEnumDto.TOT.equals(getEnviamentSirTipusDocumentEnviar()) ||
+							EnviamentSirTipusDocumentEnviarEnumDto.BINARI.equals(getEnviamentSirTipusDocumentEnviar())));
+			
+			boolean enviarTipoMIMEFicheroAnexado = Boolean.TRUE;
 
 			// Metadades per defecte (per si no estan emplenades (notificacions antigues)
 			Integer origen = document.getOrigen() != null ? document.getOrigen().getValor() : OrigenEnum.ADMINISTRACIO.getValor();
@@ -1511,7 +1510,7 @@ public class PluginHelper {
 					id = document.getUuid();
 					docDetall = arxiuDocumentConsultar(id, null, true, true);
 					doc = docDetall.getContingut();
-					if (docDetall != null) {
+					if (docDetall != null && enviarCsv) {
 						// Recuperar csv
 						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
 						if (metadadesAddicionals != null) {
@@ -1522,16 +1521,23 @@ public class PluginHelper {
 						}
 					}
 				} else {
-					id = document.getCsv();
-					docDetall = arxiuDocumentConsultar(id, null, true, false);
-					if (docDetall != null)
-						doc = docDetall.getContingut();
-
-					annex.setCsv(document.getCsv());
+					if (enviarContingut) {
+						id = document.getCsv();
+						docDetall = arxiuDocumentConsultar(id, null, true, false);
+						if (docDetall != null)
+							doc = docDetall.getContingut();
+					}
+					if (enviarCsv)
+						annex.setCsv(document.getCsv());
 				}
-
-				annex.setFicheroAnexado(doc.getContingut());
-				annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				
+				if (enviarContingut) {
+					annex.setFicheroAnexado(doc.getContingut());
+					annex.setNombreFicheroAnexado(doc.getArxiuNom());
+				} else {
+					enviarTipoMIMEFicheroAnexado = Boolean.FALSE;
+				}
+					
 				if (docDetall != null) {
 					if (docDetall.getMetadades().getTipusDocumental() != null) {
 						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
@@ -1544,12 +1550,14 @@ public class PluginHelper {
 					annex.setModoFirma(getModeFirma(docDetall, doc.getArxiuNom()));
 				}
 				
-				path = new File(doc.getArxiuNom()).toPath();
+				if (enviarTipoMIMEFicheroAnexado) {
+					path = new File(doc.getArxiuNom()).toPath();
+				}
 			}else if(document.getUrl() != null && (document.getUuid() == null && document.getCsv() == null) && document.getContingutBase64() == null) {
 				annex = new AnexoWsDto();
 				annex.setFicheroAnexado(getUrlDocumentContent(document.getUrl()));
 				annex.setNombreFicheroAnexado(FilenameUtils.getName(document.getUrl()));
-
+				
 				//Metadades
 				annex.setTipoDocumental(tipoDocumental);
 				annex.setOrigenCiudadanoAdmin(origen);
@@ -1559,11 +1567,13 @@ public class PluginHelper {
 				path = new File(FilenameUtils.getName(document.getUrl())).toPath();
 			}else if(document.getArxiuGestdocId() != null && document.getUrl() == null && (document.getUuid() == null && document.getCsv() == null)) {
 				annex = new AnexoWsDto();
+				
 				ByteArrayOutputStream output = new ByteArrayOutputStream();
 				gestioDocumentalGet(
 						document.getArxiuGestdocId(),
 						GESDOC_AGRUPACIO_NOTIFICACIONS,
 						output);
+		
 				annex.setFicheroAnexado(output.toByteArray());
 				annex.setNombreFicheroAnexado(document.getArxiuNom());
 
@@ -1576,10 +1586,15 @@ public class PluginHelper {
 
 				path = new File(document.getArxiuNom()).toPath();
 			}
-			try {
-				annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
-			} catch (IOException e) {
-				e.printStackTrace();
+			
+			if (enviarTipoMIMEFicheroAnexado) {
+				try {
+					/*  TODO: Revisar perque amb els tests unitaris Files.exists(path) es false en Tomcat
+					 *	(Això causa que fallin els tests en Tomcat) */
+					annex.setTipoMIMEFicheroAnexado(Files.probeContentType(path));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			annex.setTitulo("Annex " + idx);
 			annex.setTipoDocumento(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
@@ -1592,7 +1607,7 @@ public class PluginHelper {
 		}
 	}
 
-	private String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
+	public String estatElaboracioToValidesa(DocumentEstatElaboracio estatElaboracio) {
 		if (estatElaboracio == null)
 			return ValidesaEnum.ORIGINAL.getValor();	// Valor per defecte
 		switch (estatElaboracio) {
@@ -1607,7 +1622,7 @@ public class PluginHelper {
 				return ValidesaEnum.ORIGINAL.getValor();
 		}
 	}
-	private Integer getModeFirma(Document document, String nom) {
+	public Integer getModeFirma(Document document, String nom) {
 		Integer modeFirma = 0;
 		if (nom != null && nom.toLowerCase().endsWith("pdf") &&
 				(document.getFirmes() != null && !document.getFirmes().isEmpty()))
@@ -1645,14 +1660,49 @@ public class PluginHelper {
 
 	public AsientoRegistralBeanDto notificacioEnviamentsToAsientoRegistralBean(
 			NotificacioEntity notificacio, 
-			Set<NotificacioEnviamentEntity> enviaments) throws RegistrePluginException {
+			Set<NotificacioEnviamentEntity> enviaments,
+			boolean inclou_documents) throws RegistrePluginException {
+
+		AsientoRegistralBeanDto registre = notificacioToAsientoRegistralBean(notificacio, inclou_documents);
+		for(NotificacioEnviamentEntity enviament : enviaments) {
+			registre.getInteresados().add(enviamentToRepresentanteEInteresadoWs(enviament));
+		}
+		return registre;
+	}
+
+	public AsientoRegistralBeanDto notificacioToAsientoRegistralBean(
+			NotificacioEntity notificacio,
+			NotificacioEnviamentEntity enviament,
+			boolean inclou_documents,
+			boolean isComunicacioSir) throws RegistrePluginException {
+		AsientoRegistralBeanDto registre = notificacioToAsientoRegistralBean(notificacio, inclou_documents, isComunicacioSir);
+		registre.getInteresados().add(enviamentToRepresentanteEInteresadoWs(enviament));
+		return registre;
+	}
+
+	private InteresadoWsDto enviamentToRepresentanteEInteresadoWs(NotificacioEnviamentEntity enviament) {
+		PersonaEntity destinatari = null;
+		if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
+			destinatari =  enviament.getDestinataris().get(0);
+		}
+		return personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari);
+	}
+	
+	private AsientoRegistralBeanDto notificacioToAsientoRegistralBean(NotificacioEntity notificacio,
+			  boolean inclou_documents) throws RegistrePluginException {
+		return notificacioToAsientoRegistralBean(notificacio, inclou_documents, false);
+	}
+
+	private AsientoRegistralBeanDto notificacioToAsientoRegistralBean(NotificacioEntity notificacio,
+																	  boolean inclou_documents, 
+																	  boolean isComunicacioSir) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
 		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
 		DadesOficina dadesOficina = new DadesOficina();
 		String dir3Codi;
 		String organisme = null;
-		
+
 		if (notificacio.getEntitat().getDir3CodiReg() != null) {
 			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
 			organisme = notificacio.getEntitat().getDir3CodiReg();
@@ -1663,16 +1713,17 @@ public class PluginHelper {
 			else
 				organisme = notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null;
 		}
-		
+
+		logger.debug("Recuperant informació de l'oficina i registre...");
 		setOficina(
 				notificacio,
 				dadesOficina,
 				dir3Codi);
 		setLlibre(
-				notificacio, 
-				dadesOficina, 
+				notificacio,
+				dadesOficina,
 				dir3Codi);
-		
+
 		if (dadesOficina.getOficinaCodi() != null) {
 			//Codi Dir3 de l’oficina origen (obligatori)
 			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
@@ -1695,7 +1746,7 @@ public class PluginHelper {
 			registre.setUnidadTramitacionDestinoCodigo(organisme);
 			registre.setUnidadTramitacionDestinoDenominacion(organisme);
 		}
-		
+
 		//Salida
 		registre.setTipoRegistro(2L);
 
@@ -1715,7 +1766,7 @@ public class PluginHelper {
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
 		/*
-		 * 
+		 *
 		 * '01' : Servei de missatgers
 		 * '02' : Correu postal
 		 * '03' : Correu postal certificat
@@ -1723,7 +1774,7 @@ public class PluginHelper {
 		 * '05' : En ma
 		 * '06' : Fax
 		 * '07' : Altres
-		 * 
+		 *
 		 * */
 //		if(notificacio.getPagadorPostal() != null) {
 //			registre.setTipoTransporte("02");
@@ -1744,201 +1795,65 @@ public class PluginHelper {
 		registre.setMotivo(notificacio.getDescripcio());
 		registre.setInteresados(new ArrayList<InteresadoWsDto>());
 		registre.setAnexos(new ArrayList<AnexoWsDto>());
-		
-		for(NotificacioEnviamentEntity enviament : enviaments) {
-			PersonaEntity destinatari = null;
-			if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
-				destinatari =  enviament.getDestinataris().get(0);
+
+		if (inclou_documents) {
+			if (notificacio.getDocument() != null) {
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1, isComunicacioSir));
 			}
-			registre.getInteresados().add(personaToRepresentanteEInteresadoWs(enviament.getTitular(), destinatari));	
-		}
-		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
-		}
-		if(notificacio.getDocument2() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
-		}
-		if(notificacio.getDocument3() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
-		}
-		if(notificacio.getDocument4() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
-		}
-		if(notificacio.getDocument5() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
-		}
-		return registre;
-	}
-	
-	public AsientoRegistralBeanDto notificacioToAsientoRegistralBean(
-			NotificacioEntity notificacio, 
-			NotificacioEnviamentEntity enviament) throws RegistrePluginException {
-		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
-		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
-		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
-		
-		DadesOficina dadesOficina = new DadesOficina();
-		String dir3Codi;
-		String organisme = null;
-		
-		if (notificacio.getEntitat().getDir3CodiReg() != null) {
-			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-			organisme = notificacio.getEntitat().getDir3CodiReg();
-		} else {
-			dir3Codi = notificacio.getEmisorDir3Codi();
-			if (notificacio.getProcediment() != null)
-				organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
-			else
-				organisme = notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null;
-		}
-		
-		logger.debug("Recuperant informació de l'oficina i registre...");
-		setOficina(
-				notificacio,
-				dadesOficina,
-				dir3Codi);
-		setLlibre(
-				notificacio, 
-				dadesOficina, 
-				dir3Codi);
-		
-		if (dadesOficina.getOficinaCodi() != null) {
-			//Codi Dir3 de l’oficina origen (obligatori)
-			registre.setEntidadRegistralOrigenCodigo(dadesOficina.getOficinaCodi());
-			registre.setEntidadRegistralOrigenDenominacion(dadesOficina.getOficinaNom());
-			//Codi Dir3 de l’oficina inicial
-			//registre.setEntidadRegistralInicioCodigo(dadesOficina.getOficinaCodi());
-			//registre.setEntidadRegistralInicioDenominacion(dadesOficina.getOficinaNom());
-			//Codi Dir3 de l’oficina destí
-			//registre.setEntidadRegistralDestinoCodigo(dadesOficina.getOficinaCodi());
-			//registre.setEntidadRegistralDestinoDenominacion(dadesOficina.getOficinaNom());
-		}
-		if (dadesOficina.getLlibreCodi() != null) {
-			registre.setLibroCodigo(dadesOficina.getLlibreCodi());
-		}
-		if (organisme != null) {
-			//Codi Dir3 de l’organisme origen
-			registre.setUnidadTramitacionOrigenCodigo(organisme);
-			registre.setUnidadTramitacionOrigenDenominacion(organisme);
-			//Codi Dir3 de l’organisme destí
-			registre.setUnidadTramitacionDestinoCodigo(organisme);
-			registre.setUnidadTramitacionDestinoDenominacion(organisme);
-		}
-		
-		registre.setTipoRegistro(2L);
-
-		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? "Notificacio" : "Comunicacio";
-		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
-		/* 1 = Documentació adjunta en suport Paper
-		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
-		 * 3 = Documentació adjunta digitalitzada */
-		registre.setTipoDocumentacionFisicaCodigo(3L);
-		if (notificacio.getProcediment() != null) {
-			registre.setTipoAsunto(notificacio.getProcediment().getTipusAssumpte());
-			registre.setTipoAsuntoDenominacion(notificacio.getProcediment().getTipusAssumpte());
-			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
-			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
-		}
-		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
-//		registre.setReferenciaExterna(notificacio.getRefExterna());
-		registre.setNumeroExpediente(notificacio.getNumExpedient());
-		/*
-		 * 
-		 * '01' : Servei de missatgers
-		 * '02' : Correu postal
-		 * '03' : Correu postal certificat
-		 * '04' : Burofax
-		 * '05' : En ma
-		 * '06' : Fax
-		 * '07' : Altres
-		 * 
-		 * */
-//		if(notificacio.getPagadorPostal() != null) {
-//			registre.setTipoTransporte("02");
-//		}else {
-//			registre.setTipoTransporte("07");
-//		}
-		if (notificacio.getProcediment() != null)
-			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
-		registre.setCodigoUsuario(notificacio.getUsuariCodi());
-		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
-		registre.setAplicacion("RWE");
-		registre.setVersion("3.1");
-		registre.setObservaciones("Notib: " + notificacio.getUsuariCodi());
-		registre.setExpone("");
-		registre.setSolicita("");
-		registre.setPresencial(false);
-		registre.setEstado(notificacio.getEstat().getLongVal());
-//		registre.setUnidadTramitacionOrigenCodigo(notificacio.getProcediment().getOrganGestor().getCodi());
-//		registre.setUnidadTramitacionOrigenDenominacion(notificacio.getProcediment().getOrganGestor().getCodi());
-		registre.setMotivo(notificacio.getDescripcio());
-		registre.setInteresados(new ArrayList<InteresadoWsDto>());
-		registre.setAnexos(new ArrayList<AnexoWsDto>());
-		PersonaEntity destinatari = null;
-		if(enviament.getDestinataris() != null && enviament.getDestinataris().size() > 0) {
-			destinatari =  enviament.getDestinataris().get(0);
-		}
-		registre.getInteresados().add(personaToRepresentanteEInteresadoWs(
-						enviament.getTitular(), 
-						destinatari));
-		if(notificacio.getDocument() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1));
-		}
-		if(notificacio.getDocument2() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2));
-		}
-		if(notificacio.getDocument3() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3));
-		}
-		if(notificacio.getDocument4() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4));
-		}
-		if(notificacio.getDocument5() != null) {
-			registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5));
+			if (notificacio.getDocument2() != null) {
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument2(), 2, isComunicacioSir));
+			}
+			if (notificacio.getDocument3() != null) {
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument3(), 3, isComunicacioSir));
+			}
+			if (notificacio.getDocument4() != null) {
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument4(), 4, isComunicacioSir));
+			}
+			if (notificacio.getDocument5() != null) {
+				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5, isComunicacioSir));
+			}
 		}
 		return registre;
 	}
 
-	
-	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
-		RegistreInteressatDto interessat = new RegistreInteressatDto();
-		interessat.setNom(persona.getNom());
-		interessat.setLlinatge1(persona.getLlinatge1());
-		interessat.setLlinatge2(persona.getLlinatge2());
-		interessat.setRaoSocial(persona.getRaoSocial());
-		interessat.setTelefon(persona.getTelefon());
-		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-			interessat.setDocumentNumero(persona.getDir3Codi());
-			interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-		} else {
-			interessat.setDocumentNumero(persona.getNif());
-			if (isDocumentEstranger(persona.getNif()))
-				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-			else
-				interessat.setDocumentTipus(RegistreInteressatDocumentTipusDtoEnum.NIF);
+	public InteresadoWsDto personaToRepresentanteEInteresadoWs (
+			PersonaEntity titular, 
+			PersonaEntity destinatari) {
+		InteresadoWsDto interessat = new InteresadoWsDto();
+		if(titular != null) {
+			DatosInteresadoWsDto interessatDades = persona2DatosInteresadoWsDto(titular);
+			interessat.setInteresado(interessatDades);
+		}
+		if(destinatari != null && titular != null && titular.isIncapacitat()) {
+			DatosInteresadoWsDto representantDades = persona2DatosInteresadoWsDto(destinatari);
+			interessat.setRepresentante(representantDades);	
 		}
 		return interessat;
 	}
-	
-	public InteresadoWsDto personaToInteresadoWs (PersonaEntity persona) {
-		InteresadoWsDto interessat = new InteresadoWsDto();
+
+	private DatosInteresadoWsDto persona2DatosInteresadoWsDto(PersonaEntity persona) {
 		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
+		if (persona.getInteressatTipus() != null)
+			interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
 		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-			interessatDades.setDocumento(persona.getDir3Codi());
+			interessatDades.setDocumento(persona.getDir3Codi() != null ? persona.getDir3Codi().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("O");
-		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-			interessatDades.setDocumento(persona.getNif());
+		}  else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
+			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			if (isDocumentEstranger(persona.getNif()))
 				interessatDades.setTipoDocumentoIdentificacion("E");
 			else
 				interessatDades.setTipoDocumentoIdentificacion("N");
 		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-			interessatDades.setDocumento(persona.getNif());
+			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("C");
 		}
-		interessatDades.setRazonSocial(persona.getNom());
-		interessatDades.setNombre(persona.getNom());
+		String raoSocial = persona.getRaoSocial() == null || persona.getNom().length() <= 80 ?
+				persona.getRaoSocial() : persona.getRaoSocial().substring(0, 80);
+		String nom = persona.getNom() == null || persona.getNom().length() <= 30 ?
+				persona.getNom() : persona.getNom().substring(0, 30);
+		interessatDades.setRazonSocial(raoSocial);
+		interessatDades.setNombre(nom);
 		interessatDades.setApellido1(persona.getLlinatge1());
 		interessatDades.setApellido2(persona.getLlinatge2());
 		interessatDades.setCodigoDire("");
@@ -1948,204 +1863,9 @@ public class PluginHelper {
 		interessatDades.setEmail(persona.getEmail());
 		interessatDades.setDireccionElectronica(persona.getEmail());
 		interessatDades.setTelefono(persona.getTelefon());
-		interessat.setInteresado(interessatDades);
-		return interessat;
+		return interessatDades;
 	}
-	
-	public DadesInteressat personaToDadesInteressatIRepresenat (
-			NotificacioDtoV2 notificacio,
-			PersonaDto titular,
-			PersonaDto destinatari) {
-		String dir3Codi;
 
-		if (notificacio.getEntitat().getDir3CodiReg() != null)
-			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-		else
-			dir3Codi = notificacio.getEmisorDir3Codi();
-		DadesInteressat interessatRepresentat = new DadesInteressat();
-		Interessat dadesRepresentat = null;
-		Interessat dadesInteressat = new Interessat();
-		if (titular != null && notificacio != null) {
-			dadesInteressat.setNom(titular.getNom());
-			dadesInteressat.setEntitatCodi(dir3Codi);
-			dadesInteressat.setAutenticat(false);
-			if (titular.getInteressatTipus() != null) {
-				dadesInteressat.setTipusInteressat(titular.getInteressatTipus().getLongVal());
-			}
-			if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				dadesInteressat.setNif(titular.getDir3Codi());
-				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-			} else if (titular.getInteressatTipus() != null && titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-				dadesInteressat.setNom(titular.getRaoSocial());
-				dadesInteressat.setNif(titular.getNif());
-				dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-			} else {
-				dadesInteressat.setNif(titular.getNif());
-				if (isDocumentEstranger(titular.getNif()))
-					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-				else
-					dadesInteressat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-			}
-			dadesInteressat.setCognom1(titular.getLlinatge1());
-			dadesInteressat.setCognom2(titular.getLlinatge2());
-			dadesInteressat.setNomAmbCognoms(titular.getNom() + " " + titular.getLlinatges());
-			dadesInteressat.setPaisCodi(null);
-			dadesInteressat.setPaisNom(null);
-			dadesInteressat.setProvinciaCodi(null);
-			dadesInteressat.setProvinciaNom(null);
-			dadesInteressat.setMunicipiCodi(null);
-			dadesInteressat.setMunicipiNom(null);
-		}
-		interessatRepresentat.setInteressat(dadesInteressat);
-		
-		if (destinatari != null && titular.isIncapacitat()) {
-			dadesRepresentat = new Interessat();
-			dadesRepresentat.setEntitatCodi(dir3Codi);
-			dadesRepresentat.setAutenticat(false);
-			if (destinatari.getInteressatTipus() != null) {
-				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
-			}
-			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				dadesRepresentat.setNif(destinatari.getDir3Codi());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-				dadesRepresentat.setNif(destinatari.getNif());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-			} else {
-				dadesRepresentat.setNif(destinatari.getNif());
-				if (isDocumentEstranger(titular.getNif()))
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-				else
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-			}
-			dadesRepresentat.setNom(destinatari.getNom());
-			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
-			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
-			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-			dadesRepresentat.setPaisCodi(null);
-			dadesRepresentat.setPaisNom(null);
-			dadesRepresentat.setProvinciaCodi(null);
-			dadesRepresentat.setProvinciaNom(null);
-			dadesRepresentat.setMunicipiCodi(null);
-			dadesRepresentat.setMunicipiNom(null);
-		}
-		interessatRepresentat.setRepresentat(dadesRepresentat);
-		
-		return interessatRepresentat;
-	}
-	
-	@SuppressWarnings("unused")
-	private DadesRepresentat personaToDadesRepresentat (
-			NotificacioDtoV2 notificacio,
-			PersonaDto titular,
-			PersonaDto destinatari) {
-		String dir3Codi;
-
-		if (notificacio.getEntitat().getDir3CodiReg() != null)
-			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
-		else
-			dir3Codi = notificacio.getEmisorDir3Codi();
-		
-		DadesRepresentat dadesRepresentat = null;
-		if (destinatari != null && titular.isIncapacitat()) {
-			dadesRepresentat = new DadesRepresentat();
-			dadesRepresentat.setEntitatCodi(dir3Codi);
-			dadesRepresentat.setAutenticat(false);
-			if (destinatari.getInteressatTipus() != null) {
-				dadesRepresentat.setTipusInteressat(destinatari.getInteressatTipus().getLongVal());
-			}
-			if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				dadesRepresentat.setNif(destinatari.getDir3Codi());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CODI_ORIGEN);
-			} else if (destinatari.getInteressatTipus() != null && destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA){
-				dadesRepresentat.setNif(destinatari.getNif());
-				dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.CIF);
-			} else {
-				dadesRepresentat.setNif(destinatari.getNif());
-				if (isDocumentEstranger(destinatari.getNif()))
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.DOCUMENT_IDENTIFICACIO_EXTRANGERS);
-				else
-					dadesRepresentat.setTipusDocumentIdentificacio(RegistreInteressatDocumentTipusDtoEnum.NIF);
-			}
-			dadesRepresentat.setNom(destinatari.getNom());
-			dadesRepresentat.setCognom1(destinatari.getLlinatge1());
-			dadesRepresentat.setCognom2(destinatari.getLlinatge2());
-			dadesRepresentat.setNomAmbCognoms(destinatari.getNom() + " " + destinatari.getLlinatges());
-			dadesRepresentat.setPaisCodi(null);
-			dadesRepresentat.setPaisNom(null);
-			dadesRepresentat.setProvinciaCodi(null);
-			dadesRepresentat.setProvinciaNom(null);
-			dadesRepresentat.setMunicipiCodi(null);
-			dadesRepresentat.setMunicipiNom(null);
-		}
-		return dadesRepresentat;
-	}
-	
-	public InteresadoWsDto personaToRepresentanteEInteresadoWs (
-			PersonaEntity titular, 
-			PersonaEntity destinatari) {
-		InteresadoWsDto interessat = new InteresadoWsDto();
-		if(titular != null) {
-			DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-			if (titular.getInteressatTipus() != null)
-				interessatDades.setTipoInteresado(titular.getInteressatTipus().getLongVal());
-			if (titular.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				interessatDades.setDocumento(titular.getDir3Codi());
-				interessatDades.setTipoDocumentoIdentificacion("O");
-			}  else if (titular.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-				interessatDades.setDocumento(titular.getNif());
-				if (isDocumentEstranger(titular.getNif()))
-					interessatDades.setTipoDocumentoIdentificacion("E");
-				else
-					interessatDades.setTipoDocumentoIdentificacion("N");
-			} else if (titular.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-				interessatDades.setDocumento(titular.getNif());
-				interessatDades.setTipoDocumentoIdentificacion("C");
-			}
-			interessatDades.setRazonSocial(titular.getRaoSocial());
-			interessatDades.setNombre(titular.getNom());
-			interessatDades.setApellido1(titular.getLlinatge1());
-			interessatDades.setApellido2(titular.getLlinatge2());
-			interessatDades.setCodigoDire("");
-			interessatDades.setDireccion("");
-			interessatDades.setCp("");
-			interessatDades.setObservaciones("");
-			interessatDades.setEmail(titular.getEmail());
-			interessatDades.setDireccionElectronica(titular.getEmail());
-			interessatDades.setTelefono(titular.getTelefon());
-			interessat.setInteresado(interessatDades);
-		}
-		if(destinatari != null && titular.isIncapacitat()) {
-			DatosInteresadoWsDto representantDades = new DatosInteresadoWsDto();
-			representantDades.setTipoInteresado(destinatari.getInteressatTipus().getLongVal());
-			if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-				representantDades.setDocumento(destinatari.getDir3Codi());
-				representantDades.setTipoDocumentoIdentificacion("O");
-			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
-				representantDades.setDocumento(destinatari.getNif());
-				if (isDocumentEstranger(destinatari.getNif()))
-					representantDades.setTipoDocumentoIdentificacion("E");
-				else
-					representantDades.setTipoDocumentoIdentificacion("N");
-			} else if (destinatari.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
-				representantDades.setDocumento(destinatari.getNif());
-				representantDades.setTipoDocumentoIdentificacion("C");
-			}
-			representantDades.setRazonSocial(destinatari.getRaoSocial());
-			representantDades.setNombre(destinatari.getNom());
-			representantDades.setApellido1(destinatari.getLlinatge1());
-			representantDades.setApellido2(destinatari.getLlinatge2());
-			representantDades.setCodigoDire("");
-			representantDades.setDireccion("");
-			representantDades.setCp("");
-			representantDades.setObservaciones("");
-			representantDades.setEmail(destinatari.getEmail());
-			representantDades.setDireccionElectronica(destinatari.getEmail());
-			representantDades.setTelefono(destinatari.getTelefon());
-			interessat.setRepresentante(representantDades);	
-		}
-		return interessat;
-	}
 	public void addOficinaAndLlibreRegistre(NotificacioEntity notificacio){
 		DadesOficina dadesOficina = new DadesOficina();
 		String dir3Codi;
@@ -2294,7 +2014,7 @@ public class PluginHelper {
 			return false;
 		}
 	}
-	
+
 	public boolean isRegistrePluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -2310,7 +2030,7 @@ public class PluginHelper {
 			return false;
 		}
 	}
-	
+
 	public boolean isArxiuPluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -2326,24 +2046,24 @@ public class PluginHelper {
 			return false;
 		}
 	}
-	
 
-	private boolean dadesUsuariPluginConfiguracioProvada = false;
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
-		if (dadesUsuariPlugin == null && !dadesUsuariPluginConfiguracioProvada) {
-			dadesUsuariPluginConfiguracioProvada = true;
+		loadPluginProperties("USUARIS");
+		if (dadesUsuariPlugin == null) {
 			String pluginClass = getPropertyPluginDadesUsuari();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					dadesUsuariPlugin = (DadesUsuariPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_USUARIS,
 							"Error al crear la instància del plugin de dades d'usuari",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin d'usuari no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_USUARIS,
 						"La classe del plugin de dades d'usuari no està configurada");
@@ -2352,22 +2072,23 @@ public class PluginHelper {
 		return dadesUsuariPlugin;
 	}
 
-	private boolean gestioDocumentalPluginConfiguracioProvada = false;
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
-		if (gestioDocumentalPlugin == null && !gestioDocumentalPluginConfiguracioProvada) {
-			gestioDocumentalPluginConfiguracioProvada = true;
+		loadPluginProperties("GES_DOC");
+		if (gestioDocumentalPlugin == null) {
 			String pluginClass = getPropertyPluginGestioDocumental();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de gestió documental (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_GESDOC,
 							"Error al crear la instància del plugin de gestió documental",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin de gestió documental no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_USUARIS,
 						"La classe del plugin de gestió documental no està configurada");
@@ -2376,22 +2097,23 @@ public class PluginHelper {
 		return gestioDocumentalPlugin;
 	}
 
-	private boolean registrePluginConfiguracioProvada = false;
 	private RegistrePlugin getRegistrePlugin() {
-		if (registrePlugin == null && !registrePluginConfiguracioProvada) {
-			registrePluginConfiguracioProvada = true;
+		loadPluginProperties("REGISTRE");
+		if (registrePlugin == null) {
 			String pluginClass = getPropertyPluginRegistre();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					registrePlugin = (RegistrePlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de registre (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_REGISTRE,
 							"Error al crear la instància del plugin de registre",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin de registre no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_REGISTRE,
 						"La classe del plugin de registre no està configurada");
@@ -2401,12 +2123,13 @@ public class PluginHelper {
 	}
 	
 	private IArxiuPlugin getArxiuPlugin() {
+		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					if (PropertiesHelper.getProperties().isLlegirSystem()) {
+					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class).newInstance(
 								"es.caib.notib.");
@@ -2415,15 +2138,17 @@ public class PluginHelper {
 								String.class,
 								Properties.class).newInstance(
 								"es.caib.notib.",
-								PropertiesHelper.getProperties().findAll());
+								ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
 					}
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin d'arxiu digital (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_ARXIU,
 							"Error al crear la instància del plugin d'arxiu digital",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin d'arxiu digital no està definida");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_ARXIU,
 						"No està configurada la classe per al plugin d'arxiu digital");
@@ -2433,6 +2158,7 @@ public class PluginHelper {
 	}
 
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+		loadPluginProperties("DIR3");
 		if (unitatsOrganitzativesPlugin == null) {
 			String pluginClass = getPropertyPluginUnitats();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2440,15 +2166,17 @@ public class PluginHelper {
 					Class<?> clazz = Class.forName(pluginClass);
 					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de DIR3 (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_REGISTRE,
-							"Error al crear la instància del plugin de registre",
+							"Error al crear la instància del plugin de DIR3",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin de DIR3 no està configurada");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_REGISTRE,
-						"La classe del plugin de registre no està configurada");
+						"La classe del plugin de DIR3 no està configurada");
 			}
 		}
 		
@@ -2456,6 +2184,7 @@ public class PluginHelper {
 	}
 	
 	private GestorContingutsAdministratiuPlugin getGestorDocumentalAdministratiuPlugin() {
+		loadPluginProperties("GESCONADM");
 		if (gestorDocumentalAdministratiuPlugin == null) {
 			String pluginClass = getPropertyPluginGestorDocumentalAdministratu();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2463,12 +2192,14 @@ public class PluginHelper {
 					Class<?> clazz = Class.forName(pluginClass);
 					gestorDocumentalAdministratiuPlugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de gestor documental administratiu (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_GESCONADM,
 							"Error al crear la instància del plugin de gestor documental administratiu",
 							ex);
 				}
 			} else {
+				logger.error("La classe del plugin del gestor documental administratiu no està configurada");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_GESCONADM,
 						"La classe del plugin del gestor documental administratiu no està configurada");
@@ -2477,28 +2208,8 @@ public class PluginHelper {
 		
 		return gestorDocumentalAdministratiuPlugin;
 	}
-	private ConversioPlugin getConversioPlugin() {
-		if (conversioPlugin == null) {
-			String pluginClass = getPropertyPluginConversio();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					conversioPlugin = (ConversioPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_CONVERT,
-							"Error al crear la instància del plugin de conversió de documents",
-							ex);
-				}
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_CONVERT,
-						"No està configurada la classe per al plugin de conversió de documents");
-			}
-		}
-		return conversioPlugin;
-	}
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
+		loadPluginProperties("FIRMA");
 		if (firmaServidorPlugin == null) {
 			String pluginClass = getPropertyPluginFirmaServidor();
 			if (pluginClass != null && pluginClass.length() > 0) {
@@ -2506,12 +2217,14 @@ public class PluginHelper {
 					Class<?> clazz = Class.forName(pluginClass);
 					firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
 				} catch (Exception ex) {
+					logger.error("Error al crear la instància del plugin de firma en servidor (" + pluginClass + "): ", ex);
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_FIRMASERV,
 							"Error al crear la instància del plugin de firma en servidor",
 							ex);
 				}
 			} else {
+				logger.error("No està configurada la classe per al plugin de firma en servidor");
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_FIRMASERV,
 						"No està configurada la classe per al plugin de firma en servidor");
@@ -2519,76 +2232,100 @@ public class PluginHelper {
 		}
 		return firmaServidorPlugin;
 	}
-	private String getPropertyPluginUnitats() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.unitats.class");
-	}
-	private String getPropertyPluginDadesUsuari() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.dades.usuari.class");
-	}
-	private String getPropertyPluginGestioDocumental() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesdoc.class");
-	}
-	private String getPropertyPluginRegistre() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.class");
-	}
-	private String getPropertyPluginArxiu() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.arxiu.class");
-	}
-	private String getPropertyPluginGestorDocumentalAdministratu() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.class");
-	}
-	private String getPropertyPluginConversio() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.conversio.class");
-	}
-	private String getPropertyPluginFirmaServidor() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.firmaservidor.class");
-	}
-	public int getRegistreReintentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
-	}
-	public int getNotificaReintentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");
-	}
-	public int getConsultaReintentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.periode");
-	}
-	public int getConsultaSirReintentsPeriodeProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
-	}
-	public int getSegonsEntreReintentRegistreProperty() {
-		return PropertiesHelper.getProperties().getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions", 30);
-	}
-	public int getRegistreReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.registre.enviaments.reintents.maxim",
-				3);
-	}
-	public int getNotificaReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.notifica.enviaments.reintents.maxim",
-				3);
-	}
-	public int getConsultaReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim",
-				3);
-	}
-	public int getConsultaSirReintentsMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim",
-				3);
+
+	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
+	private synchronized void loadPluginProperties(String codeProperties) {
+		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
+			propertiesLoaded.put(codeProperties, true);
+			Map<String, String> pluginProps = configHelper.getGroupProperties(codeProperties);
+			for (Map.Entry<String, String> entry : pluginProps.entrySet() ) {
+				String value = entry.getValue() == null ? "" : entry.getValue();
+				PropertiesHelper.getProperties().setProperty(entry.getKey(), value);
+			}
+		}
 	}
 
-	public int getVersioActual() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.versio.actual");
+	/**
+	 * Esborra les properties del grup indicat per paràmetre de la memòria.
+	 *
+	 * @param codeProperties Codi del grup de propietats que vols esborrar de memòria.
+	 */
+	public void reloadProperties(String codeProperties) {
+		if (propertiesLoaded.containsKey(codeProperties))
+			propertiesLoaded.put(codeProperties, false);
 	}
-	
+	public void resetPlugins() {
+		registrePlugin = null;
+		gestorDocumentalAdministratiuPlugin = null;
+		dadesUsuariPlugin = null;
+		unitatsOrganitzativesPlugin = null;
+		arxiuPlugin = null;
+		gestioDocumentalPlugin = null;
+		firmaServidorPlugin = null;
+	}
+	private String getPropertyPluginUnitats() {
+		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");
+	}
+	private String getPropertyPluginDadesUsuari() {
+		return configHelper.getConfig("es.caib.notib.plugin.dades.usuari.class");
+	}
+	private String getPropertyPluginGestioDocumental() {
+		return configHelper.getConfig("es.caib.notib.plugin.gesdoc.class");
+	}
+	private String getPropertyPluginRegistre() {
+		return configHelper.getConfig("es.caib.notib.plugin.registre.class");
+	}
+	private String getPropertyPluginArxiu() {
+		return configHelper.getConfig("es.caib.notib.plugin.arxiu.class");
+	}
+	private String getPropertyPluginGestorDocumentalAdministratu() {
+		return configHelper.getConfig("es.caib.notib.plugin.gesconadm.class");
+	}
+	private String getPropertyPluginFirmaServidor() {
+		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
+	}
+	public int getRegistreReintentsPeriodeProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
+	}
+	public int getNotificaReintentsPeriodeProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");
+	}
+	public int getConsultaReintentsPeriodeProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.periode");
+	}
+	public int getConsultaSirReintentsPeriodeProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
+	}
+	public int getSegonsEntreReintentRegistreProperty() {
+		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
+	}
+	public int getRegistreReintentsMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
+	}
+	public int getNotificaReintentsMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
+	}
+	public int getConsultaReintentsMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim");
+	}
+	public int getConsultaReintentsDEHMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.deh.reintents.maxim");
+	}
+	public int getConsultaReintentsCIEMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.cie.reintents.maxim");
+	}
+	public int getConsultaSirReintentsMaxProperty() {
+		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
+	}
+	public String getOrganGestorsFile() {
+		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
+	}
+
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {
 		NotificacioComunicacioTipusEnumDto tipus = NotificacioComunicacioTipusEnumDto.SINCRON;
 		
 		try {
-			String tipusStr = PropertiesHelper.getProperties().getProperty("es.caib.notib.comunicacio.tipus.defecte", "SINCRON");
+			String tipusStr = configHelper.getConfig("es.caib.notib.comunicacio.tipus.defecte");
 			if (tipusStr != null && !tipusStr.isEmpty())
 				tipus = NotificacioComunicacioTipusEnumDto.valueOf(tipusStr);
 		} catch (Exception ex) {
@@ -2619,15 +2356,16 @@ public class PluginHelper {
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.notib.documents.metadades.from.arxiu", false);
+		return configHelper.getAsBoolean(
+				"es.caib.notib.documents.metadades.from.arxiu");
 	}
 
 	private static boolean isDocumentEstranger(String nie) {
-		boolean isNie = false;
-		if (nie != null && (nie.startsWith("X") || nie.startsWith("Y") || nie.startsWith("Z")))
-			isNie = true;
-		return isNie;
+		if (nie == null) {
+			return false;
+		}
+		String aux = nie.toUpperCase();
+		return aux.startsWith("X") || aux.startsWith("Y") || aux.startsWith("Z");
 	}
 
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
@@ -2638,6 +2376,21 @@ public class PluginHelper {
 		gc.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
 	}
+	
+	private EnviamentSirTipusDocumentEnviarEnumDto getEnviamentSirTipusDocumentEnviar() {
+		EnviamentSirTipusDocumentEnviarEnumDto tipus = EnviamentSirTipusDocumentEnviarEnumDto.TOT;
+		
+		try {
+			String tipusStr = configHelper.getConfig("es.caib.notib.plugin.registre.enviamentSir.tipusDocumentEnviar");
+			if (tipusStr != null && !tipusStr.isEmpty())
+				tipus = EnviamentSirTipusDocumentEnviarEnumDto.valueOf(tipusStr);
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut obtenir el tipus de document a enviar per a l'enviament SIR per defecte. S'utilitzarà el tipus TOT (CSV i binari).");
+		}
+				
+		return tipus;
+	}
+	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 

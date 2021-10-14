@@ -11,8 +11,6 @@ import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.core.security.NotibMutableAclService;
 import es.caib.notib.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
@@ -48,6 +46,8 @@ public class PermisosHelper {
 	private AclSidRepository aclSidRepository;
 	@Resource
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
+	@Autowired
+	private AclCache aclCache;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -758,13 +758,13 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.NOTIFICACIO);
 		if (permis.isComuns())
 			permissions.add(ExtendedPermission.COMUNS);
-		
+
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
 
 	private String getMapeigRol(String rol) {
 		String propertyMapeig = 
-				(String)PropertiesHelper.getProperties().get(
+				(String) ConfigHelper.JBossPropertiesHelper.getProperties().get(
 						"es.caib.notib.mapeig.rol." + rol);
 		if (propertyMapeig != null)
 			return propertyMapeig;
@@ -780,12 +780,10 @@ public class PermisosHelper {
 			permisDto.revocaPermisos();
 			updatePermis(objectIdentifier, clazz, permisDto);
 		}
+		aclCache.clearCache();
 	}
 
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(PermisosHelper.class);
-	
 }

@@ -1,12 +1,13 @@
 package es.caib.notib.core.test.data;
 
-import es.caib.notib.core.api.dto.OrganGestorDto;
 import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.test.AuthenticationTest;
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,15 +24,15 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
     protected AuthenticationTest authenticationTest;
 
     @Override
-    public ProcedimentDto create(ProcedimentDto element, Long entitatId) throws Exception{
+    public ProcedimentDto create(Object element, Long entitatId) throws Exception{
         authenticationTest.autenticarUsuari("admin");
         ProcedimentDto entitatCreada = procedimentService.create(
                 entitatId,
-                element);
+                (ProcedimentDto) element);
         OrganGestorDto organ = organGestorService.findByCodi(entitatId,
                 ConfigTest.DEFAULT_ORGAN_DIR3);
         if (((ProcedimentDto)element).getPermisos() != null) {
-            for (PermisDto permis: element.getPermisos()) {
+            for (PermisDto permis: ((ProcedimentDto)element).getPermisos()) {
                 procedimentService.permisUpdate(
                         entitatId,
                         organ.getId(),
@@ -51,11 +52,11 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
                 true);
     }
 
-    @Override
+//    @Override
     public ProcedimentDto getRandomInstance() {
         ProcedimentDto procedimentCreate = new ProcedimentDto();
-        procedimentCreate.setCodi("216076");
-        procedimentCreate.setNom("Procedimiento 1");
+        procedimentCreate.setCodi(RandomStringUtils.randomNumeric(6));
+        procedimentCreate.setNom(RandomStringUtils.randomAlphanumeric(10));
         procedimentCreate.setOrganGestor(ConfigTest.DEFAULT_ORGAN_DIR3);
 
         List<PermisDto> permisosProcediment = new ArrayList<PermisDto>();
@@ -67,6 +68,21 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
         permisosProcediment.add(permisNotificacio);
 
         procedimentCreate.setPermisos(permisosProcediment);
+        return procedimentCreate;
+    }
+    public static ProcedimentDto getRandomProcedimentSensePermis() {
+        ProcedimentDto procedimentCreate = new ProcedimentDto();
+        procedimentCreate.setCodi(RandomStringUtils.randomNumeric(6));
+        procedimentCreate.setNom(RandomStringUtils.randomAlphanumeric(10));
+        procedimentCreate.setOrganGestor(ConfigTest.DEFAULT_ORGAN_DIR3);
+        return procedimentCreate;
+    }
+
+    public ProcedimentDto getRandomInstanceAmbEntregaCie(Long cieId, Long operadorPostalId) {
+        ProcedimentDto procedimentCreate = getRandomInstance();
+        procedimentCreate.setEntregaCieActiva(true);
+        procedimentCreate.setCieId(cieId);
+        procedimentCreate.setOperadorPostalId(operadorPostalId);
         return procedimentCreate;
     }
 

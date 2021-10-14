@@ -4,6 +4,10 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +46,14 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void updateNom(Long entitatId, String organGestorCodi) {
-		delegate.updateNom(entitatId, organGestorCodi);
+	public void updateOne(Long entitatId, String organGestorCodi) {
+		delegate.updateOne(entitatId, organGestorCodi);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void updateNoms(Long entitatId, String organActualCodiDir3) {
-		delegate.updateNoms(entitatId,organActualCodiDir3);
+	public void updateAll(Long entitatId, String organActualCodiDir3) {
+		delegate.updateAll(entitatId,organActualCodiDir3);
 	}
 	
 	@Override
@@ -83,7 +87,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<CodiValorDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
+	public List<CodiValorEstatDto> findOrgansGestorsCodiByEntitat(Long entitatId) {
 		return delegate.findOrgansGestorsCodiByEntitat(entitatId);
 	}
 	
@@ -92,7 +96,13 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public List<OrganGestorDto> findByProcedimentIds(List<Long> procedimentIds) {
 		return delegate.findByProcedimentIds(procedimentIds);
 	}
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat) {
+		return delegate.findByCodisAndEstat(codisOrgans, estat);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi) {
@@ -104,7 +114,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			String organCodiDir3,
-			OrganGestorFiltreDto filtre, 
+			OrganGestorFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(entitatId, organCodiDir3,filtre, paginacioParams);
 	}
@@ -142,12 +152,6 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public String findDenominacioOrganisme(String codiDir3) {
-		return delegate.findDenominacioOrganisme(codiDir3);
-	}
-
-	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
 		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
@@ -167,7 +171,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<CodiValorDto> getOrgansGestorsDisponiblesConsulta(
+    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
     		Long entitatId,
 			String usuari,
 			RolEnumDto rol,
@@ -181,8 +185,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public OrganGestorDto updateOficina(OrganGestorDto dto) {
-		return delegate.updateOficina(dto);
+	public OrganGestorDto update(OrganGestorDto dto) {
+		return delegate.update(dto);
 	}
 
 	@Override

@@ -1,25 +1,6 @@
-/**
- * 
- */
 package es.caib.notib.core.service;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
 import com.codahale.metrics.Timer;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.EntitatService;
@@ -28,10 +9,20 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.helper.CreacioSemaforDto;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.NotificaHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
+import es.caib.notib.core.helper.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -46,19 +37,23 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
+	private NotificacioHelper notificacioHelper;
+	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
 	private EntitatService entitatService;
 	@Autowired
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private EnviamentHelper enviamentHelper;
+
+	@Autowired
+	private ConfigHelper configHelper;
 
 	// 1. Enviament de notificacions pendents al registre y notific@
 	////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.registre.enviaments.periode}", 
-			initialDelayString = "${config:es.caib.notib.tasca.registre.enviaments.retard.inicial}")
 	public void registrarEnviamentsPendents() throws RegistreNotificaException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -68,7 +63,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 				logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
 				for (NotificacioEntity pendent : (List<NotificacioEntity>)pendents) {
 					logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-					notificacioService.notificacioRegistrar(pendent.getId());
+					notificacioHelper.registrarNotificar(pendent.getId());
 				}
 			} else {
 				logger.info("[REG] No hi ha notificacions pendents de registrar");
@@ -82,9 +77,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	///////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.notifica.enviaments.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.notifica.enviaments.retard.inicial}")
 	public void notificaEnviamentsRegistrats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -107,13 +99,11 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
 	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial}")
 	public void enviamentRefrescarEstatPendents() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -140,9 +130,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	//////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial}")
 	public void enviamentRefrescarEstatEnviatSir() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -170,7 +157,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	// 5. Actualització dels procediments a partir de la informació de Rolsac
 	/////////////////////////////////////////////////////////////////////////
 	@Override
-	@Scheduled(cron = "${config:es.caib.notib.actualitzacio.procediments.cron}")
 	public void actualitzarProcediments() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -195,6 +181,76 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}	
 	}
 	
+	//6. Consulta certificació notificacions DEH finalitzades
+	//////////////////////////////////////////////////////////////////
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void enviamentRefrescarEstatDEH() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+				logger.info("[DEH] Cercant enviaments DEH finalitzats sense certificació...");
+				List pendents = notificacioService.getNotificacionsDEHPendentsRefrescarCert();
+				if (pendents != null && !pendents.isEmpty()) {
+					logger.info("[DEH] Realitzant refresc de certificació de Notifica per a " + pendents.size() + " enviaments");
+					for (NotificacioEnviamentEntity enviament: (List<NotificacioEnviamentEntity>)pendents) {
+						logger.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+						enviamentHelper.updateDEHCertNovaConsulta(enviament.getId());
+						notificacioService.enviamentRefrescarEstat(enviament.getId());
+					}
+				} else {
+					logger.info("[DEH] No hi ha enviaments DEH sense certificació");
+				}
+			} else {
+				logger.info("[DEH] L'actualització de la certificació dels enviaments amb l'estat de Notific@ està deshabilitada");
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
+	//7. Consulta certificació notificacions CIE finalitzades
+	//////////////////////////////////////////////////////////////////
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void enviamentRefrescarEstatCIE() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (!notificaHelper.isAdviserActiu() && isTasquesActivesProperty() && isEnviamentActualitzacioCertificacioActiva() && notificaHelper.isConnexioNotificaDisponible()) {
+				logger.info("[CIE] Cercant enviaments CIE finalitzats sense certificació...");
+				List pendents = notificacioService.getNotificacionsCIEPendentsRefrescarCert();
+				if (pendents != null && !pendents.isEmpty()) {
+					logger.info("[CIE] Realitzant refresc de certificació de Notifica per a " + pendents.size() + " enviaments");
+					for (NotificacioEnviamentEntity enviament: (List<NotificacioEnviamentEntity>)pendents) {
+						logger.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
+						enviamentHelper.updateCIECertNovaConsulta(enviament.getId());
+						notificacioService.enviamentRefrescarEstat(enviament.getId());
+					}
+				} else {
+					logger.info("[CIE] No hi ha enviaments CIE sense certificació");
+				}
+			} else {
+				logger.info("[CIE] L'actualització de la certificació dels enviaments amb l'estat de Notific@ està deshabilitada");
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	// Refrescar notificacions expirades
+	/////////////////////////////////////////////////////////////////////////
+	@Override
+	public void refrescarNotificacionsExpirades() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.info("[EXPIRATS] Refrescant notificacions expirades");
+			addAdminAuthentication();
+			enviamentHelper.refrescarEnviamentsExpirats();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+	
 	private void addAdminAuthentication() {
 		Principal principal = new Principal() {
 			public String getName() {
@@ -212,47 +268,25 @@ public class SchedulledServiceImpl implements SchedulledService {
 		
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
-		
-	
+
+
 	private boolean isNotificaEnviamentsActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.notifica.enviaments.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");
 	}
 	private boolean isEnviamentActualitzacioEstatActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
 	}
 	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
 	}
 	private boolean isTasquesActivesProperty() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasques.actives");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
 	}
 	private boolean isActualitzacioProcedimentsActiuProperty() {
-		String actiu = PropertiesHelper.getProperties().getProperty("es.caib.notib.actualitzacio.procediments.actiu");
-		if (actiu != null) {
-			return new Boolean(actiu).booleanValue();
-		} else {
-			return false;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");
+	}
+	private boolean isEnviamentActualitzacioCertificacioActiva() {
+		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.certificacio.finalitzades.actiu");
 	}
 	
 	private boolean isSemaforInUse() {

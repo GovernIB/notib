@@ -1,10 +1,13 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
@@ -36,15 +39,13 @@ public class OrganGestorController extends BaseUserController{
 	private final static String ORGANS_FILTRE = "organs_filtre";
 	
 	@Autowired
-	OrganGestorService organGestorService;
+	private OrganGestorService organGestorService;
 	@Autowired
-	EntitatService entitatService;
+	private EntitatService entitatService;
 	@Autowired
-	PagadorPostalService pagadorPostalService;
+	private OperadorPostalService operadorPostalService;
 	@Autowired
-	PagadorCieService pagadorCieService;
-	@Autowired
-	GrupService grupsService;
+	private PagadorCieService cieService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -52,6 +53,9 @@ public class OrganGestorController extends BaseUserController{
 			Model model) {
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
+		model.addAttribute("organGestorEstats",
+				EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class,
+	                        "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 		model.addAttribute("oficinesEntitat",
@@ -81,7 +85,7 @@ public class OrganGestorController extends BaseUserController{
 			organs = organGestorService.findAmbFiltrePaginat(
 					entitat.getId(),
 					organActualCodiDir3,
-					OrganGestorFiltreCommand.asDto(organGestorFiltreCommand),
+					organGestorFiltreCommand.asDto(),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 		}catch(SecurityException e) {
 			MissatgesHelper.error(
@@ -121,6 +125,10 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 		model.addAttribute("isModificacio", false);
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		model.addAttribute("operadorPostalList", operadorPostalList);
+		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		model.addAttribute("cieList", cieList);
 		return "organGestorForm";
 	}
 	
@@ -136,13 +144,17 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("entitat", entitat);
 			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			model.addAttribute("operadorPostalList", operadorPostalList);
+			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			model.addAttribute("cieList", cieList);
 			if (organGestorCommand.getId() != null)
 				model.addAttribute("isModificacio", true);
-			
+
 			return "organGestorForm";
 		}
 		if (organGestorCommand.getId() != null) {
-			organGestorService.updateOficina(OrganGestorCommand.asDto(organGestorCommand));
+			organGestorService.update(OrganGestorCommand.asDto(organGestorCommand));
 		} else {
 			organGestorService.create(OrganGestorCommand.asDto(organGestorCommand));
 		}
@@ -172,6 +184,10 @@ public class OrganGestorController extends BaseUserController{
 				model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 				model.addAttribute("setOficina", !isOficinaEntitat);
 				model.addAttribute("isModificacio", true);
+				List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+				model.addAttribute("operadorPostalList", operadorPostalList);
+				List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+				model.addAttribute("cieList", cieList);
 				return "organGestorForm";
 			}
 			return getAjaxControllerReturnValueError(
@@ -179,6 +195,7 @@ public class OrganGestorController extends BaseUserController{
 					"redirect:../organgestor",
 					"organgestor.controller.update.nom.error");
 		} catch (Exception e) {
+			logger.error(String.format("Excepció intentant actualitzar l'òrgan gestor (Id=%d):", organGestorId), e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../organgestor",
@@ -194,7 +211,7 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		
 		try {
-			organGestorService.updateNom(
+			organGestorService.updateOne(
 					entitat.getId(),
 					organGestorCodi);
 			return getAjaxControllerReturnValueSuccess(
@@ -202,6 +219,7 @@ public class OrganGestorController extends BaseUserController{
 					"redirect:../../organgestor",
 					"organgestor.controller.update.nom.ok");
 		} catch (Exception e) {
+			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../organgestor",
@@ -220,13 +238,14 @@ public class OrganGestorController extends BaseUserController{
 			String codiDir3OrganActual=null;
 			if (organGestorActual!=null) codiDir3OrganActual = organGestorActual.getCodi();
 			
-			organGestorService.updateNoms(
+			organGestorService.updateAll(
 					entitat.getId(), codiDir3OrganActual);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../organgestor",
 					"organgestor.controller.update.nom.tots.ok");
 		} catch (Exception e) {
+			logger.error("Excepció intentant actualitzar tots els òrgans gestors", e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../organgestor",
@@ -264,11 +283,11 @@ public class OrganGestorController extends BaseUserController{
 						"organgestor.controller.esborrat.ko");
 			}
 		} catch (Exception e) {
+			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../procediment",
-					"organgestor.controller.esborrat.ko",
-					e);
+					"organgestor.controller.esborrat.ko");
 		}
 	}
 	

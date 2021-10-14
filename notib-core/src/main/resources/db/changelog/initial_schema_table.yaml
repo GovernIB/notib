@@ -1,0 +1,3128 @@
+databaseChangeLog:
+-  property:
+    dbms:  oracle
+    name:  type.blob
+    value:  BLOB
+-  property:
+    dbms:  postgresql
+    name:  type.blob
+    value:  BYTEA
+-  property:
+       dbms:  oracle
+       name:  type.acl.pk
+       value:  BIGINT
+-  property:
+       dbms:  postgresql
+       name:  type.acl.pk
+       value:  BIGSERIAL
+- changeSet:
+    id: init-table-1
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: NOT_ACL_SID_PK
+            name: ID
+            type: ${type.acl.pk}
+        - column:
+            constraints:
+              nullable: false
+            name: PRINCIPAL
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: SID
+            type: VARCHAR2(100)
+        tableName: NOT_ACL_SID
+- changeSet:
+    id: init-table-2
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: NOT_ACL_OBJECT_IDENTITY_PK
+            name: ID
+            type: ${type.acl.pk}
+        - column:
+            constraints:
+              nullable: false
+            name: OBJECT_ID_CLASS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OBJECT_ID_IDENTITY
+            type: BIGINT
+        - column:
+            name: PARENT_OBJECT
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OWNER_SID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTRIES_INHERITING
+            type: BOOLEAN
+        tableName: NOT_ACL_OBJECT_IDENTITY
+- changeSet:
+    id: init-table-3
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: NOT_ACL_ENTRY_PK
+            name: ID
+            type: ${type.acl.pk}
+        - column:
+            constraints:
+              nullable: false
+            name: ACL_OBJECT_IDENTITY
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ACE_ORDER
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: SID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: MASK
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: GRANTING
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: AUDIT_SUCCESS
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: AUDIT_FAILURE
+            type: BOOLEAN
+        tableName: NOT_ACL_ENTRY
+- changeSet:
+    id: init-table-4
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: NOT_ACL_CLASS_PK
+            name: ID
+            type: ${type.acl.pk}
+        - column:
+            constraints:
+              nullable: false
+            name: CLASS
+            type: VARCHAR2(100)
+        tableName: NOT_ACL_CLASS
+- changeSet:
+    id: init-table-5
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: NOT_APLICACIO_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CALLBACK_URL
+            type: VARCHAR2(256)
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: ACTIVA
+            type: BOOLEAN
+        tableName: NOT_APLICACIO
+- changeSet:
+    id: init-table-6
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+                nullable: false
+                primaryKey: true
+                primaryKeyName: NOT_APLICACIO_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: APLICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CALLBACK_URL
+            type: VARCHAR2(256)
+        - column:
+            name: ACTIVA
+            type: BOOLEAN
+        tableName: NOT_APLICACIO_AUDIT
+- changeSet:
+    id: init-table-7
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_AVIS_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ASSUMPTE
+            type: VARCHAR2(256)
+        - column:
+            constraints:
+              nullable: false
+            name: MISSATGE
+            type: VARCHAR2(2048)
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_INICI
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: DATA_FINAL
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIU
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: AVIS_NIVELL
+            type: VARCHAR2(10)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        tableName: NOT_AVIS
+- changeSet:
+    id: init-table-8
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_COLUMNES_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CODI_NOTIB_ENV
+            type: BOOLEAN
+        - column:
+            name: CONCEPTE
+            type: BOOLEAN
+        - column:
+            name: CSV_UUID
+            type: BOOLEAN
+        - column:
+            name: DATA_CADUCITAT
+            type: BOOLEAN
+        - column:
+            name: CREATED_DATE
+            type: BOOLEAN
+        - column:
+            name: DATA_PROGRAMADA
+            type: BOOLEAN
+        - column:
+            name: DATA_REGISTRE
+            type: BOOLEAN
+        - column:
+            name: DESCRIPCIO
+            type: BOOLEAN
+        - column:
+            name: DESTINATARIS
+            type: BOOLEAN
+        - column:
+            name: DIR3_CODI
+            type: BOOLEAN
+        - column:
+            name: ENVIAMENT_TIPUS
+            type: BOOLEAN
+        - column:
+            name: ESTAT
+            type: BOOLEAN
+        - column:
+            name: GRUP_CODI
+            type: BOOLEAN
+        - column:
+            name: LLIBRE_REGISTRE
+            type: BOOLEAN
+        - column:
+            name: NOT_IDENTIFICADOR
+            type: BOOLEAN
+        - column:
+            name: NUM_CERTIFICACIO
+            type: BOOLEAN
+        - column:
+            name: NUMERO_REGISTRE
+            type: BOOLEAN
+        - column:
+            name: PRO_CODI
+            type: BOOLEAN
+        - column:
+            name: TITULAR_EMAIL
+            type: BOOLEAN
+        - column:
+            name: TITULAR_NIF
+            type: BOOLEAN
+        - column:
+            name: TITULAR_NOM_LLINATGE
+            type: BOOLEAN
+        - column:
+            name: USUARI
+            type: BOOLEAN
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        tableName: NOT_COLUMNES
+- changeSet:
+    id: init-table-9
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CONFIG_PK
+            name: KEY
+            type: VARCHAR2(256)
+        - column:
+            name: VALUE
+            type: VARCHAR2(2048)
+        - column:
+            name: DESCRIPTION
+            type: VARCHAR2(2048)
+        - column:
+            constraints:
+              nullable: false
+            name: GROUP_CODE
+            type: VARCHAR2(128)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: POSITION
+            type: NUMBER(3, 0)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: JBOSS_PROPERTY
+            type: BOOLEAN
+        - column:
+            defaultValue: TEXT
+            name: TYPE_CODE
+            type: VARCHAR2(128)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        tableName: NOT_CONFIG
+- changeSet:
+    id: init-table-10
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CONFIG_GROUP_PK
+            name: CODE
+            type: VARCHAR2(128)
+        - column:
+            name: PARENT_CODE
+            type: VARCHAR2(128)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: POSITION
+            type: NUMBER(3, 0)
+        - column:
+            constraints:
+              nullable: false
+            name: DESCRIPTION
+            type: VARCHAR2(512)
+        tableName: NOT_CONFIG_GROUP
+- changeSet:
+    id: init-table-11
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_CONFIG_TYPE_PK
+            name: CODE
+            type: VARCHAR2(128)
+        - column:
+            name: VALUE
+            type: VARCHAR2(2048)
+        tableName: NOT_CONFIG_TYPE
+- changeSet:
+    id: init-table-12
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_DOCUMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: ARXIU_GEST_DOC_ID
+            type: VARCHAR2(64)
+        - column:
+            name: ARXIU_NOM
+            type: VARCHAR2(200)
+        - column:
+            name: CSV
+            type: VARCHAR2(256)
+        - column:
+            name: HASH
+            type: VARCHAR2(256)
+        - column:
+            name: NORMALITZAT
+            type: BOOLEAN
+        - column:
+            name: URL
+            type: VARCHAR2(256)
+        - column:
+            name: UUID
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: MEDIA
+            type: VARCHAR2(256)
+        - column:
+            name: MIDA
+            type: BIGINT
+        - column:
+            name: ORIGEN
+            type: VARCHAR2(20)
+        - column:
+            name: VALIDESA
+            type: VARCHAR2(20)
+        - column:
+            name: TIPUS_DOCUMENTAL
+            type: VARCHAR2(30)
+        - column:
+            name: FIRMAT
+            type: BOOLEAN
+        tableName: NOT_DOCUMENT
+- changeSet:
+    id: init-table-13
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTITAT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ACTIVA
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: AMB_ENTREGA_DEH
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: API_KEY
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: COLOR_FONS
+            type: VARCHAR2(1024)
+        - column:
+            name: COLOR_LLETRA
+            type: VARCHAR2(1024)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR2(1024)
+        - column:
+            constraints:
+              nullable: false
+            name: DIR3_CODI
+            type: VARCHAR2(9)
+        - column:
+            name: DIR3_CODI_REG
+            type: VARCHAR2(9)
+        - column:
+            name: LOGO_CAP
+            type: ${type.blob}
+        - column:
+            name: LOGO_PEU
+            type: ${type.blob}
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(256)
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR2(32)
+        - column:
+            name: TIPUS_DOC_DEFAULT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOM_OFICINA_VIRTUAL
+            type: VARCHAR2(255)
+        - column:
+            name: OFICINA
+            type: VARCHAR2(255)
+        - column:
+            name: LLIBRE
+            type: VARCHAR2(255)
+        - column:
+            name: LLIBRE_NOM
+            type: VARCHAR2(255)
+        - column:
+            name: LLIBRE_ENTITAT
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: true
+            name: OFICINA_ENTITAT
+            type: BOOLEAN
+        - column:
+            name: ENTREGA_CIE_ID
+            type: BIGINT
+        - column:
+            defaultValueBoolean: false
+            name: AMB_ENTREGA_CIE
+            type: BOOLEAN
+        tableName: NOT_ENTITAT
+- changeSet:
+    id: init-table-14
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTITAT_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(256)
+        - column:
+            name: TIPUS
+            type: VARCHAR2(32)
+        - column:
+            constraints:
+              nullable: false
+            name: DIR3_CODI
+            type: VARCHAR2(9)
+        - column:
+            name: DIR3_CODI_REG
+            type: VARCHAR2(9)
+        - column:
+            name: API_KEY
+            type: VARCHAR2(64)
+        - column:
+            name: AMB_ENTREGA_DEH
+            type: BOOLEAN
+        - column:
+            name: AMB_ENTREGA_CIE
+            type: BOOLEAN
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR2(1024)
+        - column:
+            name: ACTIVA
+            type: BOOLEAN
+        - column:
+            name: OFICINA
+            type: VARCHAR2(255)
+        - column:
+            name: LLIBRE_ENTITAT
+            type: BOOLEAN
+        - column:
+            name: LLIBRE
+            type: VARCHAR2(255)
+        - column:
+            name: LLIBRE_NOM
+            type: VARCHAR2(255)
+        tableName: NOT_ENTITAT_AUDIT
+- changeSet:
+    id: init-table-15
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTITAT_TIPUS_DOC_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: TIPUS_DOC
+            type: INTEGER
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        tableName: NOT_ENTITAT_TIPUS_DOC
+- changeSet:
+    id: init-table-16
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ENTREGA_CIE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: OPERADOR_POSTAL_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CIE_ID
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        tableName: NOT_ENTREGA_CIE
+- changeSet:
+    id: init-table-17
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_DOMICILI_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: DOM_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_CON_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_VIA_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_VIA_NOM
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_NUM_TIPUS
+            type: INTEGER
+        - column:
+            name: DOM_NUM_NUM
+            type: VARCHAR2(5)
+        - column:
+            name: DOM_NUM_QUALIF
+            type: VARCHAR2(3)
+        - column:
+            name: DOM_NUM_PUNTKM
+            type: VARCHAR2(10)
+        - column:
+            name: DOM_APARTAT
+            type: VARCHAR2(10)
+        - column:
+            name: DOM_BLOC
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_PORTAL
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_ESCALA
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_PLANTA
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_PORTA
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_COMPLEM
+            type: VARCHAR2(250)
+        - column:
+            name: DOM_POBLACIO
+            type: VARCHAR2(30)
+        - column:
+            name: DOM_MUN_CODINE
+            type: VARCHAR2(6)
+        - column:
+            name: DOM_MUN_NOM
+            type: VARCHAR2(64)
+        - column:
+            name: DOM_CODI_POSTAL
+            type: VARCHAR2(10)
+        - column:
+            name: DOM_PRV_CODI
+            type: VARCHAR2(2)
+        - column:
+            name: DOM_PRV_NOM
+            type: VARCHAR2(64)
+        - column:
+            name: DOM_PAI_CODISO
+            type: VARCHAR2(3)
+        - column:
+            name: DOM_PAI_NOM
+            type: VARCHAR2(64)
+        - column:
+            name: DOM_LINEA1
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_LINEA2
+            type: VARCHAR2(50)
+        - column:
+            name: DOM_CIE
+            type: INTEGER
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: FORMAT_SOBRE
+            type: VARCHAR2(10)
+        - column:
+            name: FORMAT_FULLA
+            type: VARCHAR2(10)
+        tableName: NOT_ENTREGA_POSTAL
+- changeSet:
+    id: init-table-18
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_FORMATS_FULLA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: PAGADOR_CIE_ID
+            type: BIGINT
+        tableName: NOT_FORMATS_FULLA
+- changeSet:
+    id: init-table-19
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_FORMATS_SOBRE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: PAGADOR_CIE_ID
+            type: BIGINT
+        tableName: NOT_FORMATS_SOBRE
+- changeSet:
+    id: init-table-20
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_GRUP_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOM
+            type: VARCHAR2(100)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        tableName: NOT_GRUP
+- changeSet:
+    id: init-table-21
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_GRUP_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: GRUP_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOM
+            type: VARCHAR2(100)
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN
+            type: VARCHAR2(64)
+        tableName: NOT_GRUP_AUDIT
+- changeSet:
+    id: init-table-22
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_ENVI_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: COMU
+            type: BOOLEAN
+        - column:
+            name: GRUP_CODI
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT_NOT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: ENV_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: N_TOTAL
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_CORRECTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_AMB_ERROR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_ORIGEN_API
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_ORIGEN_WEB
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DESTI_ADM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_DESTI_CIUTADA
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: NOT_HIST_ENVIAMENTS
+- changeSet:
+    id: init-table-23
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_NOTIF_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: COMU
+            type: BOOLEAN
+        - column:
+            name: GRUP_CODI
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_TOTAL
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_CORRECTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_AMB_ERROR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_ORIGEN_API
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_ORIGEN_WEB
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_DESTI_ADM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_NOT_DESTI_CIUTADA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_TOTAL
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_CORRECTES
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_AMB_ERROR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_ORIGEN_API
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_ORIGEN_WEB
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_DESTI_ADM
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_COM_DESTI_CIUTADA
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: NOT_HIST_NOTIF
+- changeSet:
+    id: init-table-30
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_ORGAN_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: CODI_DIR3
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: N_PROCEDIMENTS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_GRUPS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_CONSULTA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_NOTIFICACIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_GESTIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_PROCESSAR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_ADMINISTRAR
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: NOT_HIST_ORGAN
+- changeSet:
+    id: init-table-31
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_HIST_PROC_OID_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: COMU
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: CODI_SIA
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: N_GRUPS
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_CONSULTA
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_NOTIFICACIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_GESTIO
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: N_PERM_PROCESSAR
+            type: BIGINT
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        tableName: NOT_HIST_PROCEDIMENT
+- changeSet:
+    id: init-table-32
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CADUCITAT
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: COM_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CONCEPTE
+            type: VARCHAR2(240)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR2(1000)
+        - column:
+            constraints:
+              nullable: false
+            name: EMISOR_DIR3CODI
+            type: VARCHAR2(9)
+        - column:
+            name: ENV_DATA_PROG
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: ENV_TIPUS
+            type: INTEGER
+        - column:
+            name: CALLBACK_ERROR
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: ESTAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: GRUP_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: MOTIU
+            type: VARCHAR2(255)
+        - column:
+            name: NOT_ENV_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOT_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: NOT_ERROR_TIPUS
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUM_EXPEDIENT
+            type: VARCHAR2(80)
+        - column:
+            name: PROC_CODI_NOTIB
+            type: VARCHAR2(9)
+        - column:
+            name: REGISTRE_DATA
+            type: date
+        - column:
+            name: REGISTRE_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR2(200)
+        - column:
+            name: RETARD_POSTAL
+            type: INTEGER
+        - column:
+            name: TIPUS_USUARI
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: PAGADOR_CIE_ID
+            type: BIGINT
+        - column:
+            name: PAGADOR_POSTAL_ID
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: VARCHAR2(64)
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+            type: BIGINT
+        - column:
+            name: NOT_ENV_DATA_NOTIFICA
+            type: TIMESTAMP(6)
+        - column:
+            name: IDIOMA
+            type: INTEGER
+        - column:
+            name: DOCUMENT2_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT3_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT4_ID
+            type: BIGINT
+        - column:
+            name: DOCUMENT5_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_OFICINA_NOM
+            type: VARCHAR2(255)
+        - column:
+            name: REGISTRE_LLIBRE_NOM
+            type: VARCHAR2(255)
+        - column:
+            defaultValueBoolean: false
+            name: IS_ERROR_LAST_EVENT
+            type: BOOLEAN
+        - column:
+            name: NOTIFICACIO_MASSIVA_ID
+            type: BIGINT
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-table-33
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            name: SINCRON
+            type: VARCHAR2(20)
+        - column:
+            name: TIPUS_USUARI
+            type: VARCHAR2(20)
+        - column:
+            name: USUARI
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: EMISOR
+            type: VARCHAR2(9)
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: VARCHAR2(20)
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN
+            type: VARCHAR2(64)
+        - column:
+            name: PROCEDIMENT
+            type: VARCHAR2(64)
+        - column:
+            name: GRUP
+            type: VARCHAR2(64)
+        - column:
+            name: CONCEPTE
+            type: VARCHAR2(255)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR2(1000)
+        - column:
+            name: NUM_EXPEDIENT
+            type: VARCHAR2(80)
+        - column:
+            name: ENV_DATA_PROG
+            type: date
+        - column:
+            name: RETARD_POSTAL
+            type: INTEGER
+        - column:
+            name: CADUCITAT
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            name: DOCUMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: VARCHAR2(20)
+        - column:
+            name: ESTAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: MOTIU
+            type: VARCHAR2(255)
+        - column:
+            name: PAGADOR_POSTAL_ID
+            type: BIGINT
+        - column:
+            name: PAGADOR_CIE_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR2(200)
+        - column:
+            name: REGISTRE_DATA
+            type: date
+        - column:
+            name: NOT_ENV_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOT_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: NOT_ERROR_TIPUS
+            type: VARCHAR2(30)
+        - column:
+            name: CALLBACK_ERROR
+            type: BOOLEAN
+        - column:
+            name: EVENT_ERROR
+            type: BIGINT
+        tableName: NOT_NOTIFICACIO_AUDIT
+- changeSet:
+    id: init-table-34
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_ENV_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: DEH_NIF
+            type: VARCHAR2(9)
+        - column:
+            name: DEH_OBLIGAT
+            type: BOOLEAN
+        - column:
+            name: DEH_PROC_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: FORMAT_FULLA
+            type: VARCHAR2(10)
+        - column:
+            name: FORMAT_SOBRE
+            type: VARCHAR2(10)
+        - column:
+            name: NOTIFICA_ARR_DIR3DESC
+            type: VARCHAR2(100)
+        - column:
+            name: NOTIFICA_ARR_DIR3CODI
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_ARR_DIR3NIF
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_CER_ARXIUID
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_CER_ARXTIP
+            type: INTEGER
+        - column:
+            name: NOTIFICA_CER_CSV
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_CER_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_CER_HASH
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_CER_METAS
+            type: VARCHAR2(255)
+        - column:
+            name: NOTIFICA_CER_MIME
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_CER_NUMSEG
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_CER_ORIGEN
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_CER_TAMANY
+            type: INTEGER
+        - column:
+            name: NOTIFICA_CER_TIPUS
+            type: INTEGER
+        - column:
+            name: NOTIFICA_DATCAD
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATCRE
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATDISP
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATAT_ERRDES
+            type: VARCHAR2(255)
+        - column:
+            name: NOTIFICA_DATAT_NUMSEG
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_DATAT_ORIGEN
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_DATAT_RECNIF
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_DATAT_RECNOM
+            type: VARCHAR2(100)
+        - column:
+            name: NOTIFICA_EMI_DIR3DESC
+            type: VARCHAR2(100)
+        - column:
+            name: NOTIFICA_EMI_DIR3CODI
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_EMI_DIR3NIF
+            type: VARCHAR2(9)
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICA_ERROR
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICA_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_ESTAT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ESTAT_DATAACT
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ESTAT_DESC
+            type: VARCHAR2(255)
+        - column:
+            name: NOTIFICA_ESTAT_FINAL
+            type: BOOLEAN
+        - column:
+            name: NOTIFICA_ID
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_INTENT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_INTENT_NUM
+            type: INTEGER
+        - column:
+            name: NOTIFICA_REF
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: ESTAT_REGISTRE
+            type: INTEGER
+        - column:
+            name: REGISTRE_ESTAT_FINAL
+            type: BOOLEAN
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR2(50)
+        - column:
+            name: SERVEI_TIPUS
+            type: INTEGER
+        - column:
+            name: SIR_CON_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_CON_INTENT
+            type: INTEGER
+        - column:
+            name: SIR_REC_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_REG_DESTI_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOTIFICA_ERROR_EVENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TITULAR_ID
+            type: BIGINT
+        - column:
+            defaultValueNumeric: 0
+            name: DEH_CERT_INTENT_NUM
+            type: INTEGER
+        - column:
+            name: DEH_CERT_INTENT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            defaultValueNumeric: 0
+            name: CIE_CERT_INTENT_NUM
+            type: INTEGER
+        - column:
+            name: CIE_CERT_INTENT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: ENTREGA_POSTAL_ID
+            type: BIGINT
+        tableName: NOT_NOTIFICACIO_ENV
+- changeSet:
+    id: init-table-35
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_ENV_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: ENVIAMENT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            name: TITULAR_ID
+            type: BIGINT
+        - column:
+            name: DESTINATARIS_ID
+            type: VARCHAR2(200)
+        - column:
+            name: DOMICILI_TIPUS
+            type: VARCHAR2(20)
+        - column:
+            name: DOMICILI
+            type: VARCHAR2(500)
+        - column:
+            name: SERVEI_TIPUS
+            type: VARCHAR2(20)
+        - column:
+            name: CIE
+            type: INTEGER
+        - column:
+            name: FORMAT_SOBRE
+            type: VARCHAR2(10)
+        - column:
+            name: FORMAT_FULLA
+            type: VARCHAR2(10)
+        - column:
+            name: DEH_OBLIGAT
+            type: BOOLEAN
+        - column:
+            name: DEH_NIF
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_REF
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_ID
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_DATCRE
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATDISP
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_DATCAD
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_EMI_DIR3CODI
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_ARR_DIR3CODI
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_ESTAT_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ESTAT_FINAL
+            type: BOOLEAN
+        - column:
+            name: NOTIFICA_DATAT_ORIGEN
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_DATAT_RECNIF
+            type: VARCHAR2(9)
+        - column:
+            name: NOTIFICA_DATAT_NUMSEG
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_CER_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_CER_ARXIUID
+            type: VARCHAR2(50)
+        - column:
+            name: NOTIFICA_CER_ORIGEN
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_CER_TIPUS
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_CER_ARXTIP
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_CER_NUMSEG
+            type: VARCHAR2(50)
+        - column:
+            name: REGISTRE_NUMERO_FORMATAT
+            type: VARCHAR2(50)
+        - column:
+            name: REGISTRE_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: REGISTRE_ESTAT
+            type: VARCHAR2(20)
+        - column:
+            name: REGISTRE_ESTAT_FINAL
+            type: BOOLEAN
+        - column:
+            name: SIR_CON_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_REC_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: SIR_REG_DESTI_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_ERROR_EVENT_ID
+            type: BIGINT
+        - column:
+            name: NOTIFICA_ERROR
+            type: BOOLEAN
+        - column:
+            name: NOTIFICA_DATAT_ERRDES
+            type: VARCHAR2(255)
+        tableName: NOT_NOTIFICACIO_ENV_AUDIT
+- changeSet:
+    id: init-table-36
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_ENV_TABLE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            defaultValue: ''
+            name: DESTINATARIS
+            type: VARCHAR2(4000)
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS_ENVIAMENT
+            type: INTEGER
+        - column:
+            name: TITULAR_NIF
+            type: VARCHAR2(9)
+        - column:
+            name: TITULAR_NOM
+            type: VARCHAR2(256)
+        - column:
+            name: TITULAR_EMAIL
+            type: VARCHAR2(160)
+        - column:
+            name: TITULAR_LLINATGE1
+            type: VARCHAR2(40)
+        - column:
+            name: TITULAR_LLINATGE2
+            type: VARCHAR2(40)
+        - column:
+            name: TITULAR_RAOSOCIAL
+            type: VARCHAR2(100)
+        - column:
+            name: DATA_PROGRAMADA
+            type: date
+        - column:
+            name: PROCEDIMENT_CODI_NOTIB
+            type: VARCHAR2(9)
+        - column:
+            name: GRUP_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: EMISOR_DIR3
+            type: VARCHAR2(9)
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOT_ORGAN_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CONCEPTE
+            type: VARCHAR2(240)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR2(1000)
+        - column:
+            name: LLIBRE
+            type: VARCHAR2(255)
+        - column:
+            constraints:
+              nullable: false
+            name: NOT_ESTAT
+            type: INTEGER
+        - column:
+            name: CSV_UUID
+            type: VARCHAR2(256)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: HAS_ERRORS
+            type: BOOLEAN
+        - column:
+            defaultValueBoolean: false
+            name: PROCEDIMENT_IS_COMU
+            type: BOOLEAN
+        - column:
+            name: PROCEDIMENT_PROCORGAN_ID
+            type: BIGINT
+        - column:
+            name: REGISTRE_NUMERO
+            type: INTEGER
+        - column:
+            name: REGISTRE_DATA
+            type: date
+        - column:
+            name: REGISTRE_ENVIAMENT_INTENT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_DATA_CADUCITAT
+            type: TIMESTAMP(6)
+        - column:
+            name: NOTIFICA_IDENTIFICADOR
+            type: VARCHAR2(20)
+        - column:
+            name: NOTIFICA_CERT_NUM_SEGUIMENT
+            type: VARCHAR2(50)
+        - column:
+            constraints:
+              nullable: false
+            name: NOTIFICA_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICA_REF
+            type: VARCHAR2(20)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: ORGAN_ESTAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: PROCEDIMENT_REQUIRE_PERMISSION
+            type: BOOLEAN
+        tableName: NOT_NOTIFICACIO_ENV_TABLE
+- changeSet:
+    id: init-table-37
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_EVENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CALLBACK_DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: CALLBACK_ERROR_DESC
+            type: VARCHAR2(2048)
+        - column:
+            name: CALLBACK_ESTAT
+            type: VARCHAR2(10)
+        - column:
+            name: CALLBACK_INTENTS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: DATA
+            type: TIMESTAMP(6)
+        - column:
+            name: DESCRIPCIO
+            type: VARCHAR2(256)
+        - column:
+            constraints:
+              nullable: false
+            name: ERROR
+            type: BOOLEAN
+        - column:
+            name: ERROR_DESC
+            type: VARCHAR2(2048)
+        - column:
+            name: NOTIFICACIO_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUS
+            type: INTEGER
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOTIFICACIO_ENV_ID
+            type: BIGINT
+        - column:
+            name: NOTIFICA_ERROR_TIPUS
+            type: INTEGER
+        tableName: NOT_NOTIFICACIO_EVENT
+- changeSet:
+    id: init-table-38
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_MASSIVA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CSV_GESDOC_ID
+            type: VARCHAR2(64)
+        - column:
+            name: ZIP_GESDOC_ID
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: CSV_FILENAME
+            type: VARCHAR2(200)
+        - column:
+            name: ZIP_FILENAME
+            type: VARCHAR2(200)
+        - column:
+            constraints:
+              nullable: false
+            name: CADUCITAT
+            type: TIMESTAMP(6)
+        - column:
+            name: EMAIL
+            type: VARCHAR2(64)
+        - column:
+            name: PAGADOR_POSTAL_ID
+            type: BIGINT
+        - column:
+            name: RESUM_GESDOC_ID
+            type: VARCHAR2(64)
+        - column:
+            name: ERRORS_GESDOC_ID
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: PROGRESS
+            type: NUMBER(3, 0)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        tableName: NOT_NOTIFICACIO_MASSIVA
+- changeSet:
+    id: init-table-39
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_NOTIFICACIO_TABLE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ENTITAT_NOM
+            type: VARCHAR2(256)
+        - column:
+            name: PROC_CODI_NOTIB
+            type: VARCHAR2(9)
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+            type: BIGINT
+        - column:
+            name: GRUP_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: USUARI_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: TIPUS_USUARI
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: ERROR_LAST_CALLBACK
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: ERROR_LAST_EVENT
+            type: BOOLEAN
+        - column:
+            name: REGISTRE_ENV_INTENT
+            type: INTEGER
+        - column:
+            name: REGISTRE_NUM_EXPEDIENT
+            type: VARCHAR2(80)
+        - column:
+            name: NOTIFICA_ERROR_DATE
+            type: date
+        - column:
+            name: NOTIFICA_ERROR_DESCRIPCIO
+            type: VARCHAR2(2048)
+        - column:
+            constraints:
+              nullable: false
+            name: ENV_TIPUS
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CONCEPTE
+            type: VARCHAR2(255)
+        - column:
+            constraints:
+              nullable: false
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: ESTAT_DATE
+            type: TIMESTAMP(6)
+        - column:
+            name: PROCEDIMENT_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: PROCEDIMENT_NOM
+            type: VARCHAR2(256)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: PROCEDIMENT_IS_COMU
+            type: BOOLEAN
+        - column:
+            name: ORGAN_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ORGAN_NOM
+            type: VARCHAR2(1000)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: ORGAN_ESTAT
+            type: INTEGER
+        - column:
+            name: NOTIFICACIO_MASSIVA_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: PROCEDIMENT_REQUIRE_PERMISSION
+            type: BOOLEAN
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: init-table-40
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_ORGAN_GESTOR_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: NOM
+            type: VARCHAR2(1000)
+        - column:
+            name: LLIBRE
+            type: VARCHAR2(255)
+        - column:
+            name: LLIBRE_NOM
+            type: VARCHAR2(255)
+        - column:
+            name: OFICINA
+            type: VARCHAR2(255)
+        - column:
+            name: OFICINA_NOM
+            type: VARCHAR2(255)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: ESTAT
+            type: INTEGER
+        - column:
+            name: ENTREGA_CIE_ID
+            type: BIGINT
+        tableName: NOT_ORGAN_GESTOR
+- changeSet:
+    id: init-table-41
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PAGADOR_CIE_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CONTRACTE_DATA_VIG
+            type: date
+        - column:
+            name: DIR3_CODI
+            type: VARCHAR2(9)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(256)
+        tableName: NOT_PAGADOR_CIE
+- changeSet:
+    id: init-table-42
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PAGADOR_POSTAL_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CONTRACTE_DATA_VIG
+            type: date
+        - column:
+            name: CONTRACTE_NUM
+            type: VARCHAR2(20)
+        - column:
+            name: DIR3_CODI
+            type: VARCHAR2(9)
+        - column:
+            name: FACTURACIO_CODI_CLIENT
+            type: VARCHAR2(20)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(256)
+        tableName: NOT_PAGADOR_POSTAL
+- changeSet:
+    id: init-table-43
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PERSONA_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: COD_ENTITAT_DESTI
+            type: VARCHAR2(9)
+        - column:
+            name: EMAIL
+            type: VARCHAR2(160)
+        - column:
+            name: INCAPACITAT
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: INTERESSATTIPUS
+            type: VARCHAR2(255)
+        - column:
+            name: LLINATGE1
+            type: VARCHAR2(40)
+        - column:
+            name: LLINATGE2
+            type: VARCHAR2(40)
+        - column:
+            name: NIF
+            type: VARCHAR2(9)
+        - column:
+            name: NOM
+            type: VARCHAR2(255)
+        - column:
+            name: RAO_SOCIAL
+            type: VARCHAR2(100)
+        - column:
+            name: TELEFON
+            type: VARCHAR2(16)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOTIFICACIO_ENV_ID
+            type: BIGINT
+        tableName: NOT_PERSONA
+- changeSet:
+    id: init-table-44
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PROCEDIMENT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: AGRUPAR
+            type: BOOLEAN
+        - column:
+            name: CADUCITAT
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CODIASSUMPTE
+            type: VARCHAR2(255)
+        - column:
+            name: CODIASSUMPTE_NOM
+            type: VARCHAR2(255)
+        - column:
+            constraints:
+              nullable: false
+            name: NOM
+            type: VARCHAR2(256)
+        - column:
+            name: RETARD
+            type: INTEGER
+        - column:
+            name: TIPUSASSUMPTE
+            type: VARCHAR2(255)
+        - column:
+            name: TIPUSASSUMPTE_NOM
+            type: VARCHAR2(255)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: ENTITAT
+            type: BIGINT
+        - column:
+            name: ORGAN_GESTOR
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: COMU
+            type: BOOLEAN
+        - column:
+            name: ULTIMA_ACT
+            type: date
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: DIRECT_PERMISSION_REQUIRED
+            type: BOOLEAN
+        - column:
+            name: ENTREGA_CIE_ID
+            type: BIGINT
+        - column:
+            name: PAGADORPOSTAL
+            type: BIGINT
+        - column:
+            name: PAGADORCIE
+            type: BIGINT
+        tableName: NOT_PROCEDIMENT
+- changeSet:
+    id: init-table-45
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PROCEDIMENT_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: ENTITAT_ID
+            type: BIGINT
+        - column:
+            name: ORGAN
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: NOM
+            type: VARCHAR2(256)
+        - column:
+            name: RETARD
+            type: INTEGER
+        - column:
+            name: CADUCITAT
+            type: INTEGER
+        - column:
+            name: AGRUPAR
+            type: BOOLEAN
+        - column:
+            name: COMU
+            type: BOOLEAN
+        - column:
+            name: PAGADORPOSTAL_ID
+            type: BIGINT
+        - column:
+            name: PAGADORCIE_ID
+            type: BIGINT
+        tableName: NOT_PROCEDIMENT_AUDIT
+- changeSet:
+    id: init-table-46
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PRO_GRUP_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: GRUP
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT
+            type: BIGINT
+        tableName: NOT_PRO_GRUP
+- changeSet:
+    id: init-table-47
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PRO_GRUP_AUDIT_PK
+            name: ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: TIPUSOPERACIO
+            type: VARCHAR2(20)
+        - column:
+            name: JOINPOINT
+            type: VARCHAR2(256)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            constraints:
+              nullable: false
+            name: PROGRUP_ID
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: PROCEDIMENT
+            type: VARCHAR2(64)
+        - column:
+            constraints:
+              nullable: false
+            name: GRUP
+            type: VARCHAR2(64)
+        tableName: NOT_PRO_GRUP_AUDIT
+- changeSet:
+    id: init-table-48
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_PRO_ORGAN_PK
+            name: ID
+            type: BIGINT
+        - column:
+            name: PROCEDIMENT_ID
+            type: BIGINT
+        - column:
+            name: ORGANGESTOR_ID
+            type: BIGINT
+        - column:
+            name: CREATEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: LASTMODIFIEDDATE
+            type: TIMESTAMP(6)
+        - column:
+            name: CREATEDBY_CODI
+            type: VARCHAR2(64)
+        - column:
+            name: LASTMODIFIEDBY_CODI
+            type: VARCHAR2(64)
+        tableName: NOT_PRO_ORGAN
+- changeSet:
+    id: init-table-49
+    author: limit (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: NOT_USUARI_PK
+            name: CODI
+            type: VARCHAR2(64)
+        - column:
+            name: EMAIL
+            type: VARCHAR2(200)
+        - column:
+            name: IDIOMA
+            type: VARCHAR2(2)
+        - column:
+            name: LLINATGES
+            type: VARCHAR2(100)
+        - column:
+            name: NOM
+            type: VARCHAR2(100)
+        - column:
+            name: NOM_SENCER
+            type: VARCHAR2(200)
+        - column:
+            name: REBRE_EMAILS
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: VERSION
+            type: BIGINT
+        - column:
+            name: ULTIM_ROL
+            type: VARCHAR2(40)
+        - column:
+            name: ULTIMA_ENTITAT
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: REBRE_EMAILS_CREATS
+            type: BOOLEAN
+        tableName: NOT_USUARI

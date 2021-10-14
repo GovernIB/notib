@@ -13,6 +13,7 @@ import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
+import es.caib.notib.core.cacheable.ProcedimentsCacheable;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -28,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,6 +50,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private PermisosCacheable permisosCacheable;
 	@Autowired
+	private ProcedimentsCacheable procedimentsCacheable;
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -57,6 +59,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -70,7 +74,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 				logger.debug("Consultant plugin de dades d'usuari (" +
 						"usuariCodi=" + auth.getName() + ")");
 				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
+				String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 				if (dadesUsuari != null) {
 					usuari = usuariRepository.save(
 							UsuariEntity.getBuilder(
@@ -87,7 +91,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 							DadesUsuari.class);
 				}
 			} else {
-				logger.debug("Consultant plugin de dades d'usuari (" + "usuariCodi=" + auth.getName() + ")");
+				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
 				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (dadesUsuari != null) {
 					if (dadesUsuari.getNomSencer() != null) {
@@ -106,7 +110,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 							DadesUsuari.class);
 				}
 			}
-			permisosCacheable.evictGetPermisosEntitatsUsuariActual(auth);
+			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
+			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -167,7 +173,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Obtenint usuari actual");
-			return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
+			if (auth == null){
+				return null;
+			} else {
+				return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -287,7 +297,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public List<String> permisosFindRolsDistinctAll() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels rols definits a les ACLs");
+			logger.info("Consulta dels rols definits a les ACLs");
 			return aclSidRepository.findSidByPrincipalFalse();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -300,7 +310,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			logger.debug("Consulta del valor de la property (" +
 					"property=" + property + ")");
-			return PropertiesHelper.getProperties().getProperty(property);
+			return configHelper.getConfig(property);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -311,22 +321,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta del valor de la property (property=" + property + ", default=" + defaultValue + ")");
-			String propertyValue = PropertiesHelper.getProperties().getProperty(property);
+			String propertyValue = configHelper.getConfig(property);
 			if (propertyValue == null || propertyValue.trim().isEmpty())
 				return defaultValue;
 			return propertyValue;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	public Map<String, String> propertyFindByPrefix(String prefix) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Consulta del valor dels properties amb prefix (" +
-					"prefix=" + prefix + ")");
-			return PropertiesHelper.getProperties().findByPrefix(prefix);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

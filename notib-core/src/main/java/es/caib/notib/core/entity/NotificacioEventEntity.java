@@ -4,10 +4,10 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.OnDelete;
@@ -26,6 +26,8 @@ import java.util.GregorianCalendar;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name="not_notificacio_event")
 @EntityListeners(AuditingEntityListener.class)
@@ -35,23 +37,25 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	@Column(name = "tipus", nullable = false)
 	private NotificacioEventTipusEnumDto tipus;
-	
+
+	@Builder.Default
 	@Column(name = "data", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date data;
+	private Date data = new Date();
 	
 	@Column(name = "descripcio", length = 256)
 	private String descripcio;
 	
 	@Column(name = "error", nullable = false)
-	private boolean error;
+	@Builder.Default
+	private boolean error = false;
 	
 	@Column(name = "error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String errorDescripcio;
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "notificacio_id")
-	@ForeignKey(name = "not_notifi_noteve_fk")
+	@ForeignKey(name = "NOT_NOTIFICACIO_NOTEVENT_FK")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private NotificacioEntity notificacio;
 
@@ -75,6 +79,14 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	@Column(name = "callback_error_desc", length = ERROR_DESC_MAX_LENGTH)
 	private String callbackError;
 
+	@Column(name = "NOTIFICA_ERROR_TIPUS")
+	protected NotificacioErrorTipusEnumDto errorTipus;
+
+	public NotificacioEventEntity() {
+		this.data = new Date();
+		this.error = false;
+	}
+
 	public int getCallbackIntents() {
 		return callbackIntents != null? callbackIntents : 0;
 	}
@@ -88,7 +100,7 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		Calendar cal = GregorianCalendar.getInstance();
 		cal.add(Calendar.SECOND, (int) ((reintentsPeriode/1000)*Math.pow(3, callbackIntents)));
 		this.callbackData = cal.getTime();
-		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH);
+		this.callbackError = StringUtils.abbreviate(error, ERROR_DESC_MAX_LENGTH - 5);
 	}
 	
 	public void callbackInicialitza() {
@@ -97,48 +109,45 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.callbackData = new Date();
 	}
 
-	public static Builder getBuilder(
+
+	public static BuilderOld getBuilder(
 			NotificacioEventTipusEnumDto tipus,
 			NotificacioEntity notificacio) {
-		return new Builder(
+		return new BuilderOld(
 				tipus,
 				notificacio);
 	}
-	public static class Builder {
+	public static class BuilderOld {
 		NotificacioEventEntity built;
-		Builder(
+		BuilderOld(
 				NotificacioEventTipusEnumDto tipus,
 				NotificacioEntity notificacio) {
 			built = new NotificacioEventEntity();
 			built.tipus = tipus;
-			built.data = new Date();
-			built.error = false;
 			built.notificacio = notificacio;
 		}
-		public Builder descripcio(String descripcio) {
+		public BuilderOld descripcio(String descripcio) {
 			if (descripcio.length() > 256) {
 				descripcio = descripcio.substring(0, 256);
 			}
 			built.descripcio = descripcio;
 			return this;
 		}
-		public Builder error(boolean error) {
+		public BuilderOld error(boolean error) {
 			built.error = error;
 			return this;
 		}
-		public Builder errorDescripcio(String errorDescripcio) {
+		public BuilderOld errorDescripcio(String errorDescripcio) {
 			built.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
 			return this;
 		}
-		public Builder enviament(NotificacioEnviamentEntity enviament) {
+		public BuilderOld enviament(NotificacioEnviamentEntity enviament) {
 			built.enviament = enviament;
 			return this;
 		}
 		/** Inicialitza els camps pel callback cap al client. */
-		public Builder callbackInicialitza() {
-			built.callbackEstat = CallbackEstatEnumDto.PENDENT;
-			built.callbackIntents = 0;
-			built.callbackData = new Date();
+		public BuilderOld callbackInicialitza() {
+			this.built.callbackInicialitza();
 			return this;
 		}
 		public NotificacioEventEntity build() {
@@ -187,4 +196,12 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 	}
 	private static final long serialVersionUID = -2299453443943600172L;
 
+	// Custom builder setters
+	public static class NotificacioEventEntityBuilder {
+		private String errorDescripcio;
+		public NotificacioEventEntityBuilder errorDescripcio(String errorDescripcio){
+			this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
+			return this;
+		}
+	}
 }

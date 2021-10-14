@@ -4,10 +4,8 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.core.api.exception.JustificantException;
+import es.caib.notib.core.api.dto.notificacio.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,17 +23,16 @@ public interface NotificacioService {
 
 	/**
 	 * Crea una nova notificació.
-	 * 
+	 *
 	 * @param notificacio
 	 *            Informació de la notificació a crear
 	 * @return La notificació amb l'id especificat.
-	 * @throws RegistreNotificaException 
+	 * @throws RegistreNotificaException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	NotificacioDatabaseDto create(
 			Long entitatId,
 			NotificacioDatabaseDto notificacio) throws RegistreNotificaException;
-	
 	/**
 	 * Esborra la notificació indicada per paràmetre
 	 * 
@@ -49,7 +46,7 @@ public interface NotificacioService {
 	 *              Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public void delete(
+	void delete(
 			Long entitatId,
 			Long notificacioId) throws NotFoundException;
 	
@@ -82,7 +79,19 @@ public interface NotificacioService {
 	 * @return La notificació amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioDtoV2 findAmbId(
+	NotificacioDtoV2 findAmbId(
+			Long id,
+			boolean isAdministrador);
+
+	/**
+	 * Consulta una notificació donat el seu id.
+	 *
+	 * @param id
+	 *            Atribut id de la notificació.
+	 * @return La notificació amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	NotificacioInfoDto findNotificacioInfo(
 			Long id,
 			boolean isAdministrador);
 
@@ -99,14 +108,17 @@ public interface NotificacioService {
 	PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
 			Long entitatId,
 			RolEnumDto rol,
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
-	
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	List<Long> findIdsAmbFiltre(Long entitatId,
+								RolEnumDto rol,
+								String organGestorCodi,
+								String usuariCodi,
+								NotificacioFiltreDto filtre);
 	
 	/**
 	 * Consulta els nivells d'administració disponibles dins DIR3.
@@ -175,6 +187,11 @@ public interface NotificacioService {
 	public List<NotificacioEventDto> eventFindAmbNotificacio(
 			Long entitatId,
 			Long notificacioId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	public List<NotificacioAuditDto> historicFindAmbNotificacio(
+			Long entitatId,
+			Long notificacioId);
 	
 	/**
 	 * Consulta l'últim event de callback d'una d'una notificació.
@@ -200,6 +217,12 @@ public interface NotificacioService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	public List<NotificacioEventDto> eventFindAmbEnviament(
+			Long entitatId,
+			Long notificacioId,
+			Long enviamentId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
 			Long entitatId,
 			Long notificacioId,
 			Long enviamentId);
@@ -280,14 +303,15 @@ public interface NotificacioService {
 	 *            	Atribut id de la notificació que es vol processar.
 	 * @param motiu
 	 *         		el motiu per el que es vol marcar la notificació com a processada.
+	 * @param isAdministrador Indica si l'usuari actual és administrador d'entitat
 	 * @return l'estat de l'enviament.
 	 * @throws MessagingException 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public String marcarComProcessada(
+	String marcarComProcessada(
 			Long notificacioId,
-			String motiu) throws Exception;
-	
+			String motiu,
+			boolean isAdministrador) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	PaginaDto<NotificacioDto> findWithCallbackError(
@@ -317,7 +341,6 @@ public interface NotificacioService {
 	
 
 	// Mètodes per cridar des de l'schedulled
-	void notificacioRegistrar(Long notificacioId) throws RegistreNotificaException;
 	void notificacioEnviar(Long notificacioId);
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
@@ -328,6 +351,10 @@ public interface NotificacioService {
 	List getNotificacionsPendentsEnviar();
 	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstat();
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsDEHPendentsRefrescarCert();
+	@SuppressWarnings("rawtypes")
+	List getNotificacionsCIEPendentsRefrescarCert();
 	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstatRegistre();
 
@@ -344,26 +371,6 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public void reactivarRegistre(Long notificacioId);
-
-	/**
-	 * Genera un justificant d'enviament
-	 * 
-	 * @param notificacioId
-	 *            Atribut id de la notificació.
-	 * @return el justificant firmat
-	 * @throws JustificantException
-	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public FitxerDto recuperarJustificant(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
-
-	/**
-	 * Recuperar l'estat de la generació del justificant
-	 * 
-	 * @return el justificant firmat
-	 * @throws JustificantException
-	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	public ProgresDescarregaDto justificantEstat(String sequence) throws JustificantException;
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
@@ -395,19 +402,12 @@ public interface NotificacioService {
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
 			Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
 
-	
-
-//	void registrarEnviamentsPendents();
-//	void notificaEnviamentsRegistrats();
-//	void enviamentRefrescarEstatPendents();
-//	void enviamentRefrescarEstatEnviatSir();
-
 	/**
 	 * Actualitza enviaments expirats sense certificació
 	 * 
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void enviamentsRefrescarEstat();
+	void refrescarEnviamentsExpirats();
 	
 	/**
 	 * Recupera l'estat actual del progrés
@@ -417,18 +417,10 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 
-	
-	/**
-	 * Guarda un document a partir del string de bytes
-	 * 
-	 * @return el id
-	 */
 	@PreAuthorize("hasRole('tothom')")
-	public String guardarArxiuTemporal(String string);
-
+	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
+	
 	@PreAuthorize("hasRole('tothom')")
-	public byte[] obtenirArxiuTemporal(String arxiuGestdocId);
-	
-	
+	public boolean validarIdCsv (String idCsv);
 
 }

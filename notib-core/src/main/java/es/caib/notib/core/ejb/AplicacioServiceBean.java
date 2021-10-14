@@ -116,12 +116,6 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
-	public Map<String, String> propertyFindByPrefix(String prefix) {
-		return delegate.propertyFindByPrefix(prefix);
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
 		return delegate.updateUsuariActual(usuariDto);
 	}

@@ -2,11 +2,11 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
-import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.CallbackHelper;
+import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.PropertiesHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +32,14 @@ public class CallbackServiceImpl implements CallbackService {
 	private CallbackHelper callbackHelper;
     @Autowired
     private MetricsHelper metricsHelper;
-    
+	@Autowired
+	private ConfigHelper configHelper;
 	@Override
-	@Scheduled(
-			fixedRateString = "${config:es.caib.notib.tasca.callback.pendents.periode}",
-			initialDelayString = "${config:es.caib.notib.tasca.callback.pendents.retard.inicial}")
 	public void processarPendents() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
-				logger.debug("[Callback] Cercant notificacions pendents d'enviar al client");
+				logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
 				int maxPendents = getEventsProcessarMaxProperty(); 
 				Pageable page = new PageRequest(
 						0,
@@ -50,20 +48,23 @@ public class CallbackServiceImpl implements CallbackService {
 				if (pendentsIds.size() > 0) {
 					logger.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 					int errors = 0;
-					for (Long pendentId: pendentsIds) {
-						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + pendentId);
+					for (Long eventId: pendentsIds) {
+						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
 						try {
-							NotificacioEntity notificacioProcessada = callbackHelper.notifica(pendentId);
-							if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {
+							if(!callbackHelper.notifica(eventId)) {
 								errors++;
 							}
-						}catch (Exception e) {
-							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", pendentId), e);
+						} catch (Exception e) {
+							errors++;
+							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
+							callbackHelper.marcarEventNoProcessable(eventId,
+									e.getMessage(),
+									ExceptionUtils.getStackTrace(e));
 						}
 					}
-					logger.debug("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
+					logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
 				} else {
-					logger.debug("[Callback] No hi ha notificacions pendents d'enviar. ");
+					logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 				}
 			} else {
 				logger.debug("[Callback] Enviament callbacks deshabilitat. ");
@@ -76,25 +77,13 @@ public class CallbackServiceImpl implements CallbackService {
 
 
 	private boolean isTasquesActivesProperty() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasques.actives");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
 	}
 	private boolean isCallbackPendentsActiu() {
-		String actives = PropertiesHelper.getProperties().getProperty("es.caib.notib.tasca.callback.pendents.actiu");
-		if (actives != null) {
-			return new Boolean(actives).booleanValue();
-		} else {
-			return true;
-		}
+		return configHelper.getAsBoolean("es.caib.notib.tasca.callback.pendents.actiu");
 	}
 	private int getEventsProcessarMaxProperty() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.notib.tasca.callback.pendents.processar.max",
-				50);
+		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CallbackServiceImpl.class);

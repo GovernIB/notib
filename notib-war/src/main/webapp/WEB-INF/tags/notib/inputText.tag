@@ -70,11 +70,6 @@ $(document).ready(function() {
 		});
 	}
 });
-$('input').change(function() {
-	if(this.type != "file"){
-		this.value = this.value.trim();
-	}
-});
 </script>
 <div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
 <c:choose>

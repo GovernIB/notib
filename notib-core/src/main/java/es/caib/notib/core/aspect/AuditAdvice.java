@@ -3,17 +3,17 @@
  */
 package es.caib.notib.core.aspect;
 
-import java.lang.reflect.Method;
-
+import es.caib.notib.core.api.service.AuditService;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.service.AuditService;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Method;
 
 /**
  * Advice AspectJ que intercepta les excepcions llençades des dels
@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Aspect
+@Order(100)
 @Component
 public class AuditAdvice {
 

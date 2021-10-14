@@ -3,30 +3,20 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.List;
-import java.util.Map;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.EntitatService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.EntitatService;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de EntitatService com a EJB que empra una clase
@@ -43,14 +33,14 @@ public class EntitatServiceBean implements EntitatService {
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
-	public EntitatDto create(EntitatDto entitat) {
+	public EntitatDto create(EntitatDataDto entitat) {
 		return delegate.create(entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public EntitatDto update(
-			EntitatDto entitat) {
+			EntitatDataDto entitat) {
 		return delegate.update(entitat);
 	}
 

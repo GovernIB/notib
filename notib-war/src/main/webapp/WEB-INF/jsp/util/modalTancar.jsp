@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
-<script src="<c:url value="/js/jquery-1.10.2.min.js"/>"></script>
+    <script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 <script>
 	//window.parent.modalTancarIRefrescar(window.frameElement);
 	$('button.close', $(window.frameElement).parent().parent().parent().parent()).trigger('click');

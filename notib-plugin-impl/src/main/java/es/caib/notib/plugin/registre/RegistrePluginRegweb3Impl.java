@@ -1,13 +1,6 @@
 package es.caib.notib.plugin.registre;
 
-import es.caib.notib.core.api.dto.AnexoWsDto;
-import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.InteresadoWsDto;
-import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.core.api.dto.PersonaDto;
-import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
-import es.caib.notib.core.api.dto.RegistreInteressatDto;
-import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.notib.core.api.dto.*;
 import es.caib.regweb3.ws.api.v3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,33 +30,18 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
 			AsientoRegistralBeanDto arb, 
-			Long tipusOperacio) {
+			Long tipusOperacio,
+			boolean generarJustificant) {
 		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
 		
 			try {			
 				AsientoRegistralWs asiento = toAsientoRegistralBean(arb);
-//				logger.debug("[SalidaAsientoRegistral - INICI]");
-//				logger.debug("   Entitat: " + codiDir3Entitat);
-//				logger.debug("   Tipus operacio: " + tipusOperacio);
-//				ObjectMapper objectMapper = new ObjectMapper();
-//				objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector(){
-//				    @Override
-//				    public boolean hasIgnoreMarker(final AnnotatedMember m) {
-	//
-//				    List<String> exclusions = Arrays.asList("anexos");
-//				    return exclusions.contains(m.getName())|| super.hasIgnoreMarker(m);
-//				    }
-//				});
-//				String asientoJson = objectMapper.writeValueAsString(asiento);
-//				logger.debug("   Asiento: " + asientoJson);
-//				logger.debug("[SalidaAsientoRegistral - FI]");
-
 				return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
 						null,
 						codiDir3Entitat, 
 						asiento, 
 						tipusOperacio,
-						true,
+						generarJustificant,
 						false));
 			} catch (WsI18NException e) {
 				rc.setErrorCodi("0");
@@ -180,176 +157,6 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		return rj;
 	}
 
-	private RegistroSalidaWs toRegistroSalidaWs(
-			RegistreSortida registreSortida,
-			String aplicacion) throws RegistrePluginException {
-		RegistroSalidaWs rsw = new RegistroSalidaWs();
-//		InteresadoWs interesado = new InteresadoWs();
-		AnexoWs anexo = null;
-		try {
-			rsw.setCodigoUsuario(registreSortida.getDadesAnotacio().getCodiUsuari());
-			rsw.setAplicacion(aplicacion);
-			rsw.setTipoAsunto(registreSortida.getDadesAnotacio().getTipusAssumpte());
-			rsw.setCodigoAsunto(registreSortida.getDadesAnotacio().getCodiAssumpte());
-			rsw.setDocFisica(registreSortida.getDadesAnotacio().getDocfisica());
-			rsw.setExpone(null);
-			rsw.setSolicita(null);
-			rsw.setExtracto(registreSortida.getDadesAnotacio().getExtracte());
-			rsw.setFecha(new Timestamp((new Date()).getTime()));
-			rsw.setIdioma(registreSortida.getDadesAnotacio().getIdiomaCodi().toLowerCase());
-			rsw.setLibro(registreSortida.getDadesOficina().getLlibreCodi());
-			rsw.setNumExpediente(registreSortida.getDadesAnotacio().getNumExpedient());
-			rsw.setObservaciones(registreSortida.getDadesAnotacio().getObservacions());
-			rsw.setOficina(registreSortida.getDadesOficina().getOficinaCodi());
-			rsw.setOrigen(registreSortida.getDadesOficina().getOrgan());
-			rsw.setRefExterna(registreSortida.getDadesAnotacio().getRefExterna());
-			
-			if (registreSortida.getDocuments() != null) {
-				for (DocumentRegistre document : registreSortida.getDocuments()) {
-					anexo = new AnexoWs();
-					anexo.setTitulo(document.getArxiuNom());
-					anexo.setFicheroAnexado(document.getArxiuContingut());
-					anexo.setModoFirma(document.getModeFirma());
-					anexo.setNombreFicheroAnexado(document.getArxiuNom());
-					anexo.setTipoDocumento("0" + 2L); //Documento adjunto
-					anexo.setValidezDocumento("0" + 1L); //Copia
-//					anexo.setOrigenCiudadanoAdmin(1); //Administaración
-//					anexo.setTipoDocumental("TD01");
-					anexo.setJustificante(false);
-					anexo.setOrigenCiudadanoAdmin(document.getOrigen());
-					anexo.setTipoDocumental(getTipusDocumental(document.getTipusDocumental()));
-					//Dettached
-					if (document.getModeFirma() != null && document.getModeFirma().equals(2)) { 
-						anexo.setValidezDocumento("0" + 4L); //Original
-						anexo.setNombreFirmaAnexada(document.getArxiuNom());
-						anexo.setFirmaAnexada(document.getArxiuContingut()); //doc.getFirmes().get(0).getContingut()
-					}
-					anexo.setCsv(document.getCsv());
-				}
-			}
-			if (anexo != null) {
-				rsw.getAnexos().add(anexo);
-			}
-			List<InteresadoWs> interesadosWs = new ArrayList<InteresadoWs>();
-			for (DadesInteressat dadesInteressat : registreSortida.getDadesInteressat()) {
-				DatosInteresadoWs datosInteresado = new DatosInteresadoWs();
-				DatosInteresadoWs datosRepresentante = new DatosInteresadoWs();
-				InteresadoWs interesadoWs = new InteresadoWs();
-				datosInteresado.setApellido1(dadesInteressat.getInteressat().getCognom1());
-				datosInteresado.setApellido2(dadesInteressat.getInteressat().getCognom2());
-				datosInteresado.setTipoDocumentoIdentificacion(dadesInteressat.getInteressat().getTipusDocumentIdentificacio().getValor());
-				datosInteresado.setDocumento(dadesInteressat.getInteressat().getNif());
-				datosInteresado.setNombre(dadesInteressat.getInteressat().getNom());
-				if (dadesInteressat.getInteressat().getTipusInteressat().equals(1L) || dadesInteressat.getInteressat().getTipusInteressat().equals(3L))
-					datosInteresado.setRazonSocial(dadesInteressat.getInteressat().getNom());
-				datosInteresado.setTipoInteresado(dadesInteressat.getInteressat().getTipusInteressat());
-				interesadoWs.setInteresado(datosInteresado);
-				
-				if (dadesInteressat.getRepresentat() != null) {
-					Interessat dadesRepresentat = dadesInteressat.getRepresentat();
-					datosRepresentante.setApellido1(dadesRepresentat.getCognom1());
-					datosRepresentante.setApellido2(dadesRepresentat.getCognom2());
-					datosRepresentante.setTipoDocumentoIdentificacion(dadesRepresentat.getTipusDocumentIdentificacio().getValor());
-					datosRepresentante.setDocumento(dadesRepresentat.getNif());
-					datosRepresentante.setNombre(dadesRepresentat.getNom());
-					if (dadesRepresentat.getTipusInteressat().equals(1L))
-						datosInteresado.setRazonSocial(dadesRepresentat.getNom());
-					datosRepresentante.setTipoInteresado(dadesRepresentat.getTipusInteressat());
-					interesadoWs.setRepresentante(datosRepresentante);
-				}
-				interesadosWs.add(interesadoWs);
-			}
-
-			rsw.getInteresados().addAll(interesadosWs);
-			rsw.setAplicacion(registreSortida.getAplicacio());
-			rsw.setVersion(registreSortida.getVersioNotib());
-			
-			
-		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió a registroSalidaWs", ex);
-			throw new RegistrePluginException("Error conversió a registroSalidaWs", ex);
-		}
-		return rsw;
-	}
-	
-	private String getTipusDocumental(String tipusDocumental) {
-		String ntiTipusDocumental = null;
-		
-		try {
-			logger.info("Conversió a la metadada ntiTipusDocumental...");
-			if (tipusDocumental != null) {
-				switch (tipusDocumental) {
-				case "RESOLUCIO":
-					ntiTipusDocumental = "TD01";
-					break;
-				case "ACORD":
-					ntiTipusDocumental = "TD02";
-					break;
-				case "CONTRACTE":
-					ntiTipusDocumental = "TD03";
-					break;
-				case "CONVENI":
-					ntiTipusDocumental = "TD04";
-					break;
-				case "DECLARACIO":
-					ntiTipusDocumental = "TD05";
-					break;
-				case "COMUNICACIO":
-					ntiTipusDocumental = "TD06";
-					break;
-				case "NOTIFICACIO":
-					ntiTipusDocumental = "TD07";
-					break;
-				case "PUBLICACIO":
-					ntiTipusDocumental = "TD08";
-					break;
-				case "JUSTIFICANT_RECEPCIO":
-					ntiTipusDocumental = "TD09";
-					break;
-				case "ACTA":
-					ntiTipusDocumental = "TD10";
-					break;
-				case "CERTIFICAT":
-					ntiTipusDocumental = "TD11";
-					break;
-				case "DILIGENCIA":
-					ntiTipusDocumental = "TD12";
-					break;
-				case "INFORME":
-					ntiTipusDocumental = "TD13";
-					break;
-				case "SOLICITUD":
-					ntiTipusDocumental = "TD14";
-					break;
-				case "DENUNCIA":
-					ntiTipusDocumental = "TD15";
-					break;
-				case "ALEGACIO":
-					ntiTipusDocumental = "TD16";
-					break;
-				case "RECURS":
-					ntiTipusDocumental = "TD17";
-					break;
-				case "COMUNICACIO_CIUTADA":
-					ntiTipusDocumental = "TD18";
-					break;
-				case "FACTURA":
-					ntiTipusDocumental = "TD19";
-					break;
-				case "ALTRES_INCAUTATS":
-					ntiTipusDocumental = "TD20";
-					break;
-				default:
-					ntiTipusDocumental = "TD99";
-					break;
-				}
-			}
-		} catch (Exception ex) {
-			throw new ArxiuException("Error a l'hora de fer la conversió de la metadada ntiTipusDocumental: ", ex);
-		}
-		return ntiTipusDocumental;
-	}
-	
 	private AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
 		AsientoRegistralWs ar = new AsientoRegistralWs();
 		ar.setAplicacion(dto.getAplicacion());
@@ -445,6 +252,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		resposta.setRegistreData(ar.getFechaRegistro());
 		resposta.setSirRecepecioData(ar.getFechaRecepcion());
 		resposta.setSirRegistreDestiData(ar.getFechaRegistroDestino());
+		resposta.setNumeroRegistroDestino(ar.getNumeroRegistroDestino());
+		resposta.setMotivo(ar.getMotivo());
+		resposta.setCodigoEntidadRegistralProcesado(ar.getCodigoEntidadRegistralProcesado());
+		resposta.setDecodificacionEntidadRegistralProcesado(ar.getDecodificacionEntidadRegistralProcesado());
 		switch(ar.getEstado().intValue()) {
 		case 1:
 			resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);

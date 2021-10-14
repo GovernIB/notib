@@ -1,7 +1,9 @@
 package es.caib.notib.core.test.data;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.test.AuthenticationTest;
 import lombok.Getter;
@@ -32,13 +34,10 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
     private String[] relatedFields = new String[]{ "procediment" };
 
     @Override
-    public NotificacioDatabaseDto create(NotificacioDatabaseDto element, Long entitatId) throws Exception{
-        NotificacioDatabaseDto item = (NotificacioDatabaseDto) element;
-        authenticationTest.autenticarUsuari("admin");
-        NotificacioDatabaseDto entitatCreada = notificacioService.create(
+    public NotificacioDatabaseDto create(Object element, Long entitatId) throws Exception{
+        return notificacioService.create(
                 entitatId,
-                item);
-        return entitatCreada;
+                (NotificacioDatabaseDto) element);
     }
 
     @Override
@@ -54,18 +53,16 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 
     public void relateElement(String key, Object element) throws Exception{
         if (element instanceof ProcedimentDto) {
-            this.objects.get(key).setProcediment((ProcedimentDto) element);
+            getObject(key).setProcediment((ProcedimentDto) element);
         }
     }
 
-    public NotificacioDatabaseDto getRandomInstance() {
-        int numDestinataris = 2;
+    public static NotificacioDatabaseDto getRandomInstanceWithoutEnviaments() {
         String notificacioId = new Long(System.currentTimeMillis()).toString();
-        byte[] arxiuBytes = new byte[0];
 
         DocumentDto document = new DocumentDto();
         try {
-            arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
+            byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
             document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
             document.setHash(
                     Base64.encodeBase64String(
@@ -94,7 +91,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 //                .procediment(procediment)
 //				.procedimentCodiNotib()
 //                .grup(grupCreate)
-                .enviaments(new ArrayList<NotificacioEnviamentDtoV2>())
+                .enviaments(new ArrayList<NotEnviamentDatabaseDto>())
                 .usuariCodi("admin")
 //				.motiu()
                 .numExpedient("EXPEDIENTEX")
@@ -102,43 +99,18 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
                 .document(new DocumentDto())
                 .build();
         notCreated.setDocument(document);
-        List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
-//		if (ambEnviamentPostal) {
-//			PagadorPostal pagadorPostal = new PagadorPostal();
-//			pagadorPostal.setDir3Codi("A04013511");
-//			pagadorPostal.setFacturacioClientCodi("ccFac_" + notificacioId);
-//			pagadorPostal.setContracteNum("pccNum_" + notificacioId);
-//			pagadorPostal.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorPostal(pagadorPostal);
-//			PagadorCie pagadorCie = new PagadorCie();
-//			pagadorCie.setDir3Codi("A04013511");
-//			pagadorCie.setContracteDataVigencia(new Date(0));
-//			notificacio.setPagadorCie(pagadorCie);
-//		}
-        for (int i = 0; i < numDestinataris; i++) {
-            NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
-            PersonaDto titular = new PersonaDto();
-            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-            titular.setNom("titularNom" + i);
-            titular.setLlinatge1("titLlinatge1_" + i);
-            titular.setLlinatge2("titLlinatge2_" + i);
-            titular.setNif("00000000T");
-            titular.setTelefon("666010101");
-            titular.setEmail("titular@gmail.com");
-            enviament.setTitular(titular);
-            List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
-            PersonaDto destinatari = new PersonaDto();
-            destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-            destinatari.setNom("destinatariNom" + i);
-            destinatari.setLlinatge1("destLlinatge1_" + i);
-            destinatari.setLlinatge2("destLlinatge2_" + i);
-            destinatari.setNif("12345678Z");
-            destinatari.setTelefon("666020202");
-            destinatari.setEmail("destinatari@gmail.com");
-            destinataris.add(destinatari);
-            enviament.setDestinataris(destinataris);
-            enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
-            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+        return notCreated;
+    }
+
+    public static NotificacioDatabaseDto getRandomInstance() {
+        return getRandomInstance(2);
+    }
+
+    public static NotificacioDatabaseDto getRandomInstance(int numEnviaments) {
+        NotificacioDatabaseDto notCreated = getRandomInstanceWithoutEnviaments();
+        List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
+        for (int i = 0; i < numEnviaments; i++) {
+            NotEnviamentDatabaseDto enviament = getRandomEnviament(i);
             enviaments.add(enviament);
         }
         notCreated.setEnviaments(enviaments);
@@ -146,8 +118,35 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         return notCreated;
     }
 
-    private InputStream getContingutNotificacioAdjunt() {
-        return getClass().getResourceAsStream(
+    public static NotEnviamentDatabaseDto getRandomEnviament(int i){
+        NotEnviamentDatabaseDto enviament = new NotEnviamentDatabaseDto();
+        PersonaDto titular = PersonaDto.builder()
+                .interessatTipus(InteressatTipusEnumDto.FISICA)
+                .nom("titularNom" + i)
+                .llinatge1("titLlinatge1_" + i)
+                .llinatge2("titLlinatge2_" + i)
+                .nif("00000000T")
+                .telefon("666010101")
+                .email("titular@gmail.com").build();
+        enviament.setTitular(titular);
+        List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
+        PersonaDto destinatari = PersonaDto.builder()
+                .interessatTipus(InteressatTipusEnumDto.FISICA)
+                .nom("destinatariNom" + i)
+                .llinatge1("destLlinatge1_" + i)
+                .llinatge2("destLlinatge2_" + i)
+                .nif("12345678Z")
+                .telefon("666020202")
+                .email("destinatari@gmail.com").build();
+        destinataris.add(destinatari);
+        enviament.setDestinataris(destinataris);
+        enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
+        enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+        return enviament;
+    }
+
+    private static InputStream getContingutNotificacioAdjunt() {
+        return NotificacioItemTest.class.getResourceAsStream(
                 "/es/caib/notib/core/notificacio_adjunt.pdf");
     }
 }

@@ -1,36 +1,20 @@
 package es.caib.notib.plugin.registre;
 
+import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.regweb3.ws.api.v3.*;
+import org.apache.commons.io.IOUtils;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.BindingProvider;
-
-import org.apache.commons.io.IOUtils;
-
-import es.caib.notib.plugin.utils.PropertiesHelper;
-import es.caib.regweb3.ws.api.v3.RegWebAsientoRegistralWs;
-import es.caib.regweb3.ws.api.v3.RegWebAsientoRegistralWsService;
 //import org.fundaciobit.genapp.common.utils.Utils;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWs;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWithSecurityWsService;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWs;
-import es.caib.regweb3.ws.api.v3.RegWebHelloWorldWsService;
-import es.caib.regweb3.ws.api.v3.RegWebInfoWs;
-import es.caib.regweb3.ws.api.v3.RegWebInfoWsService;
-import es.caib.regweb3.ws.api.v3.RegWebPersonasWs;
-import es.caib.regweb3.ws.api.v3.RegWebPersonasWsService;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroEntradaWsService;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWs;
-import es.caib.regweb3.ws.api.v3.RegWebRegistroSalidaWsService;
-//import es.caib.regweb3.ws.v3.impl.RegWebAsientoRegistralWs;
-//import es.caib.regweb3.ws.v3.impl.RegWebAsientoRegistralWsService;
 /**
  * 
  * @author anadal

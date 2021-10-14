@@ -1,32 +1,19 @@
 package es.caib.notib.core.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import es.caib.notib.core.api.dto.AplicacioDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
 import es.caib.notib.core.api.service.AuditService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.auditoria.AplicacioAudit;
-import es.caib.notib.core.entity.auditoria.EntitatAudit;
-import es.caib.notib.core.entity.auditoria.GrupAudit;
-import es.caib.notib.core.entity.auditoria.GrupProcedimentAudit;
-import es.caib.notib.core.entity.auditoria.NotificacioAudit;
-import es.caib.notib.core.entity.auditoria.NotificacioEnviamentAudit;
-import es.caib.notib.core.entity.auditoria.ProcedimentAudit;
-import es.caib.notib.core.repository.auditoria.AplicacioAuditRepository;
-import es.caib.notib.core.repository.auditoria.EntitatAuditRepository;
-import es.caib.notib.core.repository.auditoria.GrupAuditRepository;
-import es.caib.notib.core.repository.auditoria.GrupProcedimentAuditRepository;
-import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
-import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
-import es.caib.notib.core.repository.auditoria.ProcedimentAuditRepository;
+import es.caib.notib.core.entity.auditoria.*;
+import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.repository.auditoria.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,9 +35,11 @@ public class AuditServiceImpl implements AuditService {
 	private NotificacioEnviamentAuditRepository notificacioEnviamentAuditRepository;
 	@Autowired
 	private ProcedimentAuditRepository procedimentAuditRepository;
-	
+	@Autowired
+	private NotificacioHelper notificacioHelper;
+
 	@Override
-	@Transactional(propagation = Propagation.MANDATORY)
+	@Transactional(propagation = Propagation.MANDATORY) // A JBoss ha de ser Propagation.MANDATORY, a tomcat Propagation.REQUIRED
 	public void audita(
 			Object objecteAuditar,
 			TipusOperacio tipusOperacio,
@@ -250,10 +239,12 @@ public class AuditServiceImpl implements AuditService {
 		}
 		if (isAuditar) {
 //			notificacioAuditRepository.flush();
-			audit = NotificacioAudit.getBuilder(
-					(NotificacioEntity)objecteAuditar, 
+			NotificacioEventEntity lastErrorEvent = notificacioHelper.getNotificaErrorEvent((NotificacioEntity)objecteAuditar);
+			audit = new NotificacioAudit(
+					(NotificacioEntity)objecteAuditar,
+					lastErrorEvent,
 					tipusOperacio,
-					joinPoint).build();
+					joinPoint);
 			NotificacioAudit lastAudit = notificacioAuditRepository.findLastAudit(audit.getNotificacioId());
 			if (lastAudit == null || !audit.getTipusOperacio().equals(lastAudit.getTipusOperacio()) || !audit.equals(lastAudit))
 				notificacioAuditRepository.saveAndFlush(audit);

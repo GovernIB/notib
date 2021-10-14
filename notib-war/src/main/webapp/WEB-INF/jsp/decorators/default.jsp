@@ -26,7 +26,8 @@
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 	pageContext.setAttribute(
 			"isRolActualAdministradorEntitat",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request),
+			PageContext.REQUEST_SCOPE);
 	pageContext.setAttribute(
 			"isRolActualUsuari",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuari(request));
@@ -48,6 +49,9 @@
 	pageContext.setAttribute(
 			"requestParameterCanviOrgan",
 			es.caib.notib.war.helper.OrganGestorHelper.getRequestParameterCanviOrgan());
+	pageContext.setAttribute(
+			"avisos",
+			es.caib.notib.war.helper.AvisHelper.getAvisos(request));
 	
 //	pageContext.setAttribute(
 //			"versioMajorActual",
@@ -315,23 +319,36 @@ body {
 									<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
 									<li><a href="<c:url value="/cache"/>"><spring:message code="decorator.menu.caches"/></a></li>
 									<li><a href="<c:url value="/notificacio/refrescarEstatNotifica"/>" title="<spring:message code="decorator.menu.expirades.ajuda"/>" data-toggle="modal" data-height="350px"><spring:message code="decorator.menu.expirades"/> </a></li>
+									<li>
+										<a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>">
+											<spring:message code="decorator.menu.config.properties"/>
+										</a>
+									</li>
 								</ul>
 							</div>
+							<a href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>
 							
 							</c:if>
 							<c:if test="${isRolActualUsuari}">
-<%-- 								<c:if test="${isRolActualUsuari and permisNotificacio}"> --%>
 									<div class="btn-group">
-<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
-										<a class="btn btn-primary" href="<c:url value="/notificacio/new"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a>
+										<div class="btn-group">
+											<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
+											</button>
+											<ul class="dropdown-menu">
+												<li><a href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+												<li><a href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
+												<li><a href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
+											</ul>
+										</div>
 									</div>
-<%-- 								</c:if> --%>
-							
-<%-- 								<c:if test="${permisNotificacio}"> --%>
-<!-- 									<div class="btn-group"> -->
-<%-- 										<a data-toggle="modal" class="btn btn-primary" href="<c:url value="/notificacio/procediments"/>"><span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.altanotificacio"/></a> --%>
-<!-- 									</div> -->
-<%-- 								</c:if> --%>
+									<div class="btn-group">
+										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a href="<c:url value="/notificacio/massiva/new"/>"><spring:message code="decorator.menu.notificacio.massiva.nova"/></a></li>
+											<li><a href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
+										</ul>
+									</div>
 									<div class="btn-group">
 										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
@@ -350,6 +367,7 @@ body {
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
+									<li><a href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
 								</ul>
 							</div>
 								
@@ -364,8 +382,9 @@ body {
 									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 									<li class="divider"></li>
 									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-									<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>
-									<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li>
+									<li class="divider"></li>
+									<li><a href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.operadorpostal"/></a></li>
+									<li><a href="<c:url value="/cie"/>"><spring:message code="decorator.menu.operadorcie"/></a></li>
 								</ul>
 							</div>
 							</c:if>
@@ -383,8 +402,8 @@ body {
 									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 									<%--<li class="divider"></li>--%>
 									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-									<%--<li><a href="<c:url value="/pagadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>  --%>
-									<%--<li><a href="<c:url value="/pagadorCie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li> --%>
+									<%--<li><a href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>  --%>
+									<%--<li><a href="<c:url value="/cie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li> --%>
 								</ul>
 							</div>
 							</c:if>
@@ -405,20 +424,39 @@ body {
 		</div>
 	</div>
 	<div class="container container-main container-custom">
-		<div class="panel panel-default">
-				<c:choose>
-					<c:when test="${notificacio.permisProcessar}">
-						<div class="panel-heading processarButton">
-							<h2 class="col-md-8">
-								<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>
-								<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>
-								<decorator:title />
-								<small><decorator:getProperty property="meta.subtitle"/></small>
-							</h2>
-							<a href="<c:url value="/notificacio/${notificacio.id}/processar"/>"  class="btn btn-info pull-right btn-processar"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a>
+	
+		<c:if test="${not empty avisos}">
+			<div id="accordion">
+				<c:forEach var="avis" items="${avisos}" varStatus="status">
+						<div class="card avisCard ${avis.avisNivell == 'INFO' ? 'avisCardInfo':''} ${avis.avisNivell == 'WARNING' ? 'avisCardWarning':''} ${avis.avisNivell == 'ERROR' ? 'avisCardError':''}">
+	
+							<div data-toggle="collapse" data-target="#collapse${status.index}" class="card-header avisCardHeader">
+								${avis.avisNivell == 'INFO' ? '<span class="fa fa-info-circle text-info"></span>':''} ${avis.avisNivell == 'WARNING' ? '<span class="fa fa-exclamation-triangle text-warning"></span>':''} ${avis.avisNivell == 'ERROR' ? '<span class="fa fa-warning text-danger"></span>':''} ${avis.assumpte}
+							<button class="btn btn-default btn-xs pull-right"><span class="fa fa-chevron-down "></span></button>										
+							</div>
+	
+							<div id="collapse${status.index}" class="collapse" data-parent="#accordion">
+								<div class="card-body avisCardBody" >${avis.missatge}</div>
+							</div>
 						</div>
-					</c:when>
-					<c:otherwise>
+				</c:forEach>
+			</div>
+		</c:if>
+		
+		<div class="panel panel-default">
+<%--				<c:choose>--%>
+<%--					<c:when test="${notificacio.permisProcessar}">--%>
+<%--						<div class="panel-heading processarButton">--%>
+<%--							<h2 class="col-md-8">--%>
+<%--								<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>--%>
+<%--								<c:if test="${not empty metaTitleIconClass}"><span class="${metaTitleIconClass}"></span></c:if>--%>
+<%--								<decorator:title />--%>
+<%--								<small><decorator:getProperty property="meta.subtitle"/></small>--%>
+<%--							</h2>--%>
+<%--							<a href="<c:url value="/notificacio/${notificacio.id}/processar"/>"  class="btn btn-info pull-right btn-processar"  data-toggle="modal" data-modal-id="modal-processar"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a>--%>
+<%--						</div>--%>
+<%--					</c:when>--%>
+<%--					<c:otherwise>--%>
 						<div class="panel-heading">
 							<h2>
 								<c:set var="metaTitleIconClass"><decorator:getProperty property="meta.title-icon-class"/></c:set>
@@ -427,8 +465,8 @@ body {
 								<small><decorator:getProperty property="meta.subtitle"/></small>
 							</h2>
 						</div>
-					</c:otherwise>
-				</c:choose>
+<%--					</c:otherwise>--%>
+<%--				</c:choose>--%>
 			<div class="panel-body">
 				<div id="contingut-missatges"><not:missatges/></div>
     			<decorator:body />

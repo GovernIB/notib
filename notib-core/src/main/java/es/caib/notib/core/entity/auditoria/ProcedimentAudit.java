@@ -1,17 +1,16 @@
 package es.caib.notib.core.entity.auditoria;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Table;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Table;
 
 /**
  * Classe del model de dades que representa la informació de auditoria d'un procediment.
@@ -88,8 +87,6 @@ public class ProcedimentAudit extends NotibAuditoria<Long> {
 			built.caducitat = procedimentEntity.getCaducitat();
 			built.agrupar = procedimentEntity.isAgrupar();
 			built.comu = procedimentEntity.isComu();
-			built.pagadorpostalId = procedimentEntity.getPagadorpostal() != null ? procedimentEntity.getPagadorpostal().getId() : null;
-			built.pagadorcieId = procedimentEntity.getPagadorcie() != null ? procedimentEntity.getPagadorcie().getId() : null;
 		}
 		Builder(
 				ProcedimentDto procedimentDto,
@@ -107,8 +104,8 @@ public class ProcedimentAudit extends NotibAuditoria<Long> {
 			built.caducitat = procedimentDto.getCaducitat();
 			built.agrupar = procedimentDto.isAgrupar();
 			built.comu = procedimentDto.isComu();
-			built.pagadorpostalId = procedimentDto.getPagadorpostal() != null ? procedimentDto.getPagadorpostal().getId() : null;
-			built.pagadorcieId = procedimentDto.getPagadorcie() != null ? procedimentDto.getPagadorcie().getId() : null;
+//			built.pagadorpostalId = procedimentDto.getPagadorpostal() != null ? procedimentDto.getPagadorpostal().getId() : null;
+//			built.pagadorcieId = procedimentDto.getPagadorcie() != null ? procedimentDto.getPagadorcie().getId() : null;
 		}
 		public ProcedimentAudit build() {
 			return built;

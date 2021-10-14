@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import es.caib.notib.core.entity.PagadorCieEntity;
-import es.caib.notib.core.entity.PagadorCieFormatFullaEntity;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorCieFormatFullaEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base

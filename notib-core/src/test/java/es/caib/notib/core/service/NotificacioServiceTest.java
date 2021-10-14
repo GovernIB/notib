@@ -1,344 +1,257 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.test.data.ConfigTest;
-import es.caib.notib.core.test.data.NotificacioItemTest;
-import es.caib.notib.core.test.data.ProcedimentItemTest;
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.registre.RegistrePluginException;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.lang.SerializationUtils;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.plugins.arxiu.api.*;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
-@Transactional
-public class NotificacioServiceTest extends BaseServiceTestV2 {
-	
-	private static final int NUM_DESTINATARIS = 2;
-	
-	@Autowired
-	PermisosHelper permisosHelper;
-	@Autowired
-	NotificacioService notificacioService;
-	@Autowired
-	NotificacioRepository notificacioRepository;
+@RunWith(MockitoJUnitRunner.class)
+public class NotificacioServiceTest {
 
-	EntitatDto entitatCreate;
-
-	@Autowired
-	ProcedimentItemTest procedimentCreate;
-	@Autowired
-	NotificacioItemTest notificacioCreate;
+	@Mock
+	private PluginHelper pluginHelper;
+	@Mock
+	private ConfigHelper configHelper;
+	
+	@InjectMocks
+	NotificacioService notificacioService = new NotificacioServiceImpl();
 	
 	@Before
-	public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
-		List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
-		entitatCreate = new EntitatDto();
-		entitatCreate.setCodi("LIMIT");
-		entitatCreate.setNom("Limit Tecnologies");
-		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-		entitatCreate.setDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
-		entitatCreate.setApiKey(ConfigTest.ENTITAT_DGTIC_KEY);
-		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
-		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-		entitatCreate.setTipusDocDefault(tipusDocDefault);
+	public void setUp() {
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.document.consulta.id.csv.mida.min"))).thenReturn(16);
+
+	}
+
+	//Test consultaDocumentIMetadades para Uuid docu existent y metadades existents
+	@Test
+	public void whenConsultaDocumentIMetadades_uuid_withDocuAndMetadades_thenReturn() {
+
+		// Given	
+		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
+		Boolean esUuid = Boolean.TRUE;
 		
-		PermisDto permisUsuari = new PermisDto();
-		PermisDto permisAdminEntitat = new PermisDto();
+		Document documentArxiu = initDocument(identificador);
 		
-		permisUsuari.setUsuari(true);
-		permisUsuari.setTipus(TipusEnumDto.USUARI);
-		permisUsuari.setPrincipal("admin");
-		permisosEntitat.add(permisUsuari);
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+				
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);
+			
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNotNull(document.getOrigen());
+		assertNotNull(document.getValidesa());
+		assertNotNull(document.getTipoDocumental());
+		assertNotNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		comprobarMetadadesCoinciden(documentArxiu, document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid); 
+	}
+	
+	//Test consultaDocumentIMetadades para CSV docu existent y metadades existents
+	@Test
+	public void whenConsultaDocumentIMetadades_csv_withDocuAndMetadades_thenReturn() {
 		
-		permisAdminEntitat.setAdministradorEntitat(true);
-		permisAdminEntitat.setTipus(TipusEnumDto.USUARI);
-		permisAdminEntitat.setPrincipal("admin");
-		permisosEntitat.add(permisAdminEntitat);
-		entitatCreate.setPermisos(permisosEntitat);
+		// Given	
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean esUuid = Boolean.FALSE;
+		
+		Document documentArxiu = initDocument(identificador);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+			
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);		
+		
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNotNull(document.getOrigen());
+		assertNotNull(document.getValidesa());
+		assertNotNull(document.getTipoDocumental());
+		assertNotNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		comprobarMetadadesCoinciden(documentArxiu, document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+		
+	}
+	
+	//Test consultaDocumentIMetadades para Uuid docu existent y metadades inexistents
+	@Test
+	public void whenConsultaDocumentIMetadades_uuid_withDocuWithoutMetadades_thenReturn() {
+		
+		// Given	
+		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
+		Boolean esUuid = Boolean.TRUE;
+		
+		Document documentArxiu = initDocument(identificador);
+		documentArxiu.setMetadades(null);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+				
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);
+			
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNull(document.getOrigen());
+		assertNull(document.getValidesa());
+		assertNull(document.getTipoDocumental());
+		assertNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid); 
+		
+	}
+	//Test consultaDocumentIMetadades para CSV docu existent y metadades inexistents
+	@Test
+	public void whenConsultaDocumentIMetadades_csv_withDocuWithoutMetadades_thenReturn() {
+		
+		// Given	
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean esUuid = Boolean.FALSE;
+		
+		Document documentArxiu = initDocument(identificador);
+		documentArxiu.setMetadades(null);
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false))).thenReturn(documentArxiu);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
+		
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);		
+		
+		// Then
+		assertNotNull(document);
+		assertNotNull(document.getCsv());
+		assertNull(document.getOrigen());
+		assertNull(document.getValidesa());
+		assertNull(document.getTipoDocumental());
+		assertNull(document.getModoFirma());
+		assertEquals("El identificador no coincide", identificador, document.getCsv());
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+	}
+	//Test consultaDocumentIMetadades para Uuid docu inexistent
+	@Test(expected = Exception.class)
+	public void whenConsultaDocumentIMetadades_uuid_withoutDocument_thenException() {
+		
+		// Given	
+		String identificador = "7c47a378-bc04-47de-86e6-16a17064deb1";
+		Boolean esUuid = Boolean.TRUE;
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenThrow(Exception.class);
 
-//		organGestorCreate.setItemIdentifier("organGestor");
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);
+		
+		// Then
+		assertNull(document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+	}
+	//Test consultaDocumentIMetadades para CSV docu inexistent
+	@Test(expected = Exception.class)
+	public void whenConsultaDocumentIMetadades_csv_withoutDocument_thenException() {
+		
+		// Given	
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean esUuid = Boolean.FALSE;
+		
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(false))).thenThrow(Exception.class);
 
-		procedimentCreate.addObject("procediment", procedimentCreate.getRandomInstance());
+		// When	
+		DocumentDto document = notificacioService.consultaDocumentIMetadades(identificador, esUuid);		
+		
+		// Then
+		assertNull(document);
+		//verifica que se ha llamado 1 vez a este método
+		Mockito.verify(pluginHelper).arxiuDocumentConsultar(identificador, null, true, esUuid);
+		
+	}	
+	private Document initDocument(String identificador) {
+		Document documentArxiu = new Document();
+		
+		DocumentContingut contingut = new DocumentContingut();
+		contingut.setArxiuNom("arxiu.pdf");
+		contingut.setTipusMime("application/pdf");
+		contingut.setContingut("/es/caib/notib/core/arxiu.pdf".getBytes());
+//		try {
+//			byte[] arxiuBytes = IOUtils.toByteArray(getClass().getResourceAsStream(
+//					"/es/caib/notib/core/notificacio_adjunt.pdf"));		
+//			contingut.setContingut(arxiuBytes);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		contingut.setTamany(contingut.getContingut().length);
+		documentArxiu.setContingut(contingut);
+		
+		documentArxiu.setEstat(DocumentEstat.DEFINITIU);
+		documentArxiu.setFirmes(null);
+		documentArxiu.setIdentificador(identificador);
+		
+		DocumentMetadades metadades = new DocumentMetadades();
+		metadades.setOrigen(ContingutOrigen.ADMINISTRACIO);
+		metadades.setEstatElaboracio(DocumentEstatElaboracio.ORIGINAL);
+		metadades.setTipusDocumental(DocumentTipus.INFORME);
+		documentArxiu.setMetadades(metadades);
+		
+		documentArxiu.setNom("Nombre Document Arxiu");
+		documentArxiu.setVersio("Version");
 
-		notificacioCreate.addObject("notificacio", notificacioCreate.getRandomInstance());
-		notificacioCreate.addRelated("notificacio", "procediment", procedimentCreate);
-
-		notificacioCreate.addObject("notificacioError", notificacioCreate.getRandomInstance());
-		notificacioCreate.addRelated("notificacioError", "procediment", procedimentCreate);
-
-		System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
-
-
-		configureMockUnitatsOrganitzativesPlugin();
+		return documentArxiu;
+	}
+	
+	private void comprobarMetadadesCoinciden(Document documentArxiu, DocumentDto document) {
+		assertEquals("El origen no coincide", OrigenEnum.valorAsEnum(documentArxiu.getMetadades().getOrigen().ordinal()), document.getOrigen());
+		assertEquals("Validesa no coincide", ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(documentArxiu.getMetadades().getEstatElaboracio())), document.getValidesa());
+		assertEquals("El tipo documental no coincide", TipusDocumentalEnum.valorAsEnum(documentArxiu.getMetadades().getTipusDocumental().toString()), document.getTipoDocumental());
+		assertEquals("El modo firma no coincide", pluginHelper.getModeFirma(documentArxiu, documentArxiu.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE, document.getModoFirma());
 	}
 	
 	@Test
-	public void create() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(ElementsCreats elementsCreats) throws Exception {
-					configureMockRegistrePlugin();
-					configureMockDadesUsuariPlugin();
-					configureMockGestioDocumentalPlugin();
-
-					authenticationTest.autenticarUsuari("admin");
-
-					EntitatDto entitatCreate = elementsCreats.entitat;
-					ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-					assertNotNull(procedimentCreate);
-					assertNotNull(procedimentCreate.getId());
-					assertNotNull(entitatCreate);
-					assertNotNull(entitatCreate.getId());
-
-					NotificacioDatabaseDto notificacio = (NotificacioDatabaseDto) notificacioCreate.getRandomInstance();
-					notificacio.setProcediment(procedimentCreate);
-
-					NotificacioDatabaseDto notificacioCreated = notificacioService.create(
-							entitatCreate.getId(),
-							notificacio);
-					try {
-						// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
-						assertNotNull(notificacioCreated);
-						assertEquals(notificacio.getProcediment().getId(), notificacioCreated.getProcediment().getId());
-						assertEquals(notificacio.getOrganGestorCodi(), notificacioCreated.getOrganGestorCodi());
-//					assertEquals(notificacio.getGrup().getId(), notificacioCreated.getGrup().getId()); // de moment no l'hem posat
-						assertEquals(notificacio.getUsuariCodi(), notificacioCreated.getUsuariCodi());
-						assertEquals(notificacio.getEmisorDir3Codi(), notificacioCreated.getEmisorDir3Codi());
-						assertEquals(notificacio.getEnviamentTipus(), notificacioCreated.getEnviamentTipus());
-						assertEquals(notificacio.getConcepte(), notificacioCreated.getConcepte());
-						assertEquals(notificacio.getDescripcio(), notificacioCreated.getDescripcio());
-						assertEquals(notificacio.getEnviamentDataProgramada(), notificacioCreated.getEnviamentDataProgramada());
-						assertEquals(notificacio.getRetard(), notificacioCreated.getRetard());
-						assertEquals(notificacio.getCaducitat(), notificacioCreated.getCaducitat());
-						assertEquals(notificacio.getNumExpedient(), notificacioCreated.getNumExpedient());
-						assertEquals(notificacio.getIdioma(), notificacioCreated.getIdioma());
-
-						assertEquals(notificacio.getDocument().getArxiuGestdocId(), notificacioCreated.getDocument().getArxiuGestdocId());
-						assertEquals(notificacio.getDocument().getArxiuNom(), notificacioCreated.getDocument().getArxiuNom());
-						assertEquals(notificacio.getDocument().getMediaType(), notificacioCreated.getDocument().getMediaType());
-						assertEquals(notificacio.getDocument().getMida(), notificacioCreated.getDocument().getMida());
-						if (notificacio.getDocument().getContingutBase64() != null) {
-							assertNull(notificacioCreated.getDocument().getContingutBase64());
-//							assertNotNull(notificacioCreated.getDocument().getArxiuGestdocId()); // El mockito del plugin de gestió documental està mal configurat, sempre retorna null
-						}
-
-//						assertEquals(notificacio.getDocument().getHash(), notificacioCreated.getDocument().getHash()); // no sé que fa
-						assertEquals(notificacio.getDocument().getUrl(), notificacioCreated.getDocument().getUrl());
-						assertEquals(notificacio.getDocument().isNormalitzat(), notificacioCreated.getDocument().isNormalitzat());
-						assertEquals(notificacio.getDocument().isGenerarCsv(), notificacioCreated.getDocument().isGenerarCsv());
-						assertEquals(notificacio.getDocument().getUuid(), notificacioCreated.getDocument().getUuid());
-						assertEquals(notificacio.getDocument().getCsv(), notificacioCreated.getDocument().getCsv());
-						assertEquals(notificacio.getDocument().getOrigen(), notificacioCreated.getDocument().getOrigen());
-						assertEquals(notificacio.getDocument().getValidesa(), notificacioCreated.getDocument().getValidesa());
-						assertEquals(notificacio.getDocument().getTipoDocumental(), notificacioCreated.getDocument().getTipoDocumental());
-						assertEquals(notificacio.getDocument().getModoFirma(), notificacioCreated.getDocument().getModoFirma());
-
-						for (int i = 0; i < NUM_DESTINATARIS; i ++ ) {
-							NotificacioEnviamentDtoV2 enviament = notificacio.getEnviaments().get(i);
-							NotificacioEnviamentDtoV2 enviamentCreat = notificacioCreated.getEnviaments().get(i);
-							assertEquals(enviament.getServeiTipus(), enviamentCreat.getServeiTipus());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-							assertEquals(enviament.getTitular().getLlinatge1(), enviamentCreat.getTitular().getLlinatge1());
-							assertEquals(enviament.getTitular().getLlinatge2(), enviamentCreat.getTitular().getLlinatge2());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-
-							// TODO: Check destinataris
-						}
-					}finally {
-
-						notificacioService.delete(entitatCreate.getId(), notificacioCreated.getId());
-					}
-
-				}
-			}, 
-			"Create Notificació",
-			entitatCreate,
-			procedimentCreate);
+	public void whenValidarIdCsv_valid_thenReturnTrue() {
+		String identificador = "54a27c163550ef2d5f3a8cd985a4ab949b6dfb5e66174a11c2bc979e0070090a";
+		Boolean validaIdCsv = notificacioService.validarIdCsv(identificador);
+		assertTrue(validaIdCsv);
 	}
-
+	
 	@Test
-	public void delete() {
+	public void whenValidarIdCsv_noValid_thenReturnFalse() {
+		String identificador = "54a27c163550ef2";
+		Boolean validaIdCsv = notificacioService.validarIdCsv(identificador);
+		assertFalse(validaIdCsv);
 	}
-
-	@Test
-	public void update() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						EntitatDto entitatCreate = elementsCreats.entitat;
-						ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-						NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-						NotificacioDatabaseDto notificacioErrorCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacioError");
-
-
-						NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
-						notificacioEdicio.setOrganGestorCodi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
-						notificacioEdicio.setConcepte("concepte edicio");
-						notificacioEdicio.setRetard(2);
-
-						NotificacioDatabaseDto notificacioEditada = notificacioService.update(entitatCreate.getId(),
-								notificacioEdicio,
-								true
-								);
-
-						// comprovar si les dades introduïdes són iguals a les que s'han posat a la base de dades
-						assertNotNull(notificacioEditada);
-						assertEquals(notificacioCreate.getId(), notificacioEditada.getId());
-						assertEquals(notificacioCreate.getProcediment().getId(), notificacioEditada.getProcediment().getId());
-
-						// TODO: per a l'òrgan gestor hi ha diverses casuïstiques a tenir en compte en un altre test
-//						assertNotEquals(notificacioCreate.getOrganGestorCodi(),notificacioEditada.getOrganGestorCodi());
-						assertNotEquals(notificacioCreate.getConcepte(), notificacioEditada.getConcepte());
-						assertEquals((Integer) 2, notificacioEditada.getRetard());
-
-						for (int i = 0; i < NUM_DESTINATARIS; i ++ ) {
-							NotificacioEnviamentDtoV2 enviament = notificacioCreate.getEnviaments().get(i);
-							NotificacioEnviamentDtoV2 enviamentCreat = notificacioEditada.getEnviaments().get(i);
-							assertEquals(enviament.getServeiTipus(), enviamentCreat.getServeiTipus());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-							assertEquals(enviament.getTitular().getLlinatge1(), enviamentCreat.getTitular().getLlinatge1());
-							assertEquals(enviament.getTitular().getLlinatge2(), enviamentCreat.getTitular().getLlinatge2());
-							assertEquals(enviament.getTitular().getNom(), enviamentCreat.getTitular().getNom());
-
-							// TODO: Check destinataris
-						}
-
-					}
-				},
-				"Update Notificació",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
+	
+	@After
+	public void tearDown() {
+		Mockito.reset(pluginHelper);
 	}
-	@Test
-	public void whenUptateNotificacio_thenResetRegistreEnviamentIntent() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-
-						// Given: notificacio pendent registrar amb nombre màxim de reintents
-						NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
-						notEntity.setRegistreEnviamentIntent(pluginHelper.getRegistreReintentsMaxProperty());
-						notEntity.setEstat(NotificacioEstatEnumDto.PENDENT);
-						notificacioRepository.saveAndFlush(notEntity);
-
-						// When
-						NotificacioDatabaseDto notificacioEditadaDto = notificacioService.update(elementsCreats.entitat.getId(),
-								notificacioError,
-								true
-						);
-
-						// Then
-						NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
-						assertEquals(0, notEditada.getRegistreEnviamentIntent());
-
-
-					}
-				},
-				"Test registre notificació",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
-	}
-
-	@Test
-	public void whenUptateNotificacio_thenResetNotificaEnviamentIntent() {
-		testCreantElements(
-				new TestAmbElementsCreats() {
-					@Override
-					public void executar(ElementsCreats elementsCreats) throws Exception {
-						NotificacioDatabaseDto notificacioError = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-
-						// Given: notificacio pendent registrar amb nombre màxim de reintents
-						NotificacioEntity notEntity = notificacioRepository.findOne(notificacioError.getId());
-						notEntity.setNotificaEnviamentIntent(pluginHelper.getNotificaReintentsMaxProperty());
-						notEntity.setEstat(NotificacioEstatEnumDto.REGISTRADA);
-						notificacioRepository.saveAndFlush(notEntity);
-
-						// When
-						NotificacioDatabaseDto notificacioEditadaDto = notificacioService.update(elementsCreats.entitat.getId(),
-								notificacioError,
-								true
-						);
-
-						// Then
-						NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
-						assertEquals(0, notEditada.getNotificaEnviamentIntent());
-
-						List pendents = notificacioService.getNotificacionsPendentsEnviar();
-
-
-					}
-				},
-				"Test registre notificació",
-				entitatCreate,
-				procedimentCreate,
-				notificacioCreate);
-	}
-
-//	@Test
-	public void notificacioRegistrar() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(ElementsCreats elementsCreats) throws Exception {
-					EntitatDto entitatCreate = elementsCreats.entitat;
-					ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
-					NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
-
-					configureMockUnitatsOrganitzativesPlugin();
-					configureMockRegistrePlugin();
-					Mockito.mock(SchedulledServiceImpl.class);
-					notificacioService.notificacioRegistrar(notificacioCreate.getId());
-
-//						NotificacioDatabaseDto notificacioEdicio = (NotificacioDatabaseDto) SerializationUtils.clone(notificacioCreate);
-//						notificacioEdicio.setOrganGestorCodi(ConfigTest.ENTITAT_DGTIC_DIR3CODI);
-//						notificacioEdicio.setConcepte("concepte edicio");
-//						notificacioEdicio.setRetard(2);
-//
-//						NotificacioDatabaseDto notificacioEditada = notificacioService.update(entitatCreate.getId(),
-//								notificacioEdicio,
-//								true
-//						);
-				}
-			},
-			"Test registre notificació",
-			entitatCreate,
-			procedimentCreate,
-			notificacioCreate);
-	}
-
-	@Test
-	public void notificacioEnviar() {
-	}
-
 }
-
-

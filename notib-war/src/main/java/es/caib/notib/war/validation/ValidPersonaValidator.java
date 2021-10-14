@@ -2,15 +2,14 @@ package es.caib.notib.war.validation;
 
 
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.NifHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
@@ -18,6 +17,8 @@ import es.caib.notib.war.helper.NifHelper;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, PersonaCommand> {
+
+	private final int MAX_SIZE_NOM = 80;
 
 	@Override
 	public void initialize(final ValidPersona constraintAnnotation) {
@@ -30,7 +31,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		
 		try {
 			
-			// Validació del Concepte
+			// Validació del NIF/NIE/CIF
 			if (persona.getNif() != null && !persona.getNif().isEmpty()) {
 				if (!NifHelper.isvalid(persona.getNif())) {
 					valid = false;
@@ -44,13 +45,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			// Validacions per tipus de persona
 			switch (persona.getInteressatTipus()) {
 			case FISICA:
-				if (persona.getNom() == null || persona.getNom().isEmpty()) {
-					valid = false;
-					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.nom"))
-					.addNode("nom")
-					.addConstraintViolation();
-				}
+				valid = validarNom(persona, context, "notificacio.form.valid.fisica.nom");
 				if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
@@ -65,19 +60,27 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 					.addNode("nif")
 					.addConstraintViolation();
 				}
-				break;
-			case JURIDICA:
-				if (persona.getNom() == null || persona.getNom().isEmpty()) {
+				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.rao"))
-					.addNode("nom")
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto"))
+					.addNode("nif")
 					.addConstraintViolation();
 				}
+				break;
+			case JURIDICA:
+				valid = validarNom(persona, context, "notificacio.form.valid.juridica.rao");
 				if (persona.getNif() == null || persona.getNif().isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.nif"))
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.cif"))
+					.addNode("nif")
+					.addConstraintViolation();
+				}
+				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidCif(persona.getNif())) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+							MessageHelper.getInstance().getMessage("notificacio.form.valid.juridica.tipoDocumentoIncorrecto"))
 					.addNode("nif")
 					.addConstraintViolation();
 				}
@@ -110,7 +113,18 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		
 		return valid;
 	}
-	
+
+	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context, String messageKey) {
+		if (persona.getNom() == null || persona.getNom().isEmpty() || persona.getNom().length() > MAX_SIZE_NOM) {
+			context.buildConstraintViolationWithTemplate(
+					MessageHelper.getInstance().getMessage(messageKey))
+					.addNode("nom")
+					.addConstraintViolation();
+			return false;
+		}
+		return true;
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidPersonaValidator.class);
 
 }

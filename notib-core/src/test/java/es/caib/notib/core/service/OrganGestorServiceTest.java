@@ -1,243 +1,154 @@
 package es.caib.notib.core.service;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.List;
-
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.cacheable.PermisosCacheable;
+import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.*;
+import es.caib.notib.core.test.data.ConfigTest;
+import es.caib.notib.plugin.SistemaExternException;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
-import es.caib.notib.core.api.dto.OrganGestorDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.dto.TipusEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RunWith(MockitoJUnitRunner.class)
+public class OrganGestorServiceTest {
+    @Mock
+    private ProcedimentRepository procedimentRepository;
+    @Mock
+    private OrganGestorRepository organGestorRepository;
+    @Mock
+    private NotificacioTableViewRepository notificacioTableViewRepository;
+    @Mock
+    private EnviamentTableRepository enviamentTableRepository;
+    @Mock
+    private ConversioTipusHelper conversioTipusHelper;
+    @Mock
+    private EntityComprovarHelper entityComprovarHelper;
+    @Mock
+    private PaginacioHelper paginacioHelper;
+    @Mock
+    private PermisosHelper permisosHelper;
+    @Mock
+    private CacheHelper cacheHelper;
+    @Mock
+    private OrganigramaHelper organigramaHelper;
+    @Mock
+    private MetricsHelper metricsHelper;
+    @Mock
+    private GrupRepository grupReposity;
+    @Mock
+    private PagadorPostalRepository pagadorPostalReposity;
+    @Mock
+    private PagadorCieRepository pagadorCieReposity;
+    @Mock
+    private OrganGestorHelper organGestorHelper;
+    @Mock
+    private OrganGestorCachable organGestorCachable;
+    @Mock
+    private PermisosCacheable permisosCacheable;
+    @Mock
+    private ProcedimentsCacheable procedimentsCacheable;
+    @Mock
+    private ConfigHelper configHelper;
+    @Mock
+    private EntregaCieRepository entregaCieRepository;
+    @InjectMocks
+    private OrganGestorServiceImpl organGestorService;
+
+    private static final long ENTITAT_ID = 2L;
+    private static final String ENTITAT_CODI = ConfigTest.ORGAN_DIR3;
+
+    private static final String ORGAN_CODI = ConfigTest.DEFAULT_ORGAN_DIR3;
+
+    @Before
+    public void setUp() throws Exception {
+        EntitatEntity entitatEntity = new EntitatEntity();
+        ReflectionTestUtils.setField(entitatEntity, "id", ENTITAT_ID);
+        ReflectionTestUtils.setField(entitatEntity, "apiKey", "APIKEY");
+        ReflectionTestUtils.setField(entitatEntity, "dir3Codi", ENTITAT_CODI);
+
+        Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(2L))).thenReturn(entitatEntity);
+
+        OrganGestorEntity organGestor = OrganGestorEntity.builder(
+                ORGAN_CODI,
+                "nom vell",
+                entitatEntity,
+                "llibre",
+                "llibre nom",
+                "oficina",
+                "oficina nom",
+                OrganGestorEstatEnum.ALTRES)
+                .build();
+        Mockito.when(organGestorRepository.findByCodi(Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
+    }
+
+    @Test
+    public void givenOrganGestorInexistentAlRegistre_whenUpdateOne_thenUpdateAllfieldsExceptLlibre() throws RegistrePluginException, SistemaExternException {
+        // Given
+        Mockito.when(cacheHelper.getLlibreOrganGestor(
+                Mockito.eq(ENTITAT_CODI),
+                Mockito.eq(ORGAN_CODI)
+        )).thenReturn(null);
+
+        Mockito.when(cacheHelper.findDenominacioOrganisme(Mockito.eq(ORGAN_CODI))).thenReturn("Nom nou");
+
+        Map<String, NodeDir3> arbreUnitats = new HashMap<>();
+        NodeDir3 nodeOrganDefault = new NodeDir3();
+        nodeOrganDefault.setCodi(ORGAN_CODI);
+        nodeOrganDefault.setDenominacio("Òrgan default");
+        nodeOrganDefault.setEstat("Vigent");
+        arbreUnitats.put(ORGAN_CODI, nodeOrganDefault);
+        Mockito.when(cacheHelper.findOrganigramaNodeByEntitat(Mockito.eq(ENTITAT_CODI))).thenReturn(arbreUnitats);
+
+        List<OficinaDto> oficinesSIR = new ArrayList<>();
+        oficinesSIR.add(new OficinaDto("CODI2", "OFICINA NOVA"));
+        Mockito.when(cacheHelper.getOficinesSIRUnitat(
+                Mockito.<Map<String, NodeDir3>>any(), Mockito.eq(ORGAN_CODI))
+        ).thenReturn(oficinesSIR);
+        Mockito.when(organGestorHelper.getEstatOrgan(Mockito.eq(nodeOrganDefault))).thenCallRealMethod();
 
 
+        OrganGestorEntity organGestor = organGestorRepository.findByCodi(ORGAN_CODI);
+        Assert.assertEquals(ORGAN_CODI, organGestor.getCodi());
+        Assert.assertEquals("nom vell", organGestor.getNom());
+        Assert.assertEquals(ENTITAT_ID, (long) organGestor.getEntitat().getId());
+        Assert.assertEquals("llibre", organGestor.getLlibre());
+        Assert.assertEquals("llibre nom", organGestor.getLlibreNom());
+        Assert.assertEquals("oficina", organGestor.getOficina());
+        Assert.assertEquals("oficina nom", organGestor.getOficinaNom());
+        Assert.assertEquals(OrganGestorEstatEnum.ALTRES, organGestor.getEstat());
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
-@Transactional
-public class OrganGestorServiceTest extends BaseServiceTest{
+        // When
+        organGestorService.updateOne(ENTITAT_ID, ORGAN_CODI);
 
-	
-	private EntitatDto entitatCreate;
-//	private PermisDto permisUser;
-	private PermisDto permisAdmin;
-	private OrganGestorDto organoGestorCreate;
-	
-	
-	@Before
-	public void setUp() {
-		entitatCreate = new EntitatDto();
-		entitatCreate.setCodi("LIMIT");
-		entitatCreate.setNom("Limit Tecnologies");
-		entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
-		entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-		entitatCreate.setDir3Codi("23599770E");
-		entitatCreate.setApiKey("123abc");
-		entitatCreate.setAmbEntregaDeh(true);
-		entitatCreate.setAmbEntregaCie(true);
-		TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-		tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-		entitatCreate.setTipusDocDefault(tipusDocDefault);
-		
-		permisAdmin = new PermisDto();
-		permisAdmin.setAdministration(true);
-		permisAdmin.setAdministradorEntitat(true);
-		permisAdmin.setTipus(TipusEnumDto.USUARI);
-		permisAdmin.setPrincipal("admin");
-		
-//		permisUser = new PermisDto();
-//		permisUser.setUsuari(true);
-//		permisUser.setTipus(TipusEnumDto.USUARI);
-//		permisUser.setPrincipal("user");
-		
-		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
-		
-		organoGestorCreate= new OrganGestorDto();
-		organoGestorCreate.setCodi("123456789");
-		organoGestorCreate.setNom("Procedimiento 1");
-		
-	}
-	
-	
-	
-	@Test
-	public void create() {
-		
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats){
-					autenticarUsuari("admin");
-					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-					OrganGestorDto creat = (OrganGestorDto)elementsCreats.get(1);
-					
-					assertNotNull(creat);
-					assertNotNull(creat.getId());
-					
-					comprovarOrganoGestor(
-							organoGestorCreate,
-							creat);
-
-					assertEquals(entitatCreate.getId(), creat.getEntitatId());
-				}
-			}, 
-			"Create ORGAN GESTOR", 
-			entitatCreate,
-			organoGestorCreate
-			);
-	}
-
-	@Test
-	public void delete() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats){
-					EntitatDto entitatCreada=(EntitatDto)elementsCreats.get(0);
-					OrganGestorDto organGestorCreat=(OrganGestorDto)elementsCreats.get(1);
-
-					autenticarUsuari("admin");
-					OrganGestorDto esborrada = organGestorService.delete(
-							entitatCreada.getId(), 
-							organGestorCreat.getId());
-					comprovarOrganoGestor(
-							organoGestorCreate,
-							esborrada);
-
-					try {						
-						organGestorService.findById(
-								entitatCreada.getId(),
-								organGestorCreat.getId());
-						fail("L'òrgan gestor esborrat no s'hauria d'haver trobat");												
-					}catch(NotFoundException expected) {
-					}
-					elementsCreats.remove(organGestorCreat);
-				}
-			},
-			"Delete ORGAN GESTOR",
-			entitatCreate,
-			organoGestorCreate);
-	}
-	
-	@Test
-	public void findById() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats)throws NotFoundException{
-					autenticarUsuari("admin");
-					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					OrganGestorDto organCreat = (OrganGestorDto)elementsCreats.get(1);
-					
-					OrganGestorDto trobat = organGestorService.findById(
-							entitatCreada.getId(),
-							organCreat.getId());
-
-					assertNotNull(trobat);
-					assertNotNull(trobat.getId());
-					comprovarOrganoGestor(
-							organoGestorCreate,
-							trobat);
-				}
-			},
-			"FindById ORGAN GESTOR",
-			entitatCreate,
-			organoGestorCreate);
-	}
-	
-	@Test
-	public void findByCodi() {
-		testCreantElements(
-			new TestAmbElementsCreats() {
-				@Override
-				public void executar(List<Object> elementsCreats)throws NotFoundException{
-					autenticarUsuari("admin");
-					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					OrganGestorDto organCreat = (OrganGestorDto)elementsCreats.get(1);
-							
-					OrganGestorDto trobat = organGestorService.findByCodi(
-							entitatCreada.getId(), 
-							organCreat.getCodi());
-					assertNotNull(trobat);
-					assertNotNull(trobat.getId());
-					comprovarOrganoGestor(
-							organoGestorCreate,
-							trobat);
-				}
-			},
-			"FindByCodi ORGAN GESTOR",
-			entitatCreate,
-			organoGestorCreate
-			);
-	}
-	
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesSuperCreate() {
-		autenticarUsuari("super");
-		organGestorService.create(organoGestorCreate);
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplCreate() {
-		autenticarUsuari("apl");
-		organGestorService.create(organoGestorCreate);
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplDelete() {
-		autenticarUsuari("apl");
-		organGestorService.delete(
-				entitatCreate.getId(), 
-				organoGestorCreate.getId());
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesSuperDelete() {
-		autenticarUsuari("super");
-		organGestorService.delete(
-				entitatCreate.getId(), 
-				organoGestorCreate.getId());
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesSuperFinById() {
-		autenticarUsuari("super");
-		organGestorService.findById(entitatCreate.getId(),
-				organoGestorCreate.getId());
-	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplFinById() {
-		autenticarUsuari("apl");
-		organGestorService.findById(entitatCreate.getId(),
-				organoGestorCreate.getId());
-	}
-	
-	
-	private void comprovarOrganoGestor(
-			OrganGestorDto original,
-			OrganGestorDto perComprovar) {
-		assertEquals(
-				original.getCodi(),
-				perComprovar.getCodi());
-		assertEquals(
-				original.getNom(),
-				perComprovar.getNom());
-		
-		
-	}
+        // Then
+        organGestor = organGestorRepository.findByCodi(ORGAN_CODI);
+        Assert.assertEquals(ORGAN_CODI, organGestor.getCodi());
+        Assert.assertEquals("Nom nou", organGestor.getNom());
+        Assert.assertEquals(ENTITAT_ID, (long) organGestor.getEntitat().getId());
+        Assert.assertEquals("llibre", organGestor.getLlibre());
+        Assert.assertEquals("llibre nom", organGestor.getLlibreNom());
+        Assert.assertEquals("CODI2", organGestor.getOficina());
+        Assert.assertEquals("OFICINA NOVA", organGestor.getOficinaNom());
+        Assert.assertEquals(OrganGestorEstatEnum.VIGENT, organGestor.getEstat());
+    }
 
 }

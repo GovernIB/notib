@@ -1,7 +1,9 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -9,7 +11,10 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.service.BaseServiceTest;
+import es.caib.notib.core.service.BaseServiceTestV2;
+import es.caib.notib.core.test.data.EntitatItemTest;
+import es.caib.notib.core.test.data.NotificacioItemTest;
+import es.caib.notib.core.test.data.ProcedimentItemTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,14 +23,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/notib/core/application-context-test.xml"})
 @Transactional
-public class NotificacioEventHelperIT extends BaseServiceTest {
+public class NotificacioEventHelperIT extends BaseServiceTestV2 {
 
 
     private static final String ENTITAT_DGTIC_DIR3CODI = "EA0004518";
@@ -52,79 +57,33 @@ public class NotificacioEventHelperIT extends BaseServiceTest {
 //    @InjectMocks
 //    NotificacioService notificacioService;
 
-    EntitatDto entitat;
-    ProcedimentDto procediment;
-    OrganGestorDto organGestor;
-    NotificacioDtoV2 notificacio;
+
+    EntitatDto entitatCreate;
+
+    @Autowired
+    private ProcedimentItemTest procedimentCreate;
+    @Autowired
+    private NotificacioItemTest notificacioCreate;
+
 
     @Before
     public void setup() throws Exception {
+        addConfig("es.caib.notib.metriques.generar", "false");
+        addConfig("es.caib.notib.emprar.sir", "true");
+        addConfig("es.caib.notib.tasca.registre.enviaments.periode", "60000");
+        configureMockGestioDocumentalPlugin();
 
-        List<PermisDto> permisosEntitat = new ArrayList<PermisDto>();
-        entitat = new EntitatDto();
-        entitat.setCodi("LIMIT");
-        entitat.setNom("Limit Tecnologies");
-        entitat.setDescripcio("Descripció de Limit Tecnologies");
-        entitat.setTipus(EntitatTipusEnumDto.GOVERN);
-        entitat.setDir3Codi(ENTITAT_DGTIC_DIR3CODI);
-        entitat.setApiKey(ENTITAT_DGTIC_KEY);
-        entitat.setAmbEntregaDeh(true);
-        entitat.setAmbEntregaCie(true);
-        TipusDocumentDto tipusDocDefault = new TipusDocumentDto();
-        tipusDocDefault.setTipusDocEnum(TipusDocumentEnumDto.UUID);
-        entitat.setTipusDocDefault(tipusDocDefault);
+        entitatCreate = EntitatItemTest.getRandomInstance();
 
-        PermisDto permisUsuari = new PermisDto();
-        PermisDto permisAdminEntitat = new PermisDto();
+//		organGestorCreate.setItemIdentifier("organGestor");
 
-        permisUsuari.setUsuari(true);
-        permisUsuari.setTipus(TipusEnumDto.USUARI);
-        permisUsuari.setPrincipal("admin");
-        permisosEntitat.add(permisUsuari);
+        procedimentCreate.addObject("procediment", procedimentCreate.getRandomInstance());
 
-        permisAdminEntitat.setAdministradorEntitat(true);
-        permisAdminEntitat.setTipus(TipusEnumDto.USUARI);
-        permisAdminEntitat.setPrincipal("admin");
-        permisosEntitat.add(permisAdminEntitat);
-        entitat.setPermisos(permisosEntitat);
+        notificacioCreate.addObject("notificacio", notificacioCreate.getRandomInstance());
+        notificacioCreate.addRelated("notificacio", "procediment", procedimentCreate);
 
-        List<PermisDto> permisosOrgan = new ArrayList<PermisDto>();
-        organGestor = new OrganGestorDto();
-        organGestor.setCodi("A00000000");
-        organGestor.setNom("Òrgan prova");
-        PermisDto permisOrgan = new PermisDto();
-        permisOrgan.setAdministrador(true);
-        permisOrgan.setTipus(TipusEnumDto.USUARI);
-        permisOrgan.setPrincipal("admin");
-        permisosOrgan.add(permisOrgan);
-        organGestor.setPermisos(permisosOrgan);
-
-        List<PermisDto> permisosProcediment = new ArrayList<PermisDto>();
-        procediment = new ProcedimentDto();
-        procediment.setCodi("216076");
-        procediment.setNom("Procedimiento 1");
-        procediment.setOrganGestor("A00000000");
-        PermisDto permisNotificacio = new PermisDto();
-        permisNotificacio.setNotificacio(true);
-        permisNotificacio.setTipus(TipusEnumDto.USUARI);
-        permisNotificacio.setPrincipal("admin");
-        permisosProcediment.add(permisNotificacio);
-
-        procediment.setPermisos(permisosProcediment);
-
-//        configureMockRegistrePlugin();
-//        configureMockUnitatsOrganitzativesPlugin();
-//        configureMockDadesUsuariPlugin();
-
-        notificacio = generarNotificacio(
-                new Long(System.currentTimeMillis()).toString(),
-                procediment,
-                entitat,
-                ENTITAT_DGTIC_DIR3CODI,
-                NUM_DESTINATARIS,
-                false);
-
-        System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
+        notificacioCreate.addObject("notificacioError", notificacioCreate.getRandomInstance());
+        notificacioCreate.addRelated("notificacioError", "procediment", procedimentCreate);
     }
 
 
@@ -133,28 +92,29 @@ public class NotificacioEventHelperIT extends BaseServiceTest {
         testCreantElements(
                 new TestAmbElementsCreats() {
                     @Override
-                    public void executar(List<Object> elementsCreats) throws Exception {
-                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
-                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
-                        assertNotNull(procedimentCreat);
-                        assertNotNull(entitatCreada);
-                        assertNotNull(notificacioCreada);
+                    public void executar(ElementsCreats elementsCreats) throws Exception {
+                        EntitatDto entitatCreate = elementsCreats.getEntitat();
+                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+
+                        assertNotNull(procedimentCreate);
+                        assertNotNull(entitatCreate);
+                        assertNotNull(notificacioCreate);
 
                         // Given: Una notificació amb un error associat a notificaError
-                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreate.getId());
                         NotificacioEnviamentEntity env = notificacioEnviamentRepository.findByNotificacio(notificacioEntity).get(0);
                         notificacioEventHelper.addNotificaConsultaErrorEvent(notificacioEntity,
                                 env);
 
-                        assertNotNull(notificacioEntity.getNotificaErrorEvent());
+//                        assertNotNull(notificacioEntity.getNotificaErrorEvent());
 
                         // When: clear all useless events
                         notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
 
                         // Then
                         assertNull(env.getNotificacioErrorEvent());
-                        assertNull(notificacioEntity.getNotificaErrorEvent());
+//                        assertNull(notificacioEntity.getNotificaErrorEvent());
                         List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
                                 NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
                                 true);
@@ -163,10 +123,9 @@ public class NotificacioEventHelperIT extends BaseServiceTest {
                     }
                 },
                 "Netejar events no útils",
-                entitat,
-                organGestor,
-                procediment,
-                notificacio);
+                entitatCreate,
+                procedimentCreate,
+                notificacioCreate);
 
     }
 
@@ -175,16 +134,17 @@ public class NotificacioEventHelperIT extends BaseServiceTest {
         testCreantElements(
                 new TestAmbElementsCreats() {
                     @Override
-                    public void executar(List<Object> elementsCreats) throws Exception {
-                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
-                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
-                        assertNotNull(procedimentCreat);
-                        assertNotNull(entitatCreada);
-                        assertNotNull(notificacioCreada);
+                    public void executar(ElementsCreats elementsCreats) throws Exception {
+                        EntitatDto entitatCreate = elementsCreats.getEntitat();
+                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
+
+                        assertNotNull(procedimentCreate);
+                        assertNotNull(entitatCreate);
+                        assertNotNull(notificacioCreate);
 
                         // Given: Una notificació amb un error associat a notificaError
-                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreate.getId());
                         NotificacioEnviamentEntity env = notificacioEnviamentRepository.findByNotificacio(notificacioEntity).get(0);
                         notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
                                 env, "");
@@ -196,7 +156,7 @@ public class NotificacioEventHelperIT extends BaseServiceTest {
 
                         // Then
                         assertNull(env.getNotificacioErrorEvent());
-                        assertNull(notificacioEntity.getNotificaErrorEvent());
+//                        assertNull(notificacioEntity.getNotificaErrorEvent());
                         List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
                                 NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO,
                                 true);
@@ -205,344 +165,398 @@ public class NotificacioEventHelperIT extends BaseServiceTest {
                     }
                 },
                 "Netejar events no útils",
-                entitat,
-                organGestor,
-                procediment,
-                notificacio);
+                entitatCreate,
+                procedimentCreate,
+                notificacioCreate);
 
     }
 
-//    @Test
-    public void whenClearOldUselessEventsTest_thenAllEventsRemoved() {
+    @Test
+    public void whenAddNotificaConsultaInfoEventWithError_thenOnlyRemainTwoEvents() {
         testCreantElements(
                 new TestAmbElementsCreats() {
                     @Override
-                    public void executar(List<Object> elementsCreats) throws Exception {
-                        List<NotificacioEventEntity> events;
-                        NotificacioEventTipusEnumDto tipus;
-                        autenticarUsuari("admin");
+                    public void executar(ElementsCreats elementsCreats) throws Exception {
+                        EntitatDto entitatCreate = elementsCreats.getEntitat();
+                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
 
-                        // 1. Crear notificacio
-                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
-                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
-                        assertNotNull(procedimentCreat);
-                        assertNotNull(entitatCreada);
-                        assertNotNull(notificacioCreada);
+                        assertNotNull(procedimentCreate);
+                        assertNotNull(entitatCreate);
+                        assertNotNull(notificacioCreate);
 
-                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+                        // Given: Una notificació amb més de 10 events associats
+                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreate.getId());
+                        NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findByNotificacio(notificacioEntity).get(0);
 
-                        ////
-                        // 2. Crear events en la notificació
-                        ////
-                        notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, "666", new Date(),
-                                NotificacioRegistreEstatEnumDto.OFICI_EXTERN, notificacioEntity.getEnviaments(), true);
-
-                        Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            identificadorsResultatsEnviaments.put(enviament, "identificador");
+                        for (int i = 0; i < 10; i++) {
+                            NotificacioEventEntity event  = NotificacioEventEntity.builder()
+                                    .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
+                                    .notificacio(notificacioEntity)
+                                    .enviament(enviament)
+                                    .error(true)
+                                    .errorDescripcio("Prova error " + i)
+                                    .build();
+                            notificacioEntity.updateEventAfegir(event);
+                            notificacioEventRepository.saveAndFlush(event);
                         }
-                        notificacioEventHelper.addEnviamentNotificaOKEvent(notificacioEntity, identificadorsResultatsEnviaments);
-
-                        // event notifica informa finalitzat
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
-                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-                                    "datat resultado darrer");
-                        }
-
-                        // Events que s'haurien d'esborrar
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId());
-                        }
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
-                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-                                    "Notifica callback datat");
-                        }
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
-                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-                                    "anulada",
-                                    "Descripció de l'error",
-                                    true
-                            );
-                        }
-                        ////
-                        // 3. Comprovar que els events estan desats a la base de dades
-                        ////
-
-                        // events enviament registre ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events enviament notifica ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events notifica informa finalitzat
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
                                 true);
-                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+                        assertEquals(events.size(), 10);
 
-                        ////
-                        // 4. Executar el mètode
-                        ////
-                        notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
+                        // When: clear all useless events
+                        notificacioEventHelper.addNotificaConsultaInfoEvent(notificacioEntity, enviament, "DarrerErrorAfegit", true);
 
-                        ////
-                        // 5. Comprovar que els events que s'havien de borrar s'han borrat,
-                        // i que els que no s'havien de borrar encara hi son
-                        ////
-
-
-                        // events enviament registre ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events enviament notifica ok
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        // events notifica informa finalitzat
-                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
-
-                        // events a esborrar
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
+                        // Then
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
                                 true);
-                        assertEquals(0, events.size());
 
-                        events = notificacioEventRepository.findByNotificacio(notificacioEntity);
-                        assertEquals(events.size(), 4);
+                        // Comprovar que s'han conservat dos events i que aquests són el primer i el darrer afegit
+                        assertEquals(events.size(), 2);
+                        assertEquals(events.get(0).getErrorDescripcio(), "Prova error 0");
+                        assertEquals(events.get(1).getErrorDescripcio(), "DarrerErrorAfegit");
 
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
-                        }
                     }
                 },
-                "Netejar events no útils",
-                entitat,
-                organGestor,
-                procediment,
-                notificacio);
+                "Neteja d'events repetits",
+                entitatCreate,
+                procedimentCreate,
+                notificacioCreate);
     }
 
 //    @Test
-    public void addRegistreCallBackEstatEventTest() {
-        testCreantElements(
-                new TestAmbElementsCreats() {
-                    @Override
-                    public void executar(List<Object> elementsCreats) throws Exception {
-                        List<NotificacioEventEntity> events;
-                        NotificacioEventTipusEnumDto tipus;
-                        autenticarUsuari("admin");
-
-                        // 1. Crear notificacio
-                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
-                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
-                        assertNotNull(procedimentCreat);
-                        assertNotNull(entitatCreada);
-                        assertNotNull(notificacioCreada);
-
-                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
-
-                        ////
-                        // 2. Proves events amb errors
-                        ////
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId(), true);
-                        }
-                        NotificacioEventEntity primerError;
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        primerError = events.get(0);
-                        assertEquals(2, events.size());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId(), true);
-                        }
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        assertEquals(2, events.size());
-                        assertEquals(primerError.getId(), events.get(0).getId());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId(), true);
-                        }
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        assertEquals(2, events.size());
-                        assertEquals(primerError.getId(), events.get(0).getId());
-
-                        ////
-                        // 2. Proves events sense errors
-                        ////
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId(), false);
-                        }
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId(), false);
-                        }
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId(), false);
-                        }
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                false);
-                        assertEquals(1, events.size());
-                    }
-                },
-                "Únic event de consulta",
-                entitat,
-                organGestor,
-                procediment,
-                notificacio);
-    }
-
-//    @Test
-    public void addRegistreConsultaInfoErrorEventTest() {
-        testCreantElements(
-                new TestAmbElementsCreats() {
-                    @Override
-                    public void executar(List<Object> elementsCreats) throws Exception {
-                        List<NotificacioEventEntity> events;
-                        NotificacioEventTipusEnumDto tipus;
-                        autenticarUsuari("admin");
-
-                        // 1. Crear notificacio
-                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
-                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
-                        assertNotNull(procedimentCreat);
-                        assertNotNull(entitatCreada);
-                        assertNotNull(notificacioCreada);
-
-                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
-
-                        ////
-                        // 2. Crear events en la notificació
-                        ////
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId());
-                        }
-                        NotificacioEventEntity primerError;
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        primerError = events.get(0);
-                        assertEquals(2, events.size());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId());
-                        }
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        assertEquals(2, events.size());
-                        assertEquals(primerError.getId(), events.get(0).getId());
-
-                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
-                                    enviament, "registre_consulta_info_" + enviament.getId());
-                        }
-
-                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
-                                notificacioEntity,
-                                tipus,
-                                true);
-                        assertEquals(2, events.size());
-                        assertEquals(primerError.getId(), events.get(0).getId());
-                    }
-                },
-                "Deixar primer i darrer error",
-                entitat,
-                organGestor,
-                procediment,
-                notificacio);
-    }
+//    public void whenClearOldUselessEventsTest_thenAllEventsRemoved() {
+//        testCreantElements(
+//                new TestAmbElementsCreats() {
+//                    @Override
+//                    public void executar(ElementsCreats elementsCreats) throws Exception {
+//                        List<NotificacioEventEntity> events;
+//                        NotificacioEventTipusEnumDto tipus;
+//                        autenticarUsuari("admin");
+//
+//                        // 1. Crear notificacio
+//                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
+//                        NotificacioDatabaseDto notificacioCreada = (NotificacioDatabaseDto)elementsCreats.get(3);
+//                        assertNotNull(procedimentCreat);
+//                        assertNotNull(entitatCreada);
+//                        assertNotNull(notificacioCreada);
+//
+//                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+//
+//                        ////
+//                        // 2. Crear events en la notificació
+//                        ////
+//                        notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, "666", new Date(),
+//                                NotificacioRegistreEstatEnumDto.OFICI_EXTERN, notificacioEntity.getEnviaments(), true);
+//
+//                        Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            identificadorsResultatsEnviaments.put(enviament, "identificador");
+//                        }
+//                        notificacioEventHelper.addEnviamentNotificaOKEvent(notificacioEntity, identificadorsResultatsEnviaments);
+//
+//                        // event notifica informa finalitzat
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
+//                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+//                                    "datat resultado darrer");
+//                        }
+//
+//                        // Events que s'haurien d'esborrar
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId());
+//                        }
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
+//                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+//                                    "Notifica callback datat");
+//                        }
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addNotificaCallbackEvent(notificacioEntity, enviament,
+//                                    NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+//                                    "anulada",
+//                                    "Descripció de l'error",
+//                                    true
+//                            );
+//                        }
+//                        ////
+//                        // 3. Comprovar que els events estan desats a la base de dades
+//                        ////
+//
+//                        // events enviament registre ok
+//                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//
+//                        // events enviament notifica ok
+//                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//
+//                        // events notifica informa finalitzat
+//                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+//
+//                        ////
+//                        // 4. Executar el mètode
+//                        ////
+//                        notificacioEventHelper.clearOldUselessEvents(notificacioEntity);
+//
+//                        ////
+//                        // 5. Comprovar que els events que s'havien de borrar s'han borrat,
+//                        // i que els que no s'havien de borrar encara hi son
+//                        ////
+//
+//
+//                        // events enviament registre ok
+//                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//
+//                        // events enviament notifica ok
+//                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//
+//                        // events notifica informa finalitzat
+//                        tipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(notificacioEntity.getEnviaments().size(), events.size());
+//
+//                        // events a esborrar
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        assertEquals(0, events.size());
+//
+//                        events = notificacioEventRepository.findByNotificacio(notificacioEntity);
+//                        assertEquals(events.size(), 4);
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+//                        }
+//                    }
+//                },
+//                "Netejar events no útils",
+//                entitat,
+//                organGestor,
+//                procediment,
+//                notificacio);
+//    }
+//
+////    @Test
+//    public void addRegistreCallBackEstatEventTest() {
+//        testCreantElements(
+//                new TestAmbElementsCreats() {
+//                    @Override
+//                    public void executar(ElementsCreats elementsCreats) throws Exception {
+//                        List<NotificacioEventEntity> events;
+//                        NotificacioEventTipusEnumDto tipus;
+//                        autenticarUsuari("admin");
+//
+//                        // 1. Crear notificacio
+//                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
+//                        NotificacioDatabaseDto notificacioCreada = (NotificacioDatabaseDto)elementsCreats.get(3);
+//                        assertNotNull(procedimentCreat);
+//                        assertNotNull(entitatCreada);
+//                        assertNotNull(notificacioCreada);
+//
+//                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+//
+//                        ////
+//                        // 2. Proves events amb errors
+//                        ////
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId(), true);
+//                        }
+//                        NotificacioEventEntity primerError;
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        primerError = events.get(0);
+//                        assertEquals(2, events.size());
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId(), true);
+//                        }
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        assertEquals(2, events.size());
+//                        assertEquals(primerError.getId(), events.get(0).getId());
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId(), true);
+//                        }
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        assertEquals(2, events.size());
+//                        assertEquals(primerError.getId(), events.get(0).getId());
+//
+//                        ////
+//                        // 2. Proves events sense errors
+//                        ////
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId(), false);
+//                        }
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId(), false);
+//                        }
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreCallBackEstatEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId(), false);
+//                        }
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                false);
+//                        assertEquals(1, events.size());
+//                    }
+//                },
+//                "Únic event de consulta",
+//                entitat,
+//                organGestor,
+//                procediment,
+//                notificacio);
+//    }
+//
+////    @Test
+//    public void addRegistreConsultaInfoErrorEventTest() {
+//        testCreantElements(
+//                new TestAmbElementsCreats() {
+//                    @Override
+//                    public void executar(ElementsCreats elementsCreats) throws Exception {
+//                        List<NotificacioEventEntity> events;
+//                        NotificacioEventTipusEnumDto tipus;
+//                        autenticarUsuari("admin");
+//
+//                        // 1. Crear notificacio
+//                        EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
+//                        ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(2);
+//                        NotificacioDtoV2 notificacioCreada = (NotificacioDtoV2)elementsCreats.get(3);
+//                        assertNotNull(procedimentCreat);
+//                        assertNotNull(entitatCreada);
+//                        assertNotNull(notificacioCreada);
+//
+//                        NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioCreada.getId());
+//
+//                        ////
+//                        // 2. Crear events en la notificació
+//                        ////
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId());
+//                        }
+//                        NotificacioEventEntity primerError;
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        primerError = events.get(0);
+//                        assertEquals(2, events.size());
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId());
+//                        }
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        assertEquals(2, events.size());
+//                        assertEquals(primerError.getId(), events.get(0).getId());
+//
+//                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+//                            notificacioEventHelper.addRegistreConsultaInfoErrorEvent(notificacioEntity,
+//                                    enviament, "registre_consulta_info_" + enviament.getId());
+//                        }
+//
+//                        tipus = NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO;
+//                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(
+//                                notificacioEntity,
+//                                tipus,
+//                                true);
+//                        assertEquals(2, events.size());
+//                        assertEquals(primerError.getId(), events.get(0).getId());
+//                    }
+//                },
+//                "Deixar primer i darrer error",
+//                entitat,
+//                organGestor,
+//                procediment,
+//                notificacio);
+//    }
 
 //    @Test
 //    public void addErrorEventTest() {

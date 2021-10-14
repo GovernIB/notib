@@ -1,23 +1,15 @@
-/**
- * 
- */
 package es.caib.notib.war.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilitat per a gestionar els permisos de l'usuari actual.
@@ -34,17 +26,11 @@ public class PermisosHelper {
 			AplicacioService aplicacioService) { 
 		
 		if (RolHelper.isUsuariActualUsuari(request)) {
-			
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-//			List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-			List<ProcedimentDto> procedimentsDisponibles = new ArrayList<ProcedimentDto>();
-			if (RolHelper.isUsuariActualUsuari(request)) {
-				procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-//				procedimentsDisponibles = procedimentService.findProcedimentsSenseGrupsWithPermis(entitatActual.getId(), PermisEnum.NOTIFICACIO);
-//				if (procedimentsDisponibles.isEmpty())
-//					procedimentsDisponibles = procedimentService.findProcedimentsAmbGrupsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+			if (entitatActual != null && usuariActual != null && RolHelper.isUsuariActualUsuari(request)) {
+				List<ProcedimentSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
 				request.setAttribute("permisNotificacio", !procedimentsDisponibles.isEmpty());
 			}
 		}
@@ -67,6 +53,5 @@ public class PermisosHelper {
 		request.setAttribute(
 				"permisAdminOrgan",
 				permisos.get(RolEnumDto.NOT_ADMIN_ORGAN));
-
 	}
 }

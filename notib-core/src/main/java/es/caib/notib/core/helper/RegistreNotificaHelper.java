@@ -7,7 +7,6 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.slf4j.Logger;
@@ -35,11 +34,13 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
-	private AuditEnviamentHelper auditEnviamentHelper;
-	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private NotificacioMassivaHelper notificacioMassivaHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public boolean realitzarProcesRegistrar(
 			NotificacioEntity notificacioEntity) throws RegistreNotificaException {
@@ -54,14 +55,10 @@ public class RegistreNotificaHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name()),
 				new AccioParam("Sir activat", String.valueOf(isSirActivat())));
-		
+
 		if (isSirActivat()) {
-			boolean totsAdministracio = true;
-			for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-				if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
-					totsAdministracio = false;
-				}
-			}
+			boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
+
 			long startTime;
 			double elapsedTime;
 //			### COMUNICACIÓ + TOT A ADMINISTRACIÓ
@@ -74,7 +71,7 @@ public class RegistreNotificaHelper {
 					try {
 						//Només crea assentament registral sense notificar
 						long startTime2 = System.nanoTime();
-						crearAssentamentRegistralPerEnviament(
+						crearAssentamentRegistralEnviamentComunicacioSIR(
 								notificacioEntity, 
 								notificacioEntity.getEntitat().getDir3CodiReg() != null ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi(), 
 								totsAdministracio, 
@@ -160,29 +157,38 @@ public class RegistreNotificaHelper {
 			long t0) throws RegistrePluginException {
 		//Crea assentament registral + Notific@
 		logger.info(" >>> Nou assentament registral...");
-		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
-		AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
-				notificacioEntity, 
-				notificacioEntity.getEnviaments());
-		RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
-				dir3Codi, 
-				arb, 
-				!isSirActivat ? null : (isComunicacio ? 2L : 1L), //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
-				notificacioEntity.getId(),
-				getEnviamentIds(notificacioEntity));
+		RespostaConsultaRegistre arbResposta;
+		try {
+			boolean inclouDocuments = isInclouDocuments(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean generarJustificant = isGenerarJustificant(isComunicacio, isSirActivat, isAnyEnviamentsAAdministracio(notificacioEntity));
+			AsientoRegistralBeanDto arb = pluginHelper.notificacioEnviamentsToAsientoRegistralBean(
+					notificacioEntity,
+					notificacioEntity.getEnviaments(),
+					inclouDocuments);
+			arbResposta = pluginHelper.crearAsientoRegistral(
+					dir3Codi,
+					arb,
+					null, //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+					notificacioEntity.getId(),
+					getEnviamentIds(notificacioEntity),
+					generarJustificant);
+		} catch (Exception e) {
+			arbResposta = new RespostaConsultaRegistre();
+			arbResposta.setErrorCodi("ERROR");
+			arbResposta.setErrorDescripcio(e.getMessage());
+		}
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR");
 			updateEventWithError(
 					arbResposta,
-					null,
 					notificacioEntity,
 					null);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			updateEventWithoutError(
+			finalitzaRegistre(
 					arbResposta,
 					notificacioEntity,
 					notificacioEntity.getEnviaments(),
@@ -192,10 +198,12 @@ public class RegistreNotificaHelper {
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
 			enviarANotifica = true;
 		}
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
+				pluginHelper.getRegistreReintentsPeriodeProperty());
 		return enviarANotifica;
 	}
 
-	private void crearAssentamentRegistralPerEnviament(
+	private void crearAssentamentRegistralEnviamentComunicacioSIR(
 			NotificacioEntity notificacioEntity, 
 			String dir3Codi,
 			boolean totsAdministracio, 
@@ -203,29 +211,41 @@ public class RegistreNotificaHelper {
 			IntegracioInfo info,
 			long t0) throws RegistrePluginException {
 		logger.info(" >>> Nou assentament registral...");
-		notificacioEntity.updateRegistreNouEnviament(pluginHelper.getRegistreReintentsPeriodeProperty());
-		AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
-				notificacioEntity, 
-				enviament);
-		RespostaConsultaRegistre arbResposta = pluginHelper.crearAsientoRegistral(
-				dir3Codi, 
-				arb, 
-				2L,
-				notificacioEntity.getId(),
-				String.valueOf(enviament.getId()));
+		RespostaConsultaRegistre arbResposta;
+		try {
+			boolean generarJustificant =  isGenerarJustificant(true, true,
+					isAnyEnviamentsAAdministracio(notificacioEntity));
+			boolean inclouDocuments = isInclouDocuments(true, true,
+					enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO));
+			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean(
+					notificacioEntity,
+					enviament,
+					inclouDocuments,
+					true); // Es comunicacio SIR: Este método crearAssentamentRegistralPerEnviament solo se llama para comunicaciones SIR.
+			arbResposta = pluginHelper.crearAsientoRegistral(
+					dir3Codi,
+					arb,
+					2L,
+					notificacioEntity.getId(),
+					String.valueOf(enviament.getId()),
+					generarJustificant);
+		} catch (Exception e) {
+			arbResposta = new RespostaConsultaRegistre();
+			arbResposta.setErrorCodi("ERROR");
+			arbResposta.setErrorDescripcio(e.getMessage());
+		}
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR");
 			updateEventWithError(
 					arbResposta,
-					null,
 					notificacioEntity,
 					enviament);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			updateEventWithoutError(
+			finalitzaRegistre(
 					arbResposta,
 					notificacioEntity,
 					new HashSet<>(Arrays.asList(enviament)),
@@ -246,8 +266,38 @@ public class RegistreNotificaHelper {
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 		}
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
+				pluginHelper.getRegistreReintentsPeriodeProperty());
 	}
-	
+
+	private boolean isGenerarJustificant(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
+		return isGenerarJustificantActive() || (isComunicacio && isSirActivat && aAdministracio);
+
+	}
+
+	private boolean isInclouDocuments(boolean isComunicacio, boolean isSirActivat, boolean aAdministracio) {
+		return isSendDocumentsActive() || (isSirActivat && isComunicacio && aAdministracio);
+
+	}
+
+	private boolean isAllEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
+		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isAnyEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
+		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private String getEnviamentIds(NotificacioEntity notificacio) {
 		String enviamentIds = "";
 		for(NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
@@ -260,24 +310,31 @@ public class RegistreNotificaHelper {
 	
 	private void updateEventWithError(
 			RespostaConsultaRegistre arbResposta,
-			String errorDescripcio,
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament) {
-		
-		if (arbResposta != null)
-			errorDescripcio = arbResposta.getErrorDescripcio();
+		String errorDescripcio = "";
+		if (arbResposta != null) {
+			errorDescripcio = "intent " + notificacioEntity.getRegistreEnviamentIntent() + ": \n";
+			errorDescripcio += "Codi error: " + (arbResposta.getErrorCodi() != null ? arbResposta.getErrorCodi() : "Codi no proporcionat") + "\n";
+			errorDescripcio += arbResposta.getErrorDescripcio() != null ? arbResposta.getErrorDescripcio() : "El registre no aporta cap descripció de l'error";
+		}
 
-		NotificacioEventEntity event = notificacioEventHelper.addErrorEvent(notificacioEntity, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, enviament, errorDescripcio);
-		auditNotificacioHelper.updateNotificacioErrorRegistre(notificacioEntity, event);
+		notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity,
+				enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
 	}
 
-	private void updateEventWithoutError(
+	private void finalitzaRegistre(
 			RespostaConsultaRegistre arbResposta,
 			NotificacioEntity notificacioEntity,
 			Set<NotificacioEnviamentEntity> enviaments,
 			boolean totsAdministracio) {
 		if (arbResposta != null) {
+
 			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
+			// Actualitzar progrés notificació massiva.
+			if (notificacioEntity.getNotificacioMassivaEntity() != null) {
+				notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
+			}
 
 			String registreNum = arbResposta.getRegistreNumeroFormatat();
 			Date registreData = arbResposta.getRegistreData();
@@ -294,14 +351,29 @@ public class RegistreNotificaHelper {
 	}
 
 	private boolean isSirActivat() {
-		String sir = getPropertyEmprarSir();
-		return Boolean.valueOf(sir);
+		return configHelper.getAsBoolean("es.caib.notib.emprar.sir");
 	}
-	
-	private String getPropertyEmprarSir() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.emprar.sir");
+
+	/**
+	 * Indica si els documents s'han d'enviar al registre.
+	 * Si es true els documents sempre s'han d'enviar.
+	 *
+	 * @return boolean
+	 */
+	public boolean isSendDocumentsActive() {
+		return configHelper.getAsBoolean("es.caib.notib.plugin.registre.documents.enviar");
 	}
-	
+
+	/**
+	 * Indica si s'ha de generar el justificant del registre de totes les notificacions.
+	 * Si es false només es generen per a comunicacions a administracions (enviaments SIR)
+	 *
+	 * @return boolean
+	 */
+	private boolean isGenerarJustificantActive() {
+		return configHelper.getAsBoolean("es.caib.notib.plugin.registre.generar.justificant");
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(RegistreNotificaHelper.class);
 
 }

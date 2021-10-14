@@ -2,14 +2,17 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +29,9 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class OrganGestorHelper {
-	
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -41,6 +44,8 @@ public class OrganGestorHelper {
 	private OrganGestorCachable organGestorCachable;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private PermisosCacheable permisosCacheable;
 
 	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
 	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
@@ -74,6 +79,20 @@ public class OrganGestorHelper {
 		return organsDisponibles;
 	}
 
+	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth,
+														EntitatEntity entitat,
+														Permission[] permisos) {
+		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
+				entitat,
+				auth,
+				permisos);
+		List<String> codis = new ArrayList<>();
+		for (OrganGestorEntity organGestorDto : organs) {
+			codis.add(organGestorDto.getCodi());
+		}
+		return codis;
+	}
+
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
 		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
@@ -98,28 +117,82 @@ public class OrganGestorHelper {
 						OrganGestorEntity.class,
 						"L'òrgan gestor especificat no es correspon a cap Òrgan Gestor de l'entitat especificada");
 			}
-			LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
-					entitat.getCodi(),
-					codiOrgan);
-			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-			List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
-					arbreUnitats,
-					codiOrgan);
-//					### Crear òrgan gestor si no existeix, si existeix no fer res
-			organGestor = OrganGestorEntity.getBuilder(
-					codiOrgan,
-					organigramaEntitat.get(codiOrgan).getNom(),
-					entitat,
-					llibreOrgan.getCodi(),
-					llibreOrgan.getNomLlarg(),
-					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
-					(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null)).build();
-			organGestorRepository.save(organGestor);
+			crearOrganGestor(entitat, codiOrgan);
 		}
 
 		return organGestor;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
+	/**
+	 * Registra un nou òrgan gestor a la base de dades amb les dades del òrgan amb aquest codi
+	 * proporcionades per la API de DIR3.
+	 *
+	 * @param entitat L'entitat actual
+	 * @param codiOrgan Codi dir3 de l'òrgan que es vol agregar a la base de dades
+	 *
+	 * @return L'òrgan gestor creat
+	 */
+	public OrganGestorEntity crearOrganGestor(EntitatEntity entitat, String codiOrgan) {
+		LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
+				entitat.getCodi(),
+				codiOrgan);
+		Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+		List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(
+				arbreUnitats,
+				codiOrgan);
+		NodeDir3 nodeOrgan = arbreUnitats.get(codiOrgan);
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(
+				codiOrgan,
+				findDenominacioOrganisme(nodeOrgan, codiOrgan),
+				entitat,
+				llibreOrgan.getCodi(),
+				llibreOrgan.getNomLlarg(),
+				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getCodi() : null),
+				(oficinesSIR != null && !oficinesSIR.isEmpty() ? oficinesSIR.get(0).getNom() : null),
+				getEstatOrgan(nodeOrgan)
+		).build();
+		organGestorRepository.save(organGestor);
+		return organGestor;
+	}
 
+	/**
+	 * Obté l'estat de l'organ gestor d'un node de dir3 en el format utilitzat per NOTIB
+	 *
+	 * @param nodeOrgan Node d'un òrgan gestor obtingut de l'API de DIR3
+	 *
+	 * @return L'estat de l'òrgan
+	 */
+	public OrganGestorEstatEnum getEstatOrgan(NodeDir3 nodeOrgan) {
+		if (nodeOrgan == null){
+			logger.info("getEstatOrgan - nodeOrgan null");
+			return OrganGestorEstatEnum.ALTRES;
+		}
+		
+		logger.info("getEstatOrgan - nodeOrgan: " + nodeOrgan.getEstat());
+
+		if (nodeOrgan.getEstat().toUpperCase().startsWith("VIGENT")) {
+			return OrganGestorEstatEnum.VIGENT;
+
+		} else {
+			return OrganGestorEstatEnum.ALTRES;
+		}
+	}
+
+	private String findDenominacioOrganisme(NodeDir3 nodeOrgan, String codiDir3) {
+		if (nodeOrgan != null){
+			return nodeOrgan.getDenominacio();
+		}
+		String denominacio = null;
+		try {
+			denominacio = cacheHelper.findDenominacioOrganisme(codiDir3);
+		} catch (Exception e) {
+			String errorMessage = "No s'ha pogut recuperar la denominació de l'organismes: " + codiDir3;
+			log.error(
+					errorMessage,
+					e.getMessage());
+		}
+		return denominacio;
+	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 }

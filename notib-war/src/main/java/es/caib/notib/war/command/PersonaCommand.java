@@ -1,15 +1,14 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidPersona;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import javax.validation.constraints.Size;
 
 /**
  * Command per al manteniment de persones (Titulars | Destinataris).
@@ -24,7 +23,7 @@ public class PersonaCommand {
 	private Long id;
 	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
-	@Size(max=80)
+	@Size(max=255)
 	private String nom;
 	@Size(max=40)	
 	private String llinatge1;

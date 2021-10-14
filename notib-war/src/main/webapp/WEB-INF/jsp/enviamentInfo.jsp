@@ -5,6 +5,19 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+<%
+	pageContext.setAttribute(
+			"isRolActualAdministradorEntitat",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
+	pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
+
 <html>
 <head>
 	<title><spring:message code="enviament.info.titol"/></title>
@@ -81,7 +94,14 @@ $(document).ready(function() {
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatNotifica'}"> class="active"</c:if>>
 			<a href="#estatNotifica" aria-controls="estatNotifica" role="tab" data-toggle="tab">
-				<spring:message code="enviament.info.tab.estat.notifica"/>
+				<c:choose>
+					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+						<spring:message code="enviament.info.tab.estat.sir"/>
+					</c:when>
+					<c:otherwise>
+						<spring:message code="enviament.info.tab.estat.notifica"/>
+					</c:otherwise>
+				</c:choose>				
 			</a>
 		</li>
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatSeu'}"> class="active"</c:if>>
@@ -94,6 +114,13 @@ $(document).ready(function() {
 				<spring:message code="enviament.info.tab.events"/>
 			</a>
 		</li>
+		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
+		<li role="presentation"<c:if test="${pipellaActiva == 'historic'}"> class="active"</c:if>>
+			<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
+				<spring:message code="notificacio.info.tab.historic"/>
+			</a>
+		</li>
+		</c:if>
 	</ul>
 	<div class="tab-content">
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'dades'}"> active</c:if>" id="dades">
@@ -248,7 +275,7 @@ $(document).ready(function() {
 					</c:if>
 				</c:forEach>
 			</div>
-			<c:if test="${not empty enviament.entregaPostal.ConcretTipus}">
+			<c:if test="${not empty enviament.entregaPostal.domiciliConcretTipus}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -259,11 +286,11 @@ $(document).ready(function() {
 					<tbody>
 						<tr>
 							<td width="30%"><strong><spring:message code="enviament.info.domicili.tipus"/></strong></td>
-							<td>${enviament.entregaPostal.tipus}</td>
+							<td>${enviament.entregaPostal.domiciliConcretTipus}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.tipus.concret"/></strong></td>
-							<td>${enviament.entregaPostal.concretTipus}</td>
+							<td>${enviament.entregaPostal.domiciliConcretTipus}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.via"/></strong></td>
@@ -272,9 +299,9 @@ $(document).ready(function() {
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.numeracio"/></strong></td>
 							<td>
-								${enviament.entregaPostal.numeracioTipus}
-								${enviament.entregaPostal.numeracioNumero}
-								${enviament.entregaPostal.numeracioPuntKm}
+<%--								${enviament.entregaPostal.numeracioTipus}--%>
+								${enviament.entregaPostal.numeroCasa}
+								${enviament.entregaPostal.puntKm}
 								${enviament.entregaPostal.apartatCorreus}
 							</td>
 						</tr>
@@ -310,18 +337,18 @@ $(document).ready(function() {
 							<td><strong><spring:message code="enviament.info.domicili.codi.postal"/></strong></td>
 							<td>${enviament.entregaPostal.codiPostal}</td>
 						</tr>
-						<tr>
-							<td><strong><spring:message code="enviament.info.domicili.municipi"/></strong></td>
-							<td>${enviament.entregaPostal.municipiNom} (${enviament.entregaPostal.MunicipiCodiIne})</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="enviament.info.domicili.provincia"/></strong></td>
-							<td>${enviament.entregaPostal.provinciaNom} (${enviament.entregaPostal.ProvinciaCodi})</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="enviament.info.domicili.pais"/></strong></td>
-							<td>${enviament.entregaPostal.paisNom} (${enviament.entregaPostal.PaisCodiIso})</td>
-						</tr>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="enviament.info.domicili.municipi"/></strong></td>--%>
+<%--							<td>${enviament.entregaPostal.municipiNom} (${enviament.entregaPostal.municipiCodi})</td>--%>
+<%--						</tr>--%>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="enviament.info.domicili.provincia"/></strong></td>--%>
+<%--							<td>${enviament.entregaPostal.provinciaNom} (${enviament.entregaPostal.provincia})</td>--%>
+<%--						</tr>--%>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="enviament.info.domicili.pais"/></strong></td>--%>
+<%--							<td>${enviament.entregaPostal.paisNom} (${enviament.entregaPostal.paisCodi})</td>--%>
+<%--						</tr>--%>
 						<tr>
 							<td><strong><spring:message code="enviament.info.domicili.linea1"/></strong></td>
 							<td>${enviament.entregaPostal.linea1}</td>
@@ -346,12 +373,19 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
-				<p class="text-right" style="margin-top: 1em">
-					<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">
-						<span class="fa fa-refresh"></span>
-						<spring:message code="enviament.info.accio.refrescar.estat"/>
-					</a>
-				</p>
+				<c:choose>
+					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+						<br/>
+					</c:when>
+					<c:otherwise>
+						<p class="text-right" style="margin-top: 1em">
+							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">
+								<span class="fa fa-refresh"></span>
+								<spring:message code="enviament.info.accio.refrescar.estat"/>
+							</a>
+						</p>
+					</c:otherwise>
+				</c:choose>
 				<div class="row">
 					<c:set var="datatColSize" value="12"/>
 					<c:if test="${not empty enviament.notificaCertificacioData}"><c:set var="datatColSize" value="5"/></c:if>
@@ -375,7 +409,7 @@ $(document).ready(function() {
 								<c:if test="${not empty enviament.notificaDatatErrorDescripcio}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.estat.descripcio"/></strong></td>
-										<td>${enviament.notificaEstatDescripcio}</td>
+										<td>${enviament.notificaDatatErrorDescripcio}</td>
 									</tr>
 								</c:if>
 								<c:if test="${not empty enviament.notificaDatatOrigen}">
@@ -487,7 +521,7 @@ $(document).ready(function() {
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
 					<spring:message code="enviament.info.estat.registre.no.enviada"/>
 				</div>
-				<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
+				<c:if test="${enviament.notificacio.estat != 'PENDENT'}"><%-- TODO: Els dos botons que hi ha a continuació es poden eliminar --%>
 					<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
 						<p class="well well-sm text-right" style="margin-top: 1em">
 							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/comunicacioSeu"/>" class="btn btn-default">
@@ -585,6 +619,67 @@ $(document).ready(function() {
 					</th>
 				</tr>
 			</thead>
+			</table>
+		</div>
+		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'historic'}"> active</c:if>" id="historic">
+			<table id="historic"
+				   data-toggle="datatable"
+				   data-url="<c:url value="/notificacio/${notificacioId}/enviament/${enviamentId}/historic"/>"
+				   data-search-enabled="false"
+				   data-paging="false"
+				   data-info="false"
+				   data-row-info="false"
+				   class="table table-striped table-bordered"
+				   style="width: 100%">
+				<thead>
+				<tr>
+
+					<th data-col-name="tipusOperacio" data-orderable="false"><spring:message code="enviament.historic.list.columna.tipusOperacio"/></th>
+					<th data-col-name="joinPoint" data-orderable="false"><spring:message code="enviament.historic.list.columna.joinPoint"/></th>
+					<th data-col-name="createdBy" data-orderable="false"><spring:message code="enviament.historic.list.columna.createdBy"/></th>
+					<th data-col-name="createdDate" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.createdDate"/></th>
+					<th data-col-name="titularId" data-orderable="false"><spring:message code="enviament.historic.list.columna.titularId"/></th>
+					<th data-col-name="destinataris" data-orderable="false"><spring:message code="enviament.historic.list.columna.destinataris"/></th>
+					<th data-col-name="domiciliTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.domiciliTipus"/></th>
+					<th data-col-name="domicili" data-orderable="false"><spring:message code="enviament.historic.list.columna.domicili"/></th>
+					<th data-col-name="serveiTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.serveiTipus"/></th>
+					<th data-col-name="cie" data-orderable="false"><spring:message code="enviament.historic.list.columna.cie"/></th>
+					<th data-col-name="formatSobre" data-orderable="false"><spring:message code="enviament.historic.list.columna.formatSobre"/></th>
+					<th data-col-name="formatFulla" data-orderable="false"><spring:message code="enviament.historic.list.columna.formatFulla"/></th>
+					<th data-col-name="dehObligat" data-orderable="false"><spring:message code="enviament.historic.list.columna.dehObligat"/></th>
+					<th data-col-name="dehNif" data-orderable="false"><spring:message code="enviament.historic.list.columna.dehNif"/></th>
+					<th data-col-name="notificaReferencia" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaReferencia"/></th>
+					<th data-col-name="notificaIdentificador" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaIdentificador"/></th>
+					<th data-col-name="notificaDataCreacio" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaDataCreacio"/></th>
+					<th data-col-name="notificaDataDisposicio" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaDataDisposicio"/></th>
+					<th data-col-name="notificaDataCaducitat" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaDataCaducitat"/></th>
+					<th data-col-name="notificaEmisorDir3" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaEmisorDir3"/></th>
+					<th data-col-name="notificaArrelDir3" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaArrelDir3"/></th>
+					<th data-col-name="notificaEstat" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaEstat"/></th>
+					<th data-col-name="notificaEstatData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.notificaEstatData"/></th>
+					<th data-col-name="notificaEstatFinal" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaEstatFinal"/></th>
+					<th data-col-name="notificaDatatOrigen" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatOrigen"/></th>
+					<th data-col-name="notificaDatatReceptorNif" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatReceptorNif"/></th>
+					<th data-col-name="notificaDatatNumSeguiment" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatNumSeguiment"/></th>
+					<th data-col-name="notificaCertificacioData" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioData"/></th>
+					<th data-col-name="notificaCertificacioArxiuId" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioArxiuId"/></th>
+					<th data-col-name="notificaCertificacioOrigen" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioOrigen"/></th>
+					<th data-col-name="notificaCertificacioTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioTipus"/></th>
+					<th data-col-name="notificaCertificacioArxiuTipus" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioArxiuTipus"/></th>
+					<th data-col-name="notificaCertificacioNumSeguiment" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaCertificacioNumSeguiment"/></th>
+					<th data-col-name="registreNumeroFormatat" data-orderable="false"><spring:message code="enviament.historic.list.columna.registreNumeroFormatat"/></th>
+					<th data-col-name="registreData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.registreData"/></th>
+					<th data-col-name="registreEstat" data-orderable="false"><spring:message code="enviament.historic.list.columna.registreEstat"/></th>
+					<th data-col-name="registreEstatFinal" data-orderable="false"><spring:message code="enviament.historic.list.columna.registreEstatFinal"/></th>
+					<th data-col-name="sirConsultaData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.sirConsultaData"/></th>
+					<th data-col-name="sirRecepcioData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.sirRecepcioData"/></th>
+					<th data-col-name="sirRegDestiData" data-orderable="false" data-converter="datetime"><spring:message code="enviament.historic.list.columna.sirRegDestiData"/></th>
+					<th data-col-name="notificacioErrorEvent" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificacioErrorEvent"/></th>
+					<th data-col-name="notificaError" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaError"/></th>
+					<th data-col-name="notificaDatatErrorDescripcio" data-orderable="false"><spring:message code="enviament.historic.list.columna.notificaDatatErrorDescripcio"/></th>
+
+				</tr>
+				</thead>
 			</table>
 		</div>
 	</div>

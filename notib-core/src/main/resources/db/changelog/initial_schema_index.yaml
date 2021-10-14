@@ -1,0 +1,293 @@
+databaseChangeLog:
+- changeSet:
+    id: init-index-1
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CODI
+        indexName: NOT_ORGAN_GESTOR_I
+        tableName: NOT_ORGAN_GESTOR
+        unique: true
+- changeSet:
+    id: init-index-2
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CODI
+        indexName: NOT_ENTITAT_UK
+        tableName: NOT_ENTITAT
+        unique: true
+- changeSet:
+    id: init-index-3
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: APLICACIO_ID
+        indexName: NOT_APLICACIO_AUDIT_EK
+        tableName: NOT_APLICACIO_AUDIT
+- changeSet:
+    id: init-index-4
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: DATA_FINAL
+        indexName: NOT_AVIS_DATA_FINAL_I
+        tableName: NOT_AVIS
+- changeSet:
+    id: init-index-5
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: DATA_INICI
+        indexName: NOT_AVIS_DATA_INICI_I
+        tableName: NOT_AVIS
+- changeSet:
+    id: init-index-6
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        indexName: NOT_ENTITAT_AUDIT_EK
+        tableName: NOT_ENTITAT_AUDIT
+- changeSet:
+    id: init-index-7
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT_ID
+        indexName: NOT_ENTITAT_EK
+        tableName: NOT_NOTIFICACIO_MASSIVA
+- changeSet:
+    id: init-index-8
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_CIE_ID
+        indexName: NOT_ENTITAT_ENTREGA_CIE_EK
+        tableName: NOT_ENTITAT
+- changeSet:
+    id: init-index-9
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: CIE_ID
+        indexName: NOT_ENTREGA_CIE_CIE_EK
+        tableName: NOT_ENTREGA_CIE
+- changeSet:
+    id: init-index-10
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: OPERADOR_POSTAL_ID
+        indexName: NOT_ENTREGA_CIE_OPERADOR_EK
+        tableName: NOT_ENTREGA_CIE
+- changeSet:
+    id: init-index-11
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: GRUP_ID
+        indexName: NOT_GRUP_AUDIT_EK
+        tableName: NOT_GRUP_AUDIT
+- changeSet:
+    id: init-index-12
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOTIFICACIO_ID
+        indexName: NOT_NOTIFICACIO_AUDIT_EK
+        tableName: NOT_NOTIFICACIO_AUDIT
+- changeSet:
+    id: init-index-13
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENVIAMENT_ID
+        indexName: NOT_NOTIFICACIO_ENV_AUDIT_EK
+        tableName: NOT_NOTIFICACIO_ENV_AUDIT
+- changeSet:
+    id: init-index-14
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_POSTAL_ID
+        indexName: NOT_NOTIFICACIO_ENV_DOM_EK
+        tableName: NOT_NOTIFICACIO_ENV
+- changeSet:
+    id: init-index-15
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ESTAT
+        indexName: NOT_NOTIF_ESTAT_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-index-16
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ORGAN_GESTOR
+        indexName: NOT_NOTIF_ORGAN_FK_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-index-17
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ID
+        indexName: NOT_NOTIF_PROCEDIMENT_FK_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-index-18
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROC_CODI_NOTIB
+        indexName: NOT_NOTIF_PROCOD_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-index-19
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ORGAN_ID
+        indexName: NOT_NOTIF_PROORGAN_FK_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-index-20
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: USUARI_CODI
+        indexName: NOT_NOTIF_USUARI_I
+        tableName: NOT_NOTIFICACIO
+- changeSet:
+    id: init-index-21
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: NOTIFICACIO_MASSIVA_ID
+        indexName: NOT_NOT_TABLE_NOT_MASSIVA_EK
+        tableName: NOT_NOTIFICACIO_TABLE
+- changeSet:
+    id: init-index-22
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ORGANGESTOR_ID
+        indexName: NOT_ORGAN_EK
+        tableName: NOT_PRO_ORGAN
+- changeSet:
+    id: init-index-23
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTITAT
+        indexName: NOT_ORGAN_ENTITAT_FK_I
+        tableName: NOT_ORGAN_GESTOR
+- changeSet:
+    id: init-index-24
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_CIE_ID
+        indexName: NOT_ORGAN_ENTREGA_CIE_EK
+        tableName: NOT_ORGAN_GESTOR
+- changeSet:
+    id: init-index-25
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PAGADOR_POSTAL_ID
+        indexName: NOT_PAGADOR_EK
+        tableName: NOT_NOTIFICACIO_MASSIVA
+- changeSet:
+    id: init-index-26
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ID
+        indexName: NOT_PROCEDIMENT_AUDIT_EK
+        tableName: NOT_PROCEDIMENT_AUDIT
+- changeSet:
+    id: init-index-27
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROCEDIMENT_ID
+        indexName: NOT_PROCEDIMENT_EK
+        tableName: NOT_PRO_ORGAN
+- changeSet:
+    id: init-index-28
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: ENTREGA_CIE_ID
+        indexName: NOT_PROCEDIMENT_ENTREGA_CIE_EK
+        tableName: NOT_PROCEDIMENT
+- changeSet:
+    id: init-index-29
+    author: limit (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: PROGRUP_ID
+        indexName: NOT_PRO_GRUP_AUDIT_EK
+        tableName: NOT_PRO_GRUP_AUDIT

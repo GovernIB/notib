@@ -1,29 +1,24 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
-import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
@@ -36,11 +31,6 @@ import java.util.*;
 @Slf4j
 @Component
 public class CacheHelper {
-
-	@Resource
-	private EntitatRepository entitatRepository;
-	@Resource
-	private ProcedimentRepository procedimentRepository;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
 	@Resource
@@ -52,47 +42,10 @@ public class CacheHelper {
 	@Resource
 	private PluginHelper pluginHelper;
 	@Resource
-	private UsuariHelper usuariHelper;
-	@Resource
-	private OrganigramaHelper organigramaHelper;
-	@Resource
 	private CacheManager cacheManager;
 
 	public static String appVersion;
 
-
-	@Cacheable(value = "organsGestorsUsuari", key="#auth.name")
-	public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
-		List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
-		Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-		
-		permisosHelper.filterGrantedAny(
-				organsGestors,
-				new ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-						return organGestor.getId();
-					}
-				},
-				OrganGestorEntity.class,
-				permisos,
-				auth);
-
-		if (entityComprovarHelper.getGenerarLogsPermisosOrgan()) {
-			log.info("### PERMISOS - Obtenir Òrgans gestors #####################################");
-			log.info("### -----------------------------------------------------------------------");
-			log.info("### Usuari: " + auth.getName());
-			log.info("### Òrgans: ");
-			if (organsGestors != null)
-				for (OrganGestorEntity organGestor : organsGestors) {
-					log.info("### # " + organGestor.getCodi() + " - " + organGestor.getNom());
-				}
-			log.info("### -----------------------------------------------------------------------");
-		}
-		return conversioTipusHelper.convertirList(
-				organsGestors, 
-				OrganGestorDto.class);
-	}
-	
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
 	public DadesUsuari findUsuariAmbCodi(
 			String usuariCodi) {
@@ -148,6 +101,15 @@ public class CacheHelper {
 				codiDir3Organ,
 				arbreUnitats);
 	}
+
+	@Cacheable(value = "unitatPerCodi", key="#codi")
+	public OrganGestorDto unitatPerCodi(String codi) {
+		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codi);
+		if (organs != null && !organs.isEmpty()) {
+			return organs.get(0);
+		}
+		return null;
+	}
 	
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
 	public List<OficinaDto> getOficinesSIREntitat(
@@ -191,24 +153,44 @@ public class CacheHelper {
 	public void evictFindProcedimentsWithPermis() {
 	}
 	
-	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis", "procedimentsOrgan"}, allEntries = true)
+	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
 	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
-	
-	@CacheEvict(value = "organsGestorsUsuari", allEntries = true)
-	public void evictFindOrgansGestorsAccessiblesUsuari() {
-	}
 
-	@CacheEvict(value = "getPermisosEntitatsUsuariActual", allEntries = true)
-	public void evictAllPermisosEntitatsUsuariActual() {
+	@CacheEvict(value = "unitatPerCodi", allEntries = true)
+	public void evictUnitatPerCodi() {
 	}
 	
-	public void clearCache(String value) {
-		cacheManager.getCache(value).clear();
+	public void clearCache(String cacheName) {
+		cacheManager.getCache(cacheName).clear();
 	}
 
+	public void clearAllCaches() {
+		for(String cacheName : cacheManager.getCacheNames()) {
+			clearCache(cacheName);
+		}
+	}
+
+	public long getCacheSize(String cacheName)
+	{
+		Cache cache = cacheManager.getCache(cacheName);
+		Object nativeCache = cache.getNativeCache();
+		if (nativeCache instanceof net.sf.ehcache.Ehcache) {
+			net.sf.ehcache.Ehcache ehCache = (net.sf.ehcache.Ehcache) nativeCache;
+			return ehCache.getStatistics().getLocalHeapSizeInBytes();
+		}
+		return 0L;
+	}
+
+	public long getTotalEhCacheSize() {
+		long totalSize = 0L;
+		for (String cacheName : cacheManager.getCacheNames()) {
+			totalSize = getCacheSize(cacheName);
+		}
+		return totalSize;
+	}
 }

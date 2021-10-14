@@ -18,7 +18,7 @@ pageContext.setAttribute(
 	<title>${titol}</title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
-	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
@@ -178,28 +178,43 @@ $(document).ready(function() {
 		$('#codiAssumpte').val(codiAssumpteSeleccionatValue);
 		$('#codiAssumpteNom').val(codiAssumpteSeleccionatText);
 	});
-	$('#comu').on('click', function(event){
-		if ($(this).is(':checked')) {
+
+	$('#entregaCieActiva').change(function() {
+		if (this.checked) {
+			$('#entrega-cie-form').show();
+		} else {
+			$('#entrega-cie-form').hide();
+		}
+	});
+
+	if (!$('#entregaCieActiva')[0].checked) {
+		$('#entrega-cie-form').hide();
+	}
+
+	// CANVIS EN EL FORMULARI SEGONS SI EL PROCEDIMENT ES CREAT ES COMÚ O NO
+	$('#comu').change(function() {
+		if (this.checked) {
 			$('#organGestorNom').removeClass('habilitat');
 			$('#organGestor').val(entitatDir3);
 			var organText = '';
 			$("#selOrganismes option").each(function(){
-				if ($(this).val() == entitatDir3){        
+				if ($(this).val() == entitatDir3){
 					organText = $(this).text();
-			    }
-		     });
+				}
+			});
 			$('#organGestorNom').val(organText);
-		}else{
+			$('#entrega-cie').hide();
+		} else {
 			$('#organGestorNom').addClass('habilitat');
 			$('#organGestor').val(null);
 			$('#organGestorNom').val(null);
-		}	
+			$('#entrega-cie').show();
+		}
 	});
-	
-		
-	
 
-	
+	if ($('#comu')[0].checked) {
+		$('#entrega-cie').hide();
+	}
 });
 </script>
 </head>
@@ -234,14 +249,27 @@ $(document).ready(function() {
 						<form:hidden path="comu"/>
 					</c:otherwise>
 				</c:choose>
-				<not:inputTextSearch  name="organGestorNom" textKey="procediment.form.camp.organ" searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
+				<not:inputTextSearch  name="organGestorNom" textKey="procediment.form.camp.organ"
+									  searchButton="searchOrgan" required="true" readonly="true" labelSize="2"/>
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<form:hidden path="organGestor"/>
 				
 <%-- 				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/> --%>
-				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
-				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>
+<%--				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>--%>
+<%--				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>--%>
+				<div id="entrega-cie">
+					<not:inputCheckbox name="entregaCieActiva" textKey="procediment.form.camp.entregacie" labelSize="2"/>
+					<div id="entrega-cie-form">
+						<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+										 optionTextAttribute="text" required="true" emptyOption="true"
+										 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+						<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+										 optionTextAttribute="text" required="true" emptyOption="true"
+										 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+					</div>
+				</div>
 				<not:inputCheckbox name="agrupar" textKey="procediment.form.camp.agrupar" labelSize="2"/>
+				<not:inputCheckbox name="requireDirectPermission" textKey="procediment.form.camp.requireDirectPermission" labelSize="2"/>
 
 			</div>
 			<div role="tabpanel" class="tab-pane <c:if test='${not empty errorRegistre}'>active</c:if>" id="registreForm">

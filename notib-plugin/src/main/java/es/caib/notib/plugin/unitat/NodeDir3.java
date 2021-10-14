@@ -3,17 +3,16 @@
  */
 package es.caib.notib.plugin.unitat;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Informació d'una unitat organitzativa.
@@ -42,6 +41,10 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	private String localitat;
 	@JsonProperty("idPadre")
 	private String idPare;
+	@JsonProperty("cif")
+	private String cif;
+	@JsonProperty("tieneOficinaSir")
+	private Boolean tieneOficinaSir = false;
 	@JsonProperty("hijos")
 	private List<NodeDir3> fills; 
 	

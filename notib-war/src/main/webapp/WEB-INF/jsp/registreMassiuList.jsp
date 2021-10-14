@@ -196,7 +196,11 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioRegistreErrorFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
-				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="procedimentId" optionItems="${procediments}"
+								 optionValueAttribute="id" optionTextAttribute="nom"
+								 placeholderKey="notificacio.list.filtre.camp.procediment"
+								 inline="true"
+								 emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-4">
 				<not:inputText name="concepte" inline="true" placeholderKey="notificacio.list.filtre.camp.concepte"/>
@@ -208,7 +212,8 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 				<not:inputDate name="dataFi" placeholderKey="notificacio.list.filtre.camp.datafi" inline="true" required="false" />
 			</div>
 			<div class="col-md-4">
-				<not:inputSuggest name="usuari" inline="true" placeholderKey="notificacio.list.filtre.camp.usuari" urlConsultaInicial="../userajax/usuariDades" urlConsultaLlistat="../userajax/usuarisDades" suggestValue="codi" suggestText="nom" minimumInputLength="2" />
+				<not:inputSuggest name="usuari" inline="true" placeholderKey="notificacio.list.filtre.camp.usuari"
+								  urlConsultaInicial="../../userajax/usuariDades" urlConsultaLlistat="../../userajax/usuarisDades" suggestValue="codi" suggestText="nom" minimumInputLength="2" />
 			</div>
 
 			<div class="col-md-2 pull-right form-buttons" style="text-align: right;">

@@ -1,23 +1,18 @@
-/**
- * 
- */
 package es.caib.notib.plugin.usuari;
 
+import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.notib.plugin.SistemaExternException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.

@@ -30,8 +30,8 @@
 			business-interface="es.caib.notib.core.api.service.PagadorCieFormatSobreService"/>	
 	<jee:local-slsb
 			id="pagadorPostalService"
-			jndi-name="notib/PagadorPostalServiceBean/local"
-			business-interface="es.caib.notib.core.api.service.PagadorPostalService"/>	
+			jndi-name="notib/OperadorPostalServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.OperadorPostalService"/>
 	<jee:local-slsb
 			id="procedimentService"
 			jndi-name="notib/ProcedimentServiceBean/local"
@@ -80,4 +80,24 @@
 			id="auditService"
 			jndi-name="notib/AuditServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.AuditService"/>
+	<jee:local-slsb
+			id="avisService"
+			jndi-name="notib/AvisServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.AvisService"/>
+	<jee:local-slsb
+			id="justificantService"
+			jndi-name="notib/JustificantServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.JustificantService"/>
+	<jee:local-slsb
+			id="notificacioMassivaService"
+			jndi-name="notib/NotificacioMassivaServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.NotificacioMassivaService"/>
+	<jee:local-slsb
+			id="GestioDocumentalService"
+			jndi-name="notib/GestioDocumentalServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.GestioDocumentalService"/>
+	<jee:local-slsb
+			id="ConfigService"
+			jndi-name="notib/ConfigServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.ConfigService"/>
 </beans>

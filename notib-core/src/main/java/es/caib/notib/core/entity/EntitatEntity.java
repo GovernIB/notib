@@ -6,7 +6,12 @@ package es.caib.notib.core.entity;
 import es.caib.notib.core.api.dto.EntitatTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -18,6 +23,8 @@ import javax.persistence.*;
  */
 @Getter
 @Entity
+@Builder(builderMethodName = "hiddenBuilder")
+@NoArgsConstructor @AllArgsConstructor
 @Table(name="not_entitat", 
 	uniqueConstraints = {
 			@UniqueConstraint(columnNames = "codi"),
@@ -42,16 +49,18 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private String apiKey;
 	@Column(name = "amb_entrega_deh", nullable = false)
 	private boolean ambEntregaDeh;
-	@Column(name = "amb_entrega_cie", nullable = false)
-	private boolean ambEntregaCie;
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "ENTREGA_CIE_ID")
+	@ForeignKey(name = "NOT_ENTITAT_ENTREGA_CIE_FK")
+	private EntregaCieEntity entregaCie;
 	@Column(name = "descripcio", length = 1024)
 	private String descripcio;
 	@Column(name = "activa", nullable = false)
 	private boolean activa;
-	@Lob
+//	@Lob
 	@Column(name = "logo_cap")
 	private byte[] logoCapBytes;
-	@Lob
+//	@Lob
 	@Column(name = "logo_peu")
 	private byte[] logoPeuBytes;
 	@Column(name = "color_fons", length = 1024)
@@ -90,7 +99,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
-			boolean ambEntregaCie,
+			EntregaCieEntity entregaCie,
 			String descripcio,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
@@ -111,7 +120,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.dir3CodiReg = dir3CodiReg;
 		this.apiKey = apiKey;
 		this.ambEntregaDeh = ambEntregaDeh;
-		this.ambEntregaCie = ambEntregaCie;
+		this.entregaCie = entregaCie;
 		this.logoCapBytes = logoCapBytes;
 		this.logoPeuBytes = logoPeuBytes;
 		this.colorFons = colorFons;
@@ -130,7 +139,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		this.activa = activa;
 	}
 	
-	public static Builder getBuilder(
+	public static EntitatEntityBuilder getBuilder(
 			String codi,
 			String nom,
 			EntitatTipusEnumDto tipus,
@@ -138,7 +147,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String dir3CodiReg,
 			String apiKey,
 			boolean ambEntregaDeh,
-			boolean ambEntregaCie,
+//			boolean ambEntregaCie,
 			byte[] logoCapBytes,
 			byte[] logoPeuBytes,
 			String colorFons,
@@ -150,82 +159,28 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String llibre,
 			String llibreNom,
 			boolean oficinaEntitat) {
-		return new Builder(
-				codi,
-				nom,
-				tipus,
-				dir3Codi,
-				dir3CodiReg,
-				apiKey,
-				ambEntregaDeh,
-				ambEntregaCie,
-				logoCapBytes,
-				logoPeuBytes,
-				colorFons,
-				colorLletra,
-				tipusDocDefault,
-				oficina,
-				nomOficinaVirtual,
-				llibreEntitat,
-				llibre,
-				llibreNom,
-				oficinaEntitat);
+		return hiddenBuilder()
+				.codi(codi)
+				.nom(nom)
+				.tipus(tipus)
+				.dir3Codi(dir3Codi)
+				.dir3CodiReg(dir3CodiReg)
+				.apiKey(apiKey)
+				.ambEntregaDeh(ambEntregaDeh)
+				.logoCapBytes(logoCapBytes)
+				.logoPeuBytes(logoPeuBytes)
+				.colorFons(colorFons)
+				.colorLletra(colorLletra)
+				.tipusDocDefault(tipusDocDefault)
+				.oficina(oficina)
+				.nomOficinaVirtual(nomOficinaVirtual)
+				.llibreEntitat(llibreEntitat)
+				.llibre(llibre)
+				.llibreNom(llibreNom)
+				.oficinaEntitat(oficinaEntitat)
+				.activa(true);
 	}
 
-	public static class Builder {
-		EntitatEntity built;
-		Builder(
-				String codi,
-				String nom,
-				EntitatTipusEnumDto tipus,
-				String dir3Codi,
-				String dir3CodiReg,
-				String apiKey,
-				boolean ambEntregaDeh,
-				boolean ambEntregaCie,
-				byte[] logoCapBytes,
-				byte[] logoPeuBytes,
-				String colorFons,
-				String colorLletra,
-				TipusDocumentEnumDto tipusDocDefault,
-				String oficina,
-				String nomOficinaVirtual,
-				boolean llibreEntitat,
-				String llibre,
-				String llibreNom,
-				boolean oficinaEntitat) {
-			built = new EntitatEntity();
-			built.codi = codi;
-			built.nom = nom;
-			built.tipus = tipus;
-			built.dir3Codi = dir3Codi;
-			built.dir3CodiReg = dir3CodiReg;
-			built.activa = true;
-			built.apiKey = apiKey;
-			built.ambEntregaDeh = ambEntregaDeh;
-			built.ambEntregaCie = ambEntregaCie;
-			built.logoCapBytes = logoCapBytes;
-			built.logoPeuBytes = logoPeuBytes;
-			built.colorFons = colorFons;
-			built.colorLletra = colorLletra;
-			built.tipusDocDefault = tipusDocDefault;
-			built.oficina = oficina;
-			built.nomOficinaVirtual = nomOficinaVirtual;
-			built.llibreEntitat = llibreEntitat;
-			built.llibre = llibre;
-			built.llibreNom = llibreNom;
-			built.oficinaEntitat = oficinaEntitat;
-		}
-		public Builder descripcio(String descripcio) {
-			built.descripcio = descripcio;
-			return this;
-		}
-		public EntitatEntity build() {
-			return built;
-		}
-	}
-
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -249,11 +204,9 @@ public class EntitatEntity extends NotibAuditable<Long> {
 		} else if (!codi.equals(other.codi))
 			return false;
 		if (dir3Codi == null) {
-			if (other.dir3Codi != null)
-				return false;
-		} else if (!dir3Codi.equals(other.dir3Codi))
-			return false;
-		return true;
+			return other.dir3Codi == null;
+		} else
+			return dir3Codi.equals(other.dir3Codi);
 	}
 
 

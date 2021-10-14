@@ -19,6 +19,18 @@
 	<link href="<c:url value="/css/permisos.css"/>" rel="stylesheet" type="text/css">
 	<not:modalHead/>
 	<script>
+	
+		function formatRolUsuari() {
+			if ($("#tipus").val().toUpperCase() == "ROL") { 
+				if ($("#principal").val().trim().toLowerCase() == "tothom")
+					$("#principal").val($("#principal").val().trim().toLowerCase());
+				else
+					$("#principal").val($("#principal").val().trim().toUpperCase());
+			} else { // "USUARI"
+				$("#principal").val($("#principal").val().trim().toLowerCase());
+			}
+		}
+		
 		$(document).ready(function() {
 			$("#modal-botons button[type='submit']").on('click', function() {
 				$("form#permisCommand *:disabled").attr('readonly', 'readonly');
@@ -31,6 +43,14 @@
 					disableGuardarIfNoneChecked();
 				});
 			</c:if>		
+
+			$("#principal").on('change', function() {
+				formatRolUsuari();
+			});
+			
+			$("#tipus").on('change', function() {
+				formatRolUsuari();
+			});
 		});
 		
 		function disableGuardarIfNoneChecked(){
@@ -57,7 +77,7 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto" />
-		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="${not empty permisCommand.id}"/>
+		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="${not empty permisCommand.id}" inputMaxLength="${principalSize}" showsize="true"/>
 		<not:inputCheckbox name="usuari" textKey="entitat.permis.form.camp.usuari"/>
 		<not:inputCheckbox name="administradorEntitat" textKey="entitat.permis.form.camp.administradorentitat"/>
 		<not:inputCheckbox name="aplicacio" textKey="entitat.permis.form.camp.aplicacio"/>

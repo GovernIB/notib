@@ -1,12 +1,12 @@
 package es.caib.notib.war.command;
 
-import javax.validation.constraints.Size;
-
 import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.war.validation.ValidEntregaPostal;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.Size;
 
 /**
  * Command per al manteniment de entregues postals
@@ -18,7 +18,7 @@ import lombok.Setter;
 @Getter @Setter
 public class EntregapostalCommand {
 
-	private NotificaDomiciliConcretTipusEnumDto tipus;
+	private NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus;
 	private NotificaDomiciliViaTipusEnumDto viaTipus;
 	@Size(max=50)
 	private String viaNom;
@@ -63,6 +63,7 @@ public class EntregapostalCommand {
 	private String formatSobre;
 	@Size(max=10)
 	private String formatFulla;
+
 	private boolean activa;
 	
 }

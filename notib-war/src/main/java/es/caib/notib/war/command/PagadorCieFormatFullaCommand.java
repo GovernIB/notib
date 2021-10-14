@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
+import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 
 /**
@@ -38,7 +38,7 @@ public class PagadorCieFormatFullaCommand {
 	public void setPagadorCieId(Long pagadorCieId) {
 		this.pagadorCieId = pagadorCieId;
 	}
-	public static PagadorCieFormatFullaCommand asCommand(PagadorCieFormatFullaDto dto) {
+	public static PagadorCieFormatFullaCommand asCommand(CieFormatFullaDto dto) {
 		if (dto == null) {
 			return null;
 		}
@@ -47,13 +47,13 @@ public class PagadorCieFormatFullaCommand {
 				PagadorCieFormatFullaCommand.class );
 		return command;
 	}
-	public static PagadorCieFormatFullaDto asDto(PagadorCieFormatFullaCommand command) {
+	public static CieFormatFullaDto asDto(PagadorCieFormatFullaCommand command) {
 		if (command == null) {
 			return null;
 		}
-		PagadorCieFormatFullaDto dto = ConversioTipusHelper.convertir(
+		CieFormatFullaDto dto = ConversioTipusHelper.convertir(
 				command,
-				PagadorCieFormatFullaDto.class);
+				CieFormatFullaDto.class);
 		return dto;
 	}
 

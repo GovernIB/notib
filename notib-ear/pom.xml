@@ -9,6 +9,11 @@
 	</parent>
 	<artifactId>notib-ear</artifactId>
 	<packaging>ear</packaging>
+
+<!--	<properties>-->
+<!--		<docker.image.prefix>280421</docker.image.prefix>-->
+<!--		<docker.image.name>notib</docker.image.name>-->
+<!--	</properties>-->
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -61,7 +66,7 @@
 			<id>jboss</id>
 			<activation>
 				<file>
-					<missing>${basedir}/../notib-war/appserv_tomcat</missing>
+					<missing>../notib-war/appserv_tomcat</missing>
 				</file>
 				<activeByDefault>true</activeByDefault>
 			</activation>
@@ -112,7 +117,7 @@
 			<id>tomcat</id>
 			<activation>
 				<file>
-					<exists>${basedir}/../notib-war/appserv_tomcat</exists>
+					<exists>../notib-war/appserv_tomcat</exists>
 				</file>
 				<activeByDefault>false</activeByDefault>
 			</activation>
@@ -207,6 +212,31 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.33.0</version>
+				<configuration>
+					<verbose>true</verbose>
+					<images>
+						<image>
+							<name>${docker.image.prefix}/${docker.image.name}</name>
+							<alias>notib</alias>
+							<build>
+								<!--copies artifact to docker build dir in target-->
+								<assembly>
+									<descriptorRef>artifact</descriptorRef>
+								</assembly>
+								<dockerFile>Dockerfile</dockerFile>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+							</build>
+						</image>
+					</images>
+				</configuration>
 			</plugin>
 		</plugins>
 		<pluginManagement>

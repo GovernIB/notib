@@ -14,6 +14,9 @@
 	pageContext.setAttribute(
 			"isRolActualAdministradorOrgan",
 			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	pageContext.setAttribute(
+			"isRolActualAdministrador",
+			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 %>
 
 <html>
@@ -49,12 +52,13 @@ eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
 var notificacioApp = "${notificacio.tipusUsuari == 'APLICACIO'}";
 $(document).ready(function() {
-	$('#events').on('rowinfo.dataTable', function(e, td, rowData) {
+	let $tableEvents = $('#table-events');
+	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
 			$(td).empty();
 			$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
 	});
-	$('#events').on('draw.dt', function(e, settings) {
+	$tableEvents.on('draw.dt', function(e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
 			var data = this.data();
@@ -63,9 +67,25 @@ $(document).ready(function() {
 			}
 		});
 	});
+
 	$(document.body).on('hidden.bs.modal', function () {
 		$('.tab-content').load(location.href + " .tab-content");
 	});
+
+	$('#registrar-btn').click(function() {
+		$('#registrar-avis-user').css('display', 'inline-block');
+	    $('#registrar-btn').attr('disabled', true);
+        window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>';
+	    return false;    
+    });	
+	
+	$('#enviar-btn').click(function() {
+		$('#enviar-avis-user').css('display', 'inline-block');
+	    $('#enviar-btn').attr('disabled', true);
+        window.location.href = '<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>';
+	    return false;    
+    });	
+	
 });
 </script>
 <style type="text/css">
@@ -111,6 +131,12 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</c:if>
+	<div id="registrar-avis-user" class="alert alert-info well-sm" role="alert" style="display: none; width: 100%">
+		<spring:message code="notificacio.info.registrar.avis.user" />
+	</div>
+	<div id="enviar-avis-user" class="alert alert-info well-sm" role="alert" style="display: none; width: 100%">
+		<spring:message code="notificacio.info.enviar.avis.user" />
+	</div>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" class="active">
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
@@ -126,6 +152,13 @@ $(document).ready(function() {
 			<li role="presentation">
 				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
 					<spring:message code="notificacio.info.tab.accions" />
+				</a>
+			</li>
+		</c:if>
+		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
+			<li role="presentation">
+				<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
+					<spring:message code="notificacio.info.tab.historic" />
 				</a>
 			</li>
 		</c:if>
@@ -146,7 +179,7 @@ $(document).ready(function() {
 						<tr>
 							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
 							<td>${notificacio.organGestorNom}<br>
-							<small>${notificacio.organGestor}</small></td>
+							<small>${notificacio.organGestorCodi}</small></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.concepte" /></strong></td>
@@ -159,7 +192,57 @@ $(document).ready(function() {
 						<c:if test="${notificacio.estat != null && notificacio.estat != ''}">
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.estat" /></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${notificacio.estat}" /></td>
+							<td>
+								<c:choose>
+									<c:when test="${notificacio.enviant}">
+										<span class="fa fa-clock-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'PENDENT'}">
+										<span class="fa fa-clock-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'ENVIADA'}">
+										<span class="fa fa-send-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'FINALITZADA'}">
+										<span class="fa fa-check"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'REGISTRADA'}">
+										<span class="fa fa-file-o"></span>
+									</c:when>
+									<c:when test="${notificacio.estat == 'PROCESSADA'}">
+										<span class="fa fa-check-circle"></span>
+									</c:when>
+								</c:choose>
+								<c:choose>
+									<c:when test="${notificacio.enviant}">
+										<spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>
+									</c:when>
+									<c:otherwise>
+										<spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.${notificacio.estat}" />
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${notificacio.notificaError}">
+									<span class="fa fa-warning text-danger" title="${notificacio.notificaErrorDescripcio}"></span>
+								</c:if>
+<%--								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastEvent}">--%>
+<%--									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
+<%--								</c:if>--%>
+								<c:if test="${notificacio.estat == 'PROCESSADA' and not empty notificacio.estatDate}">
+									<br>
+									<span class="horaProcessat"><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></span>
+									<br>
+								</c:if>
+								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
+									<p style="display:inline">(
+									<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
+										<c:if test="${not empty enviament.notificaEstat}">
+											<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+											${!status.last ? ', ' : ''}
+										</c:if>
+									</c:forEach>
+									)</p>
+								</c:if>
+							</td>
 						</tr>
 						</c:if>
 						<tr>
@@ -182,7 +265,11 @@ $(document).ready(function() {
 						</tr>
 						<c:if test="${!notificacio.hasEnviamentsPendents}">
 							<tr>
-								<td colspan="2"><a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right"><spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span></a></td>
+								<td colspan="2">
+									<a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">
+									<spring:message code="comu.boto.justificant"/>&nbsp;<span class="fa fa-download"></span>
+									</a>
+								</td>
 							</tr>
 						</c:if>
 					</tbody>
@@ -320,7 +407,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 			</c:if>
-			<c:if test="${not empty notificacio.procediment.pagadorpostal}">
+			<c:if test="${not empty notificacio.operadorPostal}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -330,27 +417,27 @@ $(document).ready(function() {
 					<table class="table table-bordered" style="width: 100%">
 						<tbody>
 							<c:if
-								test="${not empty notificacio.procediment.pagadorpostal.dir3codi}">
+								test="${not empty notificacio.operadorPostal.organismePagadorCodi}">
 								<tr>
 									<td width="30%"><strong><spring:message
 												code="notificacio.info.pagador.correus.codi.dir3" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.dir3codi}</td>
+									<td>${notificacio.operadorPostal.organismePagadorCodi}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.contracte" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.contracteNum}</td>
+									<td>${notificacio.operadorPostal.contracteNum}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.client" /></strong></td>
-									<td>${notificacio.procediment.pagadorpostal.facturacioClientCodi}</td>
+									<td>${notificacio.operadorPostal.facturacioClientCodi}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.correus.vigencia" /></strong></td>
 									<td>
-									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.procediment.pagadorpostal.contracteDataVig}" />
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.operadorPostal.contracteDataVig}" />
 									</td>
 								</tr>
 							</c:if>
@@ -358,7 +445,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
-				<c:if test="${not empty notificacio.procediment.pagadorpostal}">
+				<c:if test="${not empty notificacio.cie}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -367,17 +454,17 @@ $(document).ready(function() {
 					</div>
 					<table class="table table-bordered" style="width: 100%">
 						<tbody>
-							<c:if test="${not empty notificacio.procediment.pagadorcie.dir3codi}">
+							<c:if test="${not empty notificacio.cie.organismePagadorCodi}">
 								<tr>
 									<td width="30%"><strong><spring:message
 												code="notificacio.info.pagador.cie.codi.dir3" /></strong></td>
-									<td>${notificacio.procediment.pagadorcie.dir3codi}</td>
+									<td>${notificacio.cie.organismePagadorCodi}</td>
 								</tr>
 								<tr>
 									<td><strong><spring:message
 												code="notificacio.info.pagador.cie.vigencia" /></strong></td>
 									<td>
-									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.procediment.pagadorcie.contracteDataVig}" />
+									<fmt:formatDate pattern="dd/MM/yyyy" value="${notificacio.cie.contracteDataVig}" />
 									</td>
 								</tr>
 							</c:if>
@@ -385,6 +472,7 @@ $(document).ready(function() {
 					</table>
 				</div>
 				</c:if>
+
 				<c:if test="${not empty notificacio.enviaments}">
 				
 					<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
@@ -429,6 +517,27 @@ $(document).ready(function() {
 							    			</c:choose>
 							    			</td>
 							    		</tr>
+										<tr>
+											<th><spring:message code="notificacio.list.enviament.list.estat"/></th>
+											<td>
+												<c:if test="${not empty enviament.notificaEstat}">
+													<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+												</c:if>
+												<c:if test="${enviament.notificacioError}">
+													<c:set var="errorTitle">
+														<c:choose>
+														<c:when test="${not empty enviament.notificacioErrorDescripcio}">
+															${enviament.notificacioErrorDescripcio}
+														</c:when>
+														<c:otherwise>
+															Descripció de l'error no registrada
+														</c:otherwise>
+														</c:choose>
+													</c:set>
+													<span class="fa fa-warning text-danger" title="${errorTitle}"></span>
+												</c:if>
+											</td>
+										</tr>
 						    			<tr>
 							    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
 							    			<%--<td>
@@ -484,6 +593,8 @@ $(document).ready(function() {
 																</c:if>
 															</c:if>
 															<%-- Assentament registral o Registre normal (versió anterior) --%>
+
+															<c:if test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
 															<c:if test="${(not empty enviament.registreEstat && (enviament.registreEstat == 'DISTRIBUIT' || enviament.registreEstat == 'VALID' || enviament.registreEstat == 'OFICI_EXTERN'  || enviament.registreEstat == 'OFICI_SIR')) || (empty enviament.registreEstat && not empty enviament.registreNumeroFormatat)}">
 																<tr>
 																	<td><strong><spring:message code="enviament.info.seu.registre.justificant"/></strong></td>
@@ -494,6 +605,7 @@ $(document).ready(function() {
 																	</a>
 																	</td>
 																<tr>
+															</c:if>
 															</c:if>
 
 														</tbody>
@@ -572,6 +684,13 @@ $(document).ready(function() {
 													</table>
 								    			</td>
 								    		</c:when>
+												<c:when test="${notificacio.comunicacioSir and enviament.registreEstatFinal}">
+													<td>
+														<a href="<c:url value="/notificacio/${enviament.id}/justificant/sir"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">
+															<spring:message code="enviament.info.accio.descarregar.justificant.sir"/>&nbsp;<span class="fa fa-download"></span>
+														</a>
+													</td>
+												</c:when>
 								    		<c:otherwise>
 								    			<td>
 								    				<spring:message code="notificacio.list.enviament.list.sensecertificacio"/>
@@ -588,7 +707,7 @@ $(document).ready(function() {
 		<div role="tabpanel"
 			class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"
 			id="events">
-			<table id="events" data-toggle="datatable"
+			<table id="table-events" data-toggle="datatable"
 				data-url="<c:url value="/notificacio/${notificacio.id}/event"/>"
 				data-search-enabled="false" data-paging="false" data-info="false"
 				data-row-info="true" class="table table-striped table-bordered"
@@ -665,7 +784,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<a
-									href="<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>"
+									id="registrar-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/registrar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.registrar.boto" />
 								</a>
@@ -682,7 +801,7 @@ $(document).ready(function() {
 							</div>
 							<div class="col-sm-6 text-right">
 								<a
-									href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
+									id="enviar-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar"/>"
 									class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
 									<spring:message code="notificacio.info.accio.enviar.boto" />
 								</a>
@@ -747,6 +866,58 @@ $(document).ready(function() {
 					<spring:message code="notificacio.info.accio.no.accions" />
 				</div>
 			</c:if>
+		</div>
+		<div role="tabpanel"
+			 class="tab-pane<c:if test="${pipellaActiva == 'events'}"> active</c:if>"
+			 id="historic">
+			<table id="table-historic"
+				   data-toggle="datatable"
+				   data-url="<c:url value="/notificacio/${notificacio.id}/historic"/>"
+				   data-search-enabled="false"
+				   data-paging="false"
+				   data-row-info="false"
+				   class="table table-striped table-bordered"
+				   style="width: 100%">
+				<thead>
+				<tr>
+
+					<th data-col-name="tipusOperacio" data-orderable="false"><spring:message code="notificacio.historic.list.columna.tipusOperacio" /></th>
+					<th data-col-name="joinPoint" data-orderable="false"><spring:message code="notificacio.historic.list.columna.joinPoint" /></th>
+					<th data-col-name="createdBy" data-orderable="false"><spring:message code="notificacio.historic.list.columna.createdBy" /></th>
+					<th data-col-name="createdDate" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.createdDate" /></th>
+					<th data-col-name="comunicacioTipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.comunicacioTipus" /></th>
+					<th data-col-name="tipusUsuari" data-orderable="false"><spring:message code="notificacio.historic.list.columna.tipusUsuari" /></th>
+					<th data-col-name="usuari" data-orderable="false"><spring:message code="notificacio.historic.list.columna.usuari" /></th>
+					<th data-col-name="emisor" data-orderable="false"><spring:message code="notificacio.historic.list.columna.emisor" /></th>
+					<th data-col-name="tipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.tipus" /></th>
+					<th data-col-name="organ" data-orderable="false"><spring:message code="notificacio.historic.list.columna.organ" /></th>
+					<th data-col-name="procediment" data-orderable="false"><spring:message code="notificacio.historic.list.columna.procediment" /></th>
+					<th data-col-name="grup" data-orderable="false"><spring:message code="notificacio.historic.list.columna.grup" /></th>
+					<th data-col-name="concepte" data-orderable="false"><spring:message code="notificacio.historic.list.columna.concepte" /></th>
+					<th data-col-name="descripcio" data-orderable="false"><spring:message code="notificacio.historic.list.columna.descripcio" /></th>
+					<th data-col-name="numExpedient" data-orderable="false"><spring:message code="notificacio.historic.list.columna.numExpedient" /></th>
+					<th data-col-name="enviamentDataProgramada" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.enviamentDataProgramada" /></th>
+					<th data-col-name="retard" data-orderable="false"><spring:message code="notificacio.historic.list.columna.retard" /></th>
+					<th data-col-name="caducitat" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.caducitat" /></th>
+					<th data-col-name="documentId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.documentId" /></th>
+					<th data-col-name="estat" data-orderable="false"><spring:message code="notificacio.historic.list.columna.estat" /></th>
+					<th data-col-name="estatDate" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.estatDate" /></th>
+					<th data-col-name="motiu" data-orderable="false"><spring:message code="notificacio.historic.list.columna.motiu" /></th>
+					<th data-col-name="pagadorPostalId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.pagadorPostalId" /></th>
+					<th data-col-name="pagadorCieId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.pagadorCieId" /></th>
+					<th data-col-name="registreEnviamentIntent" data-orderable="false"><spring:message code="notificacio.historic.list.columna.registreEnviamentIntent" /></th>
+					<th data-col-name="registreNumero" data-orderable="false"><spring:message code="notificacio.historic.list.columna.registreNumero" /></th>
+					<th data-col-name="registreNumeroFormatat" data-orderable="false"><spring:message code="notificacio.historic.list.columna.registreNumeroFormatat" /></th>
+					<th data-col-name="registreData" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.registreData" /></th>
+					<th data-col-name="notificaEnviamentData" data-orderable="false" data-converter="datetime"><spring:message code="notificacio.historic.list.columna.notificaEnviamentData" /></th>
+					<th data-col-name="notificaEnviamentIntent" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaEnviamentIntent" /></th>
+					<th data-col-name="notificaErrorTipus" data-orderable="false"><spring:message code="notificacio.historic.list.columna.notificaErrorTipus" /></th>
+					<th data-col-name="errorLastCallback" data-orderable="false"><spring:message code="notificacio.historic.list.columna.errorLastCallback" /></th>
+					<th data-col-name="errorEventId" data-orderable="false"><spring:message code="notificacio.historic.list.columna.errorEventId" /></th>
+
+				</tr>
+				</thead>
+			</table>
 		</div>
 	</div>
 	<div id="modal-botons" class="text-right">

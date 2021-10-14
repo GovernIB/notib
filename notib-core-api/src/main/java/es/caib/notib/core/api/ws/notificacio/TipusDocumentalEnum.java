@@ -33,8 +33,29 @@ public enum TipusDocumentalEnum implements Serializable {
     FACTURA("TD19"),
     ALTRES_INCAUTATS("TD20"),
     // ALTRES
-    ALTRES("TD99");
-
+    ALTRES("TD99"),
+	
+	//NOUS TIPUS
+	LLEI("TD51"),
+	MOCIO("TD52"),
+	INSTRUCCIO("TD53"),
+	CONVOCATORIA("TD54"),
+	ORDRE_DIA("TD55"),
+	INFORME_PONENCIA("TD56"),
+	DICTAMEN_COMISSIO("TD57"),
+	INICIATIVA_LEGISLATIVA("TD58"),
+	PREGUNTA("TD59"),
+	INTERPELACIO("TD60"),
+	RESPOSTA("TD61"),
+	PROPOSICIO_NO_LLEI("TD62"),
+	ESQUEMA("TD63"),
+	PROPOSTA_RESOLUCIO("TD64"),
+	COMPAREIXENSA("TD65"),
+	SOLICITUD_INFORMACIO("TD66"),
+	ESCRIT("TD67"),
+	INICIATIVA_LEGISLATIVA2("TD68"),
+	PETICIO("TD69");
+	
     private final String valor;
     private TipusDocumentalEnum(String valor) {
         this.valor = valor;

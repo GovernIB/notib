@@ -9,7 +9,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.dto.PagadorCieFormatFullaDto;
+import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -30,7 +30,7 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom",})
-	public PagadorCieFormatFullaDto create(Long pagadorCieId, PagadorCieFormatFullaDto formatSobre) {
+	public CieFormatFullaDto create(Long pagadorCieId, CieFormatFullaDto formatSobre) {
 		return delegate.create(
 				pagadorCieId, 
 				formatSobre);
@@ -38,31 +38,31 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom",})
-	public PagadorCieFormatFullaDto update(PagadorCieFormatFullaDto formatSobre) throws NotFoundException {
+	public CieFormatFullaDto update(CieFormatFullaDto formatSobre) throws NotFoundException {
 		return delegate.update(formatSobre);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom",})
-	public PagadorCieFormatFullaDto delete(Long id) throws NotFoundException {
+	public CieFormatFullaDto delete(Long id) throws NotFoundException {
 		return delegate.delete(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PagadorCieFormatFullaDto findById(Long id) {
+	public CieFormatFullaDto findById(Long id) {
 		return delegate.findById(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<PagadorCieFormatFullaDto> findAll() {
+	public List<CieFormatFullaDto> findAll() {
 		return delegate.findAll();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PaginaDto<PagadorCieFormatFullaDto> findAllPaginat(
+	public PaginaDto<CieFormatFullaDto> findAllPaginat(
 			Long pagadorCieId,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(
@@ -72,7 +72,7 @@ public class PagadorCieFormatFullaServiceBean implements PagadorCieFormatFullaSe
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<PagadorCieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId) {
+	public List<CieFormatFullaDto> findFormatFullaByPagadorCie(Long pagadorCieId) {
 		return delegate.findFormatFullaByPagadorCie(pagadorCieId);
 	}
 }

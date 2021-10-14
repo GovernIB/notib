@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import es.caib.notib.plugin.utils.PropertiesHelper;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuCaibClient;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.MediaType;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+@Slf4j
 public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlugin {
 
 	
@@ -53,8 +55,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (ambContingut)
 				response.setContingut(documentImprimibleCsv(identificador));
 
-			response.setMetadades(documentMetadadesCsv(identificador));
-
+			try {
+				Map<String,Object> result = documentMetadadesCsv(identificador);
+				response.setMetadades(toDocumentMetadades(result));
+				if (result.containsKey("eni:tipoFirma"))
+					response.setFirmes(Collections.singletonList(new Firma()));
+				else
+					response.setFirmes(null);
+			} catch(Exception e) {
+				log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador);
+				response.setMetadades(null);
+			}
+			
 			return response;
 		} catch (Exception var12) {
 			throw new ArxiuException("S'ha produit un error obtenent els detalls del document: " + identificador, var12);
@@ -67,7 +79,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (ambContingut)
 				response.setContingut(documentImprimibleUuid(identificador));
 
-			response.setMetadades(documentMetadadesUuid(identificador));
+			try {
+				Map<String,Object> result = documentMetadadesUuid(identificador);
+				response.setMetadades(toDocumentMetadades(result));
+				if (result.containsKey("eni:tipoFirma"))
+					response.setFirmes(Collections.singletonList(new Firma()));
+				else
+					response.setFirmes(null);
+			}
+			catch(Exception e) {
+				log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador);
+				response.setMetadades(null);
+			}
 
 			return response;
 		} catch (Exception var12) {
@@ -113,8 +136,10 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			contingut.setTamany(contingut.getContingut().length);
 			return contingut;
 		} catch (Exception ex) {
+			log.debug("S'ha produit un error generant la versió imprimible del document amb CSV " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"S'ha produit un error generant la versió imprimible del document amb CSV " + identificador,
 					ex);
 		}
 		
@@ -148,13 +173,15 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			contingut.setTamany(contingut.getContingut().length);
 			return contingut;
 		} catch (Exception ex) {
+			log.debug("S'ha produit un error generant la versió imprimible del document amb UUID " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"S'ha produit un error generant la versió imprimible del document amb UUID " + identificador,
 					ex);
 		}
 	}
 
-	private DocumentMetadades documentMetadadesUuid(String identificador) {
+	private Map<String,Object> documentMetadadesUuid(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
 		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
@@ -173,18 +200,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
 			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
-			Map<String,Object> result =
-					new ObjectMapper().readValue(jsonData, HashMap.class);
-			return toDocumentMetadades(result);
+			return new ObjectMapper().readValue(jsonData, HashMap.class);
 
 		} catch (Exception ex) {
+			log.debug("No ha estat possible obtenir les metadades del document amb UUID " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"No ha estat possible obtenir les metadades del document amb UUID " + identificador,
 					ex);
 		}
 	}
 
-	private DocumentMetadades documentMetadadesCsv(String identificador) {
+	private Map<String,Object> documentMetadadesCsv(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
 		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
@@ -203,13 +230,13 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
 			String jsonData = webResource.accept(MediaType.APPLICATION_JSON).get(String.class);
-			Map<String,Object> result =
-					new ObjectMapper().readValue(jsonData, HashMap.class);
-			return toDocumentMetadades(result);
+			return new ObjectMapper().readValue(jsonData, HashMap.class);
 
 		} catch (Exception ex) {
+			log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador,
+					ex);
 			throw new ArxiuException(
-					"S'ha produit un error generant la versió imprimible del document",
+					"No ha estat possible obtenir les metadades del document amb CSV " + identificador,
 					ex);
 		}
 	}
@@ -380,25 +407,18 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	private String getPropertyConversioImprimibleContrasenya() {
 		return PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "conversio.imprimible.contrasenya");
 	}
-	private String getPropertyQueryCsv() {
-		String query = PropertiesHelper.getProperties().getProperty(ARXIUCAIB_BASE_PROPERTY + "query.csv");
-		if (query == null || query.isEmpty())
-			query = "(+TYPE:\"eni:documento\" AND @eni\\:csv:\"*IDF*\" -ASPECT:\"gdib:borrador\" -ASPECT:\"gdib:trasladado\") " +
-					" OR (+TYPE:\"gdib:documentoMigrado\" AND @gdib\\:hash:\"*IDF*\") ";
-		return query;
-	}
 	private String getPropertyConcsvBaseUrl() {
 		return PropertiesHelper.getProperties().getProperty(ARXIU_BASE_PROPERTY + "csv.base.url");
 	}
 
 	private int getPropertyTimeoutConnect() {
-		String timeout = PropertiesHelper.getProperties().getProperty(
+		String timeout = System.getProperties().getProperty(
 				ARXIUCAIB_BASE_PROPERTY + "timeout.connect",
 				JERSEY_TIMEOUT_CONNECT);
 		return Integer.parseInt(timeout);
 	}
 	private int getPropertyTimeoutRead() {
-		String timeout = PropertiesHelper.getProperties().getProperty(
+		String timeout = System.getProperties().getProperty(
 				ARXIUCAIB_BASE_PROPERTY + "timeout.read",
 				JERSEY_TIMEOUT_READ);
 		return Integer.parseInt(timeout);

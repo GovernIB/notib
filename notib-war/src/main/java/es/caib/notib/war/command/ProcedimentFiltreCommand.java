@@ -2,7 +2,7 @@ package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +19,8 @@ public class ProcedimentFiltreCommand {
 	private String nom;
 	private String organGestor;
 	private Long entitatId;
-	private Boolean comu;
+	private boolean comu;
+	private boolean entregaCieActiva;
 	
 	
 	public static ProcedimentFiltreCommand asCommand(ProcedimentFiltreDto dto) {
@@ -31,14 +32,11 @@ public class ProcedimentFiltreCommand {
 				ProcedimentFiltreCommand.class );
 		return command;
 	}
-	public static ProcedimentFiltreDto asDto(ProcedimentFiltreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		ProcedimentFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
+
+	public ProcedimentFiltreDto asDto() {
+		return ConversioTipusHelper.convertir(
+				this,
 				ProcedimentFiltreDto.class);
-		return dto;
 	}
 
 	@Override

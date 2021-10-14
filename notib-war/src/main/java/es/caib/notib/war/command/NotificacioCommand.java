@@ -3,208 +3,267 @@
  */
 package es.caib.notib.war.command;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.war.helper.ConversioTipusHelper;
+import es.caib.notib.war.validation.ValidNotificacio;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.springframework.web.multipart.MultipartFile;
-
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.war.helper.ConversioTipusHelper;
-
 /**
- * Command per al manteniment de notificacions V1.
+ * Command per al manteniment de notificacions manuals (V2).
  * 
  * @author Limit Tecnologies <limit@limit.es>
- */
+ */	
+@Getter @Setter
+@ValidNotificacio
 public class NotificacioCommand {
 
 	private Long id;
-	private String codiEmisor;
+	@NotEmpty @Size(max=9)
+	private String emisorDir3Codi;
+	@NotEmpty
+	private String organGestor;
+	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
+	private TipusEnviamentEnumDto enviamentTipus;
+	@Size(min=3, max=240)
+	private String concepte;
+	@Size(max=1000)
 	private String descripcio;
+	private Date enviamentDataProgramada;
 	private int retard;
 	private Date caducitat;
-	private ProcedimentCommand procediment;
-	private GrupCommand grup;
-	private NotificaEnviamentTipusEnumDto enviamentTipus;
-	private Date enviamentDataProgramada;
-	@Size(max=50)
-	private String concepte;
-	private TipusDocumentEnumDto tipusDocument;
-	private MultipartFile arxiu;
-	private String documentArxiuId;
-	private List<String> metadades;
-	private boolean documentNormalitzat;
-	@Size(max=20)
-	private String documentSha1;	
-	private boolean documentGenerarCsv;
-	private NotificacioEstatEnumDto estat;
-	private NotificacioEnviamentEstatEnumDto estatNotifica;
-	private boolean entregaPostalActiva;
-	private EntregapostalCommand entregaPostal;
-	private boolean entregaDeh;
+	private Long procedimentId;
+	private String procedimentNom;
+	private String codiSia;
+	private Long grupId;
+	@Size(max=64)
+	private String usuariCodi;
+	private String oficina;
+	private String llibre;
+	private String extracte;
+	private String docFisica;
+	private IdiomaEnumDto idioma;
+	private String tipusAssumpte;
+	@Size(max=80)
+	private String numExpedient;
+	private String refExterna;
+	private String codiAssumpte;
+	private String observacions;
+	private boolean eliminarLogoPeu;
+	private boolean eliminarLogoCap;
+	private ServeiTipusEnumDto serveiTipus;
+	protected NotificacioErrorTipusEnumDto notificaErrorTipus;
+	@Valid @NotEmpty
+	private List<EnviamentCommand> enviaments = new ArrayList<>();
 
-	public Long getId() {
-		return id;
+	// Document 1
+	private DocumentCommand[] documents = new DocumentCommand[5];
+	private TipusDocumentEnumDto[] tipusDocument = new TipusDocumentEnumDto[5];
+	private String[] tipusDocumentSelected = new String[5];
+	private String[] tipusDocumentDefault = new String[5];
+	private String[] documentArxiuCsv = new String[5];
+	private String[] documentArxiuUuid = new String[5];
+	private String[] documentArxiuUrl = new String[5];
+	private MultipartFile[] arxiu = new MultipartFile[5];
+
+	public void setTipusDocumentDefault(int i, String value) {
+		this.tipusDocumentDefault[i] = value;
 	}
-	public void setId(Long id) {
-		this.id = id;
+
+	public byte[] getContingutArxiu(int i) {
+		try {
+			return arxiu[i].getBytes();
+		} catch (IOException e) {
+			logger.error("No s'ha pogut recuperar el contingut del fitxer per validar");
+		}
+		return null;
 	}
-	public NotificaEnviamentTipusEnumDto getEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public void setEnviamentTipus(NotificaEnviamentTipusEnumDto enviamentTipus) {
-		this.enviamentTipus = enviamentTipus;
-	}
-	public Date getEnviamentDataProgramada() {
-		return enviamentDataProgramada;
-	}
-	public void setEnviamentDataProgramada(Date enviamentDataProgramada) {
-		this.enviamentDataProgramada = enviamentDataProgramada;
-	}
-	public String getConcepte() {
-		return concepte;
-	}
-	public void setConcepte(String concepte) {
-		this.concepte = concepte;
-	}
-	public TipusDocumentEnumDto getTipusDocument() {
-		return tipusDocument;
-	}
-	public void setTipusDocument(TipusDocumentEnumDto tipusDocument) {
-		this.tipusDocument = tipusDocument;
-	}
-	public MultipartFile getArxiu() {
-		return arxiu;
-	}
-	public void setArxiu(MultipartFile arxiu) {
-		this.arxiu = arxiu;
-	}
-	public String getDocumentArxiuId() {
-		return documentArxiuId;
-	}
-	public void setDocumentArxiuId(String documentArxiuId) {
-		this.documentArxiuId = documentArxiuId;
-	}
-	public List<String> getMetadades() {
-		return metadades;
-	}
-	public void setMetadades(List<String> metadades) {
-		this.metadades = metadades;
-	}
-	public String getDocumentSha1() {
-		return documentSha1;
-	}
-	public void setDocumentSha1(String documentSha1) {
-		this.documentSha1 = documentSha1;
-	}
-	public boolean isDocumentNormalitzat() {
-		return documentNormalitzat;
-	}
-	public void setDocumentNormalitzat(boolean documentNormalitzat) {
-		this.documentNormalitzat = documentNormalitzat;
-	}
-	public boolean isDocumentGenerarCsv() {
-		return documentGenerarCsv;
-	}
-	public void setDocumentGenerarCsv(boolean documentGenerarCsv) {
-		this.documentGenerarCsv = documentGenerarCsv;
-	}
-	public NotificacioEstatEnumDto getEstat() {
-		return estat;
-	}
-	public void setEstat(NotificacioEstatEnumDto estat) {
-		this.estat = estat;
-	}
-	public NotificacioEnviamentEstatEnumDto getEstatNotifica() {
-		return estatNotifica;
-	}
-	public void setEstatNotifica(NotificacioEnviamentEstatEnumDto estatNotifica) {
-		this.estatNotifica = estatNotifica;
-	}
-	public String getCodiEmisor() {
-		return codiEmisor;
-	}
-	public void setCodiEmisor(String codiEmisor) {
-		this.codiEmisor = codiEmisor;
-	}
-	public String getDescripcio() {
-		return descripcio;
-	}
-	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
-	}
-	public int getRetard() {
-		return retard;
-	}
-	public void setRetard(int retard) {
-		this.retard = retard;
-	}
-	public Date getCaducitat() {
-		return caducitat;
-	}
-	public void setCaducitat(Date caducitat) {
-		this.caducitat = caducitat;
-	}
-	public ProcedimentCommand getProcediment() {
-		return procediment;
-	}
-	public void setProcediment(ProcedimentCommand procediment) {
-		this.procediment = procediment;
-	}
-	public GrupCommand getGrup() {
-		return grup;
-	}
-	public void setGrup(GrupCommand grup) {
-		this.grup = grup;
-	}
-	public boolean isEntregaPostalActiva() {
-		return entregaPostalActiva;
-	}
-	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
-		this.entregaPostalActiva = entregaPostalActiva;
-	}
-	public EntregapostalCommand getEntregaPostal() {
-		return entregaPostal;
-	}
-	public void setEntregaPostal(EntregapostalCommand entregaPostal) {
-		this.entregaPostal = entregaPostal;
-	}
-	public boolean isEntregaDeh() {
-		return entregaDeh;
-	}
-	public void setEntregaDeh(boolean entregaDeh) {
-		this.entregaDeh = entregaDeh;
-	}
-	
-	public static NotificacioCommand asCommand(NotificacioDto dto) {
+
+	public static NotificacioCommand asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {
 			return null;
 		}
-		NotificacioCommand command = ConversioTipusHelper.convertir(
-				dto,
-				NotificacioCommand.class );
+		NotificacioCommand command = ConversioTipusHelper.convertir(dto, NotificacioCommand.class);
+		
+		if (dto.getProcediment() != null) {
+			command.setProcedimentId(dto.getProcediment().getId());
+		}
+
+		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
+			boolean aAdministracio = false;
+			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
+				if (InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+					aAdministracio = true;
+					break;
+				}
+			}
+			if (aAdministracio) {
+				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
+
+			} else {
+				command.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
+
+			}
+		} else {
+			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
+		}
+		// Documents
+
 		return command;
 	}
-	public static NotificacioDto asDto(NotificacioCommand command) {
-		if (command == null) {
-			return null;
+	public NotificacioDatabaseDto asDatabaseDto() {
+		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(
+				this,
+				NotificacioDatabaseDto.class);
+		ProcedimentDto procedimentDto = new ProcedimentDto();
+		procedimentDto.setId(this.getProcedimentId());
+		dto.setProcediment(procedimentDto);
+
+		GrupDto grupDto = new GrupDto();
+		grupDto.setId(this.getGrupId());
+		dto.setGrup(grupDto);
+
+		// Format de municipi i província
+		if (dto.getEnviaments() != null) {
+			for (NotEnviamentDatabaseDto enviament: dto.getEnviaments()) {
+				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
+					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
+				
+				establecerCamposPersona(enviament.getTitular());
+
+				if (enviament.getDestinataris() != null) {
+					for (PersonaDto destinatari : enviament.getDestinataris()) {
+						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())
+							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+",""));
+						
+						establecerCamposPersona(destinatari);
+						destinatari.setIncapacitat(Boolean.FALSE);
+					}
+				}
+			}
 		}
-		NotificacioDto dto = ConversioTipusHelper.convertir(
-				command,
-				NotificacioDto.class);
 		return dto;
+	}
+	
+	private void establecerCamposPersona(PersonaDto persona) {
+		if (persona != null) {
+			if (InteressatTipusEnumDto.FISICA.equals(persona.getInteressatTipus())) {
+				persona.setDir3Codi(null);
+			} else if (InteressatTipusEnumDto.JURIDICA.equals(persona.getInteressatTipus())) {
+				persona.setDir3Codi(null);
+				persona.setLlinatge1(null);
+				persona.setLlinatge2(null);
+			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
+				persona.setIncapacitat(Boolean.FALSE);
+				persona.setLlinatge1(null);
+				persona.setLlinatge2(null);	
+			}
+		}
+	}
+	
+	public int getConcepteDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = this.getClass().getDeclaredField("concepte");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getDescripcioDefaultSize() {
+		int descripcioSize = 0;
+		try {
+			Field descripcio = this.getClass().getDeclaredField("descripcio");
+			descripcioSize = descripcio.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud de descripció: " + ex.getMessage());
+		}
+		return descripcioSize;
+	}
+	
+	public int getNomDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("nom");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del nom: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getLlinatge1DefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("llinatge1");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del llinatge 1: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getLlinatge2DefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("llinatge2");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del llinatge 2: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getEmailDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("email");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud de l'email: " + ex.getMessage());
+		}
+		return concepteSize;
+	}
+	
+	public int getTelefonDefaultSize() {
+		int concepteSize = 0;
+		try {
+			Field concepte = PersonaCommand.class.getDeclaredField("telefon");
+			concepteSize = concepte.getAnnotation(Size.class).max();
+		} catch (Exception ex) {
+			logger.error("No s'ha pogut recuperar la longitud del telèfon: " + ex.getMessage());
+		}
+		return concepteSize;
 	}
 
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+	
+	public interface NotificacioCaducitat {}
+	
+	private static final Logger logger = LoggerFactory.getLogger(NotificacioCommand.class);
 
 }

@@ -4,6 +4,8 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ProcedimentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto create(
 			Long entitatId, 
-			ProcedimentDto procediment) {
+			ProcedimentDataDto procediment) {
 		return delegate.create(
 				entitatId, 
 				procediment);
@@ -40,8 +42,8 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcedimentDto update(
-			Long entitatId, 
-			ProcedimentDto procediment,
+			Long entitatId,
+			ProcedimentDataDto procediment,
 			boolean isAdmin,
 			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.update(
@@ -83,13 +85,13 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcedimentDto> findByEntitat(Long entitatId) {
+	public List<ProcedimentSimpleDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ProcedimentDto> findByOrganGestorIDescendents(
+	public List<ProcedimentSimpleDto> findByOrganGestorIDescendents(
 			Long entitatId, 
 			OrganGestorDto organGestor) {
 		return delegate.findByOrganGestorIDescendents(entitatId, organGestor);
@@ -111,7 +113,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			boolean isUsuariEntitat,
 			boolean isAdministrador, 
 			OrganGestorDto organGestorActual,
-			ProcedimentFiltreDto filtre, 
+			ProcedimentFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
 				entitatId, 
@@ -161,7 +163,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+	public List<ProcedimentSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return delegate.findProcedimentsWithPermis(entitatId, usuariCodi, permis);
 	}
 
@@ -356,6 +358,12 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	@RolesAllowed({"tothom"})
+	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId) {
+		return delegate.hasProcedimentsComunsAndNotificacioPermission(entitatId);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);
@@ -393,5 +401,13 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			String entitatCodi,
 			List<ProcedimentOrganDto> procedimentsOrgans) {
 		return delegate.findProcedimentsOrganCodiWithPermisByProcediment(procediment, entitatCodi, procedimentsOrgans);
+	}
+	
+	@Override
+	@RolesAllowed({"tothom"})
+	public ProcedimentDto findByNom(
+			Long entitatId,
+			String nomProcediment) throws NotFoundException {
+		return delegate.findByNom(entitatId, nomProcediment);
 	}
 }

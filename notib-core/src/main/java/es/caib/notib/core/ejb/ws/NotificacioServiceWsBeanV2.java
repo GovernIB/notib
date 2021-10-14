@@ -3,27 +3,21 @@
  */
 package es.caib.notib.core.ejb.ws;
 
-import javax.annotation.Resource;
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-import javax.jws.WebService;
-
+import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.helper.UsuariHelper;
 import org.jboss.annotation.security.SecurityDomain;
 import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.notib.core.api.ws.notificacio.DadesConsulta;
-import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.core.api.ws.notificacio.NotificacioV2;
-import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
-import es.caib.notib.core.api.ws.notificacio.RespostaAlta;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistre;
-import es.caib.notib.core.helper.UsuariHelper;
+import javax.annotation.Resource;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import javax.jws.WebParam;
+import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * EJB per a la publicació del servei web de gestió de notificacions.
@@ -94,6 +88,12 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(
 			DadesConsulta dadesConsulta) {
 		return delegate.consultaDadesRegistre(dadesConsulta);
+	}
+	@Override
+	public RespostaConsultaJustificant consultaJustificantEnviament(
+			@WebParam(name="identificador") @XmlElement(required = true) String identificador){
+		return delegate.consultaJustificantEnviament(identificador);
+
 	}
 
 }

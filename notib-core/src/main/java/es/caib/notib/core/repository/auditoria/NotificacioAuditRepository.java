@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 
+import java.util.List;
+
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus notificacio.
@@ -21,7 +23,9 @@ public interface NotificacioAuditRepository extends JpaRepository<NotificacioAud
 			"where n.notificacioId = :notificacioId " +
 			"  and n.id = (select max(id) from NotificacioAudit where notificacioId = :notificacioId)")
 	NotificacioAudit findLastAudit(@Param("notificacioId") Long notificacioId);
-	
+
+    List<NotificacioAudit> findByNotificacioIdOrderByCreatedDateAsc(Long notificacioId);
+
 //	NotificacioAudit findFirstByNotificacioIdOrderByIdDesc(Long notificacioId);
 
 }

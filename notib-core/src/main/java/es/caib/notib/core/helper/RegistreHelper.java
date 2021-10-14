@@ -3,13 +3,14 @@
  */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
+import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -39,12 +40,13 @@ public class RegistreHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired 
-	private EmailHelper emailHelper;
+	private EmailNotificacioHelper emailNotificacioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
 
+	@UpdateEnviamentTable
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity enviamentRefrescarEstatRegistre(Long enviamentId) {
 		long startTime;
@@ -119,7 +121,7 @@ public class RegistreHelper {
 				logger.debug("Comunicació SIR --> enviar correu si és aplicació...");
 				if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB && notificacio.getEstat() == NotificacioEstatEnumDto.FINALITZADA) {
 					startTime = System.nanoTime();
-					emailHelper.prepararEnvioEmailNotificacio(notificacio);
+					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
 					elapsedTime = (System.nanoTime() - startTime) / 10e6;
 					logger.info(" [TIMER-SIR] Preparar enviament mail notificació [Id: " + enviamentId + "]: " + elapsedTime + " ms");
 				}
@@ -150,19 +152,13 @@ public class RegistreHelper {
 			Date sirRegistreDestiData,
 			String registreNumeroFormatat,
 			NotificacioEnviamentEntity enviament) {
-		logger.debug("Actualitzant estat comunicació SIR...");
-		boolean estatFinal = 
-				NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat) ||
-				NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat);
-		
 		logger.debug("Estat actual: " + registreEstat.name());
 		enviament.updateRegistreEstat(
 				registreEstat,
 				registreEstatData,
 				sirRecepcioData,
 				sirRegistreDestiData,
-				registreNumeroFormatat,
-				estatFinal);
+				registreNumeroFormatat);
 		
 		boolean estatsEnviamentsFinals = true;
 		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();

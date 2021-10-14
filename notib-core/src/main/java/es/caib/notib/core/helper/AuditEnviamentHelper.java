@@ -1,9 +1,10 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.*;
@@ -44,21 +45,17 @@ public class AuditEnviamentHelper {
 			NotificacioEntity notificacioEntity,
 			Enviament enviament,
 			ServeiTipusEnumDto serveiTipus,
-			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			PersonaEntity titular,
-			List<PersonaEntity> destinataris,
-			EntregaPostalViaTipusEnum viaTipus) {
+			List<PersonaEntity> destinataris) {
 		return notificacioEnviamentRepository.saveAndFlush(NotificacioEnviamentEntity.
 				getBuilderV2(
 						enviament,
 						entitat.isAmbEntregaDeh(),
-						numeracioTipus, 
-						tipusConcret, 
 						serveiTipus, 
 						notificacioEntity, 
 						titular, 
-						destinataris).domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
+						destinataris)
+				.build());
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.CREATE)
@@ -67,22 +64,16 @@ public class AuditEnviamentHelper {
 			NotificacioEntity notificacioGuardada,
 			Enviament enviament,
 			ServeiTipusEnumDto serveiTipus,
-			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-			NotificaDomiciliConcretTipusEnumDto tipusConcret,
 			PersonaEntity titular,
-			List<PersonaEntity> destinataris,
-			EntregaPostalViaTipusEnum viaTipus) {
+			List<PersonaEntity> destinataris) {
 		NotificacioEnviamentEntity enviamentSaved = notificacioEnviamentRepository.saveAndFlush(
 				NotificacioEnviamentEntity.getBuilderV2(
 						enviament, 
 						entitat.isAmbEntregaDeh(),
-						numeracioTipus, 
-						tipusConcret, 
 						serveiTipus, 
 						notificacioGuardada, 
 						titular, 
-						destinataris)
-				.domiciliViaTipus(toEnviamentViaTipusEnum(viaTipus)).build());
+						destinataris).build());
 		log.debug(">> [ALTA] enviament creat");
 		
 		String referencia;
@@ -105,30 +96,25 @@ public class AuditEnviamentHelper {
 			NotificacioEntity notificacioEntity,
 			Enviament enviament,
 			ServeiTipusEnumDto serveiTipus,
-			NotificaDomiciliNumeracioTipusEnumDto numeracioTipus,
-			NotificaDomiciliConcretTipusEnumDto tipusConcret,
-			PersonaEntity titular,
-			EntregaPostalViaTipusEnum viaTipus) {
+			PersonaEntity titular) {
 		NotificacioEnviamentEntity enviamentEntity = notificacioEnviamentRepository.findOne(enviament.getId());
 		enviamentEntity.update(
 				enviament,
 				entitat.isAmbEntregaDeh(),
-				numeracioTipus, 
-				tipusConcret, 
 				serveiTipus, 
 				notificacioEntity, 
-				titular, 
-				toEnviamentViaTipusEnum(viaTipus));
+				titular);
 		return enviamentEntity;
 	}
-	
+
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public void reiniciaConsultaNotifica(NotificacioEnviamentEntity enviament) {
+	public NotificacioEnviamentEntity resetConsultaNotifica(NotificacioEnviamentEntity enviament) {
 		enviament.refreshNotificaConsulta();
+		return enviament;
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity reiniciaConsultaSir(NotificacioEnviamentEntity enviament) {
+	public NotificacioEnviamentEntity resetConsultaSir(NotificacioEnviamentEntity enviament) {
 		enviament.refreshSirConsulta();
 		return enviament;
 	}
@@ -151,7 +137,7 @@ public class AuditEnviamentHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity actualizaErrorNotifica(
+	public NotificacioEnviamentEntity updateErrorNotifica(
 			NotificacioEnviamentEntity enviament, 
 			boolean notificaError, 
 			NotificacioEventEntity event) {
@@ -163,7 +149,7 @@ public class AuditEnviamentHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity actualitzaRegistreEnviament(
+	public NotificacioEnviamentEntity updateRegistreEnviament(
 			NotificacioEntity notificacioEntity,
 			NotificacioEnviamentEntity enviament,
 			String registreNum,
@@ -173,7 +159,7 @@ public class AuditEnviamentHelper {
 			NotificacioEventEntity event) {
 		enviament.setRegistreNumeroFormatat(registreNum);
 		enviament.setRegistreData(registreData);
-		enviament.setRegistreEstat(registreEstat);
+		enviament.updateRegistreEstat(registreEstat);
 		
 		//Comunicació + administració (SIR)
 		if (totsAdministracio) {
@@ -186,12 +172,19 @@ public class AuditEnviamentHelper {
 		return enviament;
 	}
 	
-	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
-			EntregaPostalViaTipusEnum viaTipus) {
-		if (viaTipus == null) {
-			return null;
-		}
-		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
+//	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
+//			EntregaPostalViaTipusEnum viaTipus) {
+//		if (viaTipus == null) {
+//			return null;
+//		}
+//		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
+//	}
+
+	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.DELETE)
+	public NotificacioEnviamentEntity deleteEnviament(NotificacioEnviamentEntity enviament) {
+		notificacioEventRepository.deleteByEnviament(enviament);
+		notificacioEnviamentRepository.delete(enviament);
+		notificacioEnviamentRepository.flush();
+		return enviament;
 	}
-	
 }

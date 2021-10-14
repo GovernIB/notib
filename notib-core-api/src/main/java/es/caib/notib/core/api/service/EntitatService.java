@@ -3,24 +3,15 @@
  */
 package es.caib.notib.core.api.service;
 
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.LlibreDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.OrganismeDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
  * Service per a la gestió d'entitats.
@@ -37,7 +28,7 @@ public interface EntitatService {
 	 * @return L'Entitat creada.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public EntitatDto create(EntitatDto entitat);
+	public EntitatDto create(EntitatDataDto entitat);
 
 	/**
 	 * Actualitza la informació de l'entitat que tengui el mateix
@@ -50,7 +41,7 @@ public interface EntitatService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	public EntitatDto update(EntitatDto entitat) throws NotFoundException;
+	public EntitatDto update(EntitatDataDto entitat) throws NotFoundException;
 
 	/**
 	 * Marca l'entitat amb l'id especificat com a activa/inactiva.

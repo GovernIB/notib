@@ -3,13 +3,14 @@
  */
 package es.caib.notib.core.api.dto;
 
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
+import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'un destinatari d'una anotació.
@@ -59,9 +60,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 		return serialVersionUID;
 	}
 	public String getTitularLlinatges() {
-		return concatenarLlinatges(
-				titular.getLlinatge1(),
-				titular.getLlinatge2());
+		return titular.concatenarLlinatges();
 	}
 	public String getTitularNomLlinatges() {
 		StringBuilder sb = new StringBuilder();
@@ -80,21 +79,6 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
-	}
-
-	private String concatenarLlinatges(
-			String llinatge1,
-			String llinatge2) {
-		if (llinatge1 == null && llinatge2 == null) {
-			return null;
-		}
-		StringBuilder sb = new StringBuilder();
-		sb.append(llinatge1);
-		if (llinatge2 != null && !llinatge2.isEmpty()) {
-			sb.append(" ");
-			sb.append(llinatge2);
-		}
-		return sb.toString();
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

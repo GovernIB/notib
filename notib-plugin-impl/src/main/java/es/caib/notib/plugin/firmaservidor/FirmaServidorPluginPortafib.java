@@ -1,31 +1,17 @@
-/**
- * 
- */
 package es.caib.notib.plugin.firmaservidor;
+
+import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.notib.plugin.SistemaExternException;
+import org.apache.commons.io.FileUtils;
+import org.fundaciobit.plugins.signature.api.*;
+import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
+import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerPlugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
-
-import org.apache.commons.io.FileUtils;
-import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
-import org.fundaciobit.plugins.signature.api.FileInfoSignature;
-import org.fundaciobit.plugins.signature.api.ITimeStampGenerator;
-import org.fundaciobit.plugins.signature.api.PdfVisibleSignature;
-import org.fundaciobit.plugins.signature.api.PolicyInfoSignature;
-import org.fundaciobit.plugins.signature.api.SecureVerificationCodeStampInfo;
-import org.fundaciobit.plugins.signature.api.SignaturesSet;
-import org.fundaciobit.plugins.signature.api.SignaturesTableHeader;
-import org.fundaciobit.plugins.signature.api.StatusSignature;
-import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
-import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
-import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerPlugin;
-
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.notib.plugin.utils.PropertiesHelper;
 
 /**
  * Implementació del plugin de firma en servidor emprant PortaFIB.

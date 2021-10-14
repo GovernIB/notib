@@ -5,12 +5,15 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<c:set var="titol"><spring:message code="notificacio.pendent.camp.marcar.processat.titol"/></c:set>
+<c:set var="titol">
+	<c:choose>
+		<c:when test="${isMassiu}"><spring:message code="notificacio.pendent.camp.marcar.processat.massiu.titol"/></c:when>
+		<c:otherwise><spring:message code="notificacio.pendent.camp.marcar.processat.titol"/></c:otherwise>
+	</c:choose>
+</c:set>
 <html>
 <head>
 	<title>${titol}</title>
-	<link href="<c:url value="/css/jstree.min.css"/>" rel="stylesheet">
-	<script src="<c:url value="/js/jstree.min.js"/>"></script>
 	<not:modalHead/>
 </head>
 <body>
@@ -18,7 +21,7 @@
 		<not:inputTextarea required="true" name="motiu" textKey="notificacio.pendent.camp.marcar.processat.motiu"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="notificacio.pendent.camp.marcar.processat.boto"/></button>
-			<a href="<c:url value="/bustiaUser"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

@@ -3,16 +3,15 @@
  */
 package es.caib.notib.core.helper;
 
-import java.security.GeneralSecurityException;
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.security.GeneralSecurityException;
+import java.util.Date;
 
 /**
  * Helper per a interactuar amb el servei web de Notific@.
@@ -26,7 +25,8 @@ public class NotificaHelper {
 	private NotificaV0Helper notificaV0Helper; // Mock
 	@Autowired
 	private NotificaV2Helper notificaV2Helper;
-
+	@Autowired
+	private ConfigHelper configHelper;
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId) {
 		return getNotificaHelper().notificacioEnviar(notificacioId);
@@ -34,6 +34,10 @@ public class NotificaHelper {
 
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 		return getNotificaHelper().enviamentRefrescarEstat(enviamentId);
+	}
+
+	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseException) throws Exception {
+		return getNotificaHelper().enviamentRefrescarEstat(enviamentId, raiseException);
 	}
 
 	public String xifrarId(Long id) throws GeneralSecurityException {
@@ -60,7 +64,7 @@ public class NotificaHelper {
 			String notificaDatatReceptorNom,
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
-			NotificacioEnviamentEntity enviament) {
+			NotificacioEnviamentEntity enviament) throws Exception {
 		getNotificaHelper().enviamentUpdateDatat(
 				notificaEstat,
 				notificaEstatData,
@@ -85,8 +89,7 @@ public class NotificaHelper {
 	}
 
 	private String getNotificaVersioProperty() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.notifica.versio");
+		return configHelper.getConfig("es.caib.notib.notifica.versio");
 	}
 
 }

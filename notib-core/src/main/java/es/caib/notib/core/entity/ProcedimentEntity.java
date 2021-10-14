@@ -1,22 +1,16 @@
 package es.caib.notib.core.entity;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
+import es.caib.notib.core.audit.NotibAuditable;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Classe de model de dades que conté la informació dels procediments.
@@ -25,11 +19,14 @@ import lombok.Getter;
  */
 @Getter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "not_procediment")
 @EntityListeners(AuditingEntityListener.class)
 public class ProcedimentEntity extends NotibAuditable<Long> {
 	
-	@Column(name = "codi", length = 64, nullable = false)
+	@Column(name = "codi", length = 64, nullable = false, unique = true)
 	protected String codi;
 	
 	@Column(name = "nom", length = 256, nullable = false)
@@ -58,7 +55,10 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "comu")
 	protected boolean comu;
-	
+
+	@Column(name = "DIRECT_PERMISSION_REQUIRED")
+	protected boolean requireDirectPermission;
+
 	@Column(name = "ultima_act")
 	@Temporal(TemporalType.DATE)
 	protected Date ultimaActualitzacio;
@@ -67,28 +67,62 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "entitat")
 	@ForeignKey(name = "not_entitat_fk")
 	protected EntitatEntity entitat;
-	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pagadorpostal")
-	@ForeignKey(name = "not_pagador_postal_fk")
-	protected PagadorPostalEntity pagadorpostal;
-	
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pagadorcie")
-	@ForeignKey(name = "not_pagador_cie_fk")
-	protected PagadorCieEntity pagadorcie;
-	
+
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "ENTREGA_CIE_ID")
+	@ForeignKey(name = "NOT_PROCEDIMENT_ENTREGA_CIE_FK")
+	private EntregaCieEntity entregaCie;
+
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "organ_gestor", referencedColumnName = "codi")
 	@ForeignKey(name = "not_proc_organ_fk")
 	protected OrganGestorEntity organGestor;
-	
+
+//	@Formula( "(case "
+//			+ "		WHEN entregaCie is not null then 1 "
+//			+ "		WHEN organGestor.entregaCie is not null then 1 "
+//			+ "		WHEN entitat.entregaCie is not null then 1 "
+//			+ "		else 0 "
+//			+ " end)")
+//	private boolean entregaCieActivaAlgunNivell;
+
+	public boolean isEntregaCieActivaAlgunNivell() {
+		if (entregaCie != null) {
+			return true;
+		}
+
+		if (organGestor != null && organGestor.getEntregaCie() != null) {
+			return true;
+		}
+
+		if (entitat != null && entitat.getEntregaCie() != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public EntregaCieEntity getEntregaCieEfectiva() {
+		if (entregaCie != null) {
+			return entregaCie;
+		}
+
+		if (organGestor != null && organGestor.getEntregaCie() != null) {
+			return organGestor.getEntregaCie();
+		}
+
+		if (entitat != null && entitat.getEntregaCie() != null) {
+			return entitat.getEntregaCie();
+		}
+
+		return null;
+	}
+
 	public void update(
 			String codi,
 			String nom,
 			EntitatEntity entitat,
-			PagadorPostalEntity pagadorcostal,
-			PagadorCieEntity pagadorcie,
+			EntregaCieEntity entregaCie,
 			int retard,
 			int caducitat,
 			boolean agrupar,
@@ -97,12 +131,12 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			String tipusAssumpteNom,
 			String codiAssumpte,
 			String codiAssumpteNom,
-			boolean comu) {
+			boolean comu,
+			boolean requireDirectPermission) {
 		this.codi = codi;
 		this.nom = nom;
 		this.entitat = entitat;
-		this.pagadorpostal = pagadorcostal;
-		this.pagadorcie = pagadorcie;
+		this.entregaCie = entregaCie;
 		this.agrupar = agrupar;
 		this.organGestor = organGestor;
 		this.retard = retard;
@@ -112,6 +146,7 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.codiAssumpte = codiAssumpte;
 		this.codiAssumpteNom = codiAssumpteNom;
 		this.comu=comu;
+		this.requireDirectPermission = requireDirectPermission;
 	}
 	
 	public void update(
@@ -127,75 +162,36 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 		this.ultimaActualitzacio = dataActualitzacio;
 	}
 	
-	public static Builder getBuilder(
+	public static ProcedimentEntityBuilder getBuilder(
 			String codi,
 			String nom,
 			int retard,
 			int caducitat,
 			EntitatEntity entitat,
-			PagadorPostalEntity pagadorpostal,
-			PagadorCieEntity pagadorcie,
 			boolean agrupar,
 			OrganGestorEntity organGestor,
 			String tipusAssumpte,
 			String tipusAssumpteNom,
 			String codiAssumpte,
 			String codiAssumpteNom,
-			boolean comu) {
-		return new Builder(
-				codi,
-				nom,
-				retard,
-				caducitat,
-				entitat,
-				pagadorpostal,
-				pagadorcie,
-				agrupar,
-				organGestor,
-				tipusAssumpte,
-				tipusAssumpteNom,
-				codiAssumpte,
-				codiAssumpteNom,
-				comu);
+			boolean comu,
+			boolean requireDirectPermission) {
+		return builder()
+				.codi(codi)
+				.nom(nom)
+				.retard(retard)
+				.caducitat(caducitat)
+				.entitat(entitat)
+				.agrupar(agrupar)
+				.organGestor(organGestor)
+				.tipusAssumpte(tipusAssumpte)
+				.tipusAssumpteNom(tipusAssumpteNom)
+				.codiAssumpte(codiAssumpte)
+				.codiAssumpteNom(codiAssumpteNom)
+				.comu(comu)
+				.requireDirectPermission(requireDirectPermission);
 	}
-	
-	public static class Builder {
-		ProcedimentEntity built;
-		Builder(
-				String codi,
-				String nom,
-				int retard,
-				int caducitat,
-				EntitatEntity entitat,
-				PagadorPostalEntity pagadorpostal,
-				PagadorCieEntity pagadorcie,
-				boolean agrupar,
-				OrganGestorEntity organGestor,
-				String tipusAssumpte,
-				String tipusAssumpteNom,
-				String codiAssumpte,
-				String codiAssumpteNom,
-				boolean comu) {
-			built = new ProcedimentEntity();
-			built.codi = codi;
-			built.nom = nom;
-			built.retard = retard;
-			built.caducitat = caducitat;
-			built.entitat = entitat;
-			built.pagadorpostal = pagadorpostal;
-			built.pagadorcie = pagadorcie;
-			built.agrupar = agrupar;
-			built.organGestor = organGestor;
-			built.tipusAssumpte = tipusAssumpte;
-			built.tipusAssumpteNom = tipusAssumpteNom;
-			built.codiAssumpte = codiAssumpte;
-			built.codiAssumpteNom = codiAssumpteNom;
-			built.comu=comu;
-		}
-		public ProcedimentEntity build() {
-			return built;
-		}
-	}
+
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -213,7 +209,15 @@ public class ProcedimentEntity extends NotibAuditable<Long> {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ProcedimentEntity{" +
+				"codi='" + codi + '\'' +
+				", nom='" + nom + '\'' +
+				'}';
+	}
+
 	private static final long serialVersionUID = 458331024861203562L;
 
 }

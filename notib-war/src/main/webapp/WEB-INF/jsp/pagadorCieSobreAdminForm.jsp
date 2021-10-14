@@ -6,8 +6,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:choose>
-	<c:when test="${empty pagadorCieFormatSobreCommand.id}"><c:set var="titol"><spring:message code="pagadorcie.form.format.sobre.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="pagadorcie.form.format.sobre.titol.modificar"/></c:set></c:otherwise>
+	<c:when test="${empty pagadorCieFormatSobreCommand.id}"><c:set var="titol"><spring:message code="cie.form.format.sobre.titol.crear"/></c:set></c:when>
+	<c:otherwise><c:set var="titol"><spring:message code="cie.form.format.sobre.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -15,10 +15,10 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<link href="<c:url value="/webjars/select2/4.0.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/select2.min.js"/>"></script>
-	<script src="<c:url value="/webjars/select2/4.0.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<link href="<c:url value="/css/jasny-bootstrap.min.css"/>" rel="stylesheet">
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
@@ -31,16 +31,16 @@
 	<not:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><not:modalUrl value="/pagadorCie/${pagadorCie.id}/formats/sobre/newOrModify"/></c:set>
+	<c:set var="formAction"><not:modalUrl value="/cie/${pagadorCie.id}/formats/sobre/newOrModify"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorCieFormatSobreCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputText name="codi" textKey="pagadorcie.form.format.sobre.camp.codi" required="true"/>
+				<not:inputText name="codi" textKey="cie.form.format.sobre.camp.codi" required="true"/>
 			</div>
 			<div id="modal-botons">
 				<button id="addPagadorCieButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-				<a href="<c:url value="/pagadorcie/${pagadorCie.id}/formats/sobre"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+				<a href="<c:url value="/cie/${pagadorCie.id}/formats/sobre"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 			</div>	
 		</div>
 	</form:form>

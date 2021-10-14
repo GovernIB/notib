@@ -17,30 +17,44 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.
 	 */
-	public void notificaEnviamentsRegistrats();
+	void notificaEnviamentsRegistrats();
 	
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * al registre.
 	 * @throws RegistreNotificaException 
 	 */
-	public void registrarEnviamentsPendents() throws RegistreNotificaException;
+	void registrarEnviamentsPendents() throws RegistreNotificaException;
 
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
 	 * Notific@.
 	 */
-	public void enviamentRefrescarEstatPendents();
+	void enviamentRefrescarEstatPendents();
 	
 	/**
 	 * Mètode d'execució periòdica per a refrescar l'estat dels enviaments fets a
 	 * Registre (comunicació SIR)
 	 */
-	public void enviamentRefrescarEstatEnviatSir();
+	void enviamentRefrescarEstatEnviatSir();
 	
 	/**
 	 * Mètode d'execució periòdica per a actualitzar els procediments a partir de les dades de Rolsac
 	 */
-	public void actualitzarProcediments();
+	void actualitzarProcediments();
 
+	/**
+	 * Mètode d'execució periòdica per a refrescar totes les notificacions expirades
+	 */
+	void refrescarNotificacionsExpirades();
+
+	/**
+	 * Mètode d'execució periòdica per a refrescar totes les notificacions DEH finalitzades sense certificació (cas pooling)
+	 */
+	void enviamentRefrescarEstatDEH();
+	
+	/**
+	 * Mètode d'execució periòdica per a refrescar totes les notificacions CIE finalitzades sense certificació (cas pooling)
+	 */
+	void enviamentRefrescarEstatCIE();
 }

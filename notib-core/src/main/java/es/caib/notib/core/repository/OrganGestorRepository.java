@@ -1,16 +1,17 @@
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -20,10 +21,17 @@ import es.caib.notib.core.entity.ProcedimentEntity;
  */
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
 
-	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
-	public List<OrganGestorEntity> findByEntitatId(Long entitatId);
+	List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
+	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
-	public OrganGestorEntity findByCodi(String codi);
+	OrganGestorEntity findByCodi(String codi);
+
+	@Modifying
+	@Query( " update " +
+			"    OrganGestorEntity og " +
+			" set " +
+			"     og.estat = :estat")
+	void updateAllStatus(@Param("estat") OrganGestorEstatEnum estat);
 
 	@Query("from " +
 			"    OrganGestorEntity og " +
@@ -38,7 +46,17 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    ProcedimentEntity p " +
 			"    left outer join p.organGestor og " +
 			"where p.id in (:procedimentIds)")
-	public List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
+	List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
+
+	@Query(	"select distinct og " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"	og.codi in (:organCodis) " +
+			"	and :estat = og.estat")
+	List<OrganGestorEntity> findByEstatAndCodiIn(
+			@Param("organCodis") List<String> organCodis,
+			@Param("estat") OrganGestorEstatEnum estat);
 
 	@Query( "select distinct og " +
 			"from ProcedimentEntity pro " +
@@ -61,8 +79,10 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where (og.entitat = :entitat)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))")
-	public Page<OrganGestorEntity> findByEntitatAndFiltre(
+			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))"+
+			" and (:isEstatNull = true or og.estat = :estat)" +
+			" and (:isEntregaCieActiva = false or og.entregaCie is not null)")
+	Page<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isCodiNull") boolean isCodiNull,
 			@Param("codi") String codi,
@@ -70,13 +90,16 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			@Param("isOficinaNull") boolean isOficinaNull,
 			@Param("oficina") String oficina,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") OrganGestorEstatEnum estat,
+			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
 			Pageable paginacio);
 	
 	@Query( "select distinct og " +
 			"from OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
 			"and og.codi in (:organsIds)")
-	public Page<OrganGestorEntity> findByEntitatAndOrganGestor(
+	Page<OrganGestorEntity> findByEntitatAndOrganGestor(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
 			Pageable paginacio);
@@ -85,7 +108,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"from OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
 			"and og.codi in (:organsIds)")
-	public List<OrganGestorEntity> findByEntitatAndOrgansGestors(
+	List<OrganGestorEntity> findByEntitatAndOrgansGestors(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs);
 	
@@ -95,8 +118,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"and og.codi in (:organsIds)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
-			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))")
-	public Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
+			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))" +
+			" and (:isEstatNull = true or og.estat = :estat)")
+	Page<OrganGestorEntity> findByEntitatAndOrganGestorAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIds") List<String> organs,
 			@Param("isCodiNull") boolean isCodiNull,
@@ -105,6 +129,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			@Param("isOficinaNull") boolean isOficinaNull,
 			@Param("oficina") String oficina,
+			@Param("isEstatNull") boolean isEstatNull,
+			@Param("estat") OrganGestorEstatEnum estat,
 			Pageable paginacio);
 	
 	@Query(	"select distinct og.codi " +

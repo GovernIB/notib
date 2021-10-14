@@ -1,10 +1,17 @@
 package es.caib.notib.plugin.gesconadm;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.*;
+import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.representation.Form;
+import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.notib.plugin.SistemaExternException;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -13,25 +20,11 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandler;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.representation.Form;
-
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.utils.PropertiesHelper;
-import lombok.Getter;
-import lombok.Setter;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
@@ -373,16 +366,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			return new Boolean(isBasicAuth).booleanValue();
 		}
 	}
-	
-//	private static void addUnitat(String codi, GdaUnitatAdministrativa unitat, String codiPare) {
-//		if (!unitatsAdministratives.containsKey(codi)) {
-//			Unitat unitatAdministrativa = new Unitat();
-//			unitatAdministrativa.setUnitatAdministrativa(unitat);
-//			unitatAdministrativa.setCodiPare(codiPare);
-//			unitatsAdministratives.put(codi, unitatAdministrativa);
-//		}
-//	}
-	
+
 	@Getter @Setter
 	private static class Unitat {
 		private GdaUnitatAdministrativa unitatAdministrativa;

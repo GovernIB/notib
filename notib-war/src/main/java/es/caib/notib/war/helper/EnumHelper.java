@@ -3,6 +3,8 @@
  */
 package es.caib.notib.war.helper;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,24 +97,19 @@ public class EnumHelper {
 		return resposta;
 	}
 
-	public static class HtmlOption {
+	@Data
+	public static class HtmlOption implements Comparable<HtmlOption> {
 		private String value;
 		private String text;
+
 		public HtmlOption(String value, String text) {
 			this.value = value;
 			this.text = text;
 		}
-		public String getValue() {
-			return value;
-		}
-		public void setValue(String value) {
-			this.value = value;
-		}
-		public String getText() {
-			return text;
-		}
-		public void setText(String text) {
-			this.text = text;
+
+		@Override
+		public int compareTo(HtmlOption o) {
+			return this.value.compareTo(o.getValue());
 		}
 	}
 

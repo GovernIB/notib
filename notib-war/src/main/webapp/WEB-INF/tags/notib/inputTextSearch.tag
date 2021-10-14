@@ -16,14 +16,7 @@
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
 <%@ attribute name="searchButton" required="true" rtexprvalue="true"%>
 <%@ attribute name="funcio" required="false" rtexprvalue="true"%>
-<script>
-$('input').change(function() {
-	if(this.type != "file"){
-		this.value = this.value.trim();
-	}
-	
-});
-</script>
+
 <c:set var="campValue" value="${value}"/>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -57,11 +50,11 @@ $('input').change(function() {
 	<c:otherwise>
    		<label class="sr-only" for="${campPath}">${campLabelText}</label>
    		<form:input value="${campValue}" path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
-			<span class="input-group-addon"> 
-			<a id="${searchButton}" onclick="${funcio}">
-				<span class="fa fa-search"></span>
-			</a>
-			</span>
-		</c:otherwise>
+		<span class="input-group-addon">
+		<a id="${searchButton}" onclick="${funcio}">
+			<span class="fa fa-search"></span>
+		</a>
+		</span>
+	</c:otherwise>
 </c:choose>
 </div>

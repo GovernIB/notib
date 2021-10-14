@@ -6,8 +6,8 @@
   <version>${revision}</version>
   <packaging>pom</packaging>
   <properties>
-		<revision>1.1.9.11</revision>
-		<version.date>2021.04.28 10:30h</version.date>
+		<revision>1.1.13.1</revision>
+		<version.date>2021.10.14 17:30h</version.date>
 		<github.global.server>github</github.global.server>
 		<spring.version>3.2.16.RELEASE</spring.version>
 		<spring-security.version>3.2.9.RELEASE</spring-security.version>
@@ -17,7 +17,7 @@
 		<ehcache.version>2.10.1</ehcache.version>
 		<orika.version>1.4.6</orika.version>
 		<jackson.version>2.6.3</jackson.version>
-		<regweb.version>3.1.2</regweb.version>
+		<regweb.version>3.2.2</regweb.version>
 		<dir3caib.version>1.0.7</dir3caib.version>
 		<rolsac.version>1.8.0</rolsac.version>
 		<slf4j.version>1.6.6</slf4j.version>
@@ -26,10 +26,13 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<arxiu.api.version>2.0.5</arxiu.api.version>
-		<lombok.version>1.18.6</lombok.version>
+		<lombok.version>1.18.12</lombok.version>
+	  	<liquibase.version>4.4.3</liquibase.version>
 		<apache.poi.version>4.1.2</apache.poi.version>
 		<xdocreport.version>2.0.2</xdocreport.version>
 		<itext.pdf.version>5.4.3</itext.pdf.version>
+	  	<docker.image.prefix>280421</docker.image.prefix>
+		<docker.image.name>notib</docker.image.name>
 	</properties>
 	<modules>
 		<module>notib-client</module>
@@ -120,6 +123,7 @@
 				<version>2.2.0</version>
 			</plugin>
 		</plugins>
+		<finalName>notib</finalName>
 	</build>
 	<distributionManagement>
 		<repository>

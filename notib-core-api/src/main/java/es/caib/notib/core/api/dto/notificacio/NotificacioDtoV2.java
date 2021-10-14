@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -38,7 +39,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String serveiTipus;
-	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<NotificacioEnviamentDtoV2>();
+	private List<NotificacioEnviamentDtoV2> enviaments = new ArrayList<>();
 	private String usuariCodi;
 	private String motiu;
 	private String numExpedient;
@@ -55,8 +56,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private DocumentDto document3;
 	private DocumentDto document4;
 	private DocumentDto document5;
-	
-	private boolean errorLastEvent;
+
 	private boolean hasEnviamentsPendents;
 
 

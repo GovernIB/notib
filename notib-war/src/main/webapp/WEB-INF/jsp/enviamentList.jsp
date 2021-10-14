@@ -1,3 +1,4 @@
+<%@ page import="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -17,7 +18,7 @@ pageContext.setAttribute(
 pageContext.setAttribute(
 		"notificacioEstatEnumOptions",
 		es.caib.notib.war.helper.EnumHelper.getOptionsForEnum(
-				es.caib.notib.core.api.dto.NotificacioEstatEnumDto.class,
+				NotificacioEstatEnumDto.class,
 				"notificacio.estat.enum."));
 
 %>
@@ -34,8 +35,8 @@ pageContext.setAttribute(
 	<title><spring:message code="enviament.list.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
-	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
-	<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.1.2/css/select.bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/datatables.net-select/1.1.2/js/dataTables.select.min.js"/>"></script>
 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
@@ -46,109 +47,55 @@ pageContext.setAttribute(
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.min.js"/>"></script>
-	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.0/jquery-ui.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
-<style type="text/css">
+	<script src="<c:url value="/js/datatable.accions-massives.js"/>"></script>
+	<link href="<c:url value="/css/datatable-accions-massives.css"/>" rel="stylesheet"/>
 
-thead input {
-	width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    color: #555;
-    padding: 4px 7px;
-}
-table.dataTable thead tr:nth-child(2) .sorting:after {
-    opacity: 0.2;
-    content: "\e150";
-}
-thead tr:nth-child(2) {
-	background-color: #eceaec;
-}
-
-#enviament tbody tr {
-	min-height: 35px;
-}
-div.dataTables_wrapper {
-        width: 100%;
-}
-table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-	background-color: #fcf8e3;
-	color: #666666;
-}
-table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
-	cursor: pointer;
-}
-.buit {
-	color: #8e8e8e;
-}
-.input-group-addon {
-	padding: 0;
-}
-#loading-screen {
-	width: 100%;
-	height: 100%;
-	top: 100px;
-	left: 0;
-	position: fixed;
-	display: none;
-	opacity: 0.7;
-	background-color: #fff;
-	z-index: 99;
-	text-align: center;
-	}
-#processing-icon {
-	position: relative;
-	top: 240px;
-	z-index: 100;
-}
-div.dataTables_wrapper {
-	overflow-x: auto;
-}
-#btnFiltrar {
-	padding: 2px 6px;
-	margin: 8px;
-}
-</style>
 <script>
 
 $(document).ready(function() {
-	
-	$('#notificacio').select2({
+
+	var $estatColumn = $('#estat');
+	var $enviamentTipusColumn = $('#enviamentTipus');
+	$estatColumn.select2({
 		width: '100%',
         allowClear:true,
         placeholder: 'Selecciona una opció'//'${placeholderText}'
     });
-    $('#notificacio').on('select2:select', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
-	});
-	$('#notificacio').on('select2:unselect', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
+	$enviamentTipusColumn.select2({
+		width: '100%',
+		allowClear:true,
+		placeholder: '<spring:message code="notificacio.list.filtre.camp.enviament.tipus"/>'
 	});
 
-	if("${filtreEnviaments.enviamentTipus}" != ""){
-		$('#notificacio').val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
+	function configureColumnSelectFilter($selector) {
+		$selector.on('select2:select', function (e) {
+			$("#enviament").dataTable().api().ajax.reload();
+		});
+		$selector.on('select2:unselect', function (e) {
+			$("#enviament").dataTable().api().ajax.reload();
+		});
+		$selector.on('change', function () {
+			console.log($selector.val());
+			$selector.val($selector.val());
+			$("#btnFiltrar").first().click();
+		});
 	}
-	
-	$('#estat').select2({
-		width: '100%',
-        allowClear:true,
-        placeholder: 'Selecciona una opció'//'${placeholderText}'
-    });
-    $('#estat').on('select2:select', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
-	});
-    $('#estat').on('select2:unselect', function (e) {
-    	$("#enviament").dataTable().api().ajax.reload();
-	});
+
+	configureColumnSelectFilter($estatColumn);
+	configureColumnSelectFilter($enviamentTipusColumn);
 	
     if("${filtreEnviaments.estat}" != ""){
-    	$('#estat').val("${filtreEnviaments.estat}").trigger('change');
+		$estatColumn.val("${filtreEnviaments.estat}").trigger('change');
     }
-    
+
+	if("${filtreEnviaments.enviamentTipus}" != ""){
+		$enviamentTipusColumn.val("${filtreEnviaments.enviamentTipus}".toLowerCase()).trigger('change');
+	}
+
     $('.data').datepicker({
 		orientation: "bottom",
 		dateFormat: 'dd/mm/yy',
@@ -156,105 +103,16 @@ $(document).ready(function() {
 		todayHighlight: true,
 		language: "${requestLocale}"
 	});
-	
-	$('#enviament').on('selectionchange.dataTable', function (e, accio, ids) {
-		$.get(
-				"enviament/" + accio,
-				{ids: ids},
-				function(data) {
-					$(".seleccioCount").html(data);
-				}
-		);
-	});
-	
-	$('#enviament').on('draw.dt', function () {
-		$('#seleccioAll').on('click', function() {
-			$.get(
-					"enviament/select",
-					function(data) {
-						$(".seleccioCount").html(data);
-						$('#enviament').webutilDatatable('refresh');
-					}
-			);
-			return false;
-		});
-		$('#seleccioNone').on('click', function() {
-			$.get(
-					"enviament/deselect",
-					function(data) {
-						$(".seleccioCount").html(data);
-						$('#enviament').webutilDatatable('select-none');
-						$('#enviament').webutilDatatable('refresh');
-					}
-			);
-			return false;
-		});
-		$('#btnNetejar').click(function() {
-			$(':input').val('');
-			event.preventDefault();
-	        $("#btnFiltrar").first().click();
-		});
 
-		$('#reintentarNotificacio').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>")){
-				$("#loading-screen").show();
-				$.get(
-					"enviament/reintentar/notificacio",
-					function(data) {
-						location.reload();
-					}
-				);
-			}
-			return false;
-		});
+	let eventMessages = {
+		'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
+		'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
+		'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
+		'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
+		'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+	};
 
-		$('#reactivarConsulta').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>")){
-				$.get(
-					"enviament/reactivar/consulta",
-					function(data) {
-						location.reload();
-					}
-				);
-			}
-			return false;
-		});
-
-		$('#reactivarSir').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>")){
-				$.get(
-					"enviament/reactivar/sir",
-					function(data) {
-						location.reload();
-					}
-				);
-			}
-			return false;
-		});
-		$('#updateEstat').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>")){
-				$.get(
-						"enviament/actualitzarestat",
-						function(data) {
-							location.reload();
-						}
-				);
-			}
-			return false;
-		});
-
-		$('#reactivarCallback').on('click', function() {
-			if(confirm("<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>")){
-				$.get(
-						"enviament/reactivar/callback",
-						function(data) {
-							location.reload();
-						}
-				);
-			}
-			return false;
-		});
-	});
+	initEvents($('#enviament'), 'enviament', eventMessages)
 
 	$("#enviament th").last().empty();
 	$("#enviament th").last().css("padding", 0);
@@ -267,44 +125,6 @@ $(document).ready(function() {
 	});
 });
 
-function guardarFilesSeleccionades(table) {
-	var idsSelectedRows = sessionStorage.getItem('rowIdsStore');
-	if (!(idsSelectedRows))
-		return;
-	
-	var rowids = JSON.parse(idsSelectedRows);
-	for (var id in rowids) {
-		var selectedRowId = document.getElementById(id);
-		var $cell = $('td:first', $(selectedRowId));
-		$(selectedRowId).addClass('selected');
-		$cell.empty().append('<span class="fa fa-check-square-o"></span>');
-	}
-}
-
-function seleccionarFila(id) {
-	var isSelected = $(document.getElementById(id)).hasClass('selected')
-	var idsSelectedRows = sessionStorage.getItem('rowIdsStore');
-	if (!(idsSelectedRows)) {
-		clearSeleccio();
-	}
-	var rowKeys = JSON.parse(idsSelectedRows);
-	if (isSelected === false && rowKeys.hasOwnProperty(id)) {
-		delete rowKeys[id];
-	} else if (isSelected) {
-		rowKeys[id] = true;
-	}
-	sessionStorage.setItem('rowIdsStore', JSON.stringify(rowKeys));
-}
-
-
-function clearSeleccio() {
-	sessionStorage.setItem('rowIdsStore', "{}");
-}
-
-function estatChange(value) {
-	$('#estat').val(value);
-	$("#btnFiltrar").first().click();
-}
 
 function setCookie(cname,cvalue) {
 	var exdays = 30;
@@ -328,6 +148,11 @@ function getCookie(cname) {
     return "";
 }
 </script>
+	<style>
+		.div-filter-data-sep {
+			padding: 0;
+		}
+	</style>
 </head>
 <body>
 	<div id="loading-screen" class="loading-screen" >
@@ -401,7 +226,7 @@ function getCookie(cname) {
 						<div class="from-group">
 							<div class="input-group vdivide">
     							<input name="dataEnviamentInici" value="${filtreEnviaments.dataEnviamentInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon"></div>
+    							<div class="input-group-addon div-filter-data-sep"></div>
     							<input name="dataEnviamentFi" value="${filtreEnviaments.dataEnviamentFi}" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
@@ -420,7 +245,7 @@ function getCookie(cname) {
 						<div class="from-group input-daterange" data-provide="daterangepicker">
 							<div class="input-group vdivide">
     							<input name="dataProgramadaDisposicioInici" value="${filtreEnviaments.dataProgramadaDisposicioInici}" type="text" class="form-control data" placeholder="Inici">
-    							<div class="input-group-addon"></div>
+    							<div class="input-group-addon div-filter-data-sep"></div>
     							<input name="dataProgramadaDisposicioFi" value="${filtreEnviaments.dataProgramadaDisposicioFi}" type="text" class="form-control data" placeholder="Final">
 							</div>
 						</div>
@@ -479,12 +304,18 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="emisorDir3Codi" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
+				<th data-col-name="organEstat" data-visible="false"></th>
+				<th data-col-name="organCodi" data-template="#cellOrganGestorTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.dir3codi"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="dir3Codi" value="${filtreEnviaments.dir3Codi}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.dir3codi"/>"/>
 						</div>
 					</script>
+					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
+						{{:organCodi}}
+						{{if organEstat != 'VIGENT'}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>{{/if}}
+ 					</script>
 				</th>
 				<c:choose>
 					<c:when test = "${columnes.usuari == true}"> 
@@ -584,7 +415,7 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="destinatarisNomLlinatges" data-orderable="false" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
+				<th data-col-name="destinataris" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.destinataris"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="destinataris" value="${filtreEnviaments.destinataris}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.destinataris"/>"/>
@@ -659,7 +490,28 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
-				<%-- <c:choose>
+				<c:choose>
+					<c:when test = "${columnes.enviamentTipus == true}">
+						<c:set value="true" var="visible"></c:set>
+					</c:when>
+					<c:when test = "${columnes.enviamentTipus == false}">
+						<c:set value="false" var="visible"></c:set>
+					</c:when>
+				</c:choose>
+				<th data-col-name="tipusEnviament" class="enviamentTipusCol" width="5px" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.tipusenviament"/>
+					<script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
+					<div class="from-group" style="padding: 0; font-weight: 100;">
+						<select class="form-control" id="enviamentTipus" name="enviamentTipus"
+								style="width:100%" data-toggle="select2" data-minimumresults="-1" tabindex="-1" aria-hidden="true" data-select2-eval="true">
+							<option value=""></option>
+							<c:forEach items="${notificacioComunicacioEnumOptions}" var="opt">
+								<option name="enviamentTipus" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>
+							</c:forEach>
+						</select>
+					</div>
+					</script>
+				</th>
+				<c:choose>
 					<c:when test = "${columnes.codiNotibEnviament == true}"> 
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
@@ -673,7 +525,7 @@ function getCookie(cname) {
 							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotibenviament"/>"/>
 						</div>
 					</script>
-				</th> --%>
+				</th>
 				<c:choose>
 					<c:when test = "${columnes.numCertificacio == true}"> 
 					  <c:set value="true" var="visible"></c:set>
@@ -715,7 +567,7 @@ function getCookie(cname) {
 				<th data-col-name="estat"  data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.estat"/>
 					<script type="text/x-jsrender">
 						<div class="from-group" style="padding: 0; font-weight: 100;">
-							<select class="form-control" id="estat" name="estat" onchange="estatChange(this.value)">
+							<select class="form-control" id="estat" name="estat">
 								<option name="estat" class=""></option>
     							<c:forEach items="${notificacioEstatEnumOptions}" var="opt">
         							<option name="estat" value="${opt.value != 'buit' ? opt.value : ''}" class="${opt.value != 'buit' ? '' : 'buit'}"><span class="${opt.value != 'buit' ? '' : 'buit'}"><spring:message code="${opt.text}"/></span></option>

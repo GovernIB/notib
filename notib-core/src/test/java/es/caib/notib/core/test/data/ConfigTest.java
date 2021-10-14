@@ -8,4 +8,6 @@ public class ConfigTest {
     // Codi de l'òrgan gestor per defecte
     public static final String DEFAULT_ORGAN_DIR3= "A00000000";
 
+    public static final String ORGAN_DIR3 = "A00000001";
+    public static final String ORGAN_DIR3_SENSE_PERMISOS = "A00000002";
 }

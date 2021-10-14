@@ -3,10 +3,10 @@
  */
 package es.caib.notib.plugin.gesdoc;
 
+import es.caib.notib.plugin.SistemaExternException;
+
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import es.caib.notib.plugin.SistemaExternException;
 
 
 /**
@@ -27,7 +27,7 @@ public interface GestioDocumentalPlugin {
 	 * @throws SistemaExternException
 	 *             Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public String create(
+	String create(
 			String agrupacio,
 			InputStream contingutIn) throws SistemaExternException;
 
@@ -43,7 +43,7 @@ public interface GestioDocumentalPlugin {
 	 * @throws SistemaExternException
 	 *             Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public void update(
+	void update(
 			String id,
 			String agrupacio,
 			InputStream contingut) throws SistemaExternException;
@@ -58,7 +58,7 @@ public interface GestioDocumentalPlugin {
 	 * @throws SistemaExternException
 	 *             Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public void delete(
+	void delete(
 			String id,
 			String agrupacio) throws SistemaExternException;
 
@@ -75,7 +75,7 @@ public interface GestioDocumentalPlugin {
 	 * @throws SistemaExternException
 	 *             Si hi ha hagut algun problema per dur a terme l'acció.
 	 */
-	public void get(
+	void get(
 			String id,
 			String agrupacio,
 			OutputStream contingutOut) throws SistemaExternException;

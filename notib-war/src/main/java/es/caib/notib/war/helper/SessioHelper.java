@@ -3,16 +3,16 @@
  */
 package es.caib.notib.war.helper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.EntitatService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -31,37 +31,35 @@ public class SessioHelper {
 			HttpServletResponse response,
 			AplicacioService aplicacioService,
 			EntitatService entitatService) {
+		HttpSession session =  request.getSession();
 		if (request.getUserPrincipal() != null) {
-			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(
-					SESSION_ATTRIBUTE_AUTH_PROCESSADA);
-			if (autenticacioProcessada == null) {
+			Boolean autenticacioProcessada = (Boolean) session.getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA);
+			if (autenticacioProcessada == null) { // Authenticam usuari
 				aplicacioService.processarAutenticacioUsuari();
-				request.getSession().setAttribute(
-						SESSION_ATTRIBUTE_AUTH_PROCESSADA,
-						new Boolean(true));
+				session.setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, Boolean.TRUE);
 			}
 		}
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		String idioma_usuari = usuari.getIdioma();
 		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-        
-		request.getSession().setAttribute(
+
+		session.setAttribute(
 				"SessionHelper.capsaleraCapLogo", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.logo"));
-		request.getSession().setAttribute(
+				aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
+		session.setAttribute(
 				"SessionHelper.capsaleraPeuLogo", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.peu.logo"));
-		request.getSession().setAttribute(
+				aplicacioService.propertyGet("es.caib.notib.peu.logo"));
+		session.setAttribute(
 				"SessionHelper.capsaleraColorFons", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.fons"));
-		request.getSession().setAttribute(
+				aplicacioService.propertyGet("es.caib.notib.capsalera.color.fons"));
+		session.setAttribute(
 				"SessionHelper.capsaleraColorLletra", 
-				aplicacioService.propertyFindByPrefix("es.caib.notib.capsalera.color.lletra"));
-		
-		request.getSession().setAttribute(
+				aplicacioService.propertyGet("es.caib.notib.capsalera.color.lletra"));
+
+		session.setAttribute(
 				SESSION_ATTRIBUTE_IDIOMA_USUARI, 
 				idioma_usuari);
-		request.getSession().setAttribute(
+		session.setAttribute(
 				"dadesUsuariActual", 
 				usuari);
 		// Assegurem que l'entitat i rol actual s'hagin carregat correctament

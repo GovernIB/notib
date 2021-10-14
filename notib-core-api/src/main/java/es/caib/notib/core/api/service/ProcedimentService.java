@@ -1,6 +1,8 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -22,9 +24,9 @@ public interface ProcedimentService {
 	 * @return El procediment creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ProcedimentDto create(
+	ProcedimentDto create(
 			Long entitatId,
-			ProcedimentDto procediment);
+			ProcedimentDataDto procediment);
 
 	/**
 	 * Actualitza la informació del procediment 
@@ -38,7 +40,7 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public ProcedimentDto update(
 			Long entitatId,
-			ProcedimentDto procediment,
+			ProcedimentDataDto procediment,
 			boolean isAdmin,
 			boolean isAdminEntitat) throws NotFoundException;
 
@@ -92,12 +94,11 @@ public interface ProcedimentService {
 	/**
 	 * Consulta els procediments d'una entitat.
 	 * 
-	 * @param codi
-	 *            Codi del procediment a trobar.
+	 * @param entitatId Identificador de l'entitat
 	 * @return El procediment amb el codi especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcedimentDto> findByEntitat(Long entitatId);
+	List<ProcedimentSimpleDto> findByEntitat(Long entitatId);
 	
 	/**
 	 * Consulta els procediments d'un organ gestor i els seus organs gestors descendents.
@@ -109,7 +110,7 @@ public interface ProcedimentService {
 	 * @return Els procediments associats a l'òrgan gestor, o a algund els seus descendents.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcedimentDto> findByOrganGestorIDescendents(
+	public List<ProcedimentSimpleDto> findByOrganGestorIDescendents(
 			Long entitatId, 
 			OrganGestorDto organGestor);
 
@@ -185,7 +186,7 @@ public interface ProcedimentService {
 	 * @return Procediments with the given permission for the given user
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcedimentDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+	List<ProcedimentSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcedimentDto> findProcedimentsSenseGrups(Long entitatId);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -351,22 +352,6 @@ public interface ProcedimentService {
 			Long entitatId,
 			Long GrupId) throws NotFoundException;
 
-//	/**
-//	 * Comprova si l'usuari actual té permisos de consulta sobre algun procediment
-//	 * 
-//	 * @return true / false
-//	 */
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public boolean hasPermisConsultaProcediment(EntitatDto entitat);
-//
-//	/**
-//	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
-//	 * 
-//	 * @return true / false
-//	 */
-//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-//	public boolean hasPermisNotificacioProcediment(EntitatDto entitat);
-	
 	/**
 	 * Comprova si l'usuari actual té permisos de notificació sobre algun procediment
 	 * 
@@ -423,6 +408,14 @@ public interface ProcedimentService {
 			RolEnumDto rol);
 
 	/**
+	 * Consulta si l'usuari té permís de notificació a tots els procediments comuns per a algún òrgan gestor.
+	 *
+	 * @param entitatId Identificador de l'entitat actual
+	 * @return boleà indicant si es te permis de procediments comuns a algun òrgan
+	 */
+	boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId);
+
+	/**
 	 * Actualitza els procediments de la entitat indicada amb la informació dels procediments actual
 	 * retornada pel plugin Gestor Documental Administratiu (GDA)
 	 *
@@ -443,4 +436,19 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	boolean isUpdatingProcediments(EntitatDto entitatDto);
 
+	/**
+	 * Consulta un procediment donat el seu nom i entitat.
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param nomProcediment
+	 *            Atribut nom del procediment a trobar.
+	 * @return El procediment amb el nom especificat o null si no s'ha trobat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'procediment amb el nom especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	ProcedimentDto findByNom(
+			Long entitatId,
+			String nomProcediment) throws NotFoundException;
 }

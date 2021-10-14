@@ -3,8 +3,14 @@
  */
 package es.caib.notib.client;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.*;
+import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.representation.Form;
+import es.caib.notib.ws.notificacio.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -12,29 +18,10 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandler;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.representation.Form;
-
-import es.caib.notib.ws.notificacio.DadesConsulta;
-import es.caib.notib.ws.notificacio.NotificacioServiceV2;
-import es.caib.notib.ws.notificacio.NotificacioV2;
-import es.caib.notib.ws.notificacio.PermisConsulta;
-import es.caib.notib.ws.notificacio.RespostaAlta;
-import es.caib.notib.ws.notificacio.RespostaConsultaDadesRegistre;
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;;
+;
 
 /**
  * Client REST per al servei de notificacions de NOTIB.
@@ -50,8 +37,8 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 	private String password;
 
 	private boolean autenticacioBasic = false;
-	private int connecTimeout = 3000000;
-	private int readTimeout = 10000000;
+	private int connecTimeout = 20000;
+	private int readTimeout = 120000;
 
 	public NotificacioRestClient() {}
 	public NotificacioRestClient(
@@ -241,9 +228,30 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 			throw new RuntimeException(ex);
 		}
 	}
-	
-	
-	
+
+	@Override
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador) {
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaJustificantNotificacio/" + identificador;
+			Client jerseyClient = generarClient();
+			if (username != null) {
+				autenticarClient(
+						jerseyClient,
+						urlAmbMetode,
+						username,
+						password);
+			}
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					get(String.class);
+			ObjectMapper mapper  = new ObjectMapper();
+			return mapper.readValue(json, RespostaConsultaJustificantEnviament.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	public boolean isAutenticacioBasic() {
 		return autenticacioBasic;
 	}

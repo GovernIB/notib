@@ -1,6 +1,6 @@
 package es.caib.notib.core.cacheable;
 
-import es.caib.notib.core.api.dto.OrganismeDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +47,31 @@ public class OrganGestorCachable {
         unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3));
 
         return unitatsEntitat;
+    }
+
+    /**
+     * Obté una llista dels codis dir3 dels organismes pares del organisme indicat,
+     * inclou el codi dir3 de l'òrgan indicat.
+     *
+     * @param codiDir3Entitat Codi dir3 de l'entitat de l'organigrama a consultar.
+     * @param codiDir3Organ Codi dir3 de l'òrgan del que es volen coneixer els seus pares.
+     *
+     * @return Una llista de String amb els codis DIR3.
+     */
+    @Cacheable(value = "organCodisAncestors", key="#codiDir3Entitat.concat('-').concat(#codiDir3Organ)")
+    public List<String> getCodisAncestors(String codiDir3Entitat, String codiDir3Organ) {
+        Map<String, OrganismeDto> organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
+        OrganismeDto currentNode = organigramaEntitat.get(codiDir3Organ);
+        if (currentNode == null) { // organ obsolet
+            return new ArrayList<>();
+        }
+
+        List<String> pares = new ArrayList<>();
+        while(!currentNode.getCodi().equals(currentNode.getPare())) {
+            pares.add(currentNode.getCodi());
+            currentNode = organigramaEntitat.get(currentNode.getPare());
+        }
+        return pares;
     }
 
     @Cacheable(value = "organismes", key="#entitatcodi")
@@ -112,5 +137,7 @@ public class OrganGestorCachable {
     @CacheEvict(value = "organismes", key="#entitatcodi")
     public void evictFindOrganismesByEntitat(String entitatcodi) {
     }
-
+    @CacheEvict(value = "organCodisAncestors", key="#codiDir3Entitat.concat('-').concat(#codiDir3Organ)")
+    public void evictCodisAncestors(String codiDir3Entitat, String codiDir3Organ) {
+    }
 }

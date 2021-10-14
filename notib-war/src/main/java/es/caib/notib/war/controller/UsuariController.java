@@ -37,6 +37,10 @@ public class UsuariController extends BaseController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
+	@RequestMapping(value = "/refresh", method = RequestMethod.HEAD)
+	public void refresh(HttpServletRequest request, HttpServletResponse response) {
+	}
+
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		// Només per Jboss

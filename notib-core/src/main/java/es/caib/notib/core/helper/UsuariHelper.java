@@ -3,13 +3,11 @@
  */
 package es.caib.notib.core.helper;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.ejb.SessionContext;
-
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -19,11 +17,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.UsuariRepository;
-import es.caib.notib.plugin.usuari.DadesUsuari;
+import javax.annotation.Resource;
+import javax.ejb.SessionContext;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -42,7 +40,7 @@ public class UsuariHelper {
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
+	private ConfigHelper configHelper;
 
 
 
@@ -119,7 +117,7 @@ public class UsuariHelper {
 			logger.debug("Consultant plugin de dades d'usuari (" +
 					"usuariCodi=" + auth.getName() + ")");
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-			String idioma = PropertiesHelper.getProperties().getProperty("es.caib.notib.default.user.language");
+			String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 			if (dadesUsuari != null) {
 				usuari = usuariRepository.save(
 						UsuariEntity.getBuilder(

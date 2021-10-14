@@ -61,7 +61,9 @@ public class EntitatPermisController extends BaseController {
 		model.addAttribute(
 				"entitat", 
 				entitatService.findById(entitatId));
-		model.addAttribute(new PermisCommand());
+		PermisCommand permisCommand = new PermisCommand();
+		model.addAttribute(permisCommand);
+		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return "entitatPermisForm";
 	}
 
@@ -98,6 +100,7 @@ public class EntitatPermisController extends BaseController {
 			model.addAttribute(
 					"entitat",
 					entitatService.findById(entitatId));
+			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return "entitatPermisForm";
 		}
 		

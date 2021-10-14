@@ -1,15 +1,15 @@
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -99,6 +99,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 
 	List<ProcedimentEntity> findByEntitatAndComuTrue(EntitatEntity entitat);
 
+	Set<ProcedimentEntity> findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(EntitatEntity entitat);
+
 	List<ProcedimentEntity> findByEntitatActiva(boolean activa);
 	
 	@Query(
@@ -180,6 +182,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	@Query(
 			"from ProcedimentEntity pro " +
 			"where pro.organGestor.codi in (:organsCodis) " +
+			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procediment " +
@@ -187,7 +190,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcedimentEntity> findByOrganGestorCodiInAndGrup(
+	List<ProcedimentEntity> findProcedimentsAccesiblesPerOrganGestor(
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups);
 
@@ -202,4 +205,14 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	public List<ProcedimentEntity> findByOrganGestorCodiInOrComu(
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("entitat") EntitatEntity entitat);
+	
+	@Query(
+			"from " +
+			"    ProcedimentEntity pro " +
+			"where pro.entitat = (:entitatActual) and " + 
+			"lower(pro.nom) = (lower(:nomProcediment))")
+	List<ProcedimentEntity> findByNomAndEntitat(
+			@Param("nomProcediment") String nomProcediment,
+			@Param("entitatActual") EntitatEntity entitat);
+	
 }

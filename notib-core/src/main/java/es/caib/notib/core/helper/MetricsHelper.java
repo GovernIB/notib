@@ -11,7 +11,9 @@ public class MetricsHelper {
 
 	@Autowired
 	private MetricRegistry metricRegistry;
-		
+	@Autowired
+	private ConfigHelper configHelper;
+
 	public Timer.Context iniciMetrica () {
 		Thread currentThread= Thread.currentThread();
 		String clazz = null;
@@ -43,6 +45,6 @@ public class MetricsHelper {
 	}
 	
 	private boolean getGenerarMetriques() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.metriques.generar");
+		return configHelper.getAsBoolean("es.caib.notib.metriques.generar");
 	}
 }

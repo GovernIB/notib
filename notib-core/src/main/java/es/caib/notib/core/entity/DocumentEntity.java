@@ -246,7 +246,22 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 			return built;
 		}
 	}
-	
+
+	public String getArxiuNom() {
+		if (arxiuNom != null && !arxiuNom.isEmpty()) {
+			return arxiuNom;
+		}
+
+		if (csv != null && !csv.isEmpty()) {
+			return this.csv + ".pdf";
+		}
+
+		if (uuid != null && !uuid.isEmpty()) {
+			return this.uuid + ".pdf";
+		}
+
+		return this.getId().toString() + ".pdf";
+	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

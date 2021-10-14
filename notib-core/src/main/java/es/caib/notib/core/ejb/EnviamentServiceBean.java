@@ -4,7 +4,9 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
+import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.rest.consulta.Resposta;
 import es.caib.notib.core.api.service.EnviamentService;
@@ -45,26 +47,15 @@ public class EnviamentServiceBean implements EnviamentService {
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			EntitatDto entitat, 
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdminOrgan, 
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
+			Long entitatId,
+			RolEnumDto rol,
 			String organGestorCodi,
 			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre, 
-			PaginacioParamsDto paginacio)
-			throws ParseException {
+			NotificacioEnviamentFiltreDto filtre,
+			PaginacioParamsDto paginacio) throws ParseException {
 		return delegate.enviamentFindByEntityAndFiltre(
-				entitat, 
-				isUsuari, 
-				isUsuariEntitat, 
-				isAdminOrgan,
-				codisProcedimentsDisponibles,
-				codisOrgansGestorsDisponibles,
-				codisProcedimentOrgansDisponibles,
+				entitatId,
+				rol,
 				organGestorCodi,
 				usuariCodi,
 				filtre, 
@@ -76,6 +67,12 @@ public class EnviamentServiceBean implements EnviamentService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId) {
 		return delegate.enviamentFindAmbNotificacio(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds) {
+		return delegate.findIdsByNotificacioIds(notificacionsIds);
 	}
 
 	@Override
@@ -127,14 +124,12 @@ public class EnviamentServiceBean implements EnviamentService {
 	public FitxerDto exportacio(
 			Long entitatId, 
 			Collection<Long> enviamentIds, 
-			String format,
-			NotificacioEnviamentFiltreDto filtre)
+			String format)
 			throws IOException, NotFoundException, ParseException {
 		return delegate.exportacio(
 				entitatId, 
 				enviamentIds, 
-				format, 
-				filtre);
+				format);
 	}
 
 	@Override

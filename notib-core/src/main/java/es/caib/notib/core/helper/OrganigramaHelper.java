@@ -1,6 +1,6 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.OrganismeDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -79,23 +79,33 @@ public class OrganigramaHelper {
 		unitatsEntitat.retainAll(unitatsExistents);
 		return unitatsEntitat;
 	}
-	
+
+	/**
+	 *
+	 * @param codiDir3Entitat Codi dir3 de l'entitat actual.
+	 * @param codiDir3Organ Codi dir3 de l'òrgan consultat.
+	 * @return Conjunt dels codis dels OrganGestorEntity fills del òrgan indicat.
+	 * 		   Inclou el OrganGestorEntity del codi indicat per paràmetre
+	 */
 	public List<OrganGestorEntity> getOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
-		
-		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		
-		List<String> unitatsEntitat = new ArrayList<String>();
-		unitatsEntitat.addAll(getCodisOrgansGestorsPare(organigramaEntitat, codiDir3, codiDir3Entitat));
-		
-		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
-		unitatsEntitat.retainAll(unitatsExistents);
+		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
 		if (!unitatsEntitat.isEmpty())
 			return organGestorRepository.findByCodiIn(unitatsEntitat);
 		else
-			return new ArrayList<OrganGestorEntity>();
+			return new ArrayList<>();
 	}
 
+	/**
+	 * Consulta el codi de tots els òrgans gestor d'un òrgan concret.
+	 * Inclou el codi de l'òrgan indicat per paràmetre.
+	 *
+	 * @param organigrama Mapa de l'organigrama amb tots els òrgans de l'aplicació
+	 * @param codiDir3 Codi dir3 de l'òrgan consultat.
+	 * @param codiDir3Entitat Codi dir3 de l'entitat actual.
+	 *
+	 * @return Conjunt dels codis dels òrganismes fills del òrgan indicat.
+	 * 		   Inclou el codi de l'òrgan indicat per paràmetre
+	 */
 	private List<String> getCodisOrgansGestorsPare(
 			Map<String, OrganismeDto> organigrama,
 			String codiDir3,

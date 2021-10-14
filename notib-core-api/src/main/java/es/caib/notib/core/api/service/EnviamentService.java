@@ -4,7 +4,9 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
+import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.rest.consulta.Resposta;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,8 +45,8 @@ public interface EnviamentService {
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
 	 * 
-	 * @param entitat
-	 * 			Entitat de la que es vol consultar els enviaments
+	 * @param entitatId
+	 * 			Identificador de l'entitat de la que es vol consultar els enviaments
 	 * @param filtre
 	 * 			Filtre per a la consulta
 	 * @param paginacio
@@ -54,13 +56,8 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			EntitatDto entitat,
-			boolean isUsuari,
-			boolean isUsuariEntitat,
-			boolean isAdminOrgan,
-			List<String> codisProcedimentsDisponibles,
-			List<String> codisOrgansGestorsDisponibles,
-			List<Long> codisProcedimentOrgansDisponibles,
+			Long entitatId,
+			RolEnumDto rol,
 			String organGestorCodi,
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
@@ -74,8 +71,16 @@ public interface EnviamentService {
 	 * @return els destinataris trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(
-			Long notificacioId);
+	List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId);
+
+	/**
+	 * Consulta els identificadors dels enviaments d'un conjunt de notificacions
+	 *
+	 * @param notificacionsIds  Atribut id de la notificació.
+	 * @return els identificadors dels enviaments.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
+	Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds);
 
 	/**
 	 * Consulta d'un enviament donat el seu id.
@@ -85,8 +90,7 @@ public interface EnviamentService {
 	 * @return el destinatari trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public NotificacioEnviamentDto enviamentFindAmbId(
-			Long enviamentId);
+	NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId);
 
 	/**
 	 * Consulta dels events d'una notificació.
@@ -96,8 +100,7 @@ public interface EnviamentService {
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public List<NotificacioEventDto> eventFindAmbNotificacio(
-			Long notificacioId);
+	List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId);
 	
 	/**
 	 * Reintenta un callback fallat
@@ -107,18 +110,13 @@ public interface EnviamentService {
 	 * @return els events trobats.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public boolean reintentarCallback(
-			Long eventId);
+	boolean reintentarCallback(Long eventId);
 
 	/**
 	 * Genera un fitxer d'exportació amb la informació dels expedients.
 	 * 
 	 * @param entitatId 
 	 *            Atribut id de l'entitat.
-	 * @param metaExpedientId 
-	 *            Atribut id del meta-expedient.
-	 * @param expedientIds
-	 *            Atribut id dels expedients a exportar.
 	 * @param format
 	 *            Format pel fitxer d'exportació ("ODS" o "CSV").
 	 * @return El fitxer resultant de l'exportació.
@@ -128,11 +126,10 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public FitxerDto exportacio(
+	FitxerDto exportacio(
 			Long entitatId,
 			Collection<Long> enviamentIds,
-			String format,
-			NotificacioEnviamentFiltreDto filtreCommand) throws IOException, NotFoundException, ParseException;
+			String format) throws IOException, NotFoundException, ParseException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar
@@ -171,16 +168,8 @@ public interface EnviamentService {
 			Long entitatId,
 			UsuariDto usuari);
 	
-	/**
-	 * Obté les columnes visibles per un usuari i entitat
-	 * 
-	 * @param columnes
-	 *            Attribut amb les columnes a visualitzar.
-	 * @return columnes que s'han de visualitzar.
-	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public NotificacioEnviamentDtoV2 getOne(
-			Long entitatId);
+	NotificacioEnviamentDtoV2 getOne(Long enviamentId);
 
 	/**
 	 * Obté les el justificant del registre.

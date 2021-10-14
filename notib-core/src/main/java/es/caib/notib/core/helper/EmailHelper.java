@@ -1,19 +1,13 @@
-/**
- * 
- */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.GrupProcedimentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;
-import es.caib.notib.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -21,260 +15,83 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.util.*;
+import java.util.List;
 
-/**
- * Mètodes per a l'enviament de correus.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@Slf4j
 @Component
-public class EmailHelper {
+public abstract class EmailHelper<T> {
+    private static final String PREFIX_NOTIB = "[NOTIB]";
+    @Resource
+    protected ProcedimentHelper procedimentHelper;
+    @Resource
+    protected CacheHelper cacheHelper;
+    @Resource
+    protected UsuariRepository usuariRepository;
+    @Resource
+    protected GrupRepository grupRepository;
+    @Resource
+    protected GrupProcedimentRepository grupProcedimentRepository;
+    @Autowired
+    protected ConfigHelper configHelper;
+    @Resource
+    private JavaMailSender mailSender;
 
-	private static final String PREFIX_NOTIB = "[NOTIB]";
-	@Resource
-	private ProcedimentHelper procedimentHelper;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Resource
-	private GrupRepository grupRepository;
-	@Resource
-	private GrupProcedimentRepository grupProcedimentRepository;
-	@Resource
-	private JavaMailSender mailSender;
-	@Resource
-	private MessageHelper messageHelper;
-	
-	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
-		String resposta = null;
-		try {
-			List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
-			if (destinataris != null && !destinataris.isEmpty()) {
-				for (UsuariDto usuariDto : destinataris) {
-					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
-						String email = usuariDto.getEmail().replaceAll("\\s+","");
-						sendEmailBustiaPendentContingut(
-								email,
-								notificacio);
-					}
-				}
-			}	
-		} catch (Exception ex) {
-			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
-			logger.error(errorDescripció);
-			resposta = errorDescripció;
-		}
-		return resposta;
-	}
-	
-	public void sendEmailBustiaPendentContingut(
-			String emailDestinatari,
-			NotificacioEntity notificacio) throws MessagingException {
-		logger.debug("Enviament emails nou contenidor a bústies");
-		String appBaseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.app.base.url");
-		MimeMessage missatge = mailSender.createMimeMessage();
-		missatge.setHeader("Content-Type", "text/html charset=UTF-8");
-		MimeMessageHelper helper;
-		helper = new MimeMessageHelper(missatge, true);
-		helper.setTo(emailDestinatari);
-		helper.setFrom(getRemitent());
-		helper.setSubject(PREFIX_NOTIB + " Canvis d'estat a les notificacions");
-		//Html text
-		String htmlText = "";		
-		htmlText += "<!DOCTYPE html>"+
-					"<html>"+
-					"<head>"+
-					"<style>"+
-					"body {"+
-					"	margin: 0px;"+
-					"	font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;"+
-					"	font-size: 14px;"+
-					"	color: #333;"+
-					"}"+
-					"table {"+
-					"	"+
-					"	border-radius: 4px;"+
-					"	width: 100%;"+
-					"	border-collapse: collapse;"+
-					"	margin-bottom: 10px;"+
-					"}"+
-					
-					"td, th {"+
-					"	border-bottom: solid 0.5px #ddd;"+
-					"	height: 38px;"+
-					"	border: 1px solid #ddd;"+
-					"	padding-left: 8px;"+
-					"	padding-right: 8px;"+
-					"}"+
-					
-					".tableHeader {"+
-					"	background-color: #f5f5f5;"+
-					"	border-top-left-radius: 4px;"+
-					"	border-top-righ-radius: 4px;"+
-					"}"+
-					
-					".header {"+
-					"	height: 30px;"+
-					"	background-color: #ff9523;"+
-					"	height: 90px;"+
-					"	text-align: center;"+
-					"	line-height: 100px;"+
-					"}"+
-					".content {"+
-					"	margin: auto;"+
-					"	width: 70%;"+
-					"	padding: 10px;"+
-					"}"+
-					
-					".footer {"+
-					"	height: 30px;"+
-					"	background-color: #ff9523;"+
-					"	text-align: center;"+
-					
-					"}"+
-					
-					".headerText {"+
-					"    font-weight: bold;"+
-					"    font-family: \"Trebuchet MS\", Helvetica, sans-serif;"+
-					"    color: white;"+
-					"    font-size: 30px;"+
-					"	display: inline-block;"+
-					"	vertical-align: middle;"+
-					"	line-height: normal; "+
-					"}"+
-					
-					".footerText {"+
-					"    font-weight: bold;"+
-					"    font-family: \"Trebuchet MS\", Helvetica, sans-serif;"+
-					"    color: white;"+
-					"    font-size: 13px;"+
-					"	display: inline-block;"+
-					"	vertical-align: middle;"+
-					"	line-height: normal; "+
-					"}"+
-					"</style>"+
-					"</head>"+
-					
-					"<body>"+
-					"<div class=\"header\">"+
-					"	<span class=\"headerText\">"+ messageHelper.getMessage("notificacio.titol").toUpperCase()+"</span> "+
-					"</div>"+
-					"<div class=\"content\">"+
-					"	<table>"+
-					"		<tr>"+
-					"			<th class=\"tableHeader\" colspan=\"2\">" + messageHelper.getMessage("notificacio.email.titol") + notificacio.getId() + "</th>"+
-					"		</tr>"+
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio") +"</th>"+
-					"			<td>"+ notificacio.getId() + "</td>"+
-					"		</tr>"+	
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.concepte") +"</th>"+
-					"			<td>"+ notificacio.getConcepte() + "</td>"+
-					"		</tr>"+	
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.procediment") +"</th>"+
-					"			<td>"+ (notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----") + "</td>"+
-					"		</tr>"+	
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.entitat") +"</th>"+
-					"			<td>"+ notificacio.getEntitat().getNom() + "</td>"+
-					"		</tr>"+
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.nou") +"</th>"+
-					"			<td>"+ messageHelper.getMessage("notificacio.estat.enum." + notificacio.getEstat()) + "</td>"+
-					"		</tr>"+	
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.estat.motiu") +"</th>"+
-					"			<td>"+ notificacio.getMotiu() + "</td>"+
-					"		</tr>"+	
-					"		<tr>"+
-					"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.info") + "</th>"+
-					"			<td> <a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a>" +
-					"			</td>"+
-					"		</tr>"+
-					"	</table>" +
-					"</div>"+
-					"<div class=\"footer\">"+
-					"	<span class=\"footerText\">"+
-							getEmailFooter() +
-					"	</span>"+
-					"</div>"+
-					"</body>"+
-					"</html>";
-		String plainText = 
-				messageHelper.getMessage("notificacio.email.notificacio")+
-				"\t\t\t\t"+ Objects.toString(notificacio.getId(), "")+"\n"+
-				"\t"+messageHelper.getMessage("notificacio.email.notificacio.concepte") + 
-				"\t\t\t\t"+ Objects.toString(notificacio.getConcepte(), "") +"\n"+
-				"\t"+messageHelper.getMessage("notificacio.email.procediment")+
-				"\t\t\t\t"+ Objects.toString(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : "----", "")+"\n"+
-				"\t"+messageHelper.getMessage("notificacio.email.entitat")+
-				"\t\t\t\t"+ Objects.toString(notificacio.getEmisorDir3Codi(), "")+"\n"+
-				"\t"+messageHelper.getMessage("notificacio.email.estat.nou") + 
-				"\t\t\t\t"+ Objects.toString(notificacio.getEstat().name(), "") +"\n"+		
-				"\t"+messageHelper.getMessage("notificacio.email.estat.motiu") + 
-				"\t\t\t\t"+ Objects.toString(notificacio.getMotiu(), "") +"\n"+
-				"\t"+messageHelper.getMessage("notificacio.email.notificacio.info") + 
-				"\t\t\t\t"+ "<a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
-				"";
-		
-		helper.setText(plainText, htmlText);
-		mailSender.send(missatge);
-	}
-	
-	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(
-			NotificacioEntity notificacio) {
-		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
-		Set<String> usuaris = new HashSet<String>();
-		GrupEntity grup;
-		
-		if (notificacio.getProcediment() == null) {
-			return destinataris;
-		}
+    protected abstract String getMailHtmlBody(T item);
+    protected abstract String getMailPlainTextBody(T item);
+    protected abstract String getMailSubject();
 
-		if (notificacio.getGrupCodi() != null) {
-			grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
-			if (grup != null)
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
-		} else {
-			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
+    public String sendMail(T item, String email) throws Exception {
+        String resposta = null;
+        try {
+            email = email.replaceAll("\\s+","");
+            sendEmailNotificacio(
+                    email,
+                    item);
+        } catch (Exception ex) {
+            String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
+            log.error(errorDescripció);
+            resposta = errorDescripció;
+        }
+        return resposta;
+    }
+    protected void sendEmailNotificacio(
+            String emailDestinatari, T item) throws MessagingException {
+        sendEmailNotificacio(emailDestinatari, item ,null);
+    }
+    protected void sendEmailNotificacio(
+            String emailDestinatari, T item, List<Attachment> files) throws MessagingException {
+        log.debug("Enviament correu notificació");
 
-			if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
-			} else {
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
-			}
-		}
+        MimeMessage missatge = mailSender.createMimeMessage();
+        missatge.setHeader("Content-Type", "text/html charset=UTF-8");
+        MimeMessageHelper helper;
+        helper = new MimeMessageHelper(missatge, true);
+        helper.setTo(emailDestinatari);
+        helper.setFrom(getRemitent());
+        helper.setSubject(PREFIX_NOTIB + " " + getMailSubject());
 
-		for (String usuari: usuaris) {
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
-				UsuariEntity user = usuariRepository.findOne(usuari);
-				if (user == null || user.isRebreEmailsNotificacio()) {
-					UsuariDto u = new UsuariDto();
-					u.setCodi(usuari);
-					u.setEmail(dadesUsuari.getEmail());
-					destinataris.add(u);
-				}
-			}
-		}
-		return destinataris;
-	}
-	
-	public String getRemitent() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.email.remitent");
-	}
-	
-	public String getEmailFooter() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.email.footer");
-	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(EmailHelper.class);
+        //Html text
+        helper.setText(getMailPlainTextBody(item), getMailHtmlBody(item));
 
-	public void setMessageHelper(MessageHelper messageHelper) {
-		this.messageHelper = messageHelper;		
-	}
+        if (files != null) {
+            for (Attachment attach: files) {
+                helper.addAttachment(attach.filename, new ByteArrayResource(attach.content));
+            }
+        }
+        mailSender.send(missatge);
+    }
+
+    public String getRemitent() {
+        return configHelper.getConfig("es.caib.notib.email.remitent");
+    }
+
+    public String getEmailFooter() {
+        return configHelper.getConfig("es.caib.notib.email.footer");
+    }
+
+    @AllArgsConstructor
+    protected class Attachment{
+        @NonNull String filename;
+        @NonNull byte[] content;
+    }
 }

@@ -3,16 +3,14 @@
  */
 package es.caib.notib.core.api.service;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
@@ -149,17 +147,6 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public String propertyGet(String property, String defaultValue);
 
-	/**
-	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
-	 * 
-	 * @param prefix
-	 *             El prefix dels paràmetres a consultar
-	 * @return un Map amb els paràmetres trobats.
-	 */
-	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public Map<String, String> propertyFindByPrefix(String prefix);
-
-	
 	/**
 	 * Modifica la configuració de l'usuari actual
 	 * 

@@ -6,11 +6,15 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorCieFormatFullaEntity;
+import es.caib.notib.core.entity.cie.PagadorCieFormatSobreEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -65,7 +69,7 @@ public class EntityComprovarHelper {
 	private GrupProcedimentRepository grupProcedimentRepository;
 	@Autowired
 	private ProcedimentOrganRepository procedimentOrganRepository;
-	
+
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
 			boolean comprovarPermisUsuari,
@@ -426,13 +430,13 @@ public class EntityComprovarHelper {
 		if (notificacio == null) {
 			throw new NotFoundException(
 					id,
-					ProcedimentEntity.class);
+					NotificacioEntity.class);
 		}
 		
 		if (entitat != null && !entitat.equals(notificacio.getEntitat())) {
 			throw new ValidationException(
 					id,
-					ProcedimentEntity.class,
+					NotificacioEntity.class,
 					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat de la notificació");
 		}
 		
@@ -538,18 +542,52 @@ public class EntityComprovarHelper {
 					getPermissionName(permis));
 		}
 	}
-	
-	public boolean hasPermisProcediment(
-			Long procedimentId,
-			PermisEnum permis) {
+
+	/**
+	 * Comprova si l'usuari authenticat té un determinat permís per a un òrgan gestor.
+	 *
+	 * @param organGestorEntity Organ gestor.
+	 * @param permis Permís a comprovar.
+	 * @return boleà indicant si té permís.
+	 */
+	public boolean hasPermisOrganGestor(OrganGestorEntity organGestorEntity, PermisEnum permis) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		EntitatEntity entitat = organGestorEntity.getEntitat();
+		Permission[] permisos = getPermissionsFromName(permis);
+
+		List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(
+				entitat.getDir3Codi(),
+				organGestorEntity.getCodi());
+		permisosHelper.filterGrantedAny(
+				organsGestors,
+				new ObjectIdentifierExtractor<OrganGestorEntity>() {
+					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+						return organGestor.getId();
+					}
+				},
+				OrganGestorEntity.class,
+				permisos,
+				auth);
+		return !organsGestors.isEmpty();
+	}
+
+	public boolean hasPermisProcediment(Long procedimentId, PermisEnum permis) {
 		ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
 		return hasPermisProcediment(procediment, permis);
 	}
+
+	/**
+	 * Comprova si l'usuari té el permís indicat per al procediment indicat per paràmetre o
+	 * si l'òrgan gestor del procediment o algún òrgan pare té el permís.
+	 *
+	 * @param procediment
+	 * @param permis
+	 * @return
+	 */
 	public boolean hasPermisProcediment(ProcedimentEntity procediment, PermisEnum permis) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
 		procediments.add(procediment);
-		EntitatEntity entitat = procediment.getEntitat();
 		
 		// 1. Comprovam si el procediment té assignat el permís d'administration
 		Permission[] permisos = getPermissionsFromName(permis);
@@ -566,24 +604,8 @@ public class EntityComprovarHelper {
 		if (!procediments.isEmpty())
 			return true;
 		
-		// 2. Comprovam si algun organ pare del procediment té permis d'administration
-		List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(
-				entitat.getDir3Codi(), 
-				procediment.getOrganGestor().getCodi());
-		permisosHelper.filterGrantedAny(
-				organsGestors,
-				new ObjectIdentifierExtractor<OrganGestorEntity>() {
-					public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-						return organGestor.getId();
-					}
-				},
-				OrganGestorEntity.class,
-				permisos,
-				auth);
-		if (!organsGestors.isEmpty())
-			return true;
-		
-		return false;
+		// 2. Comprovam si l'òrgan del procediment o algun organ pare té el permis
+		return hasPermisOrganGestor(procediment.getOrganGestor(), permis);
 	}
 	
 	public boolean hasPermisProcedimentOrgan(
@@ -721,8 +743,4 @@ public class EntityComprovarHelper {
 		return null;
 	}
 
-	public boolean getGenerarLogsPermisosOrgan() {
-		return PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.permisos.organ.logs", false);
-	}
-	
 }

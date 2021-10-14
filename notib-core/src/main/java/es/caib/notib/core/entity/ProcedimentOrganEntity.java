@@ -1,18 +1,11 @@
 package es.caib.notib.core.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
+import es.caib.notib.core.audit.NotibAuditable;
+import lombok.Getter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.audit.NotibAuditable;
-import lombok.Getter;
+import javax.persistence.*;
 
 /**
  * Classe de model de dades que conté la relació procediment-òrgan per a assignar permisos.
@@ -25,12 +18,12 @@ import lombok.Getter;
 @EntityListeners(AuditingEntityListener.class)
 public class ProcedimentOrganEntity extends NotibAuditable<Long> {
 
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_organ_pro_fk")
 	protected ProcedimentEntity procediment;
 	
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "organgestor_id")
 	@ForeignKey(name = "not_pro_organ_fk")
 	protected OrganGestorEntity organGestor;
