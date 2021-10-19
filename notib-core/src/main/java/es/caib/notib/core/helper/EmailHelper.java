@@ -1,6 +1,6 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.List;
 public abstract class EmailHelper<T> {
     private static final String PREFIX_NOTIB = "[NOTIB]";
     @Resource
-    protected ProcedimentHelper procedimentHelper;
+    protected ProcSerHelper procedimentHelper;
     @Resource
     protected CacheHelper cacheHelper;
     @Resource
@@ -30,7 +30,7 @@ public abstract class EmailHelper<T> {
     @Resource
     protected GrupRepository grupRepository;
     @Resource
-    protected GrupProcedimentRepository grupProcedimentRepository;
+    protected GrupProcSerRepository grupProcedimentRepository;
     @Autowired
     protected ConfigHelper configHelper;
     @Resource

@@ -16,12 +16,12 @@ import javax.persistence.*;
 @Entity
 @Table(name = "not_pro_organ", uniqueConstraints = {@UniqueConstraint(columnNames = {"procediment_id", "organgestor_id"})})
 @EntityListeners(AuditingEntityListener.class)
-public class ProcedimentOrganEntity extends NotibAuditable<Long> {
+public class ProcSerOrganEntity extends NotibAuditable<Long> {
 
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_organ_pro_fk")
-	protected ProcedimentEntity procediment;
+	protected ProcSerEntity procser;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "organgestor_id")
@@ -29,30 +29,30 @@ public class ProcedimentOrganEntity extends NotibAuditable<Long> {
 	protected OrganGestorEntity organGestor;
 	
 	public void update(
-			ProcedimentEntity procediment,
+			ProcSerEntity procser,
 			OrganGestorEntity organGestor) {
-		this.procediment = procediment;
+		this.procser = procser;
 		this.organGestor = organGestor;
 	}
 	
 	public static Builder getBuilder(
-			ProcedimentEntity procediment,
+			ProcSerEntity procser,
 			OrganGestorEntity organGestor) {
 		return new Builder(
-				procediment,
+				procser,
 				organGestor);
 	}
 	
 	public static class Builder {
-		ProcedimentOrganEntity built;
+		ProcSerOrganEntity built;
 		Builder(
-				ProcedimentEntity procediment,
+				ProcSerEntity procser,
 				OrganGestorEntity organGestor) {
-			built = new ProcedimentOrganEntity();
-			built.procediment = procediment;
+			built = new ProcSerOrganEntity();
+			built.procser = procser;
 			built.organGestor = organGestor;
 		}
-		public ProcedimentOrganEntity build() {
+		public ProcSerOrganEntity build() {
 			return built;
 		}
 	}

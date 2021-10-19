@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634569326780-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_procediment
+            columns:
+              - column:
+                  name: tipus
+                  type: varchar(32)
+        - sql:
+            sql: "
+        update not_procediment set tipus = 'PROCEDIMENT';
+            "

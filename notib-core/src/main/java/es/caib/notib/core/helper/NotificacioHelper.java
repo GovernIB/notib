@@ -39,7 +39,7 @@ public class NotificacioHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 	@Autowired
 	private GrupRepository grupRepository;
 	@Autowired
@@ -218,7 +218,7 @@ public class NotificacioHelper {
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
 		ProcedimentEntity procediment = null;
-		ProcedimentOrganEntity procedimentOrgan = null;
+		ProcSerOrganEntity procedimentOrgan = null;
 
 		//			### Recuperar procediment notificació
 		if (notificacio.getProcediment() != null && notificacio.getProcediment().getId() != null) {
@@ -233,7 +233,7 @@ public class NotificacioHelper {
 			}
 
 			if (procediment.isComu() && organGestor != null) {
-				procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+				procedimentOrgan = procedimentOrganRepository.findByProcSerIdAndOrganGestorId(procediment.getId(), organGestor.getId());
 			}
 
 			if (checkProcedimentPermissions) {
@@ -489,7 +489,7 @@ public class NotificacioHelper {
 		private DocumentEntity document3Entity;
 		private DocumentEntity document4Entity;
 		private DocumentEntity document5Entity;
-		private ProcedimentOrganEntity procedimentOrgan;
+		private ProcSerOrganEntity procedimentOrgan;
 		@Builder.Default
 		private NotificacioMassivaEntity notificacioMassivaEntity = null;
 	}

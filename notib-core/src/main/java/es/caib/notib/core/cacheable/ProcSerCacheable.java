@@ -1,17 +1,14 @@
 package es.caib.notib.core.cacheable;
 
 import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +31,7 @@ import java.util.*;
  */
 @Slf4j
 @Component
-public class ProcedimentsCacheable {
+public class ProcSerCacheable {
     @Autowired
     private EntitatRepository entitatRepository;
     @Autowired
@@ -42,13 +39,13 @@ public class ProcedimentsCacheable {
     @Autowired
     private CacheHelper cacheHelper;
     @Autowired
-    private ProcedimentRepository procedimentRepository;
+    private ProcSerRepository procSerRepository;
     @Autowired
     private OrganGestorHelper organGestorHelper;
     @Autowired
     private OrganigramaHelper organigramaHelper;
     @Autowired
-    private ProcedimentOrganRepository procedimentOrganRepository;
+    private ProcSerOrganRepository procedimentOrganRepository;
 
     /**
      * Obté un llistat de tots els procediments sobre els que l'usuari actual té els permisos indicats.
@@ -65,26 +62,26 @@ public class ProcedimentsCacheable {
      */
     @Cacheable(value = "procedimentEntitiesPermis",
             key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
-    public List<ProcedimentEntity> getProcedimentsWithPermis(
+    public List<ProcSerEntity> getProcedimentsWithPermis(
             String usuariCodi,
             EntitatEntity entitat,
             Permission[] permisos) {
         List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
 
         // 1. Obtenim els procediments amb permisos per procediment
-        List<ProcedimentEntity> procedimentsAmbPermis = getProcedimentsAmbPermisDirecte(entitat, permisos, grups);
+        List<ProcSerEntity> procedimentsAmbPermis = getProcedimentsAmbPermisDirecte(entitat, permisos, grups);
 
         // 2. Consulta els procediments amb permís per òrgan gestor
-        List<ProcedimentEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
+        List<ProcSerEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
 
         // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
-        List<ProcedimentEntity> procedimentsList = new ArrayList<ProcedimentEntity>(procedimentsAmbPermis);
+        List<ProcSerEntity> procedimentsList = new ArrayList<ProcSerEntity>(procedimentsAmbPermis);
         procedimentsList.addAll(procedimentsAmbPermisOrgan);
 
         // 6. Ordenam els procediments
-        Collections.sort(procedimentsList, new Comparator<ProcedimentEntity>() {
+        Collections.sort(procedimentsList, new Comparator<ProcSerEntity>() {
             @Override
-            public int compare(ProcedimentEntity p1, ProcedimentEntity p2) {
+            public int compare(ProcSerEntity p1, ProcSerEntity p2) {
                 return (p1.getNom()==null?"":p1.getNom()).compareTo(p2.getNom()==null?"":p2.getNom());
             }
         });
@@ -92,7 +89,7 @@ public class ProcedimentsCacheable {
         return procedimentsList;
     }
 
-    private List<ProcedimentEntity> getProcedimentsAmbPermisDirecte(EntitatEntity entitat,
+    private List<ProcSerEntity> getProcedimentsAmbPermisDirecte(EntitatEntity entitat,
                                                                     Permission[] permisos,
                                                                     List<String> grups) {
         List<Long> procedimentsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(
@@ -105,11 +102,11 @@ public class ProcedimentsCacheable {
             return new ArrayList<>();
         }
 
-        return  procedimentRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
+        return  procSerRepository.findProcedimentsByEntitatAndGrupAndIds(entitat,
                 grups,
                 procedimentsAmbPermisIds);
     }
-    private List<ProcedimentEntity> getProcedimentsAmbPermisOrganGestor(EntitatEntity entitat,
+    private List<ProcSerEntity> getProcedimentsAmbPermisOrganGestor(EntitatEntity entitat,
                                                                         Permission[] permisos,
                                                                         List<String> grups) {
         // 2. Obtenim els òrgans gestors amb permisos
@@ -135,7 +132,7 @@ public class ProcedimentsCacheable {
         }
 
         // 4. Obtenim els procediments amb permisos per òrgan gestor
-        return procedimentRepository.findProcedimentsAccesiblesPerOrganGestor(organsGestorsCodisAmbPermis, grups);
+        return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(organsGestorsCodisAmbPermis, grups);
     }
 
     /**
@@ -147,22 +144,22 @@ public class ProcedimentsCacheable {
      * @return Retorna una llista de tuples procediment-organ amb tots els permisos a un organ gestor de tots els procediments.
      */
     @Cacheable(value = "procedimentEntitiessOrganPermis", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
-    public List<ProcedimentOrganEntity> getProcedimentOrganWithPermis(
+    public List<ProcSerOrganEntity> getProcedimentOrganWithPermis(
             Authentication auth,
             EntitatEntity entitat,
             Permission[] permisos) {
         // 1. Obtenim els procediments amb permisos per procediment
         List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
-        List<ProcedimentOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
-        List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcedimentOrganEntity>(procedimentOrgans);
+        List<ProcSerOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
+        List<ProcSerOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcSerOrganEntity>(procedimentOrgans);
         permisosHelper.filterGrantedAny(
                 procedimentOrgansAmbPermis,
-                new PermisosHelper.ObjectIdentifierExtractor<ProcedimentOrganEntity>() {
-                    public Long getObjectIdentifier(ProcedimentOrganEntity procedimentOrgan) {
+                new PermisosHelper.ObjectIdentifierExtractor<ProcSerOrganEntity>() {
+                    public Long getObjectIdentifier(ProcSerOrganEntity procedimentOrgan) {
                         return procedimentOrgan.getId();
                     }
                 },
-                ProcedimentOrganEntity.class,
+                ProcSerOrganEntity.class,
                 permisos,
                 auth);
         return procedimentOrgansAmbPermis;

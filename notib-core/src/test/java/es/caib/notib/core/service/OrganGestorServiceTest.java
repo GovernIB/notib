@@ -4,7 +4,7 @@ import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.*;
@@ -65,7 +65,7 @@ public class OrganGestorServiceTest {
     @Mock
     private PermisosCacheable permisosCacheable;
     @Mock
-    private ProcedimentsCacheable procedimentsCacheable;
+    private ProcSerCacheable procedimentsCacheable;
     @Mock
     private ConfigHelper configHelper;
     @Mock

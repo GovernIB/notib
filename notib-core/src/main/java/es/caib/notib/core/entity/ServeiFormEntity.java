@@ -9,7 +9,7 @@ import org.hibernate.annotations.Subselect;
 import javax.persistence.*;
 
 /**
- * Classe de model de dades que conté la informació dels procediments i pagadors.
+ * Classe de model de dades que conté la informació dels serveis i pagadors.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -44,9 +44,9 @@ import javax.persistence.*;
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
 //		+ " left outer join not_pagador_postal postal on postal.id = pro.pagadorpostal "
 		+ " left outer join not_organ_gestor og on pro.organ_gestor = og.codi "
-		+ " where pro.tipus = 'PROCEDIMENT'")
+		+ " where pro.tipus = 'SERVEI'")
 @Immutable
-public class ProcedimentFormEntity {
+public class ServeiFormEntity {
 	
 	@Id
 	@Column(name = "id")

@@ -11,7 +11,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
@@ -77,7 +77,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private PermisosCacheable permisosCacheable;
 	@Resource
-	private ProcedimentsCacheable procedimentsCacheable;
+	private ProcSerCacheable procedimentsCacheable;
 	@Resource
 	private ConfigHelper configHelper;
 	@Autowired
@@ -980,7 +980,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				usuari,
 				entitat,
 				permisos);
-		List<ProcedimentOrganEntity> procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(
+		List<ProcSerOrganEntity> procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(
 				auth,
 				entitat,
 				permisos);
@@ -1006,7 +1006,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
 		setOrgansGestors.addAll(organsGestorsAmbPermis);
 		if (procedimentsOrgansDisponibles != null) {
-			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+			for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
 				setOrgansGestors.add(procedimentOrgan.getOrganGestor());
 			}
 		}
@@ -1021,12 +1021,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	private List<ProcedimentEntity> mergeProcedimentsWithProcedimentsOrgans(
 			List<ProcedimentEntity> procedimentsDisponibles,
-			List<ProcedimentOrganEntity> procedimentsOrgansDisponibles) {
+			List<ProcSerOrganEntity> procedimentsOrgansDisponibles) {
 		if (procedimentsOrgansDisponibles != null && !procedimentsOrgansDisponibles.isEmpty()) {
 			// Empleam un set per no afegir duplicats
 			Set<ProcedimentEntity> setProcediments = new HashSet<>(procedimentsDisponibles);
-			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
-				setProcediments.add(procedimentOrgan.getProcediment());
+			for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+				setProcediments.add(procedimentOrgan.getProcser());
 			}
 			procedimentsDisponibles = new ArrayList<ProcedimentEntity>(setProcediments);
 		}

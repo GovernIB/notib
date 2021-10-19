@@ -3,9 +3,9 @@
  */
 package es.caib.notib.plugin.gesconadm;
 
-import java.util.List;
-
 import es.caib.notib.plugin.SistemaExternException;
+
+import java.util.List;
 
 
 /**
@@ -14,7 +14,9 @@ import es.caib.notib.plugin.SistemaExternException;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface GestorContingutsAdministratiuPlugin {
-	
+
+	// Procediments
+
 	/**
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu.
 	 * 
@@ -56,5 +58,40 @@ public interface GestorContingutsAdministratiuPlugin {
 	 *            Si es produeix un error al consultar els procediments.
 	 */
 	public int getTotalProcediments(String codi) throws SistemaExternException;
+
+
+	// Serveis
+
+	/**
+	 * Retorna la llista de tots els serveis definits al Gestor documental administratiu.
+	 *
+	 * @return La llista de serveis.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar els serveis.
+	 */
+	public List<GcaServei> getAllServeis() throws SistemaExternException;
+
+	/**
+	 * Retorna la llista de tots els serveis definits al Gestor documental administratiu per a una unitat administrativa.
+	 *
+	 * @param codi CodiDir3 de la unitat administrativa
+	 * @param numPagina indica el número de pàgina a recuperar
+	 * @return La llista de serveis.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar els serveis.
+	 */
+	public List<GcaServei> getServeisByUnitat(
+			String codi,
+			int numPagina) throws SistemaExternException;
+
+	/**
+	 * Retorna el total de serveis per una entitat.
+	 *
+	 * @param codi CodiDir3 de la unitat administrativa
+	 * @return El nombre de serveis.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar els serveis.
+	 */
+	public int getTotalServeis(String codi) throws SistemaExternException;
 
 }

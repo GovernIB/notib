@@ -58,7 +58,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
 			if (resposta != null)
 				procediments = resposta.getResultado();
-			return toDto(procediments);
+			return toProcedimentDto(procediments);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar els procediments via REST",
@@ -94,7 +94,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
 			if (resposta != null)
 				procediments = resposta.getResultado();
-			return toDto(procediments);
+			return toProcedimentDto(procediments);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'han pogut consultar els procediments via REST",
@@ -181,64 +181,112 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 					ex);
 		}
 	}
+
+	@Override
+	public List<GcaServei> getAllServeis() throws SistemaExternException {
+		List<Servei> serveis = new ArrayList<Servei>();
+		try {
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
+
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
+			form.add("filtro", "{\"activo\":\"1\"}");
+
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta != null)
+				serveis = resposta.getResultado();
+			return toServeiDto(serveis);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar els procediments via REST",
+					ex);
+		}
+	}
+
+	@Override
+	public List<GcaServei> getServeisByUnitat(String codi, int numPagina) throws SistemaExternException {
+		List<Servei> serveis = new ArrayList<Servei>();
+		try {
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
+
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"" + numPagina + "\", \"size\":\"30\"}");
+			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta != null)
+				serveis = resposta.getResultado();
+			return toServeiDto(serveis);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar els procediments via REST",
+					ex);
+		}
+	}
+
+	@Override
+	public int getTotalServeis(String codi) throws SistemaExternException {
+		int numeroElements = 0;
+		try {
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
+
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"1\"}");
+			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta != null)
+				numeroElements = resposta.getNumeroElementos();
+			return numeroElements;
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar els total de procediments via REST",
+					ex);
+		}
+	}
+
+
 	
-//	private UnitatAdministrativa getUnitatAdministrativaRolsac(String codi) throws SistemaExternException {
-//		try {
-//			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
-//			
-//			Client jerseyClient = generarClient();
-//			autenticarClient(
-//					jerseyClient,
-//					urlAmbMetode);
-//			
-//			String json = jerseyClient.
-//					resource(urlAmbMetode).
-//					post(String.class);
-//			System.out.println("Missatge REST rebut: " + json);
-//			
-//			ObjectMapper mapper  = new ObjectMapper();
-//			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-//			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
-//			UnitatAdministrativa unitat = null;
-//			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
-//				unitat = resposta.getResultado().get(0);
-//				unitatsAdministratives.put(codi, unitat);
-//			}
-//			return unitat;
-//		} catch (Exception ex) {
-//			throw new SistemaExternException(
-//					"No s'han pogut consultar els procediments via REST",
-//					ex);
-//		}
-//	}
-	
-//	private GdaUnitatAdministrativa getUnitatAdministrativaArrel(String codi) throws SistemaExternException {
-//		GdaUnitatAdministrativa unitatAdministrativa = null;
-//		if (unitatsAdministratives.containsKey(codi)) {
-//			Unitat u = unitatsAdministratives.get(codi);
-//			if (u.getCodiPare() == null) {
-//				unitatAdministrativa = u.getUnitatAdministrativa();
-//			} else if (u.getCodiPare() != null) {
-//				unitatAdministrativa = getUnitatAdministrativaArrel(u.getCodiPare());
-//			}
-//		} else {
-//			UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
-//			GdaUnitatAdministrativa dto = toDto(unitat);
-//			String codiPare = null;
-//			if (unitat.getPadre() != null) 
-//				codiPare = unitat.getPadre().getCodigo();
-//			addUnitat(codi, dto, codiPare);
-//			if (codiPare == null) {
-//				unitatAdministrativa = dto;
-//			} else {
-//				unitatAdministrativa = getUnitatAdministrativaArrel(codiPare);
-//			}
-//		}
-//		return unitatAdministrativa;
-//	}
-	
-	
-	private List<GcaProcediment> toDto(List<Procediment> procediments) throws SistemaExternException {
+	private List<GcaProcediment> toProcedimentDto(List<Procediment> procediments) throws SistemaExternException {
 		List<GcaProcediment> procedimentsDto = new ArrayList<GcaProcediment>();
 		for (Procediment procediment: procediments) {
 			procedimentsDto.add(toDto(procediment));
@@ -259,6 +307,24 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			dto.setComu(false);
 //		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
 //		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
+		return dto;
+	}
+
+	private List<GcaServei> toServeiDto(List<Servei> serveis) throws SistemaExternException {
+		List<GcaServei> serveisDto = new ArrayList<GcaServei>();
+		for (Servei servei: serveis) {
+			serveisDto.add(toDto(servei));
+		}
+		return serveisDto;
+	}
+
+	private GcaServei toDto(Servei servei) throws SistemaExternException {
+		GcaServei dto = new GcaServei();
+		dto.setCodiSIA(servei.getCodigoSIA());
+		dto.setNom(servei.getNombre());
+		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(servei.getOrganoInstructor().getCodigo()));
+		dto.setDataActualitzacio(servei.getFechaActualizacion());
+		dto.setComu(servei.isComun());
 		return dto;
 	}
 
