@@ -31,7 +31,7 @@ import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
+import es.caib.notib.core.entity.GrupProcSerEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.CacheHelper;
@@ -41,7 +41,7 @@ import es.caib.notib.core.helper.GrupHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -67,7 +67,7 @@ public class GrupServiceImpl implements GrupService{
 	@Resource
 	private GrupRepository grupReposity;
 	@Resource
-	private GrupProcedimentRepository grupProcedimentRepositoy;
+	private GrupProcSerRepository grupProcedimentRepositoy;
 	@Resource
 	private ProcedimentRepository procedimentRepositroy;
 	@Resource
@@ -203,9 +203,9 @@ public class GrupServiceImpl implements GrupService{
 			List<GrupDto> grups = new ArrayList<GrupDto>();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
+			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepositoy.findByProcSer(procediment);
 			
-			for (GrupProcedimentEntity grupProcediment : grupsProcediment) {
+			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
 				DadesUsuari usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (usuariGrup != null) {
 					List<String> rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
@@ -230,9 +230,9 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			List<GrupDto> grups = new ArrayList<GrupDto>();
 			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(procediment); 
+			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepositoy.findByProcSer(procediment);
 			
-			for (GrupProcedimentEntity grupProcediment : grupsProcediment) {
+			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
 				grups.add(conversioTipusHelper.convertir(
 					grupReposity.findOne(grupProcediment.getGrup().getId()), 
 					GrupDto.class));	
@@ -260,7 +260,7 @@ public class GrupServiceImpl implements GrupService{
 						false);
 			
 			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepositoy.findByProcediment(
+			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepositoy.findByProcSer(
 					procediment,
 					paginacioHelper.toSpringDataPageable(paginacioParams)); 
 			
@@ -280,7 +280,7 @@ public class GrupServiceImpl implements GrupService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId);
-			GrupProcedimentEntity procedimentGrup = grupProcedimentRepositoy.findOne(procedimentGrupId);
+			GrupProcSerEntity procedimentGrup = grupProcedimentRepositoy.findOne(procedimentGrupId);
 			
 			return conversioTipusHelper.convertir(
 					procedimentGrup, 
@@ -301,7 +301,7 @@ public class GrupServiceImpl implements GrupService{
 			if (!grup.getEntitat().getId().equals(entitatId)) {
 				throw new ValidationException("El grup que s'intenta eliminar no pertany a la entitat actual");
 			}
-			List<GrupProcedimentEntity> procedimentGrups = grupProcedimentRepositoy.findByGrup(grup);
+			List<GrupProcSerEntity> procedimentGrups = grupProcedimentRepositoy.findByGrup(grup);
 			return (procedimentGrups != null && !procedimentGrups.isEmpty());
 		} finally {
 			metricsHelper.fiMetrica(timer);

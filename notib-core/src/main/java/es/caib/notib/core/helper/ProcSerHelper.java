@@ -6,11 +6,13 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.servei.ServeiDataDto;
+import es.caib.notib.core.api.dto.servei.ServeiDto;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.*;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -36,7 +38,7 @@ import java.util.*;
  */
 @Slf4j
 @Component
-public class ProcedimentHelper {
+public class ProcSerHelper {
 	
 	@Autowired
 	private PluginHelper pluginHelper;
@@ -45,7 +47,7 @@ public class ProcedimentHelper {
 	@Autowired
 	private ProcedimentUpdateHelper procedimentUpdateHelper;
 	@Autowired
-	private GrupProcedimentRepository grupProcedimentRepository;
+	private GrupProcSerRepository grupProcSerRepository;
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
@@ -57,7 +59,7 @@ public class ProcedimentHelper {
 	@Resource
 	private MessageHelper messageHelper;
 	@Resource
-	private ProcedimentsCacheable procedimentsCacheable;
+	private ProcSerCacheable procedimentsCacheable;
 
 	/**
 	 * Retorna el codi de tots els procediments que tenen un determinat permís per a totes les notificacions.
@@ -72,12 +74,12 @@ public class ProcedimentHelper {
 														Permission[] permisos) {
 
 		// Procediments comuns amb permís a un òrgan gestor
-		List<ProcedimentEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
+		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
 				auth.getName(),
 				entitat,
 				permisos);
 		Set<String> codis = new HashSet<>();
-		for (ProcedimentEntity procediment : procediments) {
+		for (ProcSerEntity procediment : procediments) {
 			codis.add(procediment.getCodi());
 		}
 
@@ -95,13 +97,13 @@ public class ProcedimentHelper {
 	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth,
 													   EntitatEntity entitat,
 													   Permission[] permisos) {
-		List<ProcedimentOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
+		List<ProcSerOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
 				auth,
 				entitat,
 				permisos);
 		List<String> codisProcedimentsOrgans = new ArrayList<>();
-		for (ProcedimentOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
-			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcediment().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
+		for (ProcSerOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
+			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcser().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
 		}
 
 		return codisProcedimentsOrgans;
@@ -142,9 +144,45 @@ public class ProcedimentHelper {
 			procediment.setPermisos(permisos);
 		}
 	}
+
+	public void omplirPermisos(
+			ServeiDto servei,
+			boolean ambLlistaPermisos) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		servei.setUsuariActualRead(
+				permisosHelper.isGrantedAll(
+						servei.getId(),
+						ProcedimentEntity.class,
+						new Permission[] {ExtendedPermission.READ},
+						auth));
+		servei.setUsuariActualProcessar(
+				permisosHelper.isGrantedAll(
+						servei.getId(),
+						ProcedimentEntity.class,
+						new Permission[] {ExtendedPermission.PROCESSAR},
+						auth));
+		servei.setUsuariActualNotificacio(
+				permisosHelper.isGrantedAll(
+						servei.getId(),
+						ProcedimentEntity.class,
+						new Permission[] {ExtendedPermission.NOTIFICACIO},
+						auth));
+		servei.setUsuariActualAdministration(
+				permisosHelper.isGrantedAll(
+						servei.getId(),
+						ProcedimentEntity.class,
+						new Permission[] {ExtendedPermission.ADMINISTRATION},
+						auth));
+		if (ambLlistaPermisos) {
+			List<PermisDto> permisos = permisosHelper.findPermisos(
+					servei.getId(),
+					ProcedimentEntity.class);
+			servei.setPermisos(permisos);
+		}
+	}
 	
 	public Set<String> findUsuarisAmbPermisReadPerProcediment(
-			ProcedimentEntity procediment) {
+			ProcSerEntity procediment) {
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
 		List<PermisDto> permisos;
 		permisos = permisosHelper.findPermisos(
@@ -185,16 +223,16 @@ public class ProcedimentHelper {
 	}
 	
 	public Set<String> findUsuarisAmbPermisReadPerGrup(
-			ProcedimentEntity procediment) {
+			ProcSerEntity procediment) {
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
-		List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(procediment);
+		List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
 		permisos = permisosHelper.findPermisos(
 				procediment.getId(),
 				ProcedimentEntity.class);
 		
 		Set<String> usuaris = new HashSet<String>();
-		for (GrupProcedimentEntity permisGrup: grupsProcediment) {
+		for (GrupProcSerEntity permisGrup: grupsProcediment) {
 			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
 					permisGrup.getGrup().getCodi());
 			sb.append(" rol ").append(permisGrup.getGrup().getCodi()).append(" (");
@@ -218,9 +256,9 @@ public class ProcedimentHelper {
 
 	public Set<String> findUsuarisAmbPermisReadPerGrupNotificacio(
 			GrupEntity grup,
-			ProcedimentEntity procediment) {
+			ProcSerEntity procediment) {
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
-		GrupProcedimentEntity grupProcediment = grupProcedimentRepository.findByGrupAndProcediment(grup, procediment);
+		GrupProcSerEntity grupProcediment = grupProcSerRepository.findByGrupAndProcSer(grup, procediment);
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
 		permisos = permisosHelper.findPermisos(
 				procediment.getId(),
@@ -264,8 +302,7 @@ public class ProcedimentHelper {
 			ProcedimentDataDto procedimentGda,
 			ProcedimentEntity procedimentEntity,
 			Map<String, OrganismeDto> organigramaEntitat,
-			ProgresActualitzacioDto progres
-			) {
+			ProgresActualitzacioDto progres) {
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 //			logger.debug(">>>> Procediment DESCARTAT: No disposa de Codi SIA");
 //			logger.debug(">>>> ..........................................................................");
@@ -292,6 +329,45 @@ public class ProcedimentHelper {
 			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
+//			logger.debug(">>>> Procediment DESCARTAT: No s'ha trobat l'organ del procediment dins l'organigrama de l'entitat. Organ: "+ procedimentGda.getOrganGestor());
+			progres.addSeparador();
+			progres.incrementProcedimentsActualitzats();
+			return false;
+		}
+		return true;
+	}
+
+	private boolean hasToBeUpdated(
+			ServeiDataDto serveiGda,
+			ServeiEntity serveiEntity,
+			Map<String, OrganismeDto> organigramaEntitat,
+			ProgresActualitzacioDto progres) {
+		if (serveiGda.getCodi() == null || serveiGda.getCodi().isEmpty()) {
+//			logger.debug(">>>> Servei DESCARTAT: No disposa de Codi SIA");
+//			logger.debug(">>>> ..........................................................................");
+//			logger.debug(">>>> ..........................................................................");
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.procediment.descartat"));
+			progres.addSeparador();
+			progres.incrementProcedimentsActualitzats();
+			return false;
+		}
+
+		if (serveiEntity != null) {
+			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
+			if (serveiEntity.getUltimaActualitzacio() != null && serveiGda.getUltimaActualitzacio() != null &&
+					serveiEntity.getUltimaActualitzacio().after(serveiGda.getUltimaActualitzacio())) {
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.procediment.descartat.data"));
+//				logger.debug(">>>> S DESCARTAT: No s'ha modificat des de la última actualització.");
+				progres.addSeparador();
+				progres.incrementProcedimentsActualitzats();
+				return false;
+			}
+		}
+
+		if (!organigramaEntitat.containsKey(serveiGda.getOrganGestor())) {
+			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
+			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {serveiGda.getOrganGestor()}));
 //			logger.debug(">>>> Procediment DESCARTAT: No s'ha trobat l'organ del procediment dins l'organigrama de l'entitat. Organ: "+ procedimentGda.getOrganGestor());
 			progres.addSeparador();
 			progres.incrementProcedimentsActualitzats();
@@ -443,6 +519,6 @@ public class ProcedimentHelper {
 		progres.addSeparador();
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(ProcedimentHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(ProcSerHelper.class);
 
 }

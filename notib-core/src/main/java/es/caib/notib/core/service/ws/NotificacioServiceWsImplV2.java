@@ -60,7 +60,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
 	@Autowired
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 	@Autowired
 	private PersonaRepository personaRepository;
 	@Autowired
@@ -114,7 +114,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			RespostaAlta resposta = new RespostaAlta();
 			ProcedimentEntity procediment = null;
 			OrganGestorEntity organGestor = null;
-			ProcedimentOrganEntity procedimentOrgan = null;
+			ProcSerOrganEntity procedimentOrgan = null;
 			
 			// Generar informació per al monitor d'integracions
 			IntegracioInfo info = generateInfoAlta(notificacio);
@@ -220,7 +220,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					}
 				}
 				if (procediment != null && procediment.isComu() && organGestor != null) {
-					procedimentOrgan = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+					procedimentOrgan = procedimentOrganRepository.findByProcSerIdAndOrganGestorId(procediment.getId(), organGestor.getId());
 				}
 
 				// Dades no depenents de procediment

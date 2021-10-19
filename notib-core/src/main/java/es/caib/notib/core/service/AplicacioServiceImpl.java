@@ -13,7 +13,7 @@ import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -50,7 +50,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private PermisosCacheable permisosCacheable;
 	@Autowired
-	private ProcedimentsCacheable procedimentsCacheable;
+	private ProcSerCacheable procedimentsCacheable;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired

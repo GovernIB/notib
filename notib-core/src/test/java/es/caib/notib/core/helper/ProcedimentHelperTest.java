@@ -5,11 +5,11 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.repository.GrupProcedimentRepository;
+import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.test.data.ConfigTest;
@@ -35,7 +35,7 @@ public class ProcedimentHelperTest {
     @Mock
     private ProcedimentUpdateHelper procedimentUpdateHelper;
     @Mock
-    private GrupProcedimentRepository grupProcedimentRepository;
+    private GrupProcSerRepository grupProcedimentRepository;
     @Mock
     private ProcedimentRepository procedimentRepository;
     @Mock
@@ -47,9 +47,9 @@ public class ProcedimentHelperTest {
     @Mock
     private MessageHelper messageHelper;
     @Mock
-    private ProcedimentsCacheable procedimentsCacheable;
+    private ProcSerCacheable procedimentsCacheable;
     @InjectMocks
-    private ProcedimentHelper procedimentHelper;
+    private ProcSerHelper procedimentHelper;
 
     private EntitatEntity entitatEntity;
 

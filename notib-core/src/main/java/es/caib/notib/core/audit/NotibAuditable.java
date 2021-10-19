@@ -1,10 +1,9 @@
 package es.caib.notib.core.audit;
 
-import java.io.Serializable;
-
+import es.caib.notib.core.entity.UsuariEntity;
 import org.springframework.data.jpa.domain.AbstractAuditable;
 
-import es.caib.notib.core.entity.UsuariEntity;
+import java.io.Serializable;
 
 /**
  * Classe basse de on extendre per a activar les auditories.

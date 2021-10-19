@@ -7,7 +7,6 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

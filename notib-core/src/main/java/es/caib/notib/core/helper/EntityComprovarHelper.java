@@ -66,9 +66,9 @@ public class EntityComprovarHelper {
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
-	private GrupProcedimentRepository grupProcedimentRepository;
+	private GrupProcSerRepository grupProcedimentRepository;
 	@Autowired
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 
 	public EntitatEntity comprovarEntitat(
 			Long entitatId,
@@ -290,13 +290,13 @@ public class EntityComprovarHelper {
 		return pagadorCieFormatSobre;
 	}
 	
-	public GrupProcedimentEntity comprovarGrupProcediment(
+	public GrupProcSerEntity comprovarGrupProcediment(
 			Long grupProcedimentId) {
-		GrupProcedimentEntity grupProcediment = grupProcedimentRepository.findOne(grupProcedimentId);
+		GrupProcSerEntity grupProcediment = grupProcedimentRepository.findOne(grupProcedimentId);
 		if (grupProcediment == null) {
 			throw new NotFoundException(
 					grupProcediment,
-					GrupProcedimentEntity.class);
+					GrupProcSerEntity.class);
 		}
 		
 		return grupProcediment;
@@ -502,7 +502,7 @@ public class EntityComprovarHelper {
 	public ProcedimentEntity comprovarProcedimentOrgan(
 			EntitatEntity entitat,
 			Long procedimentId,
-			ProcedimentOrganEntity procedimentOrgan,
+			ProcSerOrganEntity procedimentOrgan,
 			boolean comprovarPermisConsulta,
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
@@ -527,7 +527,7 @@ public class EntityComprovarHelper {
 		return procediment;
 	}
 	private void checkPermisProcedimentOrgan(
-			ProcedimentOrganEntity procedimentOrgan,
+			ProcSerOrganEntity procedimentOrgan,
 			ProcedimentEntity procediment,
 			Authentication auth,
 			PermisEnum permis) {
@@ -611,26 +611,26 @@ public class EntityComprovarHelper {
 	public boolean hasPermisProcedimentOrgan(
 			Long procedimentOrganId,
 			PermisEnum permis) {
-		ProcedimentOrganEntity procedimentOrgan = procedimentOrganRepository.findOne(procedimentOrganId);
+		ProcSerOrganEntity procedimentOrgan = procedimentOrganRepository.findOne(procedimentOrganId);
 		return hasPermisProcedimentOrgan(procedimentOrgan, permis);
 	}
 	public boolean hasPermisProcedimentOrgan(
-			ProcedimentOrganEntity procedimentOrgan,
+			ProcSerOrganEntity procedimentOrgan,
 			PermisEnum permis) {
 		if (procedimentOrgan != null) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			List<ProcedimentOrganEntity> procedimentOrgans = new ArrayList<ProcedimentOrganEntity>();
+			List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
 			procedimentOrgans.add(procedimentOrgan);
 			
 			Permission[] permisos = getPermissionsFromName(permis);
 			permisosHelper.filterGrantedAny(
 					procedimentOrgans,
-					new ObjectIdentifierExtractor<ProcedimentOrganEntity>() {
-						public Long getObjectIdentifier(ProcedimentOrganEntity procedimentOrgan) {
+					new ObjectIdentifierExtractor<ProcSerOrganEntity>() {
+						public Long getObjectIdentifier(ProcSerOrganEntity procedimentOrgan) {
 							return procedimentOrgan.getId();
 						}
 					},
-					ProcedimentOrganEntity.class,
+					ProcSerOrganEntity.class,
 					permisos,
 					auth);
 			if (!procedimentOrgans.isEmpty())

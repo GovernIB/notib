@@ -10,7 +10,7 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class ProcedimentServiceTest {
 	@Mock
 	private Pageable pageableMock;
 	@Mock
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
 	private ConfigHelper configHelper;
 	
@@ -100,7 +100,7 @@ public class ProcedimentServiceTest {
 		
 		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
 		
-		List<ProcedimentOrganEntity> procedimentOrgans = new ArrayList<ProcedimentOrganEntity>();
+		List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
 		EntitatEntity entitat = EntitatEntity.getBuilder("codi", 
 				"nom", 
 				null, 
@@ -136,7 +136,7 @@ public class ProcedimentServiceTest {
 				false,
 				false).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entitat, null, null, null, null, null).build();
-		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, organGestor).build();
+		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		procedimentOrgans.add(procedimentOrgan);
 		
 		
@@ -159,7 +159,7 @@ public class ProcedimentServiceTest {
 		Mockito.when(permisosHelper.findPermisos(Mockito.anyLong(), Mockito.eq(ProcedimentEntity.class))).thenReturn(permisos);
 		Mockito.when(grupService.findGrupsByProcediment(Mockito.anyLong())).thenReturn(grup);
 		Mockito.when(paginacioHelper.toPaginaDto(Mockito.eq(procediments), Mockito.eq(ProcedimentFormDto.class))).thenReturn(procedimentsPage);
-		Mockito.when(procedimentOrganRepository.findByProcedimentId(Mockito.anyLong())).thenReturn(procedimentOrgans);
+		Mockito.when(procedimentOrganRepository.findByProcSerId(Mockito.anyLong())).thenReturn(procedimentOrgans);
 //		Mockito.when(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(Mockito.anyString(), Mockito.anyString())).thenReturn(organsFills);		
 		
 		// When	

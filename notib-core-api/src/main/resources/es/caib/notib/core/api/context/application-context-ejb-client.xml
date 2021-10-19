@@ -37,6 +37,10 @@
 			jndi-name="notib/ProcedimentServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.ProcedimentService"/>
 	<jee:local-slsb
+			id="serveiService"
+			jndi-name="notib/ServeiServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.ServeiService"/>
+	<jee:local-slsb
 			id="organGestorService"
 			jndi-name="notib/OrganGestorServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.OrganGestorService"/>

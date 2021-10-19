@@ -114,7 +114,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.COMUNICACIO, 
     			enviaments, 
@@ -162,7 +162,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.COMUNICACIO, 
     			enviaments, 
@@ -209,7 +209,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.COMUNICACIO, 
     			enviaments, 
@@ -256,7 +256,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.COMUNICACIO, 
     			enviaments, 
@@ -304,7 +304,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.COMUNICACIO, 
     			enviaments, 
@@ -352,7 +352,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.COMUNICACIO, 
     			enviaments, 
@@ -400,7 +400,7 @@ public class PluginHelperTest {
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
     	ProcedimentEntity procediment = initProcediment(entidad);
-    	ProcedimentOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
+    	ProcSerOrganEntity procedimentOrgan = initProcedimentOrgan(procediment, organGestor);
     	NotificacioEntity notificacio = initNotificacio(entidad, 
     			NotificaEnviamentTipusEnumDto.NOTIFICACIO, 
     			enviaments, 
@@ -475,7 +475,7 @@ public class PluginHelperTest {
 			HashSet<NotificacioEnviamentEntity> enviaments,
 			OrganGestorEntity organGestor, 
 			ProcedimentEntity procediment,
-			ProcedimentOrganEntity procedimentOrgan,
+			ProcSerOrganEntity procedimentOrgan,
 			Boolean isCsv) {
 
 		String notificacioId = Long.toString(System.currentTimeMillis());
@@ -520,9 +520,9 @@ public class PluginHelperTest {
 		return procediment;
 	}
 	
-	private ProcedimentOrganEntity initProcedimentOrgan (ProcedimentEntity procediment,
-			OrganGestorEntity organGestor) {
-		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, 
+	private ProcSerOrganEntity initProcedimentOrgan (ProcedimentEntity procediment,
+                                                     OrganGestorEntity organGestor) {
+		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment,
 				organGestor).build();
 		return procedimentOrgan;
 	}

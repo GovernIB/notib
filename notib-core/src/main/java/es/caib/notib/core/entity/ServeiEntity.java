@@ -16,10 +16,10 @@ import javax.persistence.Entity;
 @SuperBuilder
 @NoArgsConstructor
 @Entity
-@DiscriminatorValue("PROCEDIMENT")
-public class ProcedimentEntity extends ProcSerEntity {
+@DiscriminatorValue("SERVEI")
+public class ServeiEntity extends ProcSerEntity {
 	
-	public static ProcedimentEntityBuilder getBuilder(
+	public static ServeiEntity.ServeiEntityBuilder getBuilder(
 			String codi,
 			String nom,
 			int retard,
@@ -58,7 +58,7 @@ public class ProcedimentEntity extends ProcSerEntity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ProcedimentEntity other = (ProcedimentEntity) obj;
+		ServeiEntity other = (ServeiEntity) obj;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;
@@ -69,12 +69,12 @@ public class ProcedimentEntity extends ProcSerEntity {
 
 	@Override
 	public String toString() {
-		return "ProcedimentEntity{" +
+		return "ServeiEntity{" +
 				"codi='" + codi + '\'' +
 				", nom='" + nom + '\'' +
 				'}';
 	}
 
-	private static final long serialVersionUID = 458331024861203562L;
+	private static final long serialVersionUID = -5588155683744582417L;
 
 }

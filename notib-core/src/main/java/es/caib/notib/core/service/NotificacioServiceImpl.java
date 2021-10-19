@@ -121,9 +121,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
-	private ProcedimentHelper procedimentHelper;
+	private ProcSerHelper procedimentHelper;
 	@Autowired
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1228,7 +1228,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		// En cas de procediments comuns també es pot tenir permís per a la tupla procediment-organ
 		if (!hasPermis && procedimentNotificacio != null && procedimentNotificacio.isComu()) {
-			ProcedimentOrganEntity procedimentOrganEntity = procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(
+			ProcSerOrganEntity procedimentOrganEntity = procedimentOrganRepository.findByProcSerIdAndOrganGestorId(
 					procedimentNotificacio.getId(),
 					notificacio.getOrganGestor().getId());
 			hasPermis = entityComprovarHelper.hasPermisProcedimentOrgan(
