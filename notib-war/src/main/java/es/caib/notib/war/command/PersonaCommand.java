@@ -62,4 +62,17 @@ public class PersonaCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
+	public String getNif() {
+		return nif != null && Character.isDigit(nif.charAt(0)) && nif.length() < 9 ? afegirZerosNif() : nif;
+	}
+
+	private String afegirZerosNif() {
+
+		int length = 9 - nif.length();
+		for (int foo = 0; foo < length; foo++) {
+			nif = 0 + nif;
+		}
+		return nif;
+	}
 }

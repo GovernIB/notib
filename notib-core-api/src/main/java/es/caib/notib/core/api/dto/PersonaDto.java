@@ -27,6 +27,19 @@ public class PersonaDto implements Serializable{
 		return concatenarLlinatges() != null ? concatenarLlinatges() : "";
 	}
 
+	public String getNif() {
+		return nif != null && Character.isDigit(nif.charAt(0)) && nif.length() < 9 ? afegirZerosNif() : nif;
+	}
+
+	private String afegirZerosNif() {
+
+		int length = 9 - nif.length();
+		for (int foo = 0; foo < length; foo++) {
+			nif = 0 + nif;
+		}
+		return nif;
+	}
+
 	public String getNomFormatted() {
 		StringBuilder sb = new StringBuilder();
 		String llinatges = concatenarLlinatges();

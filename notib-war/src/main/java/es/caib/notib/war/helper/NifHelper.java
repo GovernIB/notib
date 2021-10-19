@@ -9,7 +9,7 @@ public class NifHelper {
 	private static final String LLETRA_CIF = "KPQRSNW";
 	
 	public static boolean isvalid(String nif) {
-		if (nif == null || nif.length() < 8)
+		if (nif == null || nif.length() < 9)
 			return false;
 		
         nif = nif.toUpperCase();
@@ -25,7 +25,7 @@ public class NifHelper {
     }
 	
 	public static boolean isValidNifNie(String nif) {
-		if (nif == null || nif.length() < 8)
+		if (nif == null || nif.length() < 9)
 			return false;
 		
         nif = nif.toUpperCase();
@@ -41,7 +41,7 @@ public class NifHelper {
     }
 	
 	public static boolean isValidCif(String nif) {
-		if (nif == null || nif.length() < 8)
+		if (nif == null || nif.length() < 9)
 			return false;
 		
         nif = nif.toUpperCase();
