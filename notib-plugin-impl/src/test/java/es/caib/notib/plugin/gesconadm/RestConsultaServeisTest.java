@@ -7,7 +7,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class RestConsultaProcediments {
+public class RestConsultaServeisTest {
 
 	private static final String ROLSAC_URL = "https://dev.caib.es/rolsac/";
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
@@ -19,7 +19,7 @@ public class RestConsultaProcediments {
 
 	@Before
 	public void setUp() throws Exception {
-		String keystorePath = RestConsultaProcediments.class.getResource("/es/caib/notib/plugin/truststore.jks").toURI().getPath();
+		String keystorePath = RestConsultaServeisTest.class.getResource("/es/caib/notib/plugin/truststore.jks").toURI().getPath();
 		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 		System.setProperty("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
@@ -27,32 +27,32 @@ public class RestConsultaProcediments {
 		System.setProperty("es.caib.notib.plugin.gesconadm.password", "notib_rolsac");
 	}
 
-//	@Test
-	public void obtenirAllProcedimentsRolsac() throws Exception {
+	@Test
+	public void obtenirAllServeisRolsac() throws Exception {
 
-		List<GcaProcediment> allProcediments = pluginRolsac.getAllProcediments();
+		List<GcaServei> serveis = pluginRolsac.getAllServeis();
 
-		assertNotNull("La consulta ha retornat null", allProcediments);
-		assertTrue("La consulta no ha retornat cap resultat", allProcediments.size() > 0);
+		assertNotNull("La consulta ha retornat null", serveis);
+		assertTrue("La consulta no ha retornat cap resultat", serveis.size() > 0);
 
 	}
 
 	@Test
-	public void obtenirProcedimentsRolsac() throws Exception {
+	public void obtenirServeisRolsac() throws Exception {
 
-		List<GcaProcediment> allProcediments = pluginRolsac.getProcedimentsByUnitat("A04003003", 0);
+		List<GcaServei> serveis = pluginRolsac.getServeisByUnitat("A04003003", 0);
 
-		assertNotNull(allProcediments);
-		assertEquals(allProcediments.size(), 30);
+		assertNotNull("La consulta ha retornat null", serveis);
+		assertTrue("La consulta no ha retornat cap resultat", serveis.size() > 0);
 
 	}
 
 	@Test
-	public void countProcedimentsRolsac() throws Exception {
+	public void countServeisRolsac() throws Exception {
 
-		int countProcediments = pluginRolsac.getTotalProcediments("A04003003");
+		int countServeis = pluginRolsac.getTotalServeis("A04003003");
 
-		assertTrue("La consulta no ha retornat cap resultat", countProcediments > 0);
+		assertTrue("La consulta no ha retornat cap resultat", countServeis > 0);
 
 	}
 
