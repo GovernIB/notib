@@ -120,8 +120,8 @@ public class NotificacioTableHelper {
                     hasErrorActual,
                     tableViewItem.getEstat(),
                     tableViewItem.getNotificaErrorData() != null);
+            notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
         }
-        notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
 
     }
 
