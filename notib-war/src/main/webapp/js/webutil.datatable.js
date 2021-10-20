@@ -73,17 +73,18 @@
 			var colMd25p = plugin.settings.bootstrapRowCols / 4;
 			var colMd75p = colMd25p * 3;
 			var domPrefix;
-			if (plugin.settings.infoType == 'search' || plugin.settings.pagingStyle == 'scroll')
+			if (plugin.settings.infoType == 'search' || plugin.settings.pagingStyle == 'scroll') {
 				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"f>>';
-			else
-				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"<"botons">>>';
-			var language = window.navigator.userLanguage || window.navigator.language;
-			// Només acceptam es i ca com a llengues //
-			if (language.startsWith("es")) {
-				language = "es";
 			} else {
-				language = "ca";
+				domPrefix = '<"row"<"col-md-' + colMd50p + '"i><"col-md-' + colMd50p + '"<"botons">>>';
 			}
+			let language = "es";
+			$.ajax({url: "/notib/usuari/configuracio/idioma", async: false, success: (result) => {
+					language = result;
+				}});
+			//var language = window.navigator.userLanguage || window.navigator.language;
+			// Només acceptam es i ca com a llengues //
+			language = language.startsWith("es") ? "es" : "ca";
 			// ------------------------------------- //
 			var dataTableOptions = {
 				language: {
