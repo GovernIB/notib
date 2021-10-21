@@ -755,13 +755,13 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         //Entiendo que el "Código destino" = linia[11] solo se informará en caso de ser una administración
         //Si es persona física o jurídica no tiene sentido
         //Entonces podriamos utilizar este campo para saber si es una administración
-        if (NifHelper.isValidCif(linia[9])) {
+        if (NifHelper.isValidCif(titular.getNif())) {
             titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
-        } else if (NifHelper.isValidNifNie(linia[9])) {
+        } else if (NifHelper.isValidNifNie(titular.getNif())) {
             titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
         } else {
             try {
-                List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(linia[9]);
+                List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
                 if (lista != null && lista.size() > 0) {
                     titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
                 }

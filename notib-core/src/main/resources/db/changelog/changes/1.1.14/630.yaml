@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634569326780-2
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: estat_processat_date
+                  type: timestamp
+        - sql:
+            sql: "
+        update not_notificacio set estatProcessatDate = estatDate;
+        UPDATE not_notificacio noti SET ESTAT_PROCESSAT_DATE = (SELECT max(e.NOTIFICA_ESTAT_DATA)
+							FROM not_notificacio n LEFT JOIN not_notificacio_env e ON e.NOTIFICACIO_ID = n.ID
+							WHERE n.estat IN (3,4)  AND e.NOTIFICACIO_ID = noti.ID
+							GROUP by e.NOTIFICACIO_ID, n.id );
+            "
