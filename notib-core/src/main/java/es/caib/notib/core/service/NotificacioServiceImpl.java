@@ -1544,6 +1544,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			progres = new ProgresActualitzacioCertificacioDto();
 			progresActualitzacioExpirades.put(username, progres);
 			enviamentHelper.refrescarEnviamentsExpirats(progres);
+			progres.setFinished(true);
 //			progresActualitzacioExpirades.remove(username);
 
 		} finally {
@@ -1557,7 +1558,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(auth.getName());
-			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
+//			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
+			if (progres != null && progres.isFinished()) {
 				progresActualitzacioExpirades.remove(auth.getName());
 			}
 			return progres;
@@ -1627,10 +1629,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamenEstatDto estatDto) {
 		if (enviament.isNotificaError()) {
-			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
-			if (event != null) {
-				estatDto.setNotificaErrorData(event.getData());
-				estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+			try {
+				NotificacioEventEntity event = null;
+				if (enviament.getNotificacioErrorEvent() != null && enviament.getNotificacioErrorEvent().getId() != null) {
+					event = notificacioEventRepository.getOne(enviament.getNotificacioErrorEvent().getId());
+				}
+				if (event != null) {
+					estatDto.setNotificaErrorData(event.getData());
+					estatDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+				}
+			} catch (Exception ex) {
+				logger.error("Error obtenit l'event d'error de l'enviament " + enviament.getId(), ex);
 			}
 		}
 		estatDto.setNotificaCertificacioArxiuNom(
