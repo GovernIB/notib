@@ -103,8 +103,22 @@ $(document).ready(function() {
 <body>
 	<c:if test="${notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
-			<span class="fa fa-warning text-danger"></span>
-			<spring:message code="notificacio.info.error.titol" />
+			<span class="fa fa-warning text-danger"></span>+
+			<c:choose>
+				<c:when test="${fn:contains(notificacio.noticaErrorEventTipus, 'NOTIFICA')
+					&& notificacio.noticaErrorEventTipus != 'NOTIFICA_REGISTRE'}">
+					<spring:message code="notificacio.info.error.titol" />
+				</c:when>
+				<c:when test="${fn:contains(notificacio.noticaErrorEventTipus, 'REGISTRE')}">
+					<spring:message code="enviament.info.error.registre" />
+				</c:when>
+				<c:when test="${fn:contains(notificacio.noticaErrorEventTipus, 'CALLBACK')}">
+					<spring:message code="enviament.info.error.callback" />
+				</c:when>
+				<c:otherwise>
+					<spring:message code="notificacio.info.error.generic"></spring:message>
+				</c:otherwise>
+			</c:choose>
 			<button class="btn btn-default btn-xs pull-right"
 				data-toggle="collapse" data-target="#collapseError"
 				aria-expanded="false" aria-controls="collapseError">
@@ -717,6 +731,7 @@ $(document).ready(function() {
 						<th data-col-name="id" data-visible="false">#</th>
 						<th data-col-name="enviamentAssociat" data-visible="false"></th>
 						<th data-col-name="errorDescripcio" data-visible="false"></th>
+<%--						<th data-col-name="callbackEstat" data-visible="false"></th>--%>
 						<th data-col-name="createdBy.nom" data-orderable="false"><spring:message
 								code="notificacio.event.list.columna.usuari" /></th>
 						<th data-col-name="data" data-converter="datetime"
@@ -728,6 +743,7 @@ $(document).ready(function() {
 								id="cellTipus" type="text/x-jsrender">
 							{{:~eval('eventTipus["' + tipus + '"]')}}
 							{{if enviamentAssociat}}<span class="label label-default pull-right" title="<spring:message code="notificacio.event.list.info.associat"/>">E</span>{{/if}}
+<%--							{{if callbackEstat == 'PENDENT' && ~eval('notificacioApp') == 'true'}}<span style="padding-right:4px; color:#666;" class="fa fa-clock-o pull-right" title="<spring:message code="notificacio.event.list.info.pendent"/>"></span>{{/if}}--%>
 						</script></th>
 						<c:if test="${notificacio.tipusUsuari == 'APLICACIO'}">
 							<th data-col-name="callbackEstat" data-visible="false"></th>

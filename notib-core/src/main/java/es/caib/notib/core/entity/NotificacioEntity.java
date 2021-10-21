@@ -168,6 +168,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "NOT_NOTIF_NOTIF_MASSIVA_FK")
 	protected NotificacioMassivaEntity notificacioMassivaEntity;
 
+	@Column(name = "estat_processat_date")
+	protected Date estatProcessatDate;
+
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -218,6 +221,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	
 	public void updateEstat(NotificacioEstatEnumDto estat) {
 		this.estat = estat;
+	}
+
+	public void updateEstatProcessatDate(Date estatProcessatDate) {
+		this.estatProcessatDate = estatProcessatDate;
 	}
 	
 	public void updateEstatDate(Date estatDate) {

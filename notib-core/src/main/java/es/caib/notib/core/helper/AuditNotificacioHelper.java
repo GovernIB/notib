@@ -9,6 +9,7 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -91,6 +92,7 @@ public class AuditNotificacioHelper {
 			NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.updateMotiu(notificaEstatNom);
+		notificacio.updateEstatProcessatDate(new Date());
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;

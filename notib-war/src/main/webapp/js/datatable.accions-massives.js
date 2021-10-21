@@ -81,9 +81,11 @@ function initEvents($table, url_prefix, eventMessages) {
 
         $('#reintentarNotificacio').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-notificacio'])){
+
                 $.get(
                     url_prefix + "/reintentar/notificacio",
-                    function(data) {
+                    () => {
+                        $table.DataTable().rows().deselect();
                         $table.DataTable().ajax.reload(null, false);
                         webutilRefreshMissatges();
                     }
@@ -97,6 +99,7 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#reactivarConsulta').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-consulta'])){
                 location.href = url_prefix + "/reactivar/consulta";
+                $table.DataTable().rows().deselect();
             }
             return false;
         });
@@ -104,6 +107,7 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#reactivarSir').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-sir'])){
                 location.href =  url_prefix + "/reactivar/sir";
+                $table.DataTable().rows().deselect();
             }
             return false;
         });
@@ -111,12 +115,12 @@ function initEvents($table, url_prefix, eventMessages) {
             if(confirm(eventMessages['confirm-update-estat'])){
                 $.get(
                     url_prefix + "/actualitzarestat",
-                    function(data) {
-                        $table.DataTable().ajax.reload(null, false);
+                    () => {
+                        $table.DataTable().rows().deselect();
+                        $table.DataTable().ajax.reload(null, true);
                         webutilRefreshMissatges();
                     }
                 );
-
                 webutilRefreshMissatges(); // mostra el missatge de que s'està executant el procés en segon plà
             }
             return false;
@@ -125,9 +129,23 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#reactivarCallback').on('click', function() {
             if(confirm(eventMessages['confirm-reactivar-callback'])){
                 location.href =  url_prefix + "/reactivar/callback";
+                $table.DataTable().rows().deselect();
             }
             return false;
         });
-    });
 
+        $("#exportarODS").on("click", () => {
+            location.href = "notificacio/export/ODS";
+            $table.DataTable().rows().deselect();
+        });
+
+        $("#eliminar").on("click", () => {
+            location.href = "/notificacio/eliminar";
+            $table.DataTable().rows().deselect();
+        });
+        $("#reintentarRegistre").on("click", () => {
+            location.href =  url_prefix + "/reintentar/registre";
+            $table.DataTable().rows().deselect();
+        });
+    });
 }

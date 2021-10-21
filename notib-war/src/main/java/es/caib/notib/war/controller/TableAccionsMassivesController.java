@@ -20,8 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -304,6 +307,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                                     "enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
                 }
             }
+            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<Long>());
             if (!hasErrors) {
                 MissatgesHelper.info(
                         request,

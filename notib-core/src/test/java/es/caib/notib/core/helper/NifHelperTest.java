@@ -14,6 +14,8 @@ public class NifHelperTest {
 
     @Test
     @Parameters({
+            "NIF, 000000A, false",
+            "NIF, B, false",
             "NIF, 60697841J, true",
             "NIF, 46222996b, true",
             "NIF, 02802576A, true",
