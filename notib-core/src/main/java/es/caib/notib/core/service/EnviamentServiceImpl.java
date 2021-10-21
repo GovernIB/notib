@@ -832,8 +832,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";
 				fila[19] = enviament.getNotificaCertificacioNumSeguiment();
 				fila[20] = csvUuid;
-				fila[21] = enviament.getNotificacio().getEstat().name();
-
+				fila[21] = enviament.getNotificacio().getEstat().name()
+						+ (enviament.getNotificacio().getEstatProcessatDate() != null ? " - " + enviament.getNotificacio().getEstatProcessatDate() : "");
 				files.add(fila);
 			}
 				
