@@ -222,7 +222,7 @@ public class NotificacioHelper {
 
 		//			### Recuperar procediment notificació
 		if (notificacio.getProcediment() != null && notificacio.getProcediment().getId() != null) {
-			procediment = entityComprovarHelper.comprovarProcediment(entitat, notificacio.getProcediment().getId());
+			procediment = (ProcedimentEntity) entityComprovarHelper.comprovarProcediment(entitat, notificacio.getProcediment().getId());
 		}
 
 		// Si tenim procediment --> Comprovam permisos i consultam info òrgan gestor
@@ -237,7 +237,7 @@ public class NotificacioHelper {
 			}
 
 			if (checkProcedimentPermissions) {
-				procediment = entityComprovarHelper.comprovarProcedimentOrgan(
+				procediment = (ProcedimentEntity) entityComprovarHelper.comprovarProcedimentOrgan(
 						entitat,
 						notificacio.getProcediment().getId(),
 						procedimentOrgan,

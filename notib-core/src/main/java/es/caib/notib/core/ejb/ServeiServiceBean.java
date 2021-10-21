@@ -5,7 +5,7 @@ package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.servei.*;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.ServeiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +31,9 @@ public class ServeiServiceBean implements ServeiService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public ServeiDto create(
+	public ProcSerDto create(
 			Long entitatId, 
-			ServeiDataDto servei) {
+			ProcSerDataDto servei) {
 		return delegate.create(
 				entitatId, 
 				servei);
@@ -41,9 +41,9 @@ public class ServeiServiceBean implements ServeiService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public ServeiDto update(
+	public ProcSerDto update(
 			Long entitatId,
-			ServeiDataDto servei,
+			ProcSerDataDto servei,
 			boolean isAdmin,
 			boolean isAdminEntitat) throws NotFoundException {
 		return delegate.update(
@@ -55,7 +55,7 @@ public class ServeiServiceBean implements ServeiService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public ServeiDto delete(
+	public ProcSerDto delete(
 			Long entitatId, 
 			Long id,
 			boolean isAdminEntitat) throws NotFoundException {
@@ -67,7 +67,7 @@ public class ServeiServiceBean implements ServeiService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public ServeiDto findById(
+	public ProcSerDto findById(
 			Long entitatId, 
 			boolean isAdministrador,
 			Long id) throws NotFoundException {
@@ -79,19 +79,19 @@ public class ServeiServiceBean implements ServeiService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public ServeiDto findByCodi(Long entitatId, String codiServei) throws NotFoundException {
+	public ProcSerDto findByCodi(Long entitatId, String codiServei) throws NotFoundException {
 		return delegate.findByCodi(entitatId, codiServei);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiSimpleDto> findByEntitat(Long entitatId) {
+	public List<ProcSerSimpleDto> findByEntitat(Long entitatId) {
 		return delegate.findByEntitat(entitatId);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ServeiSimpleDto> findByOrganGestorIDescendents(
+	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(
 			Long entitatId, 
 			OrganGestorDto organGestor) {
 		return delegate.findByOrganGestorIDescendents(entitatId, organGestor);
@@ -99,7 +99,7 @@ public class ServeiServiceBean implements ServeiService {
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<ServeiDto> findByOrganGestorIDescendentsAndComu(
+    public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(
     		Long id,
 			OrganGestorDto organGestor) {
         return delegate.findByOrganGestorIDescendentsAndComu(id, organGestor);
@@ -107,13 +107,13 @@ public class ServeiServiceBean implements ServeiService {
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public PaginaDto<ServeiFormDto> findAmbFiltrePaginat(
+	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(
 			Long entitatId, 
 			boolean isUsuari, 
 			boolean isUsuariEntitat,
 			boolean isAdministrador, 
 			OrganGestorDto organGestorActual,
-			ServeiFiltreDto filtre,
+			ProcSerFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findAmbFiltrePaginat(
 				entitatId, 
@@ -127,7 +127,7 @@ public class ServeiServiceBean implements ServeiService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiDto> findAll() {
+	public List<ProcSerDto> findAll() {
 		return delegate.findAll();
 	}
 	
@@ -145,49 +145,49 @@ public class ServeiServiceBean implements ServeiService {
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiGrupDto> findAllGrups() {
+	public List<ProcSerGrupDto> findAllGrups() {
 		return delegate.findAllGrups();
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiGrupDto> findGrupsByEntitat(Long entitatId) {
+	public List<ProcSerGrupDto> findGrupsByEntitat(Long entitatId) {
 		return delegate.findGrupsByEntitat(entitatId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiDto> findServeis(Long entitatId, List<String> grups) {
+	public List<ProcSerDto> findServeis(Long entitatId, List<String> grups) {
 		return delegate.findServeis(entitatId, grups);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return delegate.findServeisWithPermis(entitatId, usuariCodi, permis);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiDto> findServeisSenseGrups(Long entitatId) {
+	public List<ProcSerDto> findServeisSenseGrups(Long entitatId) {
 		return delegate.findServeisSenseGrups(entitatId);
 	}
 	
 //	@Override
 //	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-//	public List<ServeiDto> findServeisSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
+//	public List<ProcSerDto> findServeisSenseGrupsWithPermis(Long entitatId, PermisEnum permis) {
 //		return delegate.findServeisSenseGrupsWithPermis(entitatId, permis);
 //	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ServeiDto> findServeisAmbGrups(Long entitatId, List<String> grups) {
+	public List<ProcSerDto> findServeisAmbGrups(Long entitatId, List<String> grups) {
 		return delegate.findServeisAmbGrups(entitatId, grups);
 	}
 	
 //	@Override
 //	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-//	public List<ServeiDto> findServeisAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
+//	public List<ProcSerDto> findServeisAmbGrupsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {
 //		return delegate.findServeisAmbGrupsWithPermis(entitatId, grups, permis);
 //	}
 	
@@ -197,131 +197,131 @@ public class ServeiServiceBean implements ServeiService {
 		return delegate.hasAnyServeisWithPermis(entitatId, grups, permis);
 	}
 	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<PermisDto> permisFind(
-			Long entitatId, 
-			boolean isAdministrador, 
-			Long serveiId,
-			String organ,
-			String organActual,
-			TipusPermis tipus) throws NotFoundException {
-		return delegate.permisFind(
-				entitatId, 
-				isAdministrador, 
-				serveiId,
-				organ,
-				organActual,
-				tipus);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void permisUpdate(
-			Long entitatId,
-			Long organGestorId,
-			Long id, 
-			PermisDto permis) throws NotFoundException {
-		delegate.permisUpdate(
-				entitatId,
-				organGestorId,
-				id, 
-				permis);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void permisDelete(
-			Long entitatId,
-			Long organGestorId,
-			Long serveiId,
-			String organCodi,
-			Long permisId,
-			TipusPermis tipus) throws NotFoundException {
-		delegate.permisDelete(
-				entitatId,
-				organGestorId,
-				serveiId, 
-				organCodi,
-				permisId,
-				tipus);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public ServeiGrupDto grupCreate(
-			Long entitatId,
-			Long id,
-			ServeiGrupDto serveiGrup) throws NotFoundException {
-		return delegate.grupCreate(
-				entitatId,
-				id,
-				serveiGrup);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public ServeiGrupDto grupUpdate(
-			Long entitatId, 
-			Long id, 
-			ServeiGrupDto serveiGrup) throws NotFoundException {
-		return delegate.grupUpdate(
-				entitatId, 
-				id, 
-				serveiGrup);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public ServeiGrupDto grupDelete(
-			Long entitatId, 
-			Long GrupId) throws NotFoundException {
-		return delegate.grupDelete(
-				entitatId, 
-				GrupId);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public boolean hasPermisServei(
-			Long serveiId,
-			PermisEnum permis) {
-		return delegate.hasPermisServei(
-				serveiId,
-				permis);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
-		return delegate.findTipusAssumpte(entitat);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public List<CodiAssumpteDto> findCodisAssumpte(
-			EntitatDto entitat, 
-			String codiTipusAssumpte) {
-		return delegate.findCodisAssumpte(
-				entitat, 
-				codiTipusAssumpte);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN"})
-	public void refrescarCache(EntitatDto entitat) {
-		delegate.refrescarCache(entitat);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+//	public List<PermisDto> permisFind(
+//			Long entitatId,
+//			boolean isAdministrador,
+//			Long serveiId,
+//			String organ,
+//			String organActual,
+//			TipusPermis tipus) throws NotFoundException {
+//		return delegate.permisFind(
+//				entitatId,
+//				isAdministrador,
+//				serveiId,
+//				organ,
+//				organActual,
+//				tipus);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public void permisUpdate(
+//			Long entitatId,
+//			Long organGestorId,
+//			Long id,
+//			PermisDto permis) throws NotFoundException {
+//		delegate.permisUpdate(
+//				entitatId,
+//				organGestorId,
+//				id,
+//				permis);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public void permisDelete(
+//			Long entitatId,
+//			Long organGestorId,
+//			Long serveiId,
+//			String organCodi,
+//			Long permisId,
+//			TipusPermis tipus) throws NotFoundException {
+//		delegate.permisDelete(
+//				entitatId,
+//				organGestorId,
+//				serveiId,
+//				organCodi,
+//				permisId,
+//				tipus);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public ServeiGrupDto grupCreate(
+//			Long entitatId,
+//			Long id,
+//			ServeiGrupDto serveiGrup) throws NotFoundException {
+//		return delegate.grupCreate(
+//				entitatId,
+//				id,
+//				serveiGrup);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public ServeiGrupDto grupUpdate(
+//			Long entitatId,
+//			Long id,
+//			ServeiGrupDto serveiGrup) throws NotFoundException {
+//		return delegate.grupUpdate(
+//				entitatId,
+//				id,
+//				serveiGrup);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public ServeiGrupDto grupDelete(
+//			Long entitatId,
+//			Long GrupId) throws NotFoundException {
+//		return delegate.grupDelete(
+//				entitatId,
+//				GrupId);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+//	public boolean hasPermisServei(
+//			Long serveiId,
+//			PermisEnum permis) {
+//		return delegate.hasPermisServei(
+//				serveiId,
+//				permis);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN"})
+//	public List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat) {
+//		return delegate.findTipusAssumpte(entitat);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN"})
+//	public List<CodiAssumpteDto> findCodisAssumpte(
+//			EntitatDto entitat,
+//			String codiTipusAssumpte) {
+//		return delegate.findCodisAssumpte(
+//				entitat,
+//				codiTipusAssumpte);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN"})
+//	public void refrescarCache(EntitatDto entitat) {
+//		delegate.refrescarCache(entitat);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
-	public List<ServeiDto> findServeisByOrganGestor(String organGestorCodi) {
+	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi) {
 		return delegate.findServeisByOrganGestor(organGestorCodi);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public List<ServeiDto> findServeisByOrganGestorWithPermis(
+	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
 			Long entitatId,
 			String organGestorCodi, 
 			List<String> grups,
@@ -377,35 +377,35 @@ public class ServeiServiceBean implements ServeiService {
 		return delegate.getProgresActualitzacio(dir3Codi);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ServeiOrganDto> findServeisOrganWithPermis(
-			Long entitatId,
-			String usuariCodi,
-			PermisEnum permis) {
-		return delegate.findServeisOrganWithPermis(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<ServeiOrganDto> findServeisOrganWithPermis(
+//			Long entitatId,
+//			String usuariCodi,
+//			PermisEnum permis) {
+//		return delegate.findServeisOrganWithPermis(entitatId, usuariCodi, permis);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ServeiOrganDto> findServeisOrganWithPermisByOrgan(
+	public List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(
 			String organId,
 			String entitatCodi,
-			List<ServeiOrganDto> serveisOrgans) {
+			List<ProcSerOrganDto> serveisOrgans) {
 		return delegate.findServeisOrganWithPermisByOrgan(organId, entitatCodi, serveisOrgans);
 	}
 
 	@Override
 	public List<String> findServeisOrganCodiWithPermisByServei(
-			ServeiDto servei,
+			ProcSerDto servei,
 			String entitatCodi,
-			List<ServeiOrganDto> serveisOrgans) {
+			List<ProcSerOrganDto> serveisOrgans) {
 		return delegate.findServeisOrganCodiWithPermisByServei(servei, entitatCodi, serveisOrgans);
 	}
 	
 	@Override
 	@RolesAllowed({"tothom"})
-	public ServeiDto findByNom(
+	public ProcSerDto findByNom(
 			Long entitatId,
 			String nomServei) throws NotFoundException {
 		return delegate.findByNom(entitatId, nomServei);

@@ -6,7 +6,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -54,7 +54,7 @@ public class EntityComprovarHelper {
 	@Resource
 	private PagadorCieFormatSobreRepository pagadorCieFormatSobreRepository;
 	@Autowired
-	private ProcedimentRepository procedimentRepository;
+	private ProcSerRepository procSerRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 	@Resource
@@ -303,17 +303,17 @@ public class EntityComprovarHelper {
 	}
 	
 	
-	public ProcedimentEntity comprovarProcediment(
+	public ProcSerEntity comprovarProcediment(
 			EntitatEntity entitat,
 			Long id) {
 		return comprovarProcediment(entitat.getId(), id);
 	}
 	
-	public ProcedimentEntity comprovarProcediment(
+	public ProcSerEntity comprovarProcediment(
 			Long entitatId,
 			Long id) {
-		
-		ProcedimentEntity procediment = procedimentRepository.findOne(id);
+
+		ProcSerEntity procediment = procSerRepository.findOne(id);
 		if (procediment == null) {
 			throw new NotFoundException(
 					id,
@@ -443,7 +443,7 @@ public class EntityComprovarHelper {
 		return notificacio;
 	}
 	
-	public ProcedimentEntity comprovarProcediment(
+	public ProcSerEntity comprovarProcediment(
 			Long entitatId,
 			Long procedimentId,
 			boolean comprovarPermisConsulta,
@@ -462,15 +462,15 @@ public class EntityComprovarHelper {
 				comprovarPermisGestio);
 	}
 	
-	public ProcedimentEntity comprovarProcediment(
+	public ProcSerEntity comprovarProcediment(
 			EntitatEntity entitat,
 			Long procedimentId,
 			boolean comprovarPermisConsulta,
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
 			boolean comprovarPermisGestio) {
-		
-		ProcedimentEntity procediment = comprovarProcediment(entitat, procedimentId);
+
+		ProcSerEntity procediment = comprovarProcediment(entitat, procedimentId);
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisConsulta) {
@@ -488,7 +488,7 @@ public class EntityComprovarHelper {
 		
 		return procediment;
 	}
-	private void checkPermisProcediment(ProcedimentEntity procediment, Authentication auth, PermisEnum permis) {
+	private void checkPermisProcediment(ProcSerEntity procediment, Authentication auth, PermisEnum permis) {
 		boolean granted = hasPermisProcediment(procediment, permis);
 		if (!granted) {
 			throw new PermissionDeniedException(
@@ -499,7 +499,7 @@ public class EntityComprovarHelper {
 		}
 	}
 	
-	public ProcedimentEntity comprovarProcedimentOrgan(
+	public ProcSerEntity comprovarProcedimentOrgan(
 			EntitatEntity entitat,
 			Long procedimentId,
 			ProcSerOrganEntity procedimentOrgan,
@@ -507,8 +507,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
 			boolean comprovarPermisGestio) {
-		
-		ProcedimentEntity procediment = comprovarProcediment(entitat, procedimentId);
+
+		ProcSerEntity procediment = comprovarProcediment(entitat, procedimentId);
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisConsulta) {
@@ -528,7 +528,7 @@ public class EntityComprovarHelper {
 	}
 	private void checkPermisProcedimentOrgan(
 			ProcSerOrganEntity procedimentOrgan,
-			ProcedimentEntity procediment,
+			ProcSerEntity procediment,
 			Authentication auth,
 			PermisEnum permis) {
 		boolean granted = hasPermisProcediment(procediment, permis);
@@ -572,7 +572,7 @@ public class EntityComprovarHelper {
 	}
 
 	public boolean hasPermisProcediment(Long procedimentId, PermisEnum permis) {
-		ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
+		ProcSerEntity procediment = procSerRepository.findById(procedimentId);
 		return hasPermisProcediment(procediment, permis);
 	}
 
@@ -584,17 +584,17 @@ public class EntityComprovarHelper {
 	 * @param permis
 	 * @return
 	 */
-	public boolean hasPermisProcediment(ProcedimentEntity procediment, PermisEnum permis) {
+	public boolean hasPermisProcediment(ProcSerEntity procediment, PermisEnum permis) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<ProcedimentEntity> procediments = new ArrayList<ProcedimentEntity>();
+		List<ProcSerEntity> procediments = new ArrayList<>();
 		procediments.add(procediment);
 		
 		// 1. Comprovam si el procediment té assignat el permís d'administration
 		Permission[] permisos = getPermissionsFromName(permis);
 		permisosHelper.filterGrantedAny(
 				procediments,
-				new ObjectIdentifierExtractor<ProcedimentEntity>() {
-					public Long getObjectIdentifier(ProcedimentEntity procediment) {
+				new ObjectIdentifierExtractor<ProcSerEntity>() {
+					public Long getObjectIdentifier(ProcSerEntity procediment) {
 						return procediment.getId();
 					}
 				},
@@ -738,7 +738,7 @@ public class EntityComprovarHelper {
 		
 		return resposta;
 	}
-	public List<ProcedimentDto> findGrupProcedimentsUsuariActual() {
+	public List<ProcSerDto> findGrupProcedimentsUsuariActual() {
 		
 		return null;
 	}

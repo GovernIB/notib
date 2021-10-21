@@ -6,8 +6,8 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.*;
@@ -62,16 +62,16 @@ public class NotificacioListHelper {
         }
 
         List<String> codisProcedimentsProcessables = new ArrayList<String>();
-        List<ProcedimentSimpleDto> procedimentsProcessables = procedimentService.findProcedimentsWithPermis(entitatEntity.getId(),
+        List<ProcSerSimpleDto> procedimentsProcessables = procedimentService.findProcedimentServeisWithPermis(entitatEntity.getId(),
                 usuariCodi, PermisEnum.PROCESSAR);
         if (procedimentsProcessables != null)
-            for (ProcedimentSimpleDto procediment : procedimentsProcessables) {
+            for (ProcSerSimpleDto procediment : procedimentsProcessables) {
                 codisProcedimentsProcessables.add(procediment.getCodi());
             }
-        List<ProcedimentOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        List<ProcSerOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
         if (procedimentOrgansProcessables != null) {
-            for (ProcedimentOrganDto procedimentOrgan : procedimentOrgansProcessables) {
-                codisProcedimentsProcessables.add(procedimentOrgan.getProcediment().getCodi());
+            for (ProcSerOrganDto procedimentOrgan : procedimentOrgansProcessables) {
+                codisProcedimentsProcessables.add(procedimentOrgan.getProcSer().getCodi());
             }
         }
 

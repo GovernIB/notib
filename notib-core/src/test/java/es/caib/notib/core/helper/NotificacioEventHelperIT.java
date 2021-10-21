@@ -2,7 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -94,7 +94,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                     @Override
                     public void executar(ElementsCreats elementsCreats) throws Exception {
                         EntitatDto entitatCreate = elementsCreats.getEntitat();
-                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        ProcSerDto procedimentCreate = (ProcSerDto) elementsCreats.get("procediment");
                         NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
 
                         assertNotNull(procedimentCreate);
@@ -136,7 +136,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                     @Override
                     public void executar(ElementsCreats elementsCreats) throws Exception {
                         EntitatDto entitatCreate = elementsCreats.getEntitat();
-                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        ProcSerDto procedimentCreate = (ProcSerDto) elementsCreats.get("procediment");
                         NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
 
                         assertNotNull(procedimentCreate);
@@ -178,7 +178,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                     @Override
                     public void executar(ElementsCreats elementsCreats) throws Exception {
                         EntitatDto entitatCreate = elementsCreats.getEntitat();
-                        ProcedimentDto procedimentCreate = (ProcedimentDto) elementsCreats.get("procediment");
+                        ProcSerDto procedimentCreate = (ProcSerDto) elementsCreats.get("procediment");
                         NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) elementsCreats.get("notificacio");
 
                         assertNotNull(procedimentCreate);

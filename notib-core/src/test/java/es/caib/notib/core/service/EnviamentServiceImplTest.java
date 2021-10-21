@@ -4,7 +4,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.PermisosHelper;
@@ -48,7 +48,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
     NotificacioItemTest notificacioCreate;
 
     EntitatDto entitatCreate;
-    ProcedimentDto procedimentCreate;
+    ProcSerDto procedimentCreate;
     OrganGestorDto organGestorCreate;
 
     @Before
@@ -94,7 +94,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         organGestorCreate.setPermisos(permisosOrgan);
 
         List<PermisDto> permisosProcediment = new ArrayList<PermisDto>();
-        procedimentCreate = new ProcedimentDto();
+        procedimentCreate = new ProcSerDto();
         procedimentCreate.setCodi("216076");
         procedimentCreate.setNom("Procedimiento 1");
         procedimentCreate.setOrganGestor(ConfigTest.ORGAN_DIR3);
@@ -121,7 +121,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
                         autenticarUsuari("admin");
 
                         EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-                        ProcedimentDto procedimentCreate = (ProcedimentDto)elementsCreats.get(2);
+                        ProcSerDto procedimentCreate = (ProcSerDto)elementsCreats.get(2);
                         assertNotNull(procedimentCreate);
                         assertNotNull(procedimentCreate.getId());
                         assertNotNull(entitatCreate);

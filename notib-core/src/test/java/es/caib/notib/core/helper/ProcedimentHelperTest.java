@@ -3,7 +3,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -33,7 +33,7 @@ public class ProcedimentHelperTest {
     @Mock
     private PermisosHelper permisosHelper;
     @Mock
-    private ProcedimentUpdateHelper procedimentUpdateHelper;
+    private ProcSerUpdateHelper procedimentUpdateHelper;
     @Mock
     private GrupProcSerRepository grupProcedimentRepository;
     @Mock
@@ -82,7 +82,7 @@ public class ProcedimentHelperTest {
     @Test
     public void givenProcedimentSenseOrgan_whenActualitzarProcedimentFromGda_ThenReturn() throws Exception {
         // Given
-        ProcedimentDataDto procedimentGda = ProcedimentDataDto.builder()
+        ProcSerDataDto procedimentGda = ProcSerDataDto.builder()
                 .organGestor(ORGAN_CODI)
                 .codi("codiSIA")
                 .nom("nom vell")
@@ -99,7 +99,7 @@ public class ProcedimentHelperTest {
         )).thenReturn(procedimentDB);
 
         Mockito.when(procedimentUpdateHelper.updateProcediment(
-                Mockito.<ProcedimentDataDto>any(),
+                Mockito.<ProcSerDataDto>any(),
                 Mockito.<ProcedimentEntity>any(),
                 Mockito.<OrganGestorEntity>any()
         )).thenReturn(procedimentDB);

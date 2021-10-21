@@ -5,7 +5,7 @@ package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.EnviamentDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -51,7 +51,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private String notificaErrorDescripcio;
 	private EntitatDto entitat;
-	private ProcedimentDto procediment;
+	private ProcSerDto procediment;
 	private String referenciaExterna;
 	private String notificacio;
 	private boolean permisProcessar;

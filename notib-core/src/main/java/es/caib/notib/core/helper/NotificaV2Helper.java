@@ -135,9 +135,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 				integracioHelper.addAccioOk(info);
 			} else {
-				logger.info(" >>> ... ERROR");
+				logger.info(" >>> ... ERROR:");
 				//Crea un nou event
 				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				logger.info(" >>> " + errorDescripcio);
 				updateEventWithEnviament(
 						notificacio,
 						errorDescripcio,

@@ -1,13 +1,12 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.AplicacioDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.service.AuditService;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.*;
 import es.caib.notib.core.helper.NotificacioHelper;
 import es.caib.notib.core.repository.auditoria.*;
@@ -71,6 +70,13 @@ public class AuditServiceImpl implements AuditService {
 					objecteAuditar, 
 					tipusOperacio, 
 					tipusObjecte, 
+					joinPoint);
+			break;
+		case SERVEI:
+			auditaServei(
+					objecteAuditar,
+					tipusOperacio,
+					tipusObjecte,
 					joinPoint);
 			break;
 		case PROCEDIMENT_GRUP:
@@ -180,7 +186,7 @@ public class AuditServiceImpl implements AuditService {
 		if (objecteAuditar == null) {
 			log.error("Error auditoria: No s'ha l'objecte a auditar de tipus: PROCEDIMENT");
 			isAuditar = false;
-		} else if (!(objecteAuditar instanceof ProcedimentEntity) && !(objecteAuditar instanceof ProcedimentDto)) {
+		} else if (!(objecteAuditar instanceof ProcedimentEntity) && !(objecteAuditar instanceof ProcSerDto)) {
 			log.error("Error auditoria: L'objecte a auditar no és del tipus correcte: ProcedimentEntity || ProcedimentDto");
 			isAuditar = false;
 		}
@@ -192,7 +198,38 @@ public class AuditServiceImpl implements AuditService {
 						joinPoint).build();
 			} else {
 				audit = ProcedimentAudit.getBuilder(
-						(ProcedimentDto)objecteAuditar, 
+						(ProcSerDto)objecteAuditar,
+						tipusOperacio,
+						joinPoint).build();
+			}
+			procedimentAuditRepository.saveAndFlush(audit);
+		}
+	}
+
+	private void auditaServei(
+			Object objecteAuditar,
+			TipusOperacio tipusOperacio,
+			TipusObjecte tipusObjecte,
+			String joinPoint) {
+		ProcedimentAudit audit = null;
+		boolean isAuditar = true;
+
+		if (objecteAuditar == null) {
+			log.error("Error auditoria: No s'ha trobat l'objecte a auditar de tipus: SERVEI");
+			isAuditar = false;
+		} else if (!(objecteAuditar instanceof ServeiEntity) && !(objecteAuditar instanceof ProcSerDto)) {
+			log.error("Error auditoria: L'objecte a auditar no és del tipus correcte: ServeiEntity || ServeiDto");
+			isAuditar = false;
+		}
+		if (isAuditar) {
+			if (tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte)) {
+				audit = ProcedimentAudit.getBuilder(
+						(ProcSerEntity)objecteAuditar,
+						tipusOperacio,
+						joinPoint).build();
+			} else {
+				audit = ProcedimentAudit.getBuilder(
+						(ProcSerDto)objecteAuditar,
 						tipusOperacio,
 						joinPoint).build();
 			}
@@ -210,13 +247,13 @@ public class AuditServiceImpl implements AuditService {
 		if (objecteAuditar == null) {
 			log.error("Error auditoria: No s'ha l'objecte a auditar de tipus: PROCEDIMENT_GRUP");
 			isAuditar = false;
-		} else if (!(objecteAuditar instanceof ProcedimentGrupDto)) {
+		} else if (!(objecteAuditar instanceof ProcSerGrupDto)) {
 			log.error("Error auditoria: L'objecte a auditar no és del tipus correcte: ProcedimentGrupDto");
 			isAuditar = false;
 		}
 		if (isAuditar) {
 			audit = GrupProcedimentAudit.getBuilder(
-					(ProcedimentGrupDto)objecteAuditar, 
+					(ProcSerGrupDto)objecteAuditar,
 					tipusOperacio,
 					joinPoint).build();
 			grupProcedimentAuditRepository.saveAndFlush(audit);

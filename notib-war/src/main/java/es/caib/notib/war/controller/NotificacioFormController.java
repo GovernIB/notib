@@ -8,9 +8,9 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentOrganDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
@@ -137,7 +137,7 @@ public class NotificacioFormController extends BaseUserController {
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
 //		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
-        List<ProcedimentSimpleDto> procedimentsDisponibles;
+        List<ProcSerSimpleDto> procedimentsDisponibles;
         List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 
         if (RolHelper.isUsuariActualUsuari(request)) {
@@ -146,7 +146,7 @@ public class NotificacioFormController extends BaseUserController {
             procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
             model.addAttribute("procediments", procedimentsDisponibles);
             List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-            for (ProcedimentSimpleDto pro : procedimentsDisponibles)
+            for (ProcSerSimpleDto pro : procedimentsDisponibles)
                 procedimentsDisponiblesIds.add(pro.getId());
             organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
             model.addAttribute("organsGestors", organsGestorsDisponibles);
@@ -221,7 +221,7 @@ public class NotificacioFormController extends BaseUserController {
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        ProcedimentDto procedimentActual = null;
+        ProcSerDto procedimentActual = null;
 
         if (notificacioCommand.getProcedimentId() != null)
             procedimentActual = procedimentService.findById(
@@ -414,7 +414,7 @@ public class NotificacioFormController extends BaseUserController {
             @PathVariable Long procedimentId) {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        ProcedimentDto procedimentActual = procedimentService.findById(
+        ProcSerDto procedimentActual = procedimentService.findById(
                 entitatActual.getId(),
                 false,
                 procedimentId);
@@ -436,7 +436,7 @@ public class NotificacioFormController extends BaseUserController {
 
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
-            List<ProcedimentOrganDto> procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+            List<ProcSerOrganDto> procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
             dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
         }
         return dadesProcediment;
@@ -623,7 +623,7 @@ public class NotificacioFormController extends BaseUserController {
 
     private void ompliModelFormulari(
             HttpServletRequest request,
-            ProcedimentDto procedimentActual,
+            ProcSerDto procedimentActual,
             EntitatDto entitatActual,
             NotificacioCommand notificacioCommand,
             BindingResult bindingResult,

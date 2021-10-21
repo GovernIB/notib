@@ -21,7 +21,7 @@ public class ProcSerOrganEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_organ_pro_fk")
-	protected ProcSerEntity procser;
+	protected ProcSerEntity procSer;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "organgestor_id")
@@ -31,7 +31,7 @@ public class ProcSerOrganEntity extends NotibAuditable<Long> {
 	public void update(
 			ProcSerEntity procser,
 			OrganGestorEntity organGestor) {
-		this.procser = procser;
+		this.procSer = procser;
 		this.organGestor = organGestor;
 	}
 	
@@ -49,7 +49,7 @@ public class ProcSerOrganEntity extends NotibAuditable<Long> {
 				ProcSerEntity procser,
 				OrganGestorEntity organGestor) {
 			built = new ProcSerOrganEntity();
-			built.procser = procser;
+			built.procSer = procser;
 			built.organGestor = organGestor;
 		}
 		public ProcSerOrganEntity build() {

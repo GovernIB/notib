@@ -179,7 +179,7 @@ public class RegistreNotificaHelper {
 		}
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
-			logger.info(" >>> ... ERROR");
+			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
 			updateEventWithError(
 					arbResposta,
 					notificacioEntity,
@@ -236,7 +236,7 @@ public class RegistreNotificaHelper {
 		}
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
-			logger.info(" >>> ... ERROR");
+			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
 			updateEventWithError(
 					arbResposta,
 					notificacioEntity,

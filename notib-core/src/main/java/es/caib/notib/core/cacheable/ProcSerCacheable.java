@@ -184,16 +184,20 @@ public class ProcSerCacheable {
                     cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
                     cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
 
-                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+//                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
                     cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
                     cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
                     cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
 
                     // La funció de la caché esta definida emb els serveis dels procediments
-                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
-                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
-                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
-                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
+//                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
+//                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
+//                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
+//                    cacheManager.getCache("procedimentsPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
+
+                    cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
+                    cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
+                    cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
                 }
             }
         }

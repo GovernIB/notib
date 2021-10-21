@@ -1,4 +1,4 @@
-package es.caib.notib.core.api.dto.servei;
+package es.caib.notib.core.api.dto.procediment;
 
 import es.caib.notib.core.api.dto.AuditoriaDto;
 import es.caib.notib.core.api.dto.GrupDto;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Getter @Setter
-public class ServeiFormDto extends AuditoriaDto implements Serializable{
+public class ProcSerFormDto extends AuditoriaDto implements Serializable{
 
 	private Long id;
 	private String codi;

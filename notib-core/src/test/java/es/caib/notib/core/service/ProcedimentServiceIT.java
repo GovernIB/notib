@@ -1,9 +1,9 @@
 package es.caib.notib.core.service;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentFormDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.plugin.SistemaExternException;
@@ -33,10 +33,10 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 	
 	private PermisDto permisAdmin;
 	private EntitatDto entitatCreate;
-	private ProcedimentDto createProcediment;
-	private ProcedimentDto updateProcediment;
-	private ProcedimentDto proc1;
-	private ProcedimentDto proc2;
+	private ProcSerDto createProcediment;
+	private ProcSerDto updateProcediment;
+	private ProcSerDto proc1;
+	private ProcSerDto proc2;
 		
 	@Before
 	public void setUp() throws SistemaExternException {
@@ -65,19 +65,19 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 
 		entitatCreate.setPermisos(Arrays.asList(permisAdmin));
 		
-		createProcediment= new ProcedimentDto();
+		createProcediment= new ProcSerDto();
 		createProcediment.setCodi("123456789");
 		createProcediment.setNom("Procedimiento 1");
 		createProcediment.setOrganGestor("A00000000");
 		
-		updateProcediment= new ProcedimentDto();
+		updateProcediment= new ProcSerDto();
 		updateProcediment.setCodi("234567890");
 		updateProcediment.setNom("Procedimiento 2");
 		updateProcediment.setOrganGestor("A00000001");
 		
 		configureMockUnitatsOrganitzativesPlugin();
 		
-		proc1 = new ProcedimentDto();
+		proc1 = new ProcSerDto();
 		proc1.setAgrupar(false);
 		proc1.setCodi("962793");
 		proc1.setComu(false);
@@ -92,7 +92,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 		proc1.setPermisos(null);
 		proc1.setRetard(0);
 		
-		proc2 = new ProcedimentDto();
+		proc2 = new ProcSerDto();
 		proc2.setAgrupar(false);
 		proc2.setCodi("879427");
 		proc2.setComu(true);
@@ -118,7 +118,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws Exception {
 					EntitatDto entitatCreate = (EntitatDto)elementsCreats.get(0);
-					ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(1);
+					ProcSerDto procedimentCreat = (ProcSerDto)elementsCreats.get(1);
 			
 					autenticarUsuari("admin");
 					assertNotNull(procedimentCreat);
@@ -141,10 +141,10 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);	
-					ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(1);
+					ProcSerDto procedimentCreat = (ProcSerDto)elementsCreats.get(1);
 					autenticarUsuari("admin");
 					updateProcediment.setId(procedimentCreat.getId());
-					ProcedimentDto modificat = procedimentService.update(
+					ProcSerDto modificat = procedimentService.update(
 							entitatCreada.getId(), 
 							updateProcediment, 
 							true,
@@ -174,9 +174,9 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats) throws NotFoundException{
 					 EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					 ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(1);
+					 ProcSerDto procedimentCreat = (ProcSerDto)elementsCreats.get(1);
 					 autenticarUsuari("admin");
-					 ProcedimentDto borrat = procedimentService.delete(
+					 ProcSerDto borrat = procedimentService.delete(
 							entitatCreada.getId(), 
 							procedimentCreat.getId(),
 							true);
@@ -210,10 +210,10 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 				@Override
 				public void executar(List<Object> elementsCreats)throws NotFoundException{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
-					ProcedimentDto procedimentCreat = (ProcedimentDto)elementsCreats.get(1);
+					ProcSerDto procedimentCreat = (ProcSerDto)elementsCreats.get(1);
 					autenticarUsuari("admin");
 					
-					ProcedimentDto trobat = procedimentService.findById(
+					ProcSerDto trobat = procedimentService.findById(
 							entitatCreada.getId(), 
 							true,
 							procedimentCreat.getId() );
@@ -244,7 +244,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("admin");
 					
-					ProcedimentDto trobat = procedimentService.findByCodi(
+					ProcSerDto trobat = procedimentService.findByCodi(
 							entitatCreada.getId(), 
 							createProcediment.getCodi());
 					assertNotNull(trobat);
@@ -269,7 +269,7 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("user");
 					
-					ProcedimentDto trobat = procedimentService.findByNom(
+					ProcSerDto trobat = procedimentService.findByNom(
 							entitatCreada.getId(), 
 							createProcediment.getNom());
 					assertNotNull(trobat);
@@ -294,11 +294,11 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("admin");
 					
-					ProcedimentFiltreDto procedimentFiltreCreado = buildProcedimentFiltreDto(false);
+					ProcSerFiltreDto procedimentFiltreCreado = buildProcedimentFiltreDto(false);
 					
 					PaginacioParamsDto paginacioParamsDto = getPaginacioDtoFromRequest(null, null);
 					
-					PaginaDto<ProcedimentFormDto> pagina = procedimentService.findAmbFiltrePaginat(
+					PaginaDto<ProcSerFormDto> pagina = procedimentService.findAmbFiltrePaginat(
 									entitatCreada.getId(),
 									false,
 									true, //admin d'entitat
@@ -341,11 +341,11 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 					EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 					autenticarUsuari("admin");
 					
-					ProcedimentFiltreDto procedimentFiltreCreado = buildProcedimentFiltreDto(true);
+					ProcSerFiltreDto procedimentFiltreCreado = buildProcedimentFiltreDto(true);
 					
 					PaginacioParamsDto paginacioParamsDto = getPaginacioDtoFromRequest(null, null);
 					
-					PaginaDto<ProcedimentFormDto> pagina = procedimentService.findAmbFiltrePaginat(
+					PaginaDto<ProcSerFormDto> pagina = procedimentService.findAmbFiltrePaginat(
 									entitatCreada.getId(),
 									false,
 									true, //admin d'entitat
@@ -376,8 +376,8 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 			);
 	}
 	
-	private ProcedimentFiltreDto buildProcedimentFiltreDto(boolean nomesComuns) {
-		ProcedimentFiltreDto procedimentFiltreCreado = new ProcedimentFiltreDto();
+	private ProcSerFiltreDto buildProcedimentFiltreDto(boolean nomesComuns) {
+		ProcSerFiltreDto procedimentFiltreCreado = new ProcSerFiltreDto();
 		procedimentFiltreCreado.setCodi(null);
 //		procedimentFiltreCreado.setCodi("962793");
 		procedimentFiltreCreado.setNom(null);
@@ -552,8 +552,8 @@ public class ProcedimentServiceIT extends BaseServiceTest{
 	}
 	
 	private void comprovarProcedimentCoincideix(
-			ProcedimentDto original,
-			ProcedimentDto perComprovar) {
+			ProcSerDto original,
+			ProcSerDto perComprovar) {
 		assertEquals(
 				original.getCodi(),
 				perComprovar.getCodi());

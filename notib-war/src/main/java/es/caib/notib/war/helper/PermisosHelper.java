@@ -1,7 +1,7 @@
 package es.caib.notib.war.helper;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.procediment.ProcedimentSimpleDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
@@ -30,7 +30,7 @@ public class PermisosHelper {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 
 			if (entitatActual != null && usuariActual != null && RolHelper.isUsuariActualUsuari(request)) {
-				List<ProcedimentSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+				List<ProcSerSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentServeisWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
 				request.setAttribute("permisNotificacio", !procedimentsDisponibles.isEmpty());
 			}
 		}

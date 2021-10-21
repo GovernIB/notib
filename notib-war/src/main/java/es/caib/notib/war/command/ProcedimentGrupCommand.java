@@ -4,7 +4,7 @@ package es.caib.notib.war.command;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.dto.TipusGrupEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class ProcedimentGrupCommand {
 	private Long grupId;
 
 	
-	public static ProcedimentGrupCommand asCommand(ProcedimentGrupDto dto) {
+	public static ProcedimentGrupCommand asCommand(ProcSerGrupDto dto) {
 		if (dto == null) {
 			return null;
 		}
@@ -33,19 +33,19 @@ public class ProcedimentGrupCommand {
 				ProcedimentGrupCommand.class );
 		
 		command.setGrupId(dto.getGrup().getId());
-		command.setProcedimentId(dto.getProcediment().getId());
+		command.setProcedimentId(dto.getProcSer().getId());
 		
 		return command;
 	}
 	
-	public static ProcedimentGrupDto asDto(ProcedimentGrupCommand command) {
+	public static ProcSerGrupDto asDto(ProcedimentGrupCommand command) {
 		if (command == null) {
 			return null;
 		}
 		
-		ProcedimentGrupDto dto = ConversioTipusHelper.convertir(
+		ProcSerGrupDto dto = ConversioTipusHelper.convertir(
 				command,
-				ProcedimentGrupDto.class);
+				ProcSerGrupDto.class);
 		
 		GrupDto grupDto = new GrupDto();
 		grupDto.setId(command.getGrupId());

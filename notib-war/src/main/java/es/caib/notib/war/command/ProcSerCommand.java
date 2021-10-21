@@ -1,7 +1,7 @@
 package es.caib.notib.war.command;
 
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidProcediment;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import javax.validation.constraints.Size;
  */
 @Getter @Setter
 @ValidProcediment
-public class ProcedimentCommand {
+public class ProcSerCommand {
 	
 	private Long id;
 	@NotEmpty @Size(max=9)
@@ -52,22 +52,22 @@ public class ProcedimentCommand {
 	private Long operadorPostalId;
 	private Long cieId;
 
-	public static ProcedimentCommand asCommand(ProcedimentDto dto) {
+	public static ProcSerCommand asCommand(ProcSerDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		ProcedimentCommand command = ConversioTipusHelper.convertir(
+		ProcSerCommand command = ConversioTipusHelper.convertir(
 				dto,
-				ProcedimentCommand.class );
+				ProcSerCommand.class );
 		return command;
 	}
-	public static ProcedimentDto asDto(ProcedimentCommand command) {
+	public static ProcSerDto asDto(ProcSerCommand command) {
 		if (command == null) {
 			return null;
 		}
-		ProcedimentDto dto = ConversioTipusHelper.convertir(
+		ProcSerDto dto = ConversioTipusHelper.convertir(
 				command,
-				ProcedimentDto.class);
+				ProcSerDto.class);
 		
 		EntitatDto entitatDto = new EntitatDto();
 		entitatDto.setId(command.getEntitatId());

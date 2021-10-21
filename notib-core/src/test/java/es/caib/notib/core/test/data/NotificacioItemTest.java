@@ -3,7 +3,7 @@ package es.caib.notib.core.test.data;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.test.AuthenticationTest;
 import lombok.Getter;
@@ -52,8 +52,8 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
 //    }
 
     public void relateElement(String key, Object element) throws Exception{
-        if (element instanceof ProcedimentDto) {
-            getObject(key).setProcediment((ProcedimentDto) element);
+        if (element instanceof ProcSerDto) {
+            getObject(key).setProcediment((ProcSerDto) element);
         }
     }
 

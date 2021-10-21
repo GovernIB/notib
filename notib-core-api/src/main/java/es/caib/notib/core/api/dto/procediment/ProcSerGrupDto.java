@@ -1,28 +1,28 @@
-package es.caib.notib.core.api.dto.servei;
+package es.caib.notib.core.api.dto.procediment;
 
 import es.caib.notib.core.api.dto.AuditoriaDto;
 import es.caib.notib.core.api.dto.GrupDto;
 
 import java.io.Serializable;
 
-public class ServeiGrupDto extends AuditoriaDto implements Serializable {
+public class ProcSerGrupDto extends AuditoriaDto implements Serializable {
 
 	private Long id;
-	private ServeiDto procediment;
+	private ProcSerDto procSer;
 	private GrupDto grup;
-
-
+	
+	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public ServeiDto getProcediment() {
-		return procediment;
+	public ProcSerDto getProcSer() {
+		return procSer;
 	}
-	public void setProcediment(ServeiDto procediment) {
-		this.procediment = procediment;
+	public void setProcSer(ProcSerDto procSer) {
+		this.procSer = procSer;
 	}
 	public GrupDto getGrup() {
 		return grup;

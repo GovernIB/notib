@@ -9,7 +9,7 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidNotificacio;
 import lombok.Getter;
@@ -134,7 +134,7 @@ public class NotificacioCommand {
 		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(
 				this,
 				NotificacioDatabaseDto.class);
-		ProcedimentDto procedimentDto = new ProcedimentDto();
+		ProcSerDto procedimentDto = new ProcSerDto();
 		procedimentDto.setId(this.getProcedimentId());
 		dto.setProcediment(procedimentDto);
 

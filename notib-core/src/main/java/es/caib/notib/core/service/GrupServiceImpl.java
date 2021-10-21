@@ -21,7 +21,7 @@ import es.caib.notib.core.api.dto.GrupFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
@@ -246,7 +246,7 @@ public class GrupServiceImpl implements GrupService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<ProcedimentGrupDto> findByProcediment(
+	public PaginaDto<ProcSerGrupDto> findByProcediment(
 			Long entitatId, 
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams) {
@@ -266,7 +266,7 @@ public class GrupServiceImpl implements GrupService{
 			
 			return paginacioHelper.toPaginaDto(
 					grupsProcediment, 
-					ProcedimentGrupDto.class);
+					ProcSerGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -274,7 +274,7 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public ProcedimentGrupDto findProcedimentGrupById(
+	public ProcSerGrupDto findProcedimentGrupById(
 			Long entitatId, 
 			Long procedimentGrupId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -284,7 +284,7 @@ public class GrupServiceImpl implements GrupService{
 			
 			return conversioTipusHelper.convertir(
 					procedimentGrup, 
-					ProcedimentGrupDto.class);
+					ProcSerGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -10,7 +10,7 @@ import es.caib.notib.core.api.dto.GrupFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 
 /**
@@ -101,7 +101,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public PaginaDto<ProcedimentGrupDto> findByProcediment(
+	public PaginaDto<ProcSerGrupDto> findByProcediment(
 			Long entitatId,
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams);
@@ -136,7 +136,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public ProcedimentGrupDto findProcedimentGrupById(
+	public ProcSerGrupDto findProcedimentGrupById(
 			Long entitatId,
 			Long procedimentGrupId);
 	

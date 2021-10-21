@@ -120,6 +120,18 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<NotificacioEntity> findNotificacionsPendentsDeNotificarByProcediment(
 			@Param("procediment") ProcedimentEntity procediment);
 
+	@Query(
+			"from " +
+					"    NotificacioEntity " +
+					"where " +
+					"estat in (es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PENDENT," +
+					"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA) " +
+					"and procediment.id = :procedimentId " +
+					"order by " +
+					"    notificaEnviamentData ASC")
+	List<NotificacioEntity> findNotificacionsPendentsDeNotificarByProcedimentId(
+			@Param("procedimentId") Long procediment);
+
 	@Query("  from NotificacioEntity n " +
 			" where n.tipusUsuari = es.caib.notib.core.api.dto.TipusUsuariEnumDto.APLICACIO " +
 			"   and n.errorLastCallback = true")

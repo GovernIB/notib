@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class ProcedimentFiltreDto extends AuditoriaDto implements Serializable {
+public class ProcSerFiltreDto extends AuditoriaDto implements Serializable {
 	private String id;
 	private String codi;
 	private String nom;

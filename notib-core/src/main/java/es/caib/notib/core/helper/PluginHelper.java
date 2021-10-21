@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
@@ -16,6 +16,7 @@ import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
+import es.caib.notib.plugin.gesconadm.GcaServei;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
@@ -898,18 +899,18 @@ public class PluginHelper {
 	// GESTOR CONTINGUTS ADMINISTRATIU (ROLSAC)
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
-	public List<ProcedimentDto> getProcedimentsGda() {
+	public List<ProcSerDto> getProcedimentsGda() {
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_GESCONADM, 
 				"Obtenir tots els procediments", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT);
 		
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcSerDto> procediments = new ArrayList<ProcSerDto>();
 		try {
 			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getAllProcediments();
 			if (procs != null)
 				for (GcaProcediment proc: procs) {
-					ProcedimentDto dto = new ProcedimentDto();
+					ProcSerDto dto = new ProcSerDto();
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
 					dto.setComu(proc.isComu());
@@ -952,7 +953,7 @@ public class PluginHelper {
 		return totalElements;
 	}
 	
-	public List<ProcedimentDto> getProcedimentsGdaByEntitat(
+	public List<ProcSerDto> getProcedimentsGdaByEntitat(
 			String codiDir3,
 			int numPagina) {
 		IntegracioInfo info = new IntegracioInfo(
@@ -960,14 +961,14 @@ public class PluginHelper {
 				"Obtenir procediments per entitat", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT);
 		
-		List<ProcedimentDto> procediments = new ArrayList<ProcedimentDto>();
+		List<ProcSerDto> procediments = new ArrayList<ProcSerDto>();
 		try {
 			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(
 					codiDir3,
 					numPagina);
 			if (procs != null)
 				for (GcaProcediment proc: procs) {
-					ProcedimentDto dto = new ProcedimentDto();
+					ProcSerDto dto = new ProcSerDto();
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
 					dto.setComu(proc.isComu());
@@ -988,6 +989,65 @@ public class PluginHelper {
 		}
 		
 		return procediments;
+	}
+
+	public int getTotalServeis(String codiDir3) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_GESCONADM,
+				"Recuperant el total de serveis",
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		int totalElements = 0;
+		try {
+			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalServeis(codiDir3);
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir el número total d'elemetns";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_GESCONADM,
+					errorDescripcio,
+					ex);
+		}
+
+		return totalElements;
+	}
+
+	public List<ProcSerDto> getServeisGdaByEntitat(
+			String codiDir3,
+			int numPagina) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_GESCONADM,
+				"Obtenir serveis per entitat",
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+
+		List<ProcSerDto> serveis = new ArrayList<>();
+		try {
+			List<GcaServei> servs = getGestorDocumentalAdministratiuPlugin().getServeisByUnitat(
+					codiDir3,
+					numPagina);
+			if (servs != null)
+				for (GcaServei servei: servs) {
+					ProcSerDto dto = new ProcSerDto();
+					dto.setCodi(servei.getCodiSIA());
+					dto.setNom(servei.getNom());
+					dto.setComu(servei.isComu());
+					dto.setUltimaActualitzacio(servei.getDataActualitzacio());
+					if (servei.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(servei.getUnitatAdministrativacodi());
+					}
+					serveis.add(dto);
+				}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_GESCONADM,
+					errorDescripcio,
+					ex);
+		}
+
+		return serveis;
 	}
 	
 	// UNITATS ORGANITZATIVES

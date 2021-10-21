@@ -24,7 +24,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 	
 	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
-			"left outer join po.procser pro " +
+			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +

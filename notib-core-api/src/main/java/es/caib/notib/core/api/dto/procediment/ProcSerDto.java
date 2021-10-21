@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Getter @Setter
-public class ProcedimentDto extends ProcedimentDataDto{
+public class ProcSerDto extends ProcSerDataDto {
 
 	private List<PermisDto> permisos;
 	private boolean usuariActualRead;
@@ -44,7 +44,7 @@ public class ProcedimentDto extends ProcedimentDataDto{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ProcedimentDto other = (ProcedimentDto)obj;
+		ProcSerDto other = (ProcSerDto)obj;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;

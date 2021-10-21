@@ -2,7 +2,7 @@ package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.servei.*;
+import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -24,9 +24,9 @@ public interface ServeiService {
 	 * @return El servei creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	ServeiDto create(
+	ProcSerDto create(
             Long entitatId,
-            ServeiDataDto servei);
+            ProcSerDataDto servei);
 
 	/**
 	 * Actualitza la informació del servei 
@@ -38,9 +38,9 @@ public interface ServeiService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ServeiDto update(
+	public ProcSerDto update(
             Long entitatId,
-            ServeiDataDto servei,
+            ProcSerDataDto servei,
             boolean isAdmin,
             boolean isAdminEntitat) throws NotFoundException;
 
@@ -54,7 +54,7 @@ public interface ServeiService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ServeiDto delete(
+	public ProcSerDto delete(
             Long entitatId,
             Long id,
             boolean isAdminEntitat) throws NotFoundException;
@@ -71,7 +71,7 @@ public interface ServeiService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ServeiDto findById(
+	public ProcSerDto findById(
             Long entitatId,
             boolean isAdministrador,
             Long id) throws NotFoundException;
@@ -87,7 +87,7 @@ public interface ServeiService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public ServeiDto findByCodi(
+	public ProcSerDto findByCodi(
             Long entitatId,
             String codiServei) throws NotFoundException;
 
@@ -98,7 +98,7 @@ public interface ServeiService {
 	 * @return El servei amb el codi especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ServeiSimpleDto> findByEntitat(Long entitatId);
+	List<ProcSerSimpleDto> findByEntitat(Long entitatId);
 	
 	/**
 	 * Consulta els serveis d'un organ gestor i els seus organs gestors descendents.
@@ -110,12 +110,12 @@ public interface ServeiService {
 	 * @return Els serveis associats a l'òrgan gestor, o a algund els seus descendents.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiSimpleDto> findByOrganGestorIDescendents(
+	public List<ProcSerSimpleDto> findByOrganGestorIDescendents(
             Long entitatId,
             OrganGestorDto organGestor);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiDto> findByOrganGestorIDescendentsAndComu(
+	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(
             Long entitatId,
             OrganGestorDto organGestor);
 	
@@ -136,13 +136,13 @@ public interface ServeiService {
 	 * @return La pàgina amb les notificacions.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public PaginaDto<ServeiFormDto> findAmbFiltrePaginat(
+	public PaginaDto<ProcSerFormDto> findAmbFiltrePaginat(
             Long entitatId,
             boolean isUsuari,
             boolean isUsuariEntitat,
             boolean isAdministrador,
             OrganGestorDto organGestorActual,
-            ServeiFiltreDto filtre,
+			ProcSerFiltreDto filtre,
             PaginacioParamsDto paginacioParams);
 	
 	/**
@@ -151,7 +151,7 @@ public interface ServeiService {
 	 * @return La llista dels serveis.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiDto> findAll();
+	public List<ProcSerDto> findAll();
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean serveiEnUs(Long serveiId);
@@ -164,10 +164,10 @@ public interface ServeiService {
 	 * @return La llista dels serveis.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiGrupDto> findAllGrups();
+	public List<ProcSerGrupDto> findAllGrups();
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiGrupDto> findGrupsByEntitat(Long entitatId);
+	public List<ProcSerGrupDto> findGrupsByEntitat(Long entitatId);
 	
 	/**
 	 * Llistat amb tots els serveis sense grups.
@@ -175,36 +175,36 @@ public interface ServeiService {
 	 * @return La llista dels serveis.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiDto> findServeis(Long entitatId, List<String> grups);
+	public List<ProcSerDto> findServeis(Long entitatId, List<String> grups);
 
-	/**
-	 * Get all Serveis with the given permission for the given user
-	 *
-	 * @param entitatId
-	 * @param usuariCodi
-	 * @param permis
-	 * @return Serveis with the given permission for the given user
-	 */
+//	/**
+//	 * Get all Serveis with the given permission for the given user
+//	 *
+//	 * @param entitatId
+//	 * @param usuariCodi
+//	 * @param permis
+//	 * @return Serveis with the given permission for the given user
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ServeiSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ServeiSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+	public List<ProcSerDto> findServeisSenseGrups(Long entitatId);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiDto> findServeisSenseGrups(Long entitatId);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ServeiDto> findServeisAmbGrups(Long entitatId, List<String> grups);
+	public List<ProcSerDto> findServeisAmbGrups(Long entitatId, List<String> grups);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean hasAnyServeisWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 
-	/**
-	 * Consulta tots els serveis amb permís per algún organ gestor
-	 *
-	 * @param entitatId
-	 * @param usuariCodi
-	 * @param permis
-	 *
-	 * @return
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ServeiOrganDto> findServeisOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	/**
+//	 * Consulta tots els serveis amb permís per algún organ gestor
+//	 *
+//	 * @param entitatId
+//	 * @param usuariCodi
+//	 * @param permis
+//	 *
+//	 * @return
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ServeiOrganDto> findServeisOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 	/**
 	 * Selecciona tots els serveis als que l'organ indicat té accés
@@ -216,168 +216,171 @@ public interface ServeiService {
 	 * @return
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ServeiOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ServeiOrganDto> serveisOrgans);
+	List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<String> findServeisOrganCodiWithPermisByServei(ServeiDto servei, String entitatCodi, List<ServeiOrganDto> serveisOrgans);
+	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
 
-	/**
-	 * Recupera els tipus d'assumpte d'una entitat.
-	 * 
-	 * @return La llista dels tipus d'assumpte.
-	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat);
-	
-	/**
-	 * Recupera els codis d'assumpte d'un tipus d'assumpte.
-	 * 
-	 * @return La llista dels codis d'assumpte.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<CodiAssumpteDto> findCodisAssumpte(
-            EntitatDto entitat,
-            String codiTipusAssumpte);
-	
-	/**
-	 * Consulta els permisos d'un servei.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param isAdministrador
-	 * 			  True si l'usuari acutal està com administrador           
-	 * @param serveiId
-	 *            Atribut id del permis.
-	 * @return El llistat de permisos.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<PermisDto> permisFind(
-            Long entitatId,
-            boolean isAdministrador,
-            Long serveiId,
-            String organ,
-            String organActual,
-            TipusPermis tipus) throws NotFoundException;
-	
-	/**
-	 * Modifica els permisos d'un usuari o d'un rol per a un servei.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param id
-	 *            Atribut id del servei.
-	 * @param permis
-	 *            El permís que es vol modificar.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void permisUpdate(
-            Long entitatId,
-            Long organGestorId,
-            Long id,
-            PermisDto permis) throws NotFoundException;
-	
-	/**
-	 * Esborra els permisos d'un usuari o d'un rol per a un servei.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param id
-	 *            Atribut id del servei.
-	 * @param permisId
-	 *            Atribut id del permís que es vol esborrar.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void permisDelete(
-            Long entitatId,
-            Long organGestorId,
-            Long id,
-            String organ,
-            Long permisId,
-            TipusPermis tipus) throws NotFoundException;
-	
-	/**
-	 * Assigna un grup a un servei.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param id
-	 *            Atribut id del servei.
-	 * @param serveiGrup
-	 *            El grup a assignar.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ServeiGrupDto grupCreate(
-            Long entitatId,
-            Long id,
-            ServeiGrupDto serveiGrup) throws NotFoundException;
-	
-	/**
-	 * Modifica el grup d'un servei.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param id
-	 *            Atribut id del servei.
-	 * @param serveiGrup
-	 *            El grup que es vol modificar.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ServeiGrupDto grupUpdate(
-            Long entitatId,
-            Long id,
-            ServeiGrupDto serveiGrup) throws NotFoundException;
-	
-	/**
-	 * Esborra un grup d'un servei.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
-	 * @param GrupId
-	 *            Atribut id del grup.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public ServeiGrupDto grupDelete(
-            Long entitatId,
-            Long GrupId) throws NotFoundException;
+	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-	/**
-	 * Comprova si l'usuari actual té permisos de notificació sobre algun servei
-	 * 
-	 * @return true / false
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public boolean hasPermisServei(
-            Long serveiId,
-            PermisEnum permis);
-	
-	/**
-	 * buida els serveis en cache per entitat
-	 * 
-	 * @param entitat
-	 *            Id de l'entitat.
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void refrescarCache(
-            EntitatDto entitat);
-
-	
+//	/**
+//	 * Recupera els tipus d'assumpte d'una entitat.
+//	 *
+//	 * @return La llista dels tipus d'assumpte.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<TipusAssumpteDto> findTipusAssumpte(EntitatDto entitat);
+//
+//	/**
+//	 * Recupera els codis d'assumpte d'un tipus d'assumpte.
+//	 *
+//	 * @return La llista dels codis d'assumpte.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public List<CodiAssumpteDto> findCodisAssumpte(
+//            EntitatDto entitat,
+//            String codiTipusAssumpte);
+//
+//	/**
+//	 * Consulta els permisos d'un servei.
+//	 *
+//	 * @param entitatId
+//	 *            Id de l'entitat.
+//	 * @param isAdministrador
+//	 * 			  True si l'usuari acutal està com administrador
+//	 * @param serveiId
+//	 *            Atribut id del permis.
+//	 * @return El llistat de permisos.
+//	 * @throws NotFoundException
+//	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public List<PermisDto> permisFind(
+//            Long entitatId,
+//            boolean isAdministrador,
+//            Long serveiId,
+//            String organ,
+//            String organActual,
+//            TipusPermis tipus) throws NotFoundException;
+//
+//	/**
+//	 * Modifica els permisos d'un usuari o d'un rol per a un servei.
+//	 *
+//	 * @param entitatId
+//	 *            Id de l'entitat.
+//	 * @param id
+//	 *            Atribut id del servei.
+//	 * @param permis
+//	 *            El permís que es vol modificar.
+//	 * @throws NotFoundException
+//	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public void permisUpdate(
+//            Long entitatId,
+//            Long organGestorId,
+//            Long id,
+//            PermisDto permis) throws NotFoundException;
+//
+//	/**
+//	 * Esborra els permisos d'un usuari o d'un rol per a un servei.
+//	 *
+//	 * @param entitatId
+//	 *            Id de l'entitat.
+//	 * @param id
+//	 *            Atribut id del servei.
+//	 * @param permisId
+//	 *            Atribut id del permís que es vol esborrar.
+//	 * @throws NotFoundException
+//	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public void permisDelete(
+//            Long entitatId,
+//            Long organGestorId,
+//            Long id,
+//            String organ,
+//            Long permisId,
+//            TipusPermis tipus) throws NotFoundException;
+//
+//	/**
+//	 * Assigna un grup a un servei.
+//	 *
+//	 * @param entitatId
+//	 *            Id de l'entitat.
+//	 * @param id
+//	 *            Atribut id del servei.
+//	 * @param serveiGrup
+//	 *            El grup a assignar.
+//	 * @throws NotFoundException
+//	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public ServeiGrupDto grupCreate(
+//            Long entitatId,
+//            Long id,
+//            ServeiGrupDto serveiGrup) throws NotFoundException;
+//
+//	/**
+//	 * Modifica el grup d'un servei.
+//	 *
+//	 * @param entitatId
+//	 *            Id de l'entitat.
+//	 * @param id
+//	 *            Atribut id del servei.
+//	 * @param serveiGrup
+//	 *            El grup que es vol modificar.
+//	 * @throws NotFoundException
+//	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public ServeiGrupDto grupUpdate(
+//            Long entitatId,
+//            Long id,
+//            ServeiGrupDto serveiGrup) throws NotFoundException;
+//
+//	/**
+//	 * Esborra un grup d'un servei.
+//	 *
+//	 * @param entitatId
+//	 *            Id de l'entitat.
+//	 * @param GrupId
+//	 *            Atribut id del grup.
+//	 * @throws NotFoundException
+//	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public ServeiGrupDto grupDelete(
+//            Long entitatId,
+//            Long GrupId) throws NotFoundException;
+//
+//	/**
+//	 * Comprova si l'usuari actual té permisos de notificació sobre algun servei
+//	 *
+//	 * @return true / false
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public boolean hasPermisServei(
+//            Long serveiId,
+//            PermisEnum permis);
+//
+//	/**
+//	 * buida els serveis en cache per entitat
+//	 *
+//	 * @param entitat
+//	 *            Id de l'entitat.
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN')")
+//	public void refrescarCache(
+//            EntitatDto entitat);
+//
+//
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	public List<ServeiDto> findServeisByOrganGestor(String organGestorCodi);
+	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi);
 
 	@PreAuthorize("hasRole('tothom')")
-	public List<ServeiDto> findServeisByOrganGestorWithPermis(
+	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
             Long entitatId,
             String organGestorCodi,
             List<String> grups,
@@ -448,7 +451,7 @@ public interface ServeiService {
 	 *             Si no s'ha trobat l'servei amb el nom especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	ServeiDto findByNom(
+	ProcSerDto findByNom(
             Long entitatId,
             String nomServei) throws NotFoundException;
 }

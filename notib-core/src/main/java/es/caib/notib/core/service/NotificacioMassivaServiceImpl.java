@@ -6,7 +6,7 @@ import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.*;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
@@ -262,7 +262,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     if (procediment == null) {
                         errors.add("[1330] No s'ha trobat cap procediment amb el codi indicat.");
                     } else {
-                        notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcedimentDto.class));
+                        notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -654,7 +654,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         notificacio.setRetard(Integer.valueOf(linia[15]));
 
         // Procediment
-        ProcedimentDto procediment = new ProcedimentDto();
+        ProcSerDto procediment = new ProcSerDto();
         procediment.setCodi(linia[16]);
         notificacio.setProcediment(procediment);
 

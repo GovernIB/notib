@@ -120,10 +120,9 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 //	ProcedimentEntity findByIdAndEntitat(
 //            Long procedimentId,
 //            EntitatEntity entitat);
-//
-//	ProcedimentEntity findById(
-//            Long procedimentId);
-//
+
+	ProcSerEntity findById(Long procserId);
+
 //	ProcedimentEntity findByCodi(String codi);
 //
 //	ProcedimentEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);

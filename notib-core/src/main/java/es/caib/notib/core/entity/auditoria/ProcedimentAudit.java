@@ -1,9 +1,9 @@
 package es.caib.notib.core.entity.auditoria;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -50,7 +50,7 @@ public class ProcedimentAudit extends NotibAuditoria<Long> {
 	protected Long pagadorcieId;
 	
 	public static Builder getBuilder(
-			ProcedimentEntity objecteAuditar,
+			ProcSerEntity objecteAuditar,
 			TipusOperacio tipusOperacio, 
 			String joinPoint) {
 		return new Builder(
@@ -60,50 +60,50 @@ public class ProcedimentAudit extends NotibAuditoria<Long> {
 	}
 	
 	public static Builder getBuilder(
-			ProcedimentDto procedimentDto,
+			ProcSerDto procSerDto,
 			TipusOperacio tipusOperacio,
 			String joinPoint) {
 		return new Builder(
-				procedimentDto,
+				procSerDto,
 				tipusOperacio,
 				joinPoint);
 	}
-	
+
 	public static class Builder {
 		ProcedimentAudit built;
 		Builder(
-				ProcedimentEntity procedimentEntity,
+				ProcSerEntity procSerEntity,
 				TipusOperacio tipusOperacio,
 				String joinPoint) {
 			built = new ProcedimentAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;
-			built.procedimentId = procedimentEntity.getId();
-			built.entitatId = procedimentEntity.getEntitat() != null ? procedimentEntity.getEntitat().getId() : null;
-			built.organ = procedimentEntity.getOrganGestor() != null ? procedimentEntity.getOrganGestor().getCodi() : null;
-			built.codi = procedimentEntity.getCodi();
-			built.nom = procedimentEntity.getNom();
-			built.retard = procedimentEntity.getRetard();
-			built.caducitat = procedimentEntity.getCaducitat();
-			built.agrupar = procedimentEntity.isAgrupar();
-			built.comu = procedimentEntity.isComu();
+			built.procedimentId = procSerEntity.getId();
+			built.entitatId = procSerEntity.getEntitat() != null ? procSerEntity.getEntitat().getId() : null;
+			built.organ = procSerEntity.getOrganGestor() != null ? procSerEntity.getOrganGestor().getCodi() : null;
+			built.codi = procSerEntity.getCodi();
+			built.nom = procSerEntity.getNom();
+			built.retard = procSerEntity.getRetard();
+			built.caducitat = procSerEntity.getCaducitat();
+			built.agrupar = procSerEntity.isAgrupar();
+			built.comu = procSerEntity.isComu();
 		}
 		Builder(
-				ProcedimentDto procedimentDto,
+				ProcSerDto procSerDto,
 				TipusOperacio tipusOperacio, 
 				String joinPoint) {
 			built = new ProcedimentAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;
-			built.procedimentId = procedimentDto.getId();
-			built.entitatId = procedimentDto.getEntitat() != null ? procedimentDto.getEntitat().getId() : null;
-			built.organ = procedimentDto.getOrganGestor();
-			built.codi = procedimentDto.getCodi();
-			built.nom = procedimentDto.getNom();
-			built.retard = procedimentDto.getRetard();
-			built.caducitat = procedimentDto.getCaducitat();
-			built.agrupar = procedimentDto.isAgrupar();
-			built.comu = procedimentDto.isComu();
+			built.procedimentId = procSerDto.getId();
+			built.entitatId = procSerDto.getEntitat() != null ? procSerDto.getEntitat().getId() : null;
+			built.organ = procSerDto.getOrganGestor();
+			built.codi = procSerDto.getCodi();
+			built.nom = procSerDto.getNom();
+			built.retard = procSerDto.getRetard();
+			built.caducitat = procSerDto.getCaducitat();
+			built.agrupar = procSerDto.isAgrupar();
+			built.comu = procSerDto.isComu();
 //			built.pagadorpostalId = procedimentDto.getPagadorpostal() != null ? procedimentDto.getPagadorpostal().getId() : null;
 //			built.pagadorcieId = procedimentDto.getPagadorcie() != null ? procedimentDto.getPagadorcie().getId() : null;
 		}

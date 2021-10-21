@@ -18,7 +18,7 @@ import es.caib.notib.core.api.dto.GrupFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.GrupService;
 
@@ -71,7 +71,7 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PaginaDto<ProcedimentGrupDto> findByProcediment(
+	public PaginaDto<ProcSerGrupDto> findByProcediment(
 			Long entitatId, 
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams) {
@@ -89,7 +89,7 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public ProcedimentGrupDto findProcedimentGrupById(
+	public ProcSerGrupDto findProcedimentGrupById(
 			Long entitatId, 
 			Long procedimentGrupId) {
 		return delegate.findProcedimentGrupById(

@@ -10,7 +10,7 @@ pageContext.setAttribute(
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
 %>
 <c:choose>
-	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
+	<c:when test="${empty procSerCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -228,7 +228,7 @@ $(document).ready(function() {
 			<c:set var="errorsProc" value="${error.field}"></c:set>
 		</c:if>
 	</c:forEach>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procedimentCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procSerCommand" role="form">
 		<form:hidden path="id"/>
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation" class="active"><a href="#dadesgeneralsForm" aria-controls="dadesgeneralsForm" role="tab" data-toggle="tab"><spring:message code="procediment.form.titol.dadesgenerals"/><c:if test='${not empty errorsProc}'> <span class="fa fa-warning text-danger"></span></c:if></a></li>

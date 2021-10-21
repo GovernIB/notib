@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -78,7 +78,7 @@ public class ProcedimentGrupController extends BaseUserController{
 		
 		ProcedimentGrupCommand procedimentGrupCommand;
 		
-		ProcedimentGrupDto procedimentGrup = emplenarModelGrups(
+		ProcSerGrupDto procedimentGrup = emplenarModelGrups(
 				request, 
 				procedimentId,
 				grupId,
@@ -116,13 +116,13 @@ public class ProcedimentGrupController extends BaseUserController{
 		return "ok";
 	}
 	
-	private ProcedimentGrupDto emplenarModelGrups(
+	private ProcSerGrupDto emplenarModelGrups(
 			HttpServletRequest request,
 			Long procedimentId,
 			Long grupId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ProcedimentGrupDto procedimentGrups = null;
+		ProcSerGrupDto procedimentGrups = null;
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		List<GrupDto> grups;
 		if (organGestorActual == null) {

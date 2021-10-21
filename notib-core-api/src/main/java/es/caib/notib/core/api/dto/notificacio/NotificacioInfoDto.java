@@ -4,7 +4,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.notenviament.EnviamentInfoDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -57,7 +57,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private DocumentDto document5;
 
 	// Dades del procediment
-	private ProcedimentDataDto procediment;
+	private ProcSerDataDto procediment;
 	private OperadorPostalDataDto operadorPostal;
 	private CieDataDto cie;
 
