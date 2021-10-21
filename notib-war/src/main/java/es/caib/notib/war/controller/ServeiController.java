@@ -75,7 +75,7 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		
-		return "procedimentListPage";
+		return "serveiListPage";
 	}
 
 	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
@@ -91,7 +91,7 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		return "procedimentListModal";
+		return "serveiListModal";
 	}
 
 	private List<CodiValorEstatDto> findOrgansGestorsAccessibles (EntitatDto entitatActual, OrganGestorDto organGestorActual) {
@@ -164,7 +164,7 @@ public class ServeiController extends BaseUserController{
 				this.currentFiltre,
 				command);
 		
-		return "procedimentListPage";
+		return "serveiListPage";
 	}
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
@@ -184,7 +184,7 @@ public class ServeiController extends BaseUserController{
 			model.addAttribute("operadorPostalList", operadorPostalList);
 			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
 			model.addAttribute("cieList", cieList);
-			return "procedimentAdminForm";
+			return "serveiAdminForm";
 		}
 		
 		if (procSerCommand.getId() != null) {
@@ -238,7 +238,7 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("operadorPostalList", operadorPostalList);
 		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
-		return "procedimentAdminForm";
+		return "serveiAdminForm";
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
