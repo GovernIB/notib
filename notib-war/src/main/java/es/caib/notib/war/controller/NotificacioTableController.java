@@ -806,59 +806,41 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             @Valid MarcarProcessatCommand command,
             BindingResult bindingResult,
             Model model) {
+
         // identificadors de les notificacions, no dels enviaments.
         @SuppressWarnings("unchecked")
-        Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
-                request,
-                sessionAttributeSeleccio);
+        Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
         if (seleccio == null || seleccio.isEmpty()) {
-            return getModalControllerReturnValueError(
-                    request,
-                    "redirect:../..",
-                    "accio.massiva.seleccio.buida");
+            return getModalControllerReturnValueError(request, "redirect:../..", "accio.massiva.seleccio.buida");
         }
-
         if (bindingResult.hasErrors()) {
+            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<>());
             model.addAttribute("isMassiu", true);
             return "notificacioMarcarProcessat";
         }
         boolean allOK = true;
         for (Long notificacioId : seleccio) {
             try {
-                String resposta = notificacioService.marcarComProcessada(
-                        notificacioId,
-                        command.getMotiu(),
-                        isAdministrador(request));
+                String resposta = notificacioService.marcarComProcessada(notificacioId, command.getMotiu(), isAdministrador(request));
 
                 if (resposta != null) {
                     MissatgesHelper.warning(request, resposta);
-                } else {
-                    MissatgesHelper.success(request,
-                            String.format("La notificació (Id=%d) s'ha marcat com a processada",
-                                    notificacioId)
-                    );
+                    continue;
                 }
+                MissatgesHelper.success(request, String.format("La notificació (Id=%d) s'ha marcat com a processada", notificacioId));
             } catch (Exception ex) {
-                MissatgesHelper.error(request,
-                    String.format("Hi ha hagut un error processant la notificació (Id=%d): %s",
-                            notificacioId, ex.getMessage())
-                );
-                log.error("Hi ha hagut un error processant la notificació", ex);
+                String error = "Hi ha hagut un error processant la notificació";
+                log.error(error, ex);
                 allOK = false;
+                MissatgesHelper.error(request, String.format(error + " (Id=%d): %s", notificacioId, ex.getMessage()));
             }
         }
-        if (allOK) {
-            return getModalControllerReturnValueSuccess(
-                    request,
-                    "redirect:../..",
-                    "notificacio.controller.processar.massiu.ok");
-        } else {
-            return getModalControllerReturnValueError(
-                    request,
-                    "redirect:../..",
-                    "notificacio.controller.processar.massiu.ko");
-        }
 
+        RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<>());
+        if (allOK) {
+            return getModalControllerReturnValueSuccess(request, "redirect:../..", "notificacio.controller.processar.massiu.ok");
+        }
+        return getModalControllerReturnValueError(request, "redirect:../..", "notificacio.controller.processar.massiu.ko");
     }
 
     @RequestMapping(value = "/eliminar", method = RequestMethod.GET)

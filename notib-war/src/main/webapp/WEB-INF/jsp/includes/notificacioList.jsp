@@ -498,14 +498,14 @@
   						<span class="badge seleccioCount">${fn:length(seleccio)}</span> <spring:message code="enviament.list.user.accions.massives"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li><a href="<c:url value="notificacio/export/ODS"/>"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
+						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
-                        <li><a href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
+                        <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
                         <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
 
                         <c:if test="${isRolActualAdministradorEntitat}">
-                            <li><a href="<c:url value="/notificacio/reintentar/registre"/>"><spring:message code="notificacio.list.accio.massiva.reintentar.registre"/></a></li>
+                            <li><a style="cursor: pointer;" id="reintentarRegistre"><spring:message code="notificacio.list.accio.massiva.reintentar.registre"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
