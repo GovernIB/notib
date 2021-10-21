@@ -26,6 +26,7 @@ public class ProgresActualitzacioCertificacioDto {
 	
 	boolean error = false;
 	String errorMsg;
+	boolean finished = false;
 	
 	public void addInfo(TipusActInfo tipus, String text) {
 		info.add(new ActualitzacioInfo(tipus, text));

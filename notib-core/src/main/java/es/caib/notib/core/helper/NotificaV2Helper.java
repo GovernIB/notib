@@ -198,14 +198,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-		Date dataUltimDatat = enviament.getNotificaDataCreacio();
-
-		enviament.updateNotificaDataRefrescEstat();
-		enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
 
 		long startTime;
 		double elapsedTime;
 		try {
+			Date dataUltimDatat = enviament.getNotificaDataCreacio();
+
+			enviament.updateNotificaDataRefrescEstat();
+			enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
+
 			if (enviament.getNotificaIdentificador() == null) {
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				String errorDescripcio = "L'enviament no té identificador de Notifica";

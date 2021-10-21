@@ -177,16 +177,16 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
-
 		log.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 		NotificacioEntity notificacio = notificacioRepository.findById(enviament.getNotificacio().getId());
-		Date dataUltimDatat = enviament.getNotificaDataCreacio();
-		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
-
-		enviament.updateNotificaDataRefrescEstat();
-		enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
 
 		try {
+			Date dataUltimDatat = enviament.getNotificaDataCreacio();
+			Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
+
+			enviament.updateNotificaDataRefrescEstat();
+			enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
+
 			if (enviament.getNotificaIdentificador() == null) {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				String errorDescripcio = "L'enviament no té identificador de Notifica";
