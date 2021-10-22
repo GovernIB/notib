@@ -25,7 +25,7 @@ public interface GrupProcSerRepository extends JpaRepository<GrupProcSerEntity, 
 	@Query(
 			"select distinct g.codi " +
 			"  from GrupProcSerEntity gp " +
-			"  left outer join gp.procser p " +
+			"  left outer join gp.procSer p " +
 			"  left outer join gp.grup g " +
 			" where p.codi in (:procedimentCodis) " +
 			"	and p.entitat = :entitat ")

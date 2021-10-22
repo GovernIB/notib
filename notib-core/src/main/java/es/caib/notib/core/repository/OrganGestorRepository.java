@@ -64,7 +64,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where pro.entitat = :entitat " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.procser " +
+			"  and pro in (select distinct gp.procSer " +
 			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +

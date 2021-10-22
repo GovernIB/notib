@@ -19,7 +19,7 @@ public class GrupProcSerEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment")
 	@ForeignKey(name = "not_pro_grup_fk")
-	protected ProcSerEntity procser;
+	protected ProcSerEntity procSer;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "grup")
@@ -27,11 +27,11 @@ public class GrupProcSerEntity extends NotibAuditable<Long> {
 	protected GrupEntity grup;
 	
 	
-	public ProcSerEntity getProcser() {
-		return procser;
+	public ProcSerEntity getProcSer() {
+		return procSer;
 	}
-	public void setProcser(ProcSerEntity procediment) {
-		this.procser = procediment;
+	public void setProcSer(ProcSerEntity procediment) {
+		this.procSer = procediment;
 	}
 	public GrupEntity getGrup() {
 		return grup;
@@ -43,7 +43,7 @@ public class GrupProcSerEntity extends NotibAuditable<Long> {
 	public void update(
 			ProcSerEntity procser,
 			GrupEntity grup) {
-		this.procser = procser;
+		this.procSer = procser;
 		this.grup = grup;
 	}
 	
@@ -61,7 +61,7 @@ public class GrupProcSerEntity extends NotibAuditable<Long> {
 				ProcSerEntity procser,
 				GrupEntity grup) {
 			built = new GrupProcSerEntity();
-			built.procser = procser;
+			built.procSer = procser;
 			built.grup = grup;
 		}
 		public GrupProcSerEntity build() {

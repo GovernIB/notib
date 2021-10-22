@@ -23,7 +23,7 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class ProcSerEntity extends NotibAuditable<Long> {
 
-    @Column(name = "tipus", length = 32)
+    @Column(name = "tipus", length = 32, insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private ProcSerTipusEnum tipus;
 

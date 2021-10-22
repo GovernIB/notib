@@ -33,8 +33,8 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"from ServeiEntity pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.agrupar = true " +
-			"  and pro in (select distinct gp.servei " +
-			"		from GrupServeiEntity gp " +
+			"  and pro in (select distinct gp.procSer " +
+			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups)) ")
@@ -47,8 +47,8 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"where pro.entitat = :entitat " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.servei " +
-			"		from GrupServeiEntity gp " +
+			"  and pro in (select distinct gp.procSer " +
+			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
@@ -64,8 +64,8 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"	and pro.id in (:ids)" +
 			"  	and (pro.agrupar = false " +
 			"  		or (pro.agrupar = true " +
-			"  			and pro in (select distinct gp.servei " +
-			"						from GrupServeiEntity gp " +
+			"  			and pro in (select distinct gp.procSer " +
+			"						from GrupProcSerEntity gp " +
 			"						left outer join gp.grup g " +
 			"						where g.entitat = :entitat " +
 			"		  					  and g.codi in (:grups))" +
@@ -84,8 +84,8 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"  and og.id = :organGestorId " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.servei " +
-			"		from GrupServeiEntity gp " +
+			"  and pro in (select distinct gp.procSer " +
+			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
@@ -185,8 +185,8 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.servei " +
-			"		from GrupServeiEntity gp " +
+			"  and pro in (select distinct gp.procSer " +
+			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
 			"order by pro.nom asc")

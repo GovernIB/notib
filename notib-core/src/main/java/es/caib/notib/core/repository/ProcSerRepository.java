@@ -61,7 +61,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"	and pro.id in (:ids)" +
 			"  	and (pro.agrupar = false " +
 			"  		or (pro.agrupar = true " +
-			"  			and pro in (select distinct gp.procser " +
+			"  			and pro in (select distinct gp.procSer " +
 			"						from GrupProcSerEntity gp " +
 			"						left outer join gp.grup g " +
 			"						where g.entitat = :entitat " +
@@ -181,7 +181,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.procser " +
+			"  and pro in (select distinct gp.procSer " +
 			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
