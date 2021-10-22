@@ -39,6 +39,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String grupCodi;
 	private NotificacioEstatEnumDto estat;
 	protected Date estatDate;
+	protected Date estatProcessatDate;
 	private String serveiTipus;
 	private List<EnviamentInfoDto> enviaments = new ArrayList<>();
 	private String usuariCodi;

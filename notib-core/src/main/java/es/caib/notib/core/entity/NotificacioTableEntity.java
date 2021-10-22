@@ -117,6 +117,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private OrganGestorEstatEnum organEstat;
 	@Column(name = "ERROR_LAST_EVENT")
 	private boolean isErrorLastEvent;
+	@Column(name = "ESTAT_PROCESSAT_DATE")
+	private Date estatProcessatDate;
 
 	@Setter
 	@Transient

@@ -241,28 +241,33 @@ $(document).ready(function() {
 <%--								<c:if test="${notificacio.tipusUsuari == 'APLICACIO' and notificacio.errorLastEvent}">--%>
 <%--									<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
 <%--								</c:if>--%>
-								<c:if test="${notificacio.estat == 'PROCESSADA' and not empty notificacio.estatDate}">
-									<br>
-									<span class="horaProcessat"><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></span>
-									<br>
-								</c:if>
+<%--								<c:if test="${notificacio.estat == 'PROCESSADA' and not empty notificacio.estatDate}">--%>
+<%--									<br>--%>
+<%--									<span class="horaProcessat"><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></span>--%>
+<%--									<br>--%>
+<%--								</c:if>--%>
 								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
-									<p style="display:inline">(
-									<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
+									(<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
 										<c:if test="${not empty enviament.notificaEstat}">
 											<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
 											${!status.last ? ', ' : ''}
 										</c:if>
-									</c:forEach>
-									)</p>
+									</c:forEach>)
 								</c:if>
 							</td>
 						</tr>
 						</c:if>
 						<tr>
-							<td><strong><spring:message
-										code="notificacio.info.dada.creacio.data" /></strong></td>
+							<td><strong><spring:message code="notificacio.info.dada.creacio.data" /></strong></td>
 							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.finalitzada.dada"/></strong></td>
+							<td><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.processada.dada"/></strong></td>
+							<td><fmt:formatDate value="${notificacio.estatProcessatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.creacio.usuari" /></strong></td>

@@ -83,6 +83,8 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private NotificacioEstatEnumDto estat;
 	@Column(name = "estat_date")
 	private Date estatDate;
+	@Column(name = "estat_processat_date")
+	private Date estatProcessatDate;
 	@Column(name = "motiu")
 	private String motiu;
 	
