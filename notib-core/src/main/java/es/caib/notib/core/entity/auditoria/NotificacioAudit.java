@@ -83,6 +83,8 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private NotificacioEstatEnumDto estat;
 	@Column(name = "estat_date")
 	private Date estatDate;
+	@Column(name = "estat_processat_date")
+	private Date estatProcessatDate;
 	@Column(name = "motiu")
 	private String motiu;
 	
@@ -146,6 +148,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 		this.documentId = notificacioEntity.getDocument() != null ? notificacioEntity.getDocument().getId() : null;
 		this.estat = notificacioEntity.getEstat();
 		this.estatDate = notificacioEntity.getEstatDate();
+		this.estatProcessatDate = notificacioEntity.getEstatDate();
 		this.motiu = notificacioEntity.getMotiu();
 //		this.pagadorPostalId = notificacioEntity.getPagadorPostal() != null ? notificacioEntity.getPagadorPostal().getId() : null;
 //		this.pagadorCieId = notificacioEntity.getPagadorCie() != null ? notificacioEntity.getPagadorCie().getId() : null;

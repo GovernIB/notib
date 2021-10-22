@@ -201,7 +201,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				"		</tr>"+
 				"		<tr>"+
 				"			<th>"+ messageHelper.getMessage("notificacio.email.notificacio.info") + "</th>"+
-				"			<td> <a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a>" +
+				"			<td> <a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+ "/info\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a>" +
 				"			</td>"+
 				"		</tr>"+
 				"	</table>" +
@@ -231,7 +231,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 						"\t"+messageHelper.getMessage("notificacio.email.estat.motiu") +
 						"\t\t\t\t"+ Objects.toString(notificacio.getMotiu(), "") +"\n"+
 						"\t"+messageHelper.getMessage("notificacio.email.notificacio.info") +
-						"\t\t\t\t"+ "<a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
+						"\t\t\t\t"+ "<a href=\""+appBaseUrl+"/notificacio/"+notificacio.getId()+"/info\">"+ messageHelper.getMessage("notificacio.email.notificacio.detall") + "</a> \n"+
 						"";
 	}
 	@Override

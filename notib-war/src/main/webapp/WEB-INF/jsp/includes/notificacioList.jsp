@@ -610,9 +610,9 @@
 						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
 							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
 						{{/if}}
-						{{if estat == 'PROCESSADA' && estatDate != ''}}
+						{{if (estat == 'FINALITZADA' || estat == 'PROCESSADA') && estatDate != ''}}
 							<br>
-							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate+ ')')}}</span>
+							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate + ')')}}</span>
 							<br>
 						{{/if}}
 						{{if estat == 'FINALITZADA' ||  estat == 'PROCESSADA'}}
