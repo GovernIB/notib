@@ -34,93 +34,101 @@ public class NotificacioTableHelper {
     public void crearRegistre(NotificacioEntity notificacio){
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
 
-        NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
-                .notificacio(notificacio)
-                .entitat(notificacio.getEntitat())
-                .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
-                .procedimentOrgan(notificacio.getProcedimentOrgan())
-                .usuariCodi(notificacio.getUsuariCodi())
-                .grupCodi(notificacio.getGrupCodi())
-//				.notificaErrorEvent(notificacio.getNotificaErrorEvent())
-                .tipusUsuari(notificacio.getTipusUsuari())
-                .notificaErrorData(null)
-                .notificaErrorDescripcio(null)
-                .enviamentTipus(notificacio.getEnviamentTipus())
-                .numExpedient(notificacio.getNumExpedient())
-                .concepte(notificacio.getConcepte())
-                .estat(notificacio.getEstat())
-                .estatDate(notificacio.getEstatDate())
-                .entitatNom(notificacio.getEntitat().getNom())
-                .procedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null)
-                .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
-                .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
-                .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
-                .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
-                .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
-                .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
-                .isErrorLastEvent(false)
-                .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
-                .build();
+        try {
+            NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
+                    .notificacio(notificacio)
+                    .entitat(notificacio.getEntitat())
+                    .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
+                    .procedimentOrgan(notificacio.getProcedimentOrgan())
+                    .usuariCodi(notificacio.getUsuariCodi())
+                    .grupCodi(notificacio.getGrupCodi())
+                    //				.notificaErrorEvent(notificacio.getNotificaErrorEvent())
+                    .tipusUsuari(notificacio.getTipusUsuari())
+                    .notificaErrorData(null)
+                    .notificaErrorDescripcio(null)
+                    .enviamentTipus(notificacio.getEnviamentTipus())
+                    .numExpedient(notificacio.getNumExpedient())
+                    .concepte(notificacio.getConcepte())
+                    .estat(notificacio.getEstat())
+                    .estatDate(notificacio.getEstatDate())
+                    .entitatNom(notificacio.getEntitat().getNom())
+                    .procedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null)
+                    .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
+                    .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
+                    .procedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission())
+                    .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
+                    .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
+                    .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
+                    .isErrorLastEvent(false)
+                    .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
+                    .build();
 
-        notificacioTableViewRepository.save(tableViewItem);
+            notificacioTableViewRepository.save(tableViewItem);
+        } catch (Exception ex) {
+            log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);
+        }
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEntity notificacio){
         log.info(String.format("[NOTIF-TABLE] Actualitzam el registre de la notificacio [Id: %d]", notificacio.getId()));
-        NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
-        if (tableViewItem == null) {
-            this.crearRegistre(notificacio);
-            return;
-        }
+        try {
+            NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
+            if (tableViewItem == null) {
+                this.crearRegistre(notificacio);
+                return;
+            }
 
-        // Si pertany a una notificació massiva necessitam l'estat actual i error
-        NotificacioEstatEnumDto estatActual = tableViewItem.getEstat();
-        boolean hasErrorActual = tableViewItem.getNotificaErrorData() != null;
+            // Si pertany a una notificació massiva necessitam l'estat actual i error
+            NotificacioEstatEnumDto estatActual = tableViewItem.getEstat();
+            boolean hasErrorActual = tableViewItem.getNotificaErrorData() != null;
 
-        tableViewItem.setEntitat(notificacio.getEntitat());
-        tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
-        tableViewItem.setProcedimentOrgan(notificacio.getProcedimentOrgan());
-        tableViewItem.setUsuariCodi(notificacio.getUsuariCodi());
-        tableViewItem.setGrupCodi(notificacio.getGrupCodi());
-        tableViewItem.setTipusUsuari(notificacio.getTipusUsuari());
-        tableViewItem.setNotificacioMassiva(notificacio.getNotificacioMassivaEntity());
+            tableViewItem.setEntitat(notificacio.getEntitat());
+            tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
+            tableViewItem.setProcedimentOrgan(notificacio.getProcedimentOrgan());
+            tableViewItem.setUsuariCodi(notificacio.getUsuariCodi());
+            tableViewItem.setGrupCodi(notificacio.getGrupCodi());
+            tableViewItem.setTipusUsuari(notificacio.getTipusUsuari());
+            tableViewItem.setNotificacioMassiva(notificacio.getNotificacioMassivaEntity());
 
-        if (ignoreNotificaError(notificacio)) {
-            tableViewItem.setNotificaErrorData(null);
-            tableViewItem.setNotificaErrorDescripcio(null);
+            if (ignoreNotificaError(notificacio)) {
+                tableViewItem.setNotificaErrorData(null);
+                tableViewItem.setNotificaErrorDescripcio(null);
 
-        } else {
-            NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
-            tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
-            tableViewItem.setNotificaErrorDescripcio(lastEvent != null ? lastEvent.getErrorDescripcio() : null);
-            tableViewItem.setErrorLastEvent(isErrorLastEvent(notificacio, lastEvent));
-        }
+            } else {
+                NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+                tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
+                tableViewItem.setNotificaErrorDescripcio(lastEvent != null ? lastEvent.getErrorDescripcio() : null);
+                tableViewItem.setErrorLastEvent(isErrorLastEvent(notificacio, lastEvent));
+            }
 
-        tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
-        tableViewItem.setNumExpedient(notificacio.getNumExpedient());
-        tableViewItem.setConcepte(notificacio.getConcepte());
-        tableViewItem.setEstat(notificacio.getEstat());
-        tableViewItem.setEstatDate(notificacio.getEstatDate());
-        tableViewItem.setEntitatNom(notificacio.getEntitat().getNom());
-        tableViewItem.setProcedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null);
-        tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);
-        tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());
-        tableViewItem.setProcedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission());
-        tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
-        tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
-        tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
-        tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
+            tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
+            tableViewItem.setNumExpedient(notificacio.getNumExpedient());
+            tableViewItem.setConcepte(notificacio.getConcepte());
+            tableViewItem.setEstat(notificacio.getEstat());
+            tableViewItem.setEstatDate(notificacio.getEstatDate());
+            tableViewItem.setEntitatNom(notificacio.getEntitat().getNom());
+            tableViewItem.setProcedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null);
+            tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);
+            tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());
+            tableViewItem.setProcedimentRequirePermission(notificacio.getProcediment() != null && notificacio.getProcediment().isRequireDirectPermission());
+            tableViewItem.setOrganCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null);
+            tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
+            tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
+            tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
 
-        notificacioTableViewRepository.saveAndFlush(tableViewItem);
+            notificacioTableViewRepository.saveAndFlush(tableViewItem);
 
-        if (notificacio.getNotificacioMassivaEntity() != null) {
-            updateMassiva(notificacio.getNotificacioMassivaEntity(),
-                    estatActual,
-                    hasErrorActual,
-                    tableViewItem.getEstat(),
-                    tableViewItem.getNotificaErrorData() != null);
-            notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
+            if (notificacio.getNotificacioMassivaEntity() != null) {
+                updateMassiva(notificacio.getNotificacioMassivaEntity(),
+                        estatActual,
+                        hasErrorActual,
+                        tableViewItem.getEstat(),
+                        tableViewItem.getNotificaErrorData() != null);
+                notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
+            }
+        } catch (Exception ex) {
+            log.error("No ha estat possible actualitzar la informació de la notificació " + notificacio.getId(), ex);
         }
 
     }

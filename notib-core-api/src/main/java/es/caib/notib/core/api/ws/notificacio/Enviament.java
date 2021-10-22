@@ -3,13 +3,17 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
+import es.caib.notib.core.api.util.TrimStringDeserializer;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
-import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
+import java.util.List;
 
 /**
  * Informació d'un enviament d'una notificació.
@@ -17,9 +21,13 @@ import es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @JsonAutoDetect
+@Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Enviament {
 
 	private Long id;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String referencia;
 	private Persona titular;
 	private List<Persona> destinataris;
@@ -28,62 +36,6 @@ public class Enviament {
 	private boolean entregaDehActiva;
 	private EntregaDeh entregaDeh;
 	private NotificaServeiTipusEnumDto serveiTipus;
-
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getReferencia() {
-		return referencia;
-	}
-	public void setReferencia(String referencia) {
-		this.referencia = referencia;
-	}
-	public Persona getTitular() {
-		return titular;
-	}
-	public void setTitular(Persona titular) {
-		this.titular = titular;
-	}
-	public List<Persona> getDestinataris() {
-		return destinataris;
-	}
-	public void setDestinataris(List<Persona> destinataris) {
-		this.destinataris = destinataris;
-	}
-	public boolean isEntregaPostalActiva() {
-		return entregaPostalActiva;
-	}
-	public void setEntregaPostalActiva(boolean entregaPostalActiva) {
-		this.entregaPostalActiva = entregaPostalActiva;
-	}
-	public boolean isEntregaDehActiva() {
-		return entregaDehActiva;
-	}
-	public void setEntregaDehActiva(boolean entregaDehActiva) {
-		this.entregaDehActiva = entregaDehActiva;
-	}
-	public EntregaPostal getEntregaPostal() {
-		return entregaPostal;
-	}
-	public void setEntregaPostal(EntregaPostal entregaPostal) {
-		this.entregaPostal = entregaPostal;
-	}
-	public EntregaDeh getEntregaDeh() {
-		return entregaDeh;
-	}
-	public void setEntregaDeh(EntregaDeh entregaDeh) {
-		this.entregaDeh = entregaDeh;
-	}
-	public NotificaServeiTipusEnumDto getServeiTipus() {
-		return serveiTipus;
-	}
-	public void setServeiTipus(NotificaServeiTipusEnumDto serveiTipus) {
-		this.serveiTipus = serveiTipus;
-	}
 
 	@Override
 	public String toString() {
