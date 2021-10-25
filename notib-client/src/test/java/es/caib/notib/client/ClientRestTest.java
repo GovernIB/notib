@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 public class ClientRestTest extends ClientBaseTest {
 
 	
-//	private static final String URL = "http://localhost:8180/notib";
+//	private static final String URL = "http://localhost:8080/notib";
 //	private static final String USERNAME = "admin";
 //	private static final String PASSWORD = "admin";
 
@@ -44,7 +44,12 @@ public class ClientRestTest extends ClientBaseTest {
 	private NotificacioRestClient client;
 
 	@Before
-	public void setUp() throws IOException, DecoderException {
+	public void setUp() throws Exception {
+
+		String keystorePath = ClientRestTest.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
+		System.setProperty("javax.net.ssl.trustStore", keystorePath);
+		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
+
 		client = NotificacioRestClientFactory.getRestClient(
 				URL,
 				USERNAME,
@@ -59,7 +64,7 @@ public class ClientRestTest extends ClientBaseTest {
 				generarNotificacioV2(
 						notificacioId,
 						1,
-						false));
+						true));
 
 		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {

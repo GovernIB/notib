@@ -150,11 +150,23 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 										.addNode("arxiu[" + i + "]")
 										.addConstraintViolation();
 							}
-//							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0)) {
+							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) ||
+									(notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty())) {
+								String extensio;
+								String contentType;
+								Long fileSize;
+								if (notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty()) {
+									extensio = FilenameUtils.getExtension(notificacio.getDocuments()[i].getArxiuNom());
+									contentType = notificacio.getDocuments()[i].getMediaType();
+									fileSize = notificacio.getDocuments()[i].getMida();
+								} else {
+									extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
+									contentType = notificacio.getArxiu()[i].getContentType();
+									fileSize = notificacio.getArxiu()[i].getSize();
+								}
 								log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
 								boolean formatValid = true;
 								if (comunicacioAmbAdministracio) {
-									String extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
 									log.info("NOTIFICACIO-VAL: > Extensió: '{}'", extensio);
 									if (!extensionsDisponibles.contains(extensio)) {
 										log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
@@ -165,7 +177,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 												.addConstraintViolation();
 									}
 								} else {
-									String contentType = notificacio.getArxiu()[i].getContentType();
 									log.info("NOTIFICACIO-VAL: > ContentType: '{}'", contentType);
 									if (!formatsDisponibles.contains(contentType)) {
 										log.info("NOTIFICACIO-VAL: > ContentType no vàlid!!");
@@ -179,18 +190,17 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 								if (formatValid)
 									log.info("NOTIFICACIO-VAL: > Format de document vàlid");
 
-//							}
-							Long fileSize = notificacio.getArxiu()[i].getSize();
-							fileTotalSize += fileSize;
-							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) && fileSize > fileMaxSize) {
-								valid = false;
-								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size"))
-										.addNode("arxiu[" + i + "]")
-										.addConstraintViolation();
+								fileTotalSize += fileSize;
+								if (fileSize > fileMaxSize) {
+									valid = false;
+									context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size"))
+											.addNode("arxiu[" + i + "]")
+											.addConstraintViolation();
+								}
 							}
 							break;
 						case URL:
-							if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].isEmpty())) {
+							if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].trim().isEmpty())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
 										.addNode("documentArxiuUrl[" + i + "]")
@@ -198,7 +208,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 							break;
 						case CSV:
-							if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].isEmpty())) {
+							if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].trim().isEmpty())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
 										.addNode("documentArxiuCsv[" + i + "]")
@@ -206,7 +216,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 							break;
 						case UUID:
-							if (i == 0 && (notificacio.getDocumentArxiuUuid()[i] == null || notificacio.getDocumentArxiuUuid()[i].isEmpty())) {
+							if (i == 0 && (notificacio.getDocumentArxiuUuid()[i] == null || notificacio.getDocumentArxiuUuid()[i].trim().isEmpty())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
 										.addNode("documentArxiuUuid[" + i + "]")

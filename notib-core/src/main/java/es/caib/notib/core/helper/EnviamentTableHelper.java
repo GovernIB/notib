@@ -31,12 +31,12 @@ public class EnviamentTableHelper {
                 .destinataris(getEnviamentDestinataris(enviament))
                 .tipusEnviament(notificacio.getEnviamentTipus())
 
-                .titularNif(titular.getNif())
-                .titularNom(titular.getNom())
-                .titularEmail(titular.getEmail())
-                .titularLlinatge1(titular.getLlinatge1())
-                .titularLlinatge2(titular.getLlinatge2())
-                .titularRaoSocial(titular.getRaoSocial())
+                .titularNif(titular != null ? titular.getNif() : null)
+                .titularNom(titular != null ? titular.getNom() : null)
+                .titularEmail(titular != null ? titular.getEmail() : null)
+                .titularLlinatge1(titular != null ? titular.getLlinatge1() : null)
+                .titularLlinatge2(titular != null ? titular.getLlinatge2() : null)
+                .titularRaoSocial(titular != null ? titular.getRaoSocial() : null)
 
                 .enviamentDataProgramada(notificacio.getEnviamentDataProgramada())
                 .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
@@ -49,7 +49,7 @@ public class EnviamentTableHelper {
                 .descripcio(notificacio.getDescripcio())
                 .registreLlibreNom(notificacio.getRegistreLlibreNom())
                 .estat(notificacio.getEstat())
-                .csv_uuid(document.getCsv() + document.getUuid())
+                .csv_uuid(document != null ? document.getCsv() + document.getUuid() : null)
                 .hasErrors(false)
 
                 .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
@@ -88,12 +88,12 @@ public class EnviamentTableHelper {
         tableViewItem.setDestinataris(getEnviamentDestinataris(enviament));
         tableViewItem.setTipusEnviament(notificacio.getEnviamentTipus());
 
-        tableViewItem.setTitularNif(titular.getNif());
-        tableViewItem.setTitularNom(titular.getNom());
-        tableViewItem.setTitularEmail(titular.getEmail());
-        tableViewItem.setTitularLlinatge1(titular.getLlinatge1());
-        tableViewItem.setTitularLlinatge2(titular.getLlinatge2());
-        tableViewItem.setTitularRaoSocial(titular.getRaoSocial());
+        tableViewItem.setTitularNif(titular != null ? titular.getNif() : null);
+        tableViewItem.setTitularNom(titular != null ? titular.getNom() : null);
+        tableViewItem.setTitularEmail(titular != null ? titular.getEmail() : null);
+        tableViewItem.setTitularLlinatge1(titular != null ? titular.getLlinatge1() : null);
+        tableViewItem.setTitularLlinatge2(titular != null ? titular.getLlinatge2() : null);
+        tableViewItem.setTitularRaoSocial(titular != null ? titular.getRaoSocial() : null);
 
         tableViewItem.setEnviamentDataProgramada(notificacio.getEnviamentDataProgramada());
         tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
@@ -106,7 +106,7 @@ public class EnviamentTableHelper {
         tableViewItem.setDescripcio(notificacio.getDescripcio());
         tableViewItem.setRegistreLlibreNom(notificacio.getRegistreLlibreNom());
         tableViewItem.setEstat(notificacio.getEstat());
-        tableViewItem.setCsv_uuid(document.getCsv() + document.getUuid());
+        tableViewItem.setCsv_uuid(document != null ? document.getCsv() + document.getUuid() : null);
         tableViewItem.setHasErrors(false);
 
         tableViewItem.setProcedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu());
