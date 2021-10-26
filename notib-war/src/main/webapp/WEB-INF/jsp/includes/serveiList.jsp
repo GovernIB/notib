@@ -172,7 +172,7 @@ $(document).ready(function() {
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="${unitatCodiUrlPrefix}servei/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="${unitatCodiUrlPrefix}servei/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="${unitatCodiUrlPrefix}servei/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="servei.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
 					{{/if}}
@@ -187,17 +187,17 @@ $(document).ready(function() {
 <c:if test="${not simplifiedView}">
 	<p style="text-align:right">
 		<c:if test="${isRolActualAdministradorEntitat}">
-			<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}servei/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
+			<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
 			<c:if test="${!isCodiDir3Entitat}">
 				<a id="procediment-boto-update"
 					class="btn btn-default" href="${unitatCodiUrlPrefix}servei/update/auto"
 					data-toggle="modal"
 					data-maximized="false">
-					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="procediment.list.boto.procediment.auto"/>
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="servei.list.boto.procediment.auto"/>
 				</a>
 			</c:if>
 		</c:if>
-		<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}servei/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.list.boto.nou.procediment"/></a>
+		<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}servei/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="servei.list.boto.nou.procediment"/></a>
 	</p>
 </c:if>
 </script>

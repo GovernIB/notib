@@ -17,9 +17,9 @@ import java.util.List;
 public interface GrupProcSerRepository extends JpaRepository<GrupProcSerEntity, Long> {
 
 	public List<GrupProcSerEntity> findByGrup(GrupEntity grup);
-	public List<GrupProcSerEntity> findByProcSer(ProcSerEntity procediment);
-	public List<GrupProcSerEntity> findByProcSer(ProcSerEntity procediment, Pageable paginacio);
-	public GrupProcSerEntity findByGrupAndProcSer(GrupEntity grup, ProcSerEntity procediment);
+	public List<GrupProcSerEntity> findByProcSer(ProcSerEntity procSer);
+	public List<GrupProcSerEntity> findByProcSer(ProcSerEntity procSer, Pageable paginacio);
+	public GrupProcSerEntity findByGrupAndProcSer(GrupEntity grup, ProcSerEntity procSer);
 	public List<GrupProcSerEntity> findByProcSerEntitat(EntitatEntity entitat);
 
 	@Query(

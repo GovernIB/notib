@@ -38,7 +38,7 @@ public class AuditServiceImpl implements AuditService {
 	private NotificacioHelper notificacioHelper;
 
 	@Override
-	@Transactional(propagation = Propagation.MANDATORY) // A JBoss ha de ser Propagation.MANDATORY, a tomcat Propagation.REQUIRED
+	@Transactional(propagation = Propagation.REQUIRED) // A JBoss ha de ser Propagation.MANDATORY, a tomcat Propagation.REQUIRED
 	public void audita(
 			Object objecteAuditar,
 			TipusOperacio tipusOperacio,

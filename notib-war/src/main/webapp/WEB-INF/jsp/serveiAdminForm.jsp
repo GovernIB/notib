@@ -10,8 +10,8 @@ pageContext.setAttribute(
 			es.caib.notib.war.helper.RolHelper.isUsuariActualAdministradorEntitat(request));
 %>
 <c:choose>
-	<c:when test="${empty procSerCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:otherwise>
+	<c:when test="${empty procSerCommand.codi}"><c:set var="titol"><spring:message code="servei.form.titol.crear"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:when>
+	<c:otherwise><c:set var="titol"><spring:message code="servei.form.titol.modificar"/> ${entitat.nom} <c:out value=" (${entitat.dir3Codi})"></c:out></c:set></c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -191,7 +191,7 @@ $(document).ready(function() {
 		$('#entrega-cie-form').hide();
 	}
 
-	// CANVIS EN EL FORMULARI SEGONS SI EL PROCEDIMENT ES CREAT ES COMÚ O NO
+	// CANVIS EN EL FORMULARI SEGONS SI EL SERVEI ES CREAT ES COMÚ O NO
 	$('#comu').change(function() {
 		if (this.checked) {
 			$('#organGestorNom').removeClass('habilitat');
@@ -219,7 +219,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
-	<c:set var="formAction"><not:modalUrl value="/procediment/newOrModify"/></c:set>
+	<c:set var="formAction"><not:modalUrl value="/servei/newOrModify"/></c:set>
 	<c:forEach items="${errors}" var="error" varStatus="status">
 		<c:if test="${error.field == 'llibre' || error.field == 'oficina'}">
 			<c:set var="errorsRegistre" value="${error.field}"></c:set>
@@ -254,9 +254,6 @@ $(document).ready(function() {
 				<form:hidden path="entitatId" value="${entitat.id}"/>
 				<form:hidden path="organGestor"/>
 				
-<%-- 				<not:inputText name="organGestor" textKey="procediment.form.camp.organ" required="true" labelSize="2"/> --%>
-<%--				<not:inputSelect name="pagadorPostalId" emptyOption="true" textKey="procediment.form.camp.postal" optionItems="${pagadorsPostal}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>--%>
-<%--				<not:inputSelect name="pagadorCieId" emptyOption="true" textKey="procediment.form.camp.cie" optionItems="${pagadorsCie}" optionValueAttribute="id" optionTextAttribute="dir3codi" labelSize="2"/>--%>
 				<div id="entrega-cie">
 					<not:inputCheckbox name="entregaCieActiva" textKey="procediment.form.camp.entregacie" labelSize="2"/>
 					<div id="entrega-cie-form">
@@ -276,12 +273,6 @@ $(document).ready(function() {
 				<div class="alert alert-warning" role="alert">
 				 	<spring:message code="procediment.form.warning"></spring:message>
 				</div>
-				<%--
-				<form:hidden path="oficina"/>
-				<not:inputTextSearch name="oficinaNom" textKey="procediment.form.camp.oficina" searchButton="searchOficina" required="true" readonly="true" labelSize="2"/>
-				<form:hidden path="llibre"/>
-				<not:inputTextSearch name="llibreNom" textKey="procediment.form.camp.llibre" searchButton="searchLlibre" required="true" readonly="true" labelSize="2"/>
-				--%>
 				<form:hidden path="tipusAssumpte"/>
 				<not:inputTextSearch name="tipusAssumpteNom" textKey="procediment.form.camp.tipusassumpte" searchButton="searchTipusAssumpte" labelSize="2" readonly="true"/>
 				<form:hidden path="codiAssumpte"/>
@@ -290,7 +281,7 @@ $(document).ready(function() {
 		</div>
 		<div id="modal-botons">
 			<button id="addProcedimentButton" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/procediments"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/serveis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>	
 	</form:form>
 	<!-- Organismes Modal -->

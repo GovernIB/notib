@@ -198,6 +198,24 @@ public class ConversioTipusHelper {
 				})
 				.byDefault()
 				.register();
+
+		mapperFactory.classMap(ServeiEntity.class, ProcSerDto.class).
+				field("organGestor.codi", "organGestor")
+				.field("organGestor.nom", "organGestorNom")
+				.customize(
+						new CustomMapper<ServeiEntity, ProcSerDto>() {
+							public void mapAtoB(ServeiEntity a, ProcSerDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setEntregaCieActiva(a.getEntregaCie() != null);
+								if (a.getEntregaCie() != null) {
+									b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
+									b.setCieId(a.getEntregaCie().getCieId());
+								}
+							}
+						})
+				.byDefault()
+				.register();
+
 		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").

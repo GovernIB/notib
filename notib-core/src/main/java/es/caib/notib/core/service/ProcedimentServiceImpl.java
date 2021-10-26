@@ -521,6 +521,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					if (inf.getText() != null)
 						info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
 				}
+				progres.setProgres(100);
+				progres.setFinished(true);
 				integracioHelper.addAccioOk(info);
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
@@ -529,6 +531,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				progresActualitzacio.get(entitatDto.getDir3Codi()).setError(true);
 				progresActualitzacio.get(entitatDto.getDir3Codi()).setErrorMsg(sw.toString());
 				progresActualitzacio.get(entitatDto.getDir3Codi()).setProgres(100);
+				progresActualitzacio.get(entitatDto.getDir3Codi()).setFinished(true);
 				
 				for (ActualitzacioInfo inf: progres.getInfo()) {
 					if (inf.getText() != null)
@@ -585,7 +588,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			ProgresActualitzacioDto progres = progresActualitzacio.get(dir3Codi);
-			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
+			if (progres != null && progres.isFinished()) {
 				progresActualitzacio.remove(dir3Codi);
 			}
 			return progres;
@@ -847,7 +850,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					permisos.addAll(findPermisProcedimentOrganByProcediment(procediment.getId(), organActual));
 				}
 
-				List<GrupDto> grups = grupService.findGrupsByProcediment(procediment.getId());
+				List<GrupDto> grups = grupService.findGrupsByProcSer(procediment.getId());
 				procediment.setGrups(grups);
 				procediment.setPermisos(permisos);
 			}

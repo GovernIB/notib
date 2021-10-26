@@ -1,26 +1,8 @@
 package es.caib.notib.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.codahale.metrics.Timer;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.GrupFiltreDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -29,22 +11,24 @@ import es.caib.notib.core.api.service.AuditService.TipusObjecte;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcSerEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.EntityComprovarHelper;
-import es.caib.notib.core.helper.GrupHelper;
-import es.caib.notib.core.helper.MetricsHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
-import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.entity.*;
+import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació del servei de gestió de grups.
@@ -67,7 +51,9 @@ public class GrupServiceImpl implements GrupService{
 	@Resource
 	private GrupRepository grupReposity;
 	@Resource
-	private GrupProcSerRepository grupProcedimentRepositoy;
+	private GrupProcSerRepository grupProcSerRepository;
+	@Resource
+	private ProcSerRepository procSerRepository;
 	@Resource
 	private ProcedimentRepository procedimentRepositroy;
 	@Resource
@@ -203,7 +189,7 @@ public class GrupServiceImpl implements GrupService{
 			List<GrupDto> grups = new ArrayList<GrupDto>();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepositoy.findByProcSer(procediment);
+			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
 			
 			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
 				DadesUsuari usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
@@ -225,12 +211,12 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<GrupDto> findGrupsByProcediment(Long procedimentId) {
+	public List<GrupDto> findGrupsByProcSer(Long procSerId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<GrupDto> grups = new ArrayList<GrupDto>();
-			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepositoy.findByProcSer(procediment);
+			ProcSerEntity procSer = procSerRepository.findOne(procSerId);
+			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procSer);
 			
 			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
 				grups.add(conversioTipusHelper.convertir(
@@ -246,7 +232,7 @@ public class GrupServiceImpl implements GrupService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<ProcSerGrupDto> findByProcediment(
+	public PaginaDto<ProcSerGrupDto> findByProcSer(
 			Long entitatId, 
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams) {
@@ -258,10 +244,10 @@ public class GrupServiceImpl implements GrupService{
 						false,
 						false, 
 						false);
-			
-			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
-			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepositoy.findByProcSer(
-					procediment,
+
+			ProcSerEntity procSer = procSerRepository.findOne(procedimentId);
+			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(
+					procSer,
 					paginacioHelper.toSpringDataPageable(paginacioParams)); 
 			
 			return paginacioHelper.toPaginaDto(
@@ -280,7 +266,7 @@ public class GrupServiceImpl implements GrupService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId);
-			GrupProcSerEntity procedimentGrup = grupProcedimentRepositoy.findOne(procedimentGrupId);
+			GrupProcSerEntity procedimentGrup = grupProcSerRepository.findOne(procedimentGrupId);
 			
 			return conversioTipusHelper.convertir(
 					procedimentGrup, 
@@ -301,7 +287,7 @@ public class GrupServiceImpl implements GrupService{
 			if (!grup.getEntitat().getId().equals(entitatId)) {
 				throw new ValidationException("El grup que s'intenta eliminar no pertany a la entitat actual");
 			}
-			List<GrupProcSerEntity> procedimentGrups = grupProcedimentRepositoy.findByGrup(grup);
+			List<GrupProcSerEntity> procedimentGrups = grupProcSerRepository.findByGrup(grup);
 			return (procedimentGrups != null && !procedimentGrups.isEmpty());
 		} finally {
 			metricsHelper.fiMetrica(timer);

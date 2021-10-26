@@ -59,6 +59,8 @@ public class ProcSerCommand {
 		ProcSerCommand command = ConversioTipusHelper.convertir(
 				dto,
 				ProcSerCommand.class );
+		if (dto.getEntitat() != null)
+			command.setEntitatId(dto.getEntitat().getId());
 		return command;
 	}
 	public static ProcSerDto asDto(ProcSerCommand command) {

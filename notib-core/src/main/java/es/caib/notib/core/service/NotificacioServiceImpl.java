@@ -1544,6 +1544,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			progres = new ProgresActualitzacioCertificacioDto();
 			progresActualitzacioExpirades.put(username, progres);
 			enviamentHelper.refrescarEnviamentsExpirats(progres);
+			progres.setProgres(100);
 			progres.setFinished(true);
 //			progresActualitzacioExpirades.remove(username);
 

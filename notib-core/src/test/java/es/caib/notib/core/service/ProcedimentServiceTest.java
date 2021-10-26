@@ -157,7 +157,7 @@ public class ProcedimentServiceTest {
 //		Mockito.when(procedimentFormRepository.findAmbOrganGestorOrComuAndFiltre(Mockito.anyLong(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), 
 //				Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyListOf(String.class), Mockito.anyBoolean(), Mockito.any(Pageable.class))).thenReturn(procediments);
 		Mockito.when(permisosHelper.findPermisos(Mockito.anyLong(), Mockito.eq(ProcedimentEntity.class))).thenReturn(permisos);
-		Mockito.when(grupService.findGrupsByProcediment(Mockito.anyLong())).thenReturn(grup);
+		Mockito.when(grupService.findGrupsByProcSer(Mockito.anyLong())).thenReturn(grup);
 		Mockito.when(paginacioHelper.toPaginaDto(Mockito.eq(procediments), Mockito.eq(ProcSerFormDto.class))).thenReturn(procedimentsPage);
 		Mockito.when(procedimentOrganRepository.findByProcSerId(Mockito.anyLong())).thenReturn(procedimentOrgans);
 //		Mockito.when(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(Mockito.anyString(), Mockito.anyString())).thenReturn(organsFills);		

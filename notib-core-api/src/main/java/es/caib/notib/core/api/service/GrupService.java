@@ -1,17 +1,12 @@
 package es.caib.notib.core.api.service;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.GrupFiltreDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la consulta dels procediments associats a una entitat
@@ -101,7 +96,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public PaginaDto<ProcSerGrupDto> findByProcediment(
+	public PaginaDto<ProcSerGrupDto> findByProcSer(
 			Long entitatId,
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams);
@@ -125,7 +120,7 @@ public interface GrupService {
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<GrupDto> findGrupsByProcediment(
+	public List<GrupDto> findGrupsByProcSer(
 			Long procedimentId);
 	
 	/**
