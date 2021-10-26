@@ -367,19 +367,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
         boolean enviada = notificacioService.enviar(notificacioId);
-        emplenarModelNotificacioInfo(
-                entitatActual,
-                notificacioId,
-                request,
-                "accions",
-                model);
+        emplenarModelNotificacioInfo(entitatActual, notificacioId, request, "accions", model);
         if (enviada) {
-            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
-                    "notificacio.controller.enviament.ok");
-        } else {
-            return getAjaxControllerReturnValueError(request, "notificacioInfo",
-                    "notificacio.controller.enviament.error");
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.enviament.ok");
         }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo", "notificacio.controller.enviament.error");
     }
 
     @RequestMapping(value = "/{notificacioId}/registrar", method = RequestMethod.GET)
@@ -387,34 +379,23 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             HttpServletRequest request,
             @PathVariable Long notificacioId,
             Model model) throws RegistreNotificaException {
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         List<RegistreIdDto> registresIdDto = notificacioService.registrarNotificar(notificacioId);
 
-        emplenarModelNotificacioInfo(
-                entitatActual,
-                notificacioId,
-                request,
-                "accions",
-                model);
-        if (registresIdDto.size() > 0) {
-            for (RegistreIdDto registreIdDto : registresIdDto) {
-                if (registreIdDto.getNumero() != null) {
-                    MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(
-                            request,
-                            "notificacio.controller.registrar.ok"));
-                } else {
-                    MissatgesHelper.error(request, getMessage(
-                            request,
-                            "notificacio.controller.registrar.error"));
-                }
-            }
-        } else {
-            MissatgesHelper.error(request, getMessage(
-                    request,
-                    "notificacio.controller.registrar.error"));
+        emplenarModelNotificacioInfo(entitatActual, notificacioId, request, "accions", model);
+        if (registresIdDto == null || registresIdDto.isEmpty()) {
+            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
+            return "notificacioInfo";
         }
-
+        for (RegistreIdDto registreIdDto : registresIdDto) {
+            if (registreIdDto.getNumero() != null) {
+                MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")"
+                        + getMessage(request, "notificacio.controller.registrar.ok"));
+                continue;
+            }
+            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
+        }
         return "notificacioInfo";
     }
 
