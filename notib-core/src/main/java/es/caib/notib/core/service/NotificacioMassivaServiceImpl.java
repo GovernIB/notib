@@ -334,7 +334,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     private String[] trim(String[] linia) {
         for(int i = 0; i < linia.length; i++) {
-            linia[i] = linia[i] != null ? linia[i].trim() : null;
+            String camp = linia[i] != null ? linia[i].trim() : null;
+            if (camp != null && camp.isEmpty()) {
+                camp = null;
+            }
+            linia[i] = camp;
         }
         return linia;
     }
