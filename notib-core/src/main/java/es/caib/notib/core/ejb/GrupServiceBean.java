@@ -3,24 +3,18 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
+import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
+import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.GrupService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.GrupFiltreDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
-import es.caib.notib.core.api.exception.NotFoundException;
-import es.caib.notib.core.api.service.GrupService;
+import java.util.List;
 
 /**
  * Implementació de GrupService com a EJB que empra una clase
@@ -71,11 +65,11 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PaginaDto<ProcedimentGrupDto> findByProcediment(
+	public PaginaDto<ProcSerGrupDto> findByProcSer(
 			Long entitatId, 
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findByProcediment(
+		return delegate.findByProcSer(
 				entitatId, 
 				procedimentId,
 				paginacioParams);
@@ -89,7 +83,7 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public ProcedimentGrupDto findProcedimentGrupById(
+	public ProcSerGrupDto findProcedimentGrupById(
 			Long entitatId, 
 			Long procedimentGrupId) {
 		return delegate.findProcedimentGrupById(
@@ -153,8 +147,8 @@ public class GrupServiceBean implements GrupService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<GrupDto> findGrupsByProcediment(Long procedimentId) {
-		return delegate.findGrupsByProcediment(procedimentId);
+	public List<GrupDto> findGrupsByProcSer(Long procedimentId) {
+		return delegate.findGrupsByProcSer(procedimentId);
 	}
 
 }

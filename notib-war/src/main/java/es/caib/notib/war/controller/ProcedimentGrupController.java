@@ -1,10 +1,17 @@
 package es.caib.notib.war.controller;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.war.command.ProcedimentGrupCommand;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,18 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.war.command.ProcedimentGrupCommand;
-import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.RolHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Controlador per el mantinemnt dels grups d'un procediments (VERSIÓ ANTERIOR)
@@ -78,7 +76,7 @@ public class ProcedimentGrupController extends BaseUserController{
 		
 		ProcedimentGrupCommand procedimentGrupCommand;
 		
-		ProcedimentGrupDto procedimentGrup = emplenarModelGrups(
+		ProcSerGrupDto procedimentGrup = emplenarModelGrups(
 				request, 
 				procedimentId,
 				grupId,
@@ -116,13 +114,13 @@ public class ProcedimentGrupController extends BaseUserController{
 		return "ok";
 	}
 	
-	private ProcedimentGrupDto emplenarModelGrups(
+	private ProcSerGrupDto emplenarModelGrups(
 			HttpServletRequest request,
 			Long procedimentId,
 			Long grupId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ProcedimentGrupDto procedimentGrups = null;
+		ProcSerGrupDto procedimentGrups = null;
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		List<GrupDto> grups;
 		if (organGestorActual == null) {
@@ -200,7 +198,7 @@ public class ProcedimentGrupController extends BaseUserController{
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		return DatatablesHelper.getDatatableResponse(request,
-				grupService.findByProcediment(
+				grupService.findByProcSer(
 						entitatActual.getId(), 
 						procedimentId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),

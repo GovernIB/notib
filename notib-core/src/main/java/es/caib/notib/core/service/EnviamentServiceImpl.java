@@ -93,7 +93,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
-	private ProcedimentHelper procedimentHelper;
+	private ProcSerHelper procedimentHelper;
 
 	@Override
 	@Transactional(readOnly = true)

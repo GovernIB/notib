@@ -278,10 +278,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     public String actualitzarEstat(
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        MissatgesHelper.info( request,
-                getMessage(
-                        request,
-                        "enviament.controller.actualitzarestat.executant"));
+
         Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         String resposta = "";
         if (seleccio == null || seleccio.isEmpty()) {
@@ -292,6 +289,10 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                             "enviament.controller.actualitzarestat.buida"));
             resposta = "error";
         } else {
+            MissatgesHelper.info( request,
+                    getMessage(
+                            request,
+                            "enviament.controller.actualitzarestat.executant"));
 
             log.info("Acualitzam estat dels enviaments: " + StringUtils.join(seleccio, ", "));
             boolean hasErrors = false;

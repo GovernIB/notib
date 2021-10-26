@@ -13,7 +13,7 @@ import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.*;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
@@ -210,14 +210,14 @@ public class BaseServiceTest {
 						}
 					}
 					id = entitatCreada.getId();
-				} else if(element instanceof ProcedimentDto) {
+				} else if(element instanceof ProcSerDto) {
 					autenticarUsuari("admin");
-					ProcedimentDto entitatCreada = procedimentService.create(
+					ProcSerDto entitatCreada = procedimentService.create(
 							entitatId,
-							(ProcedimentDto)element);
+							(ProcSerDto)element);
 					elementsCreats.add(entitatCreada);
-					if (((ProcedimentDto)element).getPermisos() != null) {
-						for (PermisDto permis: ((ProcedimentDto)element).getPermisos()) {
+					if (((ProcSerDto)element).getPermisos() != null) {
+						for (PermisDto permis: ((ProcSerDto)element).getPermisos()) {
 							procedimentService.permisUpdate(
 									entitatId,
 									organGestorId,
@@ -304,17 +304,17 @@ public class BaseServiceTest {
 					organGestorService.delete(
 							entitatId,
 							((OrganGestorDto)element).getId());
-				} else if(element instanceof ProcedimentDto) {
+				} else if(element instanceof ProcSerDto) {
 					
 					autenticarUsuari("admin");
-					Long procedimentId = ((ProcedimentDto)element).getId();
+					Long procedimentId = ((ProcSerDto)element).getId();
 					List<NotificacioEntity> notificacionsByProcediment = notificacioRepository.findByProcedimentId(procedimentId);
 					for(NotificacioEntity notificacioEntity: notificacionsByProcediment) {
 						notificacioService.delete(entitatId, notificacioEntity.getId());
 					}
 					procedimentService.delete(
 							entitatId,
-							((ProcedimentDto)element).getId(),
+							((ProcSerDto)element).getId(),
 							true);
 				} else if(element instanceof GrupDto) {
 					autenticarUsuari("admin");
@@ -633,7 +633,7 @@ public class BaseServiceTest {
 	// TODO: Millorar per a poder utilitzar amb més casuístiques
 	protected NotificacioDtoV2 generarNotificacio(
 			String notificacioId,
-			ProcedimentDto procediment,
+			ProcSerDto procediment,
 			EntitatDto entitat,
 			String organEmisor,
 			int numDestinataris,

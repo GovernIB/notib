@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-public class ProcedimentDataDto extends AuditoriaDto implements Serializable {
+public class ProcSerDataDto extends AuditoriaDto implements Serializable {
 
 	protected Long id;
 	protected String codi;

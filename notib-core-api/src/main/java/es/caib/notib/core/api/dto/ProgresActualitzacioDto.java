@@ -25,6 +25,7 @@ public class ProgresActualitzacioDto {
 	Integer numProcediments;
 	Integer numProcedimentsActualitzats = 0;
 	List<ActualitzacioInfo> info = new ArrayList<ProgresActualitzacioDto.ActualitzacioInfo>();
+	boolean finished = false;
 	
 	boolean error = false;
 	String errorMsg;

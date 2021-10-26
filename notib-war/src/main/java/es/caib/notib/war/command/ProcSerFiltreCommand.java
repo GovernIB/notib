@@ -2,7 +2,7 @@ package es.caib.notib.war.command;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentFiltreDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class ProcedimentFiltreCommand {
+public class ProcSerFiltreCommand {
 	
 	private String codi;
 	private String nom;
@@ -23,20 +23,20 @@ public class ProcedimentFiltreCommand {
 	private boolean entregaCieActiva;
 	
 	
-	public static ProcedimentFiltreCommand asCommand(ProcedimentFiltreDto dto) {
+	public static ProcSerFiltreCommand asCommand(ProcSerFiltreDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		ProcedimentFiltreCommand command = ConversioTipusHelper.convertir(
+		ProcSerFiltreCommand command = ConversioTipusHelper.convertir(
 				dto,
-				ProcedimentFiltreCommand.class );
+				ProcSerFiltreCommand.class );
 		return command;
 	}
 
-	public ProcedimentFiltreDto asDto() {
+	public ProcSerFiltreDto asDto() {
 		return ConversioTipusHelper.convertir(
 				this,
-				ProcedimentFiltreDto.class);
+				ProcSerFiltreDto.class);
 	}
 
 	@Override

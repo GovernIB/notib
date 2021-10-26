@@ -380,6 +380,7 @@ body {
 									<li><a href="<c:url value="/entitat/${entitatActual.id}/aplicacio"/>"><spring:message code="decorator.menu.entitat.aplicacions"/></a></li>
 									<li class="divider"></li>
 									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+									<li><a href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
 									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 									<li class="divider"></li>
 									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
@@ -400,6 +401,7 @@ body {
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+									<li><a href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
 									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 									<%--<li class="divider"></li>--%>
 									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>

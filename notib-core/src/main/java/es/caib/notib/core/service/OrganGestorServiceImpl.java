@@ -11,7 +11,7 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
-import es.caib.notib.core.cacheable.ProcedimentsCacheable;
+import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
@@ -77,7 +77,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private PermisosCacheable permisosCacheable;
 	@Resource
-	private ProcedimentsCacheable procedimentsCacheable;
+	private ProcSerCacheable procedimentsCacheable;
 	@Resource
 	private ConfigHelper configHelper;
 	@Autowired
@@ -746,7 +746,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					permisDto);
 			permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
 			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
-			cacheHelper.evictFindProcedimentsWithPermis();
+			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
 		} finally {
@@ -783,7 +783,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					permisId);
 			permisosCacheable.evictAllFindOrgansGestorsAccessiblesUsuari();
 			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
-			cacheHelper.evictFindProcedimentsWithPermis();
+			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindOrgansGestorWithPermis();
 			permisosCacheable.evictAllPermisosEntitatsUsuariActual();
 		} finally {
@@ -976,11 +976,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		List<ProcedimentEntity> procedimentsDisponibles = procedimentsCacheable.getProcedimentsWithPermis(
+		List<ProcSerEntity> procedimentsDisponibles = procedimentsCacheable.getProcedimentsWithPermis(
 				usuari,
 				entitat,
 				permisos);
-		List<ProcedimentOrganEntity> procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(
+		List<ProcSerOrganEntity> procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(
 				auth,
 				entitat,
 				permisos);
@@ -989,7 +989,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		List<OrganGestorEntity> organsGestorsProcediments = new ArrayList<>();
 		List<Long> procedimentsDisponiblesIds = new ArrayList<>();
-		for (ProcedimentEntity pro : procedimentsDisponibles)
+		for (ProcSerEntity pro : procedimentsDisponibles)
 			procedimentsDisponiblesIds.add(pro.getId());
 
 		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
@@ -1006,7 +1006,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
 		setOrgansGestors.addAll(organsGestorsAmbPermis);
 		if (procedimentsOrgansDisponibles != null) {
-			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+			for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
 				setOrgansGestors.add(procedimentOrgan.getOrganGestor());
 			}
 		}
@@ -1019,16 +1019,16 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		return organsGestors;
 	}
 
-	private List<ProcedimentEntity> mergeProcedimentsWithProcedimentsOrgans(
-			List<ProcedimentEntity> procedimentsDisponibles,
-			List<ProcedimentOrganEntity> procedimentsOrgansDisponibles) {
+	private List<ProcSerEntity> mergeProcedimentsWithProcedimentsOrgans(
+			List<ProcSerEntity> procedimentsDisponibles,
+			List<ProcSerOrganEntity> procedimentsOrgansDisponibles) {
 		if (procedimentsOrgansDisponibles != null && !procedimentsOrgansDisponibles.isEmpty()) {
 			// Empleam un set per no afegir duplicats
-			Set<ProcedimentEntity> setProcediments = new HashSet<>(procedimentsDisponibles);
-			for (ProcedimentOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
-				setProcediments.add(procedimentOrgan.getProcediment());
+			Set<ProcSerEntity> setProcediments = new HashSet<>(procedimentsDisponibles);
+			for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgansDisponibles) {
+				setProcediments.add(procedimentOrgan.getProcSer());
 			}
-			procedimentsDisponibles = new ArrayList<ProcedimentEntity>(setProcediments);
+			procedimentsDisponibles = new ArrayList<ProcSerEntity>(setProcediments);
 		}
 		return procedimentsDisponibles;
 	}

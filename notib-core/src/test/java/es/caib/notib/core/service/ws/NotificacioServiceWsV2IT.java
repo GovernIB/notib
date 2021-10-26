@@ -1,7 +1,7 @@
 package es.caib.notib.core.service.ws;
 
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.entity.AplicacioEntity;
@@ -147,7 +147,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 		authenticationTest.autenticarUsuari(ConfigTest.ADMIN_USER_CODE);
 
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procediment");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
@@ -190,7 +190,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari(ConfigTest.ADMIN_USER_CODE);
 
 		// Given
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procedimentCIE");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procedimentCIE");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
@@ -238,7 +238,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari(ConfigTest.ADMIN_USER_CODE);
 
 		// Given
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procedimentCIE");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procedimentCIE");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 

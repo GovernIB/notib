@@ -124,7 +124,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_organ_id")
 	@ForeignKey(name = "not_procorgan_not_fk")
-	protected ProcedimentOrganEntity procedimentOrgan;
+	protected ProcSerOrganEntity procedimentOrgan;
 	
 	/*document*/
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -313,7 +313,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			DocumentEntity document3,
 			DocumentEntity document4,
 			DocumentEntity document5,
-			ProcedimentOrganEntity procedimentOrgan,
+			ProcSerOrganEntity procedimentOrgan,
 			IdiomaEnumDto idioma) {
 		this.entitat = entitat;
 		this.emisorDir3Codi = emisorDir3Codi;
@@ -360,7 +360,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String grup,
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
-			ProcedimentOrganEntity procedimentOrgan,
+			ProcSerOrganEntity procedimentOrgan,
 			IdiomaEnumDto idioma) {
 		return new BuilderV2(
 				entitat,
@@ -403,7 +403,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String grup,
 				String numExpedient,
 				TipusUsuariEnumDto tipusUsuari,
-				ProcedimentOrganEntity procedimentOrgan,
+				ProcSerOrganEntity procedimentOrgan,
 				IdiomaEnumDto idioma) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;

@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentGrupDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class GrupProcedimentAudit extends NotibAuditoria<Long> {
 	private String grup;
 	
 	public static Builder getBuilder(
-			ProcedimentGrupDto procedimentGrupDto,
+			ProcSerGrupDto procedimentGrupDto,
 			TipusOperacio tipusOperacio, 
 			String joinPoint) {
 		return new Builder(
@@ -43,14 +43,14 @@ public class GrupProcedimentAudit extends NotibAuditoria<Long> {
 	public static class Builder {
 		GrupProcedimentAudit built;
 		Builder(
-				ProcedimentGrupDto procedimentGrupDto,
+				ProcSerGrupDto procedimentGrupDto,
 				TipusOperacio tipusOperacio, 
 				String joinPoint) {
 			built = new GrupProcedimentAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;
 			built.procedimentGrupId = procedimentGrupDto.getId();
-			built.procediment = procedimentGrupDto.getProcediment() != null ? procedimentGrupDto.getProcediment().getCodi() : null;
+			built.procediment = procedimentGrupDto.getProcSer() != null ? procedimentGrupDto.getProcSer().getCodi() : null;
 			built.grup = procedimentGrupDto.getGrup() != null ? procedimentGrupDto.getGrup().getCodi() : null;
 		}
 		public GrupProcedimentAudit build() {

@@ -1,6 +1,6 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDataDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDto;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
@@ -70,7 +70,7 @@ public class NotificacioMassivaServiceIT extends BaseServiceTestV2 {
         notificacioMassivaCreator.addObject("notMassiva_test2", NotificacioMassivaCreator.getTest2Instance());
         notificacioMassivaCreator.addObject("notMassiva_test3", NotificacioMassivaCreator.getTest3Instance());
 
-        ProcedimentDto procediment1 = procedimentCreator.getRandomInstance();
+        ProcSerDto procediment1 = procedimentCreator.getRandomInstance();
         procediment1.setCodi("101310");
         procedimentCreator.addObject("procediment", procediment1);
 

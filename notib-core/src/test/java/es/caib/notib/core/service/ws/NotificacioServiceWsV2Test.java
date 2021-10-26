@@ -14,7 +14,7 @@ import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -72,7 +72,7 @@ public class NotificacioServiceWsV2Test {
 	@Mock
 	private ProcedimentRepository procedimentRepository;
 	@Mock
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
 	private PersonaRepository personaRepository;
 	@Mock
@@ -197,7 +197,7 @@ public class NotificacioServiceWsV2Test {
 		
 //		Map<String, OrganismeDto> organigramaEntitat = null;
 		
-		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, organGestor).build();
+		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		
 //		DocumentV2 document = new DocumentV2();
 //		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");

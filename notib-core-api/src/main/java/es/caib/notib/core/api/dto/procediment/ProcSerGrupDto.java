@@ -5,10 +5,10 @@ import es.caib.notib.core.api.dto.GrupDto;
 
 import java.io.Serializable;
 
-public class ProcedimentGrupDto extends AuditoriaDto implements Serializable {
+public class ProcSerGrupDto extends AuditoriaDto implements Serializable {
 
 	private Long id;
-	private ProcedimentDto procediment;
+	private ProcSerDto procSer;
 	private GrupDto grup;
 	
 	
@@ -18,11 +18,11 @@ public class ProcedimentGrupDto extends AuditoriaDto implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public ProcedimentDto getProcediment() {
-		return procediment;
+	public ProcSerDto getProcSer() {
+		return procSer;
 	}
-	public void setProcediment(ProcedimentDto procediment) {
-		this.procediment = procediment;
+	public void setProcSer(ProcSerDto procSer) {
+		this.procSer = procSer;
 	}
 	public GrupDto getGrup() {
 		return grup;

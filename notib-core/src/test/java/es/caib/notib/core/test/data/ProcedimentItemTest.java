@@ -3,7 +3,7 @@ package es.caib.notib.core.test.data;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.test.AuthenticationTest;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
+public class ProcedimentItemTest extends DatabaseItemTest<ProcSerDto>{
     @Autowired
     protected ProcedimentService procedimentService;
     @Autowired
@@ -24,15 +24,15 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
     protected AuthenticationTest authenticationTest;
 
     @Override
-    public ProcedimentDto create(Object element, Long entitatId) throws Exception{
+    public ProcSerDto create(Object element, Long entitatId) throws Exception{
         authenticationTest.autenticarUsuari("admin");
-        ProcedimentDto entitatCreada = procedimentService.create(
+        ProcSerDto entitatCreada = procedimentService.create(
                 entitatId,
-                (ProcedimentDto) element);
+                (ProcSerDto) element);
         OrganGestorDto organ = organGestorService.findByCodi(entitatId,
                 ConfigTest.DEFAULT_ORGAN_DIR3);
-        if (((ProcedimentDto)element).getPermisos() != null) {
-            for (PermisDto permis: ((ProcedimentDto)element).getPermisos()) {
+        if (((ProcSerDto)element).getPermisos() != null) {
+            for (PermisDto permis: ((ProcSerDto)element).getPermisos()) {
                 procedimentService.permisUpdate(
                         entitatId,
                         organ.getId(),
@@ -44,7 +44,7 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
     }
 
     @Override
-    public void delete(Long entitatId, ProcedimentDto object) {
+    public void delete(Long entitatId, ProcSerDto object) {
         authenticationTest.autenticarUsuari("admin");
         procedimentService.delete(
                 entitatId,
@@ -53,8 +53,8 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
     }
 
 //    @Override
-    public ProcedimentDto getRandomInstance() {
-        ProcedimentDto procedimentCreate = new ProcedimentDto();
+    public ProcSerDto getRandomInstance() {
+        ProcSerDto procedimentCreate = new ProcSerDto();
         procedimentCreate.setCodi(RandomStringUtils.randomNumeric(6));
         procedimentCreate.setNom(RandomStringUtils.randomAlphanumeric(10));
         procedimentCreate.setOrganGestor(ConfigTest.DEFAULT_ORGAN_DIR3);
@@ -70,16 +70,16 @@ public class ProcedimentItemTest extends DatabaseItemTest<ProcedimentDto>{
         procedimentCreate.setPermisos(permisosProcediment);
         return procedimentCreate;
     }
-    public static ProcedimentDto getRandomProcedimentSensePermis() {
-        ProcedimentDto procedimentCreate = new ProcedimentDto();
+    public static ProcSerDto getRandomProcedimentSensePermis() {
+        ProcSerDto procedimentCreate = new ProcSerDto();
         procedimentCreate.setCodi(RandomStringUtils.randomNumeric(6));
         procedimentCreate.setNom(RandomStringUtils.randomAlphanumeric(10));
         procedimentCreate.setOrganGestor(ConfigTest.DEFAULT_ORGAN_DIR3);
         return procedimentCreate;
     }
 
-    public ProcedimentDto getRandomInstanceAmbEntregaCie(Long cieId, Long operadorPostalId) {
-        ProcedimentDto procedimentCreate = getRandomInstance();
+    public ProcSerDto getRandomInstanceAmbEntregaCie(Long cieId, Long operadorPostalId) {
+        ProcSerDto procedimentCreate = getRandomInstance();
         procedimentCreate.setEntregaCieActiva(true);
         procedimentCreate.setCieId(cieId);
         procedimentCreate.setOperadorPostalId(operadorPostalId);

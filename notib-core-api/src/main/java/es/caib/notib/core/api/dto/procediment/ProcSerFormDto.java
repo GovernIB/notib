@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Getter @Setter
-public class ProcedimentFormDto extends AuditoriaDto implements Serializable{
+public class ProcSerFormDto extends AuditoriaDto implements Serializable{
 
 	private Long id;
 	private String codi;

@@ -68,7 +68,7 @@ $(document).ready(function() {
 </script>
 
 <c:if test="${not simplifiedView}">
-<form:form id="filtre" action="" method="post" cssClass="well" commandName="procedimentFiltreCommand">
+<form:form id="filtre" action="" method="post" cssClass="well" commandName="procSerFiltreCommand">
 	<div class="row">
 		<div class="col-md-2">
 			<not:inputText name="codi" inline="true" placeholderKey="procediment.list.columna.codi"/>
@@ -91,11 +91,11 @@ $(document).ready(function() {
 	<div class="row">
 		<div class="col-md-4">
 			<div class="btn-group" role="group">
-				<button id="btn-comu" title="" class="btn btn-default <c:if test="${procedimentFiltreCommand.comu}">active</c:if>" data-toggle="button">
+				<button id="btn-comu" title="" class="btn btn-default <c:if test="${procSerFiltreCommand.comu}">active</c:if>" data-toggle="button">
 					<span class="fa fa-globe"></span> <spring:message code="procediment.filter.form.camp.comu"/>
 				</button>
 				<not:inputHidden name="comu"/>
-				<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${procedimentFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
+				<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${procSerFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
 					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
 				</button>
 				<not:inputHidden name="entregaCieActiva"/>

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.ProcedimentOrganEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -15,26 +15,26 @@ import es.caib.notib.core.entity.ProcedimentOrganEntity;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface ProcedimentOrganRepository extends JpaRepository<ProcedimentOrganEntity, Long> {
+public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity, Long> {
 
-	public ProcedimentOrganEntity findByProcedimentIdAndOrganGestorId(Long id, Long organGestorId);
-	public ProcedimentOrganEntity findByProcedimentIdAndOrganGestorCodi(Long id, String organGestorCodi);
+	public ProcSerOrganEntity findByProcSerIdAndOrganGestorId(Long id, Long organGestorId);
+	public ProcSerOrganEntity findByProcSerIdAndOrganGestorCodi(Long id, String organGestorCodi);
 
-	public List<ProcedimentOrganEntity> findByProcedimentId(Long procedimentId);
+	public List<ProcSerOrganEntity> findByProcSerId(Long procedimentId);
 	
 	@Query(	"select po " +
-			"from ProcedimentOrganEntity po " +
-			"left outer join po.procediment pro " +
+			"from ProcSerOrganEntity po " +
+			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
-			"  and pro in (select distinct gp.procediment " +
-			"		from GrupProcedimentEntity gp " +
+			"  and pro in (select distinct gp.procSer " +
+			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcedimentOrganEntity> findProcedimentsOrganByEntitatAndGrup(
+	public List<ProcSerOrganEntity> findProcedimentsOrganByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
 

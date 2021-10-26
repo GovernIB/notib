@@ -46,9 +46,12 @@ public class CallbackHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
-	@Transactional
+	@Transactional (rollbackFor = RuntimeException.class)
 	public boolean notifica(@NonNull Long eventId) throws Exception {
 		NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
+
+		if (event == null)
+			return false;
 
 		NotificacioEntity notificacioProcessada = notifica(event);
 		if (notificacioProcessada != null && notificacioProcessada.isErrorLastCallback()) {

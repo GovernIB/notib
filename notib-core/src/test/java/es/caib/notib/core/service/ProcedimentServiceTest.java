@@ -2,15 +2,15 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.procediment.ProcedimentFiltreDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentFormDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.ProcedimentFormRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class ProcedimentServiceTest {
 	@Mock
 	private Pageable pageableMock;
 	@Mock
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
 	private ConfigHelper configHelper;
 	
@@ -85,14 +85,14 @@ public class ProcedimentServiceTest {
 		Long entitatId = 1L;
 		Page<ProcedimentFormEntity> procediments = null;
 		
-		PaginaDto<ProcedimentFormDto> procedimentsPage = initProcedimentsPage();
+		PaginaDto<ProcSerFormDto> procedimentsPage = initProcedimentsPage();
 		
 		List<EntitatEntity> entitatEntityList = new ArrayList<EntitatEntity>();
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
 		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 //		List<String> organsFills = new ArrayList<String>();
 		List<GrupDto> grup = new ArrayList<GrupDto>();
-		ProcedimentFiltreDto filtre = new ProcedimentFiltreDto();
+		ProcSerFiltreDto filtre = new ProcSerFiltreDto();
 		filtre.setCodi(null);
 		filtre.setNom(null);
 		filtre.setOrganGestor(null);
@@ -100,7 +100,7 @@ public class ProcedimentServiceTest {
 		
 		PaginacioParamsDto paginacioParams = new PaginacioParamsDto();
 		
-		List<ProcedimentOrganEntity> procedimentOrgans = new ArrayList<ProcedimentOrganEntity>();
+		List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
 		EntitatEntity entitat = EntitatEntity.getBuilder("codi", 
 				"nom", 
 				null, 
@@ -136,7 +136,7 @@ public class ProcedimentServiceTest {
 				false,
 				false).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entitat, null, null, null, null, null).build();
-		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, organGestor).build();
+		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		procedimentOrgans.add(procedimentOrgan);
 		
 		
@@ -157,13 +157,13 @@ public class ProcedimentServiceTest {
 //		Mockito.when(procedimentFormRepository.findAmbOrganGestorOrComuAndFiltre(Mockito.anyLong(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), 
 //				Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyListOf(String.class), Mockito.anyBoolean(), Mockito.any(Pageable.class))).thenReturn(procediments);
 		Mockito.when(permisosHelper.findPermisos(Mockito.anyLong(), Mockito.eq(ProcedimentEntity.class))).thenReturn(permisos);
-		Mockito.when(grupService.findGrupsByProcediment(Mockito.anyLong())).thenReturn(grup);
-		Mockito.when(paginacioHelper.toPaginaDto(Mockito.eq(procediments), Mockito.eq(ProcedimentFormDto.class))).thenReturn(procedimentsPage);
-		Mockito.when(procedimentOrganRepository.findByProcedimentId(Mockito.anyLong())).thenReturn(procedimentOrgans);
+		Mockito.when(grupService.findGrupsByProcSer(Mockito.anyLong())).thenReturn(grup);
+		Mockito.when(paginacioHelper.toPaginaDto(Mockito.eq(procediments), Mockito.eq(ProcSerFormDto.class))).thenReturn(procedimentsPage);
+		Mockito.when(procedimentOrganRepository.findByProcSerId(Mockito.anyLong())).thenReturn(procedimentOrgans);
 //		Mockito.when(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(Mockito.anyString(), Mockito.anyString())).thenReturn(organsFills);		
 		
 		// When	
-		PaginaDto<ProcedimentFormDto> pagina = procedimentService.findAmbFiltrePaginat(entitatId, false, true, false, null, filtre, paginacioParams);
+		PaginaDto<ProcSerFormDto> pagina = procedimentService.findAmbFiltrePaginat(entitatId, false, true, false, null, filtre, paginacioParams);
 		
 		// Then
 		assertNotNull(pagina);
@@ -176,12 +176,12 @@ public class ProcedimentServiceTest {
 	// TODO: Falta generar más casos de test para admin d'organ y para superusuari con sus listas de permisos, etc. También sin filtre.
 	// Los Mocks comentados en el test anterior no han sido borrados porque servirán para estos casos de pruebas futuros.
 
-	private PaginaDto<ProcedimentFormDto> initProcedimentsPage() {
+	private PaginaDto<ProcSerFormDto> initProcedimentsPage() {
 		
-		PaginaDto<ProcedimentFormDto> procedimentsPage = new PaginaDto<ProcedimentFormDto>();
-		List<ProcedimentFormDto> procList = new ArrayList<ProcedimentFormDto>();
+		PaginaDto<ProcSerFormDto> procedimentsPage = new PaginaDto<ProcSerFormDto>();
+		List<ProcSerFormDto> procList = new ArrayList<ProcSerFormDto>();
 		
-		ProcedimentFormDto proc1 = new ProcedimentFormDto();
+		ProcSerFormDto proc1 = new ProcSerFormDto();
 		proc1.setAgrupar(false);
 		proc1.setCodi("962793");
 		proc1.setComu(false);
@@ -200,7 +200,7 @@ public class ProcedimentServiceTest {
 		proc1.setPermisos(null);
 		proc1.setRetard(0);
 		
-		ProcedimentFormDto proc2 = new ProcedimentFormDto();
+		ProcSerFormDto proc2 = new ProcSerFormDto();
 		proc2.setAgrupar(false);
 		proc2.setCodi("879427");
 		proc2.setComu(true);

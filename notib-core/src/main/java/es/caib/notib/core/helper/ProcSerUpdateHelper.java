@@ -1,13 +1,15 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentDataDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ServeiEntity;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ServeiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,16 +21,18 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Component
-public class ProcedimentUpdateHelper {
+public class ProcSerUpdateHelper {
 	
 	@Autowired
 	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private ServeiRepository serveiRepository;
 	@Autowired
 	private ConfigHelper configHelper;
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.UPDATE)
 	public ProcedimentEntity updateProcediment(
-			ProcedimentDataDto procedimentGda,
+			ProcSerDataDto procedimentGda,
 			ProcedimentEntity procediment,
 			OrganGestorEntity organGestor) {
 		procediment.update(
@@ -40,7 +44,7 @@ public class ProcedimentUpdateHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE)
-	public ProcedimentEntity nouProcediment(ProcedimentDataDto procedimentGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
+	public ProcedimentEntity nouProcediment(ProcSerDataDto procedimentGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
 		ProcedimentEntity procediment;
 		procediment = ProcedimentEntity.getBuilder(
 				procedimentGda.getCodi(),
@@ -60,5 +64,38 @@ public class ProcedimentUpdateHelper {
 		procediment.updateDataActualitzacio(new Date());
 		return procedimentRepository.save(procediment);
 	}
-	
+
+	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.UPDATE)
+	public ServeiEntity updateServei(
+			ProcSerDataDto serveiGda,
+			ServeiEntity servei,
+			OrganGestorEntity organGestor) {
+		servei.update(
+				serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
+				organGestor,
+				serveiGda.isComu());
+		servei.updateDataActualitzacio(new Date());
+		return serveiRepository.save(servei);
+	}
+
+	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.CREATE)
+	public ServeiEntity nouServei(ProcSerDataDto serveiGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
+		ServeiEntity servei = ServeiEntity.getBuilder(
+				serveiGda.getCodi(),
+				serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				entitat,
+				false,
+				organGestor,
+				null,
+				null,
+				null,
+				null,
+				serveiGda.isComu(),
+				false).build();
+
+		servei.updateDataActualitzacio(new Date());
+		return serveiRepository.save(servei);
+	}
 }

@@ -1,16 +1,10 @@
 package es.caib.notib.core.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import es.caib.notib.core.audit.NotibAuditable;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.notib.core.audit.NotibAuditable;
+import javax.persistence.*;
 
 /**
  * Classe de model de dades que conté la informació dels grups.
@@ -20,12 +14,12 @@ import es.caib.notib.core.audit.NotibAuditable;
 @Entity
 @Table(name = "not_pro_grup")
 @EntityListeners(AuditingEntityListener.class)
-public class GrupProcedimentEntity extends NotibAuditable<Long> {
+public class GrupProcSerEntity extends NotibAuditable<Long> {
 
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "procediment")
 	@ForeignKey(name = "not_pro_grup_fk")
-	protected ProcedimentEntity procediment;
+	protected ProcSerEntity procSer;
 	
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "grup")
@@ -33,44 +27,44 @@ public class GrupProcedimentEntity extends NotibAuditable<Long> {
 	protected GrupEntity grup;
 	
 	
-	public ProcedimentEntity getProcediment() {
-		return procediment;
+	public ProcSerEntity getProcSer() {
+		return procSer;
+	}
+	public void setProcSer(ProcSerEntity procediment) {
+		this.procSer = procediment;
 	}
 	public GrupEntity getGrup() {
 		return grup;
-	}
-	public void setProcediment(ProcedimentEntity procediment) {
-		this.procediment = procediment;
 	}
 	public void setGrup(GrupEntity grup) {
 		this.grup = grup;
 	}
 	
 	public void update(
-			ProcedimentEntity procediment,
+			ProcSerEntity procser,
 			GrupEntity grup) {
-		this.procediment = procediment;
+		this.procSer = procser;
 		this.grup = grup;
 	}
 	
 	public static Builder getBuilder(
-			ProcedimentEntity procediment,
+			ProcSerEntity procser,
 			GrupEntity grup) {
 		return new Builder(
-				procediment,
+				procser,
 				grup);
 	}
 	
 	public static class Builder {
-		GrupProcedimentEntity built;
+		GrupProcSerEntity built;
 		Builder(
-				ProcedimentEntity procediment,
+				ProcSerEntity procser,
 				GrupEntity grup) {
-			built = new GrupProcedimentEntity();
-			built.procediment = procediment;
+			built = new GrupProcSerEntity();
+			built.procSer = procser;
 			built.grup = grup;
 		}
-		public GrupProcedimentEntity build() {
+		public GrupProcSerEntity build() {
 			return built;
 		}
 	}

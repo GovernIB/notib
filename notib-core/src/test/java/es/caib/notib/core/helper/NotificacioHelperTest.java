@@ -3,13 +3,13 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.NotificacioHelper.NotificacioData;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.ProcedimentOrganRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.plugins.arxiu.api.*;
 import org.junit.After;
@@ -38,7 +38,7 @@ public class NotificacioHelperTest {
 	@Mock
 	private PluginHelper pluginHelper;
 	@Mock
-	private ProcedimentOrganRepository procedimentOrganRepository;
+	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
 	private GrupRepository grupRepository;
 	@Mock
@@ -50,7 +50,7 @@ public class NotificacioHelperTest {
 	@Mock
 	private ProcedimentEntity procediment;
 	@Mock
-	private ProcedimentOrganEntity procedimentOrgan;
+	private ProcSerOrganEntity procedimentOrgan;
 	@Mock
 	private ConfigHelper configHelper;
 
@@ -87,7 +87,7 @@ public class NotificacioHelperTest {
 				false,
 				false).build();
 		
-		ProcedimentDto procedimentDto = new ProcedimentDto();
+		ProcSerDto procedimentDto = new ProcSerDto();
 		procedimentDto.setId(1L);
 		
 		GrupDto grupDto = new GrupDto();
@@ -134,7 +134,7 @@ public class NotificacioHelperTest {
 
 		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entidad, null,
 				null, null, null, null).build();
-		ProcedimentOrganEntity procedimentOrgan = ProcedimentOrganEntity.getBuilder(procediment, organGestor).build();
+		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
 		String documentGesdocId = "documentGesdocId";
 		
@@ -147,11 +147,11 @@ public class NotificacioHelperTest {
 		
 		// Mocks
 		Mockito.when(entityComprovarHelper.comprovarProcediment(Mockito.any(EntitatEntity.class), Mockito.anyLong())).thenReturn(procediment);
-		Mockito.when(procedimentOrganRepository.findByProcedimentIdAndOrganGestorId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(procedimentOrgan);
+		Mockito.when(procedimentOrganRepository.findByProcSerIdAndOrganGestorId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(procedimentOrgan);
 		Mockito.when(entityComprovarHelper.comprovarProcedimentOrgan(
 				Mockito.any(EntitatEntity.class),
 				Mockito.anyLong(),
-				Mockito.nullable(ProcedimentOrganEntity.class),
+				Mockito.nullable(ProcSerOrganEntity.class),
 				Mockito.eq(false),
 				Mockito.eq(false),
 				Mockito.eq(true),

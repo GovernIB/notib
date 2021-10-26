@@ -5,7 +5,7 @@ import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
@@ -132,7 +132,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 
 		EntitatDto entitatCreate = database.entitat;
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procediment");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 		assertNotNull(entitatCreate);
@@ -177,7 +177,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		// Given
 		EntitatDto entitatCreate = database.entitat;
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procedimentCIE");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procedimentCIE");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
@@ -224,7 +224,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		// Given
 		EntitatDto entitatCreate = database.entitat;
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procedimentCIE");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procedimentCIE");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 
@@ -353,7 +353,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 		// Given: Notificacio no creada
 		EntitatDto entitatCreate = database.entitat;
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procediment");
 		assertNotNull(procedimentCreate);
 		assertNotNull(procedimentCreate.getId());
 		assertNotNull(entitatCreate);
@@ -535,7 +535,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		notificacioRepository.saveAndFlush(notEntity);
 
 		// Given: notificacio amb permis processar procediment
-		ProcedimentDto procediment = notificacio.getProcediment();
+		ProcSerDto procediment = notificacio.getProcediment();
 		PermisDto permisProcessar = new PermisDto();
 		permisProcessar.setProcessar(true);
 		permisProcessar.setTipus(TipusEnumDto.USUARI);
@@ -589,7 +589,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 		// Given: notificacio amb permis processar procediment per a l'òrgan gestor
 		Long organGestorId = organGestorRepository.findByCodi(notificacio.getOrganGestorCodi()).getId();
-		ProcedimentDto procediment = notificacio.getProcediment();
+		ProcSerDto procediment = notificacio.getProcediment();
 		PermisDto permisProcessar = new PermisDto();
 		permisProcessar.setProcessar(true);
 		permisProcessar.setTipus(TipusEnumDto.USUARI);
@@ -624,7 +624,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 	//	@Test
 	public void notificacioRegistrar() throws SistemaExternException, IOException, RegistrePluginException, RegistreNotificaException {
 		EntitatDto entitatCreate = database.entitat;
-		ProcedimentDto procedimentCreate = (ProcedimentDto) database.get("procediment");
+		ProcSerDto procedimentCreate = (ProcSerDto) database.get("procediment");
 		NotificacioDatabaseDto notificacioCreate = (NotificacioDatabaseDto) database.get("notificacio");
 
 		configureMockUnitatsOrganitzativesPlugin();

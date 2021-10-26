@@ -2,7 +2,7 @@ package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import lombok.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -23,7 +23,7 @@ import java.util.List;
 public class NotificacioDatabaseDto extends AuditoriaDto {
 
 	private Long id;
-	private ProcedimentDto procediment;
+	private ProcSerDto procediment;
 	private String organGestorCodi;
 	private GrupDto grup;
 	private String usuariCodi;

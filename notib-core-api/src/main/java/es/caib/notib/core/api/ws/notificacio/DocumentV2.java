@@ -4,6 +4,8 @@
 package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import es.caib.notib.core.api.util.TrimStringDeserializer;
 import lombok.Data;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -15,12 +17,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Data
 @JsonAutoDetect
 public class DocumentV2 {
-	
+
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String arxiuId;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String arxiuNom;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String contingutBase64;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String url;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String uuid;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String csv;
 	private boolean normalitzat;
 	//	private Map<String, String> metadades;

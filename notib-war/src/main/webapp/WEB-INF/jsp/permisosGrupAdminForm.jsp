@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:choose>
-	<c:when test="${empty procedimentCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/></c:set></c:when>
+	<c:when test="${empty procSerCommand.codi}"><c:set var="titol"><spring:message code="procediment.form.titol.crear"/></c:set></c:when>
 	<c:otherwise><c:set var="titol"><spring:message code="procediment.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
@@ -22,7 +22,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/procediment/newOrModify"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procedimentCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procSerCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-3">

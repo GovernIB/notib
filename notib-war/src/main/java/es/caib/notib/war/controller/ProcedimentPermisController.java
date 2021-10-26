@@ -18,7 +18,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.PermisDto;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GrupService;
@@ -63,7 +63,7 @@ public class ProcedimentPermisController extends BaseUserController{
 		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		ProcedimentDto procediment = procedimentService.findById(
+		ProcSerDto procediment = procedimentService.findById(
 				entitatActual.getId(),
 				isAdministrador,
 				procedimentId);
@@ -131,7 +131,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			String organ) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		ProcedimentDto procediment = procedimentService.findById(
+		ProcSerDto procediment = procedimentService.findById(
 				entitatActual.getId(),
 				isAdministrador(request),
 				procedimentId);

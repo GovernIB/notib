@@ -11,7 +11,8 @@ import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
@@ -181,12 +182,12 @@ public class ConversioTipusHelper {
 			.byDefault()
 			.register();
 		
-		mapperFactory.classMap(ProcedimentEntity.class, ProcedimentDto.class).
+		mapperFactory.classMap(ProcedimentEntity.class, ProcSerDto.class).
 			field("organGestor.codi", "organGestor")
 				.field("organGestor.nom", "organGestorNom")
 				.customize(
-				new CustomMapper<ProcedimentEntity, ProcedimentDto>() {
-					public void mapAtoB(ProcedimentEntity a, ProcedimentDto b, MappingContext context) {
+				new CustomMapper<ProcedimentEntity, ProcSerDto>() {
+					public void mapAtoB(ProcedimentEntity a, ProcSerDto b, MappingContext context) {
 						// add your custom mapping code here
 						b.setEntregaCieActiva(a.getEntregaCie() != null);
 						if (a.getEntregaCie() != null) {
@@ -197,6 +198,24 @@ public class ConversioTipusHelper {
 				})
 				.byDefault()
 				.register();
+
+		mapperFactory.classMap(ServeiEntity.class, ProcSerDto.class).
+				field("organGestor.codi", "organGestor")
+				.field("organGestor.nom", "organGestorNom")
+				.customize(
+						new CustomMapper<ServeiEntity, ProcSerDto>() {
+							public void mapAtoB(ServeiEntity a, ProcSerDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setEntregaCieActiva(a.getEntregaCie() != null);
+								if (a.getEntregaCie() != null) {
+									b.setOperadorPostalId(a.getEntregaCie().getOperadorPostalId());
+									b.setCieId(a.getEntregaCie().getCieId());
+								}
+							}
+						})
+				.byDefault()
+				.register();
+
 		mapperFactory.classMap(GrupEntity.class, GrupDto.class).
 			field("entitat.id", "entitatId").
 			field("organGestor.id", "organGestorId").
@@ -302,6 +321,11 @@ public class ConversioTipusHelper {
 		mapperFactory.classMap(NotificacioEnviamentAudit.class, NotificacioEnviamentAuditDto.class).
 				field("createdBy.codi", "createdBy").
 				field("lastModifiedBy.codi", "lastModifiedBy").
+				byDefault().
+				register();
+
+		mapperFactory.classMap(ProcSerOrganEntity.class, ProcSerOrganDto.class).
+//				field("procser", "procSer").
 				byDefault().
 				register();
 

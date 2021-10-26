@@ -4,6 +4,12 @@
 package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import es.caib.notib.core.api.util.TrimStringDeserializer;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Informació sobre l'entrega a la DEH.
@@ -11,29 +17,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @JsonAutoDetect
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class EntregaDeh {
 
 	private boolean obligat;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String procedimentCodi;
+	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String emisorNif;
-
-	public boolean isObligat() {
-		return obligat;
-	}
-	public void setObligat(boolean obligat) {
-		this.obligat = obligat;
-	}
-	public String getProcedimentCodi() {
-		return procedimentCodi;
-	}
-	public void setProcedimentCodi(String procedimentCodi) {
-		this.procedimentCodi = procedimentCodi;
-	}
-	public String getEmisorNif() {
-		return emisorNif;
-	}
-	public void setEmisorNif(String emisorNif) {
-		this.emisorNif = emisorNif;
-	}
 
 }

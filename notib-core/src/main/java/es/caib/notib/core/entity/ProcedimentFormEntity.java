@@ -43,7 +43,8 @@ import javax.persistence.*;
 		+ " from	not_procediment pro "
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
 //		+ " left outer join not_pagador_postal postal on postal.id = pro.pagadorpostal "
-		+ " left outer join not_organ_gestor og on pro.organ_gestor = og.codi ")
+		+ " left outer join not_organ_gestor og on pro.organ_gestor = og.codi "
+		+ " where pro.tipus = 'PROCEDIMENT'")
 @Immutable
 public class ProcedimentFormEntity {
 	

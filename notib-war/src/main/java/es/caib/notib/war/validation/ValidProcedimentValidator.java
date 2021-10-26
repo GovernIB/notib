@@ -1,8 +1,8 @@
 package es.caib.notib.war.validation;
 
-import es.caib.notib.core.api.dto.procediment.ProcedimentDto;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.war.command.ProcedimentCommand;
+import es.caib.notib.war.command.ProcSerCommand;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ import javax.validation.ConstraintValidatorContext;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ValidProcedimentValidator implements ConstraintValidator<ValidProcediment, ProcedimentCommand> {
+public class ValidProcedimentValidator implements ConstraintValidator<ValidProcediment, ProcSerCommand> {
 
 	private HttpServletRequest request;
 
@@ -38,7 +38,7 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(
-			final ProcedimentCommand command, 
+			final ProcSerCommand command,
 			final ConstraintValidatorContext context) {
 
 		boolean valid = true;
@@ -88,12 +88,12 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
 	}
 
 	private boolean checkCodi(
-			final ProcedimentCommand command
+			final ProcSerCommand command
 	) {
 		boolean valid = true;
 		final Long id = command.getId();
 		final String procedimentCodi = command.getCodi();
-		ProcedimentDto procediment = procedimentService.findByCodi(command.getEntitatId(), procedimentCodi);
+		ProcSerDto procediment = procedimentService.findByCodi(command.getEntitatId(), procedimentCodi);
 		if (procediment != null) {
 			if (id == null) {
 				valid = false;
@@ -104,11 +104,11 @@ public class ValidProcedimentValidator implements ConstraintValidator<ValidProce
 		return valid;
 	}
 	private boolean checkNom(
-			final ProcedimentCommand command
+			final ProcSerCommand command
 	) {
 		boolean valid = true;
 		final Long id = command.getId();
-		ProcedimentDto procediment = procedimentService.findByNom(command.getEntitatId(), command.getNom());
+		ProcSerDto procediment = procedimentService.findByNom(command.getEntitatId(), command.getNom());
 		if (procediment != null) {
 			if (id == null) {
 				valid = false;

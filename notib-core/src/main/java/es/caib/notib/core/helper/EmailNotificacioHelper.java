@@ -2,7 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcedimentEntity;
+import es.caib.notib.core.entity.GrupProcSerEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -64,7 +64,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			if (grup != null)
 				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
 		} else {
-			List<GrupProcedimentEntity> grupsProcediment = grupProcedimentRepository.findByProcediment(notificacio.getProcediment());
+			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepository.findByProcSer(notificacio.getProcediment());
 
 			if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
 				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
