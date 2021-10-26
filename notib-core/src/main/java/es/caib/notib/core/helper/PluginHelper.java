@@ -15,6 +15,7 @@ import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
+import es.caib.notib.plugin.firmaservidor.SignaturaPlugin;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
@@ -67,6 +68,7 @@ public class PluginHelper {
 	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
 	private GestorContingutsAdministratiuPlugin gestorDocumentalAdministratiuPlugin;
 	private FirmaServidorPlugin firmaServidorPlugin;
+	private SignaturaPlugin signaturaPlugin;
 	
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -1324,12 +1326,13 @@ public class PluginHelper {
 				new AccioParam("notificacioId", notificacio.getId().toString()),
 				new AccioParam("títol", fitxer.getNom()));
 		try {
-			byte[] firmaContingut = getFirmaServidorPlugin().firmar(
-					fitxer.getNom(),
-					motiu,
-					fitxer.getContingut(),
-					tipusFirma,
-					idioma);
+//			byte[] firmaContingut = getFirmaServidorPlugin().firmar(
+//					fitxer.getNom(),
+//					motiu,
+//					fitxer.getContingut(),
+//					tipusFirma,
+//					idioma);
+			byte [] firmaContingut = getFirmaServidorPlugin().signar(null, fitxer.getNom(), motiu, tipusFirma.name(), fitxer.getContingut(), null);
 			integracioHelper.addAccioOk(info);
 			return firmaContingut;
 		} catch (Exception ex) {
@@ -2208,29 +2211,29 @@ public class PluginHelper {
 		
 		return gestorDocumentalAdministratiuPlugin;
 	}
-	private FirmaServidorPlugin getFirmaServidorPlugin() {
+//	private FirmaServidorPlugin getFirmaServidorPlugin() {
+	private SignaturaPlugin getFirmaServidorPlugin() {
 		loadPluginProperties("FIRMA");
-		if (firmaServidorPlugin == null) {
-			String pluginClass = getPropertyPluginFirmaServidor();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin de firma en servidor (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_FIRMASERV,
-							"Error al crear la instància del plugin de firma en servidor",
-							ex);
-				}
-			} else {
-				logger.error("No està configurada la classe per al plugin de firma en servidor");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_FIRMASERV,
-						"No està configurada la classe per al plugin de firma en servidor");
-			}
+		if (signaturaPlugin != null) {
+			return signaturaPlugin;
 		}
-		return firmaServidorPlugin;
+		String pluginClass = getPropertyPluginFirmaServidor();
+//		String pluginClass = configHelper.getConfig("es.caib.notib.plugin.signatura.class");;
+		if (pluginClass == null || pluginClass.length() == 0) {
+			String error = "No està configurada la classe per al plugin de firma en servidor";
+			logger.error(error);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, error);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+//			firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
+			signaturaPlugin = (SignaturaPlugin)clazz.newInstance();
+			return signaturaPlugin;
+		} catch (Exception ex) {
+			String error = "Error al crear la instància del plugin de firma en servidor" ;
+			logger.error(error + " (" + pluginClass + "): ", ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, error, ex);
+		}
 	}
 
 	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
