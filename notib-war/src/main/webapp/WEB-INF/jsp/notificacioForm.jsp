@@ -1167,6 +1167,23 @@
 						emptyOptionTextKey="notificacio.form.camp.procediment.select"/>
 				</div>
 			</div>
+
+			<!-- SERVEI -->
+			<div class="row">
+				<div class="col-md-12">
+					<not:inputSelect
+							name="serveiId"
+							textKey="notificacio.form.camp.servei"
+							required="${enviamentTipus == 'NOTIFICACIO'}"
+							optionItems="${serveis}"
+							optionValueAttribute="codi"
+							optionTextAttribute="codi"
+							labelSize="2"
+							emptyOption="true"
+							optionMinimumResultsForSearch="2"
+							emptyOptionTextKey="notificacio.form.camp.servei.select"/>
+				</div>
+			</div>
 			
 			<!-- GRUP -->
 			<div id="grups" class="row <c:if test='${empty grups}'>hidden</c:if>">

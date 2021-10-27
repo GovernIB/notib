@@ -53,6 +53,7 @@ public class NotificacioCommand {
 	private Date caducitat;
 	private Long procedimentId;
 	private String procedimentNom;
+	private Long serveiId;
 	private String codiSia;
 	private Long grupId;
 	@Size(max=64)
@@ -105,7 +106,11 @@ public class NotificacioCommand {
 		NotificacioCommand command = ConversioTipusHelper.convertir(dto, NotificacioCommand.class);
 		
 		if (dto.getProcediment() != null) {
-			command.setProcedimentId(dto.getProcediment().getId());
+			if (ProcSerTipusEnum.SERVEI.equals(dto.getProcediment().getTipus())) {
+				command.setProcedimentId(dto.getProcediment().getId());
+			} else {
+				command.setServeiId(dto.getProcediment().getId());
+			}
 		}
 
 		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
@@ -135,7 +140,11 @@ public class NotificacioCommand {
 				this,
 				NotificacioDatabaseDto.class);
 		ProcSerDto procedimentDto = new ProcSerDto();
-		procedimentDto.setId(this.getProcedimentId());
+		if (procedimentId != null) {
+			procedimentDto.setId(this.getProcedimentId());
+		} else {
+			procedimentDto.setId(this.getServeiId());
+		}
 		dto.setProcediment(procedimentDto);
 
 		GrupDto grupDto = new GrupDto();

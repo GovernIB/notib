@@ -118,7 +118,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
-	protected ProcedimentEntity procediment;
+	protected ProcSerEntity procediment;
 	
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)

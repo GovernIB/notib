@@ -12,7 +12,7 @@ import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.EntregaPostalEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -664,7 +664,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					
 					if (enviament.getEntregaPostal() != null) {
 						EntregaPostal entregaPostal = new EntregaPostal();
-						ProcedimentEntity procedimentNotificacio = notificacio.getProcediment();
+						ProcSerEntity procedimentNotificacio = notificacio.getProcediment();
 						if (procedimentNotificacio != null && procedimentNotificacio.getEntregaCie() != null) {
 							EntregaCieEntity entregaCieEntity = procedimentNotificacio.getEntregaCie();
 							if (entregaCieEntity.getOperadorPostal() != null) {
