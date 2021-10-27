@@ -168,7 +168,7 @@ public class RegistreNotificaHelper {
 			arbResposta = pluginHelper.crearAsientoRegistral(
 					dir3Codi,
 					arb,
-					null, //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
+					isSirActivat ? (isComunicacio ? 2L : 1L) : null, //### [SIR-DESACTIVAT = registre normal, SIR-ACTIVAT = notificació/comunicació]
 					notificacioEntity.getId(),
 					getEnviamentIds(notificacioEntity),
 					generarJustificant);

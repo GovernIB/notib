@@ -1176,6 +1176,10 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Text de la cerca", codi));
 
+		// Eliminam espais
+		codi = codi != null ? codi.trim() : null;
+		municipi = municipi != null ? municipi.trim() : null;
+
 		List<NodeDir3> organismesNodeDir3 = null;
 		List<OrganGestorDto> organismes = null;
 		try {
