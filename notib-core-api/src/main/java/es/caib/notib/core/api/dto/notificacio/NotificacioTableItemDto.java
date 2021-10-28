@@ -4,6 +4,7 @@
 package es.caib.notib.core.api.dto.notificacio;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class NotificacioTableItemDto {
 	private String entitatNom;
 	private String procedimentCodi;
 	private String procedimentNom;
+	private ProcSerTipusEnum procedimentTipus;
 	private String organCodi;
 	private String organNom;
 	private OrganGestorEstatEnum organEstat;

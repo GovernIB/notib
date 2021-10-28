@@ -4,6 +4,7 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
@@ -109,6 +110,9 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private boolean procedimentIsComu;
 	@Column(name = "PROCEDIMENT_REQUIRE_PERMISSION")
 	private boolean procedimentRequirePermission;
+	@Column(name = "PROCEDIMENT_TIPUS")
+	@Enumerated(EnumType.STRING)
+	private ProcSerTipusEnum procedimentTipus;
 	@Column(name = "ORGAN_CODI")
 	private String organCodi;
 	@Column(name = "ORGAN_NOM")

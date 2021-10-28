@@ -577,7 +577,14 @@
 							<span class="fa fa-warning text-danger" title="<spring:message code='notificacio.list.columna.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
         </th>
-        <th data-col-name="procedimentDesc"  width="200px"><spring:message code="notificacio.list.columna.procediment"/></th>
+        <th data-col-name="procedimentTipus" data-visible="false"></th>
+        <th data-col-name="procedimentDesc" data-template="#cellProcedimentTemplate" width="200px"><spring:message code="notificacio.list.columna.procediment"/>
+            <script id="cellProcedimentTemplate" type="text/x-jsrender">
+                {{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
+                {{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
+                {{:procedimentDesc}}
+            </script>
+        </th>
         <c:if test="${mostrarColumnaNumExpedient}">
             <th data-col-name="numExpedient" width="170px"><spring:message code="notificacio.list.columna.num.expedient"/></th>
         </c:if>

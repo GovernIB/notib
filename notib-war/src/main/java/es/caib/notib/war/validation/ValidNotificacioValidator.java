@@ -94,17 +94,27 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			}
 			
 			// Procediment
+			boolean useProcediment = "PROCEDIMENT".equals(notificacio.getTipusProcSer());
+			Long procSer = useProcediment ? notificacio.getProcedimentId() : notificacio.getServeiId();
+
 			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.NOTIFICACIO) {
-				if (notificacio.getProcedimentId() == null) {
+				if (procSer == null) {
 					valid = false;
-					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment"))
-					.addNode("procedimentId")
-					.addConstraintViolation();
+					if (useProcediment) {
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment"))
+								.addNode("procedimentId")
+								.addConstraintViolation();
+					} else {
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.servei"))
+								.addNode("serveiId")
+								.addConstraintViolation();
+					}
 				}
 			}
-			if (notificacio.getProcedimentId() != null) {
-				boolean procedimentAmbGrups = procedimentService.procedimentAmbGrups(notificacio.getProcedimentId());
+			if (procSer != null) {
+				boolean procedimentAmbGrups = procedimentService.procedimentAmbGrups(procSer);
 				if (procedimentAmbGrups && notificacio.getGrupId() == null) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(

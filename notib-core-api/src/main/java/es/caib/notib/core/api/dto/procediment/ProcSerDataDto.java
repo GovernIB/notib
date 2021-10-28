@@ -3,6 +3,7 @@ package es.caib.notib.core.api.dto.procediment;
 import es.caib.notib.core.api.dto.AuditoriaDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import lombok.*;
 
 import java.io.Serializable;
@@ -45,5 +46,7 @@ public class ProcSerDataDto extends AuditoriaDto implements Serializable {
 	protected boolean entregaCieActiva;
 	protected Long operadorPostalId;
 	protected Long cieId;
+
+	private ProcSerTipusEnum tipus;
 
 }

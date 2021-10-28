@@ -9,7 +9,6 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,8 +59,8 @@ public class AuditNotificacioHelper {
 				data.getNotificacio().getRetard(),
 				data.getNotificacio().getCaducitat(),
 				data.getNotificacio().getUsuariCodi(),
-				data.getProcediment() != null ? data.getProcediment().getCodi() : null,
-				data.getProcediment(),
+				data.getProcSer() != null ? data.getProcSer().getCodi() : null,
+				data.getProcSer(),
 				data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null,
 				data.getNotificacio().getNumExpedient(),
 				TipusUsuariEnumDto.INTERFICIE_WEB,

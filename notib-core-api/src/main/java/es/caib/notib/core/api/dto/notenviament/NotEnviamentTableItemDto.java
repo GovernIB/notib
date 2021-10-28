@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.dto.notenviament;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
@@ -38,6 +39,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	//Info notificació
 	private Date enviamentDataProgramada;
 	private String procedimentCodiNotib;
+	private ProcSerTipusEnum procedimentTipus;
 	private String grupCodi;
 	private String organCodi;
 	private OrganGestorEstatEnum organEstat;

@@ -2,6 +2,7 @@ package es.caib.notib.core.entity;
 
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.audit.NotibAuditable;
@@ -121,6 +122,10 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 
 	@Column(name = "PROCEDIMENT_REQUIRE_PERMISSION")
 	private boolean procedimentRequirePermission;
+
+	@Column(name = "PROCEDIMENT_TIPUS")
+	@Enumerated(EnumType.STRING)
+	private ProcSerTipusEnum procedimentTipus;
 
 
 	// //

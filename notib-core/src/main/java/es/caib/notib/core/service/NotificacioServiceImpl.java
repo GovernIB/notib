@@ -411,7 +411,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					NotificacioInfoDto.class);
 
 			// Emplena dades del procediment
-			ProcedimentEntity procedimentEntity = notificacio.getProcediment();
+			ProcSerEntity procedimentEntity = notificacio.getProcediment();
 			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
 				EntregaCieEntity entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
 				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(),
@@ -1213,7 +1213,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	 */
 	private boolean hasPermisNotificacio(NotificacioEntity notificacio) {
 		boolean hasPermis = false;
-		ProcedimentEntity procedimentNotificacio = notificacio.getProcediment();
+		ProcSerEntity procedimentNotificacio = notificacio.getProcediment();
 		if (procedimentNotificacio != null) {
 			hasPermis = entityComprovarHelper.hasPermisProcediment(
 					notificacio.getProcediment().getId(),

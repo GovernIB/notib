@@ -118,7 +118,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "procediment_id")
 	@ForeignKey(name = "not_procediment_not_fk")
-	protected ProcedimentEntity procediment;
+	protected ProcSerEntity procediment;
 	
 	/*Procediment*/
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
@@ -304,7 +304,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Date caducitat,
 			String usuariCodi,
 			String procedimentCodi,
-			ProcedimentEntity procediment,
+			ProcSerEntity procSer,
 			String grup,
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
@@ -327,7 +327,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		this.caducitat = caducitat;
 		this.usuariCodi = usuariCodi;
 		this.procedimentCodiNotib = procedimentCodi;
-		this.procediment = procediment;
+		this.procediment = procSer;
 		this.grupCodi = grup;
 		this.numExpedient = numExpedient;
 		this.tipusUsuari = tipusUsuari;
@@ -356,7 +356,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			Date caducitat,
 			String usuariCodi,
 			String procedimentCodi,
-			ProcedimentEntity procediment,
+			ProcSerEntity procSer,
 			String grup,
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
@@ -375,7 +375,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				caducitat,
 				usuariCodi,
 				procedimentCodi,
-				procediment,
+				procSer,
 				grup,
 				numExpedient,
 				tipusUsuari,
@@ -399,7 +399,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				Date caducitat,
 				String usuariCodi,
 				String procedimentCodi,
-				ProcedimentEntity procediment,
+				ProcSerEntity procSer,
 				String grup,
 				String numExpedient,
 				TipusUsuariEnumDto tipusUsuari,
@@ -420,7 +420,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.procedimentCodiNotib = procedimentCodi;
 			built.grupCodi = grup;
 			built.numExpedient = numExpedient;
-			built.procediment = procediment;
+			built.procediment = procSer;
 			built.estat = NotificacioEstatEnumDto.PENDENT;
 			built.notificaEnviamentIntent = 0;
 			built.registreEnviamentIntent = 0;

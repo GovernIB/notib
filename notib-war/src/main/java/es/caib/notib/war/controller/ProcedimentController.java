@@ -224,10 +224,6 @@ public class ProcedimentController extends BaseUserController{
 		if (procediment != null) {
 			procSerCommand = ProcSerCommand.asCommand(procediment);
 			procSerCommand.setEntitatId(procediment.getEntitat().getId());
-//			if (procediment.getPagadorcie() != null)
-//				procSerCommand.setPagadorCieId(procediment.getPagadorcie().getId());
-//			if (procediment.getPagadorpostal() != null)
-//				procSerCommand.setPagadorPostalId(procediment.getPagadorpostal().getId());
 		} else {
 			procSerCommand = new ProcSerCommand();
 		}

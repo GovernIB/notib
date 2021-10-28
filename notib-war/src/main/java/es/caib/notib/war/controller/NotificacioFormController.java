@@ -63,6 +63,8 @@ public class NotificacioFormController extends BaseUserController {
     @Autowired
     private ProcedimentService procedimentService;
     @Autowired
+    private ServeiService serveiService;
+    @Autowired
     private OrganGestorService organGestorService;
     @Autowired
     private GrupService grupService;
@@ -163,6 +165,20 @@ public class NotificacioFormController extends BaseUserController {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         return procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organId.equals("-") ? null : organId,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
+        );
+    }
+
+    @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorOrganGestorComuDto> getServeisOrgan(
+            HttpServletRequest request,
+            @PathVariable String organId) {
+
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        return serveiService.getServeisOrganNotificables(
                 entitatActual.getId(),
                 organId.equals("-") ? null : organId,
                 RolEnumDto.valueOf(RolHelper.getRolActual(request))
@@ -409,7 +425,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @RequestMapping(value = "/procediment/{procedimentId}/dades", method = RequestMethod.GET)
     @ResponseBody
-    public DadesProcediment getDataCaducitat(
+    public DadesProcediment getDadesProcSer(
             HttpServletRequest request,
             @PathVariable Long procedimentId) {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
@@ -722,6 +738,15 @@ public class NotificacioFormController extends BaseUserController {
                 organFiltreProcediments,
                 RolEnumDto.valueOf(RolHelper.getRolActual(request))
         );
+        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(
+                entitatActual.getId(),
+                organFiltreProcediments,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
+        );
+        List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
+        procSerDisponibles.addAll(procedimentsDisponibles);
+        procSerDisponibles.addAll(serveisDisponibles);
+
         List<OrganGestorDto> organsGestors;
         if (RolEnumDto.NOT_ADMIN.equals(rol)) {
             organsGestors = organGestorService.findByEntitat(entitatActual.getId());
@@ -734,12 +759,12 @@ public class NotificacioFormController extends BaseUserController {
 
             organsGestors = recuperarOrgansPerProcedimentAmbPermis(
 	                entitatActual,
-	                procedimentsDisponibles,
+                    procSerDisponibles,
                     PermisEnum.NOTIFICACIO);
         }
 
 
-        if (procedimentsDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId())) {
+        if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId())) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
 
@@ -749,6 +774,7 @@ public class NotificacioFormController extends BaseUserController {
 
         model.addAttribute("organsGestors", organsGestors);
         model.addAttribute("procediments", procedimentsDisponibles);
+        model.addAttribute("serveis", serveisDisponibles);
 
 
         model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat", "true"));
