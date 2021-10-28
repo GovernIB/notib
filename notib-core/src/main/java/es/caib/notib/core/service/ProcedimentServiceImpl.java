@@ -57,6 +57,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	@Resource
 	private ProcedimentRepository procedimentRepository;
 	@Resource
+	private ProcSerRepository procSerRepository;
+	@Resource
 	private ProcedimentFormRepository procedimentFormRepository;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
@@ -362,7 +364,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			//Compravar si agrupar
-			ProcedimentEntity procediment = procedimentRepository.findById(procedimentId);
+			ProcSerEntity procediment = procSerRepository.findById(procedimentId);
 			return procediment.isAgrupar();
 		} finally {
 			metricsHelper.fiMetrica(timer);

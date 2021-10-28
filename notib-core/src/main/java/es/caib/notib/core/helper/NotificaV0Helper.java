@@ -66,7 +66,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		if (notificacio.getConcepte().startsWith("Error")) {
-			String errorDescripcio = "Error de registre MOCK (" + System.currentTimeMillis() + ")";
+			String errorDescripcio = "Error de notifica MOCK (" + System.currentTimeMillis() + ")";
 			log.error(
 					errorDescripcio,
 					errorDescripcio);

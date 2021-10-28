@@ -171,6 +171,20 @@ public class NotificacioFormController extends BaseUserController {
         );
     }
 
+    @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorOrganGestorComuDto> getServeisOrgan(
+            HttpServletRequest request,
+            @PathVariable String organId) {
+
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        return serveiService.getServeisOrganNotificables(
+                entitatActual.getId(),
+                organId.equals("-") ? null : organId,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
+        );
+    }
+
     @RequestMapping(value = "/cercaUnitats", method = RequestMethod.GET)
     @ResponseBody
     public List<OrganGestorDto> getAdministracions(
@@ -411,7 +425,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @RequestMapping(value = "/procediment/{procedimentId}/dades", method = RequestMethod.GET)
     @ResponseBody
-    public DadesProcediment getDataCaducitat(
+    public DadesProcediment getDadesProcSer(
             HttpServletRequest request,
             @PathVariable Long procedimentId) {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);

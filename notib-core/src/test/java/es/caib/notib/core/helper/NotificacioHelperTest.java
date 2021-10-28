@@ -189,7 +189,7 @@ public class NotificacioHelperTest {
 		assertEquals(entidad, notificacioData.getEntitat());
 		assertEquals(grupNotificacio, notificacioData.getGrupNotificacio());
 		assertEquals(organGestor, notificacioData.getOrganGestor());
-		assertEquals(procediment, notificacioData.getProcediment());
+		assertEquals(procediment, notificacioData.getProcSer());
 		assertEquals(documentEntity, notificacioData.getDocumentEntity());
 		assertEquals(documentEntity2, notificacioData.getDocument2Entity());
 		assertEquals(documentEntity3, notificacioData.getDocument3Entity());

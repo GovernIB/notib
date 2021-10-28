@@ -189,8 +189,8 @@ public class NotificacioHelper {
 						data.getNotificacio().getRetard(),
 						data.getNotificacio().getCaducitat(),
 						data.getNotificacio().getUsuariCodi(),
-						data.getProcediment() != null ? data.getProcediment().getCodi() : null,
-						data.getProcediment(),
+						data.getProcSer() != null ? data.getProcSer().getCodi() : null,
+						data.getProcSer(),
 						data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null,
 						data.getNotificacio().getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB,
@@ -217,27 +217,27 @@ public class NotificacioHelper {
 		log.debug("Construint les dades d'una notificació");
 		GrupEntity grupNotificacio = null;
 		OrganGestorEntity organGestor = null;
-		ProcedimentEntity procediment = null;
+		ProcSerEntity procSer = null;
 		ProcSerOrganEntity procedimentOrgan = null;
 
 		//			### Recuperar procediment notificació
 		if (notificacio.getProcediment() != null && notificacio.getProcediment().getId() != null) {
-			procediment = (ProcedimentEntity) entityComprovarHelper.comprovarProcediment(entitat, notificacio.getProcediment().getId());
+			procSer = entityComprovarHelper.comprovarProcediment(entitat, notificacio.getProcediment().getId());
 		}
 
 		// Si tenim procediment --> Comprovam permisos i consultam info òrgan gestor
-		log.trace("Processam procediment");
-		if (procediment != null) {
-			if (!procediment.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
-				organGestor = procediment.getOrganGestor();
+		log.trace("Processam procediment/servei");
+		if (procSer != null) {
+			if (!procSer.isComu()) { // || (procediment.isComu() && notificacio.getOrganGestor() == null)) { --> Tot procediment comú ha de informa un òrgan gestor
+				organGestor = procSer.getOrganGestor();
 			}
 
-			if (procediment.isComu() && organGestor != null) {
-				procedimentOrgan = procedimentOrganRepository.findByProcSerIdAndOrganGestorId(procediment.getId(), organGestor.getId());
+			if (procSer.isComu() && organGestor != null) {
+				procedimentOrgan = procedimentOrganRepository.findByProcSerIdAndOrganGestorId(procSer.getId(), organGestor.getId());
 			}
 
 			if (checkProcedimentPermissions) {
-				procediment = (ProcedimentEntity) entityComprovarHelper.comprovarProcedimentOrgan(
+				procSer = entityComprovarHelper.comprovarProcedimentOrgan(
 						entitat,
 						notificacio.getProcediment().getId(),
 						procedimentOrgan,
@@ -272,7 +272,7 @@ public class NotificacioHelper {
 				.entitat(entitat)
 				.grupNotificacio(grupNotificacio)
 				.organGestor(organGestor)
-				.procediment(procediment)
+				.procSer(procSer)
 				.documentEntity(documentEntity)
 				.document2Entity(document2Entity)
 				.document3Entity(document3Entity)
@@ -483,7 +483,7 @@ public class NotificacioHelper {
 		private EntitatEntity entitat;
 		private GrupEntity grupNotificacio;
 		private OrganGestorEntity organGestor;
-		private ProcedimentEntity procediment;
+		private ProcSerEntity procSer;
 		private DocumentEntity documentEntity;
 		private DocumentEntity document2Entity;
 		private DocumentEntity document3Entity;

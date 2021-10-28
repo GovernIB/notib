@@ -759,11 +759,6 @@
 			}
 		});
 
-//     $( "#form" ).submit(function( event ) {
-//       $("#organGestor").prop("disabled", false);
-//       return true;
-//     });
-
 		// var agrupable = $("#procedimentId").children(":selected").attr("class");
 		// var procedimentId = $("#procedimentId").children(":selected").attr("value");
 
@@ -786,167 +781,43 @@
 				organ = "-";
 			}
 			if (num_organs > 0) {
-				$.ajax({
-					type: 'GET',
-					url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
-					success: function(data) {
-						var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-						// Procediments
-						var procediments = data;
-						var selProcediments = $("#procedimentId");
-						selProcediments.empty();
-						if (procediments && procediments.length > 0) {
-							selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
-							var procedimentsComuns = [];
-							var procedimentsOrgan = [];
-							$.each(data, function(i, val) {
-								if(val.comu) {
-									procedimentsComuns.push(val);
-								} else {
-									procedimentsOrgan.push(val);
-								}
-							});
-							if (procedimentsComuns.length > 0) {
-								selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
-								$.each(procedimentsComuns, function(index, val) {
-									selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
-								});
-								selProcediments.append("</optgroup>");
-							}
-							var isOnlyOneProcedimentOrgan = (procedimentsOrgan.length < 2);
-							if (procedimentsOrgan.length > 0) {
-								selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
-								$.each(procedimentsOrgan, function(index, val) {
-									if (isOnlyOneProcedimentOrgan) {
-										selProcediments.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
-										$("#organGestor").val(val.organGestor).trigger("change.select2");
-									} else {
-										selProcediments.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
-									}
-								});
-								selProcediments.append("</optgroup>");
-								selProcediments.trigger('change.select2');
-							}
-							if (selProcediments.children('option').length == 2) {
-								$('#procedimentId option:eq(1)').attr('selected', 'selected');
-								selProcediments.trigger('change');
-							}
-						} else {
-							selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
-						}
-						selProcediments.select2(select2Options);
-						// selProcediments.val(selProcediments.attr('data-enum-value'));
-						// selProcediments.trigger('change');
-
-						let numProcediments = $('#procedimentId').children('option').length - 1;
-						if (numProcediments > 1) {
-							if ('${notificacioCommand != null && procedimentIdAux != null}') {
-								$("#procedimentId").val('${notificacioCommand.procedimentId}');
-								$('#procedimentId').trigger('change');
-								procedimentIdAux = null;
-							}
-						}
-					},
-					error: function() {
-						console.log("error obtenint els procediments de l'òrgan gestor...");
-					}
-				});
-
+				loadProcediments(organ);
+				loadServeis(organ);
 			}
 
 		});
 		$('#procedimentId').on('change', function() {
-			var procediment = $(this).val();
-			if (procediment == null) {
-				alert("No s'ha pogut trobar el procediment de la notificació, segurament degut a que " +
-						"els permisos que hi tens assignats són insuficients.")
-				return;
+			updateOrgansForProcSerChange($(this).val());
+		});
+		$('#serveiId').on('change', function() {
+			updateOrgansForProcSerChange($(this).val());
+		});
+
+		$('#rd_procediment').on('change', function () {
+			if ($(this).prop('checked')) {
+				$("#serveiRow").hide();
+				$("#procedimentRow").show();
+				$('#serveiId').val("").trigger('change.select2');;
+				loadProcediments(getOrganVal());
 			}
-			if (procediment == '') {
-				$("#organGestor").prop("disabled", false);
-			} else {
-				$.ajax({
-					type: 'GET',
-					url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades",
-					success: function(data) {
-						var select2Options = {
-							theme: 'bootstrap',
-							width: 'auto'};
-						// Òrgan gestor
-						if (!data.comu) {
-							$("#organGestor").val(data.organCodi).trigger("change.select2");
-						} else if (data.organsDisponibles.length) {
-							if (data.organsDisponibles.length == 1) {
-								$("#organGestor").val(data.organsDisponibles[0]).trigger("change.select2");
-							}
-						}
-						// Caducitat
-						$("#caducitat").val(data.caducitat);
-						// Retard
-						$("#retard").val(data.retard);
-						// Grups
-						var grups = data.grups;
-						var selGrups = $("#grupId");
-						selGrups.empty();
-						selGrups.append("<option value=\"\"></option>");
-						if (data.agrupable && grups && grups.length > 0) {
-							$.each(grups, function(i, val) {
-								selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-							});
-							selGrups.select2(select2Options);
-							$("#grups").removeClass("hidden");
-						} else {
-							$("#grups").addClass("hidden");
-						}
+		});
 
-						viewModel.ambEntregaCIE = data.entregaCieActiva;
-
-						// TODO: Afegir formats de fulla i sobre
-						// Format fulla
-// 					var selFormatFulla = $("#grupId");
-// 					selFormatFulla.empty();
-// 					selFormatFulla.append("<option value=\"\"></option>");
-// 					var formatsFulla = data.formatsFulla;
-// 					if (grups && grups.ength > 0) {
-// 						$.each(grups, function(i, val) {
-// 							selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
-// 						});
-// 					}
-// 					selGrups.select2(select2Options);
-						<%--
-                                            // Format sobre
-                                            <div class="col-md-3 formatFulla">
-                                                <c:choose>
-                                                    <c:when test="${not empty formatsFulla}">
-                                                        <not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                </div>
-                                                <div class="col-md-3 formatSobre">
-                                                <c:choose>
-                                                    <c:when test="${not empty formatsSobre}">
-                                                        <not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
-                        --%>
-					},
-					error: function() {
-						console.log("error obtenint la informació del procediment...");
-					}
-				});
+		$('#rd_servei').on('change', function () {
+			if ($(this).prop('checked')) {
+				$("#procedimentRow").hide();
+				$("#serveiRow").show();
+				$('#procedimentId').val("").trigger('change.select2');;
+				loadServeis(getOrganVal());
 			}
 		});
 
 		$('#organGestor').trigger('change');
+
+		if ($('#rd_procediment').prop('checked')) {
+			$("#serveiRow").hide();
+		} else {
+			$("#procedimentRow").hide();
+		}
 
 		//Eliminar grups
 		$(document).on('click', "#remove", function () {
@@ -1097,6 +968,242 @@
 		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
 	});
 
+	function loadProcediments(organ) {
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/organ/"/>" + organ + "/procediments",
+			success: function(data) {
+				var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+				// Procediments
+				var procediments = data;
+				var selProcediments = $("#procedimentId");
+				selProcediments.empty();
+				if (procediments && procediments.length > 0) {
+					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+					var procedimentsComuns = [];
+					var procedimentsOrgan = [];
+					$.each(data, function(i, val) {
+						if(val.comu) {
+							procedimentsComuns.push(val);
+						} else {
+							procedimentsOrgan.push(val);
+						}
+					});
+					if (procedimentsComuns.length > 0) {
+						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
+						$.each(procedimentsComuns, function(index, val) {
+							selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+						});
+						selProcediments.append("</optgroup>");
+					}
+					var isOnlyOneProcedimentOrgan = (procedimentsOrgan.length < 2);
+					if (procedimentsOrgan.length > 0) {
+						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
+						$.each(procedimentsOrgan, function(index, val) {
+							if (isOnlyOneProcedimentOrgan) {
+								selProcediments.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
+								$("#organGestor").val(val.organGestor).trigger("change.select2");
+							} else {
+								selProcediments.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
+							}
+						});
+						selProcediments.append("</optgroup>");
+						selProcediments.trigger('change.select2');
+					}
+					if (selProcediments.children('option').length == 2) {
+						$('#procedimentId option:eq(1)').attr('selected', 'selected');
+						selProcediments.trigger('change');
+					}
+				} else {
+					selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
+				}
+				selProcediments.select2(select2Options);
+				// selProcediments.val(selProcediments.attr('data-enum-value'));
+				// selProcediments.trigger('change');
+
+				let numProcediments = $('#procedimentId').children('option').length - 1;
+				if (numProcediments > 1) {
+					if ('${notificacioCommand != null && procedimentIdAux != null}') {
+						$("#procedimentId").val('${notificacioCommand.procedimentId}');
+						$('#procedimentId').trigger('change');
+						procedimentIdAux = null;
+					}
+				}
+			},
+			error: function() {
+				console.log("error obtenint els procediments de l'òrgan gestor...");
+			}
+		});
+	}
+
+	function loadServeis(organ) {
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/notificacio/organ/"/>" + organ + "/serveis",
+			success: function(data) {
+				var select2Options = {
+					theme: 'bootstrap',
+					width: 'auto'};
+				// Procediments
+				var servei = data;
+				var selServeis = $("#serveiId");
+				selServeis.empty();
+				if (servei && servei.length > 0) {
+					selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.select'/></option>");
+					var serveisComuns = [];
+					var serveisOrgan = [];
+					$.each(data, function(i, val) {
+						if(val.comu) {
+							serveisComuns.push(val);
+						} else {
+							serveisOrgan.push(val);
+						}
+					});
+					if (serveisComuns.length > 0) {
+						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
+						$.each(serveisComuns, function(index, val) {
+							selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+						});
+						selServeis.append("</optgroup>");
+					}
+					var isOnlyOneServeiOrgan = (serveisOrgan.length < 2);
+					if (serveisOrgan.length > 0) {
+						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.organs'/>'>");
+						$.each(serveisOrgan, function(index, val) {
+							if (isOnlyOneServeiOrgan) {
+								selServeis.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
+								$("#organGestor").val(val.organGestor).trigger("change.select2");
+							} else {
+								selServeis.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
+							}
+						});
+						selServeis.append("</optgroup>");
+						selServeis.trigger('change.select2');
+					}
+					if (selServeis.children('option').length == 2) {
+						$('#procedimentId option:eq(1)').attr('selected', 'selected');
+						selServeis.trigger('change');
+					}
+				} else {
+					selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.buit'/></option>");
+				}
+				selServeis.select2(select2Options);
+				// selProcediments.val(selProcediments.attr('data-enum-value'));
+				// selProcediments.trigger('change');
+
+				let numServeis = $('#serveiId').children('option').length - 1;
+				if (numServeis > 1) {
+					if ('${notificacioCommand != null && procedimentIdAux != null}') {
+						$("#serveiId").val('${notificacioCommand.procedimentId}');
+						$('#serveiId').trigger('change');
+						procedimentIdAux = null;
+					}
+				}
+			},
+			error: function() {
+				console.log("error obtenint els serveis de l'òrgan gestor...");
+			}
+		});
+	}
+
+	function updateOrgansForProcSerChange(procediment) {
+		if (procediment == null) {
+			alert("No s'ha pogut trobar el procediment o servei de la notificació, segurament degut a que " +
+					"els permisos que hi tens assignats són insuficients.")
+			return;
+		}
+		if (procediment == '') {
+			$("#organGestor").prop("disabled", false);
+		} else {
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/procediment/"/>" + procediment + "/dades",
+				success: function(data) {
+					var select2Options = {
+						theme: 'bootstrap',
+						width: 'auto'};
+					// Òrgan gestor
+					if (!data.comu) {
+						$("#organGestor").val(data.organCodi).trigger("change.select2");
+					} else if (data.organsDisponibles.length) {
+						if (data.organsDisponibles.length == 1) {
+							$("#organGestor").val(data.organsDisponibles[0]).trigger("change.select2");
+						}
+					}
+					// Caducitat
+					$("#caducitat").val(data.caducitat);
+					// Retard
+					$("#retard").val(data.retard);
+					// Grups
+					var grups = data.grups;
+					var selGrups = $("#grupId");
+					selGrups.empty();
+					selGrups.append("<option value=\"\"></option>");
+					if (data.agrupable && grups && grups.length > 0) {
+						$.each(grups, function(i, val) {
+							selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+						});
+						selGrups.select2(select2Options);
+						$("#grups").removeClass("hidden");
+					} else {
+						$("#grups").addClass("hidden");
+					}
+
+					viewModel.ambEntregaCIE = data.entregaCieActiva;
+
+					// TODO: Afegir formats de fulla i sobre
+					// Format fulla
+// 					var selFormatFulla = $("#grupId");
+// 					selFormatFulla.empty();
+// 					selFormatFulla.append("<option value=\"\"></option>");
+// 					var formatsFulla = data.formatsFulla;
+// 					if (grups && grups.ength > 0) {
+// 						$.each(grups, function(i, val) {
+// 							selGrups.append("<option value=\"" + val.id + "\">" + val.nom + "</option>");
+// 						});
+// 					}
+// 					selGrups.select2(select2Options);
+					<%--
+                                        // Format sobre
+                                        <div class="col-md-3 formatFulla">
+                                            <c:choose>
+                                                <c:when test="${not empty formatsFulla}">
+                                                    <not:inputSelect name="enviaments[${j}].entregaPostal.formatFulla" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatfulla" optionItems="${formatsFulla}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <not:inputText name="enviaments[${j}].entregaPostal.formatFulla" textKey="notificacio.form.camp.entregapostal.formatfulla" labelClass="labelcss" inputClass="inputcss"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            </div>
+                                            <div class="col-md-3 formatSobre">
+                                            <c:choose>
+                                                <c:when test="${not empty formatsSobre}">
+                                                    <not:inputSelect name="enviaments[${j}].entregaPostal.formatSobre" emptyOption="true" textKey="notificacio.form.camp.entregapostal.formatsobre" optionItems="${formatsSobre}" optionValueAttribute="codi" optionTextAttribute="codi" labelClass="labelcss" inputClass="inputcss"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <not:inputText name="enviaments[${j}].entregaPostal.formatSobre" textKey="notificacio.form.camp.entregapostal.formatsobre" labelClass="labelcss" inputClass="inputcss"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                    --%>
+				},
+				error: function() {
+					console.log("error obtenint la informació del procediment o servei...");
+				}
+			});
+		}
+	}
+
+	function getOrganVal() {
+		var organ = $('#organGestor').val();
+		if (organ == undefined || organ == "") {
+			organ = "-";
+		}
+		return organ;
+	}
+
 </script>
 <div class="loading">
 		<div class="loading-gif">
@@ -1151,8 +1258,23 @@
 				</div>
 			</div>
 
-			<!-- PROCEDIMENT -->
 			<div class="row">
+				<div class="col-xs-2"> </div>
+				<div class="form-group col-xs-10">
+					<div class="btn-group" data-toggle="buttons" style="padding-left: 15px;">
+						<label class="btn btn-warning active">
+<%--							<input type="radio" name="tipusProcSer" id="rd_procediment" value="PROCEDIMENT" <c:if test="${notificacioCommand.tipusProcSer=='PROCEDIMENT'}">checked</c:if>><spring:message code="notificacio.form.camp.procediment"/>--%>
+							<form:radiobutton path="tipusProcSer" id="rd_procediment" value="PROCEDIMENT" /><spring:message code="notificacio.form.camp.procediment"/>
+						</label>
+						<label class="btn btn-warning">
+<%--							<input type="radio" name="tipusProcSer" id="rd_servei" value="SERVEI" <c:if test="${notificacioCommand.tipusProcSer!='PROCEDIMENT'}">checked</c:if>><spring:message code="notificacio.form.camp.servei"/>--%>
+							<form:radiobutton path="tipusProcSer" id="rd_servei" value="SERVEI" /><spring:message code="notificacio.form.camp.servei"/>
+						</label>
+					</div>
+				</div>
+			</div>
+			<!-- PROCEDIMENT -->
+			<div id="procedimentRow" class="row">
 				<div class="col-md-12">
 					<not:inputSelect 
 						name="procedimentId" 
@@ -1169,7 +1291,7 @@
 			</div>
 
 			<!-- SERVEI -->
-			<div class="row">
+			<div id="serveiRow" class="row">
 				<div class="col-md-12">
 					<not:inputSelect
 							name="serveiId"

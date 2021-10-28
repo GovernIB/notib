@@ -54,6 +54,7 @@ public class NotificacioCommand {
 	private Long procedimentId;
 	private String procedimentNom;
 	private Long serveiId;
+	private String tipusProcSer = "PROCEDIMENT";
 	private String codiSia;
 	private Long grupId;
 	@Size(max=64)
@@ -107,9 +108,9 @@ public class NotificacioCommand {
 		
 		if (dto.getProcediment() != null) {
 			if (ProcSerTipusEnum.SERVEI.equals(dto.getProcediment().getTipus())) {
-				command.setProcedimentId(dto.getProcediment().getId());
-			} else {
 				command.setServeiId(dto.getProcediment().getId());
+			} else {
+				command.setProcedimentId(dto.getProcediment().getId());
 			}
 		}
 
@@ -140,7 +141,8 @@ public class NotificacioCommand {
 				this,
 				NotificacioDatabaseDto.class);
 		ProcSerDto procedimentDto = new ProcSerDto();
-		if (procedimentId != null) {
+		if ("PROCEDIMENT".equals(tipusProcSer)) {
+//		if (procedimentId != null) {
 			procedimentDto.setId(this.getProcedimentId());
 		} else {
 			procedimentDto.setId(this.getServeiId());

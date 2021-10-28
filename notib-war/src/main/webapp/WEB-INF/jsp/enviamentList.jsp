@@ -274,11 +274,17 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="procedimentCodiNotib" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
+				<th data-col-name="procedimentTipus" data-visible="false"></th>
+				<th data-col-name="procedimentCodiNotib" data-template="#cellProcedimentTemplate" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codiprocediment"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
 							<input name="codiProcediment" value="${filtreEnviaments.codiProcediment}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codiprocediment"/>"/>
 						</div>
+					</script>
+					<script id="cellProcedimentTemplate" type="text/x-jsrender">
+						{{if procedimentTipus == 'PROCEDIMENT'}}<span class="label label-primary">P</span>{{/if}}
+						{{if procedimentTipus == 'SERVEI'}}<span class="label label-warning">S</span>{{/if}}
+						{{:procedimentCodiNotib}}
 					</script>
 				</th>
 				<c:choose>

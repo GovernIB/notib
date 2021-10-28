@@ -64,11 +64,14 @@ public class PersonaCommand {
 	}
 
 	public String getNif() {
-		return nif != null && Character.isDigit(nif.charAt(0)) && nif.length() < 9 ? afegirZerosNif() : nif;
+		if (nif == null || nif.trim().length() == 0)
+			return null;
+		return Character.isDigit(nif.trim().charAt(0)) && nif.trim().length() < 9 ? afegirZerosNif() : nif.trim();
 	}
 
 	private String afegirZerosNif() {
 
+		nif = nif.trim();
 		int length = 9 - nif.length();
 		for (int foo = 0; foo < length; foo++) {
 			nif = 0 + nif;
