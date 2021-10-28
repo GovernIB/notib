@@ -242,7 +242,7 @@ public class NotificacioMassivaServiceTest {
 						.dataFi(new FiltreField<Date>(null))
 						.titular(new StringField(null))
 						.organGestor(new FiltreField<OrganGestorEntity>(null))
-						.procediment(new FiltreField<ProcedimentEntity>(null))
+						.procediment(new FiltreField<ProcSerEntity>(null))
 						.tipusUsuari(new FiltreField<TipusUsuariEnumDto>(null))
 						.numExpedient(new StringField(null))
 						.creadaPer(new StringField(null))

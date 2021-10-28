@@ -52,6 +52,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @Autowired
     private ProcedimentService procedimentService;
     @Autowired
+    private ServeiService serveiService;
+    @Autowired
     private EnviamentService enviamentService;
     @Autowired
     private GrupService grupService;
@@ -198,6 +200,28 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         );
     }
 
+    @RequestMapping(value = "/serveisOrgan", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorComuDto> getServeis(
+            HttpServletRequest request,
+            Model model) {
+        Long entitatId = EntitatHelper.getEntitatActual(request).getId();
+        String organCodi = null;
+        PermisEnum permis = PermisEnum.CONSULTA;
+        OrganGestorDto organGestor = getOrganGestorActual(request);
+        if (organGestor != null)
+            organCodi = organGestor.getCodi();
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+
+        return serveiService.getServeisOrgan(
+                entitatId,
+                organCodi,
+                null,
+                rol,
+                permis
+        );
+    }
+
     /**
      * Obté el llistat de procediments de l'òrgan gestor indicat que es pot consultar les seves notificacions.
      *
@@ -215,7 +239,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
-        String organFiltre = null;
         PermisEnum permis = PermisEnum.CONSULTA;
         OrganGestorDto organActual = getOrganGestorActual(request);
         if (organActual != null)
@@ -223,6 +246,30 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
 
         return procedimentService.getProcedimentsOrgan(
+                entitatId,
+                organCodi,
+                organGestor,
+                rol,
+                permis
+        );
+    }
+
+    @RequestMapping(value = "/serveisOrgan/{organGestor}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CodiValorComuDto> getServeiByOrganGestor(
+            HttpServletRequest request,
+            @PathVariable Long organGestor,
+            Model model) {
+
+        Long entitatId = EntitatHelper.getEntitatActual(request).getId();
+        String organCodi = null;
+        PermisEnum permis = PermisEnum.CONSULTA;
+        OrganGestorDto organActual = getOrganGestorActual(request);
+        if (organActual != null)
+            organCodi = organActual.getCodi();
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+
+        return serveiService.getServeisOrgan(
                 entitatId,
                 organCodi,
                 organGestor,

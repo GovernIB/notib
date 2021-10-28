@@ -30,6 +30,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private String titular;
 	private String organGestor;
 	private Long procedimentId;
+	private Long serveiId;
 	private TipusUsuariEnumDto tipusUsuari;
 	private String numExpedient;
 	private String creadaPer;
@@ -56,6 +57,8 @@ public class NotificacioFiltreDto implements Serializable {
 		if (organGestor != null && !organGestor.isEmpty())
 			return false;
 		if (procedimentId != null)
+			return false;
+		if (serveiId != null)
 			return false;
 		if (tipusUsuari != null)
 			return false;

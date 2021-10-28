@@ -33,6 +33,7 @@ public class NotificacioFiltreCommand {
 	private String titular;
 	private String organGestor;
 	private Long procedimentId;
+	private Long serveiId;
 	private TipusUsuariEnumDto tipusUsuari;
 	private String numExpedient;
 	private String creadaPer;
