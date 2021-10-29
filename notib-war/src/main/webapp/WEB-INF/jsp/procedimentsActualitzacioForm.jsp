@@ -77,6 +77,9 @@
 						if (data.progres == 100) {
 							clearInterval(itervalProgres);
 							isUpdating = false;
+							$('#bar').css('width', '100%');
+							$('#bar').attr('aria-valuenow', 100);
+							$('#bar').html('100%');
 // 							$('.modal-footer', parent.document).show();
 							$('.close', parent.document).prop('disabled', false);
 							$('.loading').hide();

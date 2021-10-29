@@ -108,15 +108,6 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 //            @Param("entitatActual") EntitatEntity entitatActiva,
 //            Pageable paginacio);
 //
-//	@Query(
-//			"from " +
-//			"    ProcedimentEntity pro " +
-//			"where pro.entitat = (:entitatActual) and " +
-//			"lower(pro.codi) = (lower(:codiProcediment))")
-//	ProcedimentEntity findByEntitatAndCodiProcediment(
-//            @Param("entitatActual") EntitatEntity entitat,
-//            @Param("codiProcediment") String codiProcediment);
-//
 //	ProcedimentEntity findByIdAndEntitat(
 //            Long procedimentId,
 //            EntitatEntity entitat);
@@ -124,8 +115,6 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 	ProcSerEntity findById(Long procserId);
 
 //	ProcedimentEntity findByCodi(String codi);
-//
-//	ProcedimentEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 //
 //	@Query(
 //			"from " +
@@ -189,6 +178,17 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 	List<ProcSerEntity> findProcedimentsAccesiblesPerOrganGestor(
             @Param("organsCodis") List<String> organsCodis,
             @Param("grups") List<String> grups);
+
+	ProcSerEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+
+	@Query(
+			"from " +
+					"    ProcedimentEntity pro " +
+					"where pro.entitat = (:entitatActual) and " +
+					"lower(pro.codi) = (lower(:codiProcediment))")
+	ProcSerEntity findByEntitatAndCodiProcediment(
+			@Param("entitatActual") EntitatEntity entitat,
+			@Param("codiProcediment") String codiProcediment);
 
 //	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsFills);
 //

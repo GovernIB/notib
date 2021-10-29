@@ -447,7 +447,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (registresIdDto.size() > 0) {
             for (RegistreIdDto registreIdDto : registresIdDto) {
                 if (registreIdDto.getNumero() != null) {
-                    MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(
+                    MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ") " + getMessage(
                             request,
                             "notificacio.controller.registrar.ok"));
                 } else {
@@ -462,6 +462,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     "notificacio.controller.registrar.error"));
         }
 
+        model.addAttribute("pestanyaActiva", "accions");
         return "notificacioInfo";
     }
 

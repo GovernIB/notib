@@ -16,7 +16,6 @@ import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +53,6 @@ public class GrupServiceImpl implements GrupService{
 	private GrupProcSerRepository grupProcSerRepository;
 	@Resource
 	private ProcSerRepository procSerRepository;
-	@Resource
-	private ProcedimentRepository procedimentRepositroy;
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
@@ -188,7 +185,7 @@ public class GrupServiceImpl implements GrupService{
 		try {
 			List<GrupDto> grups = new ArrayList<GrupDto>();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProcedimentEntity procediment = procedimentRepositroy.findOne(procedimentId);
+			ProcSerEntity procediment = procSerRepository.findOne(procedimentId);
 			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
 			
 			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
