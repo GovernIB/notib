@@ -90,8 +90,7 @@ public class NotificacioHelper {
 				registreIdDto.setNumeroRegistreFormat(notificacioEntity.getRegistreNumeroFormatat());
 				registresIdDto.add(registreIdDto);
 				if (notificar){
-
-					RegistreIdDto registreIdDto = new RegistreIdDto();
+					
 					registreIdDto.setNumero(notificacioEntity.getRegistreNumero());
 					registreIdDto.setData(notificacioEntity.getRegistreData());
 					registreIdDto.setNumeroRegistreFormat(notificacioEntity.getRegistreNumeroFormatat());
