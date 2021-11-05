@@ -375,7 +375,7 @@ public class ProcSerHelper {
 
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result.no"));
 
-			organGestorHelper.crearOrganGestor(entitat, procedimentGda.getOrganGestor());
+			organGestor = organGestorHelper.crearOrganGestor(entitat, procedimentGda.getOrganGestor());
 			
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.creat"));
 		} else {
@@ -490,7 +490,7 @@ public class ProcSerHelper {
 
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.organ.result.no"));
 
-			organGestorHelper.crearOrganGestor(entitat, serveiGda.getOrganGestor());
+			organGestor = organGestorHelper.crearOrganGestor(entitat, serveiGda.getOrganGestor());
 
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.organ.creat"));
 		} else {

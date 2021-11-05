@@ -16,6 +16,7 @@ import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ServeiRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +39,8 @@ public class NotificacioListHelper {
     private NotificacioEnviamentRepository notificacioEnviamentRepository;
     @Autowired
     private ProcedimentRepository procedimentRepository;
+    @Autowired
+    private ServeiRepository serveiRepository;
     @Autowired
     private OrganGestorRepository organGestorRepository;
     @Autowired
@@ -111,9 +114,11 @@ public class NotificacioListHelper {
         if (filtreDto.getOrganGestor() != null && !filtreDto.getOrganGestor().isEmpty()) {
             organGestor = organGestorRepository.findOne(Long.parseLong(filtreDto.getOrganGestor()));
         }
-        ProcedimentEntity procediment = null;
+        ProcSerEntity procediment = null;
         if (filtreDto.getProcedimentId() != null) {
             procediment = procedimentRepository.findById(filtreDto.getProcedimentId());
+        } else if (filtreDto.getServeiId() != null) {
+            procediment = serveiRepository.findById(filtreDto.getServeiId());
         }
         NotificacioEstatEnumDto estat = filtreDto.getEstat();
         Boolean hasZeronotificaEnviamentIntent = null;
@@ -163,7 +168,7 @@ public class NotificacioListHelper {
         private FiltreField<Date> dataFi;
         private StringField titular;
         private FiltreField<OrganGestorEntity> organGestor;
-        private FiltreField<ProcedimentEntity> procediment;
+        private FiltreField<ProcSerEntity> procediment;
         private FiltreField<TipusUsuariEnumDto> tipusUsuari;
         private StringField numExpedient;
         private StringField creadaPer;

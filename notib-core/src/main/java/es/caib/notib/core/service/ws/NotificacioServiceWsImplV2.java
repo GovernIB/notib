@@ -57,8 +57,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+//	@Autowired
+//	private ProcedimentRepository procedimentRepository;
 	@Autowired
-	private ProcedimentRepository procedimentRepository;
+	private ProcSerRepository procSerRepository;
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Autowired
@@ -112,7 +114,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
 			
 			RespostaAlta resposta = new RespostaAlta();
-			ProcedimentEntity procediment = null;
+			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
 			ProcSerOrganEntity procedimentOrgan = null;
 			
@@ -153,7 +155,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				// Obtenir dades depenents de procediment (Procediment NO obligatori per a comunicacions a administracions)
 				if (notificacio.getProcedimentCodi() != null) {
-					procediment = procedimentRepository.findByCodiAndEntitat(
+					procediment = procSerRepository.findByCodiAndEntitat(
 							notificacio.getProcedimentCodi(), 
 							entitat);
 
@@ -410,7 +412,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
-				ProcedimentEntity procediment = procedimentRepository.findByEntitatAndCodiProcediment(
+				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(
 						entitat,
 						permisConsulta.getProcedimentCodi());
 				
@@ -1347,7 +1349,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return mimeType;
 	}
 
-	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcedimentEntity procediment) {
+	private String getGrupNotificacio(NotificacioV2 notificacio, EntitatEntity entitat, ProcSerEntity procediment) {
 		String errorDescripcio = null;
 		if (procediment.isAgrupar() && notificacio.getGrupCodi() != null && !notificacio.getGrupCodi().isEmpty()) {
 			logger.debug(">> [ALTA] procediment amb grups");

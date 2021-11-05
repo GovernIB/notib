@@ -3,7 +3,6 @@ package es.caib.notib.core.repository;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,7 +42,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	@Query(	"select distinct og " +
 			"from " +
-			"    ProcedimentEntity p " +
+			"    ProcSerEntity p " +
 			"    left outer join p.organGestor og " +
 			"where p.id in (:procedimentIds)")
 	List<OrganGestorEntity> findByProcedimentIds(@Param("procedimentIds") List<Long> procedimentIds);
@@ -59,7 +58,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("estat") OrganGestorEstatEnum estat);
 
 	@Query( "select distinct og " +
-			"from ProcedimentEntity pro " +
+			"from ProcSerEntity pro " +
 			"	  left outer join pro.organGestor og " +
 			"where pro.entitat = :entitat " +
 			"  and (pro.agrupar = false " +
@@ -70,7 +69,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcedimentEntity> findByEntitatAndGrup(
+	public List<OrganGestorEntity> findByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
 	

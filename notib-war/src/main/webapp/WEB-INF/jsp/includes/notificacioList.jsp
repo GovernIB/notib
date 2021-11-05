@@ -334,6 +334,7 @@
             $('#nomesAmbErrorsBtn').removeClass('active');
             $('#nomesAmbErrors').val(false);
             omplirProcediments();
+            omplirServeis();
             $('#form-filtre').submit();
         });
         $('#nomesAmbErrorsBtn').click(function() {
@@ -343,62 +344,11 @@
         $('#organGestor').on('change', function () {
             //Procediments
             omplirProcediments();
+            omplirServeis();
         });
-        function omplirProcediments() {
-            var organGestor = $("#organGestor");
-            let organId = $(organGestor).val() == undefined ? "" : $(organGestor).val();
-            $.ajax({
-                type: 'GET',
-                url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + organId,
-                success: function(data) {
-                    var select2Options = {
-                        theme: 'bootstrap',
-                        allowClear: true,
-                        width: 'auto'};
-                    // Procediments
-                    var procediments = data;
-                    var selProcediments = $("#procedimentId");
-                    selProcediments.empty();
-                    if (procediments && procediments.length > 0) {
-                        selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
-                        var procedimentsComuns = [];
-                        var procedimentsOrgan = [];
-                        $.each(data, function(i, val) {
-                            if(val.comu) {
-                                procedimentsComuns.push(val);
-                            } else {
-                                procedimentsOrgan.push(val);
-                            }
-                        });
-
-                        console.debug(procedimentsComuns);
-                        console.debug(procedimentsOrgan);
-                        if (procedimentsComuns.length > 0) {
-                            selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
-                            $.each(procedimentsComuns, function(index, val) {
-                                selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
-                            });
-                            selProcediments.append("</optgroup>");
-                        }
-                        if (procedimentsOrgan.length > 0) {
-                            selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
-                            $.each(procedimentsOrgan, function(index, val) {
-                                selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
-                            });
-                            selProcediments.append("</optgroup>");
-                        }
-                    } else {
-                        selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
-                    }
-                    selProcediments.select2(select2Options);
-                },
-                error: function() {
-                    console.error("error obtenint els procediments de l'òrgan gestor...");
-                }
-            });
-        }
 
         omplirProcediments();
+        omplirServeis();
         loadOrgans($('#organGestor'), organsGestors, "<spring:message code='notificacio.list.columna.organGestor.obsolet'/>");
 
         let eventMessages = {
@@ -410,6 +360,114 @@
         };
         initEvents($('#notificacio'), 'notificacio', eventMessages)
     });
+
+    function omplirProcediments() {
+        var organGestor = $("#organGestor");
+        let organId = $(organGestor).val() == undefined ? "" : $(organGestor).val();
+        $.ajax({
+            type: 'GET',
+            url: "<c:url value="/notificacio/procedimentsOrgan/"/>" + organId,
+            success: function(data) {
+                var select2Options = {
+                    theme: 'bootstrap',
+                    allowClear: true,
+                    width: 'auto'};
+                // Procediments
+                var procediments = data;
+                var selProcediments = $("#procedimentId");
+                selProcediments.empty();
+                if (procediments && procediments.length > 0) {
+                    selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.select'/></option>");
+                    var procedimentsComuns = [];
+                    var procedimentsOrgan = [];
+                    $.each(data, function(i, val) {
+                        if(val.comu) {
+                            procedimentsComuns.push(val);
+                        } else {
+                            procedimentsOrgan.push(val);
+                        }
+                    });
+
+                    console.debug(procedimentsComuns);
+                    console.debug(procedimentsOrgan);
+                    if (procedimentsComuns.length > 0) {
+                        selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
+                        $.each(procedimentsComuns, function(index, val) {
+                            selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                        });
+                        selProcediments.append("</optgroup>");
+                    }
+                    if (procedimentsOrgan.length > 0) {
+                        selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
+                        $.each(procedimentsOrgan, function(index, val) {
+                            selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                        });
+                        selProcediments.append("</optgroup>");
+                    }
+                } else {
+                    selProcediments.append("<option value=\"\"><spring:message code='notificacio.form.camp.procediment.buit'/></option>");
+                }
+                selProcediments.select2(select2Options);
+            },
+            error: function() {
+                console.error("error obtenint els procediments de l'òrgan gestor...");
+            }
+        });
+    }
+
+    function omplirServeis() {
+        var organGestor = $("#organGestor");
+        let organId = $(organGestor).val() == undefined ? "" : $(organGestor).val();
+        $.ajax({
+            type: 'GET',
+            url: "<c:url value="/notificacio/serveisOrgan/"/>" + organId,
+            success: function(data) {
+                var select2Options = {
+                    theme: 'bootstrap',
+                    allowClear: true,
+                    width: 'auto'};
+                // Procediments
+                var serveis = data;
+                var selServeis = $("#serveiId");
+                selServeis.empty();
+                if (serveis && serveis.length > 0) {
+                    selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.select'/></option>");
+                    var serveisComuns = [];
+                    var serveisOrgan = [];
+                    $.each(data, function(i, val) {
+                        if(val.comu) {
+                            serveisComuns.push(val);
+                        } else {
+                            serveisOrgan.push(val);
+                        }
+                    });
+
+                    console.debug(serveisComuns);
+                    console.debug(serveisOrgan);
+                    if (serveisComuns.length > 0) {
+                        selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
+                        $.each(serveisComuns, function(index, val) {
+                            selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                        });
+                        selServeis.append("</optgroup>");
+                    }
+                    if (serveisOrgan.length > 0) {
+                        selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.organs'/>'>");
+                        $.each(serveisOrgan, function(index, val) {
+                            selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                        });
+                        selServeis.append("</optgroup>");
+                    }
+                } else {
+                    selServeis.append("<option value=\"\"><spring:message code='notificacio.form.camp.servei.buit'/></option>");
+                }
+                selServeis.select2(select2Options);
+            },
+            error: function() {
+                console.error("error obtenint els serveis de l'òrgan gestor...");
+            }
+        });
+    }
 </script>
 <form:form id="form-filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
     <div class="row">
@@ -445,13 +503,26 @@
         <div class="col-md-2">
             <not:inputText name="titular" inline="true" placeholderKey="notificacio.list.filtre.camp.titular"/>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
+            <not:inputText name="numExpedient" inline="true" placeholderKey="notificacio.list.filtre.camp.numexpedient"/>
+        </div>
+        <div class="col-md-2">
+            <not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
+        </div>
+        <div class="col-md-6">
             <not:inputSelect id="organGestor" name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor"
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
+    </div>
+    <div class="row">
         <div class="col-md-6">
             <not:inputSelect id="procedimentId" name="procedimentId" optionValueAttribute="id" optionTextAttribute="descripcio"
                              placeholderKey="notificacio.list.filtre.camp.procediment"
+                             inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+        </div>
+        <div class="col-md-6">
+            <not:inputSelect id="serveiId" name="serveiId" optionValueAttribute="id" optionTextAttribute="descripcio"
+                             placeholderKey="notificacio.list.filtre.camp.servei"
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
@@ -473,12 +544,7 @@
                     suggestTextAddicional="nif"
                     inline="true"/>
         </div>
-        <div class="col-md-2">
-            <not:inputText name="numExpedient" inline="true" placeholderKey="notificacio.list.filtre.camp.numexpedient"/>
-        </div>
-        <div class="col-md-2">
-            <not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
-        </div>
+
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
             <not:inputHidden name="nomesAmbErrors"/>

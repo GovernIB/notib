@@ -151,26 +151,29 @@ $(document).ready(function() {
 	<div id="enviar-avis-user" class="alert alert-info well-sm" role="alert" style="display: none; width: 100%">
 		<spring:message code="notificacio.info.enviar.avis.user" />
 	</div>
+	<c:set var="activeTab" value="dades" />
+	<c:if test="${not empty activeTab}"><c:set var="activeTab" value="${pestanyaActiva}" /></c:if>
+	Pestanya activa: ${activeTab}
 	<ul class="nav nav-tabs" role="tablist">
-		<li role="presentation" class="active">
+		<li role="presentation" <c:if test='${activeTab == "dades"}'>class="active"</c:if>>
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
 				<spring:message code="notificacio.info.tab.dades" />
 			</a>
 		</li>
-		<li role="presentation">
+		<li role="presentation" <c:if test='${activeTab == "events"}'>class="active"</c:if>>
 			<a href="#events" aria-controls="events" role="tab" data-toggle="tab"> 
 				<spring:message code="notificacio.info.tab.events" />
 			</a>
 		</li>
 		<c:if test="${permisGestio == null || permisGestio || isRolActualAdministradorEntitat || isRolActualAdministradorOrgan}">
-			<li role="presentation">
+			<li role="presentation" <c:if test='${activeTab == "accions"}'>class="active"</c:if>>
 				<a href="#accions" aria-controls="accions" role="tab" data-toggle="tab"> 
 					<spring:message code="notificacio.info.tab.accions" />
 				</a>
 			</li>
 		</c:if>
 		<c:if test="${isRolActualAdministradorEntitat || isRolActualAdministradorOrgan || isRolActualAdministrador}">
-			<li role="presentation">
+			<li role="presentation" <c:if test='${activeTab == "historic"}'>class="active"</c:if>>
 				<a href="#historic" aria-controls="historic" role="tab" data-toggle="tab">
 					<spring:message code="notificacio.info.tab.historic" />
 				</a>

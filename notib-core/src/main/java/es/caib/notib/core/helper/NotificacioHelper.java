@@ -90,6 +90,13 @@ public class NotificacioHelper {
 				registreIdDto.setNumeroRegistreFormat(notificacioEntity.getRegistreNumeroFormatat());
 				registresIdDto.add(registreIdDto);
 				if (notificar){
+
+					RegistreIdDto registreIdDto = new RegistreIdDto();
+					registreIdDto.setNumero(notificacioEntity.getRegistreNumero());
+					registreIdDto.setData(notificacioEntity.getRegistreData());
+					registreIdDto.setNumeroRegistreFormat(notificacioEntity.getRegistreNumeroFormatat());
+					registresIdDto.add(registreIdDto);
+
 					startTime2 = System.nanoTime();
 					notificaHelper.notificacioEnviar(notificacioEntity.getId());
 					elapsedTime = (System.nanoTime() - startTime2) / 10e6;
