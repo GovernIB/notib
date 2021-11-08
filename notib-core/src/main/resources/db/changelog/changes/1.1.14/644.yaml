@@ -23,7 +23,7 @@ databaseChangeLog:
                   type: timestamp
         - sql:
             sql: "
-        UPDATE not_notificacio SET estatProcessatDate = estatDate;
+        UPDATE not_notificacio SET estat_processat_date = estat_date;
 
         UPDATE not_notificacio noti SET ESTAT_DATE = (
           SELECT max(e.NOTIFICA_ESTAT_DATA)
