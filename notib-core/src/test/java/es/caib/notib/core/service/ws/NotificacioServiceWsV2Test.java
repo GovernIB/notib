@@ -13,6 +13,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.helper.*;
@@ -71,6 +72,8 @@ public class NotificacioServiceWsV2Test {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Mock
 	private ProcedimentRepository procedimentRepository;
+	@Mock
+	private ProcSerRepository procSerRepository;
 	@Mock
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
@@ -249,11 +252,14 @@ public class NotificacioServiceWsV2Test {
 				null, procedimentOrgan, null).build();
 		
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
+
+		ProcSerEntity procSer = ProcedimentEntity.builder().build();
 		
-		// When	
+		// When
+		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procSer);
 		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
 		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
-		Mockito.when(procedimentRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
+//		Mockito.when(procedimentRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
 //		Mockito.when(grupService.findByProcedimentAndUsuariGrups(Mockito.anyLong())).thenReturn(grups);
 //		Mockito.when(grupService.findByCodi(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);//GrupDto grupNotificacio
 		Mockito.when(organGestorRepository.findByCodi(notificacio.getOrganGestor())).thenReturn(organGestor);
