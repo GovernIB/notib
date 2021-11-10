@@ -164,7 +164,6 @@ function getCookie(cname) {
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
-				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<button id="seleccioAll" title="<spring:message code="enviament.list.user.seleccio.tots" />" class="btn btn-default" ><span class="fa fa-check-square-o"></span></button>
 				<button id="seleccioNone" title="<spring:message code="enviament.list.user.seleccio.cap" />" class="btn btn-default" ><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
@@ -182,11 +181,12 @@ function getCookie(cname) {
 				</div>
 			</div>
 			<div class="btn-group">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 				<a href="<c:url value="/enviament/visualitzar"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"><span class="fa fa-eye-slash"></span> <spring:message code="enviament.list.show"/></a>
 			</div>
 		</div>
 	</script>
-	
+
 	<script id="cellFilterTemplate" type="text/x-jsrender">
 		<div class="dropdown">
 			<button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
