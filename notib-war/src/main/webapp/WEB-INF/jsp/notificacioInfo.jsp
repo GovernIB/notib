@@ -153,7 +153,6 @@ $(document).ready(function() {
 	</div>
 	<c:set var="activeTab" value="dades" />
 	<c:if test="${not empty activeTab}"><c:set var="activeTab" value="${pestanyaActiva}" /></c:if>
-	Pestanya activa: ${activeTab}
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" <c:if test='${activeTab == "dades"}'>class="active"</c:if>>
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
