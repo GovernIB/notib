@@ -77,7 +77,12 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
 				UsuariEntity user = usuariRepository.findOne(usuari);
-				if (user == null || user.isRebreEmailsNotificacio()) {
+
+				boolean enviar = user == null
+									|| (user.isRebreEmailsNotificacio()
+											&& (!user.isRebreEmailsNotificacioCreats()
+													|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().getCodi())));
+				if (enviar) {
 					UsuariDto u = new UsuariDto();
 					u.setCodi(usuari);
 					u.setEmail(dadesUsuari.getEmail());
