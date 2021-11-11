@@ -39,7 +39,6 @@ function clearSeleccio() {
 function initEvents($table, url_prefix, eventMessages) {
 
     $table.on('selectionchange.dataTable', function (e, accio, ids) {
-        console.debug(accio);
         if (accio === "select" || accio === "deselect") {
             $.get(
                 url_prefix + "/" + accio,
@@ -99,7 +98,7 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#reactivarConsulta').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-consulta'])){
                 location.href = url_prefix + "/reactivar/consulta";
-                $table.DataTable().rows().deselect();
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
         });
@@ -107,7 +106,7 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#reactivarSir').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-sir'])){
                 location.href =  url_prefix + "/reactivar/sir";
-                $table.DataTable().rows().deselect();
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
         });
@@ -129,23 +128,23 @@ function initEvents($table, url_prefix, eventMessages) {
         $('#reactivarCallback').on('click', function() {
             if(confirm(eventMessages['confirm-reactivar-callback'])){
                 location.href =  url_prefix + "/reactivar/callback";
-                $table.DataTable().rows().deselect();
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
         });
 
         $("#exportarODS").on("click", () => {
             location.href = "notificacio/export/ODS";
-            $table.DataTable().rows().deselect();
+            setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
 
         $("#eliminar").on("click", () => {
+            setTimeout(() => $table.DataTable().rows().deselect(), 100);
             location.href = "/notificacio/eliminar";
-            $table.DataTable().rows().deselect();
         });
         $("#reintentarRegistre").on("click", () => {
             location.href =  url_prefix + "/reintentar/registre";
-            $table.DataTable().rows().deselect();
+            setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
     });
 }
