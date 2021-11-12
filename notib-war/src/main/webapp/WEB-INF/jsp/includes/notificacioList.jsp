@@ -656,6 +656,7 @@
         </c:if>
         <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
+        <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
             <spring:message code="notificacio.list.columna.estat"/>
             <script id="cellEstatTemplate" type="text/x-jsrender">
@@ -683,9 +684,13 @@
 						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
 							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
 						{{/if}}
-						{{if (estat == 'FINALITZADA' || estat == 'PROCESSADA') && estatDate != ''}}
+						{{if (estat == 'FINALITZADA') && estatDate != ''}}
 							<br>
 							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate + ')')}}</span>
+							<br>
+					    {{else (estat == 'PROCESSADA') && estatProcessatDate != ''}}
+					        <br>
+							<span class="horaProcessat">{{:~eval('formatDate(' + estatProcessatDate + ')')}}</span>
 							<br>
 						{{/if}}
 						{{if estat == 'FINALITZADA' ||  estat == 'PROCESSADA'}}
