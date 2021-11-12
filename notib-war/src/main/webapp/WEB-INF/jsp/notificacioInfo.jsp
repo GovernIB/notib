@@ -281,8 +281,19 @@ $(document).ready(function() {
 							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
 						</tr>
 						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.procediment.codi" /></strong></td>
-							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
+							<td><strong>
+								<c:choose>
+									<c:when test="${notificacio.procediment.tipus == 'SERVEI'}">
+										<spring:message code="notificacio.info.dada.serveis" />
+										<br />
+									</c:when>
+									<c:otherwise>
+										<spring:message code="notificacio.info.dada.procediment" />
+										<br />
+									</c:otherwise>
+								</c:choose>
+							</strong></td>
+							<td>${notificacio.procediment.codi}-${notificacio.procediment.nom}</td>
 						</tr>
 						<c:if test="${!notificacio.hasEnviamentsPendents}">
 							<tr>
