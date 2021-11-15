@@ -767,7 +767,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByIdIn(enviamentIds);
 
 			//Genera les columnes
-			int numColumnes = 23;
+			int numColumnes = 24;
 			String[] columnes = new String[numColumnes];
 			columnes[0] = messageHelper.getMessage("enviament.service.exportacio.dataenviament");
 			columnes[1] = messageHelper.getMessage("enviament.service.exportacio.dataprogramada");
@@ -791,7 +791,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			columnes[19] = messageHelper.getMessage("enviament.service.exportacio.numerocertificatcorreus");
 			columnes[20] = messageHelper.getMessage("enviament.service.exportacio.codicsvuuid");
 			columnes[21] = messageHelper.getMessage("enviament.service.exportacio.estat");
-			columnes[22] = messageHelper.getMessage("enviament.service.exportacio.estat.processat.date");
+			columnes[22] = messageHelper.getMessage("enviament.service.exportacio.estat.finalitzat.date");
+			columnes[23] = messageHelper.getMessage("enviament.service.exportacio.estat.processat.date");
 
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 			List<String[]> files = new ArrayList<String[]>();
@@ -834,7 +835,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[19] = enviament.getNotificaCertificacioNumSeguiment();
 				fila[20] = csvUuid;
 				fila[21] = enviament.getNotificacio().getEstat().name();
-				fila[22] = (enviament.getNotificacio().getEstatProcessatDate() != null ? enviament.getNotificacio().getEstatProcessatDate() + "" : "");
+				fila[22] = (enviament.getNotificacio().getEstatDate() != null ? enviament.getNotificacio().getEstatDate() + "" : "");
+				fila[23] = (enviament.getNotificacio().getEstatProcessatDate() != null ? enviament.getNotificacio().getEstatProcessatDate() + "" : "");
 				files.add(fila);
 			}
 				
