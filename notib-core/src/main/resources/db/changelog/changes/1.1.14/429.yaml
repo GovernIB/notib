@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634569326780-3
+      author: limit
+      changes:
+        - sql:
+            sql: "
+            UPDATE NOT_CONFIG_TYPE SET value = value || ',es.caib.notib.plugin.firmaservidor.FirmaSimplePluginPortafib' WHERE CODE = 'FIRMA_CLASS';
+            INSERT INTO NOT_CONFIG (\"KEY\", VALUE, DESCRIPTION, GROUP_CODE,  \"POSITION\", JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.plugin.api.firma.en.servidor.simple.perfil', 'PADES', 'Perfil de firma', 'FIRMA',0, 0, 'TEXT');
+            "
