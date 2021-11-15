@@ -23,6 +23,7 @@
 <head>
 <title><spring:message code="notificacio.info.titol" /></title>
 <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+<script src="<c:url value="/webjars/bootstrap/3.3.6/js/dropdown.js"/>"></script>
 <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 <script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -152,8 +153,7 @@ $(document).ready(function() {
 		<spring:message code="notificacio.info.enviar.avis.user" />
 	</div>
 	<c:set var="activeTab" value="dades" />
-	<c:if test="${not empty activeTab}"><c:set var="activeTab" value="${pestanyaActiva}" /></c:if>
-	Pestanya activa: ${activeTab}
+	<c:if test="${not empty pestanyaActiva}"><c:set var="activeTab" value="${pestanyaActiva}" /></c:if>
 	<ul class="nav nav-tabs" role="tablist">
 		<li role="presentation" <c:if test='${activeTab == "dades"}'>class="active"</c:if>>
 			<a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"> 
@@ -282,8 +282,19 @@ $(document).ready(function() {
 							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
 						</tr>
 						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.procediment.codi" /></strong></td>
-							<td>${notificacio.procediment.nom}<br>${notificacio.procediment.codi}</td>
+							<td><strong>
+								<c:choose>
+									<c:when test="${notificacio.procediment.tipus == 'SERVEI'}">
+										<spring:message code="notificacio.info.dada.serveis" />
+										<br />
+									</c:when>
+									<c:otherwise>
+										<spring:message code="notificacio.info.dada.procediment" />
+										<br />
+									</c:otherwise>
+								</c:choose>
+							</strong></td>
+							<td>${notificacio.procediment.codi}-${notificacio.procediment.nom}</td>
 						</tr>
 						<c:if test="${!notificacio.hasEnviamentsPendents}">
 							<tr>
