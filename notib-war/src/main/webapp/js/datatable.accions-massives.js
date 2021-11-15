@@ -115,11 +115,11 @@ function initEvents($table, url_prefix, eventMessages) {
                 $.get(
                     url_prefix + "/actualitzarestat",
                     () => {
-                        $table.DataTable().rows().deselect();
                         $table.DataTable().ajax.reload(null, true);
                         webutilRefreshMissatges();
                     }
                 );
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
                 webutilRefreshMissatges(); // mostra el missatge de que s'està executant el procés en segon plà
             }
             return false;
@@ -139,7 +139,6 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $("#eliminar").on("click", () => {
-            setTimeout(() => $table.DataTable().rows().deselect(), 100);
             location.href = "/notificacio/eliminar";
         });
         $("#reintentarRegistre").on("click", () => {
