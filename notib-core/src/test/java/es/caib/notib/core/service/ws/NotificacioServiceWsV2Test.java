@@ -69,8 +69,10 @@ public class NotificacioServiceWsV2Test {
 	private NotificacioRepository notificacioRepository;
 	@Mock
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
+//	@Mock
+//	private ProcedimentRepository procedimentRepository;
 	@Mock
-	private ProcedimentRepository procedimentRepository;
+	private ProcSerRepository procSerRepository;
 	@Mock
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Mock
@@ -253,7 +255,8 @@ public class NotificacioServiceWsV2Test {
 		// When	
 		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
 		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
-		Mockito.when(procedimentRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
+//		Mockito.when(procedimentRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
+		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
 //		Mockito.when(grupService.findByProcedimentAndUsuariGrups(Mockito.anyLong())).thenReturn(grups);
 //		Mockito.when(grupService.findByCodi(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);//GrupDto grupNotificacio
 		Mockito.when(organGestorRepository.findByCodi(notificacio.getOrganGestor())).thenReturn(organGestor);
