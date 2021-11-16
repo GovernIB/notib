@@ -1912,7 +1912,7 @@ public class PluginHelper {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("C");
 		}
-		String raoSocial = persona.getRaoSocial() == null || persona.getNom().length() <= 80 ?
+		String raoSocial = persona.getRaoSocial() == null || persona.getRaoSocial().length() <= 80 ?
 				persona.getRaoSocial() : persona.getRaoSocial().substring(0, 80);
 		String nom = persona.getNom() == null || persona.getNom().length() <= 30 ?
 				persona.getNom() : persona.getNom().substring(0, 30);
