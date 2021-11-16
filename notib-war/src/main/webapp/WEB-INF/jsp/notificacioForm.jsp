@@ -1258,7 +1258,7 @@
 				</div>
 			</div>
 
-			<div class="row">
+			<div class="row" <c:if test="${enviamentTipus == 'NOTIFICACIO'}">style="display: none;"</c:if>>
 				<div class="col-xs-2"> </div>
 				<div class="form-group col-xs-10">
 					<div class="btn-group" data-toggle="buttons" style="padding-left: 15px;">
