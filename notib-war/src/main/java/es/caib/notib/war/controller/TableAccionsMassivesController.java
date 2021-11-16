@@ -42,15 +42,10 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             HttpServletRequest request,
             @RequestParam(value="ids[]", required = false) Long[] ids) {
         @SuppressWarnings("unchecked")
-        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-                request,
-                sessionAttributeSeleccio);
+        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
         if (seleccio == null) {
             seleccio = new HashSet<>();
-            RequestSessionHelper.actualitzarObjecteSessio(
-                    request,
-                    sessionAttributeSeleccio,
-                    seleccio);
+            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, seleccio);
         }
         if (ids != null) {
             seleccio.addAll(Arrays.asList(ids));
@@ -90,13 +85,12 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return seleccio.size();
     }
 
-
     @RequestMapping(value = "/export/{format}", method = RequestMethod.GET)
     public String export(
             HttpServletRequest request,
             HttpServletResponse response,
             @PathVariable String format) throws IOException {
-        Set<Long> seleccio = getIdsSeleccionats(request);
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(
                     request,
@@ -129,7 +123,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     public String reintentarNotificacio(
             HttpServletRequest request,
             HttpServletResponse response) throws IOException, RegistreNotificaException {
-        Set<Long> seleccio = getIdsSeleccionats(request);
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         String resposta = "";
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(
@@ -206,7 +200,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     public String reactivarConsulta(
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        Set<Long> seleccio = getIdsSeleccionats(request);
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(
                     request,
@@ -240,7 +234,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     public String reactivarSir(
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        Set<Long> seleccio = getIdsSeleccionats(request);
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(
                     request,
@@ -276,7 +270,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
 
-        Set<Long> seleccio = getIdsSeleccionats(request);
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         String resposta = "";
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(
@@ -322,7 +316,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     public String reactivarCallbacks(
             HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        Set<Long> seleccio = getIdsSeleccionats(request);
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             MissatgesHelper.error(
                     request,
@@ -386,16 +380,15 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         );
     }
 
+    protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
+        Set<Long> notificacionsIds = getIdsSeleccionats(request);
+        return enviamentService.findIdsByNotificacioIds(notificacionsIds);
+    }
 
     protected Set<Long> getIdsSeleccionats(HttpServletRequest request) {
-        Set<Long> cloned_set = new HashSet<>();
-        Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
-                request,
-                sessionAttributeSeleccio);
-        if (seleccio != null) {
-            cloned_set.addAll(seleccio);
-        }
-        return cloned_set;
+
+        Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
+        return seleccio != null ? new HashSet<>(seleccio) : new HashSet<Long>();
     }
 
     /**
