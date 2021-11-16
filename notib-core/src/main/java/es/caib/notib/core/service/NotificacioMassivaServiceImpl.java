@@ -16,10 +16,7 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.NotificacioMassivaRepository;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.core.utils.CSVReader;
 import es.caib.notib.core.utils.ZipFileUtils;
 import lombok.NonNull;
@@ -77,7 +74,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private NotificacioMassivaHelper notificacioMassivaHelper;
 
     @Autowired
-    private ProcedimentRepository procedimentRepository;
+    private ProcSerRepository procSerRepository;
     @Autowired
     private PagadorPostalRepository pagadorPostalRepository;
     @Autowired
@@ -258,15 +255,19 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         entitat,
                         documentsProcessatsMassiu);
                 try {
-                    ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat);
+                    ProcSerEntity procediment = procSerRepository.findByCodiAndEntitat(
+                            notificacio.getProcediment().getCodi(),
+                            entitat);
                     if (procediment == null) {
-                        errors.add("[1330] No s'ha trobat cap procediment amb el codi indicat.");
+                        errors.add("[1330] No s'ha trobat cap procediment/servei amb el codi indicat.");
+                    } else if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
+                        errors.add("[1331] No es pot donar d'alta una notificació amb un servei. Els serveis només s'admeten en comunicacions.");
                     } else {
                         notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    errors.add(String.format("[1331] Error obtenint el procediment amb el codi %s.", notificacio.getProcediment().getCodi()));
+                    errors.add(String.format("[1332] Error obtenint el procediment amb el codi %s.", notificacio.getProcediment().getCodi()));
                 }
 
 

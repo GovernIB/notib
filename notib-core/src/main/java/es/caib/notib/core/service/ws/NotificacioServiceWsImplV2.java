@@ -57,8 +57,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-//	@Autowired
-//	private ProcedimentRepository procedimentRepository;
 	@Autowired
 	private ProcSerRepository procSerRepository;
 	@Autowired
@@ -160,6 +158,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							entitat);
 
 					if (procediment != null) {
+
+						if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(enviamentTipus)) {
+							String errorDescripcio = "[1331] No es pot donar d'alta una notificació amb un servei. Els serveis només s'admeten en comunicacions.";
+							integracioHelper.addAccioError(info, errorDescripcio);
+							return setRespostaError(errorDescripcio);
+						}
 						logger.debug(">> [ALTA] procediment: " + procediment.getNom());
 
 						if (!procediment.isEntregaCieActivaAlgunNivell()) {
@@ -201,7 +205,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						}
 					} else {
 						logger.debug(">> [ALTA] Sense procediment");
-						String errorDescripcio = "[1330] No s'ha trobat cap procediment amb el codi indicat.";
+						String errorDescripcio = "[1330] No s'ha trobat cap procediment/servei amb el codi indicat.";
 						integracioHelper.addAccioError(info, errorDescripcio);
 						return setRespostaError(errorDescripcio);
 					}
@@ -1517,6 +1521,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1321 | S'ha indicat un grup per les notificacions però el procediment no té cap grup assignat
 	// 1322 | El grup indicat no està assignat al procediment
 	// 1330 | No s'ha trobat cap procediment amb el codi indicat
+	// 1331 | No es pot donar d'alta una notificació amb servei. Els serveis només s'admeten en comunicacions
 	protected RespostaAlta validarNotificacio(
 			NotificacioV2 notificacio,
 			String emisorDir3Codi,
