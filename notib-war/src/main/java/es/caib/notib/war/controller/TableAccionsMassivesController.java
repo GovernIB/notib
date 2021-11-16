@@ -20,11 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,15 +42,10 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             HttpServletRequest request,
             @RequestParam(value="ids[]", required = false) Long[] ids) {
         @SuppressWarnings("unchecked")
-        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-                request,
-                sessionAttributeSeleccio);
+        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
         if (seleccio == null) {
             seleccio = new HashSet<>();
-            RequestSessionHelper.actualitzarObjecteSessio(
-                    request,
-                    sessionAttributeSeleccio,
-                    seleccio);
+            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, seleccio);
         }
         if (ids != null) {
             seleccio.addAll(Arrays.asList(ids));
@@ -92,7 +84,6 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         return seleccio.size();
     }
-
 
     @RequestMapping(value = "/export/{format}", method = RequestMethod.GET)
     public String export(
@@ -389,12 +380,17 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         );
     }
 
-
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
-        return (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
-                request,
-                sessionAttributeSeleccio);
+        Set<Long> notificacionsIds = getIdsSeleccionats(request);
+        return enviamentService.findIdsByNotificacioIds(notificacionsIds);
     }
+
+    protected Set<Long> getIdsSeleccionats(HttpServletRequest request) {
+
+        Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
+        return seleccio != null ? new HashSet<>(seleccio) : new HashSet<Long>();
+    }
+
     /**
      * Retorna els ids dels elements que es mostren actualment a la taula.
      * @param request

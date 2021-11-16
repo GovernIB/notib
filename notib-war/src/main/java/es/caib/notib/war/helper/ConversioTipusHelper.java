@@ -115,6 +115,7 @@ public class ConversioTipusHelper {
 						documents[3] = DocumentCommand.asCommand(notificacioDto.getDocument4());
 						documents[4] = DocumentCommand.asCommand(notificacioDto.getDocument5());
 						notificacioCommand.setDocuments(documents);
+						notificacioCommand.setTipusProcSer(notificacioDto.getProcediment().getTipus().name());
 					}
 					@Override
 					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDtoV2 notificacioDto, MappingContext context) {
