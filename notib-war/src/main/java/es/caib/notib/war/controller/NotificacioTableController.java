@@ -84,11 +84,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 filtre);
     }
 
-    protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
-        Set<Long> notificacionsIds = super.getIdsEnviamentsSeleccionats(request);
-        return enviamentService.findIdsByNotificacioIds(notificacionsIds);
-    }
-
     @RequestMapping(method = RequestMethod.GET)
     public String get(
             HttpServletRequest request,
@@ -789,7 +784,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Model model) {
 
         // identificadors de les notificacions, no dels enviaments.
-        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+        Set<Long> seleccio = getIdsSeleccionats(request);
 
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(
@@ -847,7 +842,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Model model) {
 
         // identificadors de les notificacions, no dels enviaments.
-        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+        Set<Long> seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(request, "redirect:../..", "accio.massiva.seleccio.buida");
         }
@@ -889,7 +884,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         String referer = request.getHeader("Referer");
 
-        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+        Set<Long> seleccio = getIdsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
             return getModalControllerReturnValueError(
                     request,
