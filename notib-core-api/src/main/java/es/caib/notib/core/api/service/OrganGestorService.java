@@ -39,6 +39,18 @@ public interface OrganGestorService {
 			Long entitatId, 
 			String organGestorCodi);
 
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
+
+	/**
+	 * Consulta si existeix un procés en curs actualitzant els organs de l'entitat indicada.
+	 *
+	 * @param entitatDto Entitat que es vol consultar
+	 * @return boolean indicant si existeix un procés en segon pla actualitzant els organs de l'entitat indicada.
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	boolean isUpdatingOrgans(EntitatDto entitatDto);
+
 	/**
 	 * Actualitza les dades dels organs gestors de la base de dades
 	 * amb la informació de dir3

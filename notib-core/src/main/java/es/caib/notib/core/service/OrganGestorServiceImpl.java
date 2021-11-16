@@ -83,6 +83,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Autowired
 	private EntregaCieRepository entregaCieRepository;
 
+	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
+
 	@Override
 	@Transactional
 	public OrganGestorDto create(OrganGestorDto dto) {
@@ -454,15 +456,46 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 
+	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
+		return progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError();
+	}
+
+	@Override
+	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			ProgresActualitzacioDto progres = progresActualitzacio.get(dir3Codi);
+			if (progres != null && progres.isFinished()) {
+				progresActualitzacio.remove(dir3Codi);
+			}
+			return progres;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	@Transactional
 	@Override
 	public void updateAll(Long entitatId, String organActualCodiDir3) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Actualitzant noms dels òrgans gestors");
-			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ 
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId); 
+
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+
+			// Comprova si hi ha una altre instància del procés en execució
+			ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getDir3Codi());
+			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+				return;	// Ja existeix un altre procés que està executant l'actualització.
+			}
+
+			// inicialitza el seguiment del prgrés d'actualització
+			progres = new ProgresActualitzacioDto();
+			progresActualitzacio.put(entitat.getDir3Codi(), progres);
+
 			List<OrganGestorEntity> organsGestors;
 			if (organActualCodiDir3 == null)
 				organsGestors = organGestorRepository.findByEntitat(entitat);
@@ -968,6 +1001,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+
+
 
 	private List<OrganGestorEntity> recuperarOrgansPerProcedimentAmbPermis(
 			String usuari,
