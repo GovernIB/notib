@@ -20,11 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -391,10 +388,16 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
 
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
-        return (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+        Set<Long> cloned_set = new HashSet<>();
+        Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
                 request,
                 sessionAttributeSeleccio);
+        if (seleccio != null) {
+            cloned_set.addAll(seleccio);
+        }
+        return cloned_set;
     }
+
     /**
      * Retorna els ids dels elements que es mostren actualment a la taula.
      * @param request
