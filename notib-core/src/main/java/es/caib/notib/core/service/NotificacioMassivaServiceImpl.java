@@ -309,11 +309,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
                 enviarCorreuElectronic(notificacioMassivaEntity, fileResumContent, fileErrorsContent);
             } catch (IOException e) {
-                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.");
-                e.printStackTrace();
+                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.", e);
             } catch (Exception | Error e) {
-                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.");
-                e.printStackTrace();
+                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", e);
             }
 
             writeCsvClose(listWriterErrors);
@@ -484,7 +482,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     private void checkCSVContent(List<String[]> linies, List<String> csvHeader) {
         if (linies == null || csvHeader == null) {
-            throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
+            throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat: sense contingut");
         }
         if (linies.isEmpty()) {
             throw new InvalidCSVFileNotificacioMassivaException("El fitxer CSV està buid.");
@@ -628,9 +626,14 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return null;
     }
 
-    private NotificacioDatabaseDto csvToNotificaDatabaseDto(String[] linia, Date caducitat, EntitatEntity entitat,
-                                                            String usuariCodi, List<String> fileNames, byte[] ficheroZipBytes,
-                                                            Map<String, Long> documentsProcessatsMassiu) {
+    private NotificacioDatabaseDto csvToNotificaDatabaseDto(
+            String[] linia,
+            Date caducitat,
+            EntitatEntity entitat,
+            String usuariCodi,
+            List<String> fileNames,
+            byte[] ficheroZipBytes,
+            Map<String, Long> documentsProcessatsMassiu) {
 
         log.debug("[NOT-MASSIVA] Construeix notificació de les dades del fitxer CSV");
         NotificacioDatabaseDto notificacio = new NotificacioDatabaseDto();
@@ -644,9 +647,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         notificacio.setConcepte(linia[1]);
         notificacio.setDescripcio(null);
         if (linia[2] !=null) {
-            if (linia[2].toUpperCase(Locale.ROOT).charAt(0) == 'C')
+            if (isComunicacioString(linia[2]))
+//            if (linia[2].toUpperCase(Locale.ROOT).charAt(0) == 'C')
                 notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-            else {
+            else if (isNotificacioString(linia[2])) {
                 notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
             }
         }
@@ -655,7 +659,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         // TODO: #641 - Els enviaments massius encara que s'ompli el camp de "Referencia Emisor" al csv no es mostra al llistat de remeses al camp "Número expedient"
         notificacio.setNumExpedient((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null);
         notificacio.setUsuariCodi(usuariCodi);
-        notificacio.setRetard(Integer.valueOf(linia[15]));
+        if (isEnter(linia[15])) {
+            notificacio.setRetard(Integer.valueOf(linia[15]));
+        } else if (linia[15] != null) {
+            notificacio.setRetard(-1);
+        }
 
         // Procediment
         ProcSerDto procediment = new ProcSerDto();
@@ -777,6 +785,44 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
 
         return notificacio;
+    }
+
+    private boolean isComunicacioString(String tipusEnviament) {
+        return "COMUNICACIO".equalsIgnoreCase(tipusEnviament) ||
+                "COMUNICACION".equalsIgnoreCase(tipusEnviament) ||
+                "COMUNICACIÓ".equalsIgnoreCase(tipusEnviament) ||
+                "COMUNICACIÓN".equalsIgnoreCase(tipusEnviament);
+    }
+
+    private boolean isNotificacioString(String tipusEnviament) {
+        return "NOTIFICACIO".equalsIgnoreCase(tipusEnviament) ||
+                "NOTIFICACION".equalsIgnoreCase(tipusEnviament) ||
+                "NOTIFICACIÓ".equalsIgnoreCase(tipusEnviament) ||
+                "NOTIFICACIÓN".equalsIgnoreCase(tipusEnviament);
+    }
+
+    public boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isEnter(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            int i = Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
     private void leerMetadadesDelCsv(DocumentDto document, String[] linia) {

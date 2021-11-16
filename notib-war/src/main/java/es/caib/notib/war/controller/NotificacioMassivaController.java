@@ -331,7 +331,9 @@ public class NotificacioMassivaController extends BaseUserController {
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
 
-            notificacioMassivaService.create(entitat.getId(), usuariActual.getCodi(),
+            notificacioMassivaService.create(
+                    entitat.getId(),
+                    usuariActual.getCodi(),
                     notificacioMassivaCommand.asDto(gestioDocumentalService));
       
         } catch (Exception ex) {
@@ -342,7 +344,7 @@ public class NotificacioMassivaController extends BaseUserController {
             else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, InvalidCSVFileNotificacioMassivaException.class))
                 MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error.format"));
             else
-            	MissatgesHelper.error(request, ex.getMessage());
+            	MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.error") + "<br/>" + ex.getMessage());
 
             return getNotificacioMassivaForm(entitat, request, model);
         }
