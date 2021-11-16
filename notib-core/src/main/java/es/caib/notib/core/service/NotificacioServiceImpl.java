@@ -1192,9 +1192,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
 			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				if(!usuari.isRebreEmailsNotificacioCreats() || usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
+//				if(!usuari.isRebreEmailsNotificacioCreats() || usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
 					resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioEntity);
-				}
+//				}
 			}
 			
 			notificacioRepository.saveAndFlush(notificacioEntity);
