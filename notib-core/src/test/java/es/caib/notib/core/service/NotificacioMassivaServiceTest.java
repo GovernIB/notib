@@ -10,9 +10,7 @@ import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.test.NotificacioMassivaTests;
 import org.junit.After;
 import org.junit.Assert;
@@ -44,8 +42,6 @@ public class NotificacioMassivaServiceTest {
 	@Mock
 	private NotificacioHelper notificacioHelper;
 	@Mock
-	private EmailNotificacioMassivaHelper emailNotificacioMassivaHelper;
-	@Mock
 	private PaginacioHelper paginacioHelper;
 	@Mock
 	private NotificacioValidatorHelper notificacioValidatorHelper;
@@ -53,12 +49,8 @@ public class NotificacioMassivaServiceTest {
 	private NotificacioMassivaHelper notificacioMassivaHelper;
 
 	@Mock
-	private ProcedimentRepository procedimentRepository;
-	@Mock
 	private ProcSerRepository procSerRepository;
 
-	@Mock
-	private PagadorPostalRepository pagadorPostalRepository;
 	@Mock
 	private NotificacioMassivaRepository notificacioMassivaRepository;
 	@Mock
