@@ -55,7 +55,6 @@ pageContext.setAttribute(
 	<link href="<c:url value="/css/datatable-accions-massives.css"/>" rel="stylesheet"/>
 
 <script>
-
 $(document).ready(function() {
 
 	var $estatColumn = $('#estat');
@@ -87,7 +86,7 @@ $(document).ready(function() {
 
 	configureColumnSelectFilter($estatColumn);
 	configureColumnSelectFilter($enviamentTipusColumn);
-	
+
     if("${filtreEnviaments.estat}" != ""){
 		$estatColumn.val("${filtreEnviaments.estat}").trigger('change');
     }
@@ -148,11 +147,18 @@ function getCookie(cname) {
     return "";
 }
 </script>
-	<style>
-		.div-filter-data-sep {
-			padding: 0;
-		}
-	</style>
+<style type="text/css">
+    .label-primary {
+        background-color: #999999;
+    }
+    .label-warning {
+        background-color: #dddddd;
+        color: #333333;
+    }
+    .div-filter-data-sep {
+        padding: 0;
+    }
+</style>
 </head>
 <body>
 	<div id="loading-screen" class="loading-screen" >
@@ -186,7 +192,7 @@ function getCookie(cname) {
 			</div>
 		</div>
 	</script>
-	
+
 	<script id="cellFilterTemplate" type="text/x-jsrender">
 		<div class="dropdown">
 			<button type="submit" id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-search"></span></button>
@@ -197,7 +203,7 @@ function getCookie(cname) {
 		id="enviament"
 		data-toggle="datatable"
 		data-url="<c:url value="/enviament/datatable"/>"
-		class="table table-striped table-bordered nowrap" 
+		class="table table-striped table-bordered nowrap"
 		data-default-order="0"
 		data-default-dir="desc"
 		data-individual-filter="true"
@@ -214,10 +220,10 @@ function getCookie(cname) {
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
 				<c:choose>
-					<c:when test = "${columnes.dataEnviament == true}"> 
+					<c:when test = "${columnes.dataEnviament == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.dataEnviament == false}"> 
+					<c:when test = "${columnes.dataEnviament == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -233,10 +239,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.dataProgramada == true}"> 
+					<c:when test = "${columnes.dataProgramada == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.dataProgramada == false}"> 
+					<c:when test = "${columnes.dataProgramada == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -252,10 +258,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.notIdentificador == true}"> 
+					<c:when test = "${columnes.notIdentificador == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.notIdentificador == false}"> 
+					<c:when test = "${columnes.notIdentificador == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -267,10 +273,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.proCodi == true}"> 
+					<c:when test = "${columnes.proCodi == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.proCodi == false}"> 
+					<c:when test = "${columnes.proCodi == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -288,10 +294,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.grupCodi == true}"> 
+					<c:when test = "${columnes.grupCodi == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.grupCodi == false}"> 
+					<c:when test = "${columnes.grupCodi == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -303,10 +309,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.dir3Codi == true}"> 
+					<c:when test = "${columnes.dir3Codi == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.dir3Codi == false}"> 
+					<c:when test = "${columnes.dir3Codi == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -324,10 +330,10 @@ function getCookie(cname) {
  					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.usuari == true}"> 
+					<c:when test = "${columnes.usuari == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.usuari == false}"> 
+					<c:when test = "${columnes.usuari == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -354,10 +360,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.descripcio == true}"> 
+					<c:when test = "${columnes.descripcio == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.descripcio == false}"> 
+					<c:when test = "${columnes.descripcio == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -369,10 +375,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.titularNif == true}"> 
+					<c:when test = "${columnes.titularNif == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.titularNif == false}"> 
+					<c:when test = "${columnes.titularNif == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -384,10 +390,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.titularNomLlinatge == true}"> 
+					<c:when test = "${columnes.titularNomLlinatge == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.titularNomLlinatge == false}"> 
+					<c:when test = "${columnes.titularNomLlinatge == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -399,10 +405,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.titularEmail == true}"> 
+					<c:when test = "${columnes.titularEmail == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.titularEmail == false}"> 
+					<c:when test = "${columnes.titularEmail == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -414,10 +420,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.destinataris == true}"> 
+					<c:when test = "${columnes.destinataris == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.destinataris == false}"> 
+					<c:when test = "${columnes.destinataris == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -429,10 +435,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.llibreRegistre == true}"> 
+					<c:when test = "${columnes.llibreRegistre == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.llibreRegistre == false}"> 
+					<c:when test = "${columnes.llibreRegistre == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -444,10 +450,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.numeroRegistre == true}"> 
+					<c:when test = "${columnes.numeroRegistre == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.numeroRegistre == false}"> 
+					<c:when test = "${columnes.numeroRegistre == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -459,10 +465,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.dataRegistre == true}"> 
+					<c:when test = "${columnes.dataRegistre == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.dataRegistre == false}"> 
+					<c:when test = "${columnes.dataRegistre == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -478,10 +484,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.dataCaducitat == true}"> 
+					<c:when test = "${columnes.dataCaducitat == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.dataCaducitat == false}"> 
+					<c:when test = "${columnes.dataCaducitat == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -518,10 +524,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.codiNotibEnviament == true}"> 
+					<c:when test = "${columnes.codiNotibEnviament == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.codiNotibEnviament == false}"> 
+					<c:when test = "${columnes.codiNotibEnviament == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -533,10 +539,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.numCertificacio == true}"> 
+					<c:when test = "${columnes.numCertificacio == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.numCertificacio == false}"> 
+					<c:when test = "${columnes.numCertificacio == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -548,10 +554,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.csvUuid == true}"> 
+					<c:when test = "${columnes.csvUuid == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.csvUuid == false}"> 
+					<c:when test = "${columnes.csvUuid == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
@@ -563,10 +569,10 @@ function getCookie(cname) {
 					</script>
 				</th>
 				<c:choose>
-					<c:when test = "${columnes.estat == true}"> 
+					<c:when test = "${columnes.estat == true}">
 					  <c:set value="true" var="visible"></c:set>
 					</c:when>
-					<c:when test = "${columnes.estat == false}"> 
+					<c:when test = "${columnes.estat == false}">
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>

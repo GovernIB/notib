@@ -79,11 +79,19 @@
         width: 27px;
         height: 27px;
         background-color: #dddddd;
-        color: black;
+        color: #333333;
         font-weight: bold;
         font-size: 13px;
         margin: 0 auto;
     }
+    .label-primary {
+        background-color: #999999;
+    }
+    .label-warning {
+        background-color: #dddddd;
+        color: #333333;
+    }
+
     #notificacio > tbody td:first-child {
         vertical-align: middle;
     }
