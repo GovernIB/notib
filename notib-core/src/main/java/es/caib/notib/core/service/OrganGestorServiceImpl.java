@@ -296,6 +296,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			int chunkSize = 100;
 			for (int foo = 0; foo < codisOrgans.size(); foo=foo+chunkSize) {
 				int indexFinal = foo + chunkSize;
+				indexFinal = indexFinal <= codisOrgans.size() ? indexFinal : codisOrgans.size();
 				List<OrganGestorEntity> organsChunk = organGestorRepository.findByEstatAndCodiIn(codisOrgans.subList(foo, indexFinal), estat);
 				organs.addAll(organsChunk);
 			}
