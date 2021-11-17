@@ -8,7 +8,11 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.NotificacioMassivaRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.PagadorPostalRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.test.NotificacioMassivaTests;
 import org.junit.After;
 import org.junit.Assert;
@@ -21,9 +25,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -55,6 +56,7 @@ public class NotificacioMassivaServiceTest {
 	private ProcedimentRepository procedimentRepository;
 	@Mock
 	private ProcSerRepository procSerRepository;
+
 	@Mock
 	private PagadorPostalRepository pagadorPostalRepository;
 	@Mock
@@ -69,6 +71,7 @@ public class NotificacioMassivaServiceTest {
 
 	Long entitatId = 2L;
 	EntitatEntity entitatMock;
+	ProcSerEntity procSerMock;
 
 	Long notMassivaId = 2L;
 	NotificacioMassivaEntity notificacioMassivaMock;
@@ -78,6 +81,8 @@ public class NotificacioMassivaServiceTest {
 	@Before
 	public void setUp() {
 		entitatMock = Mockito.mock(EntitatEntity.class);
+		procSerMock = Mockito.mock(ProcSerEntity.class);
+
 		Mockito.when(entitatMock.getDir3Codi()).thenReturn(entitatCodiDir3);
 
 		Mockito.when(metricsHelper.iniciMetrica())
@@ -101,29 +106,21 @@ public class NotificacioMassivaServiceTest {
 						Mockito.<Map<String, Long>>any()
 					))
 				.thenReturn(NotificacioEntity.builder().build());
-//		Mockito.when(procedimentRepository.findByCodiAndEntitat(
-//				Mockito.any(String.class),
-//				Mockito.any(EntitatEntity.class)
-//		))
-//				.thenReturn(new ProcedimentEntity());
-		Mockito.when(procSerRepository.findByCodiAndEntitat(
-						Mockito.any(String.class),
-						Mockito.any(EntitatEntity.class)
-				))
-				.thenReturn(new ProcedimentEntity());
+		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
 
 		setUpNotificacioMassiva();
 //		setUpAuthentication();
 	}
 
-	private void setUpAuthentication() {
-		Authentication authentication = Mockito.mock(Authentication.class);
-		Mockito.when(authentication.getName()).thenReturn("admin");
-		// Mockito.whens() for your authorization object
-		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-		SecurityContextHolder.setContext(securityContext);
-	}
+//	private void setUpAuthentication() {
+//		Authentication authentication = Mockito.mock(Authentication.class);
+//		ºº
+//
+//		// Mockito.whens() for your authorization object
+//		SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+//		Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+//		SecurityContextHolder.setContext(securityContext);
+//	}
 
 	private void setUpNotificacioMassiva() {
 		notificacioMassivaMock =  Mockito.mock(NotificacioMassivaEntity.class);
@@ -257,11 +254,10 @@ public class NotificacioMassivaServiceTest {
 						.nomesSenseErrors(new FiltreField<Boolean>(false))
 						.hasZeronotificaEnviamentIntent(new FiltreField<Boolean>(false))
 						.build()); // ho ignorarem per a la prova
-		Mockito.when(notificacioListHelper.complementaNotificacions(
-				Mockito.eq(entitatMock),
-				Mockito.anyString(),
-				Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
-		setUpAuthentication();
+			Mockito.when(notificacioListHelper.complementaNotificacions(
+					Mockito.eq(entitatMock),
+					Mockito.anyString(),
+					Mockito.<Page<NotificacioTableEntity>>any())).thenReturn(null);
 
 		// When
 		notificacioMassivaService.findNotificacions(entitatId, notMassivaId,
@@ -333,7 +329,6 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenFindAmbFiltrePaginat_GivenUserRole_ThenCallFindUserRolePage() throws Exception {
 		// When
-		setUpAuthentication();
 		notificacioMassivaService.findAmbFiltrePaginat(entitatId, new NotificacioMassivaFiltreDto(), RolEnumDto.tothom,
 				new PaginacioParamsDto());
 

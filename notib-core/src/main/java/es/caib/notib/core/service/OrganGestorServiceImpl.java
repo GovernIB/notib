@@ -289,11 +289,18 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			return conversioTipusHelper.convertirList(
-					organGestorRepository.findByEstatAndCodiIn(codisOrgans, estat),
-					OrganGestorDto.class);
+			List<OrganGestorEntity> organs = new ArrayList<>();
+			int chunkSize = 100;
+			for (int foo = 0; foo < codisOrgans.size(); foo=foo+chunkSize) {
+				int indexFinal = foo + chunkSize;
+				indexFinal = indexFinal <= codisOrgans.size() ? indexFinal : codisOrgans.size();
+				List<OrganGestorEntity> organsChunk = organGestorRepository.findByEstatAndCodiIn(codisOrgans.subList(foo, indexFinal), estat);
+				organs.addAll(organsChunk);
+			}
+			return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
