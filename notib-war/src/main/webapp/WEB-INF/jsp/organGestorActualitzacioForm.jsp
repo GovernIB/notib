@@ -36,7 +36,6 @@
                 return false;
             });
             $('.close', parent.document).on('click',function(){
-                $.alert('fuck');
                 $.confirm({
                     title: title,
                     content: content,
