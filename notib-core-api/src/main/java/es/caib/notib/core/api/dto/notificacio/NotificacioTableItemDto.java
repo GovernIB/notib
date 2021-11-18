@@ -49,6 +49,7 @@ public class NotificacioTableItemDto {
 	private String organNom;
 	private OrganGestorEstatEnum organEstat;
 	private Date estatProcessatDate;
+	private Date enviadaDate;
 
 	protected int registreEnviamentIntent;
 

@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id:
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: enviada_date
+                  type: timestamp
+        - sql:
+            sql: "
+            UPDATE NOT_NOTIFICACIO_TABLE t SET ENVIADA_DATE = (
+              SELECT (CASE WHEN p.INTERESSATTIPUS = 'ADMINISTRACIO' THEN n.REGISTRE_DATA ELSE n.NOT_ENV_DATA_NOTIFICA end) AS enviada_date FROM NOT_NOTIFICACIO n
+              JOIN NOT_NOTIFICACIO_ENV e ON e.NOTIFICACIO_ID = n.ID
+              JOIN NOT_PERSONA p ON p.ID  = e.TITULAR_ID
+              WHERE ((p.INTERESSATTIPUS = 'ADMINISTRACIO' AND (n.ESTAT != 0  OR n.estat != 40))
+                  OR (p.INTERESSATTIPUS != 'ADMINISTRACIO' AND (n.ESTAT != 0 OR n.ESTAT != 40 OR n.ESTAT != 2)))
+                  AND n.id = t.id
+                  AND ROWNUM = 1
+              );
+            "
