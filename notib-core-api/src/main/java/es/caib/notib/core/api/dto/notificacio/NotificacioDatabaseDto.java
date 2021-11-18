@@ -46,6 +46,9 @@ public class NotificacioDatabaseDto extends AuditoriaDto {
 	private DocumentDto document4;
 	private DocumentDto document5;
 
+	// Llista d'errors detectats al crear una notificació en enviaments massius
+	private List<String> errors = new ArrayList<>();
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

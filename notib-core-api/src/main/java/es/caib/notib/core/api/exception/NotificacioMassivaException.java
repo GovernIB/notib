@@ -1,5 +1,7 @@
 package es.caib.notib.core.api.exception;
 
+import lombok.Getter;
+
 /**
  * Excepció que es llança quan s'ha superat el màxim nombre de línies permès
  * per al CSV de càrrega massiva.
@@ -9,11 +11,13 @@ package es.caib.notib.core.api.exception;
 
 public class NotificacioMassivaException extends RuntimeException {
 
-	private Long fila;
+	@Getter
+	private Integer fila;
+	@Getter
 	private String columna;
 
 	public NotificacioMassivaException(
-			Long fila,
+			Integer fila,
 			String columna,
 			String message,
 			Throwable throwable) {
