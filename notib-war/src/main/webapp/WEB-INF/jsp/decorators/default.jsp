@@ -201,11 +201,11 @@ body {
 					
 						<c:if test="${hiHaEntitats && isRolActualAdministradorEntitat || isRolActualUsuari || isRolActualAdministradorOrgan}">
 							<li class="dropdown">
-								<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
-		         				<span class="fa fa-home"></span> <span class="truncate" title="${entitatActual.nom}">${entitatActual.nom}</span> <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
+								<c:if test="${hiHaMesEntitats}"><a id="dd_entitat" href="#" data-toggle="dropdown"></c:if>
+		         				<span class="fa fa-home"></span> <span id="dds_entitat" class="truncate" title="${entitatActual.nom}">${entitatActual.nom}</span> <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
 								<c:if test="${hiHaMesEntitats}"></a></c:if>
 								<c:if test="${hiHaMesEntitats}">
-									<ul class="dropdown-menu">
+									<ul id="ddo_entitat" class="dropdown-menu">
 										<c:forEach var="entitat" items="${sessionEntitats}" varStatus="status">
 											<c:if test="${entitat.id != entitatActual.id}">
 											
@@ -223,11 +223,11 @@ body {
 						
 						<c:if test="${hiHaOrgans && isRolActualAdministradorOrgan}">
 							<li class="dropdown">
-								<c:if test="${hiHaMesOrgans}"><a href="#" data-toggle="dropdown"></c:if>
-		         				<span class="fa fa-cubes"></span> <span class="truncate" title="${organActual.nom}">${organActual.nom}</span> <c:if test="${hiHaMesOrgans}"><b class="caret caret-white"></b></c:if></span>
+								<c:if test="${hiHaMesOrgans}"><a id="dd_organ" href="#" data-toggle="dropdown"></c:if>
+		         				<span class="fa fa-cubes"></span> <span id="dds_organ" class="truncate" title="${organActual.nom}">${organActual.nom}</span> <c:if test="${hiHaMesOrgans}"><b class="caret caret-white"></b></c:if></span>
 								<c:if test="${hiHaMesOrgans}"></a></c:if>
 								<c:if test="${hiHaMesOrgans}">
-									<ul class="dropdown-menu">
+									<ul id="ddo_organ" class="dropdown-menu">
 										<c:forEach var="organ" items="${sessionOrgans}" varStatus="status">
 											<c:if test="${organ.id != organActual.id}">
 											
@@ -246,19 +246,19 @@ body {
 						<li class="dropdown">
 							<c:choose>
 								<c:when test="${fn:length(rolsUsuariActual) > 1}">
-									<a href="#" data-toggle="dropdown">
+									<a id="dd_rol" href="#" data-toggle="dropdown">
 										<span class="fa fa-bookmark"></span>
-										<spring:message code="decorator.menu.rol.${rolActual}"/>
+										<span id="dds_rol" data-rol="${rolActual}"><spring:message code="decorator.menu.rol.${rolActual}"/></span>
 										<b class="caret caret-white"></b>
 									</a>
-									<ul class="dropdown-menu">
+									<ul id="ddo_rol" class="dropdown-menu">
 										<c:forEach var="rol" items="${rolsUsuariActual}">
 											<c:if test="${rol != rolActual}">
 												<li>
 													<c:url var="canviRolUrl" value="/index">
 														<c:param name="${requestParameterCanviRol}" value="${rol}"/>
 													</c:url>
-													<a href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
+													<a id="mr_${rol}" href="${canviRolUrl}"><spring:message code="decorator.menu.rol.${rol}"/></a>
 												</li>
 											</c:if>
 										</c:forEach>
@@ -273,7 +273,7 @@ body {
 						
 						
 						<li class="dropdown">
-							<a href="#" data-toggle="dropdown">
+							<a id="dd_user" href="#" data-toggle="dropdown">
 								<span class="fa fa-user"></span>
 								<c:choose>
 									<c:when test="${not empty dadesUsuariActual}">${dadesUsuariActual.nom}</c:when>
@@ -283,11 +283,11 @@ body {
 							</a>
 							<ul class="dropdown-menu">
 								<li>
-									<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
-									<a href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
+									<a id="mu_config" href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><spring:message code="decorator.menu.configuracio.user"/></a>
+									<a id="mu_manual" href="https://github.com/GovernIB/notib/raw/${manifestAtributes['Implementation-SCM-Branch']}/doc/pdf/NOTIB_usuari.pdf" rel="noopener noreferrer" target="_blank"><span class="fa fa-download"></span> <spring:message code="decorator.menu.manual.usuari"/></a>
 								</li>
 								<li>
-									<a href="<c:url value="/usuari/logout"/>">
+									<a id="mu_logout" href="<c:url value="/usuari/logout"/>">
 										<i class="fa fa-power-off"></i> <spring:message code="decorator.menu.accions.desconectar"/>
 									</a>
 								</li>
