@@ -283,7 +283,7 @@
 </head>
 
 <body>
-<c:if test="${not isUpdatingProcediments}">
+<c:if test="${not isUpdatingOrgans}">
     <div class="confirmacio">
         <h4><spring:message code="organgestor.actualitzacio.confirmacio"/></h4>
     </div>

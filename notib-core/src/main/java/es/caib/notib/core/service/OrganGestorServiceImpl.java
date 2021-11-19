@@ -65,6 +65,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private MetricsHelper metricsHelper;
 	@Resource
+	private MessageHelper messageHelper;
+	@Resource
 	private GrupRepository grupReposity;
 	@Resource
 	private PagadorPostalRepository pagadorPostalReposity;
@@ -492,53 +494,64 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				return;	// Ja existeix un altre procés que està executant l'actualització.
 			}
 
-			// inicialitza el seguiment del prgrés d'actualització
+			// inicialitza el seguiment del progrés d'actualització
 			progres = new ProgresActualitzacioDto();
 			progresActualitzacio.put(entitat.getDir3Codi(), progres);
 
 			List<OrganGestorEntity> organsGestors;
-			if (organActualCodiDir3 == null)
+			if (organActualCodiDir3 == null) {
 				organsGestors = organGestorRepository.findByEntitat(entitat);
-			else {
+			} else {
 				List<String> organGestorsListCodisDir3 = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActualCodiDir3);
-				organsGestors = organGestorRepository.findByEntitatAndOrgansGestors(
-						entitat,
-						organGestorsListCodisDir3);
+				organsGestors = organGestorRepository.findByEntitatAndOrgansGestors(entitat, organGestorsListCodisDir3);
 			}
+
+			progres.setNumProcediments(organsGestors.size());
 
 //			organGestorRepository.updateAllStatus(OrganGestorEstatEnum.ALTRES);
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
+				progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO,
+						messageHelper.getMessage("organgestor.actualitzacio.organ.actual") + " " + organGestor.getCodi());
 				boolean status = updateNom(entitat, organGestor);
 				logger.info("Fi - updateNom del òrgan gestor: " + organGestor);
 				if (!status) {
 					logger.error(String.format("Actualització òrgan (%s): Error actualitzant nom ", organGestor.getCodi()));
+					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.nom"));
 				}
 				status = updateLlibre(entitat, organGestor);
 				logger.info("Fi - updateLlibre del òrgan gestor: " + organGestor);
 				if (!status) {
 					logger.error(String.format("Actualització òrgan (%s): Error actualitzant llibre ", organGestor.getCodi()));
+					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.llibre"));
 				}
 
 				status = updateOficina(entitat, organGestor, arbreUnitats);
 				logger.info("Fi - updateOficina del òrgan gestor: " + organGestor);
 				if (!status) {
 					logger.error(String.format("Actualització òrgan (%s): Error actualitzant oficina ", organGestor.getCodi()));
+					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.oficina"));
 				}
 
 				status = updateEstat(organGestor, arbreUnitats);
 				logger.info("Fi - updateEstat del òrgan gestor: " + organGestor);
 				if (!status) {
 					logger.error(String.format("Actualització òrgan (%s): Error actualitzant estat ", organGestor.getCodi()));
+					progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.error.actualtizar.estat"));
 				}
-
 				organGestorRepository.saveAndFlush(organGestor);
+				progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organs.ok"));
+				progres.incrementProcedimentsActualitzats();
 			}
+			progres.setProgres(100);
+			progres.setFinished(true);
 			logger.info("Antes de Update de las tablas correspondientes a las datatables");
 			// Update de las tablas correspondientes a las datatables de notificaciones y envíos
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.actualitzar.notificacions.enviaments"));
 			notificacioTableViewRepository.updateOrganGestorEstat();
 			enviamentTableRepository.updateOrganGestorEstat();
-			
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.proces.complet"));
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
