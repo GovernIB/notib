@@ -285,7 +285,7 @@ $(document).ready(function() {
 							<td><strong>
 								<c:choose>
 									<c:when test="${notificacio.procediment.tipus == 'SERVEI'}">
-										<spring:message code="notificacio.info.dada.serveis" />
+										<spring:message code="notificacio.info.dada.servei" />
 										<br />
 									</c:when>
 									<c:otherwise>
