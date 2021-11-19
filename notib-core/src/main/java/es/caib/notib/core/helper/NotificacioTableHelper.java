@@ -51,6 +51,7 @@ public class NotificacioTableHelper {
                     .concepte(notificacio.getConcepte())
                     .estat(notificacio.getEstat())
                     .estatDate(notificacio.getEstatDate())
+                    .estatProcessatDate(notificacio.getEstatProcessatDate())
                     .entitatNom(notificacio.getEntitat().getNom())
                     .procedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null)
                     .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
@@ -108,6 +109,7 @@ public class NotificacioTableHelper {
             tableViewItem.setConcepte(notificacio.getConcepte());
             tableViewItem.setEstat(notificacio.getEstat());
             tableViewItem.setEstatDate(notificacio.getEstatDate());
+            tableViewItem.setEstatProcessatDate(notificacio.getEstatProcessatDate());
             tableViewItem.setEntitatNom(notificacio.getEntitat().getNom());
             tableViewItem.setProcedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null);
             tableViewItem.setProcedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null);

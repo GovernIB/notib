@@ -10,8 +10,7 @@ import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.test.NotificacioMassivaTests;
 import org.junit.After;
 import org.junit.Assert;
@@ -43,8 +42,6 @@ public class NotificacioMassivaServiceTest {
 	@Mock
 	private NotificacioHelper notificacioHelper;
 	@Mock
-	private EmailNotificacioMassivaHelper emailNotificacioMassivaHelper;
-	@Mock
 	private PaginacioHelper paginacioHelper;
 	@Mock
 	private NotificacioValidatorHelper notificacioValidatorHelper;
@@ -52,9 +49,8 @@ public class NotificacioMassivaServiceTest {
 	private NotificacioMassivaHelper notificacioMassivaHelper;
 
 	@Mock
-	private ProcedimentRepository procedimentRepository;
-	@Mock
-	private PagadorPostalRepository pagadorPostalRepository;
+	private ProcSerRepository procSerRepository;
+
 	@Mock
 	private NotificacioMassivaRepository notificacioMassivaRepository;
 	@Mock
@@ -67,6 +63,7 @@ public class NotificacioMassivaServiceTest {
 
 	Long entitatId = 2L;
 	EntitatEntity entitatMock;
+	ProcSerEntity procSerMock;
 
 	Long notMassivaId = 2L;
 	NotificacioMassivaEntity notificacioMassivaMock;
@@ -76,6 +73,8 @@ public class NotificacioMassivaServiceTest {
 	@Before
 	public void setUp() {
 		entitatMock = Mockito.mock(EntitatEntity.class);
+		procSerMock = Mockito.mock(ProcSerEntity.class);
+
 		Mockito.when(entitatMock.getDir3Codi()).thenReturn(entitatCodiDir3);
 
 		Mockito.when(metricsHelper.iniciMetrica())
@@ -99,11 +98,7 @@ public class NotificacioMassivaServiceTest {
 						Mockito.<Map<String, Long>>any()
 					))
 				.thenReturn(NotificacioEntity.builder().build());
-		Mockito.when(procedimentRepository.findByCodiAndEntitat(
-				Mockito.any(String.class),
-				Mockito.any(EntitatEntity.class)
-		))
-				.thenReturn(new ProcedimentEntity());
+		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
 
 		setUpNotificacioMassiva();
 //		setUpAuthentication();

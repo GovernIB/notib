@@ -531,6 +531,7 @@ public class EntityComprovarHelper {
 			ProcSerEntity procediment,
 			Authentication auth,
 			PermisEnum permis) {
+		// TODO: Comprovar que es correcte --> Al modificar notificació ha donat un error
 		boolean granted = hasPermisProcediment(procediment, permis);
 		if (!granted && procediment.isComu())
 			granted = hasPermisProcedimentOrgan(procedimentOrgan, permis);

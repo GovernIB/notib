@@ -220,7 +220,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
 			NotificacioEntity notificacioEntity = notificacioRepository.findOne(notificacio.getId());
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, !isAdministradorEntitat);
+			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false); //!isAdministradorEntitat);
 
 			// Actualitzar notificació existent
 			auditNotificacioHelper.updateNotificacio(notificacioEntity, notData);
