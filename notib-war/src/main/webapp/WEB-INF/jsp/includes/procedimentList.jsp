@@ -109,8 +109,8 @@ $(document).ready(function() {
 	data-toggle="datatable"
 	data-url="<c:url value="/procediment/datatable"/>"
 	data-search-enabled="false"
-	data-default-order="3"
-	data-default-dir="desc"
+	data-default-order="2"
+	data-default-dir="asc"
 	class="table table-striped table-bordered"
 	data-botons-template="#botonsTemplate"
 	data-save-state="true"
@@ -124,7 +124,7 @@ $(document).ready(function() {
 			<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
 
 			<c:if test="${not simplifiedView}">
-			<th data-col-name="organGestorEstat" data-visible="false"></th>
+			<th data-col-name="organGestorEstat" data-orderable="false" data-visible="false" ></th>
 				<th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate"><spring:message code="procediment.list.columna.organGestor"/>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organGestorDesc}}
