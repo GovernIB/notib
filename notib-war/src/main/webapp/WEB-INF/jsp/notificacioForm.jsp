@@ -9,21 +9,36 @@
 
 <c:set var="enviamentTipus">${notificacioCommand.enviamentTipus}</c:set>
 <c:choose>
-    <c:when test="${empty notificacioCommand.id}"><c:set var="titol">
-		<c:choose>
-			<c:when test="${enviamentTipus == 'COMUNICACIO'}">
-				<spring:message code="notificacio.form.titol.crear.comunicacio"/>
-			</c:when>
-			<c:when test="${enviamentTipus == 'COMUNICACIO_SIR'}">
-				<spring:message code="notificacio.form.titol.crear.comunicacio.sir"/>
-			</c:when>
-			<c:otherwise>
-				<spring:message code="notificacio.form.titol.crear.notificacio"/>
-			</c:otherwise>
-		</c:choose>
-	</c:set>
+    <c:when test="${empty notificacioCommand.id}">
+		<c:set var="titol">
+			<c:choose>
+				<c:when test="${enviamentTipus == 'COMUNICACIO'}">
+					<spring:message code="notificacio.form.titol.crear.comunicacio"/>
+				</c:when>
+				<c:when test="${enviamentTipus == 'COMUNICACIO_SIR'}">
+					<spring:message code="notificacio.form.titol.crear.comunicacio.sir"/>
+				</c:when>
+				<c:otherwise>
+					<spring:message code="notificacio.form.titol.crear.notificacio"/>
+				</c:otherwise>
+			</c:choose>
+		</c:set>
 	</c:when>
-    <c:otherwise><c:set var="titol"><spring:message code="notificacio.form.titol.modificar"/></c:set></c:otherwise>
+    <c:otherwise>
+		<c:set var="titol">
+			<c:choose>
+				<c:when test="${enviamentTipus == 'COMUNICACIO'}">
+					<spring:message code="notificacio.form.titol.modificar.comunicacio"/>
+				</c:when>
+				<c:when test="${enviamentTipus == 'COMUNICACIO_SIR'}">
+					<spring:message code="notificacio.form.titol.modificar.comunicacio.sir"/>
+				</c:when>
+				<c:otherwise>
+					<spring:message code="notificacio.form.titol.modificar.notificacio"/>
+				</c:otherwise>
+			</c:choose>
+		</c:set>
+	</c:otherwise>
 </c:choose>
 <c:set var="dadesGenerals"><spring:message code="notificacio.form.titol.dadesgenerals"/></c:set>
 <c:set var="document"><spring:message code="notificacio.form.titol.document"/></c:set>
@@ -276,6 +291,11 @@
 		var procedimentIdAux = '${notificacioCommand.procedimentId}';
 	} else {
 		var procedimentIdAux = null;
+	}
+	if ('${notificacioCommand != null && notificacioCommand.serveiId != null}') {
+		var serveiIdAux = '${notificacioCommand.serveiId}';
+	} else {
+		var serveiIdAux = null;
 	}
 	var interessatsTipus = new Array();
 	var interessatTipusOptions = "";
@@ -782,7 +802,7 @@
 			}
 			if (num_organs > 0) {
 				loadProcediments(organ);
-				loadServeis(organ);
+				loadServeis(organ, '${notificacioCommand.tipusProcSer}' == 'PROCEDIMENT' );
 			}
 
 		});
@@ -807,10 +827,9 @@
 				$("#procedimentRow").hide();
 				$("#serveiRow").show();
 				$('#procedimentId').val("").trigger('change.select2');;
-				loadServeis(getOrganVal());
+				loadServeis(getOrganVal(), false);
 			}
 		});
-
 		$('#organGestor').trigger('change');
 
 		if ($('#rd_procediment').prop('checked')) {
@@ -1038,7 +1057,7 @@
 		});
 	}
 
-	function loadServeis(organ) {
+	function loadServeis(organ, carregaInicial) {
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/organ/"/>" + organ + "/serveis",
@@ -1072,7 +1091,7 @@
 					if (serveisOrgan.length > 0) {
 						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.organs'/>'>");
 						$.each(serveisOrgan, function(index, val) {
-							if (isOnlyOneServeiOrgan) {
+							if (isOnlyOneServeiOrgan && !carregaInicial) {
 								selServeis.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
 								$("#organGestor").val(val.organGestor).trigger("change.select2");
 							} else {
@@ -1082,7 +1101,7 @@
 						selServeis.append("</optgroup>");
 						selServeis.trigger('change.select2');
 					}
-					if (selServeis.children('option').length == 2) {
+					if (selServeis.children('option').length == 2 && !carregaInicial) {
 						$('#procedimentId option:eq(1)').attr('selected', 'selected');
 						selServeis.trigger('change');
 					}
@@ -1095,10 +1114,10 @@
 
 				let numServeis = $('#serveiId').children('option').length - 1;
 				if (numServeis > 1) {
-					if ('${notificacioCommand != null && procedimentIdAux != null}') {
-						$("#serveiId").val('${notificacioCommand.procedimentId}');
+					if ('${notificacioCommand != null && serveiIdAux != null}') {
+						$("#serveiId").val('${notificacioCommand.serveiId}');
 						$('#serveiId').trigger('change');
-						procedimentIdAux = null;
+						serveiIdAux = null;
 					}
 				}
 			},
@@ -1258,15 +1277,15 @@
 				</div>
 			</div>
 
-			<div class="row">
+			<div class="row" <c:if test="${enviamentTipus == 'NOTIFICACIO'}">style="display: none;"</c:if>>
 				<div class="col-xs-2"> </div>
 				<div class="form-group col-xs-10">
 					<div class="btn-group" data-toggle="buttons" style="padding-left: 15px;">
-						<label class="btn btn-warning active">
+						<label class="btn btn-warning <c:if test="${notificacioCommand.tipusProcSer=='PROCEDIMENT'}">active</c:if>">
 <%--							<input type="radio" name="tipusProcSer" id="rd_procediment" value="PROCEDIMENT" <c:if test="${notificacioCommand.tipusProcSer=='PROCEDIMENT'}">checked</c:if>><spring:message code="notificacio.form.camp.procediment"/>--%>
 							<form:radiobutton path="tipusProcSer" id="rd_procediment" value="PROCEDIMENT" /><spring:message code="notificacio.form.camp.procediment"/>
 						</label>
-						<label class="btn btn-warning">
+						<label class="btn btn-warning <c:if test="${notificacioCommand.tipusProcSer=='SERVEI'}">active</c:if>">
 <%--							<input type="radio" name="tipusProcSer" id="rd_servei" value="SERVEI" <c:if test="${notificacioCommand.tipusProcSer!='PROCEDIMENT'}">checked</c:if>><spring:message code="notificacio.form.camp.servei"/>--%>
 							<form:radiobutton path="tipusProcSer" id="rd_servei" value="SERVEI" /><spring:message code="notificacio.form.camp.servei"/>
 						</label>

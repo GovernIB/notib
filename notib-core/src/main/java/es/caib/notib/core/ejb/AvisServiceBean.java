@@ -62,7 +62,7 @@ public class AvisServiceBean implements AvisService {
 	}
 
 	@Override
-	@RolesAllowed("tothom")
+	@RolesAllowed({"tothom", "NOT_SUPER"})
 	public List<AvisDto> findActive() {
 		return delegate.findActive();
 	}
