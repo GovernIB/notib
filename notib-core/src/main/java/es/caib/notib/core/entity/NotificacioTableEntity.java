@@ -123,6 +123,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private boolean isErrorLastEvent;
 	@Column(name = "ESTAT_PROCESSAT_DATE")
 	private Date estatProcessatDate;
+	@Column(name = "ENVIADA_DATE")
+	private Date enviadaDate;
 
 	@Setter
 	@Transient

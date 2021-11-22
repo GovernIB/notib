@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -226,10 +228,26 @@ public class OrganGestorController extends BaseUserController{
 					"organgestor.controller.update.nom.error");
 		}
 	}
+
+	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
+	public String actualitzacioAutomaticaGet(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		model.addAttribute("isUpdatingOrgans", organGestorService.isUpdatingOrgans(entitat));
+		return "organGestorActualitzacioForm";
+	}
+
+	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		return organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
+	}
 	
-	@RequestMapping(value = "/update", method = RequestMethod.GET)
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	public String updateNoms(
-			HttpServletRequest request) {		
+			HttpServletRequest request, Model model) {
 		
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		

@@ -415,6 +415,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 request,
                 "accions",
                 model);
+        model.addAttribute("pestanyaActiva", "accions");
         if (enviada) {
             return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.enviament.ok");
         }
@@ -469,6 +470,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 request,
                 "accions",
                 model);
+        model.addAttribute("pestanyaActiva", "accions");
         if (reactivat) {
             return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
                     "notificacio.controller.reactivar.consulta.ok");
@@ -492,6 +494,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 request,
                 "accions",
                 model);
+        model.addAttribute("pestanyaActiva", "accions");
         if (reactivat) {
             return getAjaxControllerReturnValueSuccess(request, "notificacioInfo",
                     "notificacio.controller.reactivar.sir.ok");

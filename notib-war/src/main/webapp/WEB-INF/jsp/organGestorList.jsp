@@ -169,7 +169,12 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
-			<a id="organgestor-boto-update" class="btn btn-warning" href="organgestor/update"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/></a>
+			<a id="procediment-boto-update"
+					class="btn btn-default" href="organgestor/update/auto"
+					data-toggle="modal"
+					data-maximized="false">
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
+			</a>
 			<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/new" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a>
 		</p>
 	</script>
