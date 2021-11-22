@@ -507,10 +507,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 
 			progres.setNumProcediments(organsGestors.size());
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TITOL, messageHelper.getMessage("organgestor.actualitzar.titol" ));
 
 //			organGestorRepository.updateAllStatus(OrganGestorEstatEnum.ALTRES);
 			Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for(OrganGestorEntity organGestor: organsGestors) {
+
 				progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO,
 						messageHelper.getMessage("organgestor.actualitzacio.organ.actual") + " " + organGestor.getCodi());
 				boolean status = updateNom(entitat, organGestor);
@@ -550,7 +552,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.actualitzar.notificacions.enviaments"));
 			notificacioTableViewRepository.updateOrganGestorEstat();
 			enviamentTableRepository.updateOrganGestorEstat();
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.organ.proces.complet"));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TITOL, messageHelper.getMessage("organgestor.actualitzacio.organ.proces.complet"));
 
 		} finally {
 			metricsHelper.fiMetrica(timer);
