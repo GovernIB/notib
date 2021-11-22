@@ -124,7 +124,7 @@
                 infoDiv.scrollTop = infoDiv.scrollHeight;
             }
         }
-        function myFunction() {
+        function tancarModal() {
             if (!isUpdating) {
                 window.top.location.reload();
                 return;
@@ -310,7 +310,7 @@
             </button>
             <a id="cancelbtn" href="#"
                style="display: none !important;" class="btn btn-default"
-               data-modal-cancel="false" onclick="myFunction()" ><spring:message code="comu.boto.tancar"/></a>
+               data-modal-cancel="false" onclick="tancarModal()" ><spring:message code="comu.boto.tancar"/></a>
         </div>
     </form:form>
 </c:if>
