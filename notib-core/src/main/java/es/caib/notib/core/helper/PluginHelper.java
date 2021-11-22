@@ -1743,7 +1743,9 @@ public class PluginHelper {
 			boolean inclou_documents,
 			boolean isComunicacioSir) throws RegistrePluginException {
 		AsientoRegistralBeanDto registre = notificacioToAsientoRegistralBean(notificacio, inclou_documents, isComunicacioSir);
+		logger.info("Afegint els interessats ...");
 		registre.getInteresados().add(enviamentToRepresentanteEInteresadoWs(enviament));
+		logger.info("Interessats afegits correctament");
 		return registre;
 	}
 
@@ -1763,6 +1765,8 @@ public class PluginHelper {
 	private AsientoRegistralBeanDto notificacioToAsientoRegistralBean(NotificacioEntity notificacio,
 																	  boolean inclou_documents, 
 																	  boolean isComunicacioSir) throws RegistrePluginException {
+
+		logger.info("Preparant AsientoRegistralBeanDto");
 		AsientoRegistralBeanDto registre = new AsientoRegistralBeanDto();
 		registre.setEntidadCodigo(notificacio.getEntitat().getDir3Codi());
 		registre.setEntidadDenominacion(notificacio.getEntitat().getNom());
@@ -1770,22 +1774,24 @@ public class PluginHelper {
 		String dir3Codi;
 		String organisme = null;
 
-		if (notificacio.getEntitat().getDir3CodiReg() != null) {
+		if (notificacio.getNotificaEnviamentNotificaData() != null && notificacio.getEntitat().getDir3CodiReg() != null) {
 			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
 			organisme = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();
-			if (notificacio.getProcediment() != null)
+			if (notificacio.getProcediment() != null) {
 				organisme = notificacio.getProcediment().getOrganGestor() != null ? notificacio.getProcediment().getOrganGestor().getCodi() : null;
-			else
+			} else {
 				organisme = notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null;
+			}
 		}
 
-		logger.debug("Recuperant informació de l'oficina i registre...");
+		logger.info("Recuperant informació de l'oficina i registre...");
 		setOficina(
 				notificacio,
 				dadesOficina,
 				dir3Codi);
+		logger.info("Recuperant informació del llibre");
 		setLlibre(
 				notificacio,
 				dadesOficina,
@@ -1815,20 +1821,23 @@ public class PluginHelper {
 		}
 
 		//Salida
+		logger.info("Preparant dades de sortida");
 		registre.setTipoRegistro(2L);
 
-		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) ? "Notificacio" : "Comunicacio";
+		String tipusEnv = NotificaEnviamentTipusEnumDto.NOTIFICACIO == notificacio.getEnviamentTipus() ? "Notificacio" : "Comunicacio";
 		registre.setResumen(tipusEnv + " - " + notificacio.getConcepte());
 		/* 1 = Documentació adjunta en suport Paper
 		 * 2 = Documentació adjunta digitalitzada i complementàriament en paper
 		 * 3 = Documentació adjunta digitalitzada */
 		registre.setTipoDocumentacionFisicaCodigo(3L);
 		if (notificacio.getProcediment() != null) {
+			logger.info("Afegint dades del procediment");
 			registre.setTipoAsunto(notificacio.getProcediment().getTipusAssumpte());
 			registre.setTipoAsuntoDenominacion(notificacio.getProcediment().getTipusAssumpte());
 			registre.setCodigoAsunto(notificacio.getProcediment().getCodiAssumpte());
 			registre.setCodigoAsuntoDenominacion(notificacio.getProcediment().getCodiAssumpte());
 		}
+		logger.info("Afegint dades de l'idioma");
 		registre.setIdioma(notificacio.getIdioma() != null ? (notificacio.getIdioma().ordinal() + 1) : 1L);
 //		registre.setReferenciaExterna(notificacio.getRefExterna());
 		registre.setNumeroExpediente(notificacio.getNumExpedient());
@@ -1848,8 +1857,11 @@ public class PluginHelper {
 //		}else {
 //			registre.setTipoTransporte("07");
 //		}
-		if (notificacio.getProcediment() != null)
+		if (notificacio.getProcediment() != null) {
+			logger.info("Afegint codi Sia");
 			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+		}
+		logger.info("Afegint dades varies del registre");
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
 		registre.setAplicacionTelematica("NOTIB v." + CacheHelper.appVersion);
 		registre.setAplicacion("RWE");
@@ -1864,6 +1876,7 @@ public class PluginHelper {
 		registre.setAnexos(new ArrayList<AnexoWsDto>());
 
 		if (inclou_documents) {
+			logger.info("Incloguent documents ...");
 			if (notificacio.getDocument() != null) {
 				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument(), 1, isComunicacioSir));
 			}
@@ -1880,6 +1893,7 @@ public class PluginHelper {
 				registre.getAnexos().add(documentToAnexoWs(notificacio.getDocument5(), 5, isComunicacioSir));
 			}
 		}
+		logger.info("Retornant registre");
 		return registre;
 	}
 
