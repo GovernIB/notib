@@ -15,10 +15,23 @@
 	<not:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
+
 	$("#rols").prop("disabled", true);
 	$("#btn-refresh-roles").on("click", function () {
 		var codi = $(this).data('user-codi');
 		window.top.location.href = "<c:url value="/usuari/${dadesUsuariActual.codi}/refrescarRols"/>";
+	});
+
+	 $("#rebreEmailsNotificacio").change(() => {
+	 	if (!$("#rebreEmailsNotificacio").prop('checked')) {
+			$("#rebreEmailsNotificacioCreats").prop("checked", false);
+		}
+	 });
+
+	$("#rebreEmailsNotificacioCreats").change(() => {
+		if ($("#rebreEmailsNotificacioCreats").prop("checked")) {
+			$("#rebreEmailsNotificacio").prop("checked", true);
+		}
 	});
 });
 </script>
