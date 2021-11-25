@@ -25,8 +25,12 @@ public class ExceptionHelper {
 		
 		return isTheException;
 	}
-	
-	
+
+	public static Throwable findThrowableInstance(Exception e, Class<? extends Exception> exceptionClass) {
+
+		return findThrowableInstance(e, exceptionClass, N_CHECKED_NESTED_EXCEPTIONS);
+	}
+
 	public static Throwable findThrowableInstance(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
 		int i = 0;
 		Throwable exception = null;

@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.InvalidCSVFileNotificacioMassivaException;
 import es.caib.notib.core.api.exception.MaxLinesExceededException;
+import es.caib.notib.core.api.exception.NotificacioMassivaException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GestioDocumentalService;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
@@ -331,18 +332,28 @@ public class NotificacioMassivaController extends BaseUserController {
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
 
-            notificacioMassivaService.create(entitat.getId(), usuariActual.getCodi(),
+            notificacioMassivaService.create(
+                    entitat.getId(),
+                    usuariActual.getCodi(),
                     notificacioMassivaCommand.asDto(gestioDocumentalService));
       
         } catch (Exception ex) {
             log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
-            if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class))
+            if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, MaxLinesExceededException.class)) {
                 MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error"));
-            else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, InvalidCSVFileNotificacioMassivaException.class))
+            } else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, InvalidCSVFileNotificacioMassivaException.class)) {
                 MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error.format"));
-            else
-            	MissatgesHelper.error(request, ex.getMessage());
+            } else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, NotificacioMassivaException.class)) {
+                NotificacioMassivaException notificacioMassivaException = (NotificacioMassivaException) ExceptionHelper.findThrowableInstance(ex, NotificacioMassivaException.class);
+                MissatgesHelper.error(
+                        request,
+                        getMessage(request, "notificacio.massiva.error.fila", new Object[] {notificacioMassivaException.getFila(), notificacioMassivaException.getColumna()}) +
+                                "<br/>" + notificacioMassivaException.getMessage() +
+                                "<br/>" + notificacioMassivaException.getCause().getMessage());
+            } else {
+                MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.error") + "<br/>" + ex.getMessage());
+            }
 
             return getNotificacioMassivaForm(entitat, request, model);
         }

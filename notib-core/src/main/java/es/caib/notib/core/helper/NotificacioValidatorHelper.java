@@ -44,7 +44,7 @@ public class NotificacioValidatorHelper {
 			Map<String, Long> documentsProcessatsMassiu) {
 		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
 
-		List<String> errors = new ArrayList<String>();
+		List<String> errors = notificacio.getErrors();
 		boolean comunicacioSenseAdministracio = false;
 
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
@@ -81,7 +81,7 @@ public class NotificacioValidatorHelper {
 
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
-			errors.add("[1050] El tipus d'enviament de la notificació no pot ser null.");
+			errors.add("[1050] El tipus d'enviament de la notificació no pot ser null");
 		}
 
 		// Usuari

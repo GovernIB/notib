@@ -231,6 +231,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             writeCsvHeader(listWriterInforme, csvHeader.toArray(new String[]{}));
 
             int numAltes = 0;
+            int fila = 1;
             NotificacioMassivaEntity notificacioMassivaEntity = registrarNotificacioMassiva(entitat, notificacioMassiva, linies.size());
             for (String[] linia : linies) {
                 if (linia.length < numberRequiredColumns()) {
@@ -244,7 +245,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         usuariCodi,
                         fileNames,
                         notificacioMassiva.getFicheroZipBytes(),
-                        documentsProcessatsMassiu);
+                        documentsProcessatsMassiu,
+                        fila++);
                 String keyDocument = getKeyDocument(notificacio);
                 if (keyDocument != null && !documentsProcessatsMassiu.containsKey(keyDocument)) {
                     documentsProcessatsMassiu.put(keyDocument, null);
@@ -310,11 +312,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
                 enviarCorreuElectronic(notificacioMassivaEntity, fileResumContent, fileErrorsContent);
             } catch (IOException e) {
-                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.");
-                e.printStackTrace();
+                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar guardar els documents de l'informe i del error.", e);
             } catch (Exception | Error e) {
-                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.");
-                e.printStackTrace();
+                log.error("[NOT-MASSIVA] Hi ha hagut un error al intentar enviar el correu electrònic.", e);
             }
 
             writeCsvClose(listWriterErrors);
@@ -485,7 +485,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     private void checkCSVContent(List<String[]> linies, List<String> csvHeader) {
         if (linies == null || csvHeader == null) {
-            throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat.");
+            throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat: sense contingut");
         }
         if (linies.isEmpty()) {
             throw new InvalidCSVFileNotificacioMassivaException("El fitxer CSV està buid.");
@@ -629,52 +629,228 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         return null;
     }
 
-    private NotificacioDatabaseDto csvToNotificaDatabaseDto(String[] linia, Date caducitat, EntitatEntity entitat,
-                                                            String usuariCodi, List<String> fileNames, byte[] ficheroZipBytes,
-                                                            Map<String, Long> documentsProcessatsMassiu) {
+    private NotificacioDatabaseDto csvToNotificaDatabaseDto(
+            String[] linia,
+            Date caducitat,
+            EntitatEntity entitat,
+            String usuariCodi,
+            List<String> fileNames,
+            byte[] ficheroZipBytes,
+            Map<String, Long> documentsProcessatsMassiu,
+            Integer fila) {
 
         log.debug("[NOT-MASSIVA] Construeix notificació de les dades del fitxer CSV");
         NotificacioDatabaseDto notificacio = new NotificacioDatabaseDto();
         NotEnviamentDatabaseDto enviament = new NotEnviamentDatabaseDto();
         List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
         DocumentDto document = new DocumentDto();
+        String missatge = "";
+        String columna = "";
 
-        notificacio.setCaducitat(caducitat);
-        notificacio.setOrganGestorCodi(linia[0]);
-        notificacio.setEmisorDir3Codi(entitat.getDir3Codi());
-        notificacio.setConcepte(linia[1]);
-        notificacio.setDescripcio(null);
-        if (linia[2] !=null) {
-            if (linia[2].toUpperCase(Locale.ROOT).charAt(0) == 'C')
+        try {
+            notificacio.setCaducitat(caducitat);
+            // Organ gestor
+            columna = "1 - Codigo Unidad Remisora";
+            missatge = "obtenint el codi de l'Òrgan gestor";
+            notificacio.setOrganGestorCodi(linia[0]);
+
+            // Entitat
+            columna = "";
+            missatge = "obtenint el codi Dir3 de l'entitat";
+            notificacio.setEmisorDir3Codi(entitat.getDir3Codi());
+
+            // Concepte
+            columna = "2 - Concepto";
+            missatge = "obtenint el concepte";
+            notificacio.setConcepte(linia[1]);
+
+            // Descripció
+            notificacio.setDescripcio(null);
+
+            // Tipus enviament
+            columna = "3 - Tipo de Envio";
+            missatge = "Obtenint el tipus d'enviament. Valors vàlids: [Comunicacio | Notificacio]";
+            setTipusEnviament(notificacio, linia[2]);
+
+            // Grup
+            notificacio.setGrup(null);
+
+            // Idioma
+            notificacio.setIdioma(null);
+
+            // Usuari
+            notificacio.setUsuariCodi(usuariCodi);
+
+            // Retard
+            columna = "16 - Retardo Postal";
+            missatge = "obtenint el retard postal";
+            setRetard(notificacio, linia[15]);
+
+            // Procediment
+            columna = "17 - Código Procedimiento";
+            missatge = "obtenint el procediment";
+            ProcSerDto procediment = new ProcSerDto();
+            procediment.setCodi(linia[16]);
+            notificacio.setProcediment(procediment);
+
+            // Fecha envío programado
+            columna = "18 - Fecha Envio Programado";
+            missatge = "obtenint la data d'enviament programada";
+            setDataProgramada(notificacio, linia[17]);
+
+            // Document
+            columna = "5 - Nombre Fichero";
+            missatge = "obtenint el document";
+            boolean llegirMetadades = setDocument(
+                    notificacio,
+                    document,
+                    linia,
+                    fileNames,
+                    ficheroZipBytes,
+                    documentsProcessatsMassiu);
+            if (llegirMetadades) {
+                columna = "19 - Origen";
+                missatge = "obtenint les metadades del document: Origen";
+                setOrigen(notificacio, linia[18]);
+                columna = "20 - Estado Elaboración";
+                missatge = "obtenint les metadades del document: Estat elaboració";
+                setValidesa(notificacio, linia[19]);
+                columna = "21 - Tipo documental";
+                missatge = "obtenint les metadades del document: Tipus documental";
+                setTipusDocumental(notificacio, linia[20]);
+                columna = "22 - PDF Firmado";
+                missatge = "obtenint les metadades del document: Pdf firmat";
+                setModeFirma(notificacio, linia[21]);
+            }
+
+            // Enviaments ////////////////
+
+            // Referencia - Núm. expedient
+            // TODO: #641 - Els enviaments massius encara que s'ompli el camp de "Referencia Emisor" al csv no es mostra al llistat de remeses al camp "Número expedient"
+            columna = "4 - Referencia Emisor (Número expedient)";
+            missatge = "obtenint referència";
+            String referencia = (linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null;
+            notificacio.setNumExpedient(referencia);
+            enviament.setNotificaReferencia(referencia); //si no se envía, Notific@ genera una
+            enviament.setEntregaDehActiva(false); // De momento dejamos false
+
+            // Entrega postal
+            columna = "13, 14 y 15 - Linea 1, Linea 2 y Codigo Postal";
+            missatge = "obtenint l'adreça de l'enviament postal";
+            setEntregaPostal(linia, entitat, enviament);
+
+            // Servei tipus
+            columna = "7 - Prioridad Servicio";
+            missatge = "obtenint la prioritat d'enviament. Valors vàlids: [Normal | Urgent]";
+            setServeiTipus(notificacio, enviament, linia[6]);
+
+            // Titular /////////////
+            PersonaDto titular = new PersonaDto();
+
+            // Nom
+            columna = "8 - Nombre";
+            missatge = "obtenint el nom del titular";
+            titular.setNom(linia[7]);
+
+            // Llinatges
+            columna = "9 - Apellidos";
+            missatge = "obtenint els llinatges del titular";
+            titular.setLlinatge1(linia[8]); // vienen ap1 y ap2 juntos
+            titular.setLlinatge2(null);
+
+            // NIF
+            columna = "10 - CIF/NIF";
+            missatge = "obtenint el CIF/NIF del titular";
+            titular.setNif(linia[9]);
+
+            // Interessat tipus
+            missatge = "calculant el tipus d'interessat a partir del CIF/NIF.";
+            // TODO:  Igual lo hemos planteado mal. Si es un nif, podria ser el Nif de la administración.
+            //Entiendo que el "Código destino" = linia[11] solo se informará en caso de ser una administración
+            //Si es persona física o jurídica no tiene sentido
+            //Entonces podriamos utilizar este campo para saber si es una administración
+            setInteressatTipus(notificacio, titular);
+
+            // Email
+            columna = "11 - Email";
+            missatge = "obtenint el correu electrònic del titular";
+            titular.setEmail(linia[10]);
+
+            // Codi Dir3
+            columna = "12 - Codigo destino";
+            missatge = "obtenint el Codi Dir3 de l'administració destinatària";
+            titular.setDir3Codi(linia[11]);
+
+            // Incapacitat
+            titular.setIncapacitat(false);
+
+            enviament.setTitular(titular);
+            enviaments.add(enviament);
+            notificacio.setEnviaments(enviaments);
+
+        } catch (Exception e) {
+            throw new NotificacioMassivaException(
+                    fila,
+                    columna,
+                    "Error " + missatge,
+                    e);
+        }
+
+        return notificacio;
+    }
+
+    private void setTipusEnviament(NotificacioDatabaseDto notificacio, String strTipusEnviament) {
+        if (strTipusEnviament != null && !strTipusEnviament.isEmpty()) {
+            if ("C".equalsIgnoreCase(strTipusEnviament) ||
+                    "COMUNICACIO".equalsIgnoreCase(strTipusEnviament) ||
+                    "COMUNICACION".equalsIgnoreCase(strTipusEnviament) ||
+                    "COMUNICACIÓ".equalsIgnoreCase(strTipusEnviament) ||
+                    "COMUNICACIÓN".equalsIgnoreCase(strTipusEnviament)) {
                 notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-            else {
+            } else if ("N".equalsIgnoreCase(strTipusEnviament) ||
+                    "NOTIFICACIO".equalsIgnoreCase(strTipusEnviament) ||
+                    "NOTIFICACION".equalsIgnoreCase(strTipusEnviament) ||
+                    "NOTIFICACIÓ".equalsIgnoreCase(strTipusEnviament) ||
+                    "NOTIFICACIÓN".equalsIgnoreCase(strTipusEnviament)) {
                 notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
+            } else {
+                notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+                notificacio.getErrors().add("[1051] El tipus d'enviament (" + strTipusEnviament + ") no és vàlid. Valors permesos: [Notificacio(n) | Comunicacio(n)].");
             }
         }
-        notificacio.setGrup(null);
-        notificacio.setIdioma(null);
-        // TODO: #641 - Els enviaments massius encara que s'ompli el camp de "Referencia Emisor" al csv no es mostra al llistat de remeses al camp "Número expedient"
-        notificacio.setNumExpedient((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null);
-        notificacio.setUsuariCodi(usuariCodi);
-        notificacio.setRetard(Integer.valueOf(linia[15]));
+    }
 
-        // Procediment
-        ProcSerDto procediment = new ProcSerDto();
-        procediment.setCodi(linia[16]);
-        notificacio.setProcediment(procediment);
+    private void setRetard(NotificacioDatabaseDto notificacio, String strRetard) {
+        if (isEnter(strRetard)) {
+            notificacio.setRetard(Integer.valueOf(strRetard));
+        } else if (strRetard != null) {
+            notificacio.getErrors().add("[1045] El retard (" + strRetard + ") no és vàlid. Valors permesos: número enter.");
+        }
+    }
 
-        // Fecha envío programado
-        try {//viene de CSV y es opcional pero NO sabemos formato
-            if (linia[17] != null && !linia[17].isEmpty()) {
-                notificacio.setEnviamentDataProgramada(new SimpleDateFormat("dd/MM/yyyy").parse(linia[17]));
+    private void setDataProgramada(NotificacioDatabaseDto notificacio, String strData) {
+        try {
+            if (strData != null && !strData.isEmpty()) {
+                notificacio.setEnviamentDataProgramada(new SimpleDateFormat("dd/MM/yyyy").parse(strData));
             } else {
                 notificacio.setEnviamentDataProgramada(null);
             }
         } catch (ParseException e) {
             notificacio.setEnviamentDataProgramada(null);
+            notificacio.getErrors().add("[1340] El format de la data d'enviament programada (" + strData + ") no és correcte. Format esperat: dd/MM/yyyy.");
         }
+    }
 
-        // Document
+    private boolean setDocument(
+            NotificacioDatabaseDto notificacio,
+            DocumentDto document,
+            String[] linia,
+            List<String> fileNames,
+            byte[] ficheroZipBytes,
+            Map<String, Long> documentsProcessatsMassiu) {
+
+        boolean llegirMetadades = false;
+
         if (linia[4] == null || linia[4].isEmpty()) {
             notificacio.setDocument(null);
         } else {
@@ -691,15 +867,18 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     document.setMediaType(URLConnection.guessContentTypeFromName(linia[4]));
                     document.setMida(Long.valueOf(arxiuBytes.length));
                     if (registreNotificaHelper.isSendDocumentsActive()) {
-                        leerMetadadesDelCsv(document, linia);
+                        llegirMetadades = true;
+//                        leerMetadadesDelCsv(notificacio, document, linia);
                     }
                 }
+                notificacio.setDocument(document);
             } else {
                 String[] docSplit = linia[4].split("\\.");
                 if (docSplit.length > 1 && Arrays.asList("JPG", "JPEG", "ODT", "ODP", "ODS", "ODG", "DOCX", "XLSX", "PPTX",
-                        "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV").contains(docSplit[1].toUpperCase())) {
+                        "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP")
+                        .contains(docSplit[1].toUpperCase())) {
                     notificacio.setDocument(null);
-
+                    notificacio.getErrors().add("[1350] No s'ha trobat el document dins el fitxer ZIP amb els documents adjunts.");
                 } else {
                     String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
                     Pattern pUuid = Pattern.compile(uuidPattern);
@@ -710,7 +889,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
                         document.setGenerarCsv(false);
                         if (registreNotificaHelper.isSendDocumentsActive()) {
-                            leerMetadadesDelCsv(document, linia);
+                            llegirMetadades = true;
+//                            leerMetadadesDelCsv(notificacio, document, linia);
                         }
                     } else {
                         // Csv
@@ -718,19 +898,84 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
                         document.setGenerarCsv(false);
                         if (registreNotificaHelper.isSendDocumentsActive()) {
-                            leerMetadadesDelCsv(document, linia);
+                            llegirMetadades = true;
+//                            leerMetadadesDelCsv(notificacio, document, linia);
                         }
                     }
+                    notificacio.setDocument(document);
                 }
             }
-            notificacio.setDocument(document);
         }
 
-        // Enviaments
-        enviament.setNotificaReferencia((linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null); //si no se envía, Notific@ genera una
-        enviament.setEntregaDehActiva(false); // De momento dejamos false
+        return llegirMetadades;
+    }
 
-        if (entitat.getEntregaCie() != null && linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
+    private void setOrigen(NotificacioDatabaseDto notificacio, String strOrigen) {
+        // Origen
+        if (strOrigen != null && !strOrigen.isEmpty()) {
+            if ("CIUTADA".equalsIgnoreCase(strOrigen) || "CIUDADANO".equalsIgnoreCase(strOrigen)) {
+                notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
+            } else if ("ADMINISTRACIO".equalsIgnoreCase(strOrigen) || "ADMINISTRACION".equalsIgnoreCase(strOrigen)) {
+                notificacio.getDocument().setOrigen(OrigenEnum.ADMINISTRACIO);
+            } else {
+                notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
+                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Origen (" + strOrigen + ") no és vàlid. Valors permesos: [Ciutada | Ciudadano | Administracio(n)].");
+            }
+        }
+    }
+
+    private void setValidesa(NotificacioDatabaseDto notificacio, String strValidesa) {
+        // Validesa
+        if (strValidesa != null && !strValidesa.isEmpty()) {
+            if ("ORIGINAL".equalsIgnoreCase(strValidesa)) {
+                notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
+            } else if ("COPIA".equalsIgnoreCase(strValidesa)) {
+                notificacio.getDocument().setValidesa(ValidesaEnum.COPIA);
+            } else if ("COPIA AUTENTICA".equalsIgnoreCase(strValidesa)) {
+                notificacio.getDocument().setValidesa(ValidesaEnum.COPIA_AUTENTICA);
+            } else {
+                notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
+                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Validesa (" + strValidesa + ") no és vàlid. Valors permesos: [Original | Copia | Copia autentica].");
+            }
+        }
+    }
+
+    private void setTipusDocumental(NotificacioDatabaseDto notificacio, String strTipus) {
+        // Tipo documental
+        if (strTipus != null && !strTipus.isEmpty()) {
+            TipusDocumentalEnum tipo = TipusDocumentalEnum.ALTRES;
+            try {
+                tipo = TipusDocumentalEnum.valueOf(strTipus.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Tipo documental (" + strTipus + ") no és vàlid. Valors permesos: [" +
+                        "RESSOLUCIO | ACORD | CONTRACTE | CONVENI | DECLARACIO | COMUNICACIO | NOTIFICACIO | PUBLICACIO | " +
+                        "JUSTIFICANT_RECEPCIO | ACTA | CERTIFICAT | DILIGENCIA | INFORME | SOLICITUD | DENUNCIA | ALEGACIO | " +
+                        "RECURS | COMUNICACIO_CIUTADA | FACTURA | ALTRES_INCAUTATS | ALTRES | LLEI |  MOCIO | INSTRUCCIO | " +
+                        "CONVOCATORIA | ORDRE_DIA | INFORME_PONENCIA | DICTAMEN_COMISSIO | INICIATIVA_LEGISLATIVA | " +
+                        "PREGUNTA | INTERPELACIO | RESPOSTA | PROPOSICIO_NO_LLEI | ESQUEMA | PROPOSTA_RESOLUCIO | " +
+                        "COMPAREIXENSA | SOLICITUD_INFORMACIO | ESCRIT | INICIATIVA_LEGISLATIVA2 | PETICIO].");
+            }
+            notificacio.getDocument().setTipoDocumental(tipo);
+        }
+    }
+
+    private void setModeFirma(NotificacioDatabaseDto notificacio, String strMode) {
+        // PDF firmat
+        if (strMode != null && !strMode.isEmpty()) {
+            if ("SI".equalsIgnoreCase(strMode) || "TRUE".equalsIgnoreCase(strMode)) {
+                notificacio.getDocument().setModoFirma(true);
+            } else if ("NO".equalsIgnoreCase(strMode) || "FALSE".equalsIgnoreCase(strMode)) {
+                notificacio.getDocument().setModoFirma(false);
+            } else {
+                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Validesa (" + strMode + ") no és vàlid. Valors permesos: [Original | Copia | Copia autentica].");
+            }
+//                    Boolean.valueOf(linia[21]) : Boolean.FALSE);
+        }
+    }
+
+    private void setEntregaPostal(String[] linia, EntitatEntity entitat, NotEnviamentDatabaseDto enviament) {
+        if (entitat.getEntregaCie() != null &&
+                linia[12] != null && !linia[12].isEmpty() && // Si vienen Línea 1 y Código Postal
                 linia[14] != null && !linia[14].isEmpty()) {
             enviament.setEntregaPostalActiva(true);
             EntregaPostalDto entregaPostal = EntregaPostalDto.builder()
@@ -743,52 +988,67 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         } else {
             enviament.setEntregaPostalActiva(false);
         }
-
-
-        enviament.setServeiTipus((linia[6] != null && !linia[6].isEmpty()) ?
-                ServeiTipusEnumDto.valueOf(linia[6].trim().toUpperCase()) : ServeiTipusEnumDto.NORMAL);
-
-        PersonaDto titular = new PersonaDto();
-        titular.setNom(linia[7]);
-        titular.setLlinatge1(linia[8]); // vienen ap1 y ap2 juntos
-        titular.setLlinatge2(null);
-        titular.setNif(linia[9]);
-        titular.setEmail(linia[10]);
-        titular.setDir3Codi(linia[11]);
-        titular.setIncapacitat(false);
-        // TODO:  Igual lo hemos planteado mal. Si es un nif, podria ser el Nif de la administración.
-        //Entiendo que el "Código destino" = linia[11] solo se informará en caso de ser una administración
-        //Si es persona física o jurídica no tiene sentido
-        //Entonces podriamos utilizar este campo para saber si es una administración
-        if (NifHelper.isValidCif(titular.getNif())) {
-            titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
-        } else if (NifHelper.isValidNifNie(titular.getNif())) {
-            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-        } else {
-            try {
-                List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
-                if (lista != null && lista.size() > 0) {
-                    titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-                }
-            } catch (Exception e) {}
-        }
-        enviament.setTitular(titular);
-        enviaments.add(enviament);
-        notificacio.setEnviaments(enviaments);
-
-
-        return notificacio;
     }
 
-    private void leerMetadadesDelCsv(DocumentDto document, String[] linia) {
-        document.setOrigen((linia[18] != null && !linia[18].isEmpty()) ?
-                OrigenEnum.valueOf(linia[18].trim().toUpperCase()): null);
-        document.setValidesa((linia[19] != null && !linia[19].isEmpty()) ?
-                ValidesaEnum.valueOf(linia[19].trim().toUpperCase()) : null);
-        document.setTipoDocumental((linia[20] != null && !linia[20].isEmpty()) ?
-                TipusDocumentalEnum.valueOf(linia[20].trim().toUpperCase()) : null);
-        document.setModoFirma((linia[21] != null && !linia[21].isEmpty()) ?
-                Boolean.valueOf(linia[21]) : Boolean.FALSE);
+    private void setServeiTipus(
+            NotificacioDatabaseDto notificacio,
+            NotEnviamentDatabaseDto enviament,
+            String strServeiTipus) {
+        if (strServeiTipus != null && !strServeiTipus.isEmpty()) {
+            if ("NORMAL".equalsIgnoreCase(strServeiTipus)) {
+                enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
+            } else if ("URGENT".equalsIgnoreCase(strServeiTipus) || "URGENTE".equalsIgnoreCase(strServeiTipus)) {
+                enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
+            } else {
+                enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
+                notificacio.getErrors().add("[1102] El tipus de servei (" + strServeiTipus + ") no és vàlid. Valors permesos: [Normal | Urgent(e)].");
+            }
+        }
+    }
+
+    private void setInteressatTipus(NotificacioDatabaseDto notificacio, PersonaDto titular) {
+        if (titular.getNif() != null && !titular.getNif().isEmpty()) {
+            if (NifHelper.isValidCif(titular.getNif())) {
+                titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+            } else if (NifHelper.isValidNifNie(titular.getNif())) {
+                titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+            } else {
+//                try {
+                    List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
+                    if (lista != null && lista.size() > 0) {
+                        titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+                    } else {
+                        notificacio.getErrors().add("[1116] El 'CIF/NIF' del titular (" + titular.getNif() + ") no és vàlid.");
+                    }
+//                } catch (Exception e) {
+//                    notificacio.getErrors().add("");
+//                }
+            }
+        }
+    }
+
+    public boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isEnter(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            int i = Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
     private ICsvListWriter initCsvWritter(Writer writer)
