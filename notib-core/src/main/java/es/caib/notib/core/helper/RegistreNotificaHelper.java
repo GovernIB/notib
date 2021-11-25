@@ -210,7 +210,7 @@ public class RegistreNotificaHelper {
 			NotificacioEnviamentEntity enviament,
 			IntegracioInfo info,
 			long t0) throws RegistrePluginException {
-		logger.info(" >>> Nou assentament registral...");
+		logger.info(" >>> Nou assentament registral SIR...");
 		RespostaConsultaRegistre arbResposta;
 		try {
 			boolean generarJustificant =  isGenerarJustificant(true, true,

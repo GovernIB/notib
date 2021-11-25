@@ -32,19 +32,19 @@ public class ClientBaseTest {
 
 	// LOCAL data
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
-//	protected static final String ENTITAT_DIR3CODI = "A04003003";
-//	protected static final String ORGAN_CODI = "A04035948";
-//	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
-//	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
-//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
+	protected static final String ENTITAT_DIR3CODI = "A04003003";
+	protected static final String ORGAN_CODI = "A04035948";
+	protected static final String ORGAN_CODI_CIE = "A04026958"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "2095292"; // LOCAL
+	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "215981"; // LOCAL
 
 
 	// DEV data
-	protected static final String ENTITAT_DIR3CODI = "A04003003";
-	protected static final String ORGAN_CODI = "A04013529";
-	protected static final String ORGAN_CODI_CIE = "A04013529";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105";
-	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
+//	protected static final String ENTITAT_DIR3CODI = "A04003003";
+//	protected static final String ORGAN_CODI = "A04013529";
+//	protected static final String ORGAN_CODI_CIE = "A04013529";
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105";
+//	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
 
 
 	protected NotificacioV2 generarNotificacioV2(

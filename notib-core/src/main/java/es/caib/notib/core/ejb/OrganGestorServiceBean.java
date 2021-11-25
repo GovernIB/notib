@@ -51,6 +51,16 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
+	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
+		return delegate.getProgresActualitzacio(dir3Codi);
+	}
+
+	@Override
+	public boolean isUpdatingOrgans(EntitatDto entitatDto) {
+		return delegate.isUpdatingOrgans(entitatDto);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public void updateAll(Long entitatId, String organActualCodiDir3) {
 		delegate.updateAll(entitatId,organActualCodiDir3);

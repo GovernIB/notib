@@ -1,11 +1,9 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.entity.NotificacioMassivaEntity;
-import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -63,6 +62,7 @@ public class NotificacioTableHelper {
                     .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
                     .isErrorLastEvent(false)
                     .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
+                    .enviadaDate(getEnviadaDate(notificacio))
                     .build();
 
             notificacioTableViewRepository.save(tableViewItem);
@@ -120,6 +120,7 @@ public class NotificacioTableHelper {
             tableViewItem.setOrganNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null);
             tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
             tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
+            tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
 
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
 
@@ -204,6 +205,29 @@ public class NotificacioTableHelper {
     /////
     // PRIVATE METHODS
     ////
+
+    private Date getEnviadaDate(NotificacioEntity notificacio) {
+
+        try {
+            NotificacioEnviamentEntity env = notificacio.getEnviaments().iterator().next();
+
+            if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+                && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
+                    || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
+                return notificacio.getRegistreData();
+            }
+
+            if (!env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+                    && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
+                        || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
+                        || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
+                return notificacio.getNotificaEnviamentNotificaData();
+            }
+        } catch (Exception ex) {
+            log.error("Error actualitzant la data d'enviament a la taula del llistat", ex);
+        }
+        return null;
+    }
 
     private boolean isErrorLastEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
         List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(

@@ -197,7 +197,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 							if (notificacio.getOrganGestor() != null && !notificacio.getOrganGestor().isEmpty() &&
 									organGestor != null && !notificacio.getOrganGestor().equals(organGestor.getCodi())) {
-								logger.debug(">> [ALTA] Organ gestor no es correspon amb el de l'procediment");
+								logger.debug(">> [ALTA] Organ gestor no es correspon amb el del procediment");
 								errorDescripcio = "[1024] El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment.";
 								integracioHelper.addAccioError(info, errorDescripcio);
 								return setRespostaError(errorDescripcio);

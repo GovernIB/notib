@@ -32,13 +32,13 @@ import static org.junit.Assert.assertTrue;
 public class ClientRestValidacionsTest extends ClientBaseTest {
 
 	
-//	private static final String URL = "http://localhost:8080/notib";
-//	private static final String USERNAME = "admin";
-//	private static final String PASSWORD = "admin";
+	private static final String URL = "http://localhost:8280/notib";
+	private static final String USERNAME = "admin";
+	private static final String PASSWORD = "admin";
 
-	private static final String URL = "https://dev.caib.es/notib";
-	private static final String USERNAME = "$ripea_notib";
-	private static final String PASSWORD = "ripea_notib";
+//	private static final String URL = "https://dev.caib.es/notib";
+//	private static final String USERNAME = "$ripea_notib";
+//	private static final String PASSWORD = "ripea_notib";
 
 	/*
 	@Rule
@@ -80,14 +80,14 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1011() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEmisorDir3Codi("A04013511");
+		notificacio.setEmisorDir3Codi("A17002943");
 		enviaNotificacioError(notificacio, "1011");
 	}
 	
 	@Test
 	public void test1012() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEmisorDir3Codi("A04027013");
+		notificacio.setEmisorDir3Codi("A17002943");
 		enviaNotificacioError(notificacio, "1012");
 	}
 	
@@ -166,7 +166,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1042() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setDescripcio("Descripció\n");
+		notificacio.setDescripcio("Descripció\ni algo més");
 		enviaNotificacioError(notificacio, "1042");
 	}
 	
@@ -958,7 +958,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		enviaNotificacioError(notificacio, "1291");
 	}
 	
-	// @Test
+	 @Test
 	// No se puede ejecutar este test en entorno DEV porque la entitat GOIB A04003003 no tiene activada
 	// la entrega DEH
 	public void test1300() throws DatatypeConfigurationException, IOException, DecoderException {
@@ -967,27 +967,29 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		enviaNotificacioError(notificacio, "1300");
 	}
 	
-	// @Test
+	 @Test
 	// No se puede ejecutar este test en entorno DEV porque la entitat GOIB A04003003 no tiene activada
 	// la entrega DEH
 	public void test1301() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEmisorDir3Codi("A04013511");
+		notificacio.setEmisorDir3Codi("A04035959");
 		notificacio.getEnviaments().get(0).setEntregaDehActiva(true);
 		notificacio.getEnviaments().get(0).setEntregaDeh(null);
 		enviaNotificacioError(notificacio, "1301");
 	}
 	
-	// @Test
+	 @Test
 	// No se puede ejecutar este test en entorno DEV porque la entitat GOIB A04003003 no tiene activada
 	// la entrega DEH
 	public void test1302() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEmisorDir3Codi("A04013511");
+		notificacio.setEmisorDir3Codi("A04035959");
+		notificacio.setOrganGestor(null);
+		notificacio.setProcedimentCodi("000001");
 		notificacio.getEnviaments().get(0).setEntregaDehActiva(true);
 		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setNif(null);
-		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A00000000");
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A17002943");
 		enviaNotificacioError(notificacio, "1302");
 	}
 	
@@ -1012,7 +1014,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	public void test1321() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setProcedimentCodi("PRUEBA2");
-		notificacio.setGrupCodi("NOT_APL");
+		notificacio.setGrupCodi("serveiconcret");
 		enviaNotificacioError(notificacio, "1321");
 	}
 	
@@ -1020,7 +1022,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	public void test1322() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setProcedimentCodi("PRUEBA");
-		notificacio.setGrupCodi("NOT_ADMIN");
+		notificacio.setGrupCodi("serveiconcret");
 		enviaNotificacioError(notificacio, "1322");
 	}
 	
