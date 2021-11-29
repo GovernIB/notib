@@ -298,118 +298,111 @@ body {
 					<div class="clearfix"></div>
 					<div class="btn-toolbar navbar-btn navbar-right">
 						<div class="btn-group">
-							<c:if test="${isRolActualAdministrador}">
-<%-- 
-							<div class="btn-group">
-								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>							
-							</div>
---%>							
-							<div class="btn-group">
-									<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
-									<ul class="dropdown-menu">
-										<li><a href="<c:url value="/massiu/notificacions"> <c:param name="mantenirPaginacio" value="true"/></c:url>"><spring:message code="decorator.menu.callback"/></a></li>							
-										<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
-										<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
-										<li><a href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
-										<li><a data-toggle="modal" data-maximized="true" id="botoMonitor" href="<c:url value="/modal/monitor"/>"><spring:message code='monitor.titol' /></a></li>
-									</ul>
-								</div>
-							<div class="btn-group">
-								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
-									<li><a href="<c:url value="/cache"/>"><spring:message code="decorator.menu.caches"/></a></li>
-									<li><a href="<c:url value="/notificacio/refrescarEstatNotifica"/>" title="<spring:message code="decorator.menu.expirades.ajuda"/>" data-toggle="modal" data-height="350px"><spring:message code="decorator.menu.expirades"/> </a></li>
-									<li>
-										<a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>">
-											<spring:message code="decorator.menu.config.properties"/>
-										</a>
-									</li>
-								</ul>
-							</div>
-							<a href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>
-							
-							</c:if>
-							<c:if test="${isRolActualUsuari}">
+
+							<c:choose>
+								<c:when test="${isRolActualAdministrador}">
+									<div class="btn-group">
+											<button id="m_monitor" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.monitoritzar"/>&nbsp;<span class="caret caret-white"></span></button>
+											<ul class="dropdown-menu">
+												<li><a id="mo_massiu" href="<c:url value="/massiu/notificacions"> <c:param name="mantenirPaginacio" value="true"/></c:url>"><spring:message code="decorator.menu.callback"/></a></li>
+												<li><a id="mo_integracions" href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
+												<li><a id="mo_excepcions" href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
+												<li><a id="mo_metriques" href="<c:url value="/metrics/list"/>"><spring:message code="decorator.menu.metriques"/></a></li>
+												<li><a id="mo_monitor" data-toggle="modal" data-maximized="true" id="botoMonitor" href="<c:url value="/modal/monitor"/>"><spring:message code='monitor.titol' /></a></li>
+											</ul>
+										</div>
+									<div class="btn-group">
+										<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a id="mc_entitats" href="<c:url value="/entitat"/>"><spring:message code="decorator.menu.entitats"/></a></li>
+											<li><a id="mc_caches" href="<c:url value="/cache"/>"><spring:message code="decorator.menu.caches"/></a></li>
+											<li><a id="mc_restats" href="<c:url value="/notificacio/refrescarEstatNotifica"/>" title="<spring:message code="decorator.menu.expirades.ajuda"/>" data-toggle="modal" data-height="350px"><spring:message code="decorator.menu.expirades"/> </a></li>
+											<li><a id="mc_propietats" href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"> <spring:message code="decorator.menu.config.properties"/></a></li>
+										</ul>
+									</div>
+									<a id="ma_avisos" href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>
+								</c:when>
+
+								<c:when test="${isRolActualUsuari}">
 									<div class="btn-group">
 										<div class="btn-group">
-											<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+											<button id="m_env" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
 												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
 											</button>
 											<ul class="dropdown-menu">
-												<li><a href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
-												<li><a href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
-												<li><a href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
+												<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+												<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
+												<li><a id="me_sir" href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
 											</ul>
 										</div>
 									</div>
 									<div class="btn-group">
-										<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
+										<button id="m_massiu" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
 										<ul class="dropdown-menu">
-											<li><a href="<c:url value="/notificacio/massiva/new"/>"><spring:message code="decorator.menu.notificacio.massiva.nova"/></a></li>
-											<li><a href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
+											<li><a id="mm_enviament" href="<c:url value="/notificacio/massiva/new"/>"><spring:message code="decorator.menu.notificacio.massiva.nova"/></a></li>
+											<li><a id="mm_consulta" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
 										</ul>
 									</div>
 									<div class="btn-group">
-										<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+										<a id="ml_notificacio" href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
 									</div>
 									<div class="btn-group">
-										<a href="<c:url value="/enviament"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+										<a id="ml_enviament" href="<c:url value="/enviament"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
 									</div>
-							</c:if>
-							<c:if test="${isRolActualAdministradorEntitat}">
-							<div class="btn-group">
-								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
-							</div>
-							<div class="btn-group">
-								<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
-							</div>
-							<div class="btn-group">
-								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>								
-								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
-									<li><a href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
-								</ul>
-							</div>
-								
-							<div class="btn-group">
-								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
-								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/entitat/${entitatActual.id}"/>"><spring:message code="decorator.menu.entitat"/></a></li>
-									<li><a href="<c:url value="/entitat/${entitatActual.id}/permis"/>"><spring:message code="decorator.menu.entitat.permisos"/></a></li>
-									<li><a href="<c:url value="/entitat/${entitatActual.id}/aplicacio"/>"><spring:message code="decorator.menu.entitat.aplicacions"/></a></li>
-									<li class="divider"></li>
-									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
-									<li><a href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
-									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
-									<li class="divider"></li>
-									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-									<li class="divider"></li>
-									<li><a href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.operadorpostal"/></a></li>
-									<li><a href="<c:url value="/cie"/>"><spring:message code="decorator.menu.operadorcie"/></a></li>
-								</ul>
-							</div>
-							</c:if>
-							<c:if test="${isRolActualAdministradorOrgan}">
-							<div class="btn-group">
-								<a href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
-							</div>
-							<div class="btn-group">
-								<a href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
-							</div>
-							<div class="btn-group">
-								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>								
-								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
-									<li><a href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
-									<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
-									<%--<li class="divider"></li>--%>
-									<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
-									<%--<li><a href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.pagadorpostal"/></a></li>  --%>
-									<%--<li><a href="<c:url value="/cie"/>"><spring:message code="decorator.menu.pagadorcie"/></a></li> --%>
-								</ul>
-							</div>
-							</c:if>
+								</c:when>
+
+								<c:when test="${isRolActualAdministradorEntitat}">
+									<div class="btn-group">
+										<a id="ml_notificacio" href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+									</div>
+									<div class="btn-group">
+										<a id="ml_enviament" href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+									</div>
+									<div class="btn-group">
+										<button id="m_gestio" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.gestio"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a id="mg_nerror" href="<c:url value="/massiu/registre/notificacionsError"/>"><spring:message code="decorator.menu.massiu.registre"/></a></li>
+											<li><a id="mg_massiu" href="<c:url value="/notificacio/massiva/"/>"><spring:message code="decorator.menu.notificacio.massiva.consulta"/></a></li>
+										</ul>
+									</div>
+
+									<div class="btn-group">
+										<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a id="mc_entitat" href="<c:url value="/entitat/${entitatActual.id}"/>"><spring:message code="decorator.menu.entitat"/></a></li>
+											<li><a id="mc_permisos" href="<c:url value="/entitat/${entitatActual.id}/permis"/>"><spring:message code="decorator.menu.entitat.permisos"/></a></li>
+											<li><a id="mc_aplicacions" href="<c:url value="/entitat/${entitatActual.id}/aplicacio"/>"><spring:message code="decorator.menu.entitat.aplicacions"/></a></li>
+											<li class="divider"></li>
+											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+											<li><a id="mc_serveis" href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
+											<li><a id="mc_organs" href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
+											<li class="divider"></li>
+											<li><a id="mc_grups" href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
+											<li class="divider"></li>
+											<li><a id="mc_postals" href="<c:url value="/operadorPostal"/>"><spring:message code="decorator.menu.operadorpostal"/></a></li>
+											<li><a id="mc_cies" href="<c:url value="/cie"/>"><spring:message code="decorator.menu.operadorcie"/></a></li>
+										</ul>
+									</div>
+								</c:when>
+
+								<c:when test="${isRolActualAdministradorOrgan}">
+									<div class="btn-group">
+										<a id="ml_notificacio" href="<c:url value="/notificacio"/>" class="btn btn-primary"><spring:message code="decorator.menu.notificacions"/></a>
+									</div>
+									<div class="btn-group">
+										<a id="ml_enviament" href="<c:url value="/enviament"/>" class="btn btn-primary"><spring:message code="decorator.menu.enviaments"/></a>
+									</div>
+									<div class="btn-group">
+										<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
+										<ul class="dropdown-menu">
+											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+											<li><a id="mc_serveis" href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
+											<li><a id="mc_organs" href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
+											<li><a id="mc_grups" href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
+										</ul>
+									</div>
+								</c:when>
+							</c:choose>
 						</div>
 <%--
 						<div class="btn-group">
