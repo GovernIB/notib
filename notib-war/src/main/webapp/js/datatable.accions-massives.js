@@ -105,7 +105,14 @@ function initEvents($table, url_prefix, eventMessages) {
 
         $('#reactivarSir').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-sir'])){
-                location.href =  url_prefix + "/reactivar/sir";
+                $.get(
+                    url_prefix + "/reactivar/sir",
+                    () => {
+                        $table.DataTable().ajax.reload(null, true);
+                        webutilRefreshMissatges();
+                    }
+                );
+                // location.href =  url_prefix + "/reactivar/sir";
                 setTimeout(() => $table.DataTable().rows().deselect(), 100);
             }
             return false;
@@ -134,12 +141,13 @@ function initEvents($table, url_prefix, eventMessages) {
         });
 
         $("#exportarODS").on("click", () => {
-            location.href = "notificacio/export/ODS";
+            // location.href = "notificacio/export/ODS";
+            location.href = url_prefix + "/export/ODS";
             setTimeout(() => $table.DataTable().rows().deselect(), 100);
         });
 
         $("#eliminar").on("click", () => {
-            location.href = "/notificacio/eliminar";
+            location.href = url_prefix + "/eliminar";
         });
         $("#reintentarRegistre").on("click", () => {
             location.href =  url_prefix + "/reintentar/registre";
