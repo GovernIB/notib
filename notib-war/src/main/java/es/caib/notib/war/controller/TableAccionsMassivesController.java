@@ -381,8 +381,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     }
 
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
-        Set<Long> notificacionsIds = getIdsSeleccionats(request);
-        return enviamentService.findIdsByNotificacioIds(notificacionsIds);
+        Set<Long> ids = getIdsSeleccionats(request);
+        return request.getRequestURI().contains("/notib/notificacio/") ? enviamentService.findIdsByNotificacioIds(ids) : ids;
     }
 
     protected Set<Long> getIdsSeleccionats(HttpServletRequest request) {
