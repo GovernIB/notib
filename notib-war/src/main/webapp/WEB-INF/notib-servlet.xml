@@ -209,8 +209,12 @@
 			<mvc:mapping path="/organgestor/**"/>
 			<mvc:mapping path="/procediment**"/>
 			<mvc:mapping path="/procediment/**"/>
+			<mvc:mapping path="/servei**"/>
+			<mvc:mapping path="/servei/**"/>
 			<mvc:mapping path="/grup**"/>
 			<mvc:mapping path="/grup/**"/>
+			<mvc:mapping path="/massiu/registre/notificacionsError"/>
+			<mvc:mapping path="/massiu/registre/notificacionsError/**"/>
 			<bean class="es.caib.notib.war.interceptor.AccesAdminInterceptor"/>
 		</mvc:interceptor>
 
@@ -222,6 +226,18 @@
 			<mvc:mapping path="/cache/**"/>
 			<mvc:mapping path="/config**"/>
 			<mvc:mapping path="/config/**"/>
+			<mvc:mapping path="/metrics"/>
+			<mvc:mapping path="/metrics/list"/>
+			<mvc:mapping path="/monitor"/>
+			<mvc:mapping path="/monitor/all"/>
+			<mvc:mapping path="/excepcio"/>
+			<mvc:mapping path="/excepcio/**"/>
+			<mvc:mapping path="/integracio"/>
+			<mvc:mapping path="/integracio/**"/>
+			<mvc:mapping path="/notificacio/refrescarEstatNotifica"/>
+			<mvc:mapping path="/notificacio/refrescarEstatNotifica/**"/>
+			<mvc:mapping path="/massiu/notificacions**"/>
+			<mvc:mapping path="/massiu/notificacions/**"/>
 			<bean class="es.caib.notib.war.interceptor.AccesSuperInterceptor"/>
 		</mvc:interceptor>
 
