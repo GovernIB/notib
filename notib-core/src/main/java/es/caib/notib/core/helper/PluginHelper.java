@@ -1576,15 +1576,17 @@ public class PluginHelper {
 				if(loadFromArxiu) {
 					id = document.getUuid();
 					docDetall = arxiuDocumentConsultar(id, null, true, true);
-					doc = docDetall.getContingut();
-					if (docDetall != null && enviarCsv) {
-						// Recuperar csv
-						Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
-						if (metadadesAddicionals != null) {
-							if (metadadesAddicionals.containsKey("csv"))
-								annex.setCsv((String) metadadesAddicionals.get("csv"));
-							else if (metadadesAddicionals.containsKey("eni:csv"))
-								annex.setCsv((String) metadadesAddicionals.get("eni:csv"));
+					if (docDetall != null) {
+						doc = docDetall.getContingut();
+						if (docDetall.getMetadades() != null && enviarCsv) {
+							// Recuperar csv
+							Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
+							if (metadadesAddicionals != null) {
+								if (metadadesAddicionals.containsKey("csv"))
+									annex.setCsv((String) metadadesAddicionals.get("csv"));
+								else if (metadadesAddicionals.containsKey("eni:csv"))
+									annex.setCsv((String) metadadesAddicionals.get("eni:csv"));
+							}
 						}
 					}
 				} else {
@@ -1605,7 +1607,7 @@ public class PluginHelper {
 					enviarTipoMIMEFicheroAnexado = Boolean.FALSE;
 				}
 					
-				if (docDetall != null) {
+				if (docDetall != null && docDetall.getMetadades() != null) {
 					if (docDetall.getMetadades().getTipusDocumental() != null) {
 						annex.setTipoDocumental(docDetall.getMetadades().getTipusDocumental().toString());
 					} else if (docDetall.getMetadades().getTipusDocumentalAddicional() != null) {
@@ -1669,7 +1671,7 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_REGISTRE, 
-					ex.getMessage(),
+					"Error obtenint les dades del document '" + (document != null ? document.getId() : "") + "': " + ex.getMessage(),
 					ex.getCause());
 		}
 	}
@@ -1859,7 +1861,9 @@ public class PluginHelper {
 //		}
 		if (notificacio.getProcediment() != null) {
 			logger.info("Afegint codi Sia");
-			registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+			try {
+				registre.setCodigoSia(Long.parseLong(notificacio.getProcediment().getCodi()));
+			} catch (NumberFormatException nfe) {}
 		}
 		logger.info("Afegint dades varies del registre");
 		registre.setCodigoUsuario(notificacio.getUsuariCodi());
@@ -1870,7 +1874,7 @@ public class PluginHelper {
 		registre.setExpone("");
 		registre.setSolicita("");
 		registre.setPresencial(false);
-		registre.setEstado(notificacio.getEstat().getLongVal());
+		registre.setEstado(notificacio.getEstat() != null ? notificacio.getEstat().getLongVal() : null);
 		registre.setMotivo(notificacio.getDescripcio());
 		registre.setInteresados(new ArrayList<InteresadoWsDto>());
 		registre.setAnexos(new ArrayList<AnexoWsDto>());

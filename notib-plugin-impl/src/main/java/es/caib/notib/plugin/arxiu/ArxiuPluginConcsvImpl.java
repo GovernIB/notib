@@ -233,8 +233,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			return new ObjectMapper().readValue(jsonData, HashMap.class);
 
 		} catch (Exception ex) {
-			log.debug("No ha estat possible obtenir les metadades del document amb CSV " + identificador,
-					ex);
+			log.error("No ha estat possible obtenir les metadades del document amb CSV " + identificador, ex);
 			throw new ArxiuException(
 					"No ha estat possible obtenir les metadades del document amb CSV " + identificador,
 					ex);
