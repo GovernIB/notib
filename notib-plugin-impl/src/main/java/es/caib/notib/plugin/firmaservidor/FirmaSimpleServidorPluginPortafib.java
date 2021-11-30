@@ -28,11 +28,15 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-	public class FirmaSimplePluginPortafib implements SignaturaPlugin {
+	public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 	
-	private static final String PROPERTIES_BASE = "es.caib.distribucio.plugin.signatura.portafib.";
-	  
+	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.signatura.portafib.";
+
 	@Override
+	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
+		return signar(null, nom, motiu, tipusFirma.name(), contingut, null);
+	}
+
 	public byte[] signar(
 			String id,
 			String nom,
@@ -65,10 +69,7 @@ import java.util.List;
 			throw new RuntimeException(e);
 		}
 	}  
-	
 
-   
-	
 	protected FirmaSimpleSignatureResult internalSignDocument(
 			ApiFirmaEnServidorSimple api,
 			final String perfil,
@@ -181,5 +182,5 @@ import java.util.List;
 				"es.caib.notib.plugin.api.firma.en.servidor.simple.perfil");
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(FirmaSimplePluginPortafib.class);
+	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);
 }
