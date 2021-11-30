@@ -142,8 +142,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestor(
 					entitat, 
 					organId);
-		
-			//Eliminar organ
+
+			// Eliminar permisos de l'òrgan
+			permisosHelper.deleteAcl(
+					organId,
+					OrganGestorEntity.class);
+			// Eliminar organ
 			organGestorRepository.delete(organGestorEntity);
 
 			return conversioTipusHelper.convertir(
@@ -202,8 +206,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			//Compravacions en ús
 			boolean organEnUs=false;
 			//1) Si té permisos
-			organEnUs=permisosHelper.hasAnyPermis(organId,OrganGestorEntity.class);
-			if (!organEnUs) {
+			// #571 --> Si té permisos els esborram!
+//			organEnUs=permisosHelper.hasAnyPermis(organId,OrganGestorEntity.class);
+//			if (!organEnUs) {
 				//2) Revisam si té procediments assignats
 				List<ProcedimentEntity> procedimentsOrganGestor = procedimentRepository.findByOrganGestorId(organId);
 				organEnUs=procedimentsOrganGestor != null && !procedimentsOrganGestor.isEmpty();
@@ -224,7 +229,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					}
 				
 				}
-			}
+//			}
 			return organEnUs;
 		} finally {
 			metricsHelper.fiMetrica(timer);
