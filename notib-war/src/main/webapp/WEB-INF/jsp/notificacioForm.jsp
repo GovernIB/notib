@@ -1265,7 +1265,7 @@
 				<div class="col-md-12">
 					<not:inputSelect 
 						name="organGestor" 
-						textKey="notificacio.form.camp.organGestor" 
+						textKey="notificacio.form.camp.organEmisor"
 						required="true" 
 						optionItems="${organsGestors}" 
 						optionValueAttribute="codi" 
@@ -1273,7 +1273,7 @@
 						labelSize="2" 
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
-						emptyOptionTextKey="notificacio.form.camp.organ.select"/>
+						emptyOptionTextKey="notificacio.form.camp.organ.emisor.select"/>
 				</div>
 			</div>
 
