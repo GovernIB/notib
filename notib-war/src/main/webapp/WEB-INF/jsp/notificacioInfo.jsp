@@ -21,7 +21,16 @@
 
 <html>
 <head>
-<title><spring:message code="notificacio.info.titol" /></title>
+<title>
+	<c:choose>
+		<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+			<spring:message code="comunicacio.info.titol" />
+		</c:when>
+		<c:otherwise>
+			<spring:message code="notificacio.info.titol" />
+		</c:otherwise>
+	</c:choose>
+</title>
 <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 <script src="<c:url value="/webjars/bootstrap/3.3.6/js/dropdown.js"/>"></script>
 <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
