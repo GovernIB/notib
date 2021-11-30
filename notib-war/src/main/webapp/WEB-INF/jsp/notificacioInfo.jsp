@@ -197,7 +197,16 @@ $(document).ready(function() {
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						<strong><spring:message code="notificacio.info.seccio.dades" /></strong>
+						<strong>
+						<c:choose>
+							<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+								<spring:message code="comunicacio.info.seccio.dades" />
+							</c:when>
+							<c:otherwise>
+								<spring:message code="notificacio.info.seccio.dades" />
+							</c:otherwise>
+						</c:choose>
+						</strong>
 					</h3>
 				</div>
 				<table class="table table-bordered" style="width: 100%">
@@ -351,7 +360,16 @@ $(document).ready(function() {
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							<strong><spring:message code="notificacio.info.seccio.document" /></strong>
+							<strong>
+								<c:choose>
+									<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+										<spring:message code="comunicacio.info.seccio.document" />
+									</c:when>
+									<c:otherwise>
+										<spring:message code="notificacio.info.seccio.document" />
+									</c:otherwise>
+								</c:choose>
+							</strong>
 						</h3>
 					</div>
 					<table class="table table-bordered" style="width: 100%">
