@@ -1908,8 +1908,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if(enviament.getEntregaPostal().getApartatCorreus() != null && enviament.getEntregaPostal().getApartatCorreus().length() > 10) {
 					return setRespostaError("[1243] El camp 'apartatCorreus' no pot contenir més de 10 caràcters).");
 				}
-				if (enviament.getEntregaPostal().getMunicipiCodi() != null && enviament.getEntregaPostal().getMunicipiCodi().length() > 6) {
-					return setRespostaError("[1244] El camp 'municipiCodi' de l'entrega postal no pot contenir més de 6 caràcters.");
+				if (enviament.getEntregaPostal().getMunicipiCodi() != null && enviament.getEntregaPostal().getMunicipiCodi().length() != 6) {
+					return setRespostaError("[1244] El camp 'municipiCodi' de l'entrega postal ha de contenir 6 caràcters.");
 				}
 				if (enviament.getEntregaPostal().getProvincia() != null && enviament.getEntregaPostal().getProvincia().length() > 2) {
 					return setRespostaError("[1245] El camp 'provincia' de l'entrega postal no pot contenir més de 2 caràcters.");
