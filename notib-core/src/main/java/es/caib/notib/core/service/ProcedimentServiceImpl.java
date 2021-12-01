@@ -1461,8 +1461,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 		return new ArrayList<String>(organsDisponibles);
 	}
-	
-	
+
+
 	@Transactional
 	@Override
 	public List<PermisDto> permisFind(
@@ -1471,56 +1471,39 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			Long procedimentId,
 			String organ,
 			String organActual,
-			TipusPermis tipus) {
+			TipusPermis tipus,
+			PaginacioParamsDto paginacioParams) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels permisos del procediment ("
-					+ "entitatId=" + entitatId +  ", "
-					+ "procedimentId=" + procedimentId + ", " 
+			logger.debug("Consulta dels permisos del procediment (entitatId=" + entitatId +  ", "
+					+ "procedimentId=" + procedimentId + ", "
 					+ "tipus=" + tipus + ")"); 
 
 			List<PermisDto> permisos = new ArrayList<PermisDto>();
-			
 			EntitatEntity entitat = null;
-			if (entitatId != null && !isAdministrador)
-				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId,
-						false,
-						false,
-						false);
-			ProcSerEntity procediment = entityComprovarHelper.comprovarProcediment(
-					entitat, 
-					procedimentId);
+			if (entitatId != null && !isAdministrador) {
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId, false,false,false);
+			}
+			ProcSerEntity procediment = entityComprovarHelper.comprovarProcediment(entitat, procedimentId);
 			boolean adminOrgan = organActual != null;
 
 			if (tipus == null) {
 				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
 				permisos.addAll(findPermisProcedimentOrganByProcediment(procedimentId, organActual));
-			} else if (TipusPermis.PROCEDIMENT.equals(tipus)) {
-				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
-			} else {
-				if (organ == null)
-					permisos = findPermisProcedimentOrganByProcediment(procedimentId, organActual);
-				else 
-					permisos = findPermisProcedimentOrgan(procedimentId, organ, organActual);
+				permisosHelper.ordenarPermisos(paginacioParams, permisos);
+				return permisos;
 			}
-			Collections.sort(permisos, new Comparator<PermisDto>() {
-				@Override
-				public int compare(PermisDto p1, PermisDto p2) {
-					int comp = p1.getNomSencerAmbCodi().compareTo(p2.getNomSencerAmbCodi());
-					if (comp == 0) {
-						if (p1.getOrgan() == null && p2.getOrgan() != null)
-							return 1;
-						if (p1.getOrgan() != null && p2.getOrgan() == null)
-							return -1;
-						if(p1.getOrgan() == null && p2.getOrgan() == null)
-							return p1.getTipus().compareTo(p2.getTipus());
-						
-						return p1.getOrgan().compareTo(p2.getOrgan());
-					}
-					return comp;
-				}
-			});
+
+			if (TipusPermis.PROCEDIMENT.equals(tipus)) {
+				permisos = findPermisProcediment(procediment, adminOrgan, organActual);
+				permisosHelper.ordenarPermisos(paginacioParams, permisos);
+				return permisos;
+			}
+
+			permisos =  (organ == null) ? findPermisProcedimentOrganByProcediment(procedimentId, organActual)
+					: findPermisProcedimentOrgan(procedimentId, organ, organActual);
+			permisosHelper.ordenarPermisos(paginacioParams, permisos);
 			return permisos;
 		} finally {
 			metricsHelper.fiMetrica(timer);

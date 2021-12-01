@@ -106,7 +106,8 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<PermisDto> permisFind(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id,
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public void permisUpdate(

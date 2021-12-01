@@ -457,19 +457,14 @@ public class EntitatServiceImpl implements EntitatService {
 	
 	@Transactional
 	@Override
-	public List<PermisDto> permisFindByEntitatId(
-			Long entitatId) {
+	public List<PermisDto> permisFindByEntitatId(Long entitatId, PaginacioParamsDto paginacioParams) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true );
-			return permisosHelper.findPermisos(
-					entitatId,
-					EntitatEntity.class);
+			entityComprovarHelper.comprovarPermisos(null,true,true,true);
+			List<PermisDto> permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
+			permisosHelper.ordenarPermisos(paginacioParams, permisos);
+			return permisos;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

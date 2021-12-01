@@ -6,6 +6,7 @@ import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 /**
@@ -261,7 +262,8 @@ public interface ProcedimentService {
 			Long procedimentId,
 			String organ,
 			String organActual,
-			TipusPermis tipus) throws NotFoundException;
+			TipusPermis tipus,
+			PaginacioParamsDto paginacioParams) throws NotFoundException;
 	
 	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a un procediment.

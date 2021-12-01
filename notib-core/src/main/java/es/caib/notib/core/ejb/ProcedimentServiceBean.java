@@ -211,14 +211,16 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			Long procedimentId,
 			String organ,
 			String organActual,
-			TipusPermis tipus) throws NotFoundException {
+			TipusPermis tipus,
+			PaginacioParamsDto paginacioParams) throws NotFoundException {
 		return delegate.permisFind(
 				entitatId, 
 				isAdministrador, 
 				procedimentId,
 				organ,
 				organActual,
-				tipus);
+				tipus,
+				paginacioParams);
 	}
 
 	@Override

@@ -725,31 +725,22 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Transactional
 	@Override
-	public List<PermisDto> permisFind(
-			Long entitatId,
-			Long id) {
+	public List<PermisDto> permisFind(Long entitatId, Long id,  PaginacioParamsDto paginacioParams) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta dels permisos de l'organ gestor ("
 					+ "entitatId=" + entitatId +  ", "
 					+ "id=" + id +  ")"); 
 			EntitatEntity entitat = null;
-			
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
-			if (entitatId != null)
-				entitat = entityComprovarHelper.comprovarEntitat(
-						entitatId);
-//						true,
-//						false,
-//						false);
-			
-			entityComprovarHelper.comprovarOrganGestor(
-					entitat, 
-					id);
-			
-			return permisosHelper.findPermisos(
-					id,
-					OrganGestorEntity.class);
+			if (entitatId != null) {
+				entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			}
+			entityComprovarHelper.comprovarOrganGestor(entitat, id);
+			List<PermisDto> permisos =  permisosHelper.findPermisos(id, OrganGestorEntity.class);
+			permisosHelper.ordenarPermisos(paginacioParams, permisos);
+			return permisos;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

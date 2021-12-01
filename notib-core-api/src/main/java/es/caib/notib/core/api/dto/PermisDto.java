@@ -74,9 +74,13 @@ public class PermisDto implements Serializable {
 	}
 
 	// Comparadors
+	private static Comparator<PermisDto> tipusComparator;
+	private static Comparator<PermisDto> nomSencerAmbCodiComparator;
+	private static Comparator<PermisDto> organCodiNomComparator;
 	private static Comparator<PermisDto> readComparator;
 	private static Comparator<PermisDto> processarComparator;
 	private static Comparator<PermisDto> notificacioComparator;
+	private static Comparator<PermisDto> comunsComparator;
 	private static Comparator<PermisDto> administrationComparator;
 	private static Comparator<PermisDto> administradorComparator;
 	
@@ -87,58 +91,92 @@ public class PermisDto implements Serializable {
             }
         };
     }
+
+	public static Comparator<PermisDto> sortByTipus() {
+		return tipusComparator != null ? tipusComparator : new TipusComparator();
+	}
+	public static Comparator<PermisDto> sortByNomSencerAmbCodiComparator() {
+		return nomSencerAmbCodiComparator != null ? nomSencerAmbCodiComparator : new NomSencerAmbCodiComparator();
+	}
+	public static Comparator<PermisDto> sortByOrganCodiNomComparator() {
+		return organCodiNomComparator != null ? organCodiNomComparator : new OrganCodiNomComparator();
+	}
 	
 	public static Comparator<PermisDto> sortByRead() {
-		if (readComparator == null) {
-			readComparator = new ReadComparator();
-        }
-        return readComparator;
+		return readComparator != null ?	readComparator : new ReadComparator();
     }
 	
 	public static Comparator<PermisDto> sortByProcessar() {
-		if (processarComparator == null) {
-			processarComparator = new ProcessarComparator();
-        }
-        return processarComparator;
+		return processarComparator != null ? processarComparator : new ProcessarComparator();
     }
 	
 	public static Comparator<PermisDto> sortByNotificacio() {
-		if (notificacioComparator == null) {
-			notificacioComparator = new NotificacioComparator();
-        }
-        return notificacioComparator;
+		return notificacioComparator != null ? notificacioComparator : new NotificacioComparator();
     }
+
+    public static Comparator<PermisDto> sortByComuns() {
+		return comunsComparator != null ? comunsComparator : new ComunsComparator();
+	}
 	
 	public static Comparator<PermisDto> sortByAdministration() {
-		if (administrationComparator == null) {
-			administrationComparator = new AdministrationComparator();
-        }
-        return administrationComparator;
+		return administrationComparator != null ? administrationComparator : new AdministrationComparator();
     }
 	
 	public static Comparator<PermisDto> sortByAdministrador() {
-		if (administradorComparator == null) {
-			administradorComparator = new AdministradorComparator();
-        }
-        return administradorComparator;
+		return administradorComparator != null ? administradorComparator : new AdministradorComparator();
     }
-	
-	private static class ReadComparator implements Comparator<PermisDto> {
+
+	private static class TipusComparator implements java.util.Comparator<PermisDto> {
+		public int compare(PermisDto p1, PermisDto p2) {
+			return p1.getTipus().compareTo(p2.getTipus());
+		}
+	}
+
+	private static class NomSencerAmbCodiComparator implements java.util.Comparator<PermisDto> {
+		public int compare(PermisDto p1, PermisDto p2) {
+			if (p1.getNomSencerAmbCodi() == null) {
+				return  p2.getNomSencerAmbCodi() != null ? 0 : -1;
+			}
+			if (p2.getNomSencerAmbCodi() == null) {
+				return 1;
+			}
+			return p1.getNomSencerAmbCodi().toLowerCase().compareTo(p2.getNomSencerAmbCodi().toLowerCase());
+		}
+	}
+
+	private static class OrganCodiNomComparator implements java.util.Comparator<PermisDto> {
+		public int compare(PermisDto p1, PermisDto p2) {
+			if (p1.getOrganCodiNom() == null) {
+				return p2.getOrganCodiNom() != null ? 0 : -1;
+			}
+			if (p2.getOrganCodiNom() == null) {
+				return 1;
+			}
+			return p1.getOrganCodiNom().toLowerCase().compareTo(p2.getOrganCodiNom().toLowerCase());
+		}
+	}
+
+	private static class ReadComparator implements java.util.Comparator<PermisDto> {
         public int compare(PermisDto p1, PermisDto p2) {  
             return p1.isRead() == p2.isRead() ? 0 : (p1.isRead() ? 1 : -1);
         }  
     }
 	
-	private static class ProcessarComparator implements Comparator<PermisDto> {
+	private static class ProcessarComparator implements java.util.Comparator<PermisDto> {
         public int compare(PermisDto p1, PermisDto p2) {  
         	return p1.isProcessar() == p2.isProcessar() ? 0 : (p1.isProcessar() ? 1 : -1);
         }  
     }
 	
-	private static class NotificacioComparator implements Comparator<PermisDto> {
+	private static class NotificacioComparator implements java.util.Comparator<PermisDto> {
         public int compare(PermisDto p1, PermisDto p2) {  
         	return p1.isNotificacio() == p2.isNotificacio() ? 0 : (p1.isNotificacio() ? 1 : -1);
         }  
+    }
+    private static class ComunsComparator implements Comparator<PermisDto> {
+        public int compare(PermisDto p1, PermisDto p2) {
+        	return p1.isComuns() == p2.isComuns() ? 0 : (p1.isComuns() ? 1 : -1);
+        }
     }
 	
 	private static class AdministrationComparator implements Comparator<PermisDto> {

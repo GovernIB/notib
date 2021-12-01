@@ -32,11 +32,11 @@ pageContext.setAttribute(
 	<table 
 		id="taulaDades" 
 		data-toggle="datatable" 
-		data-url="<c:url value="/procediment/${procediment.id}/permis/datatable"/>" 
+		data-url="<c:url value="/procediment/${procediment.id}/permis/datatable"/>"
 		data-search-enabled="false" 
 		data-paging-enabled="false" 
 		data-default-order="1" 
-		data-default-dir="asc" 
+		data-default-dir="asc"
 		data-botons-template="#tableButtonsTemplate" 
 		class="table table-striped table-bordered" 
 		style="width:100%">

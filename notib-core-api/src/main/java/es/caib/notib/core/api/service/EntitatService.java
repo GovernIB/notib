@@ -190,8 +190,7 @@ public interface EntitatService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	public List<PermisDto> permisFindByEntitatId(
-			Long entitatId) throws NotFoundException;
+	List<PermisDto> permisFindByEntitatId(Long entitatId, PaginacioParamsDto paramsDto) throws NotFoundException;
 
 	/**
 	 * Modifica els permisos d'un usuari o d'un rol per a una entitat com a
