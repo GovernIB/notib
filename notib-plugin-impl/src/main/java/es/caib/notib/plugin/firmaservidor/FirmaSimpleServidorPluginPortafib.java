@@ -29,8 +29,8 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 	public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
-	
-	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.signatura.portafib.";
+
+	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.firmaservidor.portafib.";
 
 	@Override
 	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
@@ -79,7 +79,7 @@ import java.util.List;
 		String signID = "999";
 		String name = fileToSign.getNom();
 		String reason = motiu;
-		String location = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
+		String location = getPropertyLocation();
 
 		int signNumber = 1;
 		String languageSign = "ca";
@@ -96,12 +96,12 @@ import java.util.List;
 				tipusDocumentalID);
 
 		String languageUI = "ca";
-		String username = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username", null);
+		String certificat = getPropertyCertificat();
 		String administrationID = null;
-		String signerEmail = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "signerEmail", "suport@caib.es");
+		String signerEmail = getPropertySignerEmail();
 
 		FirmaSimpleCommonInfo commonInfo;
-		commonInfo = new FirmaSimpleCommonInfo(perfil, languageUI, username, administrationID, signerEmail);
+		commonInfo = new FirmaSimpleCommonInfo(perfil, languageUI, certificat, administrationID, signerEmail);
 
 		logger.debug("languageUI = |" + languageUI + "|");
 
@@ -141,45 +141,53 @@ import java.util.List;
 		}
 	}
 
-	 public void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
+	private void getAvailableProfiles(ApiFirmaEnServidorSimple api) throws Exception {
 
 		    final String languagesUI[] = new String[] { "ca", "es" };
 
 		    for (String languageUI : languagesUI) {
-		      logger.debug(" ==== LanguageUI : " + languageUI + " ===========");
+		      logger.info(" ==== LanguageUI : " + languageUI + " ===========");
 
 		      List<FirmaSimpleAvailableProfile> listProfiles = api.getAvailableProfiles(languageUI);
 		      if (listProfiles.size() == 0) {
-		        logger.debug("NO HI HA PERFILS PER AQUEST USUARI APLICACIÓ");
+		        logger.info("NO HI HA PERFILS PER AQUEST USUARI APLICACIÓ");
 		      } else {
 		        for (FirmaSimpleAvailableProfile ap : listProfiles) {
-		          logger.debug("  + " + ap.getName() + ":");
-		          logger.debug("      * Codi: " + ap.getCode());
-		          logger.debug("      * Desc: " + ap.getDescription());
+		          logger.info("  + " + ap.getName() + ":");
+		          logger.info("      * Codi: " + ap.getCode());
+		          logger.info("      * Desc: " + ap.getDescription());
 		        }
 		      }
 		    }
 	 }
-	
-	
+
+
 	private String getPropertyEndpoint() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.api.firma.en.servidor.simple.endpoint");
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "endpoint");
 	}
-	
+
 	private String getPropertyUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.api.firma.en.servidor.simple.username");
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username");
 	}
-	
+
 	private String getPropertyPassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.api.firma.en.servidor.simple.password");
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "password");
 	}
-	
+
 	private String getPropertyPerfil() {
-		return System.getProperty(
-				"es.caib.notib.plugin.api.firma.en.servidor.simple.perfil");
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "perfil");
+	}
+
+	private String getPropertyLocation() {
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
+	}
+
+	private String getPropertySignerEmail() {
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "signerEmail", "suport@caib.es");
+	}
+
+	private String getPropertyCertificat() {
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "certificat");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);

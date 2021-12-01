@@ -123,6 +123,13 @@
 			<version>1.2.14</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-bundle</artifactId>
+			<version>1.19.4</version>
+		</dependency>
+
 		<!-- Fi signatura en el servidor amb PortaFib -->
 	</dependencies>
 	<build>
