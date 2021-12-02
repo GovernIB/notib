@@ -518,7 +518,7 @@
             <not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
         </div>
         <div class="col-md-6">
-            <not:inputSelect id="organGestor" name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor"
+            <not:inputSelect id="organGestor" name="organGestor" placeholderKey="notificacio.form.camp.organEmisor"
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
@@ -645,7 +645,7 @@
             </script>
         </th--%>
         <th data-col-name="organEstat" data-visible="false"></th>
-        <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organGestor"/>
+        <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organEmisor"/>
             <script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organGestorDesc}}
 						{{if organEstat != 'VIGENT'}}
