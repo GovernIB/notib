@@ -96,7 +96,7 @@ import java.util.List;
 				tipusDocumentalID);
 
 		String languageUI = "ca";
-		String certificat = getPropertyCertificat();
+		String certificat = getPropertyUsuariFirma();
 		String administrationID = null;
 		String signerEmail = getPropertySignerEmail();
 
@@ -167,11 +167,11 @@ import java.util.List;
 	}
 
 	private String getPropertyUsername() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username");
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "auth.username");
 	}
 
 	private String getPropertyPassword() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "password");
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "auth.password");
 	}
 
 	private String getPropertyPerfil() {
@@ -186,8 +186,8 @@ import java.util.List;
 		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "signerEmail", "suport@caib.es");
 	}
 
-	private String getPropertyCertificat() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "certificat");
+	private String getPropertyUsuariFirma() {
+		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);
