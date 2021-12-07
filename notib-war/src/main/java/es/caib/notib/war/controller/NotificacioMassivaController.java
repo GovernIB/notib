@@ -5,10 +5,12 @@ import es.caib.notib.core.api.dto.notificacio.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.InvalidCSVFileNotificacioMassivaException;
 import es.caib.notib.core.api.exception.MaxLinesExceededException;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.NotificacioMassivaException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GestioDocumentalService;
 import es.caib.notib.core.api.service.NotificacioMassivaService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.NotificacioMassivaCommand;
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -43,21 +46,28 @@ import java.util.Date;
 @Slf4j
 @Controller
 @RequestMapping("/notificacio/massiva")
-public class NotificacioMassivaController extends BaseUserController {
+public class NotificacioMassivaController extends TableAccionsMassivesController {
 
     private final static String TABLE_FILTRE = "not_massiva_filtre";
     private final static String TABLE_NOTIFICACIONS_FILTRE = "not_massiva_nots_filtre";
+    private static final String SESSION_ATTRIBUTE_SELECCIO = "NotificacioController.session.seleccio";
 
     @Autowired
     private AplicacioService aplicacioService;
     @Autowired
     private NotificacioMassivaService notificacioMassivaService;
     @Autowired
+    private NotificacioService notificacioService;
+    @Autowired
     private OperadorPostalService operadorPostalService;
     @Autowired
     private NotificacioListHelper notificacioListHelper;
     @Autowired
     private GestioDocumentalService gestioDocumentalService;
+
+    public NotificacioMassivaController() {
+        super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String mainPage(
@@ -85,6 +95,7 @@ public class NotificacioMassivaController extends BaseUserController {
 
         return "notificacioMassivaList";
     }
+
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
@@ -263,7 +274,7 @@ public class NotificacioMassivaController extends BaseUserController {
                             "notificacio.controller.entitat.cap.assignada"));
         }
 
-        return DatatablesHelper.getDatatableResponse(request, notificacions);
+        return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
     }
 
     @RequestMapping(value = "/new")
@@ -400,4 +411,22 @@ public class NotificacioMassivaController extends BaseUserController {
         return notificacioMassivaFiltreCommand;
     }
 
+    @Override
+    protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        String organGestorCodi = null;
+        if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
+            OrganGestorDto organGestorActual = getOrganGestorActual(request);
+            organGestorCodi = organGestorActual.getCodi();
+
+        }
+        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+        NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
+        assert entitatActual != null;
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(),
+                RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+                organGestorCodi,
+                usuariActual.getCodi(),
+                filtre);
+    }
 }

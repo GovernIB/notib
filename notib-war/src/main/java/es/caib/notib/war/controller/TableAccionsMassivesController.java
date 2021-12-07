@@ -36,7 +36,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     @Autowired
     private EnviamentService enviamentService;
 
-    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @RequestMapping(value = {"/select", "{notificacioId}/notificacio/select"}, method = RequestMethod.GET)
     @ResponseBody
     public int select(
             HttpServletRequest request,
@@ -59,7 +59,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return seleccio.size();
     }
 
-    @RequestMapping(value = "/deselect", method = RequestMethod.GET)
+    @RequestMapping(value = {"/deselect", "{notificacioId}/notificacio/deselect"}, method = RequestMethod.GET)
     @ResponseBody
     public int deselect(
             HttpServletRequest request,
@@ -84,8 +84,8 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
         return seleccio.size();
     }
-
-    @RequestMapping(value = "/export/{format}", method = RequestMethod.GET)
+    // TODO SEGUIR AQUÍ 
+    @RequestMapping(value = {"/export/{format}", "{notificacioId}/notificacio/export/{format}"}, method = RequestMethod.GET)
     public String export(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -97,7 +97,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                     getMessage(
                             request,
                             "enviament.controller.exportacio.seleccio.buida"));
-            return "redirect:../..";
+            return "redirect:../.." + (requestIsRemesesEnviamentMassiu(request) ? "/remeses" : "");
         } else {
             EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
             FitxerDto fitxer;
@@ -118,7 +118,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         }
     }
 
-    @RequestMapping(value = "/reintentar/notificacio", method = RequestMethod.GET)
+    @RequestMapping(value = {"/reintentar/notificacio", "{notificacioId}/notificacio/reintentar/notificacio"}, method = RequestMethod.GET)
     @ResponseBody
     public String reintentarNotificacio(
             HttpServletRequest request,
@@ -264,7 +264,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return "redirect:" + request.getHeader("Referer");
     }
 
-    @RequestMapping(value = "/actualitzarestat", method = RequestMethod.GET)
+    @RequestMapping(value = {"/actualitzarestat", "{notificacioId}/notificacio/actualitzarestat"}, method = RequestMethod.GET)
     @ResponseBody
     public String actualitzarEstat(
             HttpServletRequest request,
@@ -380,9 +380,13 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         );
     }
 
+    protected boolean requestIsRemesesEnviamentMassiu(HttpServletRequest request) {
+        return request.getRequestURI().contains("/notib/notificacio/");
+    }
+
     protected Set<Long> getIdsEnviamentsSeleccionats(HttpServletRequest request) {
         Set<Long> ids = getIdsSeleccionats(request);
-        return request.getRequestURI().contains("/notib/notificacio/") ? enviamentService.findIdsByNotificacioIds(ids) : ids;
+        return requestIsRemesesEnviamentMassiu(request) ? enviamentService.findIdsByNotificacioIds(ids) : ids;
     }
 
     protected Set<Long> getIdsSeleccionats(HttpServletRequest request) {

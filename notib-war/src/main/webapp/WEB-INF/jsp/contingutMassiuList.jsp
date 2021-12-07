@@ -184,7 +184,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 			</a>
 		</div>
 	</script>
-		
+
 	<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="notificacioErrorCallbackFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
