@@ -561,7 +561,7 @@
         </div>
     </div>
 </form:form>
-<c:if test="${empty notificacioMassivaId}">
+
 <script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -592,7 +592,7 @@
 			</div>
 		</div>
 	</script>
-</c:if>
+
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <table
         id="notificacio"
@@ -609,8 +609,8 @@
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
         data-rowhref-template="#rowhrefTemplate"
-        <c:if test="${empty notificacioMassivaId}">data-botons-template="#botonsTemplate"</c:if>
-        data-selection-enabled="${empty notificacioMassivaId}"
+        data-botons-template="#botonsTemplate"
+        data-selection-enabled="true"
         data-rowhref-toggle="modal"
 >
     <thead>
