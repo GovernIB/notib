@@ -56,7 +56,7 @@ public class ReintentMassiuController extends BaseUserController {
 		} else {
 			model.addAttribute("mantenirPaginacio", false);
 		}
-		model.addAttribute(new NotificacioErrorCallbackFiltreCommand());
+		model.addAttribute(getFiltre(request));
 		model.addAttribute("procediments", procedimentService.findAll());
 		model.addAttribute("notificacioEstats", 
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
@@ -96,6 +96,11 @@ public class ReintentMassiuController extends BaseUserController {
 				 "id",
 				 SESSION_ATTRIBUTE_SELECCIO);
 		
+	}
+
+	private NotificacioErrorCallbackFiltreCommand getFiltre(HttpServletRequest request) {
+		NotificacioErrorCallbackFiltreDto filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
+		return filtre != null ? NotificacioErrorCallbackFiltreCommand.asCommand(filtre) : new NotificacioErrorCallbackFiltreCommand();
 	}
 	
 	@SuppressWarnings("unchecked")
