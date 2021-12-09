@@ -186,9 +186,9 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 			}else {
 				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
 						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
-						filtre.getOrganismePagador(),
+						filtre.getOrganismePagador() != null ? filtre.getOrganismePagador() : "",
 						filtre.getContracteNum() == null || filtre.getContracteNum().isEmpty(),
-						filtre.getContracteNum(),
+						filtre.getContracteNum() != null ? filtre.getContracteNum() : "",
 						entitat,
 						pageable);
 			}
