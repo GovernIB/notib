@@ -18,6 +18,7 @@ import es.caib.notib.core.entity.EntitatTipusDocEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EntitatTipusDocRepository;
 import es.caib.notib.core.repository.EntregaCieRepository;
@@ -77,6 +78,8 @@ public class EntitatServiceImpl implements EntitatService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private EntregaCieRepository entregaCieRepository;
+	@Autowired
+	private ColumnesRepository columnesRepository;
 
 	@Transactional
 	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -285,6 +288,7 @@ public class EntitatServiceImpl implements EntitatService {
 			if (!tipusDocsEntity.isEmpty()) {
 				entitatTipusDocRepository.delete(tipusDocsEntity);
 			}
+			columnesRepository.deleteByEntitatId(id);
 			entitatRepository.delete(entitat);
 			permisosHelper.deleteAcl(
 					entitat.getId(),
