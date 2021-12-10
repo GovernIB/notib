@@ -44,7 +44,7 @@ public class NotificacioCommand {
 	private String organGestor;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private TipusEnviamentEnumDto enviamentTipus;
-	@Size(min=3, max=240)
+	@Size(min=3, max=226)
 	private String concepte;
 	@Size(max=1000)
 	private String descripcio;
