@@ -475,7 +475,7 @@
 	    <repository>
 	       <id>github-governib-maven-repos</id>
 	       <name>GovernIB Maven Repository</name>
-	       <url>http://governib.github.io/maven/maven/</url>
+	       <url>https://governib.github.io/maven/maven/</url>
 	    </repository>
 		<repository>
 			<id>mvn-local-repo</id>

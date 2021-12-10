@@ -41,6 +41,8 @@ public class NotificacioTableItemDto {
 
 	private boolean permisProcessar;
 
+	private boolean comunicacioSir;
+
 	private String entitatNom;
 	private String procedimentCodi;
 	private String procedimentNom;
@@ -53,6 +55,9 @@ public class NotificacioTableItemDto {
 
 	protected int registreEnviamentIntent;
 
+	public void setEstat(NotificacioEstatEnumDto estat) {
+		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
+	}
 
 	public boolean isNotificaError() {
 		return notificaErrorData != null;

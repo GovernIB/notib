@@ -675,7 +675,7 @@
 						{{else estat == 'PENDENT'}}
 							<span class="fa fa-clock-o"></span>
 							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{else estat == 'ENVIADA'}}
+						{{else estat == 'ENVIADA' || estat == 'ENVIAT_SIR'}}
 							<span class="fa fa-send-o"></span>
 							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'FINALITZADA'}}

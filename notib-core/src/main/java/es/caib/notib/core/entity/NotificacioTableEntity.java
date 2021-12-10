@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.entity;
 
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -132,6 +133,19 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	@Setter
 	@Transient
 	private boolean hasEnviamentsPendentsRegistre;
+
+	public boolean isComunicacioSir() { // Per al mapping al DTO
+		if (!NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(this.getEnviamentTipus())) {
+			return false;
+		}
+
+		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	private static final long serialVersionUID = 458331024861203562L;
 }
