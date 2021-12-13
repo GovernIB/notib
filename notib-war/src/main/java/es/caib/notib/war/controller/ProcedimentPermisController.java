@@ -8,9 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.helper.PaginacioHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -59,9 +57,7 @@ public class ProcedimentPermisController extends BaseUserController{
 	GrupService grupsService;
 	@Autowired
 	OrganGestorService organGestorService;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	
+
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -178,16 +174,6 @@ public class ProcedimentPermisController extends BaseUserController{
 		return "procedimentAdminPermisForm";
 	}
 
-	public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
-		Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
-		mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
-		mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organCodi"});
-		mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"procedimentNom"});
-		mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
-		mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
-		return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-	}
-	
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
