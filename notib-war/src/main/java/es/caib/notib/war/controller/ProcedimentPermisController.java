@@ -1,10 +1,13 @@
 package es.caib.notib.war.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,7 +57,7 @@ public class ProcedimentPermisController extends BaseUserController{
 	GrupService grupsService;
 	@Autowired
 	OrganGestorService organGestorService;
-	
+
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -81,6 +84,8 @@ public class ProcedimentPermisController extends BaseUserController{
 			HttpServletRequest request, 
 			@PathVariable Long procedimentId, 
 			Model model) {
+
+		PaginacioParamsDto paginacioParams = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		List<PermisDto> permisos = procedimentService.permisFind(
@@ -89,7 +94,8 @@ public class ProcedimentPermisController extends BaseUserController{
 				procedimentId,
 				null,
 				organGestorActual != null ? organGestorActual.getCodi() : null,
-				null);
+				null,
+				paginacioParams);
 		return DatatablesHelper.getDatatableResponse(request, permisos,	"id");
 	}
 	
@@ -109,7 +115,8 @@ public class ProcedimentPermisController extends BaseUserController{
 			@PathVariable Long procedimentId,
 			@PathVariable Long permisId,
 			Model model) {
-		return getPermis(request, procedimentId, permisId, model, TipusPermis.PROCEDIMENT, null);
+
+		return getPermis(request, procedimentId, permisId, model, TipusPermis.PROCEDIMENT, null, null);
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/organ/{organ}/permis/{permisId}", method = RequestMethod.GET)
@@ -119,7 +126,8 @@ public class ProcedimentPermisController extends BaseUserController{
 			@PathVariable String organ,
 			@PathVariable Long permisId,
 			Model model) {
-		return getPermis(request, procedimentId, permisId, model, TipusPermis.PROCEDIMENT_ORGAN, organ);
+
+		return getPermis(request, procedimentId, permisId, model, TipusPermis.PROCEDIMENT_ORGAN, organ, null);
 	}
 
 	private String getPermis(
@@ -128,7 +136,8 @@ public class ProcedimentPermisController extends BaseUserController{
 			Long permisId, 
 			Model model,
 			TipusPermis tipus,
-			String organ) {
+			String organ,
+			PaginacioParamsDto paginacioParams) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		ProcSerDto procediment = procedimentService.findById(
@@ -138,13 +147,17 @@ public class ProcedimentPermisController extends BaseUserController{
 		model.addAttribute("procediment", procediment);
 		PermisDto permis = null;
 		if (permisId != null) {
+
+
+
 			List<PermisDto> permisos = procedimentService.permisFind(
 					entitatActual.getId(),
 					isAdministrador(request),
 					procedimentId, 
 					organ,
 					organGestorActual != null ? organGestorActual.getCodi() : null,
-					tipus);
+					tipus,
+					paginacioParams);
 			for (PermisDto p: permisos) {
 				if (p.getId().equals(permisId)) {
 					permis = p;
@@ -160,7 +173,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			model.addAttribute("organs", getOrganismes(request));
 		return "procedimentAdminPermisForm";
 	}
-	
+
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,

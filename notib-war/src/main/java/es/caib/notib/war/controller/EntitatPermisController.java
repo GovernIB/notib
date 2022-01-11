@@ -6,6 +6,8 @@ package es.caib.notib.war.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,7 +51,8 @@ public class EntitatPermisController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable Long entitatId) {
 		List<PermisDto> permisos = null;
-		permisos = entitatService.permisFindByEntitatId(entitatId);
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		permisos = entitatService.permisFindByEntitatId(entitatId, paginacio);
 		return DatatablesHelper.getDatatableResponse(request, permisos);
 	}
 
@@ -77,7 +80,7 @@ public class EntitatPermisController extends BaseController {
 				"entitat", 
 				entitatService.findById(entitatId));
 		List<PermisDto> permisos = null;
-		permisos = entitatService.permisFindByEntitatId(entitatId);
+		permisos = entitatService.permisFindByEntitatId(entitatId, null);
 		PermisDto permis = null;
 		for (PermisDto p: permisos) {
 			if (p.getId().equals(permisId)) {

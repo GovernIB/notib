@@ -51,7 +51,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esDir3CodiNull = true or lower(nenv.organCodi) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) "+
-			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) "+
+			"and (:isNumeroRegistreNull = true or cast(nenv.registreNumero as string) like lower('%'||:numeroRegistre||'%')) " +
 			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') "+
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
@@ -164,7 +164,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esDir3CodiNull = true or lower(nenv.organCodi) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) " +
-			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) " +
+			"and (:isNumeroRegistreNull = true or cast(nenv.registreNumero as string) like lower('%'||:numeroRegistre||'%')) " +
 			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') " +
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi) " +
@@ -261,7 +261,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"and (:esDir3CodiNull = true or lower(CASE WHEN nenv.organCodi is null THEN '' ELSE nenv.organCodi END) like lower('%'||:dir3Codi||'%')) " +
 			"and (:isNumeroCertCorreusNull = true or nenv.notificaCertificacioNumSeguiment like lower('%'||:numeroCertCorreus||'%')) " +
 			"and (:isUsuariNull = true or nenv.usuariCodi like lower('%'||:usuari||'%')) " +
-			"and (:isNumeroRegistreNull = true or nenv.registreNumero like lower('%'||:numeroRegistre||'%')) " +
+			"and (:isNumeroRegistreNull = true or cast(nenv.registreNumero as string) like lower('%'||:numeroRegistre||'%')) " +
 			"and (:isNotificaReferenciaNull = true or nenv.notificaReferencia like '%'||:notificaReferencia||'%') " +
 			"and (:esDataRegistreIniciNull = true or nenv.registreData >= :dataRegistreInici) " +
 			"and (:esDataRegistreFiNull = true or nenv.registreData <= :dataRegistreFi)" +

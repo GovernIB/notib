@@ -30,7 +30,7 @@ public class AccesSuperInterceptor extends HandlerInterceptorAdapter {
 			Object handler) throws Exception {
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		if (!RolHelper.isUsuariActualAdministrador(request))
-			throw new SecurityException("Es necessari el rol de superusuari per accedir a aquesta página. L'usuari actual " + usuariActual.getCodi() + " no té el rol.", null);
+			throw new SecurityException("Es necessari el rol de superusuari per accedir a aquesta página.", null); // L'usuari actual " + usuariActual.getCodi() + " no té el rol.", null);
 		
 		return true;
 	}

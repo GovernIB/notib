@@ -43,7 +43,7 @@
 					<spring:message code="entitat.permis.list.columna.tipus"/>
 				</th>
 				<th data-col-name="nomSencerAmbCodi"><spring:message code="entitat.permis.form.camp.principal"/></th>
-				<th data-template="#cellPermisosTemplate">
+				<th data-orderable="false" data-template="#cellPermisosTemplate">
 					<spring:message code="entitat.permis.list.columna.permisos"/>
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						{{if usuari}}<span class="label label-default"><spring:message code="entitat.permis.list.permis.usuari"/></span>{{/if}}

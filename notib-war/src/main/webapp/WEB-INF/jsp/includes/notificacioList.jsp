@@ -518,7 +518,7 @@
             <not:inputText name="identificador" inline="true" placeholderKey="notificacio.list.filtre.camp.identificador"/>
         </div>
         <div class="col-md-6">
-            <not:inputSelect id="organGestor" name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor"
+            <not:inputSelect id="organGestor" name="organGestor" placeholderKey="notificacio.form.camp.organEmisor"
                              inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
         </div>
     </div>
@@ -561,7 +561,7 @@
         </div>
     </div>
 </form:form>
-<c:if test="${empty notificacioMassivaId}">
+
 <script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -592,7 +592,7 @@
 			</div>
 		</div>
 	</script>
-</c:if>
+
 <script id="rowhrefTemplate" type="text/x-jsrender"><c:url value="/notificacio/{{:id}}/info"/></script>
 <table
         id="notificacio"
@@ -609,8 +609,8 @@
         data-mantenir-paginacio="true"
         data-paging-style-x="true"
         data-rowhref-template="#rowhrefTemplate"
-        <c:if test="${empty notificacioMassivaId}">data-botons-template="#botonsTemplate"</c:if>
-        data-selection-enabled="${empty notificacioMassivaId}"
+        data-botons-template="#botonsTemplate"
+        data-selection-enabled="true"
         data-rowhref-toggle="modal"
 >
     <thead>
@@ -645,7 +645,7 @@
             </script>
         </th--%>
         <th data-col-name="organEstat" data-visible="false"></th>
-        <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organGestor"/>
+        <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organEmisor"/>
             <script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organGestorDesc}}
 						{{if organEstat != 'VIGENT'}}
@@ -675,7 +675,7 @@
 						{{else estat == 'PENDENT'}}
 							<span class="fa fa-clock-o"></span>
 							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{else estat == 'ENVIADA'}}
+						{{else estat == 'ENVIADA' || estat == 'ENVIAT_SIR'}}
 							<span class="fa fa-send-o"></span>
 							{{:~eval('notificacioEstats["' + estat + '"]')}}
 						{{else estat == 'FINALITZADA'}}

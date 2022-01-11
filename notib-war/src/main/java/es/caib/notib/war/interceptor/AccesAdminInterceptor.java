@@ -31,8 +31,8 @@ public class AccesAdminInterceptor extends HandlerInterceptorAdapter {
 			Object handler) throws Exception {
 		if (!RolHelper.isUsuariActualAdministradorEntitat(request) && !RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			throw new SecurityException("Es necessari ser administrador d'òrgan gestor o d'entitat per accedir a aquesta página. " +
-					"L'usuari actual " + usuariActual.getCodi() + " no té cap rol requerit.", null);
+			throw new SecurityException("Es necessari ser administrador d'òrgan gestor o d'entitat per accedir a aquesta página.", null);
+//					"L'usuari actual " + usuariActual.getCodi() + " no té el rol requerit.", null);
 		}
 		return true;
 	}

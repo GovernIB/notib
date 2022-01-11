@@ -827,7 +827,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 "accio.massiva.creat.ok");
     }
 
-    @RequestMapping(value = "/processar/massiu", method = RequestMethod.GET)
+    @RequestMapping(value = {"/processar/massiu", "{notificacioId}/notificacio/"}, method = RequestMethod.GET)
     public String processarMassiuModal(
             HttpServletRequest request,
             Model model) {
@@ -837,7 +837,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return "notificacioMarcarProcessat";
     }
 
-    @RequestMapping(value = "/processar/massiu", method = RequestMethod.POST)
+    @RequestMapping(value = {"/processar/massiu", "{notificacioId}/notificacio/processar/massiu"}, method = RequestMethod.POST)
     public String processarMassiuPost(
             HttpServletRequest request,
             @Valid MarcarProcessatCommand command,
@@ -879,7 +879,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return getModalControllerReturnValueError(request, "redirect:../..", "notificacio.controller.processar.massiu.ko");
     }
 
-    @RequestMapping(value = "/eliminar", method = RequestMethod.GET)
+    @RequestMapping(value = {"/eliminar", "{notificacioId}/notificacio/eliminar/"} , method = RequestMethod.GET)
     public String eliminarMassiu(
             HttpServletRequest request,
             Model model) {

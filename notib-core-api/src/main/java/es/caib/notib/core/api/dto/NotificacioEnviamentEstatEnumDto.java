@@ -82,5 +82,5 @@ public enum NotificacioEnviamentEstatEnumDto implements Serializable {
 	REGISTRADA,
 	PROCESSADA,			// 25
 	ANULADA,
-	ENVIAT_SIR
+	ENVIAT_SIR			//28
 }

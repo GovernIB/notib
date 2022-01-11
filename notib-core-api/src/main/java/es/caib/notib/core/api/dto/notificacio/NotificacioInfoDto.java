@@ -86,6 +86,10 @@ public class NotificacioInfoDto extends AuditoriaDto {
 		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && registreEnviamentIntent == 0 && !isNotificaError();
 	}
 
+	public void setEstat(NotificacioEstatEnumDto estat) {
+		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

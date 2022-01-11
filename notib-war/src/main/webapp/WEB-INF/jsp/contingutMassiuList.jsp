@@ -158,7 +158,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 			});
 		});
 		$('#btnNetejar').click(function() {
-			$(':input', $('#filtre')).each (function() {
+			$(':input', $('#form-filtre')).each (function() {
 				var type = this.type, tag = this.tagName.toLowerCase();
 				if (type == 'text' || type == 'password' || tag == 'textarea') {
 					this.value = '';
@@ -184,11 +184,11 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 			</a>
 		</div>
 	</script>
-		
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioErrorCallbackFiltreCommand" >
+
+	<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="notificacioErrorCallbackFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
-				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="id" optionTextAttribute="nom" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-4">
 				<not:inputText name="concepte" inline="true" placeholderKey="notificacio.list.filtre.camp.concepte"/>
@@ -218,6 +218,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		data-url="<c:url value="/massiu/datatable"/>"
 		class="table table-bordered table-striped" 
 		data-default-dir="desc"
+	   	data-filter="#form-filtre"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
 		data-save-state="true"

@@ -21,7 +21,16 @@
 
 <html>
 <head>
-<title><spring:message code="notificacio.info.titol" /></title>
+<title>
+	<c:choose>
+		<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+			<spring:message code="comunicacio.info.titol" />
+		</c:when>
+		<c:otherwise>
+			<spring:message code="notificacio.info.titol" />
+		</c:otherwise>
+	</c:choose>
+</title>
 <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 <script src="<c:url value="/webjars/bootstrap/3.3.6/js/dropdown.js"/>"></script>
 <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
@@ -188,7 +197,16 @@ $(document).ready(function() {
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						<strong><spring:message code="notificacio.info.seccio.dades" /></strong>
+						<strong>
+						<c:choose>
+							<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+								<spring:message code="comunicacio.info.seccio.dades" />
+							</c:when>
+							<c:otherwise>
+								<spring:message code="notificacio.info.seccio.dades" />
+							</c:otherwise>
+						</c:choose>
+						</strong>
 					</h3>
 				</div>
 				<table class="table table-bordered" style="width: 100%">
@@ -342,7 +360,16 @@ $(document).ready(function() {
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							<strong><spring:message code="notificacio.info.seccio.document" /></strong>
+							<strong>
+								<c:choose>
+									<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO'}">
+										<spring:message code="comunicacio.info.seccio.document" />
+									</c:when>
+									<c:otherwise>
+										<spring:message code="notificacio.info.seccio.document" />
+									</c:otherwise>
+								</c:choose>
+							</strong>
 						</h3>
 					</div>
 					<table class="table table-bordered" style="width: 100%">

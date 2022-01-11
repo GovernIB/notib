@@ -64,10 +64,10 @@ public class AjaxUserController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Set<UsuariDto> setUsuaris = new HashSet<UsuariDto>();
 		try {
-			List<UsuariDto> usuarisWeb = aplicacioService.findUsuariAmbText(text);
+			String encoded = new String(text.getBytes("ISO-8859-1"), "UTF-8");
+			List<UsuariDto> usuarisWeb = aplicacioService.findUsuariAmbText(encoded);
 			setUsuaris.addAll(usuarisWeb);
-			
-			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), text);
+			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndText(entitatActual.getId(), encoded);
 			if (aplicacio != null) {
 				UsuariDto usuariAplciacio = new UsuariDto();
 				usuariAplciacio.setCodi(aplicacio.getUsuariCodi());

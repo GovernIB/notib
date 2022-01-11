@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.entity.acl.AclSidEntity;
@@ -782,6 +783,57 @@ public class PermisosHelper {
 		}
 		aclCache.clearCache();
 	}
+
+	public List<PermisDto> ordenarPermisos(PaginacioParamsDto paginacioParams, List<PermisDto> permisos) {
+
+		if (paginacioParams == null || permisos == null) {
+			return permisos;
+		}
+		final String ordre = paginacioParams.getOrdres() != null  && paginacioParams.getOrdres().get(0).getCamp() != null
+				? paginacioParams.getOrdres().get(0).getCamp() : null;
+
+		if (ordre == null) {
+			return permisos;
+		}
+		boolean desc = paginacioParams.getOrdres().get(0).getDireccio().equals(PaginacioParamsDto.OrdreDireccioDto.DESCENDENT);
+		Comparator<PermisDto> comp = null;
+		switch (ordre) {
+			case "tipus":
+				comp = desc ? PermisDto.decending(PermisDto.sortByTipus()) : PermisDto.sortByTipus();
+				break;
+			case "nomSencerAmbCodi":
+				comp = desc ? PermisDto.decending(PermisDto.sortByNomSencerAmbCodiComparator()) : PermisDto.sortByNomSencerAmbCodiComparator();
+				break;
+			case "organCodiNom":
+				comp = desc ? PermisDto.decending(PermisDto.sortByOrganCodiNomComparator()) : PermisDto.sortByOrganCodiNomComparator();
+				break;
+			case "read":
+				comp = desc ? PermisDto.decending(PermisDto.sortByRead()) : PermisDto.sortByRead();
+				break;
+			case "processar":
+				comp = desc ? PermisDto.decending(PermisDto.sortByProcessar()) : PermisDto.sortByProcessar();
+				break;
+			case "notificacio":
+				comp = desc ? PermisDto.decending(PermisDto.sortByNotificacio()) : PermisDto.sortByNotificacio();
+				break;
+			case "comuns":
+				comp = desc ? PermisDto.decending(PermisDto.sortByComuns()) : PermisDto.sortByComuns();
+				break;
+			case "administration":
+				comp = desc ? PermisDto.decending(PermisDto.sortByAdministration()) : PermisDto.sortByAdministration();
+				break;
+			case "administrador":
+				comp = desc ? PermisDto.decending(PermisDto.sortByAdministrador()) : PermisDto.sortByAdministrador();
+				break;
+			default:
+				break;
+		}
+		if (comp != null) {
+			Collections.sort(permisos, comp);
+		}
+		return permisos;
+	}
+
 
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);

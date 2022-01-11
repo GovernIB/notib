@@ -13,6 +13,7 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.PermisosHelper;
 import es.caib.notib.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,7 +45,7 @@ public class OrganGestorPermisController extends BaseUserController{
 	OrganGestorService organGestorService;
 	@Autowired
 	EntitatService entitatService;
-	
+
 	@RequestMapping(value = "/{organGestorId}/permis", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -69,38 +70,10 @@ public class OrganGestorPermisController extends BaseUserController{
 			HttpServletRequest request, 
 			@PathVariable Long organGestorId, 
 			Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		List<PermisDto> permisos = organGestorService.permisFind(
-				entitatActual.getId(), 
-				organGestorId);
-		if (paginacio.getOrdres() != null && !paginacio.getOrdres().isEmpty()) {
-			// Només ordenarem per un camp
-			OrdreDto ordre = paginacio.getOrdres().get(0);
-			boolean desc = ordre.getDireccio().equals(OrdreDireccioDto.DESCENDENT);
-			Comparator<PermisDto> comp = null;
-			
-			switch (ordre.getCamp()) {
-			case "read":
-				comp = desc ? PermisDto.decending(PermisDto.sortByRead()) : PermisDto.sortByRead();
-				break;
-			case "processar":
-				comp = desc ? PermisDto.decending(PermisDto.sortByProcessar()) : PermisDto.sortByProcessar();
-				break;
-			case "notificacio":
-				comp = desc ? PermisDto.decending(PermisDto.sortByNotificacio()) : PermisDto.sortByNotificacio();
-				break;
-			case "administration":
-				comp = desc ? PermisDto.decending(PermisDto.sortByAdministration()) : PermisDto.sortByAdministration();
-				break;
-			case "administrador":
-				comp = desc ? PermisDto.decending(PermisDto.sortByAdministrador()) : PermisDto.sortByAdministrador();
-				break;
-			}
-			if (comp != null)
-				Collections.sort(permisos, comp);
-		}
+		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
 		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 	}
 	
@@ -120,18 +93,13 @@ public class OrganGestorPermisController extends BaseUserController{
 			@PathVariable Long organGestorId,
 			@PathVariable Long permisId,
 			Model model) throws ValidationException {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute(
-				"organGestor",
-				organGestorService.findById(
-						entitatActual.getId(),
-						organGestorId));
+		model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 		PermisDto permis = null;
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (permisId != null) {
-			List<PermisDto> permisos = organGestorService.permisFind(
-					entitatActual.getId(),
-					organGestorId);
+			List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, null);
 			for (PermisDto p: permisos) {
 				if (p.getId().equals(permisId)) {
 					permis = p;
@@ -139,12 +107,10 @@ public class OrganGestorPermisController extends BaseUserController{
 				}
 			}
 		}
-		if (isAdminOrgan && permis != null && permis.isAdministrador())
+		if (isAdminOrgan && permis != null && permis.isAdministrador()) {
 			throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
-		if (permis != null)
-			model.addAttribute(PermisCommand.asCommand(permis));
-		else
-			model.addAttribute(new PermisCommand());
+		}
+		model.addAttribute(permis != null ? PermisCommand.asCommand(permis) : new PermisCommand());
 		return "organGestorPermisForm";
 	}
 	

@@ -56,13 +56,11 @@ public class DatatablesHelper {
 				"start=" + params.getStart() + ", " +
 				"length=" + params.getLength() + ")");
 		PaginacioParamsDto paginacio = new PaginacioParamsDto();
-		int paginaNum = params.getStart() / params.getLength();
+		int paginaNum = params.getStart() != null && params.getLength() != null ? params.getStart() / params.getLength() : 0;
 		paginacio.setPaginaNum(paginaNum);
-		if (params.getLength() != null && params.getLength().intValue() == -1) {
-			paginacio.setPaginaTamany(Integer.MAX_VALUE);
-		} else {
-			paginacio.setPaginaTamany(params.getLength());
-		}
+
+		paginacio.setPaginaTamany(params.getLength() == null || params.getLength().intValue() == -1
+								? Integer.MAX_VALUE : params.getLength());
 		paginacio.setFiltre(params.getSearchValue());
 		for (int i = 0; i < params.getColumnsSearchValue().size(); i++) {
 			String columna = params.getColumnsData().get(i);

@@ -1,6 +1,7 @@
 package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -78,13 +79,15 @@ public class ServeiPermisController extends BaseUserController{
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		PaginacioParamsDto paginacioParams = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		List<PermisDto> permisos = procedimentService.permisFind(
 				entitatActual.getId(), 
 				isAdministrador(request),
 				serveiId,
 				null,
 				organGestorActual != null ? organGestorActual.getCodi() : null,
-				null);
+				null,
+				paginacioParams);
 		return DatatablesHelper.getDatatableResponse(request, permisos,	"id");
 	}
 	
@@ -104,7 +107,8 @@ public class ServeiPermisController extends BaseUserController{
 			@PathVariable Long serveiId,
 			@PathVariable Long permisId,
 			Model model) {
-		return getPermis(request, serveiId, permisId, model, TipusPermis.PROCEDIMENT, null);
+		PaginacioParamsDto paginacioParams = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		return getPermis(request, serveiId, permisId, model, TipusPermis.PROCEDIMENT, null, paginacioParams);
 	}
 	
 	@RequestMapping(value = "/{serveiId}/organ/{organ}/permis/{permisId}", method = RequestMethod.GET)
@@ -114,7 +118,8 @@ public class ServeiPermisController extends BaseUserController{
 			@PathVariable String organ,
 			@PathVariable Long permisId,
 			Model model) {
-		return getPermis(request, serveiId, permisId, model, TipusPermis.PROCEDIMENT_ORGAN, organ);
+		PaginacioParamsDto paginacioParams = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		return getPermis(request, serveiId, permisId, model, TipusPermis.PROCEDIMENT_ORGAN, organ, paginacioParams);
 	}
 
 	private String getPermis(
@@ -123,7 +128,8 @@ public class ServeiPermisController extends BaseUserController{
 			Long permisId, 
 			Model model,
 			TipusPermis tipus,
-			String organ) {
+			String organ,
+			PaginacioParamsDto paginacioParams) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		ProcSerDto servei = serveiService.findById(
@@ -139,7 +145,8 @@ public class ServeiPermisController extends BaseUserController{
 					serveiId,
 					organ,
 					organGestorActual != null ? organGestorActual.getCodi() : null,
-					tipus);
+					tipus,
+					paginacioParams);
 			for (PermisDto p: permisos) {
 				if (p.getId().equals(permisId)) {
 					permis = p;
