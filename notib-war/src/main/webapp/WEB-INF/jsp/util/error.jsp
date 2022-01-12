@@ -12,7 +12,8 @@
 	<c:if test="${not empty errorObject}">
 		<c:choose>
 			<c:when test="${errorObject.throwableClassName == 'java.lang.SecurityException'}">
-				<div class="alert alert-danger" style="margin-top: 20px;" role="alert"><strong>Error accedint a NOTIB!</strong> ${errorObject.exceptionMessage}</div>
+				<div class="alert alert-danger" style="margin-top: 20px;" role="alert">
+					<strong><spring:message code="error.acces.notib"/></strong> ${errorObject.exceptionMessage}</div>
 			</c:when>
 			<c:otherwise>
 				<dl class="dl-horizontal" style="margin-top: 20px;">

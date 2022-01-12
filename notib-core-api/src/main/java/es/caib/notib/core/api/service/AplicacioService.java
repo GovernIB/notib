@@ -169,4 +169,6 @@ public interface AplicacioService {
 
 	public String getAppVersion();
 	public void setAppVersion(String appVersion);
+
+	String getMissatgeErrorAccesAdmin();
 }

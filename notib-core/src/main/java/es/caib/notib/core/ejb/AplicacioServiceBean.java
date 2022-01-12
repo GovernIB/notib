@@ -147,4 +147,9 @@ public class AplicacioServiceBean implements AplicacioService {
 		delegate.setAppVersion(appVersion);
 	}
 
+	@Override
+	public String getMissatgeErrorAccesAdmin() {
+		return delegate.getMissatgeErrorAccesAdmin();
+	}
+
 }
