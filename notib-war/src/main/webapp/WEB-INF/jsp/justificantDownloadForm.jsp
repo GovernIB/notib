@@ -54,28 +54,31 @@ function getProgres() {
 		type: 'GET',
 		url: "<c:url value='/notificacio/${notificacioId}/justificant/estat/'/>" + sequence,
 		success: function(data) {
-			if (data) {
-				let info = data.info;
-				let index;
-				for (index = writtenLines; index < info.length; index++) {
-					$('.customProgressTitle').empty();
-					if (info[index].tipus != 'ERROR') {
-						$('.customProgressTitle').append("<div class='info-" + info[index].tipus + "'>" + info[index].text + " [" + data.progres + "%]</div>");
-					}
-					$('.customProgressPercentage').css('width', data.progres + '%');
-					
-					if (info[index].tipus == 'ERROR') {
-						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div>" + info[index].text + "</div></div>");
-					} else {
-						$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div class='info'>" + info[index].text + "</div><div class='percentage'>[" + data.progres + "%]</div></div>");
-					}
+			if (!data) {
+				return;
+			}
+			let info = data.info;
+			let index;
+			for (index = writtenLines; index < info.length; index++) {
+				$('.customProgressTitle').empty();
+				if (info[index].tipus != 'ERROR') {
+					$('.customProgressTitle').append("<div class='info-" + info[index].tipus + "'>" + info[index].text + " [" + data.progres + "%]</div>");
 				}
-				writtenLines = index;
-				if (data.progres >= 100) {
-					clearInterval(itervalProgres);
-					sleep(5000).then(() => { window.parent.location.reload(); });
+				$('.customProgressPercentage').css('width', data.progres + '%');
+
+				if (info[index].tipus == 'ERROR') {
+					$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div>" + info[index].text + "</div></div>");
+				} else {
+					$('#actualitzacioInfo').append("<div class='info-" + info[index].tipus + "'><div class='info'>" + info[index].text + "</div><div class='percentage'>[" + data.progres + "%]</div></div>");
 				}
 			}
+			writtenLines = index;
+			if (data.progres >= 100) {
+				clearInterval(itervalProgres);
+				$('.datatable-dades-carregant', parent.document).hide();
+				sleep(5000).then(() => { window.parent.location.reload(); });
+			}
+
 		},
 		error: function() {
 			console.log("error obtenint progrés...");

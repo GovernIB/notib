@@ -70,6 +70,8 @@ function getProgres() {
 				writtenLines = index;
 				if (data.progres == 100) {
 					clearInterval(itervalProgres);
+					$('.datatable-dades-carregant', parent.document).hide();
+					sleep(5000).then(() => { window.parent.location.reload(); });
 				}
 			}
 		},
