@@ -209,6 +209,9 @@ public class NotificacioTableHelper {
     private Date getEnviadaDate(NotificacioEntity notificacio) {
 
         try {
+            if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
+                return null;
+            }
             NotificacioEnviamentEntity env = notificacio.getEnviaments().iterator().next();
 
             if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)

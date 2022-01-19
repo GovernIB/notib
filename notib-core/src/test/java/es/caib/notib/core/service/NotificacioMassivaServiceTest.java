@@ -23,6 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 
 import java.io.OutputStream;
 import java.util.*;
@@ -57,6 +58,12 @@ public class NotificacioMassivaServiceTest {
 	private NotificacioTableViewRepository notificacioTableViewRepository;
 	@Mock
 	private NotificacioListHelper notificacioListHelper;
+	@Mock
+	private MessageHelper messageHelper;
+//	@Mock
+//	private EmailNotificacioMassivaHelper emailNotificacioMassivaHelper;
+//	@Mock
+//	private Authentication auth;
 
 	@InjectMocks
 	NotificacioMassivaService notificacioMassivaService = new NotificacioMassivaServiceImpl();
