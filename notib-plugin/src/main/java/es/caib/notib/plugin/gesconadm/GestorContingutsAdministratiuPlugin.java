@@ -18,6 +18,14 @@ public interface GestorContingutsAdministratiuPlugin {
 	// Procediments
 
 	/**
+	 * Busca el procediment amb codiSia definit al Gestor documental administratiu.
+	 * @param codiSia
+	 * @return procediment amb codi SIA especificat per parametre.
+	 * @throws SistemaExternException Si es produeix un error al consultar els procediments.
+	 */
+	GcaProcediment getProcedimentByCodiSia(String codiSia) throws SistemaExternException;
+
+	/**
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu.
 	 * 
 	 * @return La llista de procediments.

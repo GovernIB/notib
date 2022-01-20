@@ -39,6 +39,9 @@ public class ProgresActualitzacioDto {
 	}
 	
 	public void incrementProcedimentsActualitzats() {
+		if (numProcediments == null) {
+			return;
+		}
 		this.numProcedimentsActualitzats++;
 		double auxprogres = (this.numProcedimentsActualitzats.doubleValue()  / this.numProcediments.doubleValue()) * 100;
 		this.progres = (int) auxprogres;
