@@ -3,7 +3,6 @@
  */
 package es.caib.notib.war.interceptor;
 
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +24,11 @@ public class AccesAdminInterceptor extends HandlerInterceptorAdapter {
 
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		if (!RolHelper.isUsuariActualAdministradorEntitat(request) && !RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			throw new SecurityException("Es necessari ser administrador d'òrgan gestor o d'entitat per accedir a aquesta página.", null);
-//					"L'usuari actual " + usuariActual.getCodi() + " no té el rol requerit.", null);
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		if (RolHelper.isUsuariActualAdministradorEntitat(request) || RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+			return true;
 		}
-		return true;
+		throw new SecurityException(aplicacioService.getMissatgeErrorAccesAdmin(), null);
 	}
 
 }

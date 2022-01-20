@@ -952,6 +952,29 @@ public class PluginHelper {
 		
 		return totalElements;
 	}
+
+	public ProcSerDto getProcedimentByCodiSia(String codiSia) {
+
+		String msg = "Obtenint procediment amb codi SIA " + codiSia + " del gestor documental administratiu";
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM, msg, IntegracioAccioTipusEnumDto.ENVIAMENT);
+		try {
+			GcaProcediment proc = getGestorDocumentalAdministratiuPlugin().getProcedimentByCodiSia(codiSia);
+			if (proc == null) {
+				return null;
+			}
+			ProcSerDto procSer = new ProcSerDto();
+			procSer.setCodi(proc.getCodiSIA());
+			procSer.setNom(proc.getNom());
+			procSer.setComu(proc.isComu());
+			procSer.setOrganGestor(proc.getUnitatAdministrativacodi());
+			integracioHelper.addAccioOk(info);
+			return procSer;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error " + msg.toLowerCase();
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
+		}
+	}
 	
 	public List<ProcSerDto> getProcedimentsGdaByEntitat(
 			String codiDir3,

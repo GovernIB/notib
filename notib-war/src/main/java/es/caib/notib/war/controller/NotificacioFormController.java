@@ -679,6 +679,9 @@ public class NotificacioFormController extends BaseUserController {
 
         for (int i = 0; i < 5; i++) {
             DocumentCommand documentCommand = notificacioCommand.getDocuments()[i];
+            if (documentCommand == null ) {
+                continue;
+            }
             if (documentCommand.getArxiuGestdocId().isEmpty() &&
             		notificacioCommand.getTipusDocument()[i] != null && 
             		(notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) && 

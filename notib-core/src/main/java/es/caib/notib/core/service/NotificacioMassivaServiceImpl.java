@@ -85,6 +85,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private NotificacioListHelper notificacioListHelper;
     @Autowired
     private ConfigHelper configHelper;
+    @Autowired
+    private MessageHelper messageHelper;
 
     private static final int MAX_ENVIAMENTS = 999;
 
@@ -261,15 +263,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                             notificacio.getProcediment().getCodi(),
                             entitat);
                     if (procediment == null) {
-                        errors.add("[1330] No s'ha trobat cap procediment/servei amb el codi indicat.");
+                        errors.add(messageHelper.getMessage("error.validacio.procser.amb.codi.no.trobat"));
                     } else if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
-                        errors.add("[1331] No es pot donar d'alta una notificació amb un servei. Els serveis només s'admeten en comunicacions.");
+                        errors.add(messageHelper.getMessage("error.validacio.alta.notificacio.amb.servei.nomes.comunicacions"));
                     } else {
                         notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    errors.add(String.format("[1332] Error obtenint el procediment amb el codi %s.", notificacio.getProcediment().getCodi()));
+                    errors.add(messageHelper.getMessage("error.obtenint.procediment.amb.codi") + notificacio.getProcediment().getCodi());
                 }
 
 
@@ -277,9 +279,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     try {
                         crearNotificacio(entitat, notificacio, notificacioMassivaEntity, documentsProcessatsMassiu);
                     } catch (DocumentNotFoundException | NoDocumentException ex) {
-                        errors.add("[1064] No s'ha pogut obtenir el document de l'arxiu.");
+                        errors.add(messageHelper.getMessage("error.obtenint.document.arxiu"));
                     } catch (NoMetadadesException ex) {
-                        errors.add("[1066] Error en les metadades del document. No s'han obtingut de la consulta a l'arxiu ni de el fitxer CSV de càrrega.");
+                        errors.add(messageHelper.getMessage("error.metadades.document"));
                     }
                 }
 
@@ -650,26 +652,26 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         try {
             notificacio.setCaducitat(caducitat);
             // Organ gestor
-            columna = "1 - Codigo Unidad Remisora";
-            missatge = "obtenint el codi de l'Òrgan gestor";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.organ.gestor.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.organ.gestor.missatge");
             notificacio.setOrganGestorCodi(linia[0]);
 
             // Entitat
             columna = "";
-            missatge = "obtenint el codi Dir3 de l'entitat";
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.entitat.missatge");
             notificacio.setEmisorDir3Codi(entitat.getDir3Codi());
 
             // Concepte
-            columna = "2 - Concepto";
-            missatge = "obtenint el concepte";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.concepte.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.concepte.missatge");
             notificacio.setConcepte(linia[1]);
 
             // Descripció
             notificacio.setDescripcio(null);
 
             // Tipus enviament
-            columna = "3 - Tipo de Envio";
-            missatge = "Obtenint el tipus d'enviament. Valors vàlids: [Comunicacio | Notificacio]";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.tipus.enviament.missatge");
             setTipusEnviament(notificacio, linia[2]);
 
             // Grup
@@ -682,25 +684,25 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             notificacio.setUsuariCodi(usuariCodi);
 
             // Retard
-            columna = "16 - Retardo Postal";
-            missatge = "obtenint el retard postal";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.retard.postal.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.retard.postal.missatge");
             setRetard(notificacio, linia[15]);
 
             // Procediment
-            columna = "17 - Código Procedimiento";
-            missatge = "obtenint el procediment";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.procediment.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.procediment.missatge");
             ProcSerDto procediment = new ProcSerDto();
             procediment.setCodi(linia[16]);
             notificacio.setProcediment(procediment);
 
             // Fecha envío programado
-            columna = "18 - Fecha Envio Programado";
-            missatge = "obtenint la data d'enviament programada";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.data.enviament.programada.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.data.enviament.programada.missatge");
             setDataProgramada(notificacio, linia[17]);
 
             // Document
-            columna = "5 - Nombre Fichero";
-            missatge = "obtenint el document";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.codi.document.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.document.missatge");
             boolean llegirMetadades = setDocument(
                     notificacio,
                     document,
@@ -709,17 +711,17 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     ficheroZipBytes,
                     documentsProcessatsMassiu);
             if (llegirMetadades) {
-                columna = "19 - Origen";
-                missatge = "obtenint les metadades del document: Origen";
+                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.origen.columna");
+                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.origen.missatge");
                 setOrigen(notificacio, linia[18]);
-                columna = "20 - Estado Elaboración";
-                missatge = "obtenint les metadades del document: Estat elaboració";
+                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.estat.elaboracio.columna");
+                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.estat.elaboracio.missatge");;
                 setValidesa(notificacio, linia[19]);
-                columna = "21 - Tipo documental";
-                missatge = "obtenint les metadades del document: Tipus documental";
+                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.tipus.documental.columna");
+                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.tipus.documental.missatge");
                 setTipusDocumental(notificacio, linia[20]);
-                columna = "22 - PDF Firmado";
-                missatge = "obtenint les metadades del document: Pdf firmat";
+                columna = messageHelper.getMessage("error.csv.to.notificacio.codi.pdf.firmat.columna");
+                missatge = messageHelper.getMessage("error.csv.to.notificacio.codi.pdf.firmat.missatge");
                 setModeFirma(notificacio, linia[21]);
             }
 
@@ -727,44 +729,44 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             // Referencia - Núm. expedient
             // TODO: #641 - Els enviaments massius encara que s'ompli el camp de "Referencia Emisor" al csv no es mostra al llistat de remeses al camp "Número expedient"
-            columna = "4 - Referencia Emisor (Número expedient)";
-            missatge = "obtenint referència";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.referencia.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.referencia.missatge");
             String referencia = (linia[3] != null && !linia[3].isEmpty()) ? linia[3] : null;
             notificacio.setNumExpedient(referencia);
             enviament.setNotificaReferencia(referencia); //si no se envía, Notific@ genera una
             enviament.setEntregaDehActiva(false); // De momento dejamos false
 
             // Entrega postal
-            columna = "13, 14 y 15 - Linea 1, Linea 2 y Codigo Postal";
-            missatge = "obtenint l'adreça de l'enviament postal";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
             setEntregaPostal(linia, entitat, enviament);
 
             // Servei tipus
-            columna = "7 - Prioridad Servicio";
-            missatge = "obtenint la prioritat d'enviament. Valors vàlids: [Normal | Urgent]";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.missatge");
             setServeiTipus(notificacio, enviament, linia[6]);
 
             // Titular /////////////
             PersonaDto titular = new PersonaDto();
 
             // Nom
-            columna = "8 - Nombre";
-            missatge = "obtenint el nom del titular";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.nom.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.nom.missatge");
             titular.setNom(linia[7]);
 
             // Llinatges
-            columna = "9 - Apellidos";
-            missatge = "obtenint els llinatges del titular";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.llinatges.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.llinatges.missatge");
             titular.setLlinatge1(linia[8]); // vienen ap1 y ap2 juntos
             titular.setLlinatge2(null);
 
             // NIF
-            columna = "10 - CIF/NIF";
-            missatge = "obtenint el CIF/NIF del titular";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.cifnif.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.cifnif.missatge");
             titular.setNif(linia[9]);
 
             // Interessat tipus
-            missatge = "calculant el tipus d'interessat a partir del CIF/NIF.";
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.interessat.tipus.missatge");
             // TODO:  Igual lo hemos planteado mal. Si es un nif, podria ser el Nif de la administración.
             //Entiendo que el "Código destino" = linia[11] solo se informará en caso de ser una administración
             //Si es persona física o jurídica no tiene sentido
@@ -772,13 +774,13 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             setInteressatTipus(notificacio, titular);
 
             // Email
-            columna = "11 - Email";
-            missatge = "obtenint el correu electrònic del titular";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.missatge");
             titular.setEmail(linia[10]);
 
             // Codi Dir3
-            columna = "12 - Codigo destino";
-            missatge = "obtenint el Codi Dir3 de l'administració destinatària";
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.missatge");
             titular.setDir3Codi(linia[11]);
 
             // Incapacitat
@@ -815,7 +817,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
             } else {
                 notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-                notificacio.getErrors().add("[1051] El tipus d'enviament (" + strTipusEnviament + ") no és vàlid. Valors permesos: [Notificacio(n) | Comunicacio(n)].");
+                notificacio.getErrors().add(
+                        messageHelper.getMessage("error.tipus.enviament.no.valid.a")
+                        + strTipusEnviament +
+                        messageHelper.getMessage("error.tipus.enviament.no.valid.b"));
             }
         }
     }
@@ -824,7 +829,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if (isEnter(strRetard)) {
             notificacio.setRetard(Integer.valueOf(strRetard));
         } else if (strRetard != null) {
-            notificacio.getErrors().add("[1045] El retard (" + strRetard + ") no és vàlid. Valors permesos: número enter.");
+            notificacio.getErrors().add(
+                    messageHelper.getMessage("error.retard.no.valid.a")
+                    + strRetard +
+                    messageHelper.getMessage("error.retard.no.valid.b"));
         }
     }
 
@@ -837,7 +845,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             }
         } catch (ParseException e) {
             notificacio.setEnviamentDataProgramada(null);
-            notificacio.getErrors().add("[1340] El format de la data d'enviament programada (" + strData + ") no és correcte. Format esperat: dd/MM/yyyy.");
+            notificacio.getErrors().add(
+                    messageHelper.getMessage("error.format.data.programada.a")
+                    + strData +
+                    messageHelper.getMessage("error.format.data.programada.b"));
         }
     }
 
@@ -878,7 +889,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP")
                         .contains(docSplit[1].toUpperCase())) {
                     notificacio.setDocument(null);
-                    notificacio.getErrors().add("[1350] No s'ha trobat el document dins el fitxer ZIP amb els documents adjunts.");
+                    notificacio.getErrors().add(messageHelper.getMessage("error.document.no.trobat.dins.zip"));
                 } else {
                     String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
                     Pattern pUuid = Pattern.compile(uuidPattern);
@@ -919,7 +930,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacio.getDocument().setOrigen(OrigenEnum.ADMINISTRACIO);
             } else {
                 notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
-                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Origen (" + strOrigen + ") no és vàlid. Valors permesos: [Ciutada | Ciudadano | Administracio(n)].");
+                notificacio.getErrors().add(
+                        messageHelper.getMessage("error.valor.origen.no.valid.a")
+                        + strOrigen +
+                        messageHelper.getMessage("error.valor.origen.no.valid.b"));
             }
         }
     }
@@ -935,7 +949,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 notificacio.getDocument().setValidesa(ValidesaEnum.COPIA_AUTENTICA);
             } else {
                 notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
-                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Validesa (" + strValidesa + ") no és vàlid. Valors permesos: [Original | Copia | Copia autentica].");
+                notificacio.getErrors().add(
+                        messageHelper.getMessage("error.valor.validesa.no.valid.a")
+                        + strValidesa +
+                        messageHelper.getMessage("error.valor.validesa.no.valid.b"));
             }
         }
     }
@@ -947,13 +964,16 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             try {
                 tipo = TipusDocumentalEnum.valueOf(strTipus.toUpperCase());
             } catch (IllegalArgumentException e) {
-                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Tipo documental (" + strTipus + ") no és vàlid. Valors permesos: [" +
-                        "RESSOLUCIO | ACORD | CONTRACTE | CONVENI | DECLARACIO | COMUNICACIO | NOTIFICACIO | PUBLICACIO | " +
-                        "JUSTIFICANT_RECEPCIO | ACTA | CERTIFICAT | DILIGENCIA | INFORME | SOLICITUD | DENUNCIA | ALEGACIO | " +
-                        "RECURS | COMUNICACIO_CIUTADA | FACTURA | ALTRES_INCAUTATS | ALTRES | LLEI |  MOCIO | INSTRUCCIO | " +
-                        "CONVOCATORIA | ORDRE_DIA | INFORME_PONENCIA | DICTAMEN_COMISSIO | INICIATIVA_LEGISLATIVA | " +
-                        "PREGUNTA | INTERPELACIO | RESPOSTA | PROPOSICIO_NO_LLEI | ESQUEMA | PROPOSTA_RESOLUCIO | " +
-                        "COMPAREIXENSA | SOLICITUD_INFORMACIO | ESCRIT | INICIATIVA_LEGISLATIVA2 | PETICIO].");
+                notificacio.getErrors().add(
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.a")
+                        + strTipus +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.b") +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.a") +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.b") +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.c") +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.d") +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.e") +
+                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.f"));
             }
             notificacio.getDocument().setTipoDocumental(tipo);
         }
@@ -967,7 +987,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             } else if ("NO".equalsIgnoreCase(strMode) || "FALSE".equalsIgnoreCase(strMode)) {
                 notificacio.getDocument().setModoFirma(false);
             } else {
-                notificacio.getErrors().add("[1066] Error en les metadades del document. El valor Validesa (" + strMode + ") no és vàlid. Valors permesos: [Original | Copia | Copia autentica].");
+                notificacio.getErrors().add(
+                        messageHelper.getMessage("error.valor.validesa.no.valid.a")
+                        + strMode +
+                        messageHelper.getMessage("error.valor.validesa.no.valid.b"));
             }
 //                    Boolean.valueOf(linia[21]) : Boolean.FALSE);
         }
@@ -1001,7 +1024,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
             } else {
                 enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
-                notificacio.getErrors().add("[1102] El tipus de servei (" + strServeiTipus + ") no és vàlid. Valors permesos: [Normal | Urgent(e)].");
+                notificacio.getErrors().add(
+                        messageHelper.getMessage("error.tipus.servei.no.valid.a")
+                        + strServeiTipus +
+                        messageHelper.getMessage("error.tipus.servei.no.valid.b"));
             }
         }
     }
@@ -1018,7 +1044,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                     if (lista != null && lista.size() > 0) {
                         titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
                     } else {
-                        notificacio.getErrors().add("[1116] El 'CIF/NIF' del titular (" + titular.getNif() + ") no és vàlid.");
+                        notificacio.getErrors().add(
+                                messageHelper.getMessage("error.nifcif.no.valid.a")
+                                + titular.getNif() +
+                                messageHelper.getMessage("error.nifcif.no.valid.b"));
                     }
 //                } catch (Exception e) {
 //                    notificacio.getErrors().add("");
@@ -1033,10 +1062,10 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
         try {
             double d = Double.parseDouble(strNum);
+            return true;
         } catch (NumberFormatException nfe) {
             return false;
         }
-        return true;
     }
 
     public boolean isEnter(String strNum) {
@@ -1062,7 +1091,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return listWriter;
         } catch (IOException e) {
             log.error("S'ha produït un error a l'escriure la capçalera de l'fitxer CSV.", e);
-            throw new WriteCsvException("No s'ha pogut escriure la capçalera de l'fitxer CSV.");
+            throw new WriteCsvException(messageHelper.getMessage("error.escriure.capcalera.fitxer.csv"));
         }
     }
 
@@ -1081,7 +1110,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             listWriter.write(liniaAmbErrors);
         } catch (IOException e) {
             log.error("S'ha produït un error a l'escriure la línia en el fitxer CSV.", e);
-            throw new WriteCsvException("No s'ha pogut escriure la línia en el fitxer CSV.");
+            throw new WriteCsvException(messageHelper.getMessage("error.escriure.linia.fitxer.csv"));
         }
     }
 
@@ -1092,7 +1121,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             }
         } catch (IOException e) {
             log.error("S'ha produït un error a l'tancar el fitxer CSV.", e);
-            throw new WriteCsvException("No s'ha pogut tancar el fitxer CSV.");
+            throw new WriteCsvException(messageHelper.getMessage("error.tancar.fitxer.csv"));
         }
     }
 
@@ -1107,7 +1136,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         } catch (Exception ex) {
             log.error("No s'ha pogut obtenir la prioritat de la notificació massiva per defecte. S'utilitzarà la BAIXA.");
         }
-
         return tipus;
     }
 }

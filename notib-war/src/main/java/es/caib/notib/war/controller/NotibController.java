@@ -41,7 +41,7 @@ public class NotibController {
 			Model model) {
 		
 		if (RolHelper.isUsuariActualAdministrador(request)) {
-			return "redirect:entitat";
+			return "redirect:integracio";
 		} else if (RolHelper.isUsuariActualAplicacio(request)) {
 			return "redirect:api/rest";
 		} else if (RolHelper.isUsuariActualUsuari(request)) {

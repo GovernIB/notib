@@ -61,6 +61,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	@Transactional
 	@Override
@@ -378,6 +380,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 			dto.setRols(rols);
 		}
 		return dto;
+	}
+
+	public String getMissatgeErrorAccesAdmin() {
+		return messageHelper.getMessage("error.acces.administrador.excepcio");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);

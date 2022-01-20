@@ -27,6 +27,7 @@ import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import org.slf4j.Logger;
@@ -377,6 +378,33 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
+	public boolean actualitzarProcediment(String procedimentId, EntitatDto entitat) {
+		try {
+			ProcSerDto proc = pluginHelper.getProcedimentByCodiSia(procedimentId);
+			if (proc == null) {
+				return false;
+			}
+			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+			List<OrganGestorEntity> organsModificats = new ArrayList<OrganGestorEntity>();
+			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+			EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+			procedimentHelper.actualitzarProcedimentFromGda(progres, proc, entity, organigrama, true, organsModificats);
+			boolean eliminarOrgans = isActualitzacioProcedimentsEliminarOrgansProperty();
+			if (!eliminarOrgans) {
+				return true;
+			}
+			for (OrganGestorEntity organGestorAntic: organsModificats) {
+				//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava
+				procedimentHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
+			}
+			return true;
+		} catch (Exception ex) {
+			logger.error("Error actualitzant el procediment", ex);
+			throw ex;
+		}
+	}
+
+	@Override
 	//@Transactional(timeout = 300)
 	public void actualitzaProcediments(EntitatDto entitatDto) {
 		
@@ -422,7 +450,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				logger.info(" [PROCEDIMENTS] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
 
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
-				List<ProcSerDto> procedimentsGda  = new ArrayList<ProcSerDto>();
+				List<ProcSerDto> procedimentsGda  = new ArrayList<>();
 				startTime = System.nanoTime();
 				int totalElements = getTotalProcediments(entitatDto.getDir3Codi());
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
