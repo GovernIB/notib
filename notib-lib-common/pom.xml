@@ -3,7 +3,7 @@
   <parent>
     <groupId>es.caib.notib</groupId>
     <artifactId>notib</artifactId>
-    <version>1.1.16</version>
+    <version>1.1.17</version>
   </parent>
   <artifactId>notib-lib-common</artifactId>
   <packaging>pom</packaging>
