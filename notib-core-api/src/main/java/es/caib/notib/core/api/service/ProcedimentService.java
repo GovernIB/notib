@@ -420,6 +420,14 @@ public interface ProcedimentService {
 	boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId);
 
 	/**
+	 * Actualitza el procediment indicat amb la informació del procediment actual
+	 * retornada pel plugin Gestor Documental Administratiu (GDA)
+	 *
+	 * @param codiSia
+	 */
+	boolean actualitzarProcediment(String codiSia, EntitatDto entitat);
+
+	/**
 	 * Actualitza els procediments de la entitat indicada amb la informació dels procediments actual
 	 * retornada pel plugin Gestor Documental Administratiu (GDA)
 	 *

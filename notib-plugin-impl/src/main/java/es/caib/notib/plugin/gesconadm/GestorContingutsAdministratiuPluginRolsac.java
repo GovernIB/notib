@@ -31,7 +31,34 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
 	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private String baseUrl;
-	
+
+	@Override
+	public GcaProcediment getProcedimentByCodiSia(String codiSia) throws SistemaExternException {
+
+		try {
+			String url = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
+			Client jerseyClient = generarClient();
+			autenticarClient(jerseyClient, url);
+
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
+			form.add("filtro", "{\"activo\":\"1\", \"codigoSia\":\"" + codiSia + "\"}");
+
+			String json = jerseyClient.resource(url).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta == null) {
+				return null;
+			}
+			List<GcaProcediment> procs = toProcedimentDto(resposta.getResultado());
+			return procs.isEmpty() ? null : procs.get(0);
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'han pogut consultar els procediment amb codi SIA " + codiSia + " via REST", ex);
+		}
+	}
+
 	@Override
 	public List<GcaProcediment> getAllProcediments() throws SistemaExternException {
 		List<Procediment> procediments = new ArrayList<Procediment>();
@@ -284,9 +311,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		}
 	}
 
-
-	
 	private List<GcaProcediment> toProcedimentDto(List<Procediment> procediments) throws SistemaExternException {
+
+		if (procediments == null) {
+			return new ArrayList<>();
+		}
 		List<GcaProcediment> procedimentsDto = new ArrayList<GcaProcediment>();
 		for (Procediment procediment: procediments) {
 			procedimentsDto.add(toDto(procediment));
@@ -334,7 +363,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 //		dto.setNom(unitat.getNombre());
 //		return dto;
 //	}
-	
+
 	private Client generarClient() {
 		Client jerseyClient = Client.create();
 		jerseyClient.addFilter(

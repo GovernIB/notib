@@ -372,14 +372,21 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	public boolean actualitzarProcediment(String codiSia, EntitatDto entitat) {
+		return delegate.actualitzarProcediment(codiSia, entitat);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaProcediments(EntitatDto entitat) {
 		delegate.actualitzaProcediments(entitat);
 	}
+
 	@Override
 	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
 		return delegate.isUpdatingProcediments(entitatDto);
 	}
+
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
 		return delegate.getProgresActualitzacio(dir3Codi);

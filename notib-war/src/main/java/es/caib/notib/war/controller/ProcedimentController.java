@@ -267,7 +267,22 @@ public class ProcedimentController extends BaseUserController{
 					e);
 		}
 	}
-	
+
+	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
+	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
+
+		String urlResponse = "redirect:../../procediment";
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			boolean trobat = procedimentService.actualitzarProcediment(codiSia, entitat);
+			return trobat ?  getAjaxControllerReturnValueSuccess(request, urlResponse, "procediment.controller.update.ok")
+					:  getAjaxControllerReturnValueError(request, urlResponse, "procediment.controller.update.no.trobat");
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(request, urlResponse, "procediment.controller.update.ko");
+		}
+	}
+
+
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
 	public String actualitzacioAutomaticaGet(
 			HttpServletRequest request,
