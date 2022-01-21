@@ -232,10 +232,7 @@ public class BaseController implements MessageSourceAware {
 		return getMessage(request, key, null);
 	}
 
-
-
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
 	}
-
 }

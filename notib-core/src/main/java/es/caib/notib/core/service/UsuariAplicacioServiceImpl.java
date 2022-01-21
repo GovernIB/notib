@@ -5,9 +5,11 @@ package es.caib.notib.core.service;
 
 import javax.annotation.Resource;
 
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,8 @@ import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.AplicacioRepository;
+
+import java.util.List;
 
 /**
  * Implementació del servei de gestió d'usuaris.
@@ -248,21 +252,17 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de un llistat paginat de totes les aplicacions de l'entitat amb Id: " + entitatId);
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					false);
+			entityComprovarHelper.comprovarPermisos(null, true, true, false);
+			List<PaginacioParamsDto.FiltreDto> filtres = paginacioParams.getFiltres();
+			String codi = filtres.get(0).getValor();
+			String url = filtres.get(1).getValor();
+			Pageable params = paginacioHelper.toSpringDataPageable(paginacioParams);
+			Boolean activa = !Strings.isNullOrEmpty(filtres.get(2).getValor()) ?
+					Integer.parseInt(filtres.get(2).getValor()) == 1 ? true : false : true;
+			Page<AplicacioEntity> aplicacions = activa != null ? aplicacioRepository.findByEntitatIdFiltrat(entitatId, codi, url, activa, params)
+					: aplicacioRepository.findByEntitatIdFiltrat(entitatId, codi, url, params);
 			
-			Page<AplicacioEntity> aplicacions = aplicacioRepository.findByEntitatIdFiltrat(
-					entitatId,
-					paginacioParams.getFiltre(),
-					paginacioHelper.toSpringDataPageable(paginacioParams)
-					);
-			
-			return paginacioHelper.toPaginaDto(
-					aplicacions,
-					AplicacioDto.class);
+			return paginacioHelper.toPaginaDto(aplicacions, AplicacioDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -40,6 +40,28 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			@Param("entitatId") Long entitatId,
 			@Param("filtre") String filtre,
 			Pageable paginacio);
+
+	@Query(	  "FROM AplicacioEntity a "
+			+ "WHERE a.entitat.id = :entitatId "
+			+ "  AND (lower(a.usuariCodi) like concat('%', lower(:usuariCodi), '%') "
+			+ "  AND lower(a.callbackUrl) like concat('%', lower(:callbackUrl), '%'))")
+	Page<AplicacioEntity> findByEntitatIdFiltrat(
+			@Param("entitatId") Long entitatId,
+			@Param("usuariCodi") String usuariCodi,
+			@Param("callbackUrl") String callbackUrl,
+			Pageable paginacio);
+
+	@Query(	  "FROM AplicacioEntity a "
+			+ "WHERE a.entitat.id = :entitatId "
+			+ "  AND (lower(a.usuariCodi) like concat('%', lower(:usuariCodi), '%') "
+			+ "  AND lower(a.callbackUrl) like concat('%', lower(:callbackUrl), '%'))"
+			+ "  AND a.activa = :activa")
+	Page<AplicacioEntity> findByEntitatIdFiltrat(
+			@Param("entitatId") Long entitatId,
+			@Param("usuariCodi") String usuariCodi,
+			@Param("callbackUrl") String callbackUrl,
+			@Param("activa") boolean activa,
+			Pageable paginacio);
 	
 	@Query("SELECT count(a) FROM AplicacioEntity a WHERE a.entitat.id = :entitatId")
 	public Long countByEntitatId(@Param("entitatId") Long entitatId);

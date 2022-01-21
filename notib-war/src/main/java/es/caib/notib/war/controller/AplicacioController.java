@@ -5,6 +5,13 @@ package es.caib.notib.war.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.war.command.AplicacioFiltreCommand;
+import es.caib.notib.war.command.ProcSerFiltreCommand;
+import es.caib.notib.war.helper.RequestSessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +27,9 @@ import es.caib.notib.war.command.AplicacioCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Controlador per al manteniment d'aplicacions.
  * 
@@ -31,39 +41,55 @@ public class AplicacioController extends BaseController {
 
 	@Autowired private UsuariAplicacioService usuariAplicacioService;
 	@Autowired private EntitatService entitatService;
+	private final static String APLICACIO_FILTRE = "aplicacio_filtre";
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long entitatId,
-			Model model) {
-		model.addAttribute(
-				"entitat", 
-				entitatService.findById(entitatId));
+	public String get(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
+
+		AplicacioFiltreCommand command = getFiltreCommand(request);
+		model.addAttribute("aplicacioFiltreCommand", command);
+		model.addAttribute("entitat", entitatService.findById(entitatId));
+		return "aplicacioList";
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(HttpServletRequest request, @PathVariable Long entitatId, AplicacioFiltreCommand command, Model model ) {
+
+		RequestSessionHelper.actualitzarObjecteSessio(request, APLICACIO_FILTRE, command);
+		model.addAttribute("aplicacioFiltreCommand", command);
+		model.addAttribute("entitat", entitatService.findById(entitatId));
 		return "aplicacioList";
 	}
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request,
-			@PathVariable Long entitatId) {
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				usuariAplicacioService.findPaginatByEntitat(
-						entitatId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));
+	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long entitatId) {
+
+
+		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		prepararFiltres(request, params);
+		PaginaDto<AplicacioDto> apps = usuariAplicacioService.findPaginatByEntitat(entitatId, params);
+		return DatatablesHelper.getDatatableResponse(request, apps);
+	}
+
+	private void prepararFiltres(HttpServletRequest request, PaginacioParamsDto params) {
+
+		List<PaginacioParamsDto.FiltreDto> filtres = new ArrayList<>();
+		AplicacioFiltreCommand command = getFiltreCommand(request);
+		if (command == null) {
+			return;
+		}
+		params.setFiltres(new ArrayList<PaginacioParamsDto.FiltreDto>());
+		params.afegirFiltre("codiUsuari", command.getCodiUsuari());
+		params.afegirFiltre("callbackUrl", command.getCallbackUrl());
+		params.afegirFiltre("activa", command.getActiva());
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String create(
-			HttpServletRequest request,
-			@PathVariable Long entitatId,
-			Model model) {
+	public String create(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
+
 		model.addAttribute(new AplicacioCommand());
-		model.addAttribute(
-				"entitat", 
-				entitatService.findById(entitatId));
+		model.addAttribute("entitat", entitatService.findById(entitatId));
 		return "aplicacioForm";
 	}
 
@@ -88,7 +114,7 @@ public class AplicacioController extends BaseController {
 		return "aplicacioForm";
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(value = "newOrModify", method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
 			Model model,
@@ -150,6 +176,17 @@ public class AplicacioController extends BaseController {
 				request,
 				"redirect:../../entitat",
 				"aplicacio.controller.desactivada.ok");
+	}
+
+	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {
+
+		AplicacioFiltreCommand command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);
+		if (command != null) {
+			return command;
+		}
+		command = new AplicacioFiltreCommand();
+		RequestSessionHelper.actualitzarObjecteSessio(request, APLICACIO_FILTRE, command);
+		return command;
 	}
 
 }

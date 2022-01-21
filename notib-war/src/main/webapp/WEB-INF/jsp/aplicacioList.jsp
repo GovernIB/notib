@@ -35,12 +35,30 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/aplicacio/new"/>" data-toggle="modal" data-datatable-id="taulaAplicacions"><span class="fa fa-plus"></span>&nbsp;<spring:message code="aplicacio.list.boto.nova.aplicacio"/></a>
 	</div>
+	<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="aplicacioFiltreCommand">
+		<div class="row">
+			<div class="col-md-4">
+				<not:inputText name="codiUsuari" inline="true"  placeholderKey="aplicacio.list.filtre.camp.codi.usuari"/>
+			</div>
+			<div class="col-md-4">
+				<not:inputText name="callbackUrl" inline="true"  placeholderKey="aplicacio.list.filtre.camp.callback.url"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputSelect id="activa" name="activa" optionItems="${aplicacioFiltreCommand.aplicacioEstats}" optionValueAttribute="value"
+								 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+			</div>
+		</div>
+		<div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
+			<button id="btn-netejar-filtre" type="submit" name="netejar" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+			<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+		</div>
+	</form:form>
 	<script id="botonsTemplate" type="text/x-jsrender"></script>
 	<table
 		id="taulaAplicacions"
 		data-toggle="datatable"
 		data-url="<c:url value="/entitat/${entitat.id}/aplicacio/datatable"/>"
-		data-search-enabled="true"
+		data-search-enabled="false"
 		data-selection-enabled="false"
 		data-default-order="0" 
 		data-default-dir="asc"
@@ -82,4 +100,21 @@
 			<a class="btn btn-default" href="<c:url value="/entitat"/>" data-datatable-id="taulaAplicacions"><span class="fa fa-reply"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 		</div>
 	</c:if>
+
+<script>
+	$(document).ready(() =>   {
+		$('#btn-netejar-filtre').click(() => {
+			$(':input', $('#form-filtre')).each((x, y) => {
+				let type = y.type, tag = y.tagName.toLowerCase();
+				if (type === 'text') {
+					y.value = '';
+				}
+				if (tag === 'select') {
+					y.selectedIndex = 0;
+				}
+			});
+			$('#form-filtre').submit();
+		});
+	});
+</script>
 </body>
