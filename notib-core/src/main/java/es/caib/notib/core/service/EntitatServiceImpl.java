@@ -15,6 +15,7 @@ import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EntitatTipusDocEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.AplicacioRepository;
@@ -22,6 +23,7 @@ import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EntitatTipusDocRepository;
 import es.caib.notib.core.repository.EntregaCieRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +82,8 @@ public class EntitatServiceImpl implements EntitatService {
 	private EntregaCieRepository entregaCieRepository;
 	@Autowired
 	private ColumnesRepository columnesRepository;
+	@Autowired
+	private NotificacioRepository notificacioRepository;
 
 	@Transactional
 	@Audita(entityType = TipusEntitat.ENTITAT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -273,29 +277,25 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional
 	@Override
 	@CacheEvict(value = "entitatsUsuari", allEntries = true)
-	public EntitatDto delete(
-			Long id) {
+	public EntitatDto delete(Long id) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Esborrant entitat (id=" + id +  ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					false,
-					false );
-			EntitatEntity entitat = entitatRepository.findOne( id );
+			entityComprovarHelper.comprovarPermisos(null, true,false,false );
+			EntitatEntity entitat = entitatRepository.findOne(id);
+			List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitat.getId());
+			if (!notificacions.isEmpty()) {
+				return null;
+			}
+			aplicacioRepository.deleteAplicacioEntityByEntitat(entitat);
 			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
 			if (!tipusDocsEntity.isEmpty()) {
 				entitatTipusDocRepository.delete(tipusDocsEntity);
 			}
 			columnesRepository.deleteByEntitatId(id);
 			entitatRepository.delete(entitat);
-			permisosHelper.deleteAcl(
-					entitat.getId(),
-					EntitatEntity.class);
-			return conversioTipusHelper.convertir(
-					entitat,
-					EntitatDto.class);
+			permisosHelper.deleteAcl(entitat.getId(), EntitatEntity.class);
+			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

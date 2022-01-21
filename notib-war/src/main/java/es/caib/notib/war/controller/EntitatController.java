@@ -162,14 +162,14 @@ public class EntitatController extends BaseController {
 	}
 
 	@RequestMapping(value = "/{entitatId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long entitatId) {
-		entitatService.delete(entitatId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"entitat.controller.esborrada.ok");
+	public String delete(HttpServletRequest request, @PathVariable Long entitatId) {
+
+		String msg = "entitat.controller.esborrada.ok";
+		if (entitatService.delete(entitatId) != null) {
+			return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", msg);
+		}
+		msg = "entitat.controller.esborrada.ko.notificacions.existents";
+		return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
 	}
 	
 	@RequestMapping(value = "/getEntitatLogoCap", method = RequestMethod.GET)

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.entity.EntitatEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,7 +28,7 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 	@Query(	  "FROM AplicacioEntity a "
 			+ "WHERE lower(a.usuariCodi) like concat('%', lower(:filtre), '%') "
 			+ "   OR lower(a.callbackUrl) like concat('%', lower(:filtre), '%')")
-	public Page<AplicacioEntity> findAllFiltrat(
+	Page<AplicacioEntity> findAllFiltrat(
 			@Param("filtre") String filtre,
 			Pageable paginacio
 			);
@@ -36,7 +37,7 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			+ "WHERE a.entitat.id = :entitatId "
 			+ "  AND (lower(a.usuariCodi) like concat('%', lower(:filtre), '%') "
 			+ "   OR lower(a.callbackUrl) like concat('%', lower(:filtre), '%'))")
-	public Page<AplicacioEntity> findByEntitatIdFiltrat(
+	Page<AplicacioEntity> findByEntitatIdFiltrat(
 			@Param("entitatId") Long entitatId,
 			@Param("filtre") String filtre,
 			Pageable paginacio);
@@ -64,14 +65,16 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			Pageable paginacio);
 	
 	@Query("SELECT count(a) FROM AplicacioEntity a WHERE a.entitat.id = :entitatId")
-	public Long countByEntitatId(@Param("entitatId") Long entitatId);
+	Long countByEntitatId(@Param("entitatId") Long entitatId);
 	
 	@Query(  "FROM AplicacioEntity a "
 			+ "WHERE a.entitat.id = :entitatId"
 			+ "		AND lower(a.usuariCodi) like concat('%', lower(:text), '%') "
 			+ "ORDER BY a.usuariCodi desc")
-	public AplicacioEntity findByText(
+	AplicacioEntity findByText(
 			@Param("entitatId") Long entitatId,
 			@Param("text") String text);
+
+	int deleteAplicacioEntityByEntitat(EntitatEntity entitat);
 
 }
