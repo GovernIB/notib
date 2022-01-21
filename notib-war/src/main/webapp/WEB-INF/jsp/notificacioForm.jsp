@@ -471,8 +471,7 @@
 			let inputElement = $(this);
 			let inputElementValue = $(this).val().trim();
 			let indexId = $(this).attr("id").split("[")[1].substring(0,1);
-			let url = "";
-			
+
 			resetWarningIErrorsDocArxiu(indexId);
 			
 			let esCsv = $(this).attr("id").toLowerCase().includes("csv");
@@ -490,57 +489,53 @@
 				}
 			}
 
-			if (esCsv) {
-				url = "consultaDocumentIMetadadesCsv";
-			}
-			else {
-				url = "consultaDocumentIMetadadesUuid";
-			}
-
+			let url = esCsv ? "consultaDocumentIMetadadesCsv" : "consultaDocumentIMetadadesUuid";
+			console.log("<c:url value="/notificacio/"/>" + url + "/" + inputElementValue);
 			$.ajax({
-				type: 'GET',
-				url: "<c:url value="/notificacio/"/>" + url + "/" + inputElementValue,
-						success: function(data) {
-							
-							consultarFocusout = false;
-							
-							if (!data.validacioIdCsv) {
-								inputElement.parent().closest('.form-group').addClass('has-error');
-								inputElement.parent().append('<div id="id_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.valor"/></p></div>');
-								return;
-							}
+				type: 'POST',
+				data: inputElementValue,
+				url: "<c:url value="/notificacio/"/>" + url + "/consulta",
+				success: function(data) {
 
-							if (!data.documentExistent){
-								inputElement.parent().closest('.form-group').addClass('has-error');
-								inputElement.parent().append('<div id="document_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.document.inexistent"/></p></div>');
-							}
-							else if (!data.metadadesExistents){ //document pero sin metadades
-								inputElement.addClass('warningClass');
-								inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent"/></p></div>');
-							}
-							else { //document y metadades	
-								if (data.origen != null) {
-									$("#documents\\[" +indexId+ "\\]\\.origen").val(data.origen).trigger("change.select2");
-									$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', true);
-								}
-								if (data.validesa != null) {
-									$("#documents\\[" +indexId+ "\\]\\.validesa").val(data.validesa).trigger("change.select2");
-									$("#documents\\[" +indexId+ "\\]\\.validesa").prop('disabled', true);
-								}
-								if (data.tipoDocumental != null) {
-									$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(data.tipoDocumental).trigger("change.select2");
-									$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").prop('disabled', true);
-								}
-								if (data.modoFirma != null) {
-									$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', data.modoFirma);
-									$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('disabled', true);
-								}
-							}
-						},
-						error: function() {
-							consultarFocusout = false;
-							console.log("error obtenint el document CSV i les seves metadades...");
+					consultarFocusout = false;
+
+					if (!data.validacioIdCsv) {
+						inputElement.parent().closest('.form-group').addClass('has-error');
+						inputElement.parent().append('<div id="id_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.valor"/></p></div>');
+						return;
 					}
+
+					if (!data.documentExistent){
+						inputElement.parent().closest('.form-group').addClass('has-error');
+						inputElement.parent().append('<div id="document_err_' + indexId + '"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.document.inexistent"/></p></div>');
+					}
+					else if (!data.metadadesExistents){ //document pero sin metadades
+						inputElement.addClass('warningClass');
+						inputElement.parent().append('<div id="metadades_war_' + indexId + '"><p class="help-block" style="color: orange;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<spring:message code="notificacio.form.camp.error.metadades.inexistent"/></p></div>');
+					}
+					else { //document y metadades
+						if (data.origen != null) {
+							$("#documents\\[" +indexId+ "\\]\\.origen").val(data.origen).trigger("change.select2");
+							$("#documents\\[" +indexId+ "\\]\\.origen").prop('disabled', true);
+						}
+						if (data.validesa != null) {
+							$("#documents\\[" +indexId+ "\\]\\.validesa").val(data.validesa).trigger("change.select2");
+							$("#documents\\[" +indexId+ "\\]\\.validesa").prop('disabled', true);
+						}
+						if (data.tipoDocumental != null) {
+							$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").val(data.tipoDocumental).trigger("change.select2");
+							$("#documents\\[" +indexId+ "\\]\\.tipoDocumental").prop('disabled', true);
+						}
+						if (data.modoFirma != null) {
+							$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('checked', data.modoFirma);
+							$("#documents\\[" +indexId+ "\\]\\.modoFirma").prop('disabled', true);
+						}
+					}
+				},
+				error: function() {
+					consultarFocusout = false;
+					console.log("error obtenint el document CSV i les seves metadades...");
+				}
 				});
 		});
 		

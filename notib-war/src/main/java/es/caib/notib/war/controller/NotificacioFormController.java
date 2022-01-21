@@ -483,25 +483,22 @@ public class NotificacioFormController extends BaseUserController {
         return notificacioService.llistarLocalitats(provinciaId);
     }
 
-    @RequestMapping(value = "/consultaDocumentIMetadadesCsv/{csv}", method = RequestMethod.GET)
+    @RequestMapping(value = "/consultaDocumentIMetadadesCsv/consulta", method = RequestMethod.POST)
     @ResponseBody
-    public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(
-            HttpServletRequest request,
-            @PathVariable String csv) {
+    public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(HttpServletRequest request, @RequestBody String csv) {
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
-
-    	if (validacioIdCsv)
-    		doc = notificacioService.consultaDocumentIMetadades(csv, false);
-
+    	if (validacioIdCsv) {
+            doc = notificacioService.consultaDocumentIMetadades(csv, false);
+        }
     	return existeixDocumentMetadades(validacioIdCsv, doc, request);
     }
 
-    @RequestMapping(value = "/consultaDocumentIMetadadesUuid/{uuid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST)
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesUuid(
             HttpServletRequest request,
-            @PathVariable String uuid) {
+            @RequestBody String uuid) {
         DocumentDto doc = notificacioService.consultaDocumentIMetadades(uuid, true);
 
         return existeixDocumentMetadades(true, doc, request);
