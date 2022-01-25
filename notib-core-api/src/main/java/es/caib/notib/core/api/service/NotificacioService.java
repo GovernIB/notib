@@ -359,18 +359,18 @@ public interface NotificacioService {
 	List getNotificacionsPendentsRefrescarEstatRegistre();
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
+	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
 			Long entitatId,
 			NotificacioRegistreErrorFiltreDto filtre,
 			PaginacioParamsDto paginacioDtoFromRequest);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public List<Long> findNotificacionsIdAmbErrorRegistre(
+	List<Long> findNotificacionsIdAmbErrorRegistre(
 			Long entitatId,
 			NotificacioRegistreErrorFiltreDto filtre);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public void reactivarRegistre(Long notificacioId);
+	void reactivarRegistre(Long notificacioId);
 
 	/**
 	 * Consulta les administracions disponibles dins DIR3 a partir del codi.
@@ -399,7 +399,7 @@ public interface NotificacioService {
 	 * @return Una llista amb les administracions cercades.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
+	List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
 			Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi);
 
 	/**
@@ -415,12 +415,15 @@ public interface NotificacioService {
 	 * @return el progrés d'actualització
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
+	ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat();
 
 	@PreAuthorize("hasRole('tothom')")
-	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
+	DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid);
 	
 	@PreAuthorize("hasRole('tothom')")
-	public boolean validarIdCsv (String idCsv);
+	boolean validarIdCsv (String idCsv);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean validarFormatCsv (String csv);
 
 }

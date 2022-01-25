@@ -1670,7 +1670,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public boolean validarIdCsv (String idCsv) {
 		return idCsv.length() >= getMidaMinIdCsv() ? Boolean.TRUE : Boolean.FALSE;
 	}
-	
+
+	@Override
+	public boolean validarFormatCsv(String csv) {
+		return csv.matches("^([0-9a-f]{64})$") || csv.matches("^([0-9a-zA-Z_]+)$");
+	}
+
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
 		
 		Document documentArxiu = new Document();

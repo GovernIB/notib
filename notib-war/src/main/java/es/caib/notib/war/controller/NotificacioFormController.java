@@ -483,75 +483,48 @@ public class NotificacioFormController extends BaseUserController {
         return notificacioService.llistarLocalitats(provinciaId);
     }
 
-    @RequestMapping(value = "/consultaDocumentIMetadadesCsv/consulta", method = RequestMethod.POST)
+    @RequestMapping(value = "/consultaDocumentIMetadadesCsv/consulta", method = RequestMethod.POST, headers="Content-Type=application/json")
     @ResponseBody
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(HttpServletRequest request, @RequestBody String csv) {
+
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
+        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
     	if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
-    	return existeixDocumentMetadades(validacioIdCsv, doc, request);
+    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
     }
 
-    @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST)
+    @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST, headers="Content-Type=application/json" )
     @ResponseBody
-    public RespostaConsultaArxiuDto consultaDocumentIMetadadesUuid(
-            HttpServletRequest request,
-            @RequestBody String uuid) {
+    public RespostaConsultaArxiuDto consultaDocumentIMetadadesUuid(HttpServletRequest request, @RequestBody String uuid) {
+
         DocumentDto doc = notificacioService.consultaDocumentIMetadades(uuid, true);
-
-        return existeixDocumentMetadades(true, doc, request);
+        return prepararResposta(true, doc, request);
     }
+    private RespostaConsultaArxiuDto prepararResposta(Boolean validacio, DocumentDto doc, HttpServletRequest request) {
 
-    private RespostaConsultaArxiuDto existeixDocumentMetadades(Boolean validacioIdCsv, DocumentDto doc, HttpServletRequest request) {
-
-		Boolean teMetadades = Boolean.FALSE;
-        if (doc != null) {
-        	teMetadades = doc.getOrigen() != null || doc.getValidesa() != null ||
-        		doc.getTipoDocumental() != null || doc.getModoFirma() != null;
-
-        	if (teMetadades) {
-    			//Es guarden en sessió
-            	RequestSessionHelper.actualitzarObjecteSessio(
-    	            request,
-    	            METADADES_ORIGEN,
-    	            doc.getOrigen());
-    			RequestSessionHelper.actualitzarObjecteSessio(
-    				request,
-    				METADADES_VALIDESA,
-    				doc.getValidesa());
-    			RequestSessionHelper.actualitzarObjecteSessio(
-    				request,
-    				METADADES_TIPO_DOCUMENTAL,
-    				doc.getTipoDocumental());
-    			RequestSessionHelper.actualitzarObjecteSessio(
-    				request,
-    				METADADES_MODO_FIRMA,
-    				doc.getModoFirma());
-            }
-
-        	 return RespostaConsultaArxiuDto.builder()
-             		.validacioIdCsv(Boolean.TRUE)
-             		.documentExistent(Boolean.TRUE)
-             		.metadadesExistents(teMetadades)
-             		.origen(doc.getOrigen())
-             		.validesa(doc.getValidesa())
-             		.tipoDocumental(doc.getTipoDocumental())
-             		.modoFirma(doc.getModoFirma())
-             		.build();
-        } else {
-        	return RespostaConsultaArxiuDto.builder()
-             		.validacioIdCsv(validacioIdCsv)
-        			.documentExistent(Boolean.FALSE)
-             		.metadadesExistents(teMetadades)
-             		.origen(null)
-             		.validesa(null)
-             		.tipoDocumental(null)
-             		.modoFirma(null)
-             		.build();
+        Boolean teMetadades = Boolean.FALSE;
+        if (!validacio && doc == null) {
+            return RespostaConsultaArxiuDto.builder().validacioIdCsv(false).documentExistent(false)
+                    .metadadesExistents(teMetadades).origen(null).validesa(null).tipoDocumental(null).modoFirma(null).build();
         }
-
+        if (doc == null) {
+            return RespostaConsultaArxiuDto.builder().validacioIdCsv(true).documentExistent(false)
+                    .metadadesExistents(teMetadades).origen(null).validesa(null).tipoDocumental(null).modoFirma(null).build();
+        }
+        teMetadades = doc.getOrigen() != null || doc.getValidesa() != null || doc.getTipoDocumental() != null || doc.getModoFirma() != null;
+        if (teMetadades) {
+            //Es guarden en sessió
+            RequestSessionHelper.actualitzarObjecteSessio(request, METADADES_ORIGEN, doc.getOrigen());
+            RequestSessionHelper.actualitzarObjecteSessio(request, METADADES_VALIDESA, doc.getValidesa());
+            RequestSessionHelper.actualitzarObjecteSessio(request, METADADES_TIPO_DOCUMENTAL, doc.getTipoDocumental());
+            RequestSessionHelper.actualitzarObjecteSessio(request, METADADES_MODO_FIRMA, doc.getModoFirma());
+        }
+        return RespostaConsultaArxiuDto.builder().validacioIdCsv(validacio).documentExistent(true)
+                .metadadesExistents(teMetadades).origen(doc.getOrigen()).validesa(doc.getValidesa())
+                .tipoDocumental(doc.getTipoDocumental()).modoFirma(doc.getModoFirma()).build();
     }
 
     private void emplenarModelNotificacio(

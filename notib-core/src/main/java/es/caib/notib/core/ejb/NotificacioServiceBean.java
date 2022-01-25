@@ -381,6 +381,11 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.validarIdCsv(idCsv);
 	}
 
+	@Override
+	public boolean validarFormatCsv(String csv) {
+		return delegate.validarFormatCsv(csv);
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List getNotificacionsDEHPendentsRefrescarCert() {

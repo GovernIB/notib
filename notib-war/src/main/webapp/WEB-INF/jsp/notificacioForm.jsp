@@ -493,6 +493,7 @@
 			console.log("<c:url value="/notificacio/"/>" + url + "/" + inputElementValue);
 			$.ajax({
 				type: 'POST',
+				contentType: "application/json",
 				data: inputElementValue,
 				url: "<c:url value="/notificacio/"/>" + url + "/consulta",
 				success: function(data) {
