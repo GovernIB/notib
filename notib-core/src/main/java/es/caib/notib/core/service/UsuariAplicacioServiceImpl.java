@@ -258,7 +258,7 @@ public class UsuariAplicacioServiceImpl implements UsuariAplicacioService {
 			String url = filtres.get(1).getValor();
 			Pageable params = paginacioHelper.toSpringDataPageable(paginacioParams);
 			Boolean activa = !Strings.isNullOrEmpty(filtres.get(2).getValor()) ?
-					Integer.parseInt(filtres.get(2).getValor()) == 1 ? true : false : true;
+					Integer.parseInt(filtres.get(2).getValor()) == 1 ? true : false : null;
 			Page<AplicacioEntity> aplicacions = activa != null ? aplicacioRepository.findByEntitatIdFiltrat(entitatId, codi, url, activa, params)
 					: aplicacioRepository.findByEntitatIdFiltrat(entitatId, codi, url, params);
 			
