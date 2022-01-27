@@ -1462,7 +1462,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		// Tipus d'enviament
 		if (notificacio.getEnviamentTipus() == null) {
-			return setRespostaError(messageHelper.getMessage("error.validacio.tipus.enviament.no.nul"));
+			return setRespostaError(messageHelper.getMessage("error.validacio.tipus.enviament.no.null"));
 		}
 		// Document
 		if (notificacio.getDocument() == null) {
