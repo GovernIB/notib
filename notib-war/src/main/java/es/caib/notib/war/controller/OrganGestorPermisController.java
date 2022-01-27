@@ -121,41 +121,28 @@ public class OrganGestorPermisController extends BaseUserController{
 			@Valid PermisCommand command,
 			BindingResult bindingResult,
 			Model model) throws NotFoundException, ValidationException {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"organGestor",
-					organGestorService.findById(
-							entitatActual.getId(),
-							organGestorId));
+			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 			model.addAttribute("principalSize", command.getPrincipalDefaultSize());
 			return "organGestorPermisForm";
 		}
-		
-		if (TipusEnumDto.ROL.equals(command.getTipus()) &&
-				command.getPrincipal().equalsIgnoreCase("tothom") &&
+
+		String msg = command.getId() == null ? "creat" : "modificat";
+		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") &&
 				RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-			model.addAttribute(
-					"organGestor",
-					organGestorService.findById(
-							entitatActual.getId(),
-							organGestorId));
-			return getModalControllerReturnValueError(
-					request,
-					"organGestorPermisForm",
-					"organgestor.controller.permis.modificat.ko");
+
+			model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
+			return getModalControllerReturnValueError(request,"organGestorPermisForm",
+					"organgestor.controller.permis." + msg + ".ko");
 		}
-		
+
+
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		organGestorService.permisUpdate(
-				entitatActual.getId(),
-				organGestorId,
-				isAdminOrgan,
-				PermisCommand.asDto(command));
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../organgestor/" + organGestorId + "/permis",
-				"organgestor.controller.permis.modificat.ok");
+		organGestorService.permisUpdate(entitatActual.getId(), organGestorId, isAdminOrgan, PermisCommand.asDto(command));
+		return getModalControllerReturnValueSuccess(request, "redirect:../../organgestor/" + organGestorId + "/permis",
+				"organgestor.controller.permis." + msg + ".ok");
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis/{permisId}/delete", method = RequestMethod.GET)
