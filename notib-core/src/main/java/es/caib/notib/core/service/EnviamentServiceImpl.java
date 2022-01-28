@@ -6,6 +6,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -1151,32 +1152,41 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		return transmissions;
 	}
-	
+
 	private Transmissio toTransmissio(NotificacioEnviamentDto enviament, String basePath) {
+
 		Transmissio transmissio = new Transmissio();
 		transmissio.setId(enviament.getId());
-		transmissio.setEmisor(enviament.getNotificacio().getEntitat().getCodi());
-		transmissio.setOrganGestor(enviament.getNotificacio().getOrganGestor());
-		if (enviament.getNotificacio().getProcediment() != null)
-			transmissio.setProcediment(enviament.getNotificacio().getProcediment().getCodi());
-		transmissio.setNumExpedient(enviament.getNotificacio().getNumExpedient());
-		transmissio.setConcepte(enviament.getNotificacio().getConcepte());
-		transmissio.setDescripcio(enviament.getNotificacio().getDescripcio());
-		Date dataProgramada = enviament.getNotificacio().getEnviamentDataProgramada();
+		NotificacioDto not = enviament.getNotificacio();
+		transmissio.setEmisor(not.getEntitat().getCodi());
+		transmissio.setOrganGestor(not.getOrganGestor());
+		if (not.getProcediment() != null) {
+			transmissio.setProcediment(not.getProcediment().getCodi());
+		}
+		transmissio.setNumExpedient(not.getNumExpedient());
+		transmissio.setConcepte(not.getConcepte());
+		transmissio.setDescripcio(not.getDescripcio());
+		Date dataProgramada = not.getEnviamentDataProgramada();
 		if (dataProgramada == null) {
-			transmissio.setDataEnviament(enviament.getNotificacio().getNotificaEnviamentData());
+			transmissio.setDataEnviament(not.getNotificaEnviamentData());
 		} else {
 			transmissio.setDataEnviament(dataProgramada);
 		}
 
-		transmissio.setEstat(Estat.valueOf(enviament.getNotificacio().getEstat().name()));
-		transmissio.setDataEstat(enviament.getNotificacio().getEstatDate());
-		if (enviament.getNotificacio().getDocument() != null) {
+		transmissio.setEstat(Estat.valueOf(not.getEstat().name()));
+		Date data = not.getEstatDate() != null ? not.getEstatDate() :
+				(NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) ? not.getRegistreData()
+						: NotificacioEstatEnumDto.PENDENT.equals(not.getEstat()) ? not.getCreatedDate()
+						: NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) ? not.getNotificaEnviamentData()
+						: not.getCreatedDate());
+
+		transmissio.setDataEstat(data);
+		if (not.getDocument() != null) {
 			Document document = Document.builder()
-					.nom(enviament.getNotificacio().getDocument().getArxiuNom())
-					.mediaType(enviament.getNotificacio().getDocument().getMediaType())
-					.mida(enviament.getNotificacio().getDocument().getMida())
-					.url(basePath + "/document/" + enviament.getNotificacio().getId()).build();
+					.nom(not.getDocument().getArxiuNom())
+					.mediaType(not.getDocument().getMediaType())
+					.mida(not.getDocument().getMida())
+					.url(basePath + "/document/" + not.getId()).build();
 			transmissio.setDocument(document);
 		}
 		transmissio.setTitular(toPersona(enviament.getTitular()));
@@ -1188,14 +1198,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 		transmissio.setDestinataris(destinataris);
 		transmissio.setSubestat(SubEstat.valueOf(enviament.getNotificaEstat().name()));
-		transmissio.setDataSubestat(enviament.getNotificaEstatData());
+		transmissio.setDataSubestat(enviament.getNotificaEstatData() != null ? enviament.getNotificaEstatData() : data);
 
 		transmissio.setError(enviament.isNotificaError());
 		transmissio.setErrorData(enviament.getNotificaErrorData());
 		transmissio.setErrorDescripcio(enviament.getNotificaErrorDescripcio());
 		
 		// Justificant de registre
-		if (NotificacioEstatEnumDto.REGISTRADA.equals(enviament.getNotificacio().getEstat()) &&
+		if (NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) &&
 			(enviament.getRegistreEstat() != null && 
 				(NotificacioRegistreEstatEnumDto.DISTRIBUIT.equals(enviament.getRegistreEstat()) || 
 				 NotificacioRegistreEstatEnumDto.OFICI_EXTERN.equals(enviament.getRegistreEstat()) ||

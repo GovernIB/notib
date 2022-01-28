@@ -27,6 +27,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;
 	private Date enviamentDataProgramada;
+	private Date createdDate;
 	private String concepte;
 //	private String pagadorCorreusCodiDir3;
 //	private String pagadorCorreusContracteNum;
