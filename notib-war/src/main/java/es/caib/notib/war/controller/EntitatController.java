@@ -165,11 +165,17 @@ public class EntitatController extends BaseController {
 	public String delete(HttpServletRequest request, @PathVariable Long entitatId) {
 
 		String msg = "entitat.controller.esborrada.ok";
-		if (entitatService.delete(entitatId) != null) {
-			return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", msg);
+		try {
+			if (entitatService.delete(entitatId) != null) {
+				return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", msg);
+			}
+			msg = "entitat.controller.esborrada.ko.notificacions.existents";
+			return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
+		} catch(Exception ex) {
+			msg = "entitat.controller.esborrada.ko";
+			return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
+
 		}
-		msg = "entitat.controller.esborrada.ko.notificacions.existents";
-		return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
 	}
 	
 	@RequestMapping(value = "/getEntitatLogoCap", method = RequestMethod.GET)
