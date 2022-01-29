@@ -63,50 +63,28 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
+
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if (mantenirPaginacio) {
-			model.addAttribute("mantenirPaginacio", true);
-		} else {
-			model.addAttribute("mantenirPaginacio", false);
-		}
+		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
 		UsuariDto usuariAcutal = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
 
-		model.addAttribute(
-				getFiltreCommand(request));
-		model.addAttribute(
-				"seleccio",
-				RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						SESSION_ATTRIBUTE_SELECCIO));
-		if(entitatActual != null) {
-			columnes = enviamentService.getColumnesUsuari(
-					entitatActual.getId(),
-					usuariAcutal);
-
-			if (columnes == null) {
-				enviamentService.columnesCreate(
-						usuariAcutal,
-						entitatActual.getId(),
-						columnes);
-			}
-		}else {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.entitat.cap.creada"));
-		}
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
-
+		model.addAttribute(filtreEnviaments);
+		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
+		if(entitatActual != null) {
+			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), usuariAcutal);
+			if (columnes == null) {
+				enviamentService.columnesCreate(usuariAcutal, entitatActual.getId(), columnes);
+			}
+		} else {
+			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.creada"));
+		}
 		model.addAttribute(new NotificacioEnviamentCommand());
 		model.addAttribute("columnes", ColumnesCommand.asCommand(columnes));
 		model.addAttribute("filtreEnviaments", filtreEnviaments);
-
 		return "enviamentList";
 	}
 
@@ -229,21 +207,17 @@ public class EnviamentController extends TableAccionsMassivesController {
 				"enviament.controller.modificat.ok");
 	}
 
-	private NotificacioEnviamentFiltreCommand getFiltreCommand(
-			HttpServletRequest request) {
-		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				ENVIAMENTS_FILTRE);
-		if (filtreCommand == null) {
-			filtreCommand = new NotificacioEnviamentFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					ENVIAMENTS_FILTRE,
-					filtreCommand);
+	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {
+
+		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
+		if (filtreCommand != null) {
+			return filtreCommand;
 		}
-		
+		filtreCommand = new NotificacioEnviamentFiltreCommand();
+		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
+		return filtreCommand;
+
 		/*Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));*/
-		return filtreCommand;
 	}
 }

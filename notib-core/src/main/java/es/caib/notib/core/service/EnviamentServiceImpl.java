@@ -668,6 +668,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.descripcio(new StringField(filtreDto.getDescripcio()))
 				.nifTitular(new StringField(filtreDto.getNifTitular()))
 				.nomTitular(new StringField(filtreDto.getNomTitular()))
+				.nomTitular(new StringField(filtreDto.getTitularNomLlinatge()))
 				.emailTitular(new StringField(filtreDto.getEmailTitular()))
 //				.destinataris(new FiltreField<>(dataProgramadaDisposicioFi))
 //				.registreLlibre(new FiltreField<>(dataProgramadaDisposicioFi))
