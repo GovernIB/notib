@@ -924,35 +924,24 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
 
     }
-    private void emplenarModelNotificacioInfo(
-            EntitatDto entitatActual,
-            Long notificacioId,
-            HttpServletRequest request,
-            String pipellaActiva,
-            Model model) {
-        NotificacioInfoDto notificacio = notificacioService.findNotificacioInfo(
-                notificacioId,
-                isAdministrador(request));
+    private void emplenarModelNotificacioInfo(EntitatDto entitatActual, Long notificacioId, HttpServletRequest request, String pipellaActiva, Model model) {
 
-        if (notificacio.getGrupCodi() != null) {
-            GrupDto grup = grupService.findByCodi(
-                    notificacio.getGrupCodi(),
-                    entitatActual.getId());
+        NotificacioInfoDto notificacio = notificacioService.findNotificacioInfo(notificacioId, isAdministrador(request));
+        if (notificacio != null && notificacio.getGrupCodi() != null) {
+            GrupDto grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);
         }
 
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
-        model.addAttribute("eventTipus",
-                EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
-        if (notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
+        model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, "es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+        model.addAttribute("permisGestio", null);
+        if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
             model.addAttribute("permisGestio", procedimentService.hasPermisProcediment(
                     notificacio.getProcediment().getId(),
                     PermisEnum.GESTIO));
-        } else {
-            model.addAttribute("permisGestio", null);
         }
+
         model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
     }
 

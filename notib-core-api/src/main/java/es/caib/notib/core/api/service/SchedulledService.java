@@ -57,4 +57,9 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a refrescar totes les notificacions CIE finalitzades sense certificació (cas pooling)
 	 */
 	void enviamentRefrescarEstatCIE();
+
+	/**
+	 * Mètode d'execució periòdica per a refrescar totes les notificacions CIE finalitzades sense certificació (cas pooling)
+	 */
+	void eliminarDocumentsTemporals();
 }

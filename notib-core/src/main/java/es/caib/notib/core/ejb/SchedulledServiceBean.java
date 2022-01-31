@@ -71,4 +71,9 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.enviamentRefrescarEstatCIE();
 	}
 
+	@Override
+	public void eliminarDocumentsTemporals() {
+		delegate.eliminarDocumentsTemporals();
+	}
+
 }
