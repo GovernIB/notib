@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -192,6 +193,20 @@ public class OrganGestorServiceBean implements OrganGestorService {
 				rol,
 				organ);
     }
+
+
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat) {
+		return delegate.generarArbreOrgans(codiEntitat);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<OrganGestorDto> getOrgansAsList() {
+		return delegate.getOrgansAsList();
+	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})

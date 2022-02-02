@@ -42,10 +42,18 @@
 			let entregaCieActiva = !$(this).hasClass('active');
 			$('#entregaCieActiva').val(entregaCieActiva);
 		})
+		$(".panel-heading").css({"display": "flex", "justify-content": "space-between"})
+		$(".panel-heading").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
+		$("#canviarVistaOrganGestor").click(function(){
+			window.location.replace("/notib/organgestorArbre");
+		});
 	});
 	</script>
 </head>
 <body>
+	<div id="botoVistes" class="row">
+
+	</div>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="organGestorFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">

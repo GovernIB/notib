@@ -29,7 +29,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 /**
- * Controlador per el mantinemnt de procediments.
+ * Controlador per el mantinemnt organs gestors format llista.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  *
@@ -334,7 +334,7 @@ public class OrganGestorController extends BaseUserController{
 				false);
 	}
 	
-	private OrganGestorFiltreCommand getFiltreCommand(
+	public OrganGestorFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		OrganGestorFiltreCommand organGestorFiltreCommand = (
 				OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(

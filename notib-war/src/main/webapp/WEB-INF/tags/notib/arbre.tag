@@ -88,5 +88,5 @@
 	.on('deselect_all.jstree', function (e, data) {
 		//console.log('>>> deselect_all.jstree');
 		//return ${changedCallback}(e, data);
-	})</c:if>;	
+	})</c:if>;
 </script>

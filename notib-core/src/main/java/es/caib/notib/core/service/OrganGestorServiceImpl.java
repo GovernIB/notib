@@ -19,6 +19,7 @@ import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private EntregaCieRepository entregaCieRepository;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
+
+	@Getter
+	private List<OrganGestorDto> organsList;
 
 	@Override
 	@Transactional
@@ -985,7 +989,51 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
     }
 
-    @Override
+	@Override
+	public List<OrganGestorDto> getOrgansAsList() {
+		return organsList;
+	}
+
+	@Override
+	public Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Map<String, NodeDir3> organs = cacheHelper.findOrganigramaNodeByEntitat(codiEntitat);
+			List<NodeDir3> nodes = (List<NodeDir3>) organs.values();
+			for (NodeDir3 node : nodes) {
+				organsList.add(conversioTipusHelper.convertir(node, OrganGestorDto.class));
+			}
+			Arbre<OrganGestorDto> arbre = new Arbre<>(true);
+			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(codiEntitat), OrganGestorDto.class));
+			arbre.setArrel(arrel);
+			arrel.setFills(generarFillsArbre(organs, arrel, codiEntitat));
+			return arbre;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private List<ArbreNode<OrganGestorDto>> generarFillsArbre(Map<String, NodeDir3> organs, ArbreNode<OrganGestorDto> pare, String codiEntitat) {
+
+		NodeDir3 organ = organs.get(codiEntitat);
+		List<NodeDir3> fills = organ.getFills();
+		List<ArbreNode<OrganGestorDto>> nodes = new ArrayList<>();
+		if (fills == null || fills.isEmpty()) {
+			return nodes;
+		}
+
+		for (int foo = 0; foo < fills.size(); foo++) {
+			NodeDir3 node = organs.get(fills.get(foo).getCodi());
+			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, conversioTipusHelper.convertir(node, OrganGestorDto.class));
+			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi());
+			actual.setFills(nets);
+			nodes.add(actual);
+		}
+		return nodes;
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public List<OficinaDto> getOficinesSIR(
 			Long entitatId,
