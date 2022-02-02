@@ -50,6 +50,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		boolean comunicacioAmbAdministracio = false;
 		boolean comunicacioSenseAdministracio = false;
 		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+		context.disableDefaultConstraintViolation();
 		try {
 
 			// Validació del Concepte
@@ -330,8 +331,12 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					+ "Si l'error es continua donant en properes intents, posis en contacte amb els administradors de l'aplicació.", ex);
         	valid = false;
         }
-		
-		
+		if (!valid) {
+			String msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())
+					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
+			msg = MessageHelper.getInstance().getMessage(msg, null, locale);
+			context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
+		}
 		return valid;
 	}
 	
