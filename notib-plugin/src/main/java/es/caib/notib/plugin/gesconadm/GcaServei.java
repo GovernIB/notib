@@ -10,12 +10,6 @@ import java.util.Date;
  *
  */
 @Getter @Setter
-public class GcaServei {
-	
-	private String codiSIA;
-    private String nom;
-    private String unitatAdministrativacodi;
-    private boolean comu;
-    private Date dataActualitzacio;
+public class GcaServei extends GesconAdm{
 
 }

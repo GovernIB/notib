@@ -171,6 +171,7 @@ $(document).ready(function() {
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
+								<li><a href="${unitatCodiUrlPrefix}servei/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="servei.list.boto.servei.actualitzar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}servei/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}servei/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="servei.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
@@ -193,7 +194,7 @@ $(document).ready(function() {
 					class="btn btn-default" href="${unitatCodiUrlPrefix}servei/update/auto"
 					data-toggle="modal"
 					data-maximized="false">
-					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="servei.list.boto.procediment.auto"/>
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="servei.list.boto.servei.auto"/>
 				</a>
 			</c:if>
 		</c:if>

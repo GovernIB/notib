@@ -364,6 +364,11 @@ public class ServeiServiceBean implements ServeiService {
 	}
 
 	@Override
+	public boolean actualitzarServei(String codiSia, EntitatDto entitat) {
+		return delegate.actualitzarServei(codiSia, entitat);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN"})
 	public void actualitzaServeis(EntitatDto entitat) {
 		delegate.actualitzaServeis(entitat);

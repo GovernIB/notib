@@ -10,13 +10,8 @@ import lombok.Setter;
  *
  */
 @Getter @Setter
-public class GcaProcediment {
-	
-	private String codiSIA;
-    private String nom;
-    private String unitatAdministrativacodi;
-    private boolean comu;
-    private Date dataActualitzacio;
+public class GcaProcediment extends GesconAdm {
+
 //    private GdaUnitatAdministrativa unidadAdministrativa;
 //    private GdaUnitatAdministrativa unitatAdministrativaPare;
 

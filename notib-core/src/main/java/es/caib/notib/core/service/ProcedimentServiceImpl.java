@@ -378,9 +378,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
-	public boolean actualitzarProcediment(String procedimentId, EntitatDto entitat) {
+	public boolean actualitzarProcediment(String codiSia, EntitatDto entitat) {
 		try {
-			ProcSerDto proc = pluginHelper.getProcedimentByCodiSia(procedimentId);
+			ProcSerDto proc = pluginHelper.getProcSerByCodiSia(codiSia, false);
 			if (proc == null) {
 				return false;
 			}

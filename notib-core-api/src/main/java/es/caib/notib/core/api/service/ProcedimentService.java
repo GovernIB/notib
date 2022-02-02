@@ -422,8 +422,6 @@ public interface ProcedimentService {
 	/**
 	 * Actualitza el procediment indicat amb la informació del procediment actual
 	 * retornada pel plugin Gestor Documental Administratiu (GDA)
-	 *
-	 * @param codiSia
 	 */
 	boolean actualitzarProcediment(String codiSia, EntitatDto entitat);
 

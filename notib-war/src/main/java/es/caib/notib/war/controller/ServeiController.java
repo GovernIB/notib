@@ -272,6 +272,20 @@ public class ServeiController extends BaseUserController{
 					e);
 		}
 	}
+
+	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
+	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
+
+		String urlResponse = "redirect:../../servei";
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			boolean trobat = serveiService.actualitzarServei(codiSia, entitat);
+			return trobat ?  getAjaxControllerReturnValueSuccess(request, urlResponse, "servei.controller.update.ok")
+					:  getAjaxControllerReturnValueError(request, urlResponse, "servei.controller.update.no.trobat");
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(request, urlResponse, "servei.controller.update.ko");
+		}
+	}
 	
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
 	public String actualitzacioAutomaticaGet(

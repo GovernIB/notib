@@ -33,29 +33,52 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	private String baseUrl;
 
 	@Override
-	public GcaProcediment getProcedimentByCodiSia(String codiSia) throws SistemaExternException {
+	public GesconAdm getProcSerByCodiSia(String codiSia, boolean isServei) throws SistemaExternException {
 
 		try {
-			String url = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
+			String url = getBaseUrl() + ROLSAC_SERVICE_PATH + (isServei ? "servicios" : "procedimientos");
 			Client jerseyClient = generarClient();
 			autenticarClient(jerseyClient, url);
-
 			Form form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
 			form.add("filtro", "{\"activo\":\"1\", \"codigoSia\":\"" + codiSia + "\"}");
-
 			String json = jerseyClient.resource(url).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
-
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			return isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'han pogut consultar el " + (isServei ? "servei" : "procediment")
+					+ " amb codi SIA " + codiSia + " via REST", ex);
+		}
+	}
+
+	@Override
+	public GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception {
+
+		try {
+			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta == null) {
+				return null;
+			}
+			List<GcaServei> procs = toServeiDto(resposta.getResultado());
+			return !procs.isEmpty() ? procs.get(0) : null;
+		} catch (Exception ex) {
+			throw ex;
+		}
+	}
+
+	@Override
+	public GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception {
+
+		try {
 			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
 			if (resposta == null) {
 				return null;
 			}
 			List<GcaProcediment> procs = toProcedimentDto(resposta.getResultado());
-			return procs.isEmpty() ? null : procs.get(0);
+			return !procs.isEmpty() ? procs.get(0) : null;
 		} catch (Exception ex) {
-			throw new SistemaExternException("No s'han pogut consultar els procediment amb codi SIA " + codiSia + " via REST", ex);
+			throw ex;
 		}
 	}
 

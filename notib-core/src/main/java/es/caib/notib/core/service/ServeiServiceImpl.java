@@ -375,6 +375,34 @@ public class ServeiServiceImpl implements ServeiService{
 	}
 
 	@Override
+	public boolean actualitzarServei(String codiSia, EntitatDto entitat) {
+
+		try {
+			ProcSerDto proc = pluginHelper.getProcSerByCodiSia(codiSia, true);
+			if (proc == null) {
+				return false;
+			}
+			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+			List<OrganGestorEntity> organsModificats = new ArrayList<OrganGestorEntity>();
+			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+			EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+			serveiHelper.actualitzarServeiFromGda(progres, proc, entity, organigrama, true, organsModificats);
+			boolean eliminarOrgans = isActualitzacioServeisEliminarOrgansProperty();
+			if (!eliminarOrgans) {
+				return true;
+			}
+			for (OrganGestorEntity organGestorAntic: organsModificats) {
+				//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava
+				serveiHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
+			}
+			return true;
+		} catch (Exception ex) {
+			logger.error("Error actualitzant el procediment", ex);
+			throw ex;
+		}
+	}
+
+	@Override
 	//@Transactional(timeout = 300)
 	public void actualitzaServeis(EntitatDto entitatDto) {
 		

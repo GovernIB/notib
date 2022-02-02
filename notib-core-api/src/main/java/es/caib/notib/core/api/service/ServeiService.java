@@ -419,6 +419,13 @@ public interface ServeiService {
 	boolean hasServeisComunsAndNotificacioPermission(Long entitatId);
 
 	/**
+	 * Actualitza el servei indicat amb la informació del servei actual
+	 * retornada pel plugin Gestor Documental Administratiu (GDA)
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	boolean actualitzarServei(String codiSia, EntitatDto entitat);
+
+	/**
 	 * Actualitza els serveis de la entitat indicada amb la informació dels serveis actual
 	 * retornada pel plugin Gestor Documental Administratiu (GDA)
 	 *

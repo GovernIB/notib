@@ -17,6 +17,7 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
 import es.caib.notib.plugin.gesconadm.GcaServei;
+import es.caib.notib.plugin.gesconadm.GesconAdm;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
@@ -953,12 +954,12 @@ public class PluginHelper {
 		return totalElements;
 	}
 
-	public ProcSerDto getProcedimentByCodiSia(String codiSia) {
+	public ProcSerDto getProcSerByCodiSia(String codiSia, boolean isServei) {
 
-		String msg = "Obtenint procediment amb codi SIA " + codiSia + " del gestor documental administratiu";
+		String msg = "Obtenint " + (isServei ? "servei" : "procediment") + " amb codi SIA " + codiSia + " del gestor documental administratiu";
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM, msg, IntegracioAccioTipusEnumDto.ENVIAMENT);
 		try {
-			GcaProcediment proc = getGestorDocumentalAdministratiuPlugin().getProcedimentByCodiSia(codiSia);
+			GesconAdm proc = getGestorDocumentalAdministratiuPlugin().getProcSerByCodiSia(codiSia, isServei);
 			if (proc == null) {
 				return null;
 			}

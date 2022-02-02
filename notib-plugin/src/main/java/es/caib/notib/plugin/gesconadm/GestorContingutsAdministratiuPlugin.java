@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.gesconadm;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.plugin.SistemaExternException;
 
 import java.util.List;
@@ -15,25 +16,23 @@ import java.util.List;
  */
 public interface GestorContingutsAdministratiuPlugin {
 
+	GesconAdm getProcSerByCodiSia(String codiSia, boolean isService) throws SistemaExternException;
+
+	GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception;
+
+	GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception;
+
 	// Procediments
 
 	/**
-	 * Busca el procediment amb codiSia definit al Gestor documental administratiu.
-	 * @param codiSia
-	 * @return procediment amb codi SIA especificat per parametre.
-	 * @throws SistemaExternException Si es produeix un error al consultar els procediments.
-	 */
-	GcaProcediment getProcedimentByCodiSia(String codiSia) throws SistemaExternException;
-
-	/**
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu.
-	 * 
+	 *
 	 * @return La llista de procediments.
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar els procediments.
 	 */
 	public List<GcaProcediment> getAllProcediments() throws SistemaExternException;
-	
+
 	/**
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu per a una unitat administrativa.
 	 * 
