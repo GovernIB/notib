@@ -726,6 +726,25 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return permisosCacheable.findOrgansGestorsAccessiblesUsuari(auth);
 	}
+
+	@Transactional
+	@Override
+	public List<PermisDto> permisFind(Long entitatId, Long id) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (entitatId == null || id == null) {
+				return new ArrayList<>();
+			}
+			logger.debug("Consulta dels permisos de l'organ gestor (entitatId=" + entitatId +  ", id=" + id +  ")");
+			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			entityComprovarHelper.comprovarOrganGestor(entitat, id);
+			return  permisosHelper.findPermisos(id, OrganGestorEntity.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	
 	@Transactional
 	@Override
@@ -1000,10 +1019,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Map<String, NodeDir3> organs = cacheHelper.findOrganigramaNodeByEntitat(codiEntitat);
-			List<NodeDir3> nodes = (List<NodeDir3>) organs.values();
-			for (NodeDir3 node : nodes) {
-				organsList.add(conversioTipusHelper.convertir(node, OrganGestorDto.class));
-			}
+			List<NodeDir3> nodes = new ArrayList<>(organs.values());
+			organsList = new ArrayList<>();
+//			for (NodeDir3 node : nodes) {
+//				organsList.add(conversioTipusHelper.convertir(node, OrganGestorDto.class));
+//			}
 			Arbre<OrganGestorDto> arbre = new Arbre<>(true);
 			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(codiEntitat), OrganGestorDto.class));
 			arbre.setArrel(arrel);
@@ -1020,6 +1040,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<NodeDir3> fills = organ.getFills();
 		List<ArbreNode<OrganGestorDto>> nodes = new ArrayList<>();
 		if (fills == null || fills.isEmpty()) {
+			organsList.add(conversioTipusHelper.convertir(organ, OrganGestorDto.class));
 			return nodes;
 		}
 

@@ -131,6 +131,11 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
+	public List<PermisDto> permisFind(Long entitatId, Long id) throws NotFoundException {
+		return delegate.permisFind(entitatId, id);
+	}
+
+	@Override
 	public List<OrganGestorDto> findAccessiblesByUsuariActual() {
 		return delegate.findAccessiblesByUsuariActual();
 	}

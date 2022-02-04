@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.xml.bind.ValidationException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -64,6 +65,20 @@ public class OrganGestorPermisController extends BaseUserController{
 		return "organGestorPermis";
 	}
 
+	@RequestMapping(value = "/{codiSia}/permisos", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse getPermisos(HttpServletRequest request, @PathVariable String codiSia, Model model) {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (entitatActual == null) {
+			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
+		}
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		OrganGestorDto organ = organGestorService.findByCodi(entitatActual.getId(), codiSia);
+		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organ.getId(), paginacio);
+		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
+	}
+
 	@RequestMapping(value = "/{organGestorId}/permis/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
@@ -71,6 +86,9 @@ public class OrganGestorPermisController extends BaseUserController{
 			@PathVariable Long organGestorId, 
 			Model model) {
 
+		if (organGestorId == 1) {
+			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
+		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
