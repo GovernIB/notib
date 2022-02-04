@@ -864,59 +864,60 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
         if (linia[4] == null || linia[4].isEmpty()) {
             notificacio.setDocument(null);
-        } else {
-            if (fileNames.contains(linia[4])) { // Archivo físico
-                document.setArxiuNom(linia[4]);
-                byte[] arxiuBytes;
-                if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
-                        (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) &&
-                                documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
-                    arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, linia[4]);
-                    document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
-                    document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
-                    document.setGenerarCsv(false);
-                    document.setMediaType(URLConnection.guessContentTypeFromName(linia[4]));
-                    document.setMida(Long.valueOf(arxiuBytes.length));
-                    if (registreNotificaHelper.isSendDocumentsActive()) {
-                        llegirMetadades = true;
+            return llegirMetadades;
+        }
+
+        if (fileNames != null && fileNames.contains(linia[4])) { // Archivo físico
+            document.setArxiuNom(linia[4]);
+            byte[] arxiuBytes;
+            if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
+                    (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
+
+                arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, linia[4]);
+                document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
+                document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+                document.setGenerarCsv(false);
+                document.setMediaType(URLConnection.guessContentTypeFromName(linia[4]));
+                document.setMida(Long.valueOf(arxiuBytes.length));
+                if (registreNotificaHelper.isSendDocumentsActive()) {
+                    llegirMetadades = true;
 //                        leerMetadadesDelCsv(notificacio, document, linia);
-                    }
-                }
-                notificacio.setDocument(document);
-            } else {
-                String[] docSplit = linia[4].split("\\.");
-                if (docSplit.length > 1 && Arrays.asList("JPG", "JPEG", "ODT", "ODP", "ODS", "ODG", "DOCX", "XLSX", "PPTX",
-                        "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP")
-                        .contains(docSplit[1].toUpperCase())) {
-                    notificacio.setDocument(null);
-                    notificacio.getErrors().add(messageHelper.getMessage("error.document.no.trobat.dins.zip"));
-                } else {
-                    String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
-                    Pattern pUuid = Pattern.compile(uuidPattern);
-                    Matcher mUuid = pUuid.matcher(linia[4]);
-                    if (mUuid.matches()) {
-                        // Uuid
-                        document.setUuid(linia[4]);
-                        document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
-                        document.setGenerarCsv(false);
-                        if (registreNotificaHelper.isSendDocumentsActive()) {
-                            llegirMetadades = true;
-//                            leerMetadadesDelCsv(notificacio, document, linia);
-                        }
-                    } else {
-                        // Csv
-                        document.setCsv(linia[4]);
-                        document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
-                        document.setGenerarCsv(false);
-                        if (registreNotificaHelper.isSendDocumentsActive()) {
-                            llegirMetadades = true;
-//                            leerMetadadesDelCsv(notificacio, document, linia);
-                        }
-                    }
-                    notificacio.setDocument(document);
                 }
             }
+            notificacio.setDocument(document);
+            return llegirMetadades;
         }
+        String[] docSplit = linia[4].split("\\.");
+        if (docSplit.length > 1 && Arrays.asList("JPG", "JPEG", "ODT", "ODP", "ODS", "ODG", "DOCX", "XLSX", "PPTX",
+                "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP")
+                .contains(docSplit[1].toUpperCase())) {
+            notificacio.setDocument(null);
+            notificacio.getErrors().add(messageHelper.getMessage("error.document.no.trobat.dins.zip"));
+            return llegirMetadades;
+        }
+        String uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$";
+        Pattern pUuid = Pattern.compile(uuidPattern);
+        Matcher mUuid = pUuid.matcher(linia[4]);
+        if (mUuid.matches()) {
+            // Uuid
+            document.setUuid(linia[4]);
+            document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+            document.setGenerarCsv(false);
+            if (registreNotificaHelper.isSendDocumentsActive()) {
+                llegirMetadades = true;
+//                            leerMetadadesDelCsv(notificacio, document, linia);
+            }
+            return llegirMetadades;
+        }
+        // Csv
+        document.setCsv(linia[4]);
+        document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
+        document.setGenerarCsv(false);
+        if (registreNotificaHelper.isSendDocumentsActive()) {
+            llegirMetadades = true;
+//                            leerMetadadesDelCsv(notificacio, document, linia);
+        }
+        notificacio.setDocument(document);
 
         return llegirMetadades;
     }

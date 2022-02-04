@@ -361,7 +361,14 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
                         request,
                         getMessage(request, "notificacio.massiva.error.fila", new Object[] {notificacioMassivaException.getFila(), notificacioMassivaException.getColumna()}) +
                                 "<br/>" + notificacioMassivaException.getMessage() +
-                                "<br/>" + notificacioMassivaException.getCause().getMessage());
+                                (notificacioMassivaException.getCause().getMessage() != null ? "<br/>" + notificacioMassivaException.getCause().getMessage() : "") +
+                                "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
+                                "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
+                                "\t\t\t</button>\n" +
+                                "\t\t\t<div id=\"collapseError\" class=\"collapse\">\n" +
+                                "\t\t\t\t<br/>\n" +
+                                "\t\t\t\t<textarea rows=\"10\" style=\"width:100%\">" + ExceptionUtils.getStackTrace(notificacioMassivaException) +"</textarea>\n" +
+                                "\t\t\t</div>");
             } else {
                 MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.error") + "<br/>" + ex.getMessage());
             }
