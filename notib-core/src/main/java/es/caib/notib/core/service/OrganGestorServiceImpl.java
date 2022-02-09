@@ -85,6 +85,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private ConfigHelper configHelper;
 	@Autowired
 	private EntregaCieRepository entregaCieRepository;
+	@Autowired
+	private PluginHelper pluginHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 
@@ -684,14 +686,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	
 	@Transactional(readOnly = true)
 	@Override
-	public OrganGestorDto findByCodi(
-			Long entitatId,
-			String codi) {
+	public OrganGestorDto findByCodi(Long entitatId, String codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'organ gestor ("
-					+ "entitatId=" + entitatId + ", "
-					+ "codi=" + codi + ")");
+			logger.debug("Consulta de l'organ gestor (entitatId=" + entitatId + ", codi=" + codi + ")");
 //			EntitatEntity entitat = null;
 				
 			//TODO: verificació de permisos per administrador entitat i per administrador d'Organ
@@ -707,14 +705,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //					codi);
 			
 			OrganGestorEntity organGestor = organGestorRepository.findByCodi(codi);
-			
-			if (organGestor!=null) {
-					OrganGestorDto resposta = conversioTipusHelper.convertir(
-					organGestor,
-					OrganGestorDto.class);
-					return resposta;
-			}else
+			if (organGestor == null) {
 				return null;
+			}
+			OrganGestorDto resposta = conversioTipusHelper.convertir(organGestor, OrganGestorDto.class);
+			return resposta;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1014,44 +1009,53 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 
 	@Override
-	public Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat) {
+	public Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat, OrganGestorFiltreDto filtres) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Map<String, NodeDir3> organs = cacheHelper.findOrganigramaNodeByEntitat(codiEntitat);
 			List<NodeDir3> nodes = new ArrayList<>(organs.values());
 			organsList = new ArrayList<>();
-//			for (NodeDir3 node : nodes) {
-//				organsList.add(conversioTipusHelper.convertir(node, OrganGestorDto.class));
-//			}
 			Arbre<OrganGestorDto> arbre = new Arbre<>(true);
 			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(codiEntitat), OrganGestorDto.class));
 			arbre.setArrel(arrel);
-			arrel.setFills(generarFillsArbre(organs, arrel, codiEntitat));
+			arrel.setFills(generarFillsArbre(organs, arrel, codiEntitat, filtres));
 			return arbre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
-	private List<ArbreNode<OrganGestorDto>> generarFillsArbre(Map<String, NodeDir3> organs, ArbreNode<OrganGestorDto> pare, String codiEntitat) {
+	private List<ArbreNode<OrganGestorDto>> generarFillsArbre(Map<String, NodeDir3> organs, ArbreNode<OrganGestorDto> pare,
+															  String codiEntitat, OrganGestorFiltreDto filtres) {
 
 		NodeDir3 organ = organs.get(codiEntitat);
 		List<NodeDir3> fills = organ.getFills();
+		OrganGestorDto o = conversioTipusHelper.convertir(organ, OrganGestorDto.class);
 		List<ArbreNode<OrganGestorDto>> nodes = new ArrayList<>();
-		if (fills == null || fills.isEmpty()) {
-			organsList.add(conversioTipusHelper.convertir(organ, OrganGestorDto.class));
+		if (fills == null || fills.isEmpty() && filtres.filtresOk(o)) {
+			organsList.add(o);
 			return nodes;
 		}
 
 		for (int foo = 0; foo < fills.size(); foo++) {
 			NodeDir3 node = organs.get(fills.get(foo).getCodi());
-			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, conversioTipusHelper.convertir(node, OrganGestorDto.class));
-			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi());
+			o = conversioTipusHelper.convertir(node, OrganGestorDto.class);
+			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, o);
+			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi(), filtres);
+			if (!filtres.filtresOk(o) && nets.isEmpty()) {
+				continue;
+			}
 			actual.setFills(nets);
 			nodes.add(actual);
 		}
 		return nodes;
+	}
+
+	public OrganGestorDto getOrganNou(String codiSia) {
+
+		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codiSia);
+		return organs != null && !organs.isEmpty() ? organs.get(0) : new OrganGestorDto();
 	}
 
 	@Override

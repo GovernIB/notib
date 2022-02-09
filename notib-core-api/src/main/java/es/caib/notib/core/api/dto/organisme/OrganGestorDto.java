@@ -33,12 +33,18 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 
 	private Boolean sir;
 	private String cif;
+	private boolean actiu;
 
 	private String nomCodi;
 
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;
 	private Long cieId;
+
+	public void setOrganGestorEstatEnum(OrganGestorEstatEnum estat) {
+		this.estat = estat;
+		actiu = estat != null && OrganGestorEstatEnum.VIGENT.equals(estat);
+	}
 
 	public String getNomCodi() {
 		return nom + " (" + codi + ")";

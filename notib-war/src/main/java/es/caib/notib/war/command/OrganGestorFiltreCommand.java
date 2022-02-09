@@ -20,7 +20,7 @@ public class OrganGestorFiltreCommand {
 	private String nom;
 	private String oficina;
 	private OrganGestorEstatEnum estat;
-	private boolean entregaCieActiva;
+	private boolean entregaCie;
 
 	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
 		if (dto == null) {

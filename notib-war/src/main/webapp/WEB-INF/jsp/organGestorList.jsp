@@ -34,13 +34,13 @@
 					this.selectedIndex = 0;
 				}
 			});
-			$('#btn-entregaCieActiva').removeClass('active');
+			$('#btn-entregaCie').removeClass('active');
 			$('#entregaCieActiva').val(false);
 			$('#form-filtre').submit();
 		});
-		$('#btn-entregaCieActiva').click(function() {
-			let entregaCieActiva = !$(this).hasClass('active');
-			$('#entregaCieActiva').val(entregaCieActiva);
+		$('#btn-entregaCie').click(function() {
+			let entregaCie = !$(this).hasClass('active');
+			$('#entregaCie').val(entregaCie);
 		})
 		$(".panel-heading").css({"display": "flex", "justify-content": "space-between"})
 		$(".panel-heading").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
@@ -89,15 +89,15 @@
 				</div>
 			</div>
 		</div>
-	<div class="row">
-		<div class="col-md-2">
-				<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
-			<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
-				<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
-			</button>
-			<not:inputHidden name="entregaCieActiva"/>
+		<div class="row">
+			<div class="col-md-2">
+					<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
+				<button id="btn-entregaCie" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCie}">active</c:if>" data-toggle="button">
+					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
+				</button>
+				<not:inputHidden name="entregaCie"/>
+			</div>
 		</div>
-	</div>
 	</form:form>
 
 	<table

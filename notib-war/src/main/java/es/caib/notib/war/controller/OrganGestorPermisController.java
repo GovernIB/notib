@@ -65,6 +65,19 @@ public class OrganGestorPermisController extends BaseUserController{
 		return "organGestorPermis";
 	}
 
+	@RequestMapping(value = "/{organGestorId}/permis/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long organGestorId, Model model) {
+
+		if (organGestorId == 0) {
+			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
+		}
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
+		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
+	}
+
 	@RequestMapping(value = "/{codiSia}/permisos", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse getPermisos(HttpServletRequest request, @PathVariable String codiSia, Model model) {
@@ -75,26 +88,13 @@ public class OrganGestorPermisController extends BaseUserController{
 		}
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		OrganGestorDto organ = organGestorService.findByCodi(entitatActual.getId(), codiSia);
+		if (organ == null) {
+			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
+		}
 		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organ.getId(), paginacio);
 		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 	}
 
-	@RequestMapping(value = "/{organGestorId}/permis/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request, 
-			@PathVariable Long organGestorId, 
-			Model model) {
-
-		if (organGestorId == 1) {
-			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
-		}
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
-		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
-	}
-	
 	@RequestMapping(value = "/{organGestorId}/permis/new", method = RequestMethod.GET)
 	public String getNew(
 			HttpServletRequest request,
@@ -164,19 +164,11 @@ public class OrganGestorPermisController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/{organGestorId}/permis/{permisId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long organGestorId,
-			@PathVariable Long permisId,
-			Model model) {
+	public String delete(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		organGestorService.permisDelete(
-				entitatActual.getId(),
-				organGestorId,
-				permisId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../../../organgestor/" + organGestorId + "/permis",
-				"organgestor.controller.permis.esborrat.ok");
+		organGestorService.permisDelete(entitatActual.getId(), organGestorId, permisId);
+		String url = "redirect:../../../../organgestor/" + organGestorId + "/permis";
+		return getAjaxControllerReturnValueSuccess(request, url, "organgestor.controller.permis.esborrat.ok");
 	}
 }

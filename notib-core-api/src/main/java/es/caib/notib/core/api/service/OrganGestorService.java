@@ -193,8 +193,11 @@ public interface OrganGestorService {
 	 *  Obte el llistat d'organs en format d'arbre
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat);
+	Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat, OrganGestorFiltreDto filtres);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<OrganGestorDto> getOrgansAsList();
+	List<OrganGestorDto> getOrgansAsList();
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	OrganGestorDto getOrganNou(String codiSia);
 }

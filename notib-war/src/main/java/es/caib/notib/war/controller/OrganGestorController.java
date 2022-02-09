@@ -206,33 +206,22 @@ public class OrganGestorController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/{organGestorCodi}/update", method = RequestMethod.GET)
-	public String updateNom(
-			HttpServletRequest request,
-			@PathVariable String organGestorCodi) {		
-		
+	public String updateNom(HttpServletRequest request, @PathVariable String organGestorCodi) {
+
+		String redirect = "redirect:../../organgestor";
+		redirect += request.getHeader("Referer").contains("Arbre") ? "Arbre" : "";
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		
 		try {
-			organGestorService.updateOne(
-					entitat.getId(),
-					organGestorCodi);
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					"redirect:../../organgestor",
-					"organgestor.controller.update.nom.ok");
+			organGestorService.updateOne(entitat.getId(), organGestorCodi);
+			return getAjaxControllerReturnValueSuccess(request, redirect, "organgestor.controller.update.nom.ok");
 		} catch (Exception e) {
 			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../organgestor",
-					"organgestor.controller.update.nom.error");
+			return getAjaxControllerReturnValueError(request, redirect, "organgestor.controller.update.nom.error");
 		}
 	}
 
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
-	public String actualitzacioAutomaticaGet(
-			HttpServletRequest request,
-			Model model) {
+	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("isUpdatingOrgans", organGestorService.isUpdatingOrgans(entitat));
 		return "organGestorActualitzacioForm";
@@ -246,8 +235,7 @@ public class OrganGestorController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	public String updateNoms(
-			HttpServletRequest request, Model model) {
+	public String updateNoms(HttpServletRequest request, Model model) {
 		
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		

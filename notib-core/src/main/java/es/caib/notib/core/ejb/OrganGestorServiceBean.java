@@ -199,18 +199,21 @@ public class OrganGestorServiceBean implements OrganGestorService {
 				organ);
     }
 
-
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat) {
-		return delegate.generarArbreOrgans(codiEntitat);
+	public Arbre<OrganGestorDto> generarArbreOrgans(String codiEntitat, OrganGestorFiltreDto filtres) {
+		return delegate.generarArbreOrgans(codiEntitat, filtres);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> getOrgansAsList() {
 		return delegate.getOrgansAsList();
+	}
+
+	@Override
+	public OrganGestorDto getOrganNou(String codiSia) {
+		return delegate.getOrganNou(codiSia);
 	}
 
 	@Override
