@@ -224,7 +224,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 							integracioHelper.addAccioError(info, errorDescripcio);
 							return setRespostaError(errorDescripcio);
 						}
-						organGestorHelper.crearOrganGestor(entitat, notificacio.getOrganGestor());
+						organGestor = organGestorHelper.crearOrganGestor(entitat, notificacio.getOrganGestor());
 					}
 				}
 				if (procediment != null && procediment.isComu() && organGestor != null) {

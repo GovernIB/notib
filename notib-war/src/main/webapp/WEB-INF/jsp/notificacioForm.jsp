@@ -555,89 +555,13 @@
 
 
 		$('.customSelect').webutilInputSelect2(null);
-		let i = 0;
-		let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
-		let tipusDocumentSelected = $('#tipusDocumentSelected_0').val();
 
-		if (tipusDocumentSelected !== '') {
-			$("#tipusDocument_0").val(tipusDocumentSelected).trigger("change");
-			$("#document").removeClass("hidden");
-		} else if (tipusDocumentDefault !== '') {
-			$("#tipusDocument_0").val(tipusDocumentDefault).trigger("change");
-			if (tipusDocumentDefault === 'CSV') {
-				$('#documentArxiuCsv\\[0\\]').val("${nomDocument_0}");
-			} else if (tipusDocumentDefault === 'UUID') {
-				$('#documentArxiuUuid\\[0\\]').val("${nomDocument_0}");
-			} else if (tipusDocumentDefault === 'URL') {
-				$('#documentArxiuUrl\\[0\\]').val("${nomDocument_0}");
-			}
-		}
-		var nom_documents = [
-			"${nomDocument_0}",
-			"${nomDocument_1}",
-			"${nomDocument_2}",
-			"${nomDocument_3}",
-			"${nomDocument_4}",
-		];
-		for (let i = 1; i < 4; i++) {
-			let document_arxiuNom = $('input[name="documents\\[' + i + '\\].arxiuNom"]').val();
-			let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
-			let tipusDocumentSelected = $('#tipusDocumentSelected_' + i).val();
-			if (tipusDocumentSelected !== '') {
-				$("#tipusDocument_" + i).val(tipusDocumentSelected[i]).trigger("change");
-				$("#document" + (i+1)).removeClass("hidden");
-				numDocuments++;
-			} else if (tipusDocumentDefault !== '' && document_arxiuNom !== '') {
-				$("#tipusDocument_" + i).val(tipusDocumentDefault).trigger("change");
-				if (tipusDocumentDefault === 'CSV') {
-					$('#documentArxiuCsv_' + i).val(nom_documents[i]);
-				} else if (tipusDocumentDefault === 'UUID') {
-					$('#documentArxiuUuid_' + i).val(nom_documents[i]);
-				} else if (tipusDocumentDefault === 'URL') {
-					$('#documentArxiuUrl_' + i).val(nom_documents[i]);
-				}
-
-				$("#tipusDocument_" + i).val(tipusDocumentDefault[i]).trigger("change");
-				$("#document" + (i+1)).removeClass("hidden");
-				numDocuments++;
-			}
-		}
-
-
-		$('#addDocument').click(function() {
-			let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
-			console.debug(tipusDocumentDefault);
-			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault).trigger("change");
-			$('#document' + (numDocuments + 1)).removeClass('hidden');
-			numDocuments++;
-			if (numDocuments == 5)
-				$('#addDocument').addClass('hidden');
-			$('#removeDocument').removeClass('hidden');
-		});
-
-		$('#removeDocument').click(function() {
-			$('#document' + numDocuments).addClass('hidden');
-			var documentFields = numDocuments - 1;
-			
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].id"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuGestdocId"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuNom"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mediaType"]').val('');
-			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mida"]').val('');
-			numDocuments--;
-			$('#tipusDocument_' + numDocuments).val('').trigger('change');
-
-			if (numDocuments == 1)
-				$('#removeDocument').addClass('hidden');
-			$('#addDocument').removeClass('hidden');
-		});
-
+		// Documents
 		var isWindowReload = [true, true, true, true, true];
 		$('.tipusDocument').on('change', function() {
 			let id = $(this).attr("id").split("_")[1];
 			if (!isWindowReload[id]) {
 				resetWarningIErrorsDocArxiu(id);
-				
 			} else {
 				isWindowReload[id] = false;
 			}
@@ -693,6 +617,69 @@
 			webutilModalAdjustHeight();
 		});
 
+		var nom_documents = [
+			"${nomDocument_0}",
+			"${nomDocument_1}",
+			"${nomDocument_2}",
+			"${nomDocument_3}",
+			"${nomDocument_4}",
+		];
+
+		for (let i = 0; i < 5; i++) {
+			let document_arxiuNom = $('input[name="documents\\[' + i + '\\].arxiuNom"]').val();
+			let tipusDocumentDefault = $('#tipusDocumentDefault' + i).val();
+			let tipusDocumentSelected = $('#tipusDocumentSelected_' + i).val();
+			if (tipusDocumentSelected !== '') {
+				if (i > 0) {
+					$("#document" + (i + 1)).removeClass("hidden");
+					numDocuments++;
+				}
+				$("#tipusDocument_" + i).val(tipusDocumentSelected).trigger("change");
+			} else if (tipusDocumentDefault !== '' && (i == 0 || document_arxiuNom !== '')) {
+				if (i > 0) {
+					$("#document" + (i + 1)).removeClass("hidden");
+					numDocuments++;
+				}
+				$("#tipusDocument_" + i).val(tipusDocumentDefault).trigger("change");
+				if (tipusDocumentDefault === 'CSV') {
+					$('#documentArxiuCsv\\[' + i + '\\]').val(nom_documents[i]);
+				} else if (tipusDocumentDefault === 'UUID') {
+					$('#documentArxiuUuid\\[' + i + '\\]').val(nom_documents[i]);
+				} else if (tipusDocumentDefault === 'URL') {
+					$('#documentArxiuUrl\\[' + i + '\\]').val(nom_documents[i]);
+				}
+				// $("#tipusDocument_" + i).val(tipusDocumentDefault[i]).trigger("change");
+			}
+		}
+
+
+		$('#addDocument').click(function() {
+			let tipusDocumentDefault = $('#tipusDocumentDefault' + numDocuments).val();
+			console.debug(tipusDocumentDefault);
+			$("#tipusDocument_" + numDocuments).val(tipusDocumentDefault).trigger("change");
+			$('#document' + (numDocuments + 1)).removeClass('hidden');
+			numDocuments++;
+			if (numDocuments == 5)
+				$('#addDocument').addClass('hidden');
+			$('#removeDocument').removeClass('hidden');
+		});
+
+		$('#removeDocument').click(function() {
+			$('#document' + numDocuments).addClass('hidden');
+			var documentFields = numDocuments - 1;
+
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].id"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuGestdocId"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].arxiuNom"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mediaType"]').val('');
+			$('#document' + numDocuments).find('input[name="documents[' + documentFields + '].mida"]').val('');
+			numDocuments--;
+			$('#tipusDocument_' + numDocuments).val('').trigger('change');
+
+			if (numDocuments == 1)
+				$('#removeDocument').addClass('hidden');
+			$('#addDocument').removeClass('hidden');
+		});
 
 		if ($('#document2').is(":visible")) {
 			$('#removeDocument').removeClass('hidden');
@@ -907,7 +894,7 @@
 				$(dir3codi).find('.form-group').addClass('has-error')
 			}
 
-			clearDocuments(numDocuments);
+			// clearDocuments(numDocuments);
 
 		});
 

@@ -888,7 +888,7 @@ public class PluginHelper {
 					contingutOut);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de gestió documental";
+			String errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_GESDOC,
@@ -1090,6 +1090,9 @@ public class PluginHelper {
 		
 		Map<String, NodeDir3> organigrama = null;
 		String filenameOrgans = getOrganGestorsFile();
+		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
+			filenameOrgans = filenameOrgans + "_" + entitatcodi + ".json";
+		}
 		try {
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				logger.info("Obtenir l'organigrama per entitat SOAP");

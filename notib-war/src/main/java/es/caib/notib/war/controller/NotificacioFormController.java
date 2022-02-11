@@ -316,13 +316,10 @@ public class NotificacioFormController extends BaseUserController {
                     case ARXIU:
                         if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
                             notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
-//                                notificacioCommand.getDocument()[i].setNormalitzat(notificacioCommand.getDocument()[i].isNormalitzat());
                             String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
                             notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
                             notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
-//                                notificacioCommand.getDocument()[i].setMetadadesKeys(notificacioCommand.getDocument()[i].getMetadadesKeys());
-//                                notificacioCommand.getDocument()[i].setMetadadesValues(notificacioCommand.getDocument()[i].getMetadadesValues());
                         } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
                             byte[] result;
                             if (notificacioCommand.getId() != null) {
@@ -333,27 +330,37 @@ public class NotificacioFormController extends BaseUserController {
 
                             String contingutBase64 = Base64.encodeBase64String(result);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
                         }
                         break;
                     case CSV:
                         if (notificacioCommand.getDocumentArxiuCsv()[i] != null
                                 && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
                             notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
                         }
                         break;
                     case UUID:
                         if (notificacioCommand.getDocumentArxiuUuid()[i] != null
                                 && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
                             notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
                         }
                         break;
                     case URL:
                         if (notificacioCommand.getDocumentArxiuUrl()[i] != null
                                 && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
                             notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
                         }
                         break;
                 }
+            } else {
+                notificacioCommand.getDocuments()[i] = null;
             }
         }
     }
@@ -669,9 +676,9 @@ public class NotificacioFormController extends BaseUserController {
                 documentCommand.setMediaType(notificacioCommand.getArxiu()[i].getContentType());
                 documentCommand.setMida(notificacioCommand.getArxiu()[i].getSize());
 
-                arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(notificacioCommand.getDocuments()[i].getContingutBase64());
+                arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(documentCommand.getContingutBase64());
 
-                notificacioCommand.getDocuments()[i].setArxiuGestdocId(arxiuGestdocId);
+                documentCommand.setArxiuGestdocId(arxiuGestdocId);
                 model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
 
             } else if (documentCommand.getArxiuNom() != null && !documentCommand.getArxiuNom().isEmpty()) {
