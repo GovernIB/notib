@@ -242,6 +242,12 @@ table.dataTable tr.datatable-dades-carregant div {
 	justify-content: center;
 }
 
+.flex-column-space-between {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
 .flex-space-between {
 	display:flex;
 	justify-content: space-between;
