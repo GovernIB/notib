@@ -645,7 +645,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			return notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
+			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
+			List<NotificacioTableItemDto> nots = pag.getContingut();
+			for (NotificacioTableItemDto not : nots) {
+				NotificacioEntity e = notificacioRepository.findById(not.getId());
+				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
+				not.setDocumentId(id);
+			}
+			return pag;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
