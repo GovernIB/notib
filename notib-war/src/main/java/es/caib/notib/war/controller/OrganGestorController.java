@@ -167,41 +167,27 @@ public class OrganGestorController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
-	public String update(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long organGestorId) {		
+	public String update(HttpServletRequest request, Model model, @PathVariable Long organGestorId) {
+
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		try {
-			boolean isOficinaEntitat = entitat.isOficinaEntitat();
-			
-			if (!isOficinaEntitat) {
-				OrganGestorDto organGestorDto = organGestorService.findById(
-						entitat.getId(),
-						organGestorId);
+				OrganGestorDto organGestorDto = organGestorService.findById(entitat.getId(), organGestorId);
 				OrganGestorCommand organGestorCommand = OrganGestorCommand.asCommand(organGestorDto);
-	
+				entitat = entitatService.findById(entitat.getId());
 				model.addAttribute(organGestorCommand);
 				model.addAttribute("entitat", entitat);
 				model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
-				model.addAttribute("setOficina", !isOficinaEntitat);
+				model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 				model.addAttribute("isModificacio", true);
 				List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
 				model.addAttribute("operadorPostalList", operadorPostalList);
 				List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
 				model.addAttribute("cieList", cieList);
+
 				return "organGestorForm";
-			}
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../organgestor",
-					"organgestor.controller.update.nom.error");
 		} catch (Exception e) {
 			logger.error(String.format("Excepció intentant actualitzar l'òrgan gestor (Id=%d):", organGestorId), e);
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../organgestor",
-					"organgestor.controller.update.nom.error");
+			return getAjaxControllerReturnValueError(request, "redirect:../../organgestor", "organgestor.controller.update.nom.error");
 		}
 	}
 	

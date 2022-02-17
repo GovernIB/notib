@@ -241,6 +241,9 @@ $(document).ready(function() {
 					<li class="list-group-item"><b><spring:message code="organgestor.form.camp.codiDir3"/>:</b> ${organGestorCommand.codi}</li>
 					<li class="list-group-item"><b><spring:message code="organgestor.form.camp.organisme"/>:</b> ${organGestorCommand.nom}</li>
 					<li class="list-group-item"><b><spring:message code="organgestor.form.camp.llibre"/>:</b> ${organGestorCommand.llibreNom}</li>
+					<c:if test="${!setOficina}">
+						<li class="list-group-item"><b><spring:message code="organgestor.form.camp.codiDir3"/>:</b> ${organGestorCommand.oficinaNom}</li>
+					</c:if>
 				</ul>
 			</c:if>
 			<c:if test="${setOficina}">

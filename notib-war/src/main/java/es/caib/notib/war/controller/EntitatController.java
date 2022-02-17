@@ -110,12 +110,10 @@ public class EntitatController extends BaseController {
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}
+
 	@RequestMapping(method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid EntitatCommand command,
-			BindingResult bindingResult,
-			Model model) throws NotFoundException, IOException {
+	public String save(HttpServletRequest request, @Valid EntitatCommand command, BindingResult bindingResult, Model model) throws NotFoundException, IOException {
+
 		if (bindingResult.hasErrors()) {
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
 			model.addAttribute("operadorPostalList", operadorPostalList);
@@ -124,20 +122,16 @@ public class EntitatController extends BaseController {
 			model.addAttribute("errors", bindingResult.getAllErrors());
 			return "entitatForm";
 		}
+		String redirect = "redirect:entitat";
+		String msg = command.getId() != null ? "entitat.controller.modificada.ok" : "entitat.controller.creada.ok";
 		if (command.getId() != null) {
 			entitatService.update(command.asDto());
 			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:entitat" + (isAdminEntitat ? "/" + command.getId() : ""),
-					"entitat.controller.modificada.ok");
-		} else {
-			entitatService.create(command.asDto());
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:entitat",
-					"entitat.controller.creada.ok");
+			return getModalControllerReturnValueSuccess(request,redirect + (isAdminEntitat ? "/" + command.getId() : ""), msg);
 		}
+		entitatService.create(command.asDto());
+		return getModalControllerReturnValueSuccess(request, redirect, msg);
+
 	}
 
 	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)
