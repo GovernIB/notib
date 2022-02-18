@@ -135,7 +135,7 @@ public class ProcedimentServiceTest {
 				null,
 				false,
 				false).build();
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entitat, null, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null,null, entitat, null, null, null, null, null).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		procedimentOrgans.add(procedimentOrgan);
 		

@@ -375,7 +375,7 @@ body {
 											<li class="divider"></li>
 											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
 											<li><a id="mc_serveis" href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
-											<li><a id="mc_organs" href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
+											<li><a id="mc_organs" href="<c:url value="/organgestorArbre"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 											<li class="divider"></li>
 											<li><a id="mc_grups" href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 											<li class="divider"></li>

@@ -496,7 +496,7 @@ public class PluginHelperTest {
 	}
 
 	private OrganGestorEntity initOrganGestor(EntitatEntity entitatMock) {
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null,
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, null,
 				entitatMock, null, null, null, null, null).build();
 		return organGestor;
 

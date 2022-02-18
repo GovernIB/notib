@@ -132,7 +132,7 @@ public class NotificacioHelperTest {
                 .grup(grupDto)
                 .build();
 
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, entidad, null,
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null,null, entidad, null,
 				null, null, null, null).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();

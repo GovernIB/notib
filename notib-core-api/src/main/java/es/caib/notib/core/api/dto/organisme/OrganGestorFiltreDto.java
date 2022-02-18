@@ -16,19 +16,19 @@ import java.util.Locale;
 public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	
 	private String codi;
+	private String codiPare;
 	private String nom;
 	private String oficina;
 	private OrganGestorEstatEnum estat;
-	private boolean entregaCieActiva;
+	private boolean entregaCie;
 
 	private static final long serialVersionUID = -2393511650074099319L;
 
 	public boolean filtresOk(OrganGestorDto organ) {
 
-		return organ != null && (codi == null || organ.getCodi() != null &&  organ.getCodi().contains(codi.toUpperCase()))
-				&& (nom == null || organ.getNom() != null && organ.getNom().toLowerCase().contains(nom.toLowerCase()))
-				&& (estat == null || estat.equals(organ.getEstat())
-				&& (organ.isEntregaCieActiva()) == entregaCieActiva)
-				&& (oficina == null || oficina.equals(organ.getOficina()));
+		return organ != null && (codi == null || codi.isEmpty() || organ.getCodi() != null &&  organ.getCodi().contains(codi.toUpperCase()))
+				&& (nom == null || nom.isEmpty() || organ.getNom() != null && organ.getNom().toLowerCase().contains(nom.toLowerCase()))
+				&& (!entregaCie || organ.getCieId() != null)
+				&& (oficina == null || oficina.isEmpty() || organ.getOficina() != null && oficina.equals(organ.getOficina().getCodi()));
 	}
 }

@@ -27,6 +27,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@NaturalId
 	@Column(name = "codi", length = 64, nullable = false, unique = true)
 	protected String codi;
+
+	@Column(name = "codi_pare", length = 64)
+	protected String codiPare;
 	
 	@Column(name = "nom", length = 1000)
 	protected String nom;
@@ -75,6 +78,10 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	public void update(String nom) {
 		this.nom = nom;
 	}
+
+	public void updateCodiPare(String codiPare) {
+		this.codiPare = codiPare;
+	}
 	
 	public void updateLlibre(
 			String llibre,
@@ -99,6 +106,7 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	public static OrganGestorEntityBuilder builder(
 			String codi,
 			String nom,
+			String codiPare,
 			EntitatEntity entitat,
 			String llibre,
 			String llibreNom,
@@ -113,7 +121,8 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 				.llibreNom(llibreNom)
 				.oficina(oficina)
 				.oficinaNom(oficinaNom)
-				.estat(estat);
+				.estat(estat)
+				.codiPare(codiPare);
 	}
 
 	@Override

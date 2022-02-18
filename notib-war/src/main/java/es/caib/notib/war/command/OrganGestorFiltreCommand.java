@@ -17,6 +17,7 @@ import lombok.Setter;
 public class OrganGestorFiltreCommand {
 	
 	private String codi;
+	private String codiPare;
 	private String nom;
 	private String oficina;
 	private OrganGestorEstatEnum estat;
@@ -26,15 +27,11 @@ public class OrganGestorFiltreCommand {
 		if (dto == null) {
 			return null;
 		}
-		OrganGestorFiltreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				OrganGestorFiltreCommand.class );
+		OrganGestorFiltreCommand command = ConversioTipusHelper.convertir(dto,OrganGestorFiltreCommand.class );
 		return command;
 	}
 	public OrganGestorFiltreDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				OrganGestorFiltreDto.class);
+		return ConversioTipusHelper.convertir(this, OrganGestorFiltreDto.class);
 	}
 
 	@Override

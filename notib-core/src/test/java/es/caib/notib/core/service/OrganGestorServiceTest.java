@@ -90,6 +90,7 @@ public class OrganGestorServiceTest {
         OrganGestorEntity organGestor = OrganGestorEntity.builder(
                 ORGAN_CODI,
                 "nom vell",
+                null,
                 entitatEntity,
                 "llibre",
                 "llibre nom",

@@ -21,6 +21,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private Long id;
 	@EqualsAndHashCode.Include
 	private String codi;
+	private String codiPare;
 	private String nom;
 	private Long entitatId;
 	private String entitatNom;

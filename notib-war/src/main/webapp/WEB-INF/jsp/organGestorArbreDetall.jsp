@@ -34,6 +34,13 @@
 
     <script type="text/javascript">
 
+        $(document).on("click", "#expandAll", function() {
+            $('#arbreOrgans').jstree().open_all(null, 200);
+        });
+
+        $(document).on("click", "#closeAll", function() {
+            $('#arbreOrgans').jstree().close_all(null, 300);
+        });
 
 
         $.views.helpers({
@@ -126,21 +133,23 @@
         <div class="flex-column">
             <not:inputHidden name="id"/>
             <not:inputHidden name="entitatId"/>
-            <not:inputText name="codi" disabled="false" textKey="organgestor.list.columna.codi" required="true"/>
-            <not:inputText name="nom" disabled="false" textKey="organgestor.list.columna.nom" required="true"/>
+            <not:inputText name="codi" readonly="true" textKey="organgestor.list.columna.codi" required="true"/>
+            <not:inputText name="nom" readonly="true" textKey="organgestor.list.columna.nom" required="true"/>
 
-            <not:inputText name="estat" disabled="false" textKey="organgestor.list.columna.estat" required="true"/>
+            <not:inputText name="estat" readonly="true" textKey="organgestor.list.columna.estat" required="true"/>
 
-
-            <c:if test="${setLlibre}">
+            <c:if test="${setLlibre and !isModificacio}">
                 <br/>
                 <form:hidden path="llibreNom"/>
                 <not:inputSelect name="llibre" required="true" optionItems="${llibres}" optionValueAttribute="codi"
                                  optionTextAttribute="nomCurt" emptyOption="true"
                                  textKey="organgestor.form.camp.llibre" placeholderKey="organgestor.form.camp.llibre.info" optionMinimumResultsForSearch="0"/>
             </c:if>
+            <c:if test="${setLlibre and isModificacio}">
+                <not:inputText name="llibreNom" disabled="true" textKey="organgestor.form.camp.llibre"/>
+            </c:if>
             <c:if test="${!setOficina}">
-                <not:inputText generalClass="row" name="oficinaNom" disabled="true" textKey="organgestor.list.columna.oficina"/>
+                <not:inputText name="oficinaNom" disabled="true" textKey="organgestor.list.columna.oficina"/>
             </c:if>
             <c:if test="${setOficina}">
                 <br/>
