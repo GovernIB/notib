@@ -77,6 +77,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
+			" and (:isCodiPareNull = true or lower(og.codiPare) like lower('%'||:codiPare||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.oficina) like lower('%'||:oficina||'%'))"+
 			" and (:isEstatNull = true or og.estat = :estat)" +
@@ -92,6 +93,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") OrganGestorEstatEnum estat,
 			@Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isCodiPareNull") boolean isCodiPareNull,
+			@Param("codiPare") String codiPare,
 			Pageable paginacio);
 	
 	@Query( "select distinct og " +
@@ -116,6 +119,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where (og.entitat = :entitat)" + 
 			"and og.codi in (:organsIds)" +
 			" and (:isCodiNull = true or lower(og.codi) like lower('%'||:codi||'%'))" +
+			" and (:isCodiPareNull = true or lower(og.codiPare) like lower('%'||:codiPare||'%'))" +
 			" and (:isNomNull = true or lower(og.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOficinaNull = true or lower(og.entitat.oficina) like lower('%'||:oficina||'%'))" +
 			" and (:isEstatNull = true or og.estat = :estat)")
@@ -130,6 +134,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("oficina") String oficina,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") OrganGestorEstatEnum estat,
+			@Param("isCodiPareNull") boolean isCodiPareNull,
+			@Param("codiPare") String codiPare,
 			Pageable paginacio);
 	
 	@Query(	"select distinct og.codi " +

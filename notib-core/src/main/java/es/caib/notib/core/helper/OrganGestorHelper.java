@@ -141,9 +141,11 @@ public class OrganGestorHelper {
 				arbreUnitats,
 				codiOrgan);
 		NodeDir3 nodeOrgan = arbreUnitats.get(codiOrgan);
+		String codiPare = nodeOrgan != null ? nodeOrgan.getSuperior().split("-")[0].trim() : null;
 		OrganGestorEntity organGestor = OrganGestorEntity.builder(
 				codiOrgan,
 				findDenominacioOrganisme(nodeOrgan, codiOrgan),
+				codiPare,
 				entitat,
 				llibreOrgan.getCodi(),
 				llibreOrgan.getNomLlarg(),

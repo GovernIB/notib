@@ -48,7 +48,7 @@ public class OrganGestorController extends BaseUserController{
 	private OperadorPostalService operadorPostalService;
 	@Autowired
 	private PagadorCieService cieService;
-	
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 
@@ -61,41 +61,29 @@ public class OrganGestorController extends BaseUserController{
 		model.addAttribute("oficinesEntitat", organGestorService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(), true));
 		return "organGestorList";
 	}
-	
-	
+
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable( 
-			HttpServletRequest request ) {
-		
+	public DatatablesResponse datatable(HttpServletRequest request ) {
+
 		OrganGestorFiltreCommand organGestorFiltreCommand = getFiltreCommand(request);
-		PaginaDto<OrganGestorDto> organs = new PaginaDto<OrganGestorDto>();
-		
+		PaginaDto<OrganGestorDto> organs = new PaginaDto<>();
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
 			OrganGestorDto organGestorActual = getOrganGestorActual(request);
-			String organActualCodiDir3=null;
-			if (organGestorActual!=null) organActualCodiDir3 = organGestorActual.getCodi();
-			
-			organs = organGestorService.findAmbFiltrePaginat(
-					entitat.getId(),
-					organActualCodiDir3,
-					organGestorFiltreCommand.asDto(),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
-		}catch(SecurityException e) {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
-							request, 
-							"notificacio.controller.entitat.cap.assignada"));
+			String organActualCodiDir3 = null;
+			if (organGestorActual != null) {
+				organActualCodiDir3 = organGestorActual.getCodi();
+			}
+			organs = organGestorService.findAmbFiltrePaginat(entitat.getId(), organActualCodiDir3,
+					organGestorFiltreCommand.asDto(), DatatablesHelper.getPaginacioDtoFromRequest(request));
+
+		} catch (SecurityException e) {
+			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
 		}
-		return DatatablesHelper.getDatatableResponse(
-				request, 
-				organs,
-				"codi");
+		return DatatablesHelper.getDatatableResponse(request, organs, "codi");
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(HttpServletRequest request, OrganGestorFiltreCommand command, Model model) {
 		
@@ -210,24 +198,16 @@ public class OrganGestorController extends BaseUserController{
 	public String updateNoms(HttpServletRequest request, Model model) {
 		
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		
+		String url = "redirect:../organgestor";
+		String msg = "organgestor.controller.update.nom.tots.ok";
 		try {
 			OrganGestorDto organGestorActual = getOrganGestorActual(request);
-			String codiDir3OrganActual=null;
-			if (organGestorActual!=null) codiDir3OrganActual = organGestorActual.getCodi();
-			
-			organGestorService.updateAll(
-					entitat.getId(), codiDir3OrganActual);
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					"redirect:../organgestor",
-					"organgestor.controller.update.nom.tots.ok");
+			organGestorService.updateAll(entitat.getId(), organGestorActual != null ? organGestorActual.getCodi() : null);
+			return getAjaxControllerReturnValueSuccess(request, url, msg);
 		} catch (Exception e) {
 			logger.error("Excepció intentant actualitzar tots els òrgans gestors", e);
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../organgestor",
-					"organgestor.controller.update.nom.tots.error");
+			msg = "organgestor.controller.update.nom.tots.error";
+			return getAjaxControllerReturnValueError(request, url, msg);
 		}
 	}
 	

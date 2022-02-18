@@ -16,6 +16,7 @@ import java.util.Locale;
 public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	
 	private String codi;
+	private String codiPare;
 	private String nom;
 	private String oficina;
 	private OrganGestorEstatEnum estat;

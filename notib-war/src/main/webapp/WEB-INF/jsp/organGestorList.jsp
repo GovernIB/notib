@@ -63,6 +63,9 @@
 				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
 			</div>
 			<div class="col-md-2">
+				<not:inputText name="codiPare" inline="true" placeholderKey="organgestor.list.columna.codi.pare"/>
+			</div>
+			<div class="col-md-2">
 				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
 			</div>
 			<c:if test="${setOficina}">
@@ -124,6 +127,7 @@
  					</script>
 				</th>
 				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
+				<th data-col-name="codiPare"><spring:message code="organgestor.list.columna.codi.pare"/></th>
 				<c:if test="${setLlibre}">
 					<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				</c:if>
