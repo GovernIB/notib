@@ -722,7 +722,7 @@
                         <li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/documentDescarregar/{{:documentId}}"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
-<%--                        <li><a href="<c:url value="/notificacio/{{:id}}/enviament/{{:enviament.id}}/certificacioDescarregar"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>--%>
+                        <li><a href="<c:url value="/notificacio/{{:id}}/enviament/certificacionsDescarregar"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>
                     {^{if (~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar }}
                         <li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
                     {{/if}}

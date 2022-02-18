@@ -592,16 +592,21 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void certificacioDescarregar(
-            HttpServletResponse response,
-            @PathVariable Long notificacioId,
-            @PathVariable Long enviamentId) throws IOException {
+    public void certificacioDescarregar(HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+
         ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse(
-                arxiu.getNom(),
-                arxiu.getContingut(),
-                response);
+        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+    }
+
+    @RequestMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar", method = RequestMethod.GET)
+    @ResponseBody
+    public void certificacionsDescarregar(HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
+
+//
+//        ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+//        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+//        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
     }
 
 	/////
