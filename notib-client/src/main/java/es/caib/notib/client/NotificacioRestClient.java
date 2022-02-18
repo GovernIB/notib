@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Deprecated
 public class NotificacioRestClient extends NotificacioBaseRestClient {
 
 	private static final String NOTIFICACIOV1_SERVICE_PATH = "/api/services/notificacioV2";

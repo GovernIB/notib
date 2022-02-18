@@ -1101,7 +1101,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			resposta.setErrorData(new Date());
 		}
 		resposta.setReferencies(referencies);
-		resposta.setDataCreacio(notificacioGuardada.getCreatedDate().toDate());
+		resposta.setDataCreacio(notificacioGuardada.getCreatedDate() != null ? notificacioGuardada.getCreatedDate().toDate() : null);
 		logger.debug(">> [ALTA] afegides referències");
 		integracioHelper.addAccioOk(info);
 		return resposta;
