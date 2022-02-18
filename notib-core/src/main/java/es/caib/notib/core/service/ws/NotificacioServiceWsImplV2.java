@@ -105,15 +105,31 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private MessageHelper messageHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
+
+
 	@Transactional
 	@Override
 	public RespostaAlta alta(
+			NotificacioV2 notificacio) throws NotificacioServiceWsException {
+		RespostaAltaV2 resposta = altaV2(notificacio);
+		return RespostaAlta.builder()
+				.identificador(resposta.getIdentificador())
+				.estat(resposta.getEstat())
+				.referencies(resposta.getReferencies())
+				.error(resposta.isError())
+				.errorDescripcio(resposta.getErrorDescripcio())
+				.build();
+	}
+
+	@Transactional
+	@Override
+	public RespostaAltaV2 altaV2(
 			NotificacioV2 notificacio) throws NotificacioServiceWsException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
 			
-			RespostaAlta resposta = new RespostaAlta();
+			RespostaAltaV2 resposta;
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
 			ProcSerOrganEntity procedimentOrgan = null;
@@ -421,6 +437,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	@Override
+	@Transactional
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -486,12 +503,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 
 	@Override
 	@Transactional(readOnly = true)
-	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
-			String identificador) {
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
+		RespostaConsultaEstatNotificacioV2 resposta = consultaEstatNotificacioV2(identificador);
+		return RespostaConsultaEstatNotificacio.builder()
+				.estat(resposta.getEstat())
+				.error(resposta.isError())
+				.errorData(resposta.getErrorData())
+				.errorDescripcio(resposta.getErrorDescripcio())
+				.build();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacioV2(String identificador) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			IntegracioInfo info = new IntegracioInfo(
@@ -501,7 +529,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					new AccioParam("Identificador xifrat de la notificacio", identificador));
 			
 			Long notificacioId;
-			RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
+			RespostaConsultaEstatNotificacioV2 resposta = new RespostaConsultaEstatNotificacioV2();
+			resposta.setIdentificador(identificador);
 	
 			try {
 				try {
@@ -540,6 +569,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
 						break;
 					}
+
+					resposta.setTipus(notificacio.getEnviamentTipus().name());
+					resposta.setEmisorDir3(notificacio.getEmisorDir3Codi());
+					if (notificacio.getProcediment() != null)
+						resposta.setProcediment(Procediment.builder()
+								.codiSia(notificacio.getProcediment().getCodi())
+								.nom(notificacio.getProcediment().getNom())
+								.build());
+					resposta.setConcepte(notificacio.getConcepte());
+					if (notificacio.getOrganGestor() != null)
+						resposta.setOrganGestorDir3(notificacio.getOrganGestor().getCodi());
+					resposta.setNumExpedient(notificacio.getNumExpedient());
+
+					resposta.setDataCreada(notificacio.getCreatedDate().toDate());
+					resposta.setDataEnviada(notificacio.getNotificaEnviamentData());
+					resposta.setDataFinalitzada(notificacio.getEstatDate());
+					resposta.setDataProcessada(notificacio.getEstatProcessatDate());
 				}
 
 				NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacio);
@@ -578,9 +624,25 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	@Override
-	@Transactional
-	public RespostaConsultaEstatEnviament consultaEstatEnviament(
-			String referencia) throws NotificacioServiceWsException {
+	@Transactional(readOnly = true)
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
+		RespostaConsultaEstatEnviamentV2 resposta = consultaEstatEnviamentV2(referencia);
+		return RespostaConsultaEstatEnviament.builder()
+				.estat(resposta.getEstat())
+				.estatOrigen(resposta.getDatat() != null ? resposta.getDatat().getOrigen() : null)
+				.estatDescripcio(resposta.getEstatDescripcio())
+				.receptorNif(resposta.getDatat() != null ? resposta.getDatat().getReceptorNif() : null)
+				.receptorNom(resposta.getDatat() != null ? resposta.getDatat().getReceptorNom() : null)
+				.certificacio(resposta.getCertificacio())
+				.error(resposta.isError())
+				.errorData(resposta.getErrorData())
+				.errorDescripcio(resposta.getErrorDescripcio())
+				.build();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviamentV2(String referencia) throws NotificacioServiceWsException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			IntegracioInfo info = new IntegracioInfo(
@@ -599,9 +661,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			}
 			if (enviament == null)
 				enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
-			
-			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
+
 			logger.debug("Consultant estat enviament amb referencia: " + referencia);
+			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
 			try {
 				if (enviament == null) {
 					resposta.setError(true);
@@ -619,30 +681,106 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						logger.debug("Consultat estat de l'enviament amb referencia " + referencia + " a Notifica.");
 						enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
 					}
+					try {
+						resposta.setIdentificador(notificaHelper.xifrarId(enviament.getNotificacio().getId()));
+					} catch (Exception ex) {
+						logger.error("No s'ha pogut xifrar l'identificador.", ex);
+					}
+					resposta.setNotificaIndentificador(enviament.getNotificaIdentificador());
 					resposta.setEstat(toEnviamentEstat(enviament.getNotificaEstat()));
 					resposta.setEstatData(enviament.getNotificaEstatData());
 					resposta.setEstatDescripcio(enviament.getNotificaEstatDescripcio());
-					resposta.setReceptorNif(enviament.getNotificaDatatReceptorNif());
-					resposta.setReceptorNom(enviament.getNotificaDatatReceptorNom());
+					resposta.setDehNif(enviament.getDehNif());
+					resposta.setDehObligat(enviament.getDehObligat() != null ? enviament.getDehObligat() : false);
+					resposta.setEntragaPostalActiva(enviament.getEntregaPostal() != null);
+					if (enviament.getEntregaPostal() != null)
+						resposta.setAdressaPostal(enviament.getEntregaPostal().toString());
+					boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
+							InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
+					resposta.setEnviamentSir(esSir);
+
+					// INTERESSAT
+					Persona interessat = Persona.builder()
+							.interessatTipus(enviament.getTitular().getInteressatTipus())
+							.nom(enviament.getTitular().getNom())
+							.llinatge1(enviament.getTitular().getLlinatge1())
+							.llinatge2(enviament.getTitular().getLlinatge2())
+							.nif(enviament.getTitular().getNif())
+							.telefon(enviament.getTitular().getTelefon())
+							.email(enviament.getTitular().getEmail())
+							.raoSocial(enviament.getTitular().getRaoSocial())
+							.dir3Codi(enviament.getTitular().getDir3Codi())
+							.incapacitat(enviament.getTitular().isIncapacitat())
+							.build();
+					resposta.setInteressat(interessat);
+					if (enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty()) {
+						List<Persona> representants = new ArrayList<>();
+						for (PersonaEntity destinatari: enviament.getDestinataris()) {
+							Persona representant = Persona.builder()
+									.interessatTipus(destinatari.getInteressatTipus())
+									.nom(destinatari.getNom())
+									.llinatge1(destinatari.getLlinatge1())
+									.llinatge2(destinatari.getLlinatge2())
+									.nif(destinatari.getNif())
+									.telefon(destinatari.getTelefon())
+									.email(destinatari.getEmail())
+									.raoSocial(destinatari.getRaoSocial())
+									.dir3Codi(destinatari.getDir3Codi())
+									.build();
+							representants.add(representant);
+						}
+						resposta.setRepresentants(representants);
+					}
+					// REGISTRE
+					Registre registre = Registre.builder()
+							.numeroFormatat(enviament.getRegistreNumeroFormatat())
+							.data(enviament.getRegistreData())
+							.estat(toRegistreEstat(enviament.getRegistreEstat()))
+							.oficina(enviament.getNotificacio().getRegistreOficinaNom())
+							.llibre(enviament.getNotificacio().getRegistreLlibreNom())
+							.build();
+					resposta.setRegistre(registre);
+					// SIR
+					if (esSir) {
+						Sir sir = Sir.builder()
+								.dataRecepcio(enviament.getSirRecepcioData())
+								.dataRegistreDesti(enviament.getSirRegDestiData())
+								.build();
+					// DATAT
+					} else {
+						Datat datat = Datat.builder()
+								.estat(toEnviamentEstat(enviament.getNotificaEstat()))
+								.data(enviament.getNotificaEstatData())
+								.origen(enviament.getNotificaDatatOrigen())
+								.receptorNif(enviament.getNotificaDatatReceptorNif())
+								.receptorNom(enviament.getNotificaDatatReceptorNom())
+								.numSeguiment(enviament.getNotificaDatatNumSeguiment())
+								.errorDescripcio(enviament.getNotificaDatatErrorDescripcio())
+								.build();
+					}
+
+					// Certificacio
 					if (enviament.getNotificaCertificacioData() != null) {
 						logger.debug("Guardant certificació enviament amb referencia: " + referencia);
-						Certificacio certificacio = new Certificacio();
-						certificacio.setData(enviament.getNotificaCertificacioData());
-						certificacio.setOrigen(enviament.getNotificaCertificacioOrigen());
 						ByteArrayOutputStream baos = new ByteArrayOutputStream();
 						pluginHelper.gestioDocumentalGet(
 								enviament.getNotificaCertificacioArxiuId(),
 								PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
 								baos);
-						certificacio.setContingutBase64(Base64.encodeBase64String(baos.toByteArray()));
-						
+						String certificacioBase64 = Base64.encodeBase64String(baos.toByteArray());
+
+						Certificacio certificacio = Certificacio.builder()
+								.data(enviament.getNotificaCertificacioData())
+								.origen(enviament.getNotificaCertificacioOrigen())
+								.contingutBase64(certificacioBase64)
+								.hash(enviament.getNotificaCertificacioHash())
+								.metadades(enviament.getNotificaCertificacioMetadades())
+								.csv(enviament.getNotificaCertificacioCsv())
+								.tipusMime(enviament.getNotificaCertificacioMime())
+								.build();
 						if (enviament.getNotificaCertificacioTamany() != null)
 							certificacio.setTamany(enviament.getNotificaCertificacioTamany());
 						
-						certificacio.setHash(enviament.getNotificaCertificacioHash());
-						certificacio.setMetadades(enviament.getNotificaCertificacioMetadades());
-						certificacio.setCsv(enviament.getNotificaCertificacioCsv());
-						certificacio.setTipusMime(enviament.getNotificaCertificacioMime());
 						resposta.setCertificacio(certificacio);
 						logger.debug("Certificació de l'enviament amb referencia: " + referencia + " s'ha obtingut correctament.");
 					}
@@ -658,6 +796,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			} catch (Exception ex) {
 				logger.debug("Error consultar estat enviament amb referencia: " + referencia, ex);
 				integracioHelper.addAccioError(info, "Error al obtenir l'estat de l'enviament", ex);
+				resposta.setError(true);
+				resposta.setErrorData(new Date());
+				resposta.setErrorDescripcio("Error inesperat al obtenir la informació de l'enviament amb referencia: " + referencia);
+				return resposta;
 			}
 			integracioHelper.addAccioOk(info);
 			return resposta;
@@ -667,7 +809,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
+		RespostaConsultaDadesRegistreV2 resposta = consultaDadesRegistreV2(dadesConsulta);
+		return RespostaConsultaDadesRegistre.builder()
+				.numRegistre(resposta.getNumRegistre())
+				.numRegistreFormatat(resposta.getNumRegistreFormatat())
+				.dataRegistre(resposta.getDataRegistre())
+				.justificant(resposta.getJustificant())
+				.error(resposta.isError())
+				.errorData(resposta.getErrorData())
+				.errorDescripcio(resposta.getErrorDescripcio())
+				.build();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public RespostaConsultaDadesRegistreV2 consultaDadesRegistreV2(DadesConsulta dadesConsulta) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			String json = "S'ha produït un error al intentar llegir la informació de les dades de la consulta";
@@ -682,7 +840,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					IntegracioAccioTipusEnumDto.RECEPCIO, 
 					new AccioParam("Dades de la consulta", json));
 			
-			RespostaConsultaDadesRegistre resposta = new RespostaConsultaDadesRegistre();
+			RespostaConsultaDadesRegistreV2 resposta = new RespostaConsultaDadesRegistreV2();
 			if (dadesConsulta.getIdentificador() != null) {
 				logger.debug("Consultant les dades de registre de la notificació amb identificador: " + dadesConsulta.getIdentificador());
 				int numeroRegistre = 0;
@@ -716,7 +874,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					if (numeroRegistreFormatat == null) {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
-						resposta.setErrorDescripcio("Error: No s'ha trobat cap registre relacionat amb la notificació: " + notificacioId);
+						resposta.setErrorDescripcio("Error: No s'ha trobat cap registre relacionat amb la notificació: " + dadesConsulta.getIdentificador());
 						integracioHelper.addAccioError(info, "No hi ha cap registre associat a la notificació");
 						return resposta;
 					}
@@ -724,6 +882,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setDataRegistre(notificacio.getRegistreData());
 					resposta.setNumRegistre(numeroRegistre);
 					resposta.setNumRegistreFormatat(numeroRegistreFormatat);
+					resposta.setOficina(notificacio.getRegistreOficinaNom());
+					resposta.setLlibre(notificacio.getRegistreLlibreNom());
+					// SIR
+					NotificacioEnviamentEntity enviament = null;
+					if (!notificacio.getEnviaments().isEmpty()) {
+						enviament = notificacio.getEnviaments().iterator().next();
+					}
+					boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus()) && enviament != null &&
+							InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
+					resposta.setEnviamentSir(esSir);
+					if (esSir && notificacio.getEnviaments().size() == 1) {
+						resposta.setDataRecepcioSir(enviament.getSirRecepcioData());
+						resposta.setDataRegistreDestiSir(enviament.getSirRegDestiData());
+					}
 					if (dadesConsulta.isAmbJustificant()) {
 						RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(
 								codiDir3Entitat, 
@@ -733,7 +905,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						} else {
 							resposta.setError(true);
 							resposta.setErrorData(new Date());
-							String errorDescripcio = justificant.getErrorCodi() + ": " + justificant.getErrorDescripcio();
+							String errorDescripcio = "No s'ha pogut obtenir el justificant de registre. " + justificant.getErrorCodi() + ": " + justificant.getErrorDescripcio();
 							resposta.setErrorDescripcio(errorDescripcio);
 							integracioHelper.addAccioError(info, errorDescripcio);
 							return  resposta;
@@ -777,6 +949,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setDataRegistre(enviament.getRegistreData());
 					resposta.setNumRegistre(0);
 					resposta.setNumRegistreFormatat(numeroRegistreFormatat);
+					resposta.setOficina(enviament.getNotificacio().getRegistreOficinaNom());
+					resposta.setLlibre(enviament.getNotificacio().getRegistreLlibreNom());
+					// SIR
+					boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
+							InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
+					resposta.setEnviamentSir(esSir);
+					if (esSir) {
+						resposta.setDataRecepcioSir(enviament.getSirRecepcioData());
+						resposta.setDataRegistreDestiSir(enviament.getSirRegDestiData());
+					}
 					if (dadesConsulta.isAmbJustificant()) {
 						RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(
 								codiDir3Entitat, 
@@ -786,7 +968,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						} else {
 							resposta.setError(true);
 							resposta.setErrorData(new Date());
-							String errorDescripcio = justificant.getErrorCodi() + ": " + justificant.getErrorDescripcio();
+							String errorDescripcio = "No s'ha pogut obtenir el justificant de registre. " + justificant.getErrorCodi() + ": " + justificant.getErrorDescripcio();
 							resposta.setErrorDescripcio(errorDescripcio);
 							integracioHelper.addAccioError(info, errorDescripcio);
 							return  resposta;
@@ -803,7 +985,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	@Override
 	@Transactional(readOnly = true)
-	public RespostaConsultaJustificant consultaJustificantEnviament(
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(
 			String identificador) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -814,7 +996,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					new AccioParam("Identificador xifrat de la notificacio", identificador));
 
 			Long notificacioId;
-			RespostaConsultaJustificant resposta = new RespostaConsultaJustificant();
+			RespostaConsultaJustificantEnviament resposta = new RespostaConsultaJustificantEnviament();
 
 			try {
 				try {
@@ -858,11 +1040,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setErrorDescripcio("Error durant la generació del justificant de la notificació");
 					return resposta;
 				}
-				resposta.setJustificant(FitxerBase64EncodedDto.builder()
+				resposta.setJustificant(Fitxer.builder()
 						.nom(justificantDto.getNom())
 						.contentType(justificantDto.getContentType())
 						.tamany(justificantDto.getTamany())
-						.contingut(new BASE64Encoder().encode(justificantDto.getContingut())).build());
+						.contingut(new BASE64Encoder().encode(justificantDto.getContingut()).getBytes()).build());
 				integracioHelper.addAccioOk(info);
 				return resposta;
 
@@ -878,14 +1060,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 
-	private RespostaAlta generaResposta(
+	private RespostaAltaV2 generaResposta(
 			IntegracioInfo info,
 			NotificacioEntity notificacioGuardada,
 			List<EnviamentReferencia> referencies) {
-		RespostaAlta resposta = new RespostaAlta();
+		RespostaAltaV2 resposta = new RespostaAltaV2();
 		try {
-			resposta.setIdentificador(
-					notificaHelper.xifrarId(notificacioGuardada.getId()));
+			resposta.setIdentificador(notificaHelper.xifrarId(notificacioGuardada.getId()));
 			logger.debug(">> [ALTA] identificador creat");
 		} catch (GeneralSecurityException ex) {
 			logger.debug(">> [ALTA] Error creant identificador");
@@ -916,10 +1097,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (errorEvent != null) {
 			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
 			resposta.setError(true);
-			resposta.setErrorDescripcio(
-					errorEvent.getErrorDescripcio());
+			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
+			resposta.setErrorData(new Date());
 		}
 		resposta.setReferencies(referencies);
+		resposta.setDataCreacio(notificacioGuardada.getCreatedDate().toDate());
 		logger.debug(">> [ALTA] afegides referències");
 		integracioHelper.addAccioOk(info);
 		return resposta;
@@ -1398,12 +1580,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1322 | El grup indicat no està assignat al procediment
 	// 1330 | No s'ha trobat cap procediment amb el codi indicat
 	// 1331 | No es pot donar d'alta una notificació amb servei. Els serveis només s'admeten en comunicacions
-	protected RespostaAlta validarNotificacio(
+	protected RespostaAltaV2 validarNotificacio(
 			NotificacioV2 notificacio,
 			String emisorDir3Codi,
 			EntitatEntity entitat,
 			AplicacioEntity aplicacio) {
-		RespostaAlta resposta = new RespostaAlta();
 		boolean comunicacioSenseAdministracio = false;
 		boolean comunicacioAmbAdministracio = false;
 		Map<String, OrganismeDto> organigramaByEntitat = null;
@@ -1914,9 +2095,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 //			}
 //		}
 
+		RespostaAltaV2 resposta = RespostaAltaV2.builder().build();
 		// Documents
 		if (comunicacioAmbAdministracio) {
-			RespostaAlta respostaDoc = null;
+			RespostaAltaV2 respostaDoc;
 			if (notificacio.getDocument2() != null && !notificacio.getDocument2().isEmpty()) {
 				respostaDoc = validaDocumentComunicacioAdmin(notificacio.getDocument2(), 2);
 				if (respostaDoc != null)
@@ -1978,7 +2160,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		return resposta;
 	}
 
-	private RespostaAlta validaDocumentComunicacioAdmin(DocumentV2 document, int numDocument) {
+	private RespostaAltaV2 validaDocumentComunicacioAdmin(DocumentV2 document, int numDocument) {
 
 		if (document.getArxiuNom() == null || document.getArxiuNom().isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.nom.arxiu.document.no.null")
@@ -2029,12 +2211,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	}
 
-	private RespostaAlta setRespostaError(String descripcioError) {
-		RespostaAlta resposta = new RespostaAlta();
-		resposta.setError(true);
-		resposta.setEstat(NotificacioEstatEnum.PENDENT);
-		resposta.setErrorDescripcio(descripcioError);
-		return resposta;
+	private RespostaAltaV2 setRespostaError(String descripcioError) {
+		return RespostaAltaV2.builder()
+				.error(true)
+				.estat(NotificacioEstatEnum.PENDENT)
+				.errorDescripcio(descripcioError)
+				.errorData(new Date())
+				.build();
 	}
 	
 	private EnviamentEstatEnum toEnviamentEstat(NotificacioEnviamentEstatEnumDto estat) {
@@ -2088,6 +2271,40 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			return EnviamentEstatEnum.ANULADA;
 		default:
 			return null;
+		}
+	}
+
+	private RegistreEstatEnum toRegistreEstat(NotificacioRegistreEstatEnumDto estat) {
+		if (estat == null) return null;
+		switch (estat) {
+			case VALID:
+				return RegistreEstatEnum.VALID;
+			case RESERVA:
+				return RegistreEstatEnum.RESERVA;
+			case PENDENT:
+				return RegistreEstatEnum.PENDENT;
+			case OFICI_EXTERN:
+				return RegistreEstatEnum.OFICI_EXTERN;
+			case OFICI_INTERN:
+				return RegistreEstatEnum.OFICI_INTERN;
+			case OFICI_ACCEPTAT:
+				return RegistreEstatEnum.OFICI_ACCEPTAT;
+			case DISTRIBUIT:
+				return RegistreEstatEnum.DISTRIBUIT;
+			case ANULAT:
+				return RegistreEstatEnum.ANULAT;
+			case RECTIFICAT:
+				return RegistreEstatEnum.RECTIFICAT;
+			case REBUTJAT:
+				return RegistreEstatEnum.REBUTJAT;
+			case REENVIAT:
+				return RegistreEstatEnum.REENVIAT;
+			case DISTRIBUINT:
+				return RegistreEstatEnum.DISTRIBUINT;
+			case OFICI_SIR:
+				return RegistreEstatEnum.OFICI_SIR;
+			default:
+				return null;
 		}
 	}
 	

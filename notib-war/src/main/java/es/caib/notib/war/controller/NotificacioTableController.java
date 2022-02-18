@@ -592,16 +592,21 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void certificacioDescarregar(
-            HttpServletResponse response,
-            @PathVariable Long notificacioId,
-            @PathVariable Long enviamentId) throws IOException {
+    public void certificacioDescarregar(HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+
         ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse(
-                arxiu.getNom(),
-                arxiu.getContingut(),
-                response);
+        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+    }
+
+    @RequestMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar", method = RequestMethod.GET)
+    @ResponseBody
+    public void certificacionsDescarregar(HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
+
+//
+//        ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+//        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+//        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
     }
 
 	/////
@@ -924,35 +929,24 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
 
     }
-    private void emplenarModelNotificacioInfo(
-            EntitatDto entitatActual,
-            Long notificacioId,
-            HttpServletRequest request,
-            String pipellaActiva,
-            Model model) {
-        NotificacioInfoDto notificacio = notificacioService.findNotificacioInfo(
-                notificacioId,
-                isAdministrador(request));
+    private void emplenarModelNotificacioInfo(EntitatDto entitatActual, Long notificacioId, HttpServletRequest request, String pipellaActiva, Model model) {
 
-        if (notificacio.getGrupCodi() != null) {
-            GrupDto grup = grupService.findByCodi(
-                    notificacio.getGrupCodi(),
-                    entitatActual.getId());
+        NotificacioInfoDto notificacio = notificacioService.findNotificacioInfo(notificacioId, isAdministrador(request));
+        if (notificacio != null && notificacio.getGrupCodi() != null) {
+            GrupDto grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);
         }
 
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
-        model.addAttribute("eventTipus",
-                EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class,
-                        "es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
-        if (notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
+        model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, "es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto."));
+        model.addAttribute("permisGestio", null);
+        if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
             model.addAttribute("permisGestio", procedimentService.hasPermisProcediment(
                     notificacio.getProcediment().getId(),
                     PermisEnum.GESTIO));
-        } else {
-            model.addAttribute("permisGestio", null);
         }
+
         model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
     }
 

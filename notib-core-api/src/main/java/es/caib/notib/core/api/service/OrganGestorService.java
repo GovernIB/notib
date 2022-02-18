@@ -98,24 +98,27 @@ public interface OrganGestorService {
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
-			Long entitatId, 
+			Long entitatId,
 			String organCodiDir3,
 			OrganGestorFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	List<PermisDto> permisFind(Long entitatId, Long id) throws  NotFoundException;
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<PermisDto> permisFind(
 			Long entitatId,
 			Long id,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
-	
+
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public void permisUpdate(
 			Long entitatId,
 			Long id,
 			boolean isAdminOrgan,
 			PermisDto permis) throws NotFoundException, ValidationException;
-	
+
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public void permisDelete(
 			Long entitatId,
@@ -185,4 +188,17 @@ public interface OrganGestorService {
 			String usuari,
 			RolEnumDto rol,
 			String organ);
+
+	/**
+	 *  Obte el llistat d'organs en format d'arbre
+	 */
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	List<OrganGestorDto> getOrgansAsList();
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	OrganGestorDto getOrganNou(String codiSia);
+
 }

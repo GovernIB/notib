@@ -34,18 +34,26 @@
 					this.selectedIndex = 0;
 				}
 			});
-			$('#btn-entregaCieActiva').removeClass('active');
+			$('#btn-entregaCie').removeClass('active');
 			$('#entregaCieActiva').val(false);
 			$('#form-filtre').submit();
 		});
-		$('#btn-entregaCieActiva').click(function() {
-			let entregaCieActiva = !$(this).hasClass('active');
-			$('#entregaCieActiva').val(entregaCieActiva);
+		$('#btn-entregaCie').click(function() {
+			let entregaCie = !$(this).hasClass('active');
+			$('#entregaCie').val(entregaCie);
 		})
+		$(".panel-heading").css({"display": "flex", "justify-content": "space-between"})
+		$(".panel-heading").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
+		$("#canviarVistaOrganGestor").click(function(){
+			window.location.replace("/notib/organgestorArbre");
+		});
 	});
 	</script>
 </head>
 <body>
+	<div id="botoVistes" class="row">
+
+	</div>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="organGestorFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
@@ -53,6 +61,9 @@
 			</div>
 			<div class="col-md-3">
 				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
+			</div>
+			<div class="col-md-2">
+				<not:inputText name="codiPare" inline="true" placeholderKey="organgestor.list.columna.codi.pare"/>
 			</div>
 			<div class="col-md-2">
 				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
@@ -81,15 +92,15 @@
 				</div>
 			</div>
 		</div>
-	<div class="row">
-		<div class="col-md-2">
-				<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
-			<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
-				<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
-			</button>
-			<not:inputHidden name="entregaCieActiva"/>
+		<div class="row">
+			<div class="col-md-2">
+					<%--				<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" inline="true" />--%>
+				<button id="btn-entregaCie" title="" class="btn btn-default <c:if test="${organGestorFiltreCommand.entregaCie}">active</c:if>" data-toggle="button">
+					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
+				</button>
+				<not:inputHidden name="entregaCie"/>
+			</div>
 		</div>
-	</div>
 	</form:form>
 
 	<table
@@ -116,6 +127,7 @@
  					</script>
 				</th>
 				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
+				<th data-col-name="codiPare"><spring:message code="organgestor.list.columna.codi.pare"/></th>
 				<c:if test="${setLlibre}">
 					<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				</c:if>
@@ -154,9 +166,7 @@
 							<ul class="dropdown-menu">
 								<li><a href="procediment/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="650px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.procediment"/></a></li>
 								<li><a href="servei/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="650px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/></a></li>
-								<c:if test="${setOficina}">
-									<li><a href="organgestor/{{:id}}" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								</c:if>
+								<li><a href="organgestor/{{:id}}" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>
 								<li><a href="organgestor/{{:codi}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>

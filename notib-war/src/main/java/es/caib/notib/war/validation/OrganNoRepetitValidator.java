@@ -53,6 +53,12 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 			
 			final String codi = command.getCodi();
 			final Long id = command.getId();
+
+			if (command.getEntitatId() == null) {
+				valid = false;
+				LOGGER.error("La entitat no pot estar buida");
+				throw new Exception();
+			}
 			
 			// Comprovar codi no repetit
 			OrganGestorDto organGestor = null;
@@ -96,8 +102,9 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
         	LOGGER.error("Error al validar si el codi de l'òrgan gestor és únic", ex);
         	MissatgesHelper.error(request, "Error inesperat en la validació del codi de l'òrgan gestor.");
         }
-       	if (!valid)
-       		context.disableDefaultConstraintViolation();
+       	if (!valid) {
+			context.disableDefaultConstraintViolation();
+		}
        	
        	return valid;
 	}

@@ -27,7 +27,7 @@
 		<div class="input-group" style="width:100%">
 			<spring:bind path="${campPath}">
 				<input type="hidden" id="${campPath}" name="${campPath}"/>
-				<not:arbre id="arbreUnitats_${campPath}" seleccionatId="${status.value}" arbre="${arbre}" atributId="codi" atributNom="denominacio" changedCallback="changedCallback_${campPath}" fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" isArbreSeleccionable="${isArbreSeleccionable}" isFullesSeleccionable="${isFullesSeleccionable}" isOcultarCounts="${isOcultarCounts}" isError="${not empty campErrors}"/>
+				<not:arbre id="arbreOrgans_${campPath}" seleccionatId="${status.value}" arbre="${arbre}" atributId="codi" atributNom="nom" changedCallback="changedCallback_${campPath}" fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" isArbreSeleccionable="${isArbreSeleccionable}" isFullesSeleccionable="${isFullesSeleccionable}" isOcultarCounts="${isOcultarCounts}" isError="${not empty campErrors}"/>
 			</spring:bind>
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		</div>

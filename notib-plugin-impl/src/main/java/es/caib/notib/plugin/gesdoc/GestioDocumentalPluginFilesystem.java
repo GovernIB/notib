@@ -21,9 +21,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	private static final long MAX_FILES_IN_FOLDER = 5000;
 
 	@Override
-	public String create(
-			String agrupacio,
-			InputStream contingut) throws SistemaExternException {
+	public String create(String agrupacio, InputStream contingut) throws SistemaExternException {
 		try {
 			agrupacio = checkAgrupacio(agrupacio);
 			String basedir = getBaseDir(agrupacio);
@@ -35,9 +33,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 			outContent.close();
 			return id;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut crear l'arxiu",
-					ex);
+			throw new SistemaExternException("No s'ha pogut crear l'arxiu", ex);
 		}
 	}
 
@@ -65,22 +61,16 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	}
 
 	@Override
-	public void delete(
-			String id,
-			String agrupacio) throws SistemaExternException {
+	public void delete(String id, String agrupacio) throws SistemaExternException {
 		try {
 			File fContent = getFile(agrupacio, id);
 			log.debug("Eliminant fitxer, directori: %s amb id: %s ".format(getBaseDir(agrupacio), id));
-			if (fContent != null) {
-				fContent.delete();
-			} else {
-				throw new SistemaExternException(
-						"No s'ha trobat l'arxiu (id=" + id + ")");
+			if (fContent == null) {
+				throw new SistemaExternException("No s'ha trobat l'arxiu (id=" + id + ")");
 			}
+			fContent.delete();
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut esborrar l'arxiu (id=" + id + ")",
-					ex);
+			throw new SistemaExternException("No s'ha pogut esborrar l'arxiu (id=" + id + ")", ex);
 		}
 	}
 
@@ -117,10 +107,8 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 		fContent.getParentFile().mkdirs();
 		if (!fContent.exists()) {
 			return null;
-		} else {
-			return fContent;
 		}
-
+		return fContent;
 	}
 	private String getValidSubfolder(String agrupacio){
 		String basedir = getBaseDir(agrupacio);

@@ -129,25 +129,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional(rollbackFor=Exception.class)
 	@Override
-	public NotificacioDatabaseDto create(
-			Long entitatId,
-			NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
+	public NotificacioDatabaseDto create(Long entitatId, NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio,
-					false);
+			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
 			// Dades generals de la notificació
 			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
-
-
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
-
-			return conversioTipusHelper.convertir(
-				notificacioEntity,
-				NotificacioDatabaseDto.class);
+			return conversioTipusHelper.convertir(notificacioEntity, NotificacioDatabaseDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -654,7 +645,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			return notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
+			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
+			List<NotificacioTableItemDto> nots = pag.getContingut();
+			for (NotificacioTableItemDto not : nots) {
+				NotificacioEntity e = notificacioRepository.findById(not.getId());
+				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
+				not.setDocumentId(id);
+			}
+			return pag;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

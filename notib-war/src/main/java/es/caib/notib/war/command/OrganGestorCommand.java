@@ -34,6 +34,10 @@ public class OrganGestorCommand {
 	private String oficina;
 	private String oficinaNom;
 
+	private String oficinaEntitat;
+	private String estat;
+	private boolean cie;
+
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;
 	private Long cieId;

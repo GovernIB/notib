@@ -21,6 +21,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private Long id;
 	@EqualsAndHashCode.Include
 	private String codi;
+	private String codiPare;
 	private String nom;
 	private Long entitatId;
 	private String entitatNom;
@@ -33,10 +34,22 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 
 	private Boolean sir;
 	private String cif;
+	private boolean actiu;
+
+	private String nomCodi;
 
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;
 	private Long cieId;
+
+	public void setOrganGestorEstatEnum(OrganGestorEstatEnum estat) {
+		this.estat = estat;
+		actiu = estat != null && OrganGestorEstatEnum.VIGENT.equals(estat);
+	}
+
+	public String getNomCodi() {
+		return nom + " (" + codi + ")";
+	}
 
 	public String getLlibreCodiNom() {
 		if (llibre != null)

@@ -16,6 +16,8 @@
 <%@ attribute name="isFullesSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isOcultarCounts" type="java.lang.Boolean"%>
 <%@ attribute name="isError" type="java.lang.Boolean"%>
+<%@ attribute name="fullesAtributCssClassCondition"%>
+<%@ attribute name="fullesAtributInfoText"%>
 <%@ attribute name="height" required="false" rtexprvalue="true"%>
 <c:if test="${empty isArbreSeleccionable and empty isFullesSeleccionable}"><c:set var="isArbreSeleccionable" value="${true}"/><c:set var="isFullesSeleccionable" value="${true}"/></c:if>
 <c:if test="${empty isOcultarCounts}"><c:set var="isOcultarCounts" value="${false}"/></c:if>
@@ -26,7 +28,9 @@
 		<ul>
 			<li id="${arbre.arrel.dades[atributId]}" class="jstree-open" data-jstree='{"icon":"fa fa-home fa-lg"<c:if test="${not empty seleccionatId and arbre.arrel.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
 				<small>${arbre.arrel.dades[atributNom]}<c:if test="${not isOcultarCounts and arbre.arrel.mostrarCount}"> <span class="badge">${arbre.arrel.count}</span></c:if></small>
-				<not:arbreFills pare="${arbre.arrel}" fills="${arbre.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}" fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" isOcultarCounts="${isOcultarCounts}"/>
+				<not:arbreFills pare="${arbre.arrel}" fills="${arbre.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}" fulles="${fulles}"
+								fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}"
+								isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}" fullesAtributInfoText="${fullesAtributInfoText}"/>
 			</li>
 		</ul>
 	</c:if>
@@ -88,5 +92,5 @@
 	.on('deselect_all.jstree', function (e, data) {
 		//console.log('>>> deselect_all.jstree');
 		//return ${changedCallback}(e, data);
-	})</c:if>;	
+	})</c:if>;
 </script>

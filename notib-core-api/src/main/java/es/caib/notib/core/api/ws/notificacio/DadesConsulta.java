@@ -3,11 +3,11 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Informació d'una notificació per al seu enviament.
@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  */
 
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
 public class DadesConsulta {
 

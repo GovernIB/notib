@@ -230,3 +230,30 @@ table.dataTable tr.datatable-dades-carregant div {
 .avisCardError button{
 	color: #721c24CC;
 }
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+.flex-column-center {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.flex-column-space-between {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.flex-space-between {
+	display:flex;
+	justify-content: space-between;
+}
+
+.flex-space-around {
+	display:flex;
+	justify-content: space-around;
+}

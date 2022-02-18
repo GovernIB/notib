@@ -5,6 +5,8 @@ import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
 import lombok.SneakyThrows;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -274,5 +277,44 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
+
+        // 8. Eliminiar arxius temporals
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        schedulledService.eliminarDocumentsTemporals();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        PeriodicTrigger trigger = new PeriodicTrigger(24, TimeUnit.HOURS);
+                        trigger.setFixedRate(true);
+                        trigger.setInitialDelay(calcularDelay());
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+
     }
+
+    private long calcularDelay() {
+
+        Calendar cal = Calendar.getInstance();
+        Date now = new Date();
+        cal.setTime(now);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        cal.setTimeInMillis(cal.getTimeInMillis() + 2*60*60*1000l);
+        logger.info("EL TIMER S'EXECUTARÀ EL " + new Date(cal.getTimeInMillis()));
+        return cal.getTimeInMillis() - now.getTime();
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
 }

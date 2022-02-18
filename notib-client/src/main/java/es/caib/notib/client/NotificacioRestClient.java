@@ -4,43 +4,41 @@
 package es.caib.notib.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.*;
-import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.representation.Form;
-import es.caib.notib.ws.notificacio.*;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import es.caib.notib.ws.notificacio.DadesConsulta;
+import es.caib.notib.ws.notificacio.NotificacioV2;
+import es.caib.notib.ws.notificacio.PermisConsulta;
+import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.RespostaConsultaDadesRegistre;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
+import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
+import es.caib.notib.ws.notificacio.RespostaConsultaJustificantEnviament;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ejb.CreateException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
 
 ;
 
 /**
- * Client REST per al servei de notificacions de NOTIB.
+ * Client REST v1 per al servei de notificacions de NOTIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioRestClient implements NotificacioServiceV2 {
+public class NotificacioRestClient extends NotificacioBaseRestClient {
 
-	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV2";
-	
-	private String baseUrl;
-	private String username;
-	private String password;
+	private static final String NOTIFICACIOV1_SERVICE_PATH = "/api/services/notificacioV2";
 
-	private boolean autenticacioBasic = false;
-	private int connecTimeout = 20000;
-	private int readTimeout = 120000;
-
-	public NotificacioRestClient() {}
+	/**
+	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
+	 * <p>El client creat amb aquest constructor utilitzarà autenticació tipus form (per defecte en entorn CAIB),
+	 * un timeout de connexió de 20s i un timeout de lectura de 120s</p>
+	 *
+	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
+	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @version 1.0
+	 */
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -50,7 +48,18 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		this.username = username;
 		this.password = password;
 	}
-	
+
+	/**
+	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
+	 * <p>El client creat amb aquest constructor utilitzarà autenticació tipus form (per defecte en entorn CAIB)</p>
+	 *
+	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
+	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param connecTimeout Timeout de connexio en milisegons
+	 * @param readTimeout Timeout de lectura en milisegons
+	 * @version 1.0
+	 */
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -64,7 +73,17 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		this.connecTimeout = connecTimeout;
 		this.readTimeout = readTimeout;
 	}
-	
+
+	/**
+	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
+	 * <p>El client creat amb aquest constructor utilitzarà un timeout de connexió de 20s i un timeout de lectura de 120s</p>
+	 *
+	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
+	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
+	 * @version 1.0
+	 */
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -76,7 +95,18 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		this.password = password;
 		this.autenticacioBasic = autenticacioBasic;
 	}
-	
+
+	/**
+	 * Constructor per a crear un client per a connectar-se amb la API REST v1 de NOTIB.
+	 *
+	 * @param baseUrl URL de NOTIB al que es vol connectar. Ex. https://notib_server:8080/notib
+	 * @param username Nom de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param password Contrassenya de l'usuari de tipus aplicació a utilitzar per a connectar-se a Notib
+	 * @param autenticacioBasic Indica si utilitzar autenticació tipus basic. Si té el valor false, utilitzarà autenticació tipus Form (per defecte en entorn CAIB)
+	 * @param connecTimeout Timeout de connexio en milisegons
+	 * @param readTimeout Timeout de lectura en milisegons
+	 * @version 1.0
+	 */
 	public NotificacioRestClient(
 			String baseUrl,
 			String username,
@@ -93,21 +123,19 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		this.readTimeout = readTimeout;
 	}
 
-	@Override
-	public RespostaAlta alta(
-			NotificacioV2 notificacio) {
+
+	/**
+	 * Mètode per a donar d'alta una Notificació/Comunicació a Notib
+	 *
+	 * @param notificacio Objecte amb tota la informació necessària per donar d'alta la notificació (veure documentació)
+	 * @return L'estat de la notificació/comunicació creada, o informació de l'error en cas que no s'hagi pogut crear
+	 */
+	public RespostaAlta alta(NotificacioV2 notificacio) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/alta";
-			ObjectMapper mapper  = new ObjectMapper();
+			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/alta";
+			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(notificacio);
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
+			Client jerseyClient = generarClient(urlAmbMetode);
 			logger.debug("Missatge REST enviat: " + body);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -130,68 +158,58 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		}
 	}
 
-	@Override
-	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
-			String identificador) {
+	/**
+	 * Mètode per a consultar la informació d'una notificació/comunicació
+	 *
+	 * @param identificador Identificador de la notificació retornat per el màtode d'alta
+	 * @return Informació de la nottificació/comunicació
+	 */
+	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
+			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatNotificacio/" + identificador;
+			Client jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
 					get(String.class);
-			ObjectMapper mapper  = new ObjectMapper();
-			return mapper.readValue(json, RespostaConsultaEstatNotificacio.class);
+			return getMapper().readValue(json, RespostaConsultaEstatNotificacio.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	@Override
-	public RespostaConsultaEstatEnviament consultaEstatEnviament(
-			String referencia) {
+	/**
+	 * Mètode per a consultar la informació d'un enviament d'una notificació/comunicació
+	 *
+	 * @param referencia referència de l'enviament retornat per el màtode d'alta
+	 * @return Informació de l'enviament
+	 */
+	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
+			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaEstatEnviament/" + referencia;
+			Client jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
 					get(String.class);
-			ObjectMapper mapper  = new ObjectMapper();
-			return mapper.readValue(json, RespostaConsultaEstatEnviament.class);
+			return getMapper().readValue(json, RespostaConsultaEstatEnviament.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
-	
-	@Override
+
+	/**
+	 * Mètode per a consultar les dades del registre de sortida de la notificació/comunicació, o enviament. Pot incloure el justificant de registre
+	 *
+	 * @param dadesConsulta Objecte on es pot indicar l'indentificador de la notificació/comunicació a consultar, i si es vol obtenir el justificant de registre
+	 * @return Dades del registre i opcionalment el justificant
+	 */
 	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaDadesRegistre";
-			ObjectMapper mapper  = new ObjectMapper();
+			String urlAmbMetode = baseUrl + NOTIFICACIOV1_SERVICE_PATH + "/consultaDadesRegistre";
+			ObjectMapper mapper  = getMapper();
 			String body = mapper.writeValueAsString(dadesConsulta);
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
+			Client jerseyClient = generarClient(urlAmbMetode);
 			String json = jerseyClient.
 					resource(urlAmbMetode).
 					type("application/json").
@@ -203,131 +221,24 @@ public class NotificacioRestClient implements NotificacioServiceV2 {
 		}
 	}
 
-	@Override
-	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
-		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/permisConsulta";
-			ObjectMapper mapper  = new ObjectMapper();
-			String body = mapper.writeValueAsString(permisConsulta);
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
-			logger.debug("Missatge REST enviat: " + body);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					post(String.class, body);
-			logger.debug("Missatge REST rebut: " + json);
-			return mapper.readValue(json, boolean.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
-
-	@Override
+	/**
+	 * Mètode per a obtenir el justificant d'enviament de la notificació/comunicació
+	 *
+	 * @param identificador Identificador de la notificació retornat per el màtode d'alta
+	 * @return Justificant d'enviament
+	 */
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador) {
-		try {
-			String urlAmbMetode = baseUrl + NOTIFICACIOV2_SERVICE_PATH + "/consultaJustificantNotificacio/" + identificador;
-			Client jerseyClient = generarClient();
-			if (username != null) {
-				autenticarClient(
-						jerseyClient,
-						urlAmbMetode,
-						username,
-						password);
-			}
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
-			ObjectMapper mapper  = new ObjectMapper();
-			return mapper.readValue(json, RespostaConsultaJustificantEnviament.class);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
+		return consultaJustificantEnviament(identificador, NOTIFICACIOV1_SERVICE_PATH);
 	}
 
-	public boolean isAutenticacioBasic() {
-		return autenticacioBasic;
-	}
-
-	private Client generarClient() {
-		Client jerseyClient = Client.create();
-		jerseyClient.setConnectTimeout(connecTimeout);
-		jerseyClient.setReadTimeout(readTimeout);
-		//jerseyClient.addFilter(new LoggingFilter(System.out));
-		jerseyClient.addFilter(
-				new ClientFilter() {
-					private ArrayList<Object> cookies;
-					@Override
-					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-						if (cookies != null) {
-							request.getHeaders().put("Cookie", cookies);
-						}
-						ClientResponse response = getNext().handle(request);
-						if (response.getCookies() != null) {
-							if (cookies == null) {
-								cookies = new ArrayList<Object>();
-							}
-							cookies.addAll(response.getCookies());
-						}
-						return response;
-					}
-				}
-		);
-		jerseyClient.addFilter(
-				new ClientFilter() {
-					@Override
-					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-						ClientHandler ch = getNext();
-				        ClientResponse resp = ch.handle(request);
-
-				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
-				            return resp;
-				        } else {
-				            String redirectTarget = resp.getHeaders().getFirst("Location");
-				            request.setURI(UriBuilder.fromUri(redirectTarget).build());
-				            return ch.handle(request);
-				        }
-					}
-				}
-		);
-		return jerseyClient;
-	}
-
-	private void autenticarClient(
-			Client jerseyClient,
-			String urlAmbMetode,
-			String username,
-			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		if (!autenticacioBasic) {
-			logger.debug(
-					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			jerseyClient.resource(urlAmbMetode).get(String.class);
-			Form form = new Form();
-			form.putSingle("j_username", username);
-			form.putSingle("j_password", password);
-			jerseyClient.
-			resource(baseUrl + "/j_security_check").
-			type("application/x-www-form-urlencoded").
-			post(form);
-		} else {
-			logger.debug(
-					"Autenticant REST amb autenticació de tipus HTTP basic (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			jerseyClient.addFilter(
-					new HTTPBasicAuthFilter(username, password));
-		}
+	/**
+	 * Métode per a donar o treure el permís de consulta sobre un procediment a un usuari
+	 *
+	 * @param permisConsulta Objecte amb les dades necessàries per a donar el permís
+	 * @return True si se li ha donat el permís
+	 */
+	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
+		return donarPermisConsulta(permisConsulta, NOTIFICACIOV1_SERVICE_PATH);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClient.class);

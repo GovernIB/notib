@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.service.EntitatService;
@@ -10,6 +11,7 @@ import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.*;
+import es.caib.notib.plugin.PropertiesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +22,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -235,6 +243,54 @@ public class SchedulledServiceImpl implements SchedulledService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public void eliminarDocumentsTemporals() {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		String baseDir = getBaseDir(PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
+		if (baseDir == null) {
+			logger.error("SchedulledService.eliminarDocumentsTemporals -> Error directori base null");
+			return;
+		}
+		try {
+			logger.info("Eliminant documents temporals del directori " + baseDir);
+			esborrarTemporals(baseDir);
+		} catch(Exception ex) {
+			logger.error("SchedulledService.eliminarDocumentsTemporals -> Error eliminant els documents temporals del directori " + baseDir);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private void esborrarTemporals(String dir) throws Exception {
+
+		if (Strings.isNullOrEmpty(dir)) {
+			return;
+		}
+		Path path = Paths.get(dir);
+		DirectoryStream<Path> files = Files.newDirectoryStream(path);
+		long now = new Date().getTime();
+		for (Path file : files) {
+			if (Files.isDirectory(file)) {
+				esborrarTemporals(file.toString());
+			}
+			File f = file.toFile();
+			long periode = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000L);;
+			if (f.lastModified() < periode) {
+				logger.info("Esborrant fitxer " + file);
+				Files.delete(file);
+			}
+		}
+	}
+
+	private String getBaseDir(String agrupacio) {
+		String baseDir = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		if (baseDir == null) {
+			return null;
+		}
+		return baseDir.endsWith("/") ? baseDir + agrupacio : baseDir + "/" + agrupacio;
 	}
 
 	// Refrescar notificacions expirades
