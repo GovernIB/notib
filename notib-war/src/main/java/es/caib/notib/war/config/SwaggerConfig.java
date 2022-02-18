@@ -30,7 +30,7 @@ public class SwaggerConfig {
                 .apiVersion("1.0")
                 .ignoredParameterTypes(ResponseEntity.class)
 //                .pathProvider(apiPathProvider())
-                .includePatterns(".*/api/services/*.*", ".*/api/consulta/*/*.*");
+                .includePatterns(".*/api/rest/appinfo", ".*/api/services/*.*", ".*/api/consulta/*/*.*");
     }
  
 	private ApiInfo apiInfo() {

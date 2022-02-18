@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1638376153806-2
+      author: limit
+      changes:
+        - modifyDataType:
+            tableName: not_notificacio
+            columnName: registre_data
+            newDataType: timestamp
+        - sql:
+            sql: "update not_notificacio n set registre_data = (select min(registre_data) from not_notificacio_env e where e.notificacio_id = n.id)"

@@ -64,7 +64,7 @@ public class ClientRestTest extends ClientBaseTest {
 				generarNotificacioV2(
 						notificacioId,
 						1,
-						true));
+						false));
 
 		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {
@@ -81,7 +81,7 @@ public class ClientRestTest extends ClientBaseTest {
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
 		assertEquals(
-				NotificacioEstatEnum.ENVIADA,
+				NotificacioEstatEnum.PENDENT,
 				respostaAlta.getEstat());
 	}
 
@@ -115,6 +115,62 @@ public class ClientRestTest extends ClientBaseTest {
 //		assertEquals(
 //				NotificacioEstatEnum.ENVIADA,
 //				respostaConsultaEstatEnviament.getEstat());
+	}
+
+//	@Test
+	public void testConsultaEstatEnviament_donadaReferencia() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		String referencia = "8vzkicPP5FQ=";
+
+		// When
+		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
+		assertNotNull(respostaConsultaEstatEnviament);
+		if (respostaConsultaEstatEnviament.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
+		assertFalse(respostaConsultaEstatEnviament.isError());
+		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
+	}
+
+//		@Test
+	public void testConsultaDadesRegistre() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		DadesConsulta dadesConsulta = new DadesConsulta();
+		dadesConsulta.setReferencia("8vzkicPP5FQ=");
+
+		// When
+		RespostaConsultaDadesRegistre resposta = client.consultaDadesRegistre(dadesConsulta);
+		if (resposta.isError()) {
+			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
+		System.out.println(">>> Informació registre: " + resposta.toString());
+		assertFalse(resposta.isError());
+		assertNull(resposta.getErrorDescripcio());
+	}
+
+//	@Test
+	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		DadesConsulta dadesConsulta = new DadesConsulta();
+		dadesConsulta.setReferencia("8vzkicPP5FQ=");
+
+		// When
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("8vzkicPP5Fg=");
+		if (resposta.isError()) {
+			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
+		System.out.println(">>> Informació registre: " + resposta.toString());
+		assertFalse(resposta.isError());
+		assertNull(resposta.getErrorDescripcio());
 	}
 
 	@Test

@@ -5,6 +5,7 @@ package es.caib.notib.core.ejb.ws;
 
 import es.caib.notib.core.api.ws.notificacio.*;
 import es.caib.notib.core.helper.UsuariHelper;
+import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistreV2;
 import org.jboss.annotation.security.SecurityDomain;
 import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,12 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 		return delegate.alta(notificacio);
 	}
 
-	@Override
+    @Override
+    public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+        return delegate.altaV2(notificacio);
+    }
+
+    @Override
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
 		usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
@@ -69,11 +75,21 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 	}
 
 	@Override
+	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacioV2(String identificador) {
+		return delegate.consultaEstatNotificacioV2(identificador);
+	}
+
+	@Override
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
 		usuariHelper.generarUsuariAutenticatEjb(
 				sessionContext,
 				true);
 		return delegate.consultaEstatEnviament(referencia);
+	}
+
+	@Override
+	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviamentV2(String referencia) throws NotificacioServiceWsException {
+		return delegate.consultaEstatEnviamentV2(referencia);
 	}
 
 	@Override
@@ -89,8 +105,14 @@ public class NotificacioServiceWsBeanV2 implements NotificacioServiceWsV2 {
 			DadesConsulta dadesConsulta) {
 		return delegate.consultaDadesRegistre(dadesConsulta);
 	}
-	@Override
-	public RespostaConsultaJustificant consultaJustificantEnviament(
+
+    @Override
+    public RespostaConsultaDadesRegistreV2 consultaDadesRegistreV2(DadesConsulta dadesConsulta) {
+        return delegate.consultaDadesRegistreV2(dadesConsulta);
+    }
+
+    @Override
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(
 			@WebParam(name="identificador") @XmlElement(required = true) String identificador){
 		return delegate.consultaJustificantEnviament(identificador);
 

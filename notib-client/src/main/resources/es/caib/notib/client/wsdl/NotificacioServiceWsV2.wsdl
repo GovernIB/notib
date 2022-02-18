@@ -4,12 +4,20 @@
   <xs:schema targetNamespace="http://www.caib.es/notib/ws/notificacio" version="1.0" xmlns:tns="http://www.caib.es/notib/ws/notificacio" xmlns:xs="http://www.w3.org/2001/XMLSchema">
    <xs:element name="alta" type="tns:alta"/>
    <xs:element name="altaResponse" type="tns:altaResponse"/>
+   <xs:element name="altaV2" type="tns:altaV2"/>
+   <xs:element name="altaV2Response" type="tns:altaV2Response"/>
    <xs:element name="consultaDadesRegistre" type="tns:consultaDadesRegistre"/>
    <xs:element name="consultaDadesRegistreResponse" type="tns:consultaDadesRegistreResponse"/>
+   <xs:element name="consultaDadesRegistreV2" type="tns:consultaDadesRegistreV2"/>
+   <xs:element name="consultaDadesRegistreV2Response" type="tns:consultaDadesRegistreV2Response"/>
    <xs:element name="consultaEstatEnviament" type="tns:consultaEstatEnviament"/>
    <xs:element name="consultaEstatEnviamentResponse" type="tns:consultaEstatEnviamentResponse"/>
+   <xs:element name="consultaEstatEnviamentV2" type="tns:consultaEstatEnviamentV2"/>
+   <xs:element name="consultaEstatEnviamentV2Response" type="tns:consultaEstatEnviamentV2Response"/>
    <xs:element name="consultaEstatNotificacio" type="tns:consultaEstatNotificacio"/>
    <xs:element name="consultaEstatNotificacioResponse" type="tns:consultaEstatNotificacioResponse"/>
+   <xs:element name="consultaEstatNotificacioV2" type="tns:consultaEstatNotificacioV2"/>
+   <xs:element name="consultaEstatNotificacioV2Response" type="tns:consultaEstatNotificacioV2Response"/>
    <xs:element name="consultaJustificantEnviament" type="tns:consultaJustificantEnviament"/>
    <xs:element name="consultaJustificantEnviamentResponse" type="tns:consultaJustificantEnviamentResponse"/>
    <xs:element name="dadesConsulta" type="tns:dadesConsulta"/>
@@ -19,90 +27,15 @@
    <xs:element name="notificacioV2" type="tns:notificacioV2"/>
    <xs:element name="permisConsulta" type="tns:permisConsulta"/>
    <xs:element name="respostaAlta" type="tns:respostaAlta"/>
+   <xs:element name="respostaAltaV2" type="tns:respostaAltaV2"/>
+   <xs:element name="respostaConsultaDadesRegistre" type="tns:respostaConsultaDadesRegistre"/>
+   <xs:element name="respostaConsultaDadesRegistreV2" type="tns:respostaConsultaDadesRegistreV2"/>
    <xs:element name="respostaConsultaEstatEnviament" type="tns:respostaConsultaEstatEnviament"/>
+   <xs:element name="respostaConsultaEstatEnviamentV2" type="tns:respostaConsultaEstatEnviamentV2"/>
    <xs:element name="respostaConsultaEstatNotificacio" type="tns:respostaConsultaEstatNotificacio"/>
-   <xs:complexType name="consultaEstatNotificacio">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="consultaEstatNotificacioResponse">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatNotificacio"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="respostaConsultaEstatNotificacio">
-    <xs:sequence>
-     <xs:element name="error" type="xs:boolean"/>
-     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
-     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
-     <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
-    </xs:sequence>
-   </xs:complexType>
+   <xs:element name="respostaConsultaEstatNotificacioV2" type="tns:respostaConsultaEstatNotificacioV2"/>
    <xs:element name="respostaConsultaJustificantEnviament" type="tns:respostaConsultaJustificantEnviament"/>
-   <xs:complexType name="consultaJustificantEnviament">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="consultaJustificantEnviamentResponse">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaJustificantEnviament"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="respostaConsultaJustificantEnviament">
-    <xs:sequence>
-     <xs:element name="error" type="xs:boolean"/>
-     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
-     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
-     <xs:element minOccurs="0" name="justificant" type="tns:fitxer"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="fitxer">
-    <xs:sequence>
-     <xs:element name="nom" type="xs:string"/>
-     <xs:element name="contentType" type="xs:string"/>
-     <xs:element name="contingut" type="xs:base64Binary"/>
-     <xs:element name="tamany" type="xs:int"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="consultaEstatEnviament">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="consultaEstatEnviamentResponse">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatEnviament"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="respostaConsultaEstatEnviament">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="certificacio" type="tns:certificacio"/>
-     <xs:element name="error" type="xs:boolean"/>
-     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
-     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
-     <xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum"/>
-     <xs:element minOccurs="0" name="estatData" type="xs:dateTime"/>
-     <xs:element minOccurs="0" name="estatDescripcio" type="xs:string"/>
-     <xs:element minOccurs="0" name="estatOrigen" type="xs:string"/>
-     <xs:element minOccurs="0" name="receptorNif" type="xs:string"/>
-     <xs:element minOccurs="0" name="receptorNom" type="xs:string"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="certificacio">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="contingutBase64" type="xs:string"/>
-     <xs:element minOccurs="0" name="csv" type="xs:string"/>
-     <xs:element minOccurs="0" name="data" type="xs:dateTime"/>
-     <xs:element minOccurs="0" name="hash" type="xs:string"/>
-     <xs:element minOccurs="0" name="metadades" type="xs:string"/>
-     <xs:element minOccurs="0" name="origen" type="xs:string"/>
-     <xs:element name="tamany" type="xs:int"/>
-     <xs:element minOccurs="0" name="tipusMime" type="xs:string"/>
-    </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="alta">
+   <xs:complexType name="altaV2">
     <xs:sequence>
      <xs:element minOccurs="0" name="arg0" type="tns:notificacioV2"/>
     </xs:sequence>
@@ -110,6 +43,7 @@
    <xs:complexType name="notificacioV2">
     <xs:sequence>
      <xs:element minOccurs="0" name="caducitat" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="caducitatDiesNaturals" type="xs:int"/>
      <xs:element minOccurs="0" name="concepte" type="xs:string"/>
      <xs:element minOccurs="0" name="descripcio" type="xs:string"/>
      <xs:element minOccurs="0" name="document" type="tns:documentV2"/>
@@ -162,7 +96,7 @@
     <xs:sequence>
      <xs:element minOccurs="0" name="dir3Codi" type="xs:string"/>
      <xs:element minOccurs="0" name="email" type="xs:string"/>
-     <xs:element minOccurs="0" name="id" type="xs:long"/>
+<!--     <xs:element minOccurs="0" name="id" type="xs:long"/>-->
      <xs:element name="incapacitat" type="xs:boolean"/>
      <xs:element minOccurs="0" name="interessatTipus" type="tns:interessatTipusEnumDto"/>
      <xs:element minOccurs="0" name="llinatge1" type="xs:string"/>
@@ -207,6 +141,41 @@
      <xs:element minOccurs="0" name="viaTipus" type="tns:entregaPostalViaTipusEnum"/>
     </xs:sequence>
    </xs:complexType>
+   <xs:complexType name="altaV2Response">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaAltaV2"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaAltaV2">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="dataCreacio" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
+       <xs:element minOccurs="0" name="identificador" type="xs:string"/>
+       <xs:element maxOccurs="unbounded" minOccurs="0" name="referencies" nillable="true" type="tns:enviamentReferencia"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="respostaBase">
+    <xs:sequence>
+     <xs:element name="error" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="enviamentReferencia">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="referencia" type="xs:string"/>
+     <xs:element minOccurs="0" name="titularNif" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="alta">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="tns:notificacioV2"/>
+    </xs:sequence>
+   </xs:complexType>
    <xs:complexType name="altaResponse">
     <xs:sequence>
      <xs:element minOccurs="0" name="return" type="tns:respostaAlta"/>
@@ -221,10 +190,219 @@
      <xs:element maxOccurs="unbounded" minOccurs="0" name="referencies" nillable="true" type="tns:enviamentReferencia"/>
     </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="enviamentReferencia">
+   <xs:complexType name="consultaDadesRegistreV2">
     <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="tns:dadesConsulta"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="dadesConsulta">
+    <xs:sequence>
+     <xs:element name="ambJustificant" type="xs:boolean"/>
+     <xs:element minOccurs="0" name="identificador" type="xs:string"/>
      <xs:element minOccurs="0" name="referencia" type="xs:string"/>
-     <xs:element minOccurs="0" name="titularNif" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaDadesRegistreV2Response">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaDadesRegistreV2"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaDadesRegistreV2">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="dataRecepcioSir" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="dataRegistre" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="dataRegistreDestiSir" type="xs:dateTime"/>
+       <xs:element name="enviamentSir" type="xs:boolean"/>
+       <xs:element minOccurs="0" name="justificant" type="xs:base64Binary"/>
+       <xs:element minOccurs="0" name="llibre" type="xs:string"/>
+       <xs:element name="numRegistre" type="xs:int"/>
+       <xs:element minOccurs="0" name="numRegistreFormatat" type="xs:string"/>
+       <xs:element minOccurs="0" name="oficina" type="xs:string"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="consultaJustificantEnviament">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="identificador" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaJustificantEnviamentResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaJustificantEnviament"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaJustificantEnviament">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="justificant" type="tns:fitxer"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="fitxer">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="contentType" type="xs:string"/>
+     <xs:element minOccurs="0" name="contingut" type="xs:base64Binary"/>
+     <xs:element minOccurs="0" name="nom" type="xs:string"/>
+     <xs:element name="tamany" type="xs:long"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatNotificacio">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatNotificacioResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatNotificacio"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaEstatNotificacio">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatNotificacioV2">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatNotificacioV2Response">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatNotificacioV2"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaEstatNotificacioV2">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="concepte" type="xs:string"/>
+       <xs:element minOccurs="0" name="dataCreada" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="dataEnviada" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="dataFinalitzada" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="dataProcessada" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="emisorDir3" type="xs:string"/>
+       <xs:element minOccurs="0" name="estat" type="tns:notificacioEstatEnum"/>
+       <xs:element minOccurs="0" name="identificador" type="xs:string"/>
+       <xs:element minOccurs="0" name="numExpedient" type="xs:string"/>
+       <xs:element minOccurs="0" name="organGestorDir3" type="xs:string"/>
+       <xs:element minOccurs="0" name="procediment" type="tns:procediment"/>
+       <xs:element minOccurs="0" name="tipus" type="xs:string"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="procediment">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="codiSia" type="xs:string"/>
+     <xs:element minOccurs="0" name="nom" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatEnviament">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatEnviamentResponse">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatEnviament"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaEstatEnviament">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="certificacio" type="tns:certificacio"/>
+       <xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum"/>
+       <xs:element minOccurs="0" name="estatData" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="estatDescripcio" type="xs:string"/>
+       <xs:element minOccurs="0" name="estatOrigen" type="xs:string"/>
+       <xs:element minOccurs="0" name="receptorNif" type="xs:string"/>
+       <xs:element minOccurs="0" name="receptorNom" type="xs:string"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="certificacio">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="contingutBase64" type="xs:string"/>
+     <xs:element minOccurs="0" name="csv" type="xs:string"/>
+     <xs:element minOccurs="0" name="data" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="hash" type="xs:string"/>
+     <xs:element minOccurs="0" name="metadades" type="xs:string"/>
+     <xs:element minOccurs="0" name="origen" type="xs:string"/>
+     <xs:element name="tamany" type="xs:int"/>
+     <xs:element minOccurs="0" name="tipusMime" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatEnviamentV2">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="consultaEstatEnviamentV2Response">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="return" type="tns:respostaConsultaEstatEnviamentV2"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="respostaConsultaEstatEnviamentV2">
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="adressaPostal" type="xs:string"/>
+       <xs:element minOccurs="0" name="certificacio" type="tns:certificacio"/>
+       <xs:element minOccurs="0" name="datat" type="tns:datat"/>
+       <xs:element minOccurs="0" name="dehNif" type="xs:string"/>
+       <xs:element name="dehObligat" type="xs:boolean"/>
+       <xs:element name="entragaPostalActiva" type="xs:boolean"/>
+       <xs:element name="enviamentSir" type="xs:boolean"/>
+       <xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum"/>
+       <xs:element minOccurs="0" name="estatData" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="estatDescripcio" type="xs:string"/>
+       <xs:element minOccurs="0" name="interessat" type="tns:persona"/>
+       <xs:element minOccurs="0" name="notificaIndentificador" type="xs:string"/>
+       <xs:element minOccurs="0" name="referencia" type="xs:string"/>
+       <xs:element minOccurs="0" name="identificador" type="xs:string"/>
+       <xs:element minOccurs="0" name="registre" type="tns:registre"/>
+       <xs:element maxOccurs="unbounded" minOccurs="0" name="representants" nillable="true" type="tns:persona"/>
+       <xs:element minOccurs="0" name="sir" type="tns:sir"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="datat">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="data" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
+     <xs:element minOccurs="0" name="estat" type="tns:enviamentEstatEnum"/>
+     <xs:element minOccurs="0" name="numSeguiment" type="xs:string"/>
+     <xs:element minOccurs="0" name="origen" type="xs:string"/>
+     <xs:element minOccurs="0" name="receptorNif" type="xs:string"/>
+     <xs:element minOccurs="0" name="receptorNom" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="registre">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="data" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="estat" type="tns:registreEstatEnum"/>
+     <xs:element minOccurs="0" name="llibre" type="xs:string"/>
+     <xs:element minOccurs="0" name="numero" type="xs:int"/>
+     <xs:element minOccurs="0" name="numeroFormatat" type="xs:string"/>
+     <xs:element minOccurs="0" name="oficina" type="xs:string"/>
+    </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="sir">
+    <xs:sequence>
+     <xs:element minOccurs="0" name="dataRecepcio" type="xs:dateTime"/>
+     <xs:element minOccurs="0" name="dataRegistreDesti" type="xs:dateTime"/>
     </xs:sequence>
    </xs:complexType>
    <xs:complexType name="donarPermisConsulta">
@@ -250,70 +428,23 @@
      <xs:element minOccurs="0" name="arg0" type="tns:dadesConsulta"/>
     </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="dadesConsulta">
-    <xs:sequence>
-     <xs:element name="ambJustificant" type="xs:boolean"/>
-     <xs:element minOccurs="0" name="identificador" type="xs:string"/>
-     <xs:element minOccurs="0" name="referencia" type="xs:string"/>
-    </xs:sequence>
-   </xs:complexType>
    <xs:complexType name="consultaDadesRegistreResponse">
     <xs:sequence>
      <xs:element minOccurs="0" name="return" type="tns:respostaConsultaDadesRegistre"/>
     </xs:sequence>
    </xs:complexType>
    <xs:complexType name="respostaConsultaDadesRegistre">
-    <xs:sequence>
-     <xs:element minOccurs="0" name="dataRegistre" type="xs:dateTime"/>
-     <xs:element name="error" type="xs:boolean"/>
-     <xs:element minOccurs="0" name="errorData" type="xs:dateTime"/>
-     <xs:element minOccurs="0" name="errorDescripcio" type="xs:string"/>
-     <xs:element minOccurs="0" name="justificant" type="xs:base64Binary"/>
-     <xs:element name="numRegistre" type="xs:int"/>
-     <xs:element minOccurs="0" name="numRegistreFormatat" type="xs:string"/>
-    </xs:sequence>
+    <xs:complexContent>
+     <xs:extension base="tns:respostaBase">
+      <xs:sequence>
+       <xs:element minOccurs="0" name="dataRegistre" type="xs:dateTime"/>
+       <xs:element minOccurs="0" name="justificant" type="xs:base64Binary"/>
+       <xs:element name="numRegistre" type="xs:int"/>
+       <xs:element minOccurs="0" name="numRegistreFormatat" type="xs:string"/>
+      </xs:sequence>
+     </xs:extension>
+    </xs:complexContent>
    </xs:complexType>
-   <xs:simpleType name="notificacioEstatEnum">
-    <xs:restriction base="xs:string">
-     <xs:enumeration value="PENDENT"/>
-     <xs:enumeration value="ENVIADA"/>
-     <xs:enumeration value="REGISTRADA"/>
-     <xs:enumeration value="FINALITZADA"/>
-     <xs:enumeration value="PROCESSADA"/>
-    </xs:restriction>
-   </xs:simpleType>
-   <xs:simpleType name="enviamentEstatEnum">
-    <xs:restriction base="xs:string">
-     <xs:enumeration value="NOTIB_PENDENT"/>
-     <xs:enumeration value="NOTIB_ENVIADA"/>
-     <xs:enumeration value="ABSENT"/>
-     <xs:enumeration value="ADRESA_INCORRECTA"/>
-     <xs:enumeration value="DESCONEGUT"/>
-     <xs:enumeration value="ENVIADA_CI"/>
-     <xs:enumeration value="ENVIADA_DEH"/>
-     <xs:enumeration value="ENVIAMENT_PROGRAMAT"/>
-     <xs:enumeration value="ENTREGADA_OP"/>
-     <xs:enumeration value="ERROR_ENTREGA"/>
-     <xs:enumeration value="EXPIRADA"/>
-     <xs:enumeration value="EXTRAVIADA"/>
-     <xs:enumeration value="MORT"/>
-     <xs:enumeration value="LLEGIDA"/>
-     <xs:enumeration value="NOTIFICADA"/>
-     <xs:enumeration value="PENDENT"/>
-     <xs:enumeration value="PENDENT_ENVIAMENT"/>
-     <xs:enumeration value="PENDENT_SEU"/>
-     <xs:enumeration value="PENDENT_CIE"/>
-     <xs:enumeration value="PENDENT_DEH"/>
-     <xs:enumeration value="REBUTJADA"/>
-     <xs:enumeration value="SENSE_INFORMACIO"/>
-     <xs:enumeration value="FINALITZADA"/>
-     <xs:enumeration value="ENVIADA"/>
-     <xs:enumeration value="REGISTRADA"/>
-     <xs:enumeration value="PROCESSADA"/>
-     <xs:enumeration value="ANULADA"/>
-     <xs:enumeration value="ENVIAT_SIR"/>
-    </xs:restriction>
-   </xs:simpleType>
    <xs:simpleType name="origenEnum">
     <xs:restriction base="xs:string">
      <xs:enumeration value="CIUTADA"/>
@@ -343,6 +474,25 @@
      <xs:enumeration value="FACTURA"/>
      <xs:enumeration value="ALTRES_INCAUTATS"/>
      <xs:enumeration value="ALTRES"/>
+     <xs:enumeration value="LLEI"/>
+     <xs:enumeration value="MOCIO"/>
+     <xs:enumeration value="INSTRUCCIO"/>
+     <xs:enumeration value="CONVOCATORIA"/>
+     <xs:enumeration value="ORDRE_DIA"/>
+     <xs:enumeration value="INFORME_PONENCIA"/>
+     <xs:enumeration value="DICTAMEN_COMISSIO"/>
+     <xs:enumeration value="INICIATIVA_LEGISLATIVA"/>
+     <xs:enumeration value="PREGUNTA"/>
+     <xs:enumeration value="INTERPELACIO"/>
+     <xs:enumeration value="RESPOSTA"/>
+     <xs:enumeration value="PROPOSICIO_NO_LLEI"/>
+     <xs:enumeration value="ESQUEMA"/>
+     <xs:enumeration value="PROPOSTA_RESOLUCIO"/>
+     <xs:enumeration value="COMPAREIXENSA"/>
+     <xs:enumeration value="SOLICITUD_INFORMACIO"/>
+     <xs:enumeration value="ESCRIT"/>
+     <xs:enumeration value="INICIATIVA_LEGISLATIVA2"/>
+     <xs:enumeration value="PETICIO"/>
     </xs:restriction>
    </xs:simpleType>
    <xs:simpleType name="validesaEnum">
@@ -431,10 +581,71 @@
      <xs:enumeration value="ES"/>
     </xs:restriction>
    </xs:simpleType>
+   <xs:simpleType name="notificacioEstatEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="PENDENT"/>
+     <xs:enumeration value="ENVIADA"/>
+     <xs:enumeration value="REGISTRADA"/>
+     <xs:enumeration value="FINALITZADA"/>
+     <xs:enumeration value="PROCESSADA"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="enviamentEstatEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="NOTIB_PENDENT"/>
+     <xs:enumeration value="NOTIB_ENVIADA"/>
+     <xs:enumeration value="ABSENT"/>
+     <xs:enumeration value="ADRESA_INCORRECTA"/>
+     <xs:enumeration value="DESCONEGUT"/>
+     <xs:enumeration value="ENVIADA_CI"/>
+     <xs:enumeration value="ENVIADA_DEH"/>
+     <xs:enumeration value="ENVIAMENT_PROGRAMAT"/>
+     <xs:enumeration value="ENTREGADA_OP"/>
+     <xs:enumeration value="ERROR_ENTREGA"/>
+     <xs:enumeration value="EXPIRADA"/>
+     <xs:enumeration value="EXTRAVIADA"/>
+     <xs:enumeration value="MORT"/>
+     <xs:enumeration value="LLEGIDA"/>
+     <xs:enumeration value="NOTIFICADA"/>
+     <xs:enumeration value="PENDENT"/>
+     <xs:enumeration value="PENDENT_ENVIAMENT"/>
+     <xs:enumeration value="PENDENT_SEU"/>
+     <xs:enumeration value="PENDENT_CIE"/>
+     <xs:enumeration value="PENDENT_DEH"/>
+     <xs:enumeration value="REBUTJADA"/>
+     <xs:enumeration value="SENSE_INFORMACIO"/>
+     <xs:enumeration value="FINALITZADA"/>
+     <xs:enumeration value="ENVIADA"/>
+     <xs:enumeration value="REGISTRADA"/>
+     <xs:enumeration value="PROCESSADA"/>
+     <xs:enumeration value="ANULADA"/>
+     <xs:enumeration value="ENVIAT_SIR"/>
+    </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="registreEstatEnum">
+    <xs:restriction base="xs:string">
+     <xs:enumeration value="VALID"/>
+     <xs:enumeration value="RESERVA"/>
+     <xs:enumeration value="PENDENT"/>
+     <xs:enumeration value="OFICI_EXTERN"/>
+     <xs:enumeration value="OFICI_INTERN"/>
+     <xs:enumeration value="OFICI_ACCEPTAT"/>
+     <xs:enumeration value="DISTRIBUIT"/>
+     <xs:enumeration value="ANULAT"/>
+     <xs:enumeration value="RECTIFICAT"/>
+     <xs:enumeration value="REBUTJAT"/>
+     <xs:enumeration value="REENVIAT"/>
+     <xs:enumeration value="DISTRIBUINT"/>
+     <xs:enumeration value="OFICI_SIR"/>
+    </xs:restriction>
+   </xs:simpleType>
   </xs:schema>
  </types>
- <message name="NotificacioServiceV2_alta">
-  <part element="tns:alta" name="alta"/>
+ <message name="NotificacioServiceV2_consultaEstatNotificacioV2">
+  <part element="tns:consultaEstatNotificacioV2" name="consultaEstatNotificacioV2"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatNotificacioV2Response">
+  <part element="tns:consultaEstatNotificacioV2Response" name="consultaEstatNotificacioV2Response"/>
  </message>
  <message name="NotificacioServiceV2_consultaEstatEnviament">
   <part element="tns:consultaEstatEnviament" name="consultaEstatEnviament"/>
@@ -445,26 +656,47 @@
  <message name="NotificacioServiceV2_consultaEstatEnviamentResponse">
   <part element="tns:consultaEstatEnviamentResponse" name="consultaEstatEnviamentResponse"/>
  </message>
+ <message name="NotificacioServiceV2_consultaJustificantEnviamentResponse">
+  <part element="tns:consultaJustificantEnviamentResponse" name="consultaJustificantEnviamentResponse"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaJustificantEnviament">
+  <part element="tns:consultaJustificantEnviament" name="consultaJustificantEnviament"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatNotificacioResponse">
+  <part element="tns:consultaEstatNotificacioResponse" name="consultaEstatNotificacioResponse"/>
+ </message>
+ <message name="NotificacioServiceV2_donarPermisConsulta">
+  <part element="tns:donarPermisConsulta" name="donarPermisConsulta"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatEnviamentV2Response">
+  <part element="tns:consultaEstatEnviamentV2Response" name="consultaEstatEnviamentV2Response"/>
+ </message>
+ <message name="NotificacioServiceV2_altaV2Response">
+  <part element="tns:altaV2Response" name="altaV2Response"/>
+ </message>
+ <message name="NotificacioServiceV2_alta">
+  <part element="tns:alta" name="alta"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaDadesRegistreV2">
+  <part element="tns:consultaDadesRegistreV2" name="consultaDadesRegistreV2"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaDadesRegistreV2Response">
+  <part element="tns:consultaDadesRegistreV2Response" name="consultaDadesRegistreV2Response"/>
+ </message>
+ <message name="NotificacioServiceV2_consultaEstatEnviamentV2">
+  <part element="tns:consultaEstatEnviamentV2" name="consultaEstatEnviamentV2"/>
+ </message>
  <message name="NotificacioServiceV2_consultaDadesRegistre">
   <part element="tns:consultaDadesRegistre" name="consultaDadesRegistre"/>
  </message>
  <message name="NotificacioServiceV2_consultaEstatNotificacio">
   <part element="tns:consultaEstatNotificacio" name="consultaEstatNotificacio"/>
  </message>
- <message name="NotificacioServiceV2_consultaEstatNotificacioResponse">
-  <part element="tns:consultaEstatNotificacioResponse" name="consultaEstatNotificacioResponse"/>
- </message>
- <message name="NotificacioServiceV2_consultaJustificantEnviament">
-  <part element="tns:consultaJustificantEnviament" name="consultaJustificantEnviament"/>
- </message>
- <message name="NotificacioServiceV2_consultaJustificantEnviamentResponse">
-  <part element="tns:consultaJustificantEnviamentResponse" name="consultaJustificantEnviamentResponse"/>
+ <message name="NotificacioServiceV2_altaV2">
+  <part element="tns:altaV2" name="altaV2"/>
  </message>
  <message name="NotificacioServiceV2_altaResponse">
   <part element="tns:altaResponse" name="altaResponse"/>
- </message>
- <message name="NotificacioServiceV2_donarPermisConsulta">
-  <part element="tns:donarPermisConsulta" name="donarPermisConsulta"/>
  </message>
  <message name="NotificacioServiceV2_consultaDadesRegistreResponse">
   <part element="tns:consultaDadesRegistreResponse" name="consultaDadesRegistreResponse"/>
@@ -474,17 +706,33 @@
    <input message="tns:NotificacioServiceV2_alta"/>
    <output message="tns:NotificacioServiceV2_altaResponse"/>
   </operation>
+  <operation name="altaV2" parameterOrder="altaV2">
+   <input message="tns:NotificacioServiceV2_altaV2"/>
+   <output message="tns:NotificacioServiceV2_altaV2Response"/>
+  </operation>
   <operation name="consultaDadesRegistre" parameterOrder="consultaDadesRegistre">
    <input message="tns:NotificacioServiceV2_consultaDadesRegistre"/>
    <output message="tns:NotificacioServiceV2_consultaDadesRegistreResponse"/>
+  </operation>
+  <operation name="consultaDadesRegistreV2" parameterOrder="consultaDadesRegistreV2">
+   <input message="tns:NotificacioServiceV2_consultaDadesRegistreV2"/>
+   <output message="tns:NotificacioServiceV2_consultaDadesRegistreV2Response"/>
   </operation>
   <operation name="consultaEstatEnviament" parameterOrder="consultaEstatEnviament">
    <input message="tns:NotificacioServiceV2_consultaEstatEnviament"/>
    <output message="tns:NotificacioServiceV2_consultaEstatEnviamentResponse"/>
   </operation>
+  <operation name="consultaEstatEnviamentV2" parameterOrder="consultaEstatEnviamentV2">
+   <input message="tns:NotificacioServiceV2_consultaEstatEnviamentV2"/>
+   <output message="tns:NotificacioServiceV2_consultaEstatEnviamentV2Response"/>
+  </operation>
   <operation name="consultaEstatNotificacio" parameterOrder="consultaEstatNotificacio">
    <input message="tns:NotificacioServiceV2_consultaEstatNotificacio"/>
    <output message="tns:NotificacioServiceV2_consultaEstatNotificacioResponse"/>
+  </operation>
+  <operation name="consultaEstatNotificacioV2" parameterOrder="consultaEstatNotificacioV2">
+   <input message="tns:NotificacioServiceV2_consultaEstatNotificacioV2"/>
+   <output message="tns:NotificacioServiceV2_consultaEstatNotificacioV2Response"/>
   </operation>
   <operation name="consultaJustificantEnviament" parameterOrder="consultaJustificantEnviament">
    <input message="tns:NotificacioServiceV2_consultaJustificantEnviament"/>
@@ -506,7 +754,25 @@
     <soap:body use="literal"/>
    </output>
   </operation>
+  <operation name="altaV2">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
   <operation name="consultaDadesRegistre">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="consultaDadesRegistreV2">
    <soap:operation soapAction=""/>
    <input>
     <soap:body use="literal"/>
@@ -524,7 +790,25 @@
     <soap:body use="literal"/>
    </output>
   </operation>
+  <operation name="consultaEstatEnviamentV2">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
   <operation name="consultaEstatNotificacio">
+   <soap:operation soapAction=""/>
+   <input>
+    <soap:body use="literal"/>
+   </input>
+   <output>
+    <soap:body use="literal"/>
+   </output>
+  </operation>
+  <operation name="consultaEstatNotificacioV2">
    <soap:operation soapAction=""/>
    <input>
     <soap:body use="literal"/>

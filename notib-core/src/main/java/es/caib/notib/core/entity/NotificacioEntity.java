@@ -97,7 +97,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected String registreNumeroFormatat;
 	
 	@Column(name = "registre_data")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	protected Date registreData;
 	
 	@Column(name = "registre_num_expedient", length = 80)
