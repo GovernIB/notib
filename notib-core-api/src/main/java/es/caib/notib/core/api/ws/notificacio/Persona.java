@@ -4,7 +4,7 @@
 package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.util.TrimStringDeserializer;
@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Informació d'una persona per a un enviament.
@@ -25,6 +27,8 @@ import lombok.NoArgsConstructor;
 @JsonAutoDetect
 public class Persona {
 
+	@XmlTransient
+	@JsonIgnore
 	private Long id;
 	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;

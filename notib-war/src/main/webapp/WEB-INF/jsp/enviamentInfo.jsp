@@ -424,7 +424,7 @@ $(document).ready(function() {
 										<td>${enviament.notificaDatatReceptorNif}</td>
 									</tr>
 								</c:if>
-								<c:if test="${not empty enviament.notificaDatatNumSeguiment}">
+								<c:if test="${not empty enviament.notificaDatatReceptorNom}">
 									<tr>
 										<td><strong><spring:message code="enviament.info.notifica.datat.receptor.nom"/></strong></td>
 										<td>${enviament.notificaDatatReceptorNom}</td>

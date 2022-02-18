@@ -4,7 +4,10 @@
 package es.caib.notib.core.api.ws.notificacio;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -15,6 +18,9 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonAutoDetect
 @XmlRootElement
 public class RespostaAlta {
