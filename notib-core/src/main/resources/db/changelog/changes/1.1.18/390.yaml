@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_organ_gestor
+            columns:
+              - column:
+                  name: codi_pare
+                  type: varchar(32)
+        - sql:
+            sql: ""
