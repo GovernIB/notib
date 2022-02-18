@@ -39,11 +39,6 @@
                 $(".datatable-dades-carregant").css("display", "block");
                 let text = data.node.text.split('(');
                 text = text[text.length-1].split(')')[0];
-                <%--$("#esborrar").attr('href', "<c:url value="/organgestor/"/>" + text + "/delete");--%>
-                <%--$("#procediments").attr('href', "<c:url value="/procediment/organ/"/>" + text);--%>
-                <%--$("#serveis").attr('href', "<c:url value="/servei/organ/"/>" + text);--%>
-                <%--$("#actualitzar").attr('href', "<c:url value="/organgestor/"/>" + text + "/update");--%>
-
                 $.ajax({
                     url: "/notib/organgestorArbre/organgestor/" + text,
                     success: organ => {
@@ -58,24 +53,16 @@
                 });
             }
 
-            function checkSelectedNodes() {
-                // Se declara esta función para evitar error JS en el arbre.tag durante la llamada a la misma
-            }
-            function paintSelectedNodes() {
-                // Se declara esta función para evitar error JS en el arbre.tag durante la llamada a la misma
-            }
+            $(document).on("click", "#expandAll", function() {
+                $('#arbreOrgans').jstree().open_all(null, 200);
+            });
+
+            $(document).on("click", "#closeAll", function() {
+                $('#arbreOrgans').jstree().close_all(null, 300);
+            });
+
 
             $(document).ready(function() {
-
-                $("#expandAll").click(() => {
-                    console.log("open all")
-                    console.log($('#arbreOrgans'))
-                    $('#arbreOrgans').jstree('open_all');
-                } );
-                $("#closeAll").click(() => {
-                    console.log("close all")
-                    $('#arbreOrgans').jstree('close_all');
-                });
 
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
@@ -114,9 +101,6 @@
                 <div class="col-md-3">
                     <not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
                 </div>
-                <div class="col-md-2">
-                    <not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
-                </div>
                 <c:if test="${setOficina}">
                     <div class="col-md-3">
                         <not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionItems="${oficinesEntitat}" optionValueAttribute="codi"
@@ -151,7 +135,7 @@
                     <button id="closeAll" class="btn btn-default"><span class="fa fa-caret-square-o-up"></span> <spring:message code="organgestor.arbre.contrau"/></button>
                 </div>
 
-                <not:arbre id="arbreOrgans" atributId="codi" atributNom="nomCodi" arbre="${arbreOrgans}" fulles="${organs}" fullesAtributId="id" fullesAtributNom="nomCodi"
+                <not:arbre id="arbreOrgans" atributId="codi" atributNom="nomCodi" arbre="${arbreOrgans}" fullesAtributId="id" fullesAtributNom="nomCodi"
                            fullesAtributPare="codi"  fullesIcona="fa fa-inbox fa-lg" changedCallback="changedCallback" isArbreSeleccionable="${true}"
                            isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"/>
 <%--                <not:arbre id="arbreOrgans" atributId="codi" atributNom="nom" arbre="${arbreOrgans}" fulles="${organs}" fullesAtributId="id" fullesAtributNom="nom"--%>

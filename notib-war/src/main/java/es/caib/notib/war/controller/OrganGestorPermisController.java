@@ -13,8 +13,10 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.PermisosHelper;
 import es.caib.notib.war.helper.RolHelper;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import javax.validation.Valid;
 import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
@@ -72,10 +75,26 @@ public class OrganGestorPermisController extends BaseUserController{
 		if (organGestorId == 0) {
 			return DatatablesHelper.getDatatableResponse(request, new ArrayList<PermisDto>(), "id");
 		}
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
-		return DatatablesHelper.getDatatableResponse(request, permisos, "id");
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+			List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
+			return DatatablesHelper.getDatatableResponse(request, permisos, "id");
+		} catch(Exception ex) {
+			System.out.println(ex.getMessage());
+			String msg = getMessage(request, "organgestor.permis.datatable.error", new Object[] {
+					"<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
+					"\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
+					"\t\t\t</button>\n" +
+					"\t\t\t<div id=\"collapseError\" class=\"collapse\">\n" +
+					"\t\t\t\t<br/>\n" +
+					"\t\t\t\t<textarea rows=\"10\" style=\"width:100%\">" + ExceptionUtils.getStackTrace(ex) +"</textarea>\n" +
+					"\t\t\t</div>"});
+			MissatgesHelper.error(request, msg);
+
+		}
+
+		return DatatablesHelper.getDatatableResponse(request, new ArrayList<>(), "id");
 	}
 
 	@RequestMapping(value = "/{codiSia}/permisos", method = RequestMethod.GET)

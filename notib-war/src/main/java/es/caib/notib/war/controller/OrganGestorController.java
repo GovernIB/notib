@@ -50,21 +50,15 @@ public class OrganGestorController extends BaseUserController{
 	private PagadorCieService cieService;
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
+
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
-		model.addAttribute("organGestorEstats",
-				EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class,
-	                        "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
+		model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class,
+				"es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
-		model.addAttribute("oficinesEntitat",
-				organGestorService.getOficinesSIR(
-						entitat.getId(), 
-						entitat.getDir3Codi(), 
-						true));
+		model.addAttribute("oficinesEntitat", organGestorService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(), true));
 		return "organGestorList";
 	}
 	
@@ -103,23 +97,15 @@ public class OrganGestorController extends BaseUserController{
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(	
-			HttpServletRequest request,
-			OrganGestorFiltreCommand command,
-			Model model) {
+	public String post(HttpServletRequest request, OrganGestorFiltreCommand command, Model model) {
 		
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request, 
-				ORGANS_FILTRE, 
-				command);
-		
+		RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, command);
 		return "organGestorList";
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String newGet(
-			HttpServletRequest request,
-			Model model) {
+	public String newGet(HttpServletRequest request, Model model) {
+
 		OrganGestorCommand organGestorCommand = new OrganGestorCommand();
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute(organGestorCommand);

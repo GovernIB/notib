@@ -88,6 +88,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Autowired
 	private PluginHelper pluginHelper;
 
+	List<OrganGestorDto> sotredOrgans = new ArrayList<>();
+
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 
 	@Getter
@@ -405,7 +407,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					filtre.getOficina() == null ? "" : filtre.getOficina(),
 					isEstatNull,
 					estat,
-					filtre.isEntregaCieActiva(),
+					filtre.isEntregaCie(),
 					pageable);
 		}
 	}
@@ -1016,16 +1018,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Map<String, NodeDir3> organs = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-			List<NodeDir3> nodes = new ArrayList<>(organs.values());
+			sotredOrgans = findByEntitat(entitat.getId());
 			organsList = new ArrayList<>();
 			Arbre<OrganGestorDto> arbre = new Arbre<>(true);
 			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(entitat.getDir3Codi()), OrganGestorDto.class));
 			arbre.setArrel(arrel);
-			arrel.setFills(generarFillsArbre(organs, arrel, entitat.getId(), entitat.getDir3Codi(), filtres));
-			List<OrganGestorDto> dades = arbre.toDadesList();
-			for (OrganGestorDto dada : dades) {
-
-			}
+			arrel.setFills(generarFillsArbre(organs, arrel, entitat.getDir3Codi(), filtres));
 			return arbre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1033,13 +1031,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 
 	public List<ArbreNode<OrganGestorDto>> generarFillsArbre(Map<String, NodeDir3> organs, ArbreNode<OrganGestorDto> pare,
-															  Long idEntitat, String codiEntitat, OrganGestorFiltreDto filtres) {
+															  String codiEntitat, OrganGestorFiltreDto filtres) {
 
 		NodeDir3 organ = organs.get(codiEntitat);
 		List<NodeDir3> fills = organ.getFills();
-//		OrganGestorDto organExsitent = findByCodi(idEntitat, codiEntitat);
-//		OrganGestorDto o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
-		OrganGestorDto o = conversioTipusHelper.convertir(organ, OrganGestorDto.class);
+		OrganGestorDto organExsitent = buscarOrgan(organ.getCodi());
+		OrganGestorDto o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
 		List<ArbreNode<OrganGestorDto>> nodes = new ArrayList<>();
 		if (fills == null || fills.isEmpty() && filtres.filtresOk(o)) {
 			organsList.add(o);
@@ -1048,9 +1045,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		for (int foo = 0; foo < fills.size(); foo++) {
 			NodeDir3 node = organs.get(fills.get(foo).getCodi());
-			o = conversioTipusHelper.convertir(node, OrganGestorDto.class);
+			organExsitent = buscarOrgan(node.getCodi());
+			o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
 			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, o);
-			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, idEntitat, node.getCodi(), filtres);
+			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi(), filtres);
 			if (!filtres.filtresOk(o) && nets.isEmpty()) {
 				continue;
 			}
@@ -1058,6 +1056,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			nodes.add(actual);
 		}
 		return nodes;
+	}
+
+	private OrganGestorDto buscarOrgan(String codi) {
+		for (OrganGestorDto o : sotredOrgans) {
+			if (codi.equals(o.getCodi())) {
+				return o;
+			}
+		}
+		return null;
 	}
 
 	public OrganGestorDto getOrganNou(String codiSia) {

@@ -18,8 +18,10 @@ import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.AjaxHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MessageHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.SessioHelper;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,6 @@ public class OrganGestorArbreController extends BaseUserController {
     public String get(HttpServletRequest request, Model model) {
 
         try {
-
             OrganGestorFiltreCommand filtres = controller.getFiltreCommand(request);
             EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
             model.addAttribute("organGestorFiltreCommand", filtres);
@@ -77,7 +78,15 @@ public class OrganGestorArbreController extends BaseUserController {
             model.addAttribute("arbreOrgans", arbre);
             omplirModel(model, entitat, null);
         } catch (Exception ex) {
-            System.out.println(ex); // TODO FALTA PASSAR MISSATGE AL FRONT
+            String msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {
+                    "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
+                            "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
+                            "\t\t\t</button>\n" +
+                            "\t\t\t<div id=\"collapseError\" class=\"collapse\">\n" +
+                            "\t\t\t\t<br/>\n" +
+                            "\t\t\t\t<textarea rows=\"10\" style=\"width:100%\">" + ExceptionUtils.getStackTrace(ex) +"</textarea>\n" +
+                            "\t\t\t</div>"});
+            MissatgesHelper.error(request, msg);
         }
         return "organGestorArbre";
     }
@@ -99,7 +108,7 @@ public class OrganGestorArbreController extends BaseUserController {
         if (bindingResult.hasErrors()) {
             omplirModel(model, entitat, organ);
             msg = "organgestor.arbre.error.guardar";
-            return getAjaxControllerReturnValueError(request,"redirect:./",msg);
+            return getAjaxControllerReturnValueError(request,"redirect:./", msg);
         }
 
         organ.setLlibreNom(command.getLlibre() != null ? organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()).getNomLlarg() : null);
@@ -155,8 +164,15 @@ public class OrganGestorArbreController extends BaseUserController {
             o = o == null ? organService.getOrganNou(codiSia) : o;
             omplirModel(model, entitat, o);
         } catch (Exception ex) {
-            System.out.println(ex); // TODO FALTA PASSAR MISSATGE AL FRONT
-//            MissatgesHelper.error(request, ex.getMessage());
+            String msg = getMessage(request, "organgestor.detall.error", new Object[] {
+                    "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
+                            "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
+                            "\t\t\t</button>\n" +
+                            "\t\t\t<div id=\"collapseError\" class=\"collapse\">\n" +
+                            "\t\t\t\t<br/>\n" +
+                            "\t\t\t\t<textarea rows=\"10\" style=\"width:100%\">" + ExceptionUtils.getStackTrace(ex) +"</textarea>\n" +
+                            "\t\t\t</div>"});
+            MissatgesHelper.error(request, msg);
         }
         return "organGestorArbreDetall";
     }
