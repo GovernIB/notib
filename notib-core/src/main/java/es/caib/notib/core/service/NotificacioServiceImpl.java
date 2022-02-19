@@ -1097,22 +1097,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ArxiuDto enviamentGetCertificacioArxiu(
-			Long enviamentId) {
+	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEnviamentEntity enviament =
-					notificacioEnviamentRepository.findOne(enviamentId);
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					enviament.getNotificaCertificacioArxiuId(),
-					PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-					output);
-			return new ArxiuDto(
-					calcularNomArxiuCertificacio(enviament),
-					enviament.getNotificaCertificacioMime(),
-					output.toByteArray(),
-					output.size());
+			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(),PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
+			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1123,8 +1115,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public boolean enviar(Long notificacioId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Intentant enviament de la notificació pendent (" +
-					"notificacioId=" + notificacioId + ")");
+			logger.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
 			NotificacioEntity notificacio = notificaHelper.notificacioEnviar(notificacioId);
 			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
 		} finally {
@@ -1145,21 +1136,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional
-	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
-			Long entitatId, 
-			Long enviamentId) {
+	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 //			enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacio().getId()));
 			notificaHelper.enviamentRefrescarEstat(enviament.getId());
-			NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
-					enviament,
-					NotificacioEnviamenEstatDto.class);
-			estatCalcularCampsAddicionals(
-					enviament,
-					estatDto);
+			NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
+			estatCalcularCampsAddicionals(enviament, estatDto);
 			return estatDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

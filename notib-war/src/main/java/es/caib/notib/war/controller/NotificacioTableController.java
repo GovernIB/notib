@@ -27,10 +27,13 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -601,12 +604,33 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void certificacionsDescarregar(HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
+    public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
 
-//
-//        ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
-//        response.setHeader("Set-cookie", "fileDownload=true; path=/");
-//        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        boolean contingut = false;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+        List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
+        for(NotificacioEnviamentDatatableDto env : enviaments) {
+            if (env.getNotificaCertificacioData() == null) {
+                continue;
+            }
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+            arxiu.setNom(env.getTitular().getNif() + "_" + arxiu.getNom());
+            ZipEntry entry = new ZipEntry(arxiu.getNom());
+            entry.setSize(arxiu.getTamany());
+            zos.putNextEntry(entry);
+            zos.write(arxiu.getContingut());
+            contingut = true;
+        }
+
+        if (!contingut) {
+            MissatgesHelper.error(request, MessageHelper.getInstance().getMessage("notificacio.list.enviament.descarregar.sensecertificacio"));
+            return;
+        }
+        zos.closeEntry();
+        zos.close();
+        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        writeFileToResponse("certificacio.zip", baos.toByteArray(), response);
     }
 
 	/////
