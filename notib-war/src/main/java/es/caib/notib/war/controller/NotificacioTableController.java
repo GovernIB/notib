@@ -606,6 +606,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
 
+        Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
         boolean contingut = false;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
@@ -624,13 +625,14 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
 
         if (!contingut) {
-            MissatgesHelper.error(request, MessageHelper.getInstance().getMessage("notificacio.list.enviament.descarregar.sensecertificacio"));
+            MissatgesHelper.error(request, MessageHelper.getInstance().getMessage("notificacio.list.enviament.descarregar.sensecertificacio", null, locale));
             return;
         }
         zos.closeEntry();
         zos.close();
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse("certificacio.zip", baos.toByteArray(), response);
+        String nom = MessageHelper.getInstance().getMessage("notificacio.list.enviament.certificacio.zip.nom", null, locale);
+        writeFileToResponse( nom + "_" + notificacioId + ".zip", baos.toByteArray(), response);
     }
 
 	/////
