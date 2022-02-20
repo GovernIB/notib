@@ -9,5 +9,3 @@ databaseChangeLog:
               - column:
                   name: codi_pare
                   type: varchar(32)
-        - sql:
-            sql: ""

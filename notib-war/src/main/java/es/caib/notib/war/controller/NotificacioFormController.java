@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -75,6 +77,8 @@ public class NotificacioFormController extends BaseUserController {
     @Autowired
     private GestioDocumentalService gestioDocumentalService;
 
+    DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
         initForm(request, model, TipusEnviamentEnumDto.NOTIFICACIO);
@@ -110,7 +114,8 @@ public class NotificacioFormController extends BaseUserController {
         enviament.setEntregaPostal(entregaPostal);
         enviaments.add(enviament);
         notificacioCommand.setEnviaments(enviaments);
-        notificacioCommand.setCaducitat(CaducitatHelper.sumarDiesLaborals(10));
+        notificacioCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
+        notificacioCommand.setCaducitatDiesNaturals(10);
 
         TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
         if (tipusDocumentDefault != null) {
@@ -444,7 +449,8 @@ public class NotificacioFormController extends BaseUserController {
 
         DadesProcediment dadesProcediment = new DadesProcediment();
         dadesProcediment.setOrganCodi(procedimentActual.getOrganGestor());
-        dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesLaborals(procedimentActual.getCaducitat()));
+        dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(procedimentActual.getCaducitat()));
+        dadesProcediment.setCaducitatDiesNaturals(procedimentActual.getCaducitat());
         dadesProcediment.setRetard(procedimentActual.getRetard());
         dadesProcediment.setAgrupable(procedimentActual.isAgrupar());
         if (procedimentActual.isAgrupar()) {
@@ -532,6 +538,23 @@ public class NotificacioFormController extends BaseUserController {
         return RespostaConsultaArxiuDto.builder().validacioIdCsv(validacio).documentExistent(true)
                 .metadadesExistents(teMetadades).origen(doc.getOrigen()).validesa(doc.getValidesa())
                 .tipoDocumental(doc.getTipoDocumental()).modoFirma(doc.getModoFirma()).build();
+    }
+
+    @RequestMapping(value = "/caducitatDiesNaturals/{dia}/{mes}/{any}", method = RequestMethod.GET)
+    @ResponseBody
+    private long getDiesCaducitat(
+            @PathVariable String dia,
+            @PathVariable String mes,
+            @PathVariable String any) throws ParseException {
+        Date data = df.parse(dia + "/" + mes + "/" + any);
+        return CaducitatHelper.getDiesEntreDates(data);
+    }
+
+    @RequestMapping(value = "/caducitatData/{dies}", method = RequestMethod.GET)
+    @ResponseBody
+    private String getDataCaducitat(
+            @PathVariable int dies) {
+        return df.format(CaducitatHelper.sumarDiesNaturals(dies));
     }
 
     private void emplenarModelNotificacio(
@@ -843,6 +866,7 @@ public class NotificacioFormController extends BaseUserController {
     @Data
     public class DadesProcediment {
         private String caducitat;
+        private Integer caducitatDiesNaturals;
         private Integer retard;
         private String organCodi;
         private List<String> organsDisponibles;

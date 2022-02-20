@@ -43,6 +43,11 @@ public class CaducitatHelper {
 	}
 
 	public static Date sumarDiesNaturals(
+			int diesCaducitat) {
+		return sumarDiesNaturals(new Date(), diesCaducitat);
+	}
+
+	public static Date sumarDiesNaturals(
 			Date dataCaducitat,
 			int diesCaducitat) {
 		Calendar diaActual = Calendar.getInstance();
@@ -50,6 +55,7 @@ public class CaducitatHelper {
 		diaActual.add(Calendar.DATE, diesCaducitat);
 		return diaActual.getTime();
 	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CaducitatHelper.class);
 
 }

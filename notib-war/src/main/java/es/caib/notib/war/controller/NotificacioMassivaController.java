@@ -1,11 +1,20 @@
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.dto.notificacio.*;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaDataDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaEstatDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaFiltreDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaInfoDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaTableItemDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.InvalidCSVFileNotificacioMassivaException;
 import es.caib.notib.core.api.exception.MaxLinesExceededException;
-import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.NotificacioMassivaException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.GestioDocumentalService;
@@ -15,7 +24,15 @@ import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.command.NotificacioMassivaCommand;
 import es.caib.notib.war.command.NotificacioMassivaFiltreCommand;
-import es.caib.notib.war.helper.*;
+import es.caib.notib.war.helper.CaducitatHelper;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.EnumHelper;
+import es.caib.notib.war.helper.ExceptionHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.NotificacioListHelper;
+import es.caib.notib.war.helper.RequestSessionHelper;
+import es.caib.notib.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -26,7 +43,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -283,7 +304,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             Model model) {
         EntitatDto entitat = getEntitatActualComprovantPermisos(request);
         NotificacioMassivaCommand notificacioMassiuCommand = new NotificacioMassivaCommand();
-        notificacioMassiuCommand.setCaducitat(CaducitatHelper.sumarDiesLaborals(10));
+        notificacioMassiuCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
 
         model.addAttribute("notificacioMassivaCommand", notificacioMassiuCommand);
         model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());

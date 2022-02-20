@@ -10,6 +10,7 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidNotificacio;
 import lombok.Getter;
@@ -51,6 +52,7 @@ public class NotificacioCommand {
 	private Date enviamentDataProgramada;
 	private int retard;
 	private Date caducitat;
+	private Integer caducitatDiesNaturals;
 	private Long procedimentId;
 	private String procedimentNom;
 	private Long serveiId;
@@ -132,8 +134,10 @@ public class NotificacioCommand {
 		} else {
 			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
 		}
-		// Documents
 
+		if (dto.getCaducitat() != null) {
+			command.setCaducitatDiesNaturals(CaducitatHelper.getDiesEntreDates(dto.getCaducitat()));
+		}
 		return command;
 	}
 	public NotificacioDatabaseDto asDatabaseDto() {
