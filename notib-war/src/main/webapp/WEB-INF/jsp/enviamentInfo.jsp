@@ -62,6 +62,15 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	$("#remesa-link").click(e => {
+		e.preventDefault();
+		$.ajax({
+			url: "/notib/notificacio/filtrades/${enviament.notificacio.id}",
+			success: url => top.location = "/notib/",
+			error: err => console.log(err)
+		});
+	});
 });
 </script>
 </head>
@@ -134,11 +143,15 @@ $(document).ready(function() {
 				<table class="table table-bordered" style="width:100%">
 				<tbody>
 					<tr>
-						<!-- <td width="30%"><strong><spring:message code="enviament.info.dada.identificadors"/></strong></td> -->
+<%--						<!-- <td width="30%"><strong><spring:message code="enviament.info.dada.identificadors"/></strong></td> -->--%>
 						<c:choose>
 							<c:when test="${not empty enviament.notificacio.id}">
 								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.identificador"/></strong></td>
-								<td>${enviament.notificaIdentificador}</td>
+<%--								<td>${enviament.notificaIdentificador}</td>--%>
+								<td>
+									<a id="remesa-link" href="#">${enviament.notificacio.id}</a>
+<%--									<a href="<c:url value="/notificacio/"/>" data-toggle="tab">${enviament.notificacio.id}</a>--%>
+								</td>
 								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.referencia"/></strong></td>
 								<td>${enviament.notificaReferencia}</td>
 							</c:when>

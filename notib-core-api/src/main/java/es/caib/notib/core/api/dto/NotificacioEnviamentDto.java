@@ -21,6 +21,7 @@ import java.util.List;
 public class NotificacioEnviamentDto extends AuditoriaDto {
 
 	private Long id;
+	private String idXifrat;
 	private NotificacioDto notificacio;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
@@ -55,7 +56,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private Date registreData;
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;
-	
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

@@ -248,45 +248,31 @@ public class OrganGestorController extends BaseUserController{
 					"organgestor.controller.esborrat.ko");
 		}
 	}
-	
+
+	@ResponseBody
 	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
-	@ResponseBody
-	private LlibreDto getLlibreOrgan(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String organGestorDir3Codi) {
+	private LlibreDto getLlibreOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
+
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		return organGestorService.getLlibreOrganisme(
-				entitat.getId(),
-				organGestorDir3Codi);
+		return organGestorService.getLlibreOrganisme(entitat.getId(), organGestorDir3Codi);
 	}
-	
+
+	@ResponseBody
 	@RequestMapping(value = "/oficines/{organGestorDir3Codi}", method = RequestMethod.GET)
-	@ResponseBody
-	private List<OficinaDto> getOficinesOrgan(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String organGestorDir3Codi) {
+	private List<OficinaDto> getOficinesOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
+
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		return organGestorService.getOficinesSIR(
-				entitat.getId(),
-				organGestorDir3Codi,
-				false);
+		return organGestorService.getOficinesSIR(entitat.getId(), organGestorDir3Codi, false);
 	}
-	
-	public OrganGestorFiltreCommand getFiltreCommand(
-			HttpServletRequest request) {
-		OrganGestorFiltreCommand organGestorFiltreCommand = (
-				OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						ORGANS_FILTRE);
-		if (organGestorFiltreCommand == null) {
-			organGestorFiltreCommand = new OrganGestorFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					ORGANS_FILTRE,
-					organGestorFiltreCommand);
+
+	public OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
+
+		OrganGestorFiltreCommand organGestorFiltreCommand = (OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, ORGANS_FILTRE);
+		if (organGestorFiltreCommand != null) {
+			return organGestorFiltreCommand;
 		}
+		organGestorFiltreCommand = new OrganGestorFiltreCommand();
+		RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
 		return organGestorFiltreCommand;
 	}
 	

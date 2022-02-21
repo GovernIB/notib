@@ -201,11 +201,8 @@ public class OrganGestorArbreController extends BaseUserController {
         List<LlibreDto> llibres = new ArrayList<>();
         llibres.add(organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()));
         model.addAttribute("llibres", llibres);
-        List<OficinaDto> oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),true);
+        List<OficinaDto> oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),false);
         model.addAttribute("oficines", oficines);
-//        if (!entitat.isOficinaEntitat()) {
-//            return;
-//        }
         for(OficinaDto oficina: oficines) {
             if (oficina.getCodi() != null && oficina.getCodi().equals(entitat.getOficina())) {
                 command.setOficinaNom(oficina.getCodi() + " - " + oficina.getNom());

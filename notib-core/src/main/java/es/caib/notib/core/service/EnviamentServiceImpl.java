@@ -299,15 +299,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de destinatari donat el seu id (" +
-					"destinatariId=" + enviamentId + ")");
+			logger.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					false,
-					false,
-					false);
+			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			return enviamentToDto(enviament);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1014,12 +1009,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 				e.printStackTrace();
 
 				// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
-				callbackHelper.marcarEventNoProcessable(eventId,
-						e.getMessage(),
-						ExceptionUtils.getStackTrace(e));
+				callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
 				return false;
 			}
-
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1051,23 +1043,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 	}
 
-	private NotificacioEnviamentDto enviamentToDto(
-			NotificacioEnviamentEntity enviament) {
-//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
-		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(
-				enviament,
-				NotificacioEnviamentDto.class);
+	private NotificacioEnviamentDto enviamentToDto(NotificacioEnviamentEntity enviament) {
+
+		//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class);
 		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
 		enviamentDto.setRegistreData(enviament.getRegistreData());
-		destinatariCalcularCampsAddicionals(
-				enviament,
-				enviamentDto);
+		destinatariCalcularCampsAddicionals(enviament, enviamentDto);
 		return enviamentDto;
 	}
 
-	private void destinatariCalcularCampsAddicionals(
-			NotificacioEnviamentEntity enviament,
-			NotificacioEnviamentDto enviamentDto) {
+	private void destinatariCalcularCampsAddicionals(NotificacioEnviamentEntity enviament, NotificacioEnviamentDto enviamentDto) {
+
 		if (enviament.isNotificaError()) {
 			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
 			if (event != null) {
@@ -1075,12 +1062,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
 			}
 		}
-		enviamentDto.setNotificaCertificacioArxiuNom(
-				calcularNomArxiuCertificacio(enviament));
+		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
 	}
 
-	private String calcularNomArxiuCertificacio(
-			NotificacioEnviamentEntity enviament) {
+	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 	

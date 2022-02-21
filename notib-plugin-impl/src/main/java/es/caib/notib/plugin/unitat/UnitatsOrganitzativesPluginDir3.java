@@ -472,14 +472,12 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 	
 	@Override
-	public List<OficinaSIR> oficinesSIRUnitat(
-			String unitat,
-			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+	public List<OficinaSIR> oficinesSIRUnitat(String unitat, Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+
 		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
 		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
 		try {
 			getOficinesUnitatSuperior(unitat, oficinesWS, arbreUnitats);
-			
 			for (OficinaTF oficinaTF : oficinesWS) {
 				OficinaSIR oficinaSIR = new OficinaSIR();
 				oficinaSIR.setCodi(oficinaTF.getCodigo());
@@ -488,20 +486,17 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			}
 			return oficinesSIR;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar les oficines SIR via REST (" +
-					"unitat=" + unitat + ")",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar les oficines SIR via REST (unitat=" + unitat + ")", ex);
 		}
 	}
 	
 	@Override
 	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException {
+
 		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
 		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
 		try {
 			oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
-			
 			for (OficinaTF oficinaTF : oficinesWS) {
 				OficinaSIR oficinaSIR = new OficinaSIR();
 				oficinaSIR.setCodi(oficinaTF.getCodigo());
@@ -510,28 +505,20 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			}
 			return oficinesSIR;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar les oficines SIR via REST (" +
-					"entitat=" + entitat + ")",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar les oficines SIR via REST (entitat=" + entitat + ")", ex);
 		}
 	}
 
-	private void getOficinesUnitatSuperior(
-			String unitat, 
-			List<OficinaTF> oficinesWS, 
-			Map<String, NodeDir3> arbreUnitats) throws MalformedURLException {
+	private void getOficinesUnitatSuperior(String unitat, List<OficinaTF> oficinesWS, Map<String, NodeDir3> arbreUnitats) throws MalformedURLException {
+
 		NodeDir3 arbre = arbreUnitats.get(unitat);
 		List<OficinaTF> oficinesUnitatActual = getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(unitat);
-		
 		if (arbre != null) {
 			String unitatSuperiorCurrentUnitat = arbre.getSuperior();
 			// Cerca de forma recursiva a l'unitat superior si l'unitat actual no disposa d'una oficina
 			if (oficinesUnitatActual.isEmpty() && !unitatSuperiorCurrentUnitat.isEmpty() && !unitatSuperiorCurrentUnitat.equals(arbre.getArrel())) {
-				getOficinesUnitatSuperior(
-						unitatSuperiorCurrentUnitat.substring(0, unitatSuperiorCurrentUnitat.indexOf(' ')), 
-						oficinesUnitatActual,
-						arbreUnitats);
+				String u = unitatSuperiorCurrentUnitat.substring(0, unitatSuperiorCurrentUnitat.indexOf(' '));
+				getOficinesUnitatSuperior(u, oficinesUnitatActual, arbreUnitats);
 			// No cercar més si l'oficina actual és l'oficina arrel
 			} else if (oficinesUnitatActual.isEmpty() && !unitatSuperiorCurrentUnitat.isEmpty() && unitatSuperiorCurrentUnitat.equals(arbre.getArrel())) {
 				oficinesWS.addAll(getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(arbre.getCodi()));

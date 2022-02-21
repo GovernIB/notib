@@ -272,6 +272,13 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
+				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotifica"/>
+					<script type="text/x-jsrender">
+						<div class="from-group">
+							<input name="codiNotifica" value="${filtreEnviaments.codiNotifica}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
+						</div>
+					</script>
+				</th>
 				<c:choose>
 					<c:when test = "${columnes.proCodi == true}">
 					  <c:set value="true" var="visible"></c:set>
@@ -590,8 +597,9 @@ function getCookie(cname) {
 				</th>
 				<th data-col-name="notificacioId" data-visible="false"></th>
 				<th data-orderable="false" data-template="#cellAccionsTemplate" width="101">
-			 	 	<script id="cellAccionsTemplate" type="text/x-jsrender">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/notificacio/{{:notificacioId}}/enviament/{{:id}}"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
+						<a href="<c:url value="/notificacio/{{:notificacioId}}/info"/>" data-toggle="modal" class="btn btn-default"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detall.remesa"/></a>
 					</script>
 				</th>
 			</tr>

@@ -119,22 +119,18 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request,
-			Model model) throws ParseException {
+	public DatatablesResponse datatable(HttpServletRequest request, Model model) throws ParseException {
+
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
-
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
@@ -149,18 +145,9 @@ public class EnviamentController extends TableAccionsMassivesController {
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		}catch(SecurityException e) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.entitat.cap.assignada"));
+			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
 		}
-
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				enviaments,
-				"id",
-				SESSION_ATTRIBUTE_SELECCIO);
+		return DatatablesHelper.getDatatableResponse(request, enviaments,"id", SESSION_ATTRIBUTE_SELECCIO);
 	}
 
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
