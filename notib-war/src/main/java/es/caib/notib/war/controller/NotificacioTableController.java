@@ -597,33 +597,47 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @ResponseBody
     public void certificacionsDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId) throws IOException {
 
-        Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
-        boolean contingut = false;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zos = new ZipOutputStream(baos);
-        List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
-        for(NotificacioEnviamentDatatableDto env : enviaments) {
-            if (env.getNotificaCertificacioData() == null) {
-                continue;
+        try {
+            Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+            boolean contingut = false;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ZipOutputStream zos = new ZipOutputStream(baos);
+            List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(notificacioId);
+            Map<String, Integer> interessats = new HashMap<>();
+            int numInteressats = 0;
+            for (NotificacioEnviamentDatatableDto env : enviaments) {
+                if (env.getNotificaCertificacioData() == null) {
+                    continue;
+                }
+                ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(env.getId());
+                arxiu.setNom(env.getTitular().getNif() + "_" + arxiu.getNom());
+                if (interessats.get(env.getTitular().getNif()) == null) {
+                    numInteressats++;
+                    interessats.put(env.getTitular().getNif(), numInteressats);
+//                    arxiu.setNom(numInteressats + "_" + arxiu.getNom());
+                }
+                ZipEntry entry = new ZipEntry(arxiu.getNom());
+                entry.setSize(arxiu.getTamany());
+                zos.putNextEntry(entry);
+                zos.write(arxiu.getContingut());
+                contingut = true;
             }
-            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(env.getId());
-            arxiu.setNom(env.getTitular().getNif() + "_" + arxiu.getNom());
-            ZipEntry entry = new ZipEntry(arxiu.getNom());
-            entry.setSize(arxiu.getTamany());
-            zos.putNextEntry(entry);
-            zos.write(arxiu.getContingut());
-            contingut = true;
-        }
 
-        if (!contingut) {
-            MissatgesHelper.error(request, MessageHelper.getInstance().getMessage("notificacio.list.enviament.descarregar.sensecertificacio", null, locale));
-            return;
+            if (!contingut) {
+                MissatgesHelper.error(request, MessageHelper.getInstance().getMessage("notificacio.list.enviament.descarregar.sensecertificacio", null, locale));
+                return;
+            }
+            zos.closeEntry();
+            zos.close();
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            String nom = MessageHelper.getInstance().getMessage("notificacio.list.enviament.certificacio.zip.nom", null, locale);
+            writeFileToResponse(nom + "_" + notificacioId + ".zip", baos.toByteArray(), response);
+        } catch (Exception ex) {
+            String msg = getMessage(request, "notificacio.list.enviament.descaregar.certificacio.error");
+            log.error(msg, ex);
+            MissatgesHelper.error(request, msg);
+            throw new RuntimeException(msg);
         }
-        zos.closeEntry();
-        zos.close();
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        String nom = MessageHelper.getInstance().getMessage("notificacio.list.enviament.certificacio.zip.nom", null, locale);
-        writeFileToResponse( nom + "_" + notificacioId + ".zip", baos.toByteArray(), response);
     }
 
 	/////
