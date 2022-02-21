@@ -59,7 +59,7 @@
 		<label class="sr-only" for="${campPath}">${campLabelText}</label>
 		<div class="input-group">
 			<form:input path="${campPath}" cssClass="form-control datepicker classe" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" data-toggle="datepicker" data-idioma="${idioma}" data-orientacio="bottom"/>
-			<span class="input-group-addon" style="width:auto"><span class="fa fa-calendar"></span></span>
+			<span class="input-group-addon" style="width:1%"><span class="fa fa-calendar"></span></span>
 		</div>
 	</c:otherwise>
 </c:choose>

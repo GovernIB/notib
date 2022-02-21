@@ -1,10 +1,10 @@
 package es.caib.notib.core.helper;
 
-import java.util.Calendar;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Utilitat per sumar dies de caducitat a la data de caducitat d'una notificació.
@@ -18,18 +18,20 @@ public class CaducitatHelper {
 			int diesCaducitat) {
 		Calendar diaActual = Calendar.getInstance();
 		diaActual.setTime(dataCaducitat);
-		diaActual.add(Calendar.DATE, 1);
+//		diaActual.add(Calendar.DATE, 1); La data de caducitat comtempla tot el dia final, fins a última hora.
 		
 		try {
+			int diesASumar = 1;
 			for (int dia = 1; dia <= diesCaducitat; dia++) {
 				Calendar diaSeguent = Calendar.getInstance();
-				diaSeguent.setTime(new Date());
-				diaSeguent.add(Calendar.DAY_OF_YEAR, dia);
+				diaSeguent.setTime(dataCaducitat);
+				diaSeguent.add(Calendar.DAY_OF_YEAR, diesASumar);
 				
 				if ((diaSeguent.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY)) {
+					diesASumar++;
 					diaActual.add(Calendar.DAY_OF_YEAR, 1);
 				} else if (diaSeguent.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
-					dia = dia + 2;
+					diesASumar += 3;
 					diaActual.add(Calendar.DAY_OF_YEAR, 3);
 				}
 			}
@@ -39,7 +41,21 @@ public class CaducitatHelper {
 		}
 		return diaActual.getTime();
 	}
-	
+
+	public static Date sumarDiesNaturals(
+			int diesCaducitat) {
+		return sumarDiesNaturals(new Date(), diesCaducitat);
+	}
+
+	public static Date sumarDiesNaturals(
+			Date dataCaducitat,
+			int diesCaducitat) {
+		Calendar diaActual = Calendar.getInstance();
+		diaActual.setTime(dataCaducitat);
+		diaActual.add(Calendar.DATE, diesCaducitat);
+		return diaActual.getTime();
+	}
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CaducitatHelper.class);
 
 }
