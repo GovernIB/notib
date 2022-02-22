@@ -614,7 +614,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 if (interessats.get(env.getTitular().getNif()) == null) {
                     numInteressats++;
                     interessats.put(env.getTitular().getNif(), numInteressats);
-//                    arxiu.setNom(numInteressats + "_" + arxiu.getNom());
+                    arxiu.setNom(numInteressats + "_" + arxiu.getNom());
                 }
                 ZipEntry entry = new ZipEntry(arxiu.getNom());
                 entry.setSize(arxiu.getTamany());
