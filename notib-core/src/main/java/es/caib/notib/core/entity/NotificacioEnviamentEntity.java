@@ -64,7 +64,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	protected ServeiTipusEnumDto serveiTipus;
 
 	/* Notifica informació */
-	@Column(name = "notifica_ref", length = 20)
+	@Column(name = "notifica_ref", length = 36)
 	protected String notificaReferencia;
 	
 	@Column(name = "notifica_id", length = 20)
@@ -256,12 +256,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void setNotificacio(NotificacioEntity notificacio) {
 		this.notificacio = notificacio;
 	}
-	public void updateNotificaReferencia(
-			String notificaReferencia) {
+	public void updateNotificaReferencia(String notificaReferencia) {
 		this.notificaReferencia = notificaReferencia;
 	}
-	public void updateNotificaIdentificador(
-			String notificaidentificador) {
+	public void updateNotificaIdentificador(String notificaidentificador) {
 		this.notificaIdentificador = notificaidentificador;
 	}
 	public void setDehObligat(Boolean dehObligat) {
@@ -286,15 +284,12 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 
 	public void updateRegistreEstat(NotificacioRegistreEstatEnumDto registreEstat) {
-		boolean estatFinal =
-				NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat) ||
-				NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat);
+		boolean estatFinal = NotificacioRegistreEstatEnumDto.REBUTJAT.equals(registreEstat) || NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(registreEstat);
 		this.registreEstat = registreEstat;
 		this.registreEstatFinal = estatFinal;
 	}
 
-	public void updateNotificaEnviada(
-			String notificaIdentificador) {
+	public void updateNotificaEnviada(String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
 		this.notificaEstatData = new Date();
 		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
@@ -472,14 +467,16 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			ServeiTipusEnumDto tipusServei,
 			NotificacioEntity notificacioGuardada,
 			PersonaEntity titular,
-			List<PersonaEntity> destinataris) {
+			List<PersonaEntity> destinataris,
+			String referencia) {
 		return new BuilderV2(
 				enviament,
 				isAmbEntregaDeh,
 				tipusServei,
 				notificacioGuardada,
 				titular,
-				destinataris);
+				destinataris,
+				referencia);
 	}
 
 	public static class BuilderV2 {
@@ -490,7 +487,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				ServeiTipusEnumDto tipusServei,
 				NotificacioEntity notificacioGuardada,
 				PersonaEntity titular,
-				List<PersonaEntity> destinataris) {	
+				List<PersonaEntity> destinataris,
+				String referencia) {
 			built = new NotificacioEnviamentEntity();
 			built.serveiTipus = tipusServei;
 			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
@@ -514,6 +512,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			Date data = new Date();
 			built.notificaIntentData = data;
 			built.sirConsultaData = data;
+			built.notificaReferencia = referencia;
 		}
 
 		public BuilderV2 destinataris(List<PersonaEntity> destinataris) {

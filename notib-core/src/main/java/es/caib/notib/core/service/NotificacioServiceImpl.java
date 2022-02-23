@@ -28,6 +28,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +42,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.util.*;
 
 /**
@@ -126,6 +130,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ProcSerHelper procedimentHelper;
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
+	@Autowired
+	private EnviamentTableRepository enviamentTableRepository;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -560,6 +566,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getNomesSenseErrors().getField(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+							filtreNetejat.getReferencia().isNull(),
+							filtreNetejat.getReferencia().getField(),
 							pageable);
 
 				} else if (isUsuariEntitat || isSuperAdmin) {
@@ -603,6 +611,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getNomesSenseErrors().getField(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+							filtreNetejat.getReferencia().isNull(),
+							filtreNetejat.getReferencia().getField(),
 							pageable);
 
 				} else if (isAdminOrgan) {
@@ -643,6 +653,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getNomesSenseErrors().getField(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+							filtreNetejat.getReferencia().isNull(),
+							filtreNetejat.getReferencia().getField(),
 							pageable);
 				}
 			}
@@ -653,7 +665,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioTableItemDto not = nots.get(foo);
 				NotificacioEntity e = notificacioRepository.findById(not.getId());
 				List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
-				Date cerData = envs != null && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
+				Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
 				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
 				not.setDocumentId(id);
 				not.setEnvCerData(cerData);
@@ -1663,6 +1675,58 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean validarFormatCsv(String csv) {
 		return csv.matches("^([0-9a-f]{64})$") || csv.matches("^([0-9a-zA-Z_]+)$");
+	}
+
+	@Override
+	@Transactional
+	public boolean actualitzarReferencies() {
+
+		try {
+			List<Long> ids = notificacioRepository.findIdsSenseReferencia();
+			int size = ids != null ? ids.size() : 0;
+
+			// Obtenim el xifrador
+			Cipher cipher = Cipher.getInstance("RC4");
+			SecretKeySpec rc4Key = new SecretKeySpec(configHelper.getConfig("es.caib.notib.notifica.clau.xifrat.ids").getBytes(),"RC4");
+			cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
+
+			logger.info("Actualitzant not_notificacions");
+			for (int foo = 0; foo < size; foo++) {
+				Long notId = ids.get(foo);
+				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(notId.longValue()))));
+				notificacioRepository.updateReferencia(notId, referencia);
+//				notificacioTableViewRepository.updateReferencia(notId, referencia);
+			}
+
+			logger.info("Actualitzant not_notificacio_env");
+			ids = enviamentRepository.findIdsSenseReferencia();
+			size = ids != null ? ids.size() : 0;
+			for (int foo = 0; foo < size; foo++) {
+				Long id = ids.get(foo);
+				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(id.longValue()))));
+				enviamentRepository.updateReferencia(id, referencia);
+			}
+			//Taules auxiliar de notificacions
+			notificacioTableViewRepository.updateReferenciesNules();
+			notificacioAuditRepository.updateReferenciesNules();
+			//Taules auxiliar d'enviament
+			notificacioEnviamentAuditRepository.updateReferenciesNules();
+			enviamentTableRepository.updateReferenciesNules();
+
+			return true;
+		} catch (Exception ex) {
+			logger.error("Error actualitzant les referencies", ex);
+			return false;
+		}
+	}
+
+	private byte[] longToBytes(long l) {
+		byte[] result = new byte[Long.SIZE / Byte.SIZE];
+		for (int i = 7; i >= 0; i--) {
+			result[i] = (byte)(l & 0xFF);
+			l >>= 8;
+		}
+		return result;
 	}
 
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {

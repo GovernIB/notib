@@ -35,41 +35,61 @@ public class NotificacioFiltreDto implements Serializable {
 	private String numExpedient;
 	private String creadaPer;
 	private String identificador;
+	private String referencia;
 	private boolean nomesAmbErrors;
 
 	public boolean isEmpty() {
-		if (entitatId != null)
+		if (entitatId != null) {
 			return false;
-		if (comunicacioTipus != null)
+		}
+		if (comunicacioTipus != null) {
 			return false;
-		if (enviamentTipus != null)
+		}
+		if (enviamentTipus != null) {
 			return false;
-		if (estat != null)
+		}
+		if (estat != null) {
 			return false;
-		if (concepte != null && !concepte.isEmpty())
+		}
+		if (concepte != null && !concepte.isEmpty()) {
 			return false;
-		if (dataInici != null)
+		}
+		if (dataInici != null) {
 			return false;
-		if (dataFi != null)
+		}
+		if (dataFi != null) {
 			return false;
-		if (titular != null && !titular.isEmpty())
+		}
+		if (titular != null && !titular.isEmpty()) {
 			return false;
-		if (organGestor != null && !organGestor.isEmpty())
+		}
+		if (organGestor != null && !organGestor.isEmpty()) {
 			return false;
-		if (procedimentId != null)
+		}
+		if (procedimentId != null) {
 			return false;
-		if (serveiId != null)
+		}
+		if (serveiId != null) {
 			return false;
-		if (tipusUsuari != null)
+		}
+		if (tipusUsuari != null) {
 			return false;
-		if (numExpedient != null && !numExpedient.isEmpty())
+		}
+		if (numExpedient != null && !numExpedient.isEmpty()) {
 			return false;
-		if (creadaPer != null && !creadaPer.isEmpty())
+		}
+		if (creadaPer != null && !creadaPer.isEmpty()) {
 			return false;
-		if (identificador != null && !identificador.isEmpty())
+		}
+		if (identificador != null && !identificador.isEmpty()) {
 			return false;
-		if (nomesAmbErrors)
+		}
+		if (nomesAmbErrors) {
 			return false;
+		}
+		if (referencia != null && !referencia.isEmpty()) {
+			return false;
+		}
 		return true;
 	}
 	@Override

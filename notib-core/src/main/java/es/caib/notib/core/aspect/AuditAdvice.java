@@ -39,22 +39,14 @@ public class AuditAdvice {
 	    if (method.getDeclaringClass().isInterface()) {
 	        method = joinPoint.getTarget().getClass().getDeclaredMethod(methodName, method.getParameterTypes());    
 	    }
-
 	    Audita auditAnnotation = method.getAnnotation(Audita.class);
-	    
 		log.debug(">>> AUDIT - JoinPoint: " + joinPoint.getSignature().toShortString());
 		log.debug(">>> AUDIT - Entitat a auditar: " + auditAnnotation.entityType());
 		log.debug(">>> AUDIT - Tipus d'operació: " + auditAnnotation.operationType());
 		log.debug(">>> AUDIT - Objecte disponible per auditar: " + auditAnnotation.returnType());
 		log.debug(">>> AUDIT ----------------------------------------------------------------- ");
-		
-		auditService.audita(
-				entitat, 
-				auditAnnotation.operationType(), 
-				auditAnnotation.entityType(), 
-				auditAnnotation.returnType(),
-				joinPoint.getSignature().toShortString());
-		
+		auditService.audita(entitat, auditAnnotation.operationType(), auditAnnotation.entityType(),
+							auditAnnotation.returnType(), joinPoint.getSignature().toShortString());
 	}
 
 //	// Auditoria d'entitat

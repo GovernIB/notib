@@ -151,47 +151,25 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
-	public String visualitzar(
-			HttpServletRequest request,
-			Model model) {
+	public String visualitzar(HttpServletRequest request, Model model) {
+
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-
-		ColumnesDto columnes = enviamentService.getColumnesUsuari(
-				entitat.getId(),
-				usuari);
-
-		if (columnes != null) {
-			model.addAttribute(ColumnesCommand.asCommand(columnes));
-		} else {
-			model.addAttribute(new ColumnesCommand());
-		}
-
-
+		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
+		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}
 
 	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid ColumnesCommand columnesCommand,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) throws IOException {
 
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}
-
 		model.addAttribute(new NotificacioFiltreCommand());
-		enviamentService.columnesUpdate(
-					entitat.getId(),
-					ColumnesCommand.asDto(columnesCommand));
-
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:enviament",
-				"enviament.controller.modificat.ok");
+		enviamentService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
+		return getModalControllerReturnValueSuccess(request, "redirect:enviament", "enviament.controller.modificat.ok");
 	}
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {

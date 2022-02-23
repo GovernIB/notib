@@ -61,6 +61,7 @@ public class NotificacioTableHelper {
                     .isErrorLastEvent(false)
                     .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
                     .enviadaDate(getEnviadaDate(notificacio))
+                    .referencia(notificacio.getReferencia())
                     .build();
 
             notificacioTableViewRepository.save(tableViewItem);

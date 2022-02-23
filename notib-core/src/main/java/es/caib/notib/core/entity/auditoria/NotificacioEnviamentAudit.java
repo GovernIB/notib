@@ -56,7 +56,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	private String dehNif;
 	
 	// Notifica
-	@Column(name = "notifica_ref", length = 20)
+	@Column(name = "notifica_ref", length = 36)
 	private String notificaReferencia;
 	@Column(name = "notifica_id", length = 20)
 	private String notificaIdentificador;

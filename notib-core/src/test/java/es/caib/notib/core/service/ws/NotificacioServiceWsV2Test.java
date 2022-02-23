@@ -249,7 +249,7 @@ public class NotificacioServiceWsV2Test {
 		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, 
 				notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, 
 				null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, 
-				null, procedimentOrgan, null).build();
+				null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
 		
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
 		

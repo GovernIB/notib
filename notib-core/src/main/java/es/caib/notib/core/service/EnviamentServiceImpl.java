@@ -325,16 +325,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
 			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					false,
-					isUsuariEntitat,
-					false);
-
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
 			Page<EnviamentTableEntity> pageEnviaments = null;
-			
 			logger.info("Consulta de taula d'enviaments ...");
-
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"enviamentDataProgramada"});
 			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"notificaIdentificador"});
@@ -354,6 +347,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"csv_uuid"});
 			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
 			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
+			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			NotificacioEnviamentFiltre filtreFields = getFiltre(entitatId, filtre);
@@ -446,6 +440,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.nomesSenseErrors,
 						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
 						filtreFields.hasZeronotificaEnviamentIntent.getField(),
+						filtreFields.referenciaNotificacio.isNull(),
+						filtreFields.referenciaNotificacio.getField(),
 						pageable);
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
@@ -506,6 +502,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.nomesSenseErrors,
 						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
 						filtreFields.hasZeronotificaEnviamentIntent.getField(),
+						filtreFields.referenciaNotificacio.isNull(),
+						filtreFields.referenciaNotificacio.getField(),
 						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
@@ -567,6 +565,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.nomesSenseErrors,
 						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
 						filtreFields.hasZeronotificaEnviamentIntent.getField(),
+						filtreFields.referenciaNotificacio.isNull(),
+						filtreFields.referenciaNotificacio.getField(),
 						pageable);
 				logger.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
@@ -683,6 +683,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.nomesSenseErrors(nomesSenseErrors)
 				.nomesAmbErrors(nomesAmbErrors)
 				.hasZeronotificaEnviamentIntent(new FiltreField<Boolean>(hasZeronotificaEnviamentIntent))
+				.referenciaNotificacio(new StringField(filtreDto.getReferenciaNotificacio()))
 				.build();
 	}
 	@Builder
@@ -725,6 +726,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		private boolean nomesSenseErrors = false;
 		private boolean nomesAmbErrors = false;
 		private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
+		private StringField referenciaNotificacio;
 
 //		private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
 //		private FiltreField<Date> dataInici;
@@ -913,13 +915,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Transactional
 	@Override
-	public void columnesUpdate(
-			Long entitatId, 
-			ColumnesDto columnes) {
+	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			ColumnesEntity columnesEntity = columnesRepository.findOne(columnes.getId());
-	
 			columnesEntity.update(
 					columnes.isDataEnviament(), 
 					columnes.isDataProgramada(), 
@@ -942,7 +942,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					columnes.isCodiNotibEnviament(), 
 					columnes.isNumCertificacio(),
 					columnes.isCsvUuid(), 
-					columnes.isEstat());
+					columnes.isEstat(),
+					columnes.isReferenciaNotificacio());
 	
 			columnesRepository.saveAndFlush(columnesEntity);
 		} finally {
@@ -952,21 +953,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		
 	@Transactional(readOnly = true)	
 	@Override
-	public ColumnesDto getColumnesUsuari(
-			Long entitatId,
-			UsuariDto usuariDto) {
+	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuariDto) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			UsuariEntity usuari = usuariRepository.findByCodi(usuariDto.getCodi());
-			
-			ColumnesEntity columnes = columnesRepository.findByEntitatAndUser(
-					entitat, 
-					usuari);
-			
-			return conversioTipusHelper.convertir(
-					columnes, 
-					ColumnesDto.class);
+			ColumnesEntity columnes = columnesRepository.findByEntitatAndUser(entitat, usuari);
+			return conversioTipusHelper.convertir(columnes, ColumnesDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

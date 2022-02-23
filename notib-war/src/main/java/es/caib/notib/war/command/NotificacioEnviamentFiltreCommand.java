@@ -43,6 +43,7 @@ public class NotificacioEnviamentFiltreCommand {
 	private String numeroCertCorreus;
 	private String csvUuid;
 	private NotificacioEstatEnumDto estat;
+	private String referenciaNotificacio;
 
 	
 	public static NotificacioEnviamentFiltreCommand asCommand(NotificacioEnviamentFiltreDto dto) {

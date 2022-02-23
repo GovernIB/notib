@@ -42,8 +42,8 @@ public class RegistreNotificaHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
-	public boolean realitzarProcesRegistrar(
-			NotificacioEntity notificacioEntity) throws RegistreNotificaException {
+	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
+
 		logger.info(" [REG-NOT] Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		boolean enviarANotifica = false;
 		boolean isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
@@ -137,9 +137,7 @@ public class RegistreNotificaHelper {
 				String errorDescripcio = "Hi ha hagut un error registrant la notificació " + notificacioEntity.getId();
 				logger.error(errorDescripcio, ex);
 				integracioHelper.addAccioError(info, errorDescripcio, ex);
-				throw new RegistreNotificaException(
-						ex.getMessage(),
-						ex);
+				throw new RegistreNotificaException(ex.getMessage(), ex);
 			}
 			logger.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
 		}
@@ -180,26 +178,18 @@ public class RegistreNotificaHelper {
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			updateEventWithError(
-					arbResposta,
-					notificacioEntity,
-					null);
+			updateEventWithError(arbResposta, notificacioEntity, null);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			finalitzaRegistre(
-					arbResposta,
-					notificacioEntity,
-					notificacioEntity.getEnviaments(),
-					false);
+			finalitzaRegistre(arbResposta, notificacioEntity, notificacioEntity.getEnviaments(), false);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
 			enviarANotifica = true;
 		}
-		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity,
-				pluginHelper.getRegistreReintentsPeriodeProperty());
+		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
 		return enviarANotifica;
 	}
 

@@ -98,13 +98,13 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return "notificacioList";
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/filtrades/{notificacioId}")
-    public String getFiltrades(HttpServletRequest request, @PathVariable Long notificacioId, Model model) {
+    @RequestMapping(method = RequestMethod.GET, value = "/filtrades/{referencia}")
+    public String getFiltrades(HttpServletRequest request, @PathVariable String referencia, Model model) {
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         OrganGestorDto organGestorActual = getOrganGestorActual(request);
         NotificacioFiltreCommand filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE);
-        filtre.setIdentificador(notificacioId + "");
+        filtre.setReferencia(referencia);
         model.addAttribute(filtre);
         notificacioListHelper.fillModel(entitatActual, organGestorActual, request, model);
         return "redirect:/notificacio";
@@ -129,6 +129,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
+
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         PaginaDto<NotificacioTableItemDto> notificacions = new PaginaDto<>();
@@ -149,7 +150,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             if (isAdminOrgan && entitatActual != null) {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
-
             }
             notificacions = notificacioService.findAmbFiltrePaginat(
                     entitatActual != null ? entitatActual.getId() : null,
@@ -159,16 +159,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     filtre,
                     DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
-            MissatgesHelper.error(
-                    request,
-                    getMessage(
-                            request,
-                            "notificacio.controller.entitat.cap.assignada"));
+            MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
-
-        return DatatablesHelper.getDatatableResponse(request, notificacions,
-                "id",
-                SESSION_ATTRIBUTE_SELECCIO);
+        return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
     }
 
 

@@ -550,6 +550,9 @@
                     suggestTextAddicional="nif"
                     inline="true"/>
         </div>
+        <div class="col-md-2">
+            <not:inputText name="referencia" inline="true" placeholderKey="notificacio.list.filtre.camp.referencia"/>
+        </div>
 
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>

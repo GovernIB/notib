@@ -66,9 +66,10 @@ $(document).ready(function() {
 	$("#remesa-link").click(e => {
 		e.preventDefault();
 		$.ajax({
-			url: "/notib/notificacio/filtrades/${enviament.notificacio.id}",
-			success: url => top.location = "/notib/",
-			error: err => console.log(err)
+			url: "/notib/notificacio/filtrades/${enviament.notificacio.referencia}",
+			// success: () => top.location = "/notib/",
+			success: () => window.open("/notib/", "_blank"),
+			error: err => console.error(err)
 		});
 	});
 });
@@ -142,25 +143,27 @@ $(document).ready(function() {
  				</div>
 				<table class="table table-bordered" style="width:100%">
 				<tbody>
-					<tr>
-<%--						<!-- <td width="30%"><strong><spring:message code="enviament.info.dada.identificadors"/></strong></td> -->--%>
-						<c:choose>
-							<c:when test="${not empty enviament.notificacio.id}">
+					<c:choose>
+						<c:when test="${not empty enviament.notificacio.id}">
+							<tr>
 								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.identificador"/></strong></td>
-<%--								<td>${enviament.notificaIdentificador}</td>--%>
 								<td>
-									<a id="remesa-link" href="#">${enviament.notificacio.id}</a>
-<%--									<a href="<c:url value="/notificacio/"/>" data-toggle="tab">${enviament.notificacio.id}</a>--%>
+									${enviament.notificacio.referencia}
+									<a id="remesa-link" class="btn btn-default btn-sm pull-right" title="<spring:message code="enviament.info.notifica.certificacio.num.descarregar"/>">
+											<span class="fa fa-external-link"></span>
+									</a>
 								</td>
+							</tr>
+							<tr>
 								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.referencia"/></strong></td>
 								<td>${enviament.notificaReferencia}</td>
-							</c:when>
-							<c:otherwise>
-								<td colspan="2" width="1%"><strong>NOTIB</strong></td>
-								<td colspan="2">${enviament.notificaReferencia}</td>
-							</c:otherwise>
-						</c:choose>
-					</tr>
+							</tr>
+						</c:when>
+						<c:otherwise>
+							<tr><td colspan="2" width="1%"><strong>NOTIB</strong></td></tr>
+							<tr><td colspan="2">${enviament.notificaReferencia}</td></tr>
+						</c:otherwise>
+					</c:choose>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.nif"/></strong></td>
 						<td colspan="4">${enviament.entregaDeh.nif}</td>

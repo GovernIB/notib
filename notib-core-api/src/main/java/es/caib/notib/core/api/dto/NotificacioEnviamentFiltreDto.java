@@ -45,7 +45,7 @@ public class NotificacioEnviamentFiltreDto extends AuditoriaDto {
 	private String dir3Codi;
 	private String titularNomLlinatge;
 	private String uuid;
-
+	private String referenciaNotificacio;
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

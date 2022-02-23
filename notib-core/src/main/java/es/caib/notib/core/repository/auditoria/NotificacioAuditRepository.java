@@ -4,6 +4,7 @@
 package es.caib.notib.core.repository.auditoria;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,6 +19,11 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioAuditRepository extends JpaRepository<NotificacioAudit, Long> {
+
+	@Modifying
+	@Query("update NotificacioAudit nte set nte.referencia =" +
+			" (select net.referencia from NotificacioEntity net where net.id = nte.id) where nte.referencia is null")
+	void updateReferenciesNules();
 
 	@Query(	" from NotificacioAudit n " +
 			"where n.notificacioId = :notificacioId " +

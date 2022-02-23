@@ -152,6 +152,7 @@ public class NotificacioListHelper {
                 .nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
                 .nomesSenseErrors(new FiltreField<>(nomesSenseErrors))
                 .hasZeronotificaEnviamentIntent(new FiltreField<>(hasZeronotificaEnviamentIntent))
+                .referencia(new StringField(filtreDto.getReferencia()))
                 .build();
     }
 
@@ -173,6 +174,7 @@ public class NotificacioListHelper {
         private StringField numExpedient;
         private StringField creadaPer;
         private StringField identificador;
+        private StringField referencia;
         private FiltreField<Boolean> nomesAmbErrors;
         private FiltreField<Boolean> nomesSenseErrors;
         private FiltreField<Boolean> hasZeronotificaEnviamentIntent;

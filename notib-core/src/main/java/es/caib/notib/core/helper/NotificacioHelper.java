@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Helper per notificacions
@@ -164,10 +165,10 @@ public class NotificacioHelper {
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
-						notificacioEntity);
-				if (notificar)
+				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
+				if (notificar) {
 					notificaHelper.notificacioEnviar(notificacioEntity.getId());
+				}
 			}
 		}
 		return notificacioEntity;
@@ -206,7 +207,8 @@ public class NotificacioHelper {
 						data.getNotificacio().getNumExpedient(),
 						TipusUsuariEnumDto.INTERFICIE_WEB,
 						data.getProcedimentOrgan(),
-						data.getNotificacio().getIdioma())
+						data.getNotificacio().getIdioma(),
+						UUID.randomUUID().toString())
 				.document(data.getDocumentEntity())
 				.document2(data.getDocument2Entity())
 				.document3(data.getDocument3Entity())

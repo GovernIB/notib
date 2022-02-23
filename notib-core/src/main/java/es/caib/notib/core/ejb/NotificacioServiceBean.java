@@ -386,6 +386,12 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.validarFormatCsv(csv);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public boolean actualitzarReferencies() {
+		return delegate.actualitzarReferencies();
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List getNotificacionsDEHPendentsRefrescarCert() {

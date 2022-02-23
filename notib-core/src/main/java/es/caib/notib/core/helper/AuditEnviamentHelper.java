@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -54,7 +55,8 @@ public class AuditEnviamentHelper {
 						serveiTipus, 
 						notificacioEntity, 
 						titular, 
-						destinataris)
+						destinataris,
+						UUID.randomUUID().toString())
 				.build());
 	}
 	
@@ -73,7 +75,8 @@ public class AuditEnviamentHelper {
 						serveiTipus, 
 						notificacioGuardada, 
 						titular, 
-						destinataris).build());
+						destinataris,
+						UUID.randomUUID().toString()).build());
 		log.debug(">> [ALTA] enviament creat");
 		
 		String referencia;

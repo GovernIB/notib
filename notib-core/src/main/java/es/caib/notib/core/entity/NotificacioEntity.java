@@ -23,7 +23,7 @@ import java.util.*;
 @AllArgsConstructor
 @Getter
 @Entity
-@Table(name="not_notificacio")
+@Table(name="not_notificacio", uniqueConstraints = @UniqueConstraint(columnNames={"REFERENCIA"}))
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEntity extends NotibAuditable<Long> {
 
@@ -171,6 +171,9 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Column(name = "estat_processat_date")
 	protected Date estatProcessatDate;
 
+	@Column(name = "referencia", length = 36)
+	protected String referencia;
+
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -202,9 +205,12 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Transient
 	protected boolean hasEnviamentsPendents;
 
-	public void addEnviament(
-			NotificacioEnviamentEntity enviament) {
+	public void addEnviament(NotificacioEnviamentEntity enviament) {
 		this.enviaments.add(enviament);
+	}
+
+	public void updateReferencia(String referencia) {
+		this.referencia = referencia;
 	}
 
 	public void updateRegistreNumero(Integer registreNumero) {
@@ -214,7 +220,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateRegistreNumeroFormatat(String registreNumeroFormatat) {
 		this.registreNumeroFormatat = registreNumeroFormatat;
 	}
-	
+
 	public void updateRegistreData(Date registreData) {
 		this.registreData = registreData;
 	}
@@ -361,7 +367,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
 			ProcSerOrganEntity procedimentOrgan,
-			IdiomaEnumDto idioma) {
+			IdiomaEnumDto idioma,
+			String referencia) {
 		return new BuilderV2(
 				entitat,
 				emisorDir3Codi,
@@ -380,7 +387,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				numExpedient,
 				tipusUsuari,
 				procedimentOrgan,
-				idioma);
+				idioma,
+				referencia);
 	}
 	
 
@@ -404,7 +412,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String numExpedient,
 				TipusUsuariEnumDto tipusUsuari,
 				ProcSerOrganEntity procedimentOrgan,
-				IdiomaEnumDto idioma) {
+				IdiomaEnumDto idioma,
+				String referencia) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
 			built.emisorDir3Codi = emisorDir3Codi;
@@ -428,6 +437,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.tipusUsuari = tipusUsuari;
 			built.procedimentOrgan = procedimentOrgan;
 			built.idioma = idioma == null ? IdiomaEnumDto.CA : idioma;
+			built.referencia = referencia;
 		}
 		public BuilderV2 usuariCodi(String usuariCodi) {
 			built.usuariCodi = usuariCodi;

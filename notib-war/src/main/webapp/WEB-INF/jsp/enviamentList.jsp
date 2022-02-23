@@ -272,13 +272,6 @@ function getCookie(cname) {
 						</div>
 					</script>
 				</th>
-				<th data-col-name="notificaIdentificador" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotifica"/>
-					<script type="text/x-jsrender">
-						<div class="from-group">
-							<input name="codiNotifica" value="${filtreEnviaments.codiNotifica}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotifica"/>"/>
-						</div>
-					</script>
-				</th>
 				<c:choose>
 					<c:when test = "${columnes.proCodi == true}">
 					  <c:set value="true" var="visible"></c:set>
@@ -538,10 +531,25 @@ function getCookie(cname) {
 					  <c:set value="false" var="visible"></c:set>
 					</c:when>
 				</c:choose>
-				<th data-col-name="codiNotibEnviament" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.codinotibenviament"/>
+				<th data-col-name="codiNotibEnviament" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.referencia.enviament"/>
 					<script type="text/x-jsrender">
 						<div class="from-group">
-							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.codinotibenviament"/>"/>
+							<input name="codiNotibEnviament" value="${filtreEnviaments.codiNotibEnviament}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.referencia.enviament"/>"/>
+						</div>
+					</script>
+				</th>
+				<c:choose>
+					<c:when test = "${columnes.referenciaNotificacio == true}">
+						<c:set value="true" var="visible"></c:set>
+					</c:when>
+					<c:when test = "${columnes.referenciaNotificacio == false}">
+						<c:set value="false" var="visible"></c:set>
+					</c:when>
+				</c:choose>
+				<th data-col-name="referenciaNotificacio" data-visible="<c:out value = "${visible}"/>" ><spring:message code="enviament.list.identificador.notificacio"/>
+					<script type="text/x-jsrender">
+						<div class="from-group">
+							<input name="referenciaNotificacio" value="${filtreEnviaments.referenciaNotificacio}" class="form-control" type="text" placeholder="<spring:message code="enviament.list.identificador.notificacio"/>"/>
 						</div>
 					</script>
 				</th>
