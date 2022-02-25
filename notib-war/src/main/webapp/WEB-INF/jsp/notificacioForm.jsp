@@ -970,11 +970,12 @@
 		$("input[name=idioma][value=" + locale.toUpperCase()+ "]").prop('checked', true);
 
 		// Data caducitat
-		$("#caducitat").change(function () {
-			updateCaducitatDiesNaturals($("#caducitat").val());
-		});
+		$("#caducitat").change( () => updateCaducitatDiesNaturals($("#caducitat").val()));
 
 		$("#caducitatDiesNaturals").change(function () {
+			let val = $("#caducitatDiesNaturals").val();
+			val = val > 99999999 ? 99999999 : val;
+			$("#caducitatDiesNaturals").val(val);
 			updateCaducitatAmbDies($("#caducitatDiesNaturals").val());
 		});
 
