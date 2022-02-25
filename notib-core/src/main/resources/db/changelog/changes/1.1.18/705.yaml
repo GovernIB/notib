@@ -11,10 +11,6 @@ databaseChangeLog:
              columnNames: referencia
              constraintName: not_notificacio_table_ref_uk
              tableName: not_notificacio_table
-        - addUniqueConstraint:
-            columnNames: referencia
-            constraintName: not_notificacio_audit_ref_uk
-            tableName: not_notificacio_audit
         - addColumn:
             tableName: not_notificacio
             columns:
