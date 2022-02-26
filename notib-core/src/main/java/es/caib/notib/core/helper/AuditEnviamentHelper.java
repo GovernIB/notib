@@ -160,6 +160,7 @@ public class AuditEnviamentHelper {
 			NotificacioRegistreEstatEnumDto registreEstat,
 			boolean totsAdministracio,
 			NotificacioEventEntity event) {
+
 		enviament.setRegistreNumeroFormatat(registreNum);
 		enviament.setRegistreData(registreData);
 		enviament.updateRegistreEstat(registreEstat);

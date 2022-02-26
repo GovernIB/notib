@@ -273,18 +273,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @RequestMapping(value = "/{notificacioId}/info", method = RequestMethod.GET)
-    public String info(
-            HttpServletRequest request,
-            Model model,
-            @PathVariable Long notificacioId) {
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+    public String info(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
-        emplenarModelNotificacioInfo(
-                entitatActual,
-                notificacioId,
-                request,
-                "dades",
-                model);
+        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"dades", model);
         return "notificacioInfo";
     }
 

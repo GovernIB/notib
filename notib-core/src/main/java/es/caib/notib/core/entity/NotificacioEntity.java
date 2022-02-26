@@ -89,19 +89,27 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Setter // Només a test
 	@Column(name = "registre_env_intent")
 	protected int registreEnviamentIntent;
-	
+
 	@Column(name = "registre_numero", length = 19)
 	protected Integer registreNumero;
-	
+
 	@Column(name = "registre_numero_formatat", length = 200)
 	protected String registreNumeroFormatat;
-	
+
 	@Column(name = "registre_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date registreData;
-	
+
 	@Column(name = "registre_num_expedient", length = 80)
 	protected String numExpedient;
+
+	@Setter
+	@Column(name = "registre_oficina_nom")
+	private String registreOficinaNom;
+
+	@Setter
+	@Column(name = "registre_llibre_nom")
+	private String registreLlibreNom;
 	
 	@Column(name = "callback_error")
 	protected boolean errorLastCallback;
@@ -177,8 +185,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
-			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH,
-					CascadeType.DETACH},
+			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH},
 			orphanRemoval = true)
 	protected Set<NotificacioEnviamentEntity> enviaments = new LinkedHashSet<NotificacioEnviamentEntity>();
 	
@@ -188,14 +195,6 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},
 			orphanRemoval = true)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<>();
-
-	@Setter
-	@Column(name = "registre_oficina_nom")
-	private String registreOficinaNom;
-
-	@Setter
-	@Column(name = "registre_llibre_nom")
-	private String registreLlibreNom;
 
 	@Setter
 	@Transient

@@ -67,7 +67,7 @@ public class NotificacioHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 
 	@Transactional
-	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
+	public List<RegistreIdDto>  registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		log.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
 		List<RegistreIdDto> registresIdDto = new ArrayList<>();
 		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
