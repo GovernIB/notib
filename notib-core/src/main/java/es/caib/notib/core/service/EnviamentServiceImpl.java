@@ -1225,37 +1225,50 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Transactional
 	@Override
 	public void actualitzarEstat(Long enviamentId) {
+
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		auditEnviamentHelper.resetConsultaNotifica(enviament);
 		auditEnviamentHelper.resetConsultaSir(enviament);
-
 		// si l'enviament esta pendent de refrescar estat a notifica
-		if (enviament.isPendentRefrescarEstatNotifica())
+		if (enviament.isPendentRefrescarEstatNotifica()) {
 			notificacioService.enviamentRefrescarEstat(enviamentId);
-
+		}
 		// si l'enviament esta pendent de refrescar l'estat enviat SIR
-		if (enviament.isPendentRefrescarEstatRegistre())
+		if (enviament.isPendentRefrescarEstatRegistre()) {
 			notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+		}
 	}
 
 	@Transactional
 	@Override
 	public void activarCallback(Long enviamentId) {
+
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId,
-				CallbackEstatEnumDto.PENDENT);
-		if (
-				enviament.getNotificacio().isTipusUsuariAplicacio() &&
-				numEventsCallbackPendent == 0
-		) {
+		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
+		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
 			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
 			notificacioEventHelper.addCallbackActivarEvent(enviament);
-		} else {
-			logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
-					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
-
+			return;
 		}
+		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
 	}
+
+	@Transactional
+	@Override
+	public void enviarCallback(Long enviamentId) {
+
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
+		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
+			logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", enviamentId));
+//			notificacioEventHelper.addCallbackActivarEvent(enviament);
+			return;
+		}
+		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+				enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 

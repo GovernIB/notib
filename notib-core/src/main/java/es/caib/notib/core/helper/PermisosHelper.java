@@ -789,7 +789,7 @@ public class PermisosHelper {
 		if (paginacioParams == null || permisos == null) {
 			return permisos;
 		}
-		final String ordre = paginacioParams.getOrdres() != null  && paginacioParams.getOrdres().get(0).getCamp() != null
+		final String ordre = paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty() && paginacioParams.getOrdres().get(0).getCamp() != null
 				? paginacioParams.getOrdres().get(0).getCamp() : null;
 
 		if (ordre == null) {
