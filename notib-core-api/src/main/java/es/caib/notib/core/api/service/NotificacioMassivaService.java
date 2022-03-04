@@ -171,4 +171,12 @@ public interface NotificacioMassivaService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException;
+
+	/**
+	 * Cancelar la notificacio massiva.
+	 *
+	 * @param entitatId Identificador de l'entitat actual
+	 * @param notificacioMassivaId Identificador de la notificacio massiva que es vol cancelar
+	 */
+	void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception;
 }

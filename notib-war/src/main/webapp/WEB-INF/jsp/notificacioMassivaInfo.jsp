@@ -177,6 +177,14 @@ $(document).ready(function() {
 						<td>${notInfo.nombre} ${notInfo.apellidos} - ${notInfo.cifNif}</td>
 <%--						<td>${notInfo.origen}</td>--%>
 						<td>${notInfo.errores}</td>
+						<c:choose>
+                            <c:when test="${notInfo.cancelada}">
+							    <td><strong><spring:message code="notificacio.massiva.info.resum.cancelada" /></strong></td>
+                            </c:when>
+                            <c:otherwise>
+                                <td></td>
+                            </c:otherwise>
+                        </c:choose>
 					</tr>
 					</c:forEach>
 				</tbody>

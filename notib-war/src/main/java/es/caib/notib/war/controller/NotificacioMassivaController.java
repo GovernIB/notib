@@ -199,6 +199,22 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         return getModalControllerReturnValueSuccess(request, "redirect:..", "notificacio.massiva.controller.reactivar.ok");
     }
 
+    @RequestMapping(value = "/{id}/cancelar", method = RequestMethod.GET)
+    public String cancelar(HttpServletRequest request, @PathVariable Long id) {
+
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        String redirect = "redirect:..";
+        String msg = "notificacio.massiva.controller.cancelar.ok";
+        try {
+            notificacioMassivaService.cancelar(entitatActual.getId(), id);
+        } catch (Exception e) {
+            log.error("Hi ha hagut un error cancelant la notificació massiva", e);
+            msg = "notificacio.massiva.controller.cancelar.ko";
+            return getModalControllerReturnValueError(request,redirect, msg, new Object[]{e.getMessage()});
+        }
+        return getModalControllerReturnValueSuccess(request, redirect, msg);
+    }
+
     @RequestMapping(value = "/{id}/remeses", method = RequestMethod.GET)
     public String consultarRemeses(HttpServletRequest request, Model model, @PathVariable Long id) {
 

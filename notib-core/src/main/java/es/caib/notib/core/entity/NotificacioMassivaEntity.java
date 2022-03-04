@@ -101,6 +101,8 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
     private Integer notificacionsProcessades;
     @Column(name = "num_error")
     private Integer notificacionsProcessadesAmbError;
+    @Column(name = "num_cancelades")
+    private Integer notificacionsCancelades;
 
 //    @Formula("(case  when progress < 0 then " +
 //            "           'ERRONIA' " +
@@ -148,6 +150,15 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
         updateProgres();
     }
 
+    public void updateCancelades() {
+        log.info("[PROCES MASSIU] updateCancelades");
+        if (notificacionsCancelades == null) {
+            notificacionsCancelades = 0;
+        }
+        notificacionsCancelades++;
+        updateProgres();
+    }
+
     public void updateToError() {
         log.info("[PROCES MASSIU] updateToError");
         this.notificacionsProcessadesAmbError++;
@@ -157,6 +168,16 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
     private void updateProgres() {
         this.progress = ((notificacionsProcessades + notificacionsProcessadesAmbError) * 100) / notificacionsValidades;
         log.info("[PROCES MASSIU] updateProgres (" + this.progress + ") - validades: " + notificacionsValidades + ", processades: " + notificacionsProcessades + ", error: " + notificacionsProcessadesAmbError);
+
+        if (notificacionsCancelades != null && notificacionsCancelades == notificacions.size()) {
+            this.estatProces = NotificacioMassivaEstatDto.CANCELADA;
+            return;
+        }
+
+        if (notificacionsCancelades != null && notificacionsCancelades > 0) {
+            this.estatProces = NotificacioMassivaEstatDto.FINALITZAT_PARCIAL;
+            return;
+        }
 
         if ((notificacionsProcessades + notificacionsProcessadesAmbError) == 0) {
             this.estatProces = NotificacioMassivaEstatDto.PENDENT;

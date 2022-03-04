@@ -75,6 +75,12 @@ public class NotificacioMassivaServiceBean implements NotificacioMassivaService 
 	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
 		return delegate.getModelDadesCarregaMassiuCSV();
 	}
+
+	@Override
+	public void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception {
+		delegate.cancelar(entitatId, notificacioMassivaId);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public NotificacioMassivaDataDto create(

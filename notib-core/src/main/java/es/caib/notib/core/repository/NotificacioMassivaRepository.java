@@ -21,6 +21,10 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioMassivaRepository extends JpaRepository<NotificacioMassivaEntity, Long> {
+
+	@Query("from NotificacioMassivaEntity nm where nm.id = :id")
+	NotificacioMassivaEntity findById(Long id);
+
 	@Query(	"from " +
 			"    NotificacioMassivaEntity nm " +
 			"where " +

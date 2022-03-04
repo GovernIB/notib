@@ -6,5 +6,7 @@ public enum NotificacioMassivaEstatDto {
     EN_PROCES_AMB_ERRORS,
     FINALITZAT,
     FINALITZAT_AMB_ERRORS,
-    ERRONIA
+    ERRONIA,
+    CANCELADA,
+    FINALITZAT_PARCIAL
 }

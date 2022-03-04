@@ -29,6 +29,7 @@ public class NotificacioMassivaTableItemDto implements Serializable {
 	private Integer notificacionsValidades;
 	private Integer notificacionsProcessades;
 	private Integer notificacionsProcessadesAmbError;
+	private Integer notificacionsCancelades;
 
 	public String getCreatedByComplet() {
 		String nomComplet = "";
