@@ -82,7 +82,7 @@ public class NotificacioHelper {
 
 			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
 				long startTime2 = System.nanoTime();
-				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
+ 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
 				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
 				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
 				RegistreIdDto registreIdDto = new RegistreIdDto();

@@ -67,14 +67,14 @@ public class SchedulledServiceImpl implements SchedulledService {
 		try {
 			logger.info("[REG] Cercant notificacions pendents de registrar");
 			List pendents = notificacioService.getNotificacionsPendentsRegistrar();
-			if (pendents != null && !pendents.isEmpty()) {
-				logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
-				for (NotificacioEntity pendent : (List<NotificacioEntity>)pendents) {
-					logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-					notificacioHelper.registrarNotificar(pendent.getId());
-				}
-			} else {
+			if (pendents == null || pendents.isEmpty()) {
 				logger.info("[REG] No hi ha notificacions pendents de registrar");
+				return;
+			}
+			logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
+			for (NotificacioEntity pendent : (List<NotificacioEntity>)pendents) {
+				logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
+				notificacioHelper.registrarNotificar(pendent.getId());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -414,35 +414,22 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @RequestMapping(value = "/{notificacioId}/registrar", method = RequestMethod.GET)
-    public String registrar(
-            HttpServletRequest request,
-            @PathVariable Long notificacioId,
-            Model model) throws RegistreNotificaException {
+    public String registrar(HttpServletRequest request, @PathVariable Long notificacioId, Model model) throws RegistreNotificaException {
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         List<RegistreIdDto> registresIdDto = notificacioService.registrarNotificar(notificacioId);
-
-        emplenarModelNotificacioInfo(
-                entitatActual,
-                notificacioId,
-                request,
-                "accions",
-                model);
+        emplenarModelNotificacioInfo(entitatActual, notificacioId, request,"accions", model);
         if (registresIdDto == null || registresIdDto.isEmpty()) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
             return "notificacioInfo";
         }
-
         for (RegistreIdDto registreIdDto : registresIdDto) {
             if (registreIdDto.getNumero() != null) {
-                MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")"
-                        + getMessage(request, "notificacio.controller.registrar.ok"));
+                MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(request, "notificacio.controller.registrar.ok"));
                 continue;
             }
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.registrar.error"));
         }
-
-
         model.addAttribute("pestanyaActiva", "accions");
         return "notificacioInfo";
     }

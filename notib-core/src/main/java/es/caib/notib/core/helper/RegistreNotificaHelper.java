@@ -4,6 +4,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -37,6 +39,8 @@ public class RegistreNotificaHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private NotificacioTableHelper notificacioTableHelper;
 //	@Autowired
 //	private NotificacioMassivaHelper notificacioMassivaHelper;
 	@Autowired
@@ -58,9 +62,12 @@ public class RegistreNotificaHelper {
 		long startTime;
 		double elapsedTime;
 
-		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
+		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments() ) {
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral de l'enviament: " + enviament.getId()));
 			startTime = System.nanoTime();
+			if (enviament.getRegistreData() != null) {
+				continue;
+			}
 			try {
 
 				if (isSirActivat() && isComunicacio && totsAdministracio) {
@@ -85,17 +92,22 @@ public class RegistreNotificaHelper {
 					msg = " [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: ";
 				}
 				info.getParams().add(accio);
-				enviarANotifica = crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, enviarANotifica, isComunicacio, isSirActivat(), info, t0, enviament);
+				boolean ok = crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, enviarANotifica, isComunicacio, isSirActivat(), info, t0, enviament);
+				enviarANotifica = enviarANotifica && ok;
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(msg + elapsedTime + " ms");
 				logger.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-
 			} catch (Exception ex) {
 				String errorDescripcio = "Hi ha hagut un error registrant l'enviament + " + enviament.getId();
 				logger.error(errorDescripcio, ex);
 				integracioHelper.addAccioError(info, errorDescripcio, ex);
 				throw new RegistreNotificaException(ex.getMessage(), ex);
 			}
+		}
+		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
+			notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
+			enviarANotifica = true;
 		}
 		integracioHelper.addAccioOk(info);
 		return enviarANotifica;
@@ -215,21 +227,33 @@ public class RegistreNotificaHelper {
 		notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity, enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
 	}
 
-	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacioEntity,
-								   Set<NotificacioEnviamentEntity> enviaments, boolean totsAdministracio) {
+	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacioEntity, Set<NotificacioEnviamentEntity> enviaments, boolean totsAdministracio) {
 
-		if (arbResposta != null) {
-			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
+		if (arbResposta == null) {
+			return;
+		}
+//		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
+//			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
+//		}
 //			// Actualitzar progrés notificació massiva.
 //			if (notificacioEntity.getNotificacioMassivaEntity() != null) {
 //				notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
 //			}
-			String registreNum = arbResposta.getRegistreNumeroFormatat();
-			Date registreData = arbResposta.getRegistreData();
-			NotificacioRegistreEstatEnumDto registreEstat = arbResposta.getEstat();
-			//Crea un nou event
-			notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, registreNum, registreData, registreEstat, enviaments, totsAdministracio);
+		String registreNum = arbResposta.getRegistreNumeroFormatat();
+		Date registreData = arbResposta.getRegistreData();
+		NotificacioRegistreEstatEnumDto registreEstat = arbResposta.getEstat();
+		//Crea un nou event
+		notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, registreNum, registreData, registreEstat, enviaments, totsAdministracio);
+	}
+
+	private boolean enviamentsRegistrats(Set<NotificacioEnviamentEntity> enviaments) {
+		Iterator<NotificacioEnviamentEntity> it = enviaments.iterator();
+		while (it.hasNext()) {
+			if (it.next().getRegistreData() == null) {
+				return false;
+			}
 		}
+		return true;
 	}
 
 	private boolean isSirActivat() {
