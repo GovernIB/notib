@@ -154,7 +154,7 @@ public class CallbackHelper {
 		return notificacio;
 	}
 
-	private String notificaCanvi(@NonNull NotificacioEnviamentEntity enviament, @NonNull String urlBase) throws Exception {
+	public String notificaCanvi(@NonNull NotificacioEnviamentEntity enviament, @NonNull String urlBase) throws Exception {
 		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
 				notificaHelper.xifrarId(enviament.getNotificacio().getId()), 
 				notificaHelper.xifrarId(enviament.getId()));
@@ -228,7 +228,7 @@ public class CallbackHelper {
 		log.info(String.format("[Callback] Event [Id: %d] eliminat de la coa d'events per error fatal. Error: %s", event.getId(), errorDescripcio));
 	}
 
-	private boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
+	public boolean isAllEnviamentsEstatFinal(NotificacioEntity notificacio) {
 		boolean estatsEnviamentsFinals = true;
 		if (notificacio != null) {
 			for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
@@ -246,7 +246,7 @@ public class CallbackHelper {
 		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
 	}
 
-	private int getIntentsPeriodeProperty() {
+	public int getIntentsPeriodeProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.periode");
 	}
 

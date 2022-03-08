@@ -22,6 +22,7 @@ import es.caib.notib.core.repository.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class EnviamentServiceImpl implements EnviamentService {
 
@@ -95,6 +97,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ProcSerHelper procedimentHelper;
+	@Autowired
+	private AplicacioRepository aplicacioRepository;
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -1256,17 +1266,44 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public void enviarCallback(Long enviamentId) {
+	public void enviarCallback(Long enviamentId) throws Exception {
 
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
-		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
-			logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", enviamentId));
-//			notificacioEventHelper.addCallbackActivarEvent(enviament);
+		if (!enviament.getNotificacio().isTipusUsuariAplicacio() || numEventsCallbackPendent == 0) {
+			logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
 			return;
 		}
-		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
-				enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+		logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", enviamentId));
+		UsuariEntity usuari = enviament.getCreatedBy();
+		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
+		callbackHelper.notificaCanvi(enviament, aplicacio.getCallbackUrl());
+		NotificacioEntity not = enviament.getNotificacio();
+		//Marcar com a processada si la notificació s'ha fet des de una aplicació
+		if (not.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && callbackHelper.isAllEnviamentsEstatFinal(not)) {
+			log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
+			auditNotificacioHelper.updateNotificacioProcessada(not, "Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
+		}
+
+		int maxPendents = configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
+		Pageable page = new PageRequest(0, maxPendents);
+		List<NotificacioEventEntity> events = notificacioEventRepository.findEventsAmbCallbackPendent();
+		for (NotificacioEventEntity event : events) {
+			int intents = event.getCallbackIntents() + 1;
+			event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT,  intents, null, callbackHelper.getIntentsPeriodeProperty());
+			auditNotificacioHelper.updateLastCallbackError(not, false);
+			IntegracioInfo info = new IntegracioInfo(
+					IntegracioHelper.INTCODI_CLIENT,
+					String.format("Enviament d'avís de canvi d'estat (%s)", aplicacio.getCallbackUrl()),
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					new AccioParam("Identificador de l'event", String.valueOf(event.getId())),
+					new AccioParam("Identificador de la notificacio", String.valueOf(not.getId())),
+					new AccioParam("Callback", aplicacio.getCallbackUrl())
+			);
+			integracioHelper.addAccioOk(info);
+			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", event.getId(), not.getId()));
+		}
 	}
 
 

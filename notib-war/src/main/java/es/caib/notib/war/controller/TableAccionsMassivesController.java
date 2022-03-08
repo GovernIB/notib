@@ -300,7 +300,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
         Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
-            MissatgesHelper.error(request, getMessage(request,"enviament.controller.callback.callback.buida"));
+            MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
             return "redirect:" + request.getHeader("Referer");
         }
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
@@ -310,11 +310,11 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                 enviamentService.enviarCallback(enviamentId);
             } catch (Exception e) {
                 hasErrors = true;
-                MissatgesHelper.error(request, getMessage(request, "enviament.controller.callback.callback.KO"));
+                MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO"));
             }
         }
         if (!hasErrors) {
-            MissatgesHelper.info(request, getMessage(request,"enviament.controller.callback.callback.OK"));
+            MissatgesHelper.info(request, getMessage(request,"enviament.controller.enviar.callback.OK"));
         }
         return "redirect:" + request.getHeader("Referer");
     }
