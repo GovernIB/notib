@@ -797,14 +797,17 @@ public class NotificacioFormController extends BaseUserController {
                         ServeiTipusEnumDto.class,
                         "es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
         Enum<?>[] interessatsTipus;
+        Enum<?>[] interessatsTipusDest;
         if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.ADMINISTRACIO};
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
 
         } else if (TipusEnviamentEnumDto.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA};
-
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         } else {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA};
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
         }
 
         model.addAttribute("interessatTipus",
@@ -812,6 +815,11 @@ public class NotificacioFormController extends BaseUserController {
                         InteressatTipusEnumDto.class,
                         "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
                         interessatsTipus));
+        model.addAttribute("interessatTipusDest",
+                EnumHelper.getOrderedOptionsForEnum(
+                        InteressatTipusEnumDto.class,
+                        "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
+                        interessatsTipusDest));
         model.addAttribute("entregaPostalTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificaDomiciliConcretTipusEnumDto.class,
@@ -846,6 +854,8 @@ public class NotificacioFormController extends BaseUserController {
                 "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum.");
         Collections.sort(tipusDocumentals);
         model.addAttribute("tipusDocumentals", tipusDocumentals);
+        model.addAttribute("documentTipus", EnumHelper.getOptionsForEnum(DocumentTipusEnumDto.class,
+                "es.caib.notib.core.api.dto.DocumentTipusEnum."));
     }
 
 

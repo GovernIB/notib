@@ -37,6 +37,8 @@ import java.net.URLConnection;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import static es.caib.notib.core.api.dto.InteressatTipusEnumDto.FISICA_SENSE_NIF;
+
 /**
  * Implementació del servei per a l'enviament i consulta de notificacions V2 (Sense paràmetres SEU).
  * 
@@ -1692,12 +1694,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
-				if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-					comunicacioAmbAdministracio = true;
-				}
-				if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.JURIDICA))  {
-					comunicacioSenseAdministracio = true;
-				}
+				comunicacioAmbAdministracio = InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
+				comunicacioSenseAdministracio = !InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
 			}
 			boolean senseNif = true;
 			
@@ -1730,7 +1728,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			if(enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
 			}
-			if (enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+			if (!FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 				if (NifHelper.isvalid(enviament.getTitular().getNif())) {
 					senseNif = false;
 				} else {
@@ -1784,6 +1782,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 				if(enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.nif.persona.fisica.titular.enviament.no.null"));
+				}
+			//   - Persona física sense nif
+			} else if(enviament.getTitular().getInteressatTipus().equals(FISICA_SENSE_NIF)) {
+				if(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
+					return setRespostaError(messageHelper.getMessage("error.validacio.nom.persona.fisica.no.null"));
+				}
+				if (enviament.getTitular().getLlinatge1() == null || enviament.getTitular().getLlinatge1().isEmpty()) {
+					return setRespostaError(messageHelper.getMessage("error.validacio.llinatge1.persona.fisica.titular.enviament.no.null"));
+				}
+				// Email obligatori si no té destinataris amb nif o enviament postal
+				if ((enviament.getTitular().getEmail() == null || enviament.getTitular().getEmail().isEmpty())
+						&& (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty())
+						&& !enviament.isEntregaPostalActiva() ) {
+					return setRespostaError(messageHelper.getMessage("error.validacio.email.persona.fisica.sense.nif.email.titular.enviament.no.null"));
 				}
 			//   - Persona jurídica
 			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
@@ -1853,26 +1865,26 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					if(destinatari.getNif() != null && destinatari.getNif().length() > 9) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.longitud.max"));
 					}
-					if (destinatari.getNif() != null && !destinatari.getNif().isEmpty()) {
+					if (!FISICA_SENSE_NIF.equals(destinatari.getInteressatTipus()) && destinatari.getNif() != null && !destinatari.getNif().isEmpty()) {
 						if (NifHelper.isvalid(destinatari.getNif())) {
 							senseNif = false;
 						} else {
 							return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid"));
 						}
 						switch (destinatari.getInteressatTipus()) {
-						case FISICA:
-							if (!NifHelper.isValidNifNie(destinatari.getNif())) {
-								return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid.persona.fisica"));
-							}
-							break;
-						case JURIDICA:
-							if (!NifHelper.isValidCif(destinatari.getNif())) {
-								return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid.persona.juridica"));
-							}
-							break;
-						case ADMINISTRACIO:
-							break;
-					}
+							case FISICA:
+								if (!NifHelper.isValidNifNie(destinatari.getNif())) {
+									return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid.persona.fisica"));
+								}
+								break;
+							case JURIDICA:
+								if (!NifHelper.isValidCif(destinatari.getNif())) {
+									return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid.persona.juridica"));
+								}
+								break;
+							case ADMINISTRACIO:
+								break;
+						}
 					}
 					// - Email
 					if (destinatari.getEmail() != null && destinatari.getEmail().length() > 160) {
@@ -1904,6 +1916,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						if(destinatari.getNif() == null) {
 							return setRespostaError(messageHelper.getMessage("error.nif.persona.fisica.destinataria.enviament.no.null"));
 						}
+					} else if(destinatari.getInteressatTipus().equals(FISICA_SENSE_NIF)) {
+						return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid.persona.fisica.sense.nif"));
 					} else if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
 						if((destinatari.getRaoSocial() == null || destinatari.getRaoSocial().isEmpty()) && (destinatari.getNom() == null || destinatari.getNom().isEmpty())) {
 							return setRespostaError(messageHelper.getMessage("error.rao.social.persona.juridica.destinataria.enviament.no.null"));
@@ -1946,7 +1960,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					
 				}
 			}
-			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO && senseNif) {
+			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO && senseNif && !FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.informat.interessats"));
 			}
 

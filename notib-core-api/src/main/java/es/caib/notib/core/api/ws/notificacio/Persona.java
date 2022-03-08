@@ -6,6 +6,7 @@ package es.caib.notib.core.api.ws.notificacio;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import es.caib.notib.core.api.dto.DocumentTipusEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.util.TrimStringDeserializer;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ public class Persona {
 	private String llinatge1;
 	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String llinatge2;
+	protected DocumentTipusEnumDto documentTipus;
 	@JsonDeserialize(using = TrimStringDeserializer.class)
 	private String nif;
 	@JsonDeserialize(using = TrimStringDeserializer.class)

@@ -96,11 +96,11 @@
     <xs:sequence>
      <xs:element minOccurs="0" name="dir3Codi" type="xs:string"/>
      <xs:element minOccurs="0" name="email" type="xs:string"/>
-<!--     <xs:element minOccurs="0" name="id" type="xs:long"/>-->
      <xs:element name="incapacitat" type="xs:boolean"/>
      <xs:element minOccurs="0" name="interessatTipus" type="tns:interessatTipusEnumDto"/>
      <xs:element minOccurs="0" name="llinatge1" type="xs:string"/>
      <xs:element minOccurs="0" name="llinatge2" type="xs:string"/>
+     <xs:element minOccurs="0" name="documentTipus" type="tns:documentTipusEnumDto"/>
      <xs:element minOccurs="0" name="nif" type="xs:string"/>
      <xs:element minOccurs="0" name="nom" type="xs:string"/>
      <xs:element minOccurs="0" name="raoSocial" type="xs:string"/>
@@ -512,9 +512,17 @@
     <xs:restriction base="xs:string">
      <xs:enumeration value="ADMINISTRACIO"/>
      <xs:enumeration value="FISICA"/>
+     <xs:enumeration value="FISICA_SENSE_NIF"/>
      <xs:enumeration value="JURIDICA"/>
     </xs:restriction>
    </xs:simpleType>
+   <xs:simpleType name="documentTipusEnumDto">
+   <xs:restriction base="xs:string">
+    <xs:enumeration value="PASSAPORT"/>
+    <xs:enumeration value="ESTRANGER"/>
+    <xs:enumeration value="ALTRE"/>
+   </xs:restriction>
+  </xs:simpleType>
    <xs:simpleType name="notificaDomiciliConcretTipusEnumDto">
     <xs:restriction base="xs:string">
      <xs:enumeration value="NACIONAL"/>

@@ -25,6 +25,7 @@ import es.caib.notib.plugin.unitat.*;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.*;
+import lombok.Synchronized;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -785,7 +786,8 @@ public class PluginHelper {
 	
 	// GESTOR DOCUMENTAL
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
+
+	@Synchronized
 	public String gestioDocumentalCreate(
 			String agrupacio,
 			byte[] contingut) {
@@ -813,7 +815,8 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
+	@Synchronized
 	public void gestioDocumentalUpdate(
 			String id,
 			String agrupacio,

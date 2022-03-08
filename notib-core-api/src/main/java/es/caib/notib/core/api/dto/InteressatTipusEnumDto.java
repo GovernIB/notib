@@ -9,7 +9,8 @@ public enum InteressatTipusEnumDto {
 	
 	ADMINISTRACIO(1L),
 	FISICA(2L),
-	JURIDICA(3L);
+	JURIDICA(3L),
+	FISICA_SENSE_NIF(4L);
 
 	private final Long val;
 
@@ -29,6 +30,10 @@ public enum InteressatTipusEnumDto {
 			}
 		}
 		throw new IllegalArgumentException("No s'ha trobat cap correspondència a dins l'enumeració " + InteressatTipusEnumDto.class.getName() + " per al text " + text);
+	}
+
+	public static boolean isAdministracio(InteressatTipusEnumDto interessatTipus) {
+		return ADMINISTRACIO.equals(interessatTipus);
 	}
 
 }

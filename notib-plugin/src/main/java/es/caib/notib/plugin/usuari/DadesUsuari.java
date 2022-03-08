@@ -3,6 +3,11 @@
  */
 package es.caib.notib.plugin.usuari;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -10,6 +15,10 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DadesUsuari implements Serializable {
 
 	private String codi;
@@ -18,12 +27,7 @@ public class DadesUsuari implements Serializable {
 	private String llinatges;
 	private String nif;
 	private String email;
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
+
 	public String getNomSencer() {
 		if (nomSencer != null) {
 			return nomSencer;
@@ -45,33 +49,6 @@ public class DadesUsuari implements Serializable {
 		return codi;
 	}
 	
-	public void setNomSencer(String nomSencer) {
-		this.nomSencer = nomSencer;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getLlinatges() {
-		return llinatges;
-	}
-	public void setLlinatges(String llinatges) {
-		this.llinatges = llinatges;
-	}
-	public String getNif() {
-		return nif;
-	}
-	public void setNif(String nif) {
-		this.nif = nif;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

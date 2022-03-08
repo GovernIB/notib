@@ -9,25 +9,43 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActIn
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioInfoDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +59,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -124,6 +145,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ProcSerHelper procedimentHelper;
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
+	@Autowired
+	private DocumentHelper documentHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1030,7 +1053,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String nomDocumetnDefault = "document";
 			NotificacioEntity entity = notificacioRepository.findById(notificacioId);
 			DocumentEntity document = entity.getDocument();
-			return documentToArxiuDto(nomDocumetnDefault, document);
+			return documentHelper.documentToArxiuDto(nomDocumetnDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1046,53 +1069,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String nomDocumentDefault = "document";
 			DocumentEntity document = documentRepository.findOne(documentId);
 //			DocumentEntity document = documentRepository.findByNotificacioIdAndId(notificacioId, documentId);
-			return documentToArxiuDto(nomDocumentDefault, document);
+			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
-	}
-
-	private ArxiuDto documentToArxiuDto(String nomDocumetnDefault, DocumentEntity document) {
-		if (document == null)
-			return null;
-		if(document.getArxiuGestdocId() != null) {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					document.getArxiuGestdocId(),
-					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					output);
-			return new ArxiuDto(
-					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-					null,
-					output.toByteArray(),
-					output.size());
-		}else if(document.getUuid() != null){
-			DocumentContingut dc = pluginHelper.arxiuGetImprimible(document.getUuid(), true);
-			return new ArxiuDto(
-					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-					dc.getTipusMime(),
-					dc.getContingut(),
-					dc.getTamany());
-		}else if(document.getCsv() != null){
-			DocumentContingut dc = pluginHelper.arxiuGetImprimible(document.getCsv(), false);
-			return new ArxiuDto(
-					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-					dc.getTipusMime(),
-					dc.getContingut(),
-					dc.getTamany());
-		}else if(document.getUrl() != null){
-			try {
-				byte[] contingut = downloadUsingStream(document.getUrl(), "document");
-				return new ArxiuDto(
-						document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-						"PDF",
-						contingut,
-						contingut.length);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -1650,21 +1630,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 
-	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{
-        URL url = new URL(urlStr);
-        BufferedInputStream bis = new BufferedInputStream(url.openStream());
-        FileOutputStream fis = new FileOutputStream(file);
-        byte[] buffer = new byte[1024];
-        int count=0;
-        while((count = bis.read(buffer,0,1024)) != -1)
-        {
-            fis.write(buffer, 0, count);
-        }
-        fis.close();
-        bis.close();
-        return buffer;
-    }
-	
 	public boolean validarIdCsv (String idCsv) {
 		return idCsv.length() >= getMidaMinIdCsv() ? Boolean.TRUE : Boolean.FALSE;
 	}

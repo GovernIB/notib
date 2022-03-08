@@ -8,12 +8,12 @@ databaseChangeLog:
       value: ''
       dbms: postgresql
   - changeSet:
-      id: 1634114082437-1
+      id: 1638376153806-3
       author: limit
       changes:
         - addColumn:
-            tableName: not_organ_gestor
+            tableName: not_persona
             columns:
               - column:
-                  name: codi_pare
+                  name: document_tipus
                   type: varchar(32 ${varcharUnit})

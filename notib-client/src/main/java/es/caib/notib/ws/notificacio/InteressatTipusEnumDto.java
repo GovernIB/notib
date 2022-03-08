@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="ADMINISTRACIO"/>
  *     &lt;enumeration value="FISICA"/>
+ *     &lt;enumeration value="FISICA_SENSE_NIF"/>
  *     &lt;enumeration value="JURIDICA"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
@@ -27,6 +28,7 @@ public enum InteressatTipusEnumDto {
 
     ADMINISTRACIO,
     FISICA,
+    FISICA_SENSE_NIF,
     JURIDICA;
 
     public String value() {

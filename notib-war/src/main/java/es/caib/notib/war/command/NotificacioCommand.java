@@ -183,11 +183,16 @@ public class NotificacioCommand {
 		if (persona != null) {
 			if (InteressatTipusEnumDto.FISICA.equals(persona.getInteressatTipus())) {
 				persona.setDir3Codi(null);
+				persona.setDocumentTipus(null);
+			} else if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
+				persona.setDir3Codi(null);
 			} else if (InteressatTipusEnumDto.JURIDICA.equals(persona.getInteressatTipus())) {
 				persona.setDir3Codi(null);
+				persona.setDocumentTipus(null);
 				persona.setLlinatge1(null);
 				persona.setLlinatge2(null);
 			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
+				persona.setDocumentTipus(null);
 				persona.setIncapacitat(Boolean.FALSE);
 				persona.setLlinatge1(null);
 				persona.setLlinatge2(null);	
