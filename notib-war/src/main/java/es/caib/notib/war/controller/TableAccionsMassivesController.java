@@ -297,27 +297,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return resposta;
     }
 
-//    @RequestMapping(value = "{notifiacioId}/enviar/callback", method = RequestMethod.GET)
-//    public String enviarCallbacksById(HttpServletRequest request, HttpServletResponse response, @PathVariable("notificacioId") Long notificacioId) throws IOException {
-//
-//        if (notificacioId == null) {
-//            MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
-//            return "redirect:" + request.getHeader("Referer");
-//        }
-//        Set<Long> seleccio = new HashSet<>();
-//        seleccio.add(notificacioId);
-//        return enviarCallbacks(request, response, seleccio);
-//    }
-//
-//    @RequestMapping(value = "/enviar/callback", method = RequestMethod.GET)
-//    public String enviarCallbacksMassiva(HttpServletRequest request, HttpServletResponse response) throws IOException {
-//
-//        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
-//        return enviarCallbacks(request, response, seleccio);
-//    }
-
     @RequestMapping(value = {"/enviar/callback", "{notifiacioId}/enviar/callback"}, method = RequestMethod.GET)
-//    public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response, Set<Long> seleccio) throws IOException {
     public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 
