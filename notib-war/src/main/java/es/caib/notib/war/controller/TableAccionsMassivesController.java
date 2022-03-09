@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -295,14 +297,38 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
         return resposta;
     }
 
-    @RequestMapping(value = "/enviar/callback", method = RequestMethod.GET)
+//    @RequestMapping(value = "{notifiacioId}/enviar/callback", method = RequestMethod.GET)
+//    public String enviarCallbacksById(HttpServletRequest request, HttpServletResponse response, @PathVariable("notificacioId") Long notificacioId) throws IOException {
+//
+//        if (notificacioId == null) {
+//            MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
+//            return "redirect:" + request.getHeader("Referer");
+//        }
+//        Set<Long> seleccio = new HashSet<>();
+//        seleccio.add(notificacioId);
+//        return enviarCallbacks(request, response, seleccio);
+//    }
+//
+//    @RequestMapping(value = "/enviar/callback", method = RequestMethod.GET)
+//    public String enviarCallbacksMassiva(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//
+//        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+//        return enviarCallbacks(request, response, seleccio);
+//    }
+
+    @RequestMapping(value = {"/enviar/callback", "{notifiacioId}/enviar/callback"}, method = RequestMethod.GET)
+//    public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response, Set<Long> seleccio) throws IOException {
     public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+
+        String[] path = request.getServletPath().split("/");
         Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty()) {
+        if ((seleccio == null || seleccio.isEmpty()) && (path.length == 0 || Strings.isNullOrEmpty(path[2]))) {
             MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
             return "redirect:" + request.getHeader("Referer");
         }
+        Long notificacioId = seleccio.isEmpty() ? Long.parseLong(path[2]) : null;
+        seleccio = notificacioId != null ? new HashSet<>(Arrays.asList(notificacioId)) : seleccio;
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         boolean hasErrors = false;
         for(Long enviamentId : seleccio) {

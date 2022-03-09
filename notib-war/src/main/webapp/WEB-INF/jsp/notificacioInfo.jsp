@@ -830,11 +830,26 @@ $(document).ready(function() {
 				</thead>
 			</table>
 		</div>
-		<div role="tabpanel"
-			class="tab-pane<c:if test="${pipellaActiva == 'accions'}"> active</c:if>"
-			id="accions">
+		<div id="accions" role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'accions'}"> active</c:if>">
 			<c:set var="algunaAccioDisponible" value="${false}" />
 			<ul class="list-group">
+
+				<c:if test="${notificacio.eventsCallbackPendent}">
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.enviar.callback.boto" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a id="enviar-callback-btn" href="<not:modalUrl value="/notificacio/${notificacio.id}/enviar/callback"/>"
+										class="btn btn-default btn-sm"> <span class="fa fa-send"></span>
+									<spring:message code="notificacio.info.accio.enviar.callback.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>
+
 				<c:if test="${notificacio.estat == 'PENDENT'}">
 					<c:set var="algunaAccioDisponible" value="${true}" />
 					<li class="list-group-item">

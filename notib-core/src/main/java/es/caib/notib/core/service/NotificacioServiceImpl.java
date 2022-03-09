@@ -391,6 +391,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
@@ -398,25 +399,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if(notificacio == null) {
 				return null;
 			}
-
 			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
 			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 
-			NotificacioInfoDto dto = conversioTipusHelper.convertir(
-					notificacio,
-					NotificacioInfoDto.class);
+			NotificacioInfoDto dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
+
+			List<Long> pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
+			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
 
 			// Emplena dades del procediment
 			ProcSerEntity procedimentEntity = notificacio.getProcediment();
 			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
 				EntregaCieEntity entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
-				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(),
-						OperadorPostalDataDto.class));
-				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(),
-						CieDataDto.class));
+				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(), OperadorPostalDataDto.class));
+				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
 			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);

@@ -11,6 +11,7 @@
 
 	<sec:http pattern="/api/rest**" security="none"/>
 	<sec:http pattern="/api/rest/**" security="none"/>
+	<sec:http pattern="/api/rest/notificaCanvi" security="none"/>
 	<sec:http pattern="/api/apidoc/" security="none"/>
 	<sec:http pattern="/api-docs**" security="none"/>
 	<sec:http pattern="/**/api-docs" security="none"/>
