@@ -65,16 +65,15 @@
 </style>
 <script type="text/javascript">
 
-var oficinaActual = '${oficinaSelected}';
+var oficinaActual = '${entitatCommand.oficina}';
 var codiDir3Actual =  '${entitatCommand.dir3Codi}';
 var codiDir3RegActual = '${entitatCommand.dir3CodiReg}';
+var llibreChecked = "${entitatCommand.llibreEntitat}" === "false" ? false : true;
 
 $(document).ready(function() {
 
 	var entitatId = document.getElementById('id').value;
 	if (entitatId != '') {
-		
-		
 		var getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
 		 $.get(getUrl).done(function(data) {
 			 var dataMod =[]
@@ -84,7 +83,7 @@ $(document).ready(function() {
 	} else {
 		$("#tipusDocName").webutilInputSelect2(null);
 	}
-	
+
 	$("#tipusDocName").webutilInputSelect2();
 	
 	var data = new Array();
@@ -163,7 +162,11 @@ $(document).ready(function() {
 	if (!$('#llibreEntitat').checked) {
 		$('#llibre-entitat').hide();
 	}
-	
+
+	if (llibreChecked) {
+		$('#llibre-entitat').show();
+	}
+
 	$('#oficinaEntitat').change(function() {
 		if (this.checked) {
 			$('#oficina').closest('.form-group').show();

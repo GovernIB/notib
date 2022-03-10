@@ -120,6 +120,7 @@ public class EntitatController extends BaseController {
 			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
 			model.addAttribute("cieList", cieList);
 			model.addAttribute("errors", bindingResult.getAllErrors());
+			model.addAttribute("oficinaSelected", command.getOficina());
 			return "entitatForm";
 		}
 		String redirect = "redirect:entitat";
