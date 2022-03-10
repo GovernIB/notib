@@ -25,9 +25,9 @@ public class PersonaCommand {
 	private InteressatTipusEnumDto interessatTipus;
 	@Size(max=255)
 	private String nom;
-	@Size(max=40)	
+	@Size(max=30)
 	private String llinatge1;
-	@Size(max=40)
+	@Size(max=30)
 	private String llinatge2;
 	@Size(max=9)
 	private String nif;
