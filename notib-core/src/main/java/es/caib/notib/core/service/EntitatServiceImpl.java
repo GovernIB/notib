@@ -697,7 +697,24 @@ public class EntitatServiceImpl implements EntitatService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	public boolean existeixPermis(Long entitatId, String principal) throws Exception {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<PermisDto> permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
+			for (PermisDto permis : permisos) {
+				if (permis.getPrincipal().equals(principal)) {
+					return true;
+				}
+			}
+			return false;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

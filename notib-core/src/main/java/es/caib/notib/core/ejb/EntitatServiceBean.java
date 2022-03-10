@@ -176,4 +176,9 @@ public class EntitatServiceBean implements EntitatService {
 	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
 		return delegate.findOrganigramaByEntitat(entitatCodi);
 	}
+
+	@Override
+	public boolean existeixPermis(Long entitatId, String principal) throws Exception {
+		return delegate.existeixPermis(entitatId, principal);
+	}
 }
