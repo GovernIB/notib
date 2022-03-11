@@ -170,19 +170,19 @@
         var content = "";
         var getUrl = "<c:url value="/notificacio/"/>" + notificacioId + "/enviament";
 
-        $.getJSON({
-            url: getUrl,
-            success: (user) => {
-                for (i = 0; i < user.length; i++) {
-                    content += (user[i].notificaEstat) ? notificacioEnviamentEstats[user[i].notificaEstat] + ',' : '';
-                }
-                if (content !== undefined && content != '') {
-                    content = "("+content.replace(/,\s*$/, "")+")";
-                }
-                $('.estat_' + notificacioId).append(content);
-            },
-            error: console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId)
-        })
+        // $.getJSON({
+        //     url: getUrl,
+        //     success: (user) => {
+        //         for (i = 0; i < user.length; i++) {
+        //             content += (user[i].notificaEstat) ? notificacioEnviamentEstats[user[i].notificaEstat] + ',' : '';
+        //         }
+        //         if (content !== undefined && content != '') {
+        //             content = "("+content.replace(/,\s*$/, "")+")";
+        //         }
+        //         $('.estat_' + notificacioId).append(content);
+        //     },
+        //     error: console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId)
+        // })
     }
 
     function mostraEnviamentsNotificacio(td, rowData) {
@@ -669,48 +669,49 @@
         <th data-col-name="concepte" width="${ampladaConcepte}" ><spring:message code="notificacio.list.columna.concepte"/></th>
         <th data-col-name="estatDate" data-converter="datetime" data-visible="false"></th>
         <th data-col-name="estatProcessatDate" data-converter="datetime" data-visible="false"></th>
-        <th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">
+        <th data-col-name="estatString" width="120px">
+<%--        <th data-col-name="estat" data-template="#cellEstatTemplate"  width="120px">--%>
             <spring:message code="notificacio.list.columna.estat"/>
-            <script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if enviant}}
-							<span class="fa fa-clock-o"></span>
-							<spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>
-						{{else estat == 'PENDENT'}}
-							<span class="fa fa-clock-o"></span>
-							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{else estat == 'ENVIADA' || estat == 'ENVIAT_SIR'}}
-							<span class="fa fa-send-o"></span>
-							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{else estat == 'FINALITZADA'}}
-							<span class="fa fa-check"></span>
-							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{else estat == 'REGISTRADA'}}
-							<span class="fa fa-file-o"></span>
-							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{else estat == 'PROCESSADA'}}
-							<span class="fa fa-check-circle"></span>
-							{{:~eval('notificacioEstats["' + estat + '"]')}}
-						{{/if}}
+<%--            <script id="cellEstatTemplate" type="text/x-jsrender">--%>
+<%--						{{if enviant}}--%>
+<%--							<span class="fa fa-clock-o"></span>--%>
+<%--							<spring:message code="es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIANT"/>--%>
+<%--						{{else estat == 'PENDENT'}}--%>
+<%--							<span class="fa fa-clock-o"></span>--%>
+<%--							{{:~eval('notificacioEstats["' + estat + '"]')}}--%>
+<%--						{{else estat == 'ENVIADA' || estat == 'ENVIAT_SIR'}}--%>
+<%--							<span class="fa fa-send-o"></span>--%>
+<%--							{{:~eval('notificacioEstats["' + estat + '"]')}}--%>
+<%--						{{else estat == 'FINALITZADA'}}--%>
+<%--							<span class="fa fa-check"></span>--%>
+<%--							{{:~eval('notificacioEstats["' + estat + '"]')}}--%>
+<%--						{{else estat == 'REGISTRADA'}}--%>
+<%--							<span class="fa fa-file-o"></span>--%>
+<%--							{{:~eval('notificacioEstats["' + estat + '"]')}}--%>
+<%--						{{else estat == 'PROCESSADA'}}--%>
+<%--							<span class="fa fa-check-circle"></span>--%>
+<%--							{{:~eval('notificacioEstats["' + estat + '"]')}}--%>
+<%--						{{/if}}--%>
 
-						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}
-						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
-							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
-						{{/if}}
-						{{if (estat == 'FINALITZADA') && estatDate != ''}}
-							<br>
-							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate + ')')}}</span>
-							<br>
-					    {{else (estat == 'PROCESSADA') && estatProcessatDate != ''}}
-					        <br>
-							<span class="horaProcessat">{{:~eval('formatDate(' + estatProcessatDate + ')')}}</span>
-							<br>
-						{{/if}}
-						{{if estat == 'FINALITZADA' ||  estat == 'PROCESSADA'}}
-							{{:~recuperarEstatEnviament(id)}}
-							<p class="estat_{{:id}}"  style="display:inline"></p>
-						{{/if}}
+<%--						{{if notificaError}}<span class="fa fa-warning text-danger" title="{{>notificaErrorDescripcio}}"></span>{{/if}}--%>
+<%--						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}--%>
+<%--							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>--%>
+<%--						{{/if}}--%>
+<%--						{{if (estat == 'FINALITZADA') && estatDate != ''}}--%>
+<%--							<br>--%>
+<%--							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate + ')')}}</span>--%>
+<%--							<br>--%>
+<%--					    {{else (estat == 'PROCESSADA') && estatProcessatDate != ''}}--%>
+<%--					        <br>--%>
+<%--							<span class="horaProcessat">{{:~eval('formatDate(' + estatProcessatDate + ')')}}</span>--%>
+<%--							<br>--%>
+<%--						{{/if}}--%>
+<%--						{{if estat == 'FINALITZADA' ||  estat == 'PROCESSADA'}}--%>
+<%--							{{:~recuperarEstatEnviament(id)}}--%>
+<%--							<p class="estat_{{:id}}"  style="display:inline"></p>--%>
+<%--						{{/if}}--%>
 
-					</script>
+<%--					</script>--%>
         </th>
         <%-- 				<th data-col-name="notificaEstat"  width="200px"><spring:message code="notificacio.form.camp.organGestor"/></th> --%>
         <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>

@@ -108,17 +108,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(
-			Long notificacioId) {
+	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta els destinataris d'una notificació (" +
-					"notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
+			logger.debug("Consulta els destinataris d'una notificació (notificacioId=" + notificacioId + ")");
+			entityComprovarHelper.comprovarPermisos(null,true,true,true);
 			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
 			return conversioTipusHelper.convertirList(enviaments, NotificacioEnviamentDatatableDto.class);

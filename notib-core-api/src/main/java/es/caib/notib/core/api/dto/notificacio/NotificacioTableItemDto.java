@@ -34,6 +34,7 @@ public class NotificacioTableItemDto {
 	private String concepte;
 	private Date estatDate;
 	private NotificacioEstatEnumDto estat;
+	private String estatString;
 
 	private String createdByNom;
 	private String createdByCodi;
