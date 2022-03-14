@@ -105,7 +105,7 @@ public interface EnviamentService {
 	/**
 	 * Reintenta un callback fallat
 	 * 
-	 * @param notificacioId
+	 * @param eventId
 	 *            Atribut id de la notificació.
 	 * @return els events trobats.
 	 */
@@ -158,9 +158,6 @@ public interface EnviamentService {
 	
 	/**
 	 * Obté les columnes visibles per un usuari i entitat
-	 * 
-	 * @param columnes
-	 *            Attribut amb les columnes a visualitzar.
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
@@ -200,13 +197,13 @@ public interface EnviamentService {
 	void reactivaSir(Set<Long> enviaments);
 	
 	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
-	Resposta findEnviamentsByNif(
-			String dniTitular,
-			NotificaEnviamentTipusEnumDto tipus,
-			Boolean estatFinal,
-			String basePath, 
-			Integer pagina, 
-			Integer mida);
+	Resposta findEnviaments(ApiConsulta consulta);
+//	Resposta findEnviamentsByNif(String dniTitular,
+//			NotificaEnviamentTipusEnumDto tipus,
+//			Boolean estatFinal,
+//			String basePath,
+//			Integer pagina,
+//			Integer mida);
 
 	/**
 	 * Actualitza l'estat de l'enviament indicat i reinicia el comptador de reintents.

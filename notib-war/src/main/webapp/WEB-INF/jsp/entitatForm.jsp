@@ -98,7 +98,7 @@ $(document).ready(function() {
 		});
 	    addDefault(data);
 
-	  
+
 	});
 	
 	$('#colorFons, #colorLletra').colorpicker();

@@ -1091,39 +1091,42 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public Resposta findEnviamentsByNif(
-			String dniTitular,
-			NotificaEnviamentTipusEnumDto tipus,
-			Boolean estatFinal,
-			String basePath, 
-			Integer pagina, 
-			Integer mida) {
-		Integer numEnviaments = notificacioEnviamentRepository.countEnviamentsByNif(
-				dniTitular.toUpperCase(),
-				tipus,
-				estatFinal == null,
-				estatFinal);
-		Page<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findEnviamentsByNif(
-				dniTitular.toUpperCase(),
-				tipus,
-				estatFinal == null,
-				estatFinal,
-				getPageable(pagina, mida));
+	public Resposta findEnviaments(ApiConsulta consulta) {
+
+		Date dataInicial = consulta.getDataInicial() != null ? FiltreHelper.toIniciDia(consulta.getDataInicial()) : null;
+		Date dataFinal = consulta.getDataFinal() != null ? FiltreHelper.toFiDia(consulta.getDataFinal()) : null;
+		Integer numEnviaments = notificacioEnviamentRepository.countEnviaments(
+				consulta.getDniTitular(),
+				dataInicial == null,
+				dataInicial,
+				dataFinal == null,
+				dataFinal,
+				consulta.getTipus(),
+				consulta.getEstatFinal() == null,
+				consulta.getEstatFinal());
+		Page<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findEnviaments(
+				consulta.getDniTitular(),
+				dataInicial == null,
+				dataInicial,
+				dataFinal == null,
+				dataFinal,
+				consulta.getTipus(),
+				consulta.getEstatFinal() == null,
+				consulta.getEstatFinal(),
+				getPageable(consulta.getPagina(), consulta.getMida()));
 		Resposta resposta = new Resposta();
 		resposta.setNumeroElementsTotals(numEnviaments);
 		resposta.setNumeroElementsRetornats(comunicacions.getContent() != null ? comunicacions.getContent().size() : 0);
-		
 		List<NotificacioEnviamentDto> dtos = conversioTipusHelper.convertirList(comunicacions.getContent(), NotificacioEnviamentDto.class);
-		resposta.setResultat(dtosToTransmissions(dtos, basePath));
+		resposta.setResultat(dtosToTransmissions(dtos, consulta.getBasePath()));
 		return resposta;
 	}
 	
 	private Pageable getPageable(Integer pagina, Integer mida) {
 		Pageable pageable = new PageRequest(0, 999999999);
-		if (pagina != null && mida != null)
-			pageable = new PageRequest(
-					pagina,
-					mida);
+		if (pagina != null && mida != null) {
+			pageable = new PageRequest(pagina, mida);
+		}
 		return pageable;
 	}
 	
