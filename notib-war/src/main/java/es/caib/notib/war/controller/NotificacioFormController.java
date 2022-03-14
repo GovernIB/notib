@@ -763,7 +763,7 @@ public class NotificacioFormController extends BaseUserController {
             interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA};
 
         } else {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA};
+            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA};
         }
 
         model.addAttribute("interessatTipus",
