@@ -81,24 +81,59 @@
 
 			$('#modal-details').modal();
 		});
+
+		let codi = "${codiActual}";
+		if (codi === "CALLBACK") {
+			console.log("show");
+			console.log($("#missatges-integracions_filter"));
+			$("#missatges-integracions_filter").show();
+		} else {
+			console.log("hide");
+			$("#missatges-integracions_filter").hide();
+		}
+
+
+		$(".pestanya").click(() => {
+			let codi = "${codiActual}";
+			console.log(codi);
+			if (codi === "CALLBACK") {
+				console.log("show");
+				console.log($("#missatges-integracions_filter"));
+				$("#missatges-integracions_filter").show();
+			} else {
+				console.log("hide");
+				$("#missatges-integracions_filter").hide();
+			}
+		});
 	});
 </script>
 	<ul class="nav nav-tabs" role="tablist">
 		<c:forEach var="integracio" items="${integracions}">
-			<li<c:if test="${integracio.codi == codiActual}"> class="active"</c:if>>
+			<li<c:if test="${integracio.codi == codiActual}"> class="active pestanya"</c:if>>
 				<a href="<c:url value="/integracio/${integracio.codi}"/>"><spring:message code="${integracio.nom}"/></a>
 			</li>
 		</c:forEach>
 	</ul>
 	<br/>
+<script id="botonsTemplate" type="text/x-jsrender">
+
+	</script>
 	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
-		   data-search-enabled="false" data-page-length="250" class="table table-striped table-bordered" style="width:100%">
+			<c:if test="${codiActual == 'CALLBACK'}">
+			   data-search-enabled="true"
+			   data-info-type="search"
+			</c:if>
+		   data-page-length="250" class="table table-striped table-bordered" style="width:100%"
+		   data-botons-template="#botonsTemplate">
 		<thead>
 			<tr>
 				<th data-col-name="excepcioMessage" data-visible="false"></th>
 				<th data-col-name="excepcioStacktrace" data-visible="false"></th>
 				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="integracio.list.columna.data"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
+				<c:if test="${codiActual == 'CALLBACK'}">
+					<th data-col-name="aplicacio" data-orderable="false"><spring:message code="integracio.list.columna.aplicacio"/></th>
+				</c:if>
 				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
 				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
 					<spring:message code="integracio.list.columna.temps.resposta"/>
@@ -159,5 +194,20 @@
 			</div>
 		</div>
 	</div>
-
+<script>
+	$(document).ready(() =>   {
+		$('#btn-netejar-filtre').click(() => {
+			$(':input', $('#form-filtre')).each((x, y) => {
+				let type = y.type, tag = y.tagName.toLowerCase();
+				if (type === 'text') {
+					y.value = '';
+				}
+				if (tag === 'select') {
+					y.selectedIndex = 0;
+				}
+			});
+			$('#form-filtre').submit();
+		});
+	});
+</script>
 </body>

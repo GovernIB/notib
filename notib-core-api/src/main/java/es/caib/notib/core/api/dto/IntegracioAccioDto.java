@@ -22,6 +22,7 @@ public class IntegracioAccioDto implements Serializable {
 	private Long index;
 	private Date data;
 	private String descripcio;
+	private String aplicacio;
 	private List<AccioParam> parametres;
 	private IntegracioDto integracio;
 	private IntegracioAccioTipusEnumDto tipus;

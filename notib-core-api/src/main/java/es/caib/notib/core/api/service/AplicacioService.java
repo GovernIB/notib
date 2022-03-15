@@ -6,6 +6,7 @@ package es.caib.notib.core.api.service;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -88,8 +89,7 @@ public interface AplicacioService {
 	 *             Si no s'ha trobat la integració amb el codi especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(
-			String codi) throws NotFoundException;
+	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) throws NotFoundException;
 
 	/**
 	 * Emmagatzema una excepció llençada per un servei.
