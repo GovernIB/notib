@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestsHelper {
 
+    private static Integer CONNECT_TIMEOUT = 10000;
+    private static Integer READ_TIMEOUT = 30000;
+
     public ClientResponse callbackAplicacioNotificaCanvi(String urlCallback, NotificacioCanviClient contingut)
             throws JsonProcessingException {
         // Passa l'objecte a JSON
@@ -29,6 +32,8 @@ public class RequestsHelper {
 
     private Client getClient() {
         Client jerseyClient =  new Client();
+        jerseyClient.setConnectTimeout(CONNECT_TIMEOUT);
+        jerseyClient.setReadTimeout(READ_TIMEOUT);
         // Només per depurar la sortida, esborrar o comentar-ho:
         jerseyClient.addFilter(new LoggingFilter(System.out));
         return jerseyClient;
