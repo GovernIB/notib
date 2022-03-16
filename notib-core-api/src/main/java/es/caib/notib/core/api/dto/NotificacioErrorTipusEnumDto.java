@@ -23,5 +23,6 @@ public enum NotificacioErrorTipusEnumDto implements Serializable {
 	ERROR_REMOT,
 	ERROR_REGISTRE,
 	ERROR_REINTENTS_CONSULTA,
-	ERROR_REINTENTS_SIR
+	ERROR_REINTENTS_SIR,
+	ERROR_EMAIL
 }

@@ -314,7 +314,7 @@ $(document).ready(function() {
 							</strong></td>
 							<td>${notificacio.procediment.codi}-${notificacio.procediment.nom}</td>
 						</tr>
-						<c:if test="${!notificacio.hasEnviamentsPendents}">
+						<c:if test="${!notificacio.hasEnviamentsPendents || notificacio.estat == 'FINALITZADA_AMB_ERRORS'}">
 							<tr>
 								<td colspan="2">
 									<a href="<c:url value="/notificacio/${notificacio.id}/justificant"/>" data-toggle="modal" data-height="250px" data-refresh="true" class="btn btn-default btn-sm pull-right">
@@ -553,9 +553,8 @@ $(document).ready(function() {
 												</c:choose>
 												${enviament.titular.llinatge1}
 												${enviament.titular.llinatge2}
-												<c:if test="${not empty enviament.titular.nif}">
-													 (${enviament.titular.nif})
-												</c:if>
+												<c:if test="${not empty enviament.titular.nif}">(${enviament.titular.nif})</c:if>
+												<c:if test="${enviament.perEmail}"> - <span class="fa fa-envelope-o"></span> ${enviament.titular.email}</c:if>
 											</td>
 										</tr>
 						    			<tr>
@@ -582,6 +581,9 @@ $(document).ready(function() {
 											<td>
 												<c:if test="${not empty enviament.notificaEstat}">
 													<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+													<c:if test="${enviament.perEmail and enviament.notificaEstat == 'FINALITZADA'}">
+														(<c:choose><c:when test="${notificacio.enviamentTipus == 'NOTIFICACIO'}"><spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/></c:when><c:otherwise><spring:message code="notificacio.list.enviament.list.finalitzat.email"/></c:otherwise></c:choose>)
+													</c:if>
 												</c:if>
 												<c:if test="${enviament.notificacioError}">
 													<c:set var="errorTitle">

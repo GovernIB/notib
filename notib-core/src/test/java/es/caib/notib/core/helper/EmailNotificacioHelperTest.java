@@ -36,9 +36,10 @@ import static org.junit.Assert.assertNull;
 public class EmailNotificacioHelperTest {
 
 	// Dades per el Test
-	private static final String EMAIL_USER = "sion.limit@gmail.com";
-	private static final String EMAIL_PASS = "S10n.2016.T8";
-//	private static final String EMAIL_DEST = "sandreu@limit.es";
+//	private static final String EMAIL_USER = "xxxx@gmail.com";
+//	private static final String EMAIL_PASS = "xxxxxxx";
+	private static final String EMAIL_USER = "proves_limit@limit.es";
+	private static final String EMAIL_PASS = "xxxxxx";
 	private static final String EMAIL_DEST = "sion.limit@gmail.com";
 	private static final String FILE_PATH = "/home/siona/Documents/buit.pdf";
 
@@ -73,19 +74,29 @@ public class EmailNotificacioHelperTest {
 
 	private JavaMailSender getMailSender() {
 		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-		javaMailSender.setHost("smtp.gmail.com");
-		javaMailSender.setPort(465);
+		javaMailSender.setHost("correu.limit.es");
+		javaMailSender.setPort(25);
+//		javaMailSender.setHost("smtp.gmail.com");
+//		javaMailSender.setPort(465);
 		javaMailSender.setUsername(EMAIL_USER);
 		javaMailSender.setPassword(EMAIL_PASS);
 
 		Properties props = javaMailSender.getJavaMailProperties();
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtp.socketFactory.fallback", "false");
-		props.put("mail.smtp.port", "465");
-		props.put("mail.smtp.socketFactory.port", "465");
+//		props.put("mail.smtp.host", "smtp.gmail.com");
+//		props.put("mail.smtp.auth", "true");
+//		props.put("mail.smtp.starttls.enable", "true");
+//		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//		props.put("mail.smtp.socketFactory.fallback", "false");
+//		props.put("mail.smtp.port", "465");
+//		props.put("mail.smtp.socketFactory.port", "465");
+
+		props.put("mail.smtp.host", "correu.limit.es");
+		props.put("mail.smtp.auth", "false");
+//		props.put("mail.smtp.starttls.enable", "true");
+//		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//		props.put("mail.smtp.socketFactory.fallback", "false");
+		props.put("mail.smtp.port", "25");
+		props.put("mail.smtp.socketFactory.port", "25");
 
 		Session session = Session.getInstance(props,
 				new javax.mail.Authenticator() {

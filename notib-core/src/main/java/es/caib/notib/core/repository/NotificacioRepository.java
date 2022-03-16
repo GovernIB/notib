@@ -99,7 +99,8 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"from " +
 			"    NotificacioEntity " +
 			"where " +
-			"    estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA " +
+			"    estat in (es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA, " +
+					"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS) " +
 			"and notificaEnviamentIntent < :maxReintents " +
 			"and notificaEnviamentData is not null " +
 			"order by " +

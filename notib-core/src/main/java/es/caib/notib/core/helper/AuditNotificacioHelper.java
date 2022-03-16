@@ -1,7 +1,7 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
@@ -98,6 +98,18 @@ public class AuditNotificacioHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateEstatAFinalitzadaAmbError(
+			String notificaEstatNom,
+			NotificacioEntity notificacio) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
+		notificacio.updateMotiu(notificaEstatNom);
+		notificacio.updateEstatDate(new Date());
+		notificacioEventHelper.clearOldUselessEvents(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
+	}
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateLastCallbackError(
 			NotificacioEntity notificacio,
 			boolean error) {
@@ -126,11 +138,40 @@ public class AuditNotificacioHelper {
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
-	
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateNotificacioMixtaEnviadaNotifica(NotificacioEntity notificacio) {
+		notificacioEventHelper.clearOldNotificaUselessEvents(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
+	}
+
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviada(NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
+	}
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateNotificacioEnviadaEmail(NotificacioEntity notificacio) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
+		notificacioEventHelper.clearOldUselessEvents(notificacio);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
+	}
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateNotificacioEnviadaAmbErrors(NotificacioEntity notificacio) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
+	}
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateNotificacioFinalitzadaAmbErrors(NotificacioEntity notificacio) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}

@@ -39,7 +39,7 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 //			e.printStackTrace();
 //		}
 //		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		if (arb.getResumen().contains("Error")) {
+		if (arb.getResumen().contains("RError")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
 			return resposta;

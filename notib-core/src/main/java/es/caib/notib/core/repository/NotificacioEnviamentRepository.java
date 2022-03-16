@@ -246,9 +246,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" left outer join ne.destinataris d " +
 		    " where ne.notificacio.enviamentTipus = :tipus " +
 		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+		    "   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
 		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
 		    "   or (upper(d.nif) = :nif)) ")
 	Integer countEnviamentsByNif(
@@ -262,9 +265,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" left outer join ne.destinataris d " +
 		    " where ne.notificacio.enviamentTipus =  :tipus " +
 		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+			"   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
 		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
 		    "   or (upper(d.nif) = :nif)) ")
 	Page<NotificacioEnviamentEntity> findEnviamentsByNif(

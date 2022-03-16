@@ -95,6 +95,9 @@ $(document).ready(function() {
 		<li role="presentation"<c:if test="${pipellaActiva == 'estatNotifica'}"> class="active"</c:if>>
 			<a href="#estatNotifica" aria-controls="estatNotifica" role="tab" data-toggle="tab">
 				<c:choose>
+					<c:when test="${enviament.perEmail}">
+						<spring:message code="enviament.info.tab.estat.email"/>
+					</c:when>
 					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
 						<spring:message code="enviament.info.tab.estat.sir"/>
 					</c:when>
@@ -172,7 +175,7 @@ $(document).ready(function() {
 					</tr>
 					<tr>
 						<td width="30%"><strong><spring:message code="enviament.info.dada.estat"/></strong></td>
-						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificacio.estat}"/></td>
+						<td colspan="4"><spring:message code="es.caib.notib.core.api.dto.NotificacioEstatEnumDto.${enviament.notificacio.estat}"/></td>
 					</tr>
 				</tbody>
 				</table>
@@ -369,12 +372,12 @@ $(document).ready(function() {
 		<div role="tabpanel" class="tab-pane<c:if test="${pipellaActiva == 'estatNotifica'}"> active</c:if>" id="estatNotifica">
 			<c:if test="${enviament.notificacio.estat == 'PENDENT'}">
 				<div class="alert alert-warning well-sm" role="alert" style="margin-top: 1em">
-					<spring:message code="enviament.info.notifica.no.enviada"/>
+					<c:choose><c:when test="${enviament.perEmail}"><spring:message code="enviament.info.email.no.enviat"/></c:when><c:otherwise><spring:message code="enviament.info.notifica.no.enviada"/></c:otherwise></c:choose>
 				</div>
 			</c:if>
 			<c:if test="${enviament.notificacio.estat != 'PENDENT'}">
 				<c:choose>
-					<c:when test="${notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO'}">
+					<c:when test="${(notificacio.enviamentTipus == 'COMUNICACIO' && enviament.titular.interessatTipus == 'ADMINISTRACIO') || enviament.perEmail}">
 						<br/>
 					</c:when>
 					<c:otherwise>

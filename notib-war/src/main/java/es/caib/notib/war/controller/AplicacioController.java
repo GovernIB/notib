@@ -3,14 +3,15 @@
  */
 package es.caib.notib.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.AplicacioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.UsuariAplicacioService;
+import es.caib.notib.war.command.AplicacioCommand;
 import es.caib.notib.war.command.AplicacioFiltreCommand;
-import es.caib.notib.war.command.ProcSerFiltreCommand;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,13 +21,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import es.caib.notib.core.api.dto.AplicacioDto;
-import es.caib.notib.core.api.service.EntitatService;
-import es.caib.notib.core.api.service.UsuariAplicacioService;
-import es.caib.notib.war.command.AplicacioCommand;
-import es.caib.notib.war.helper.DatatablesHelper;
-import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +38,7 @@ public class AplicacioController extends BaseController {
 
 	@Autowired private UsuariAplicacioService usuariAplicacioService;
 	@Autowired private EntitatService entitatService;
+
 	private final static String APLICACIO_FILTRE = "aplicacio_filtre";
 
 	@RequestMapping(method = RequestMethod.GET)

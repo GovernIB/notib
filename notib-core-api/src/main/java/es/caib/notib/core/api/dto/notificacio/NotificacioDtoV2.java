@@ -73,6 +73,18 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 		return organGestor;
 	}
 
+	public List<NotificacioEnviamentDtoV2> getEnviamentsFinalitzats() {
+		List<NotificacioEnviamentDtoV2> enviamentsFinalitzats = new ArrayList<>();
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentDtoV2 enviament: enviaments) {
+				if (enviament.isNotificaEstatFinal()) {
+					enviamentsFinalitzats.add(enviament);
+				}
+			}
+		}
+		return enviamentsFinalitzats;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

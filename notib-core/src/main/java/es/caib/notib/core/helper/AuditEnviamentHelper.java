@@ -135,6 +135,15 @@ public class AuditEnviamentHelper {
 
 		return enviament;
 	}
+
+	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
+	public NotificacioEnviamentEntity updateEnviamentEmailFinalitzat(
+			NotificacioEnviamentEntity enviament) {
+
+		enviament.updateNotificaEnviadaEmail();
+		notificacioEnviamentRepository.saveAndFlush(enviament);
+		return enviament;
+	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity updateErrorNotifica(

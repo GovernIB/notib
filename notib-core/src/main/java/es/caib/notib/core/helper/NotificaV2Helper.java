@@ -83,7 +83,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	@UpdateNotificacioTable
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity notificacioEnviar(Long notificacioId) {
+	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_NOTIFICA,
@@ -93,7 +93,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
+		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			logger.error(" [NOT] la notificació no té l'estat REGISTRADA.");
 			integracioHelper.addAccioError(info, "La notificació no està registrada");
 			throw new ValidationException(
@@ -118,12 +118,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				startTime = System.nanoTime();
 				logger.info(" >>> ... OK");
 
-				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
+				if (ambEnviamentPerEmail)
+					auditNotificacioHelper.updateNotificacioMixtaEnviadaNotifica(notificacio);
+				else
+					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 
 				//Crea un nou event
 				Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
-					for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
 							identificadorsResultatsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
 						}
@@ -162,6 +165,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					NotificacioErrorTipusEnumDto.ERROR_XARXA,
 					false);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
+		}
+		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
+		if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+			auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return notificacio;
@@ -603,7 +610,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	private Envios generarEnvios(
 			NotificacioEntity notificacio) throws DatatypeConfigurationException {
 		Envios envios = new Envios();
-		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+		for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 			if (enviament != null) {
 				Envio envio = new Envio();
 				envio.setReferenciaEmisor(enviament.getNotificaReferencia());

@@ -10,7 +10,11 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
@@ -21,28 +25,53 @@ import es.caib.notib.plugin.gesconadm.GesconAdm;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
-import es.caib.notib.plugin.unitat.*;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.OficinaSIR;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.plugins.arxiu.api.*;
+import es.caib.plugins.arxiu.api.ArxiuException;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Synchronized;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +106,11 @@ public class PluginHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Resource
+	private CacheManager cacheManager;
+
+	public static Map<String, Boolean> organigramaCarregat = new HashMap<>();
+
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
@@ -1080,17 +1114,26 @@ public class PluginHelper {
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 
+	@Async
+	public void getOrganigramaPerEntitatAsync(String entitatcodi) throws SistemaExternException {
+		getOrganigramaPerEntitat(entitatcodi);
+		if (organigramaCarregat.get(entitatcodi) == null) {
+			organigramaCarregat.put(entitatcodi, true);
+			cacheManager.getCache("organigramaOriginal").evict(entitatcodi);
+		}
+	}
+
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
 		logger.info("Obtenir l'organigrama per entitat");
-		
+
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir organigrama per entitat", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				IntegracioHelper.INTCODI_UNITATS,
+				"Obtenir organigrama per entitat",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
 
 		String protocol = configHelper.getConfig("es.caib.notib.plugin.unitats.dir3.protocol");
-		
+
 		Map<String, NodeDir3> organigrama = null;
 		String filenameOrgans = getOrganGestorsFile();
 		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
@@ -1114,25 +1157,6 @@ public class PluginHelper {
 			logger.info("Error al obtenir l'organigrama per entitat");
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-				File file = new File(filenameOrgans);
-				if (file.exists()) {
-					try {
-						ObjectMapper mapper = new ObjectMapper();
-						Map<String, Object> map = mapper.readValue(new FileReader(file), Map.class);
-						organigrama = new HashMap<>();
-
-						for (Map.Entry<String, Object> entry : map.entrySet()) {
-							NodeDir3 node = mapper.convertValue(entry.getValue(), NodeDir3.class);
-							organigrama.put(entry.getKey(), node);
-						}
-						return organigrama;
-					} catch (IOException e) {
-						logger.info("Error al procesar map l'organigrama per entitat");
-						e.printStackTrace();
-					}
-				}
-			}
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_UNITATS,
 					errorDescripcio,
@@ -1434,88 +1458,6 @@ public class PluginHelper {
 		}
 	}
 	
-	//////////////////////////////////////////////
-	
-//	private DocumentRegistre documentToDocumentRegistreDto (DocumentDto documentDto) throws SistemaExternException {
-//		DocumentRegistre document = new DocumentRegistre();
-//		
-//		if(((documentDto.getUuid() != null && !documentDto.getUuid().isEmpty())
-//			|| (documentDto.getCsv() != null && !documentDto.getCsv().isEmpty()))
-//			&& (documentDto.getUrl() == null || documentDto.getUrl().isEmpty())
-//			&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
-//			DocumentContingut doc = null;
-//			String id = "";
-//			if(documentDto.getUuid() != null) {
-//				id = documentDto.getUuid();
-//				doc = arxiuGetImprimible(id, true);
-//				document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
-//				Document docDetall = arxiuDocumentConsultar(id, null);
-//				if (docDetall.getMetadades() != null) {
-//					document.setData(docDetall.getMetadades().getDataCaptura());
-//					document.setOrigen(docDetall.getMetadades().getOrigen().ordinal());
-//					document.setTipusDocumental(docDetall.getMetadades().getTipusDocumental().toString());
-//					
-//					//Recuperar csv
-//					Map<String, Object> metadadesAddicionals = docDetall.getMetadades().getMetadadesAddicionals();
-//					if (metadadesAddicionals != null && metadadesAddicionals.containsKey("csv")) {
-//						document.setCsv((String)metadadesAddicionals.get("csv"));
-//					}
-//				}
-//			} else if (documentDto.getCsv() != null) {
-//				id = documentDto.getCsv();
-//				doc = arxiuGetImprimible(id, false);	
-//				document.setModeFirma(RegistreModeFirmaEnum.AUTOFIRMA_SI.getValor());
-//				
-//				document.setData(new Date());
-//				document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
-//				document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
-//				document.setCsv(documentDto.getCsv());
-//			}
-//			try {
-//				if (doc != null) {
-//					document.setArxiuNom(doc.getArxiuNom());
-//					document.setArxiuContingut(doc.getContingut());
-//				}
-//				document.setIdiomaCodi("ca");
-//				document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
-//				
-//			} catch(ArxiuException ae) {
-//				logger.error("Error Obtenint el document uuid/csv: " + id);
-//			}
-//		} else if((documentDto.getUrl() != null && !documentDto.getUrl().isEmpty()) 
-//				&& (documentDto.getUuid() == null || documentDto.getUuid().isEmpty()) 
-//				&& (documentDto.getCsv() == null || documentDto.getCsv().isEmpty()) 
-//				&& (documentDto.getContingutBase64() == null || documentDto.getContingutBase64().isEmpty())) {
-//			document.setNom(documentDto.getUrl());
-//			document.setArxiuNom(documentDto.getArxiuNom());
-//			document.setArxiuContingut(getUrlDocumentContent(documentDto.getUrl()));
-//			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
-//			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
-//			document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
-//			document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
-//			document.setData(new Date());
-//			document.setIdiomaCodi("ca");
-//		} else if((documentDto.getArxiuGestdocId() != null && !documentDto.getArxiuGestdocId().isEmpty()) 
-//				&& (documentDto.getUrl() == null || documentDto.getUrl().isEmpty())
-//				&& (documentDto.getUuid() == null || documentDto.getUuid().isEmpty()) 
-//				&& (documentDto.getCsv() == null || documentDto.getCsv().isEmpty())) {
-//			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//			gestioDocumentalGet(
-//					documentDto.getArxiuGestdocId(), 
-//					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-//					baos);
-//			document.setArxiuContingut(baos.toByteArray());
-//			document.setArxiuNom(documentDto.getArxiuNom());
-//			document.setTipusDocument(RegistreTipusDocumentEnum.DOCUMENT_ADJUNT_FORMULARI.getValor());
-//			document.setTipusDocumental(RegistreTipusDocumentalEnum.NOTIFICACIO.getValor());
-//			document.setOrigen(RegistreOrigenEnum.ADMINISTRACIO.getValor());
-//			document.setModeFirma(RegistreModeFirmaEnum.SENSE_FIRMA.getValor());
-//			document.setData(new Date());
-//			document.setIdiomaCodi("ca");
-//		}
-//		return document;
-//	}
-
 	public RegistreAnnexDto documentToRegistreAnnexDto (DocumentEntity document) {
 		RegistreAnnexDto annex = new RegistreAnnexDto();
 		annex.setTipusDocument(RegistreTipusDocumentDtoEnum.DOCUMENT_ADJUNT_FORMULARI);
@@ -1951,6 +1893,21 @@ public class PluginHelper {
 				interessatDades.setTipoDocumentoIdentificacion("E");
 			else
 				interessatDades.setTipoDocumentoIdentificacion("N");
+		}  else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA_SENSE_NIF) {
+			// Pot tenir un document (No NIF), que s'ha desat al camp NIF
+			if (persona.getNif() != null && !persona.getNif().isEmpty()) {
+				interessatDades.setDocumento(persona.getNif());
+				if (persona.getDocumentTipus() != null) {
+					switch (persona.getDocumentTipus()) {
+						case PASSAPORT:
+							interessatDades.setTipoDocumentoIdentificacion("P");
+							break;
+						default:
+							interessatDades.setTipoDocumentoIdentificacion("X");
+							break;
+					}
+				}
+			}
 		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("C");

@@ -38,6 +38,7 @@ public class NotificacioEnviamentDatatableDto {
 	private NotificacioRegistreEstatEnumDto registreEstat;
 	private Date registreData;
 	private String registreNumeroFormatat;
+	private boolean perEmail;
 
 	public boolean isNotificacioError() {
 		return notificacioErrorData != null;

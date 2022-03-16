@@ -29,7 +29,11 @@ public class NotificaHelper {
 	private ConfigHelper configHelper;
 
 	public NotificacioEntity notificacioEnviar(Long notificacioId) {
-		return getNotificaHelper().notificacioEnviar(notificacioId);
+		return getNotificaHelper().notificacioEnviar(notificacioId, false);
+	}
+
+	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
+		return getNotificaHelper().notificacioEnviar(notificacioId, ambEnviamentPerEmail);
 	}
 
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
