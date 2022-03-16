@@ -96,16 +96,12 @@ public class NotificacioListHelper {
                 permisProcessar = codisOrgansProcessables.contains(notificacio.getOrganCodi());
             }
             notificacio.setPermisProcessar(permisProcessar);
-
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
             if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {
                 notificacio.setHasEnviamentsPendentsRegistre(true);
             }
         }
-
-        return paginacioHelper.toPaginaDto(
-                notificacions,
-                NotificacioTableItemDto.class);
+        return paginacioHelper.toPaginaDto(notificacions, NotificacioTableItemDto.class);
     }
 
     public NotificacioFiltre getFiltre(NotificacioFiltreDto filtreDto) {

@@ -171,21 +171,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
                     NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\">" :
                     NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
-            estat += " " + getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "\n";
-            estat += item.isNotificaError() ? "<span class=\"fa fa-warning text-danger\" title=\"" + item.getNotificaErrorDescripcio() + "\"></span>\n" : "\n";
-// TODO          estat +=  TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.iser
-//          {{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
-//              <span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
-//          {{/if}}
-
+            String nomEstat = " " + getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "";
+            String error = item.isNotificaError() ? "<span class=\"fa fa-warning text-danger\" title=\"" + item.getNotificaErrorDescripcio() + " \"></span>" : "";
+            error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
+                    "<span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error\"/> \"></span>" : "";
+            estat = "<span>" + estat + nomEstat + error + "</span>";
+            String data = "\n";
             if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) && item.getEstatDate() != null) {
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
                 String d = df.format(item.getEstatDate());
-                estat += "<span class=\"horaProcessat\">" + d + "</span>\n";
+                data += "<span class=\"horaProcessat\">" + d + "</span>\n";
             } else if (NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) && item.getEstatProcessatDate() != null) {
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
                 String d = df.format(item.getEstatProcessatDate());
-                estat += "<span class=\"horaProcessat\">" + d + "</span>\n";
+                data += "<span class=\"horaProcessat\">" + d + "</span>\n";
             }
 
             String notificaEstat = "";
@@ -205,11 +204,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     }
                 }
                 if (item.isComunicacioSir()) {
-                    registreEstat += env.getRegistreEstat() != null ? getMessage(request, "es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto." + env.getRegistreEstat()) + ", " : "";
+                    NotificacioRegistreEstatEnumDto r = env.getRegistreEstat();
+                    registreEstat += env.getRegistreEstat() != null ?  "<div><span style=\"padding-bottom:1px; background-color: " + r.getColor() + ";\" title=" +
+                            getMessage(request, "es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto." + r)
+                            + " class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "";
                 }
             }
             notificaEstat = notificaEstat.length() > 0 ? "(" + notificaEstat.substring(0, notificaEstat.length()-2) +")" : "";
-            estat += notificaEstat + (registreEstat.length() > 0 ? "\n(" + registreEstat.substring(0, registreEstat.length()-2) + ")" : "");
+            estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
+                    + "</div></div>" + data + notificaEstat;
             item.setEstatString(estat);
         }
     }

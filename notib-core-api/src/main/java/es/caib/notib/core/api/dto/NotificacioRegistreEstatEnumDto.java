@@ -16,30 +16,43 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioRegistreEstatEnumDto implements Serializable {
-	VALID(1),
-	RESERVA(2),
-	PENDENT(3),
-	OFICI_EXTERN(4),
-	OFICI_INTERN(5),
-	OFICI_ACCEPTAT(6),
-	DISTRIBUIT(7),
-	ANULAT(8),
-	RECTIFICAT(9),
-	REBUTJAT(10),
-	REENVIAT(11),
-	DISTRIBUINT(12),
-	OFICI_SIR(13);
+	VALID(1, "V", "#c1bcbc"),
+	RESERVA(2, "R", "#c1bcbc"),
+	PENDENT(3, "P", "#c1bcbc"),
+	OFICI_EXTERN(4, "E", "#c1bcbc"),
+	OFICI_INTERN(5, "I", "#c1bcbc"),
+	OFICI_ACCEPTAT(6, "A", "#999999"),
+	DISTRIBUIT(7, "D", "#999999"),
+	ANULAT(8, "X", "#955959"),
+	RECTIFICAT(9, "RC", "#c1bcbc"),
+	REBUTJAT(10, "RB", "#955959"),
+	REENVIAT(11, "RE", "#c1bcbc"),
+	DISTRIBUINT(12, "DT", "#c1bcbc"),
+	OFICI_SIR(13, "S", "#c1bcbc");
 	
 	private Integer numVal;
-	
-	NotificacioRegistreEstatEnumDto(int numVal) {
-        this.numVal = numVal;
+	private String budget;
+	private String color;
+
+	NotificacioRegistreEstatEnumDto(int numVal, String budget, String color) {
+
+		this.numVal = numVal;
+		this.budget = budget;
+		this.color = color;
     }
 	
 	public int getNumVal() {
 		return numVal;
 	}
-	
+
+	public String getBudget() {
+		return budget;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
 	public Long getLongVal() {
 		return Long.parseLong(numVal.toString());
 	}
