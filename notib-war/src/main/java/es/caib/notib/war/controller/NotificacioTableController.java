@@ -205,9 +205,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 }
                 if (item.isComunicacioSir()) {
                     NotificacioRegistreEstatEnumDto r = env.getRegistreEstat();
-                    registreEstat += env.getRegistreEstat() != null ?  "<div><span style=\"padding-bottom:1px; background-color: " + r.getColor() + ";\" title=" +
+                    registreEstat += env.getRegistreEstat() != null ?  "<div><span style=\"padding-bottom:1px; background-color: " + r.getColor() + ";\" title=\"" +
                             getMessage(request, "es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto." + r)
-                            + " class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "";
+                            + "\" class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "";
                 }
             }
             notificaEstat = notificaEstat.length() > 0 ? "(" + notificaEstat.substring(0, notificaEstat.length()-2) +")" : "";
