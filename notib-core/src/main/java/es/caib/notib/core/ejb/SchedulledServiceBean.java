@@ -24,7 +24,13 @@ public class SchedulledServiceBean implements SchedulledService {
 
 	@Autowired
 	SchedulledService delegate;
-	
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void restartSchedulledTasks() {
+		delegate.restartSchedulledTasks();
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void notificaEnviamentsRegistrats() {

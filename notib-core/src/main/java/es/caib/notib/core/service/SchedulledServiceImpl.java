@@ -8,6 +8,7 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
+import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.*;
@@ -57,8 +58,15 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private SchedulingConfig schedulingConfig;
 
-	// 1. Enviament de notificacions pendents al registre y notific@
+	@Override
+	public void restartSchedulledTasks() {
+		schedulingConfig.restartSchedulledTasks();
+	}
+
+	// 1. Enviament de notificacions pendents al registre i notific@
 	////////////////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -80,7 +88,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
 	// 2. Enviament de notificacions registrades a Notific@
 	///////////////////////////////////////////////////////
 	@SuppressWarnings({ "unchecked", "rawtypes" })
