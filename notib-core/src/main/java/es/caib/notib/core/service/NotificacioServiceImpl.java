@@ -147,6 +147,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Autowired
 	private DocumentHelper documentHelper;
+	@Autowired
+	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1305,7 +1307,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public void notificacioEnviar(Long notificacioId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			notificaHelper.notificacioEnviar(notificacioId);
+		NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
+
+			// 3 possibles casuístiques
+			// 1. Tots els enviaments a Notifica
+			if (enviamentsSenseNifNoEnviats.isEmpty()) {
+				notificaHelper.notificacioEnviar(notificacio.getId());
+			}
+			// 2. Tots els enviaments per email
+			else if (notificacio.getEnviamentsNoEnviats().size() <= enviamentsSenseNifNoEnviats.size()) {
+				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, true);
+			}
+			// 3. Una part dels enviaments a Notifica i l'altre via email
+			else {
+				notificaHelper.notificacioEnviar(notificacio.getId(), true);
+				// Fa falta enviar els restants per email
+				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

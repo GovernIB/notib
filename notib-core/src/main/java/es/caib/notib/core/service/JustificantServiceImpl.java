@@ -4,6 +4,7 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.ProgresDescarregaDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.JustificantException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.JustificantService;
@@ -90,7 +91,7 @@ public class JustificantServiceImpl implements JustificantService {
             NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 
-            if (enviamentsPendents != null && !enviamentsPendents.isEmpty())
+            if (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat()))
                 throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
 
             entityComprovarHelper.comprovarEntitat(

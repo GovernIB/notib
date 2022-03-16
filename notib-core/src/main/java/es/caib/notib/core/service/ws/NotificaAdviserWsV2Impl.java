@@ -337,7 +337,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		return notificaEstat;
 	}
-	@Transactional
+
 	private void certificacionOrganismo(
 			Acuse acusePDF,
 			String organismoEmisor,

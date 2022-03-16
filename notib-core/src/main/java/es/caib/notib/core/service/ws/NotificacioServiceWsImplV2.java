@@ -567,11 +567,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					case ENVIADA:
 						resposta.setEstat(NotificacioEstatEnum.ENVIADA);
 						break;
+					case ENVIADA_AMB_ERRORS:
+						resposta.setEstat(NotificacioEstatEnum.ENVIADA_AMB_ERRORS);
+						break;
 					case REGISTRADA:
 						resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
 						break;
 					case FINALITZADA:
 						resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+						break;
+					case FINALITZADA_AMB_ERRORS:
+						resposta.setEstat(NotificacioEstatEnum.FINALITZADA_AMB_ERRORS);
 						break;
 					case PROCESSADA:
 						resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
@@ -1089,11 +1095,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			case ENVIADA:
 				resposta.setEstat(NotificacioEstatEnum.ENVIADA);
 				break;
+			case ENVIADA_AMB_ERRORS:
+				resposta.setEstat(NotificacioEstatEnum.ENVIADA_AMB_ERRORS);
+				break;
 			case REGISTRADA:
 				resposta.setEstat(NotificacioEstatEnum.REGISTRADA);
 				break;
 			case FINALITZADA:
 				resposta.setEstat(NotificacioEstatEnum.FINALITZADA);
+				break;
+			case FINALITZADA_AMB_ERRORS:
+				resposta.setEstat(NotificacioEstatEnum.FINALITZADA_AMB_ERRORS);
 				break;
 			case PROCESSADA:
 				resposta.setEstat(NotificacioEstatEnum.PROCESSADA);
