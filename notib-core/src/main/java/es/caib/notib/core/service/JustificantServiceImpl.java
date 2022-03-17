@@ -220,6 +220,7 @@ public class JustificantServiceImpl implements JustificantService {
             progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorDescripcio);
             log.error(errorDescripcio, ex);
             progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat"));
+            notificacio.setJustificantCreat(true);
             return justificantOriginal;
         }
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.finalitzat.firma"));
@@ -228,6 +229,7 @@ public class JustificantServiceImpl implements JustificantService {
         justificantFirmat.setContingut(contingutFirmat);
         justificantFirmat.setNom("justificant_notificació_" + notificacio.getId() + "_firmat.pdf");
         justificantFirmat.setTamany(contingutFirmat.length);
+        notificacio.setJustificantCreat(true);
         return justificantFirmat;
     }
     private FitxerDto generarJustificantComunicacioSIR(

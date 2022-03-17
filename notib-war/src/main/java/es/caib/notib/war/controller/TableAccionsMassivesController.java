@@ -179,7 +179,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                         request,
                         getMessage(
                                 request,
-                                "enviament.controller.reintent." + (notificacionsNoRegistrades == 1 ? "notificacio" : "notificacions" )+ ".pendents.error"));
+                                "enviament.controller.reintent." + (notificacionsError == 1 ? "notificacio" : "notificacions" )+ ".pendents.error"));
             } else if (notificacionsError > 0) {
                 MissatgesHelper.warning(
                         request,
@@ -193,6 +193,76 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             }
             resposta = "ok";
         }
+        return resposta;
+    }
+
+    @RequestMapping(value = "/reactivar/notificacionsError", method = RequestMethod.GET)
+    @ResponseBody
+    public String reactivarErrors(
+            HttpServletRequest request) throws IOException {
+        String resposta = "";
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+        if (seleccio == null || seleccio.isEmpty()) {
+            MissatgesHelper.error(
+                    request,
+                    getMessage(
+                            request,
+                            "enviament.controller.notificacio.seleccio.buida"));
+            resposta = "error";
+        } else {
+
+            Set<Long> notificacioIds = new HashSet<Long>();
+            for(Long id: seleccio) {
+                NotificacioEnviamentDtoV2 e = enviamentService.getOne(id);
+                notificacioIds.add(e.getNotificacioId());
+            }
+
+            log.info("Reactivam enviaments de notificacions amb error: " + StringUtils.join(notificacioIds, ", "));
+
+            Integer notificacionsNoFinalitzadesAmbError = 0;
+            Integer notificacionsError = 0;
+            for(Long notificacioId: notificacioIds) {
+                NotificacioDtoV2 notificacio = notificacioService.findAmbId(
+                        notificacioId,
+                        isAdministrador(request));
+                if(notificacio.getEstat().equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) || notificacio.isJustificantCreat()) {
+                    try {
+                        notificacioService.reactivarNotificacioAmbErrors(notificacioId);
+                    } catch (Exception e) {
+                        notificacionsError++;
+                        mostraErrorReintentarNotificacio(request, notificacioId, notificacio, e);
+                    }
+                } else {
+                    notificacionsNoFinalitzadesAmbError++;
+                }
+            }
+
+            if(notificacionsNoFinalitzadesAmbError.equals((Integer)notificacioIds.size())) {
+                MissatgesHelper.error(
+                        request,
+                        getMessage(
+                                request,
+                                "enviament.controller.reintent." + (notificacionsNoFinalitzadesAmbError == 1 ? "notificacio" : "notificacions" )+ ".errors.KO"));
+            } else if(notificacionsError.equals((Integer)notificacioIds.size())) {
+                MissatgesHelper.error(
+                        request,
+                        getMessage(
+                                request,
+                                "enviament.controller.reintent." + (notificacionsError == 1 ? "notificacio" : "notificacions" )+ ".errors.error"));
+            } else if (notificacionsError > 0) {
+                MissatgesHelper.warning(
+                        request,
+                        notificacionsError + " " + getMessage(request, "enviament.controller.reintent.notificacions.errors.error.alguna"));
+            } else {
+                MissatgesHelper.info(
+                        request,
+                        getMessage(
+                                request,
+                                "enviament.controller.reintent." + (notificacioIds.size() == 1 ? "notificacio" : "notificacions") + ".errors.OK"));
+            }
+            resposta = "ok";
+        }
+
         return resposta;
     }
 

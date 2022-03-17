@@ -922,6 +922,36 @@ $(document).ready(function() {
 						</div>
 					</li>
 				</c:if>
+				<c:if test="${(notificacio.estat == 'ENVIADA_AMB_ERRORS' || notificacio.estat == 'FINALITZADA_AMB_ERRORS') && !notificacio.justificantCreat}">
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.reactiva.errors" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a
+										href="<not:modalUrl value="/notificacio/${notificacio.id}/reactivarErrors"/>"
+										class="btn btn-default btn-sm"> <span class="fa fa-undo"></span>
+									<spring:message code="notificacio.info.accio.reactiva.errors.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+					<li class="list-group-item">
+						<div class="row">
+							<div class="col-sm-6" style="height: 100%">
+								<strong><spring:message code="notificacio.info.accio.reintent.errors" /></strong>
+							</div>
+							<div class="col-sm-6 text-right">
+								<a
+										href="<not:modalUrl value="/notificacio/${notificacio.id}/reenviarErrors"/>"
+										class="btn btn-default btn-sm"> <span class="fa fa-undo"></span>
+									<spring:message code="notificacio.info.accio.reintent.errors.boto" />
+								</a>
+							</div>
+						</div>
+					</li>
+				</c:if>
 			</ul>
 			<c:if test="${not algunaAccioDisponible}">
 				<div class="alert alert-info well-sm" role="alert">

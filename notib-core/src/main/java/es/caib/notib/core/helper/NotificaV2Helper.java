@@ -93,6 +93,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
+
+		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
+
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			logger.error(" [NOT] la notificació no té l'estat REGISTRADA.");
 			integracioHelper.addAccioError(info, "La notificació no està registrada");
@@ -101,8 +104,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					NotificacioEntity.class,
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
-
-		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 
 		try {
 			logger.info(" >>> Enviant notificació...");

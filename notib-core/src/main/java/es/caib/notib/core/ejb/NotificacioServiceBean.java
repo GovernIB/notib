@@ -382,8 +382,20 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public boolean validarFormatCsv(String csv) {
 		return delegate.validarFormatCsv(csv);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
+		return delegate.reenviarNotificacioAmbErrors(notificacioId);
+	}
+
+	@Override
+	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
+		return delegate.reactivarNotificacioAmbErrors(notificacioId);
 	}
 
 	@SuppressWarnings("rawtypes")

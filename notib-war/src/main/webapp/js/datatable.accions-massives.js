@@ -95,6 +95,23 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
+        $('#reintentarErrors').on('click', function() {
+            if(confirm(eventMessages['confirm-reintentar-errors'])){
+
+                $.get(
+                    url_prefix + "/reactivar/notificacionsError",
+                    () => {
+                        $table.DataTable().rows().deselect();
+                        $table.DataTable().ajax.reload(null, false);
+                        webutilRefreshMissatges();
+                    }
+                );
+
+                webutilRefreshMissatges(); // mostra el missatge de que s'està executant el procés en segon plà
+            }
+            return false;
+        });
+
         $('#reactivarConsulta').on('click', function() {
             if(confirm(eventMessages['confirm-reintentar-consulta'])){
                 location.href = url_prefix + "/reactivar/consulta";

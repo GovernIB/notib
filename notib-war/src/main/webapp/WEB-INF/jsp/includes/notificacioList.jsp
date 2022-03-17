@@ -369,6 +369,7 @@
 
         let eventMessages = {
             'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
+            'confirm-reintentar-errors': "<spring:message code="enviament.list.user.reintentar.errors.misatge.avis"/>",
             'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
             'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
             'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
@@ -582,6 +583,7 @@
 					<ul class="dropdown-menu">
 						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
+						<li><a style="cursor: pointer;" id="reintentarErrors"><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
                         <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
                         <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>

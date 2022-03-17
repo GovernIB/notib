@@ -69,18 +69,23 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		if (notificacio.getConcepte().startsWith("NError")) {
 			String errorDescripcio = "Error de notifica MOCK (" + System.currentTimeMillis() + ")";
-			log.error(
+			log.error(errorDescripcio);
+//			NotificacioEventEntity event = NotificacioEventEntity.builder()
+//					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
+//					.notificacio(notificacio)
+//					.error(true)
+//					.errorTipus(NotificacioErrorTipusEnumDto.ERROR_XARXA)
+//					.errorDescripcio(errorDescripcio).
+//					build();
+//			notificacio.updateEventAfegir(event);
+//			notificacioEventRepository.save(event);
+
+			notificacioEventHelper.addErrorEvent(
+					notificacio,
+					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
 					errorDescripcio,
-					errorDescripcio);
-			NotificacioEventEntity event = NotificacioEventEntity.builder()
-					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
-					.notificacio(notificacio)
-					.error(true)
-					.errorTipus(NotificacioErrorTipusEnumDto.ERROR_XARXA)
-					.errorDescripcio(errorDescripcio).
-					build();
-			notificacio.updateEventAfegir(event);
-			notificacioEventRepository.save(event);
+					NotificacioErrorTipusEnumDto.ERROR_REMOT,
+					true);
 
 			boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 			if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {

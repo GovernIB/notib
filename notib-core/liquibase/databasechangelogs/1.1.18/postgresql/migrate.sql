@@ -17,6 +17,9 @@ update not_notificacio n set registre_data = (select min(registre_data) from not
 
 -- Changeset db/changelog/changes/1.1.18/709.yaml::1638376153806-3::limit
 ALTER TABLE not_persona ADD document_tipus VARCHAR(32);
-ALTER TABLE not_notificacio_audit MODIFY estat VARCHAR(32);
+ALTER TABLE not_notificacio_audit ALTER COLUMN estat TYPE VARCHAR(32) USING (estat::VARCHAR(32));
 ALTER TABLE not_notificacio_env ADD per_email BOOLEAN;
+ALTER TABLE not_notificacio ADD justificant_creat BOOLEAN;
+
 UPDATE not_notificacio_env SET per_email = 'false';
+UPDATE not_notificacio SET justificant_creat = 'false';

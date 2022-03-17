@@ -1523,6 +1523,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}		
 	}
 
+	@Transactional
+	@Override
+	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+					null,
+					notificacioId);
+			if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+				notificacioEnviar(notificacioId);
+				return true;
+			}
+		} catch (Exception e) {
+			logger.debug("Error reenviant notificació amb errors (notificacioId=" + notificacioId + ")", e);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+		return false;
+	}
+
+	@Transactional
+	@Override
+	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
+			Timer.Context timer = metricsHelper.iniciMetrica();
+			try {
+				NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+						null,
+						notificacioId);
+				if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+					auditNotificacioHelper.updateNotificacioReintentaFinalitzadaAmbErrors(notificacio);
+					return true;
+				}
+			} catch (Exception e) {
+				logger.debug("Error reactivant notificació amb errors (notificacioId=" + notificacioId + ")", e);
+			} finally {
+				metricsHelper.fiMetrica(timer);
+			}
+			return false;
+	}
+
 	@Override
 	public void refrescarEnviamentsExpirats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -1597,7 +1638,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
 
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.processar.max");

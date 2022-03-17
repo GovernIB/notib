@@ -242,7 +242,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			taulaEnviaments.setWidthPercentage(99f);
 			
 //			## [TÍTOL]
-			PdfPCell titolCell = getTitolEnviament(numEnviament, notificacio);
+			PdfPCell titolCell = getTitolEnviament(numEnviament, notificacio, enviament);
 			
 //			## [CONTINGUT]
 			PdfPCell contingut = getContingutEnviament(enviament, notificacio);
@@ -258,12 +258,13 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 		}
 	}
 	
-	private PdfPCell getTitolEnviament(int numEnviament, NotificacioDtoV2 notificacio) {
+	private PdfPCell getTitolEnviament(int numEnviament, NotificacioDtoV2 notificacio, NotificacioEnviamentDtoV2 enviament) {
 		log.debug("Generant el títol de la taula d'enviament del justificant d'enviament de la notificació [notificacioId=" + notificacio.getId() + "]");
 		PdfPCell titolCell = new PdfPCell();
 		String titolEnviamentMessage = messageHelper.getMessage(
 				"es.caib.notib.justificant.enviaments.taula.titol", 
 				new Object[] {
+						(NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && enviament.isPerEmail() ?  messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol.notificacio.email") + " " : "") + messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(),
 						numEnviament, 
 						notificacio.getEnviamentsFinalitzats().size()});
 		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, calibriWhiteBold);

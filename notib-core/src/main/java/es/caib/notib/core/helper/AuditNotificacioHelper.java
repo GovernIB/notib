@@ -177,6 +177,14 @@ public class AuditNotificacioHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
+	public NotificacioEntity updateNotificacioReintentaFinalitzadaAmbErrors(NotificacioEntity notificacio) {
+		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+		notificacio.resetIntentsNotificacio();
+		notificacioTableHelper.actualitzarRegistre(notificacio);
+		return notificacio;
+	}
+
+	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioRefreshRegistreNotificacio(NotificacioEntity notificacio) {
 		notificacio.refreshRegistre();
 		notificacioRepository.saveAndFlush(notificacio);

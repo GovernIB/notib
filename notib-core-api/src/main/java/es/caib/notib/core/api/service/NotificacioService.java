@@ -426,4 +426,9 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('tothom')")
 	boolean validarFormatCsv (String csv);
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	boolean reenviarNotificacioAmbErrors(Long notificacioId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	boolean reactivarNotificacioAmbErrors(Long notificacioId);
 }

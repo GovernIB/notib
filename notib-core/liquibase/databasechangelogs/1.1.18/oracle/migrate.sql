@@ -19,4 +19,6 @@ update not_notificacio n set registre_data = (select min(registre_data) from not
 ALTER TABLE not_persona ADD document_tipus VARCHAR2(32 CHAR);
 ALTER TABLE not_notificacio_audit MODIFY estat VARCHAR2(32 CHAR);
 ALTER TABLE not_notificacio_env ADD per_email NUMBER(1);
+ALTER TABLE not_notificacio ADD justificant_creat NUMBER(1);
 UPDATE not_notificacio_env SET per_email = '0';
+UPDATE not_notificacio SET justificant_creat = '0';

@@ -195,6 +195,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	private String registreLlibreNom;
 
 	@Setter
+	@Column(name = "justificant_creat")
+	private boolean justificantCreat;
+
+	@Setter
 	@Transient
 	protected boolean permisProcessar;
 

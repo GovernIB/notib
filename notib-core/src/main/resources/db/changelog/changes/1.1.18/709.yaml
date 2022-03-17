@@ -35,9 +35,21 @@ databaseChangeLog:
               - column:
                   name: per_email
                   type: boolean
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: justificant_creat
+                  type: boolean
         - update:
             tableName: not_notificacio_env
             columns:
               - column:
                   name: per_email
+                  value: ${fals}
+        - update:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: justificant_creat
                   value: ${fals}

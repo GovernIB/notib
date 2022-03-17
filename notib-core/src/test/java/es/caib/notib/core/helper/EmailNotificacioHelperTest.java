@@ -10,7 +10,6 @@ import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -37,9 +36,10 @@ public class EmailNotificacioHelperTest {
 
 	// Dades per el Test
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
-//	private static final String EMAIL_PASS = "xxxxxxx";
+//	private static final String EMAIL_PASS = "xxxxxx";
 	private static final String EMAIL_USER = "proves_limit@limit.es";
 	private static final String EMAIL_PASS = "xxxxxx";
+//	private static final String EMAIL_DEST = "sandreu@limit.es";
 	private static final String EMAIL_DEST = "sion.limit@gmail.com";
 	private static final String FILE_PATH = "/home/siona/Documents/buit.pdf";
 
@@ -131,7 +131,7 @@ public class EmailNotificacioHelperTest {
 
 	}
 	
-	@Test
+//	@Test
 	public void whenSendEmailNotificacio_thenReturn() throws Exception {
 
 		// Given
@@ -180,7 +180,7 @@ public class EmailNotificacioHelperTest {
 		assertNull(resposta);
 	}
 
-	@Test
+//	@Test
 	public void whenSendEmailNotificacioSenseNif_thenReturn() throws Exception {
 
 		// Given
@@ -210,7 +210,7 @@ public class EmailNotificacioHelperTest {
 		assertNull(resposta);
 	}
 
-	@Test
+//	@Test
 	public void whenSendEmailComunicacioSenseNif_thenReturn() throws Exception {
 
 		// Given

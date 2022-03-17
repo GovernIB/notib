@@ -125,39 +125,6 @@ public class EmailNotificacioSenseNifHelper {
 		return notificacio;
 	}
 
-//	@UpdateNotificacioTable
-//	@Audita(entityType = AuditService.TipusEntitat.NOTIFICACIO, operationType = AuditService.TipusOperacio.UPDATE)
-//	public NotificacioEntity enviamentsEnviarEmail(List<NotificacioEnviamentEntity> enviamentsSenseNif) {
-//		NotificacioEntity notificacio = notificacioRepository.findById(enviamentsSenseNif.get(0).getNotificacio().getId());
-//		log.info(" [NOT] Inici enviament enviaments sense nif [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-//		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())) {
-//			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");
-//			throw new ValidationException(
-//					notificacio.getId(),
-//					NotificacioEntity.class,
-//					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
-//		}
-//
-//		boolean hasErrors = false;
-//		for (NotificacioEnviamentEntity enviament: enviamentsSenseNif) {
-//			String error = sendEmailInfoEnviamentSenseNif(enviament);
-//			notificacioEventHelper.addNotificacioEmailEvent(
-//					notificacio,
-//					enviament,
-//					error != null,
-//					error);
-//			hasErrors = hasErrors || error != null;
-//		}
-//
-//		if (!hasErrors) {
-//			notificacioEventHelper.addEnviamentEmailOKEvent(notificacio);
-//		} else {
-//			notificacioEventHelper.addEnviamentEmailErrorEvent(notificacio);
-//		}
-//
-//		return notificacio;
-//	}
-
 	public String sendEmailInfoEnviamentSenseNif(NotificacioEnviamentEntity enviament) {
 		String resposta = null;
 		try {
@@ -273,9 +240,7 @@ public class EmailNotificacioSenseNifHelper {
 			}
 		}
 
-		// TODO: Ara dóna error al enviar el correu. No enviar per fer proves
-		if ("sion.limit@gmail.com".equals(emailDestinatari))
-			mailSender.send(missatge);
+		mailSender.send(missatge);
 	}
 
 	private String getImageByteArrayMimeType(byte[] bytes) throws IOException {
