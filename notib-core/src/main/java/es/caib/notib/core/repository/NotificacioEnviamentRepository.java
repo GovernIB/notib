@@ -264,7 +264,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular))" +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
-	Integer countEnviamentsByNif(
+	Integer countEnviaments(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
 			@Param("dataInicial") Date dataInicial,
@@ -288,7 +288,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular)) " +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
-	Page<NotificacioEnviamentEntity> findEnviamentsByNif(
+	Page<NotificacioEnviamentEntity> findEnviaments(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
 			@Param("dataInicial") Date dataInicial,

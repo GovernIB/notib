@@ -167,8 +167,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(item.getId());
             String estat = item.isEnviant() ? "<span class=\"fa fa-clock-o\"></span>" :
                     NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) ? "<span class=\"fa fa-clock-o\"></span>" :
-                    NotificacioEstatEnumDto.ENVIADA.equals(item.getEstat()) ? "<span class=\"fa fa-send-o\"></span>" :
-                    NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
+                    NotificacioEstatEnumDto.ENVIADA.equals(item.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-send-o\"></span>" :
+                    NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
                     NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\">" :
                     NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
             String nomEstat = " " + getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "";
@@ -177,7 +177,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     "<span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error\"/> \"></span>" : "";
             estat = "<span>" + estat + nomEstat + error + "</span>";
             String data = "\n";
-            if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) && item.getEstatDate() != null) {
+            if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
                 String d = df.format(item.getEstatDate());
                 data += "<span class=\"horaProcessat\">" + d + "</span>\n";
@@ -191,7 +191,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             String registreEstat = "";
             Map<String, Integer>  registres = new HashMap<>();
             for (NotificacioEnviamentDatatableDto env : enviaments) {
-                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
+                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
                     notificaEstat += getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + env.getNotificaEstat()) + ", ";
                 }
                 if (env.getRegistreEstat() != null) {
