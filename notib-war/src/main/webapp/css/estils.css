@@ -231,6 +231,48 @@ table.dataTable tr.datatable-dades-carregant div {
 	color: #721c24CC;
 }
 
+.alert-config {
+	border: 1px solid transparent;
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-bottom-color: transparent;
+	border-left-color: transparent;
+	border-radius: 4px;
+	padding: 5px;
+}
+
+.alert-config-ok {
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+
+}
+
+.display-inline {
+	display: inline;
+}
+
+.spinner-config {
+	margin-left: 5px;
+	font-size: 1.2em;
+}
+
+.alert-config-error {
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+}
+
+.alert-config-boto {
+	cursor: pointer;
+	padding: 5px;
+	color: #a4a4a494;
+}
+
+.flex {
+	display: flex;
+}
+
 .flex-column {
 	display: flex;
 	flex-direction: column;
