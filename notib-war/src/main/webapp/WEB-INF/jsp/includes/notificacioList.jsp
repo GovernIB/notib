@@ -708,7 +708,7 @@
 						{{if tipusUsuari == 'APLICACIO' && errorLastEvent}}
 							<span class="fa fa-exclamation-circle text-primary" title="<spring:message code="notificacio.list.client.error"/>"></span>
 						{{/if}}
-						{{if (estat == 'FINALITZADA') && estatDate != ''}}
+						{{if (estat == 'FINALITZADA' || estat == 'FINALITZADA_AMB_ERRORS') && estatDate != ''}}
 							<br>
 							<span class="horaProcessat">{{:~eval('formatDate(' + estatDate + ')')}}</span>
 							<br>
@@ -717,7 +717,7 @@
 							<span class="horaProcessat">{{:~eval('formatDate(' + estatProcessatDate + ')')}}</span>
 							<br>
 						{{/if}}
-						{{if estat == 'FINALITZADA' ||  estat == 'PROCESSADA'}}
+						{{if estat == 'FINALITZADA'  || estat == 'FINALITZADA_AMB_ERRORS' ||  estat == 'PROCESSADA'}}
 							{{:~recuperarEstatEnviament(id)}}
 							<p class="estat_{{:id}}"  style="display:inline"></p>
 						{{/if}}
