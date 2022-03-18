@@ -915,9 +915,9 @@
 			var dir3codi = closest.find('.dir3Codi');
 			var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
 			var noNifLabelText = "<spring:message code='notificacio.form.camp.titular.sense.nif'/>";
-			<%--var email = closest.find('.email');--%>
-			<%--var emailLabel = email.find('label');--%>
-			<%--var emailLabelText = "<spring:message code='notificacio.form.camp.titular.email'/>";--%>
+			var email = closest.find('.email');
+			var emailLabel = email.find('label');
+			var emailLabelText = "<spring:message code='notificacio.form.camp.titular.email'/>";
 			var incapacitat = closest.find('.incapacitat');
 			var raoSocial = closest.find('.rao');
 			var index = closest.find(".rowId input").val();
@@ -940,7 +940,7 @@
 					$(nifLabel).text(nifLabelText + " *");
 					$(nif).removeClass('hidden');
 				}
-				// $(emailLabel).text(emailLabelText);
+				$(emailLabel).text(emailLabelText);
 			} else if ($(this).val() == 'FISICA') {
 				$(llinatge1).removeClass('hidden');
 				$(llinatge2).removeClass('hidden');
@@ -951,7 +951,7 @@
 				$(dir3codi).addClass('hidden');
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
-				// $(emailLabel).text(emailLabelText);
+				$(emailLabel).text(emailLabelText);
 			} else if ($(this).val() == 'FISICA_SENSE_NIF') {
 				$(llinatge1).removeClass('hidden');
 				$(llinatge2).removeClass('hidden');
@@ -962,7 +962,7 @@
 				$(dir3codi).addClass('hidden');
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
-				// $(emailLabel).text(emailLabelText + " *");
+				$(emailLabel).text(emailLabelText + " *");
 			} else {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
@@ -973,7 +973,7 @@
 				$(nifLabel).text(nifLabelText + " *");
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
-				// $(emailLabel).text(emailLabelText);
+				$(emailLabel).text(emailLabelText);
 			}
 
 			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
