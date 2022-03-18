@@ -392,6 +392,18 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.actualitzarReferencies();
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
+		return delegate.reenviarNotificacioAmbErrors(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
+		return delegate.reactivarNotificacioAmbErrors(notificacioId);
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List getNotificacionsDEHPendentsRefrescarCert() {

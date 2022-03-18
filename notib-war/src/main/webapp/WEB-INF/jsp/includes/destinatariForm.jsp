@@ -27,9 +27,10 @@
                 <div class="col-md-12 destinatariForm destenv_${j} personaForm_${j}_${i}">
                         <%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
                     <input type="hidden" name="enviaments[${j}].destinataris[${i}].id" value="${destinatari.id}"/>
+
                     <!-- TIPUS INTERESSAT -->
                     <div class="col-md-3 interessatTipus">
-                        <not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+                        <not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipusDest}" optionValueAttribute="value" optionTextKeyAttribute="text" />
                     </div>
                     <!-- NIF -->
                     <div class="col-md-3 nif">

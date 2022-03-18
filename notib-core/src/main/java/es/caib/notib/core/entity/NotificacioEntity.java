@@ -110,7 +110,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	@Setter
 	@Column(name = "registre_llibre_nom")
 	private String registreLlibreNom;
-	
+
 	@Column(name = "callback_error")
 	protected boolean errorLastCallback;
 
@@ -195,6 +195,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH},
 			orphanRemoval = true)
 	protected Set<NotificacioEventEntity> events = new LinkedHashSet<>();
+
+	@Setter
+	@Column(name = "justificant_creat")
+	private boolean justificantCreat;
 
 	@Setter
 	@Transient
@@ -295,7 +299,96 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public void updateEventAfegir(NotificacioEventEntity event) {
 		events.add(event);
 	}
-	
+
+	public List<NotificacioEnviamentEntity> getEnviamentsPerNotifica() {
+		List<NotificacioEnviamentEntity> enviamentsPerNotifica = new ArrayList<>();
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentEntity enviament: enviaments) {
+				if (!enviament.isPerEmail()) {
+					enviamentsPerNotifica.add(enviament);
+				}
+			}
+		}
+		return enviamentsPerNotifica;
+	}
+
+	public List<NotificacioEnviamentEntity> getEnviamentsPerEmail() {
+		List<NotificacioEnviamentEntity> enviamentsPerEmail = new ArrayList<>();
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentEntity enviament: enviaments) {
+				if (enviament.isPerEmail()) {
+					enviamentsPerEmail.add(enviament);
+				}
+			}
+		}
+		return enviamentsPerEmail;
+	}
+
+	public List<NotificacioEnviamentEntity> getEnviamentsPerEmailNoEnviats() {
+		List<NotificacioEnviamentEntity> enviamentsPerEmail = new ArrayList<>();
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentEntity enviament: enviaments) {
+				if (enviament.isPerEmail() && enviament.getNotificaEstat() != NotificacioEnviamentEstatEnumDto.FINALITZADA) {
+					enviamentsPerEmail.add(enviament);
+				}
+			}
+		}
+		return enviamentsPerEmail;
+	}
+
+	public List<NotificacioEnviamentEntity> getEnviamentsNoEnviats() {
+		List<NotificacioEnviamentEntity> enviamentsNoEnviats = new ArrayList<>();
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentEntity enviament: enviaments) {
+				if (enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT ||
+						enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.REGISTRADA) {
+					enviamentsNoEnviats.add(enviament);
+				}
+			}
+		}
+		return enviamentsNoEnviats;
+	}
+
+	public boolean hasEnviamentsNotifica() {
+		return enviaments.size() > getEnviamentsPerEmail().size();
+	}
+
+	public boolean hasEnviamentsEnviats() {
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentEntity enviament: enviaments) {
+				if (enviament.getNotificaEstat() != NotificacioEnviamentEstatEnumDto.REGISTRADA &&
+						enviament.getNotificaEstat() != NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean hasEnviamentsNoEnviats() {
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentEntity enviament: enviaments) {
+				if (enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.REGISTRADA ||
+						enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean allEnviamentsNotificaFinalitzats() {
+		if (enviaments != null && !enviaments.isEmpty()) {
+			List<NotificacioEnviamentEntity> enviamentsNotifica = new ArrayList<>(enviaments);
+			enviamentsNotifica.removeAll(getEnviamentsPerEmail());
+			for(NotificacioEnviamentEntity enviament: enviamentsNotifica) {
+				if (!enviament.isNotificaEstatFinal())
+					return false;
+			}
+		}
+		return true;
+	}
+
 	public void update (
 			EntitatEntity entitat,
 			String emisorDir3Codi,

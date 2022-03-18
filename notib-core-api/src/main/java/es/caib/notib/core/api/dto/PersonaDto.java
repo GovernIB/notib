@@ -18,6 +18,7 @@ public class PersonaDto implements Serializable{
 	private String llinatge1;
 	private String llinatge2;
 	private String raoSocial;
+	private DocumentTipusEnumDto documentTipus;
 	private String nif;
 	private String telefon;
 	private String email;

@@ -658,6 +658,50 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         }
     }
 
+
+    @RequestMapping(value = "/{notificacioId}/reenviarErrors", method = RequestMethod.GET)
+    public String reenviarErrors(
+            HttpServletRequest request,
+            @PathVariable Long notificacioId,
+            Model model) {
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+        boolean enviada = notificacioService.reenviarNotificacioAmbErrors(notificacioId);
+        emplenarModelNotificacioInfo(
+                entitatActual,
+                notificacioId,
+                request,
+                "accions",
+                model);
+        model.addAttribute("pestanyaActiva", "accions");
+        if (enviada) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.reenviar.errors.ok");
+        }
+        return getAjaxControllerReturnValueError(request, "notificacioInfo", "notificacio.controller.reenviar.errors.error");
+    }
+
+    @RequestMapping(value = "/{notificacioId}/reactivarErrors", method = RequestMethod.GET)
+    public String reactivarErrors(
+            HttpServletRequest request,
+            @PathVariable Long notificacioId,
+            Model model) {
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+        boolean reactivat = notificacioService.reactivarNotificacioAmbErrors(notificacioId);
+        emplenarModelNotificacioInfo(
+                entitatActual,
+                notificacioId,
+                request,
+                "accions",
+                model);
+        model.addAttribute("pestanyaActiva", "accions");
+        if (reactivat) {
+            return getAjaxControllerReturnValueSuccess(request, "notificacioInfo", "notificacio.controller.reactivar.errors.ok");
+        } else {
+            return getAjaxControllerReturnValueError(request, "notificacioInfo", "notificacio.controller.reactivar.errors.error");
+        }
+    }
+
 	/////
     /// CONTROLADORS DELS JUSTIFICANTS
     /////

@@ -1,13 +1,26 @@
 package es.caib.notib.core.entity;
 
+import es.caib.notib.core.api.dto.DocumentTipusEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * Classe del model de dades que representa una persona
@@ -34,6 +47,9 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private String llinatge1;
 	@Column(name = "llinatge2", length = 30)
 	private String llinatge2;
+	@Column(name = "document_tipus", nullable = true)
+	@Enumerated(EnumType.STRING)
+	private DocumentTipusEnumDto documentTipus;
 	@Column(name = "nif", length = 9)
 	private String nif;
 	@Column(name = "nom", length = 255)
@@ -148,6 +164,17 @@ public class PersonaEntity extends NotibAuditable<Long> {
 				.email(email)
 				.dir3Codi(dir3Codi)
 				.build();
+	}
+
+	public String getNomSencer() {
+		String nomSencer = nom;
+		if (llinatge1 != null && !llinatge1.isEmpty()) {
+			nomSencer += " " + llinatge1;
+		}
+		if (llinatge2 != null && !llinatge2.isEmpty()) {
+			nomSencer += " " + llinatge2;
+		}
+		return nomSencer;
 	}
 	private static final long serialVersionUID = 4569697366006085907L;
 }

@@ -11,9 +11,17 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NoDocumentException;
 import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import lombok.Builder;
@@ -64,49 +72,68 @@ public class NotificacioHelper {
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
+	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
+	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 
 	@Transactional
-	public List<RegistreIdDto>  registrarNotificar(Long notificacioId) throws RegistreNotificaException {
+	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		log.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
 		List<RegistreIdDto> registresIdDto = new ArrayList<>();
-		NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacioId);
-		log.info(" [REG] Inici registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
+		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
+		log.info(" [REG] Inici registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 
 		long startTime = System.nanoTime();
 		double elapsedTime;
 		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-			log.info("Comprovant estat actual notificació (id: " + notificacioEntity.getId() + ")...");
-			NotificacioEstatEnumDto estatActual = notificacioEntity.getEstat();
-			log.info("Estat notificació [Id:" + notificacioEntity.getId() + ", Estat: "+ estatActual + "]");
+			log.info("Comprovant estat actual notificació (id: " + notificacio.getId() + ")...");
+			NotificacioEstatEnumDto estatActual = notificacio.getEstat();
+			log.info("Estat notificació [Id:" + notificacio.getId() + ", Estat: "+ estatActual + "]");
 
 			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
 				long startTime2 = System.nanoTime();
- 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
+				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
 				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
-				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
+				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 				RegistreIdDto registreIdDto = new RegistreIdDto();
-				registreIdDto.setNumero(notificacioEntity.getRegistreNumero());
-				registreIdDto.setData(notificacioEntity.getRegistreData());
-				registreIdDto.setNumeroRegistreFormat(notificacioEntity.getRegistreNumeroFormatat());
+				registreIdDto.setNumero(notificacio.getRegistreNumero());
+				registreIdDto.setData(notificacio.getRegistreData());
+				registreIdDto.setNumeroRegistreFormat(notificacio.getRegistreNumeroFormatat());
 				registresIdDto.add(registreIdDto);
 				if (notificar){
 					
-					registreIdDto.setNumero(notificacioEntity.getRegistreNumero());
-					registreIdDto.setData(notificacioEntity.getRegistreData());
-					registreIdDto.setNumeroRegistreFormat(notificacioEntity.getRegistreNumeroFormatat());
+					registreIdDto.setNumero(notificacio.getRegistreNumero());
+					registreIdDto.setData(notificacio.getRegistreData());
+					registreIdDto.setNumeroRegistreFormat(notificacio.getRegistreNumeroFormatat());
 					registresIdDto.add(registreIdDto);
 
 					startTime2 = System.nanoTime();
-					notificaHelper.notificacioEnviar(notificacioEntity.getId());
+
+					List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
+					// 3 possibles casuístiques
+					// 1. Tots els enviaments a Notifica
+					if (enviamentsSenseNifNoEnviats.isEmpty()) {
+						notificaHelper.notificacioEnviar(notificacio.getId());
+					}
+					// 2. Tots els enviaments per email
+					else if (notificacio.getEnviamentsNoEnviats().size() <= enviamentsSenseNifNoEnviats.size()) {
+						emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, true);
+					}
+					// 3. Una part dels enviaments a Notifica i l'altre via email
+					else {
+						notificacio = notificaHelper.notificacioEnviar(notificacio.getId(), true);
+						// Fa falta enviar els restants per email
+						emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
+					}
+
 					elapsedTime = (System.nanoTime() - startTime2) / 10e6;
-					log.info(" [TIMER-REG] Notificació enviar [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
+					log.info(" [TIMER-REG] Notificació enviar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 				}
 			}
 		}
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;
-		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacioEntity.getId() + "]: " + elapsedTime + " ms");
-		log.info(" [REG] Fi registre notificació [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
+		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
+		log.info(" [REG] Fi registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return registresIdDto;
 	}
 

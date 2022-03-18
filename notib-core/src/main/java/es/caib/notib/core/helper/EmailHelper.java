@@ -34,26 +34,26 @@ public abstract class EmailHelper<T> {
     @Autowired
     protected ConfigHelper configHelper;
     @Resource
-    private JavaMailSender mailSender;
+    protected JavaMailSender mailSender;
 
     protected abstract String getMailHtmlBody(T item);
     protected abstract String getMailPlainTextBody(T item);
     protected abstract String getMailSubject();
 
-    public String sendMail(T item, String email) throws Exception {
-        String resposta = null;
-        try {
-            email = email.replaceAll("\\s+","");
-            sendEmailNotificacio(
-                    email,
-                    item);
-        } catch (Exception ex) {
-            String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
-            log.error(errorDescripció);
-            resposta = errorDescripció;
-        }
-        return resposta;
-    }
+//    public String sendMail(T item, String email) throws Exception {
+//        String resposta = null;
+//        try {
+//            email = email.replaceAll("\\s+","");
+//            sendEmailNotificacio(
+//                    email,
+//                    item);
+//        } catch (Exception ex) {
+//            String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
+//            log.error(errorDescripció);
+//            resposta = errorDescripció;
+//        }
+//        return resposta;
+//    }
     protected void sendEmailNotificacio(
             String emailDestinatari, T item) throws MessagingException {
         sendEmailNotificacio(emailDestinatari, item ,null);
@@ -90,7 +90,7 @@ public abstract class EmailHelper<T> {
     }
 
     @AllArgsConstructor
-    protected class Attachment{
+    protected static class Attachment{
         @NonNull String filename;
         @NonNull byte[] content;
     }

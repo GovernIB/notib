@@ -49,15 +49,40 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	)
 	void deleteOldUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
 
+	@Modifying
+	@Query( " delete from " +
+			"	NotificacioEventEntity ne " +
+			" where " +
+			"		ne.notificacio = :notificacio " +
+			"	and (ne.error = true " +
+			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)" +
+			"			)" +
+			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+			") "
+	)
+	void deleteOldNotificaUselessEvents(@Param("notificacio") NotificacioEntity notificacio);
+
 	void deleteByEnviament(NotificacioEnviamentEntity enviament);
 
 	void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
 									 NotificacioEventTipusEnumDto tipus,
 									 boolean error);
 	void deleteByNotificacio(NotificacioEntity notificacio);
-	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataAsc(NotificacioEntity notificacio,
-																   NotificacioEventTipusEnumDto tipus,
-																   boolean error);
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(
+			NotificacioEntity notificacio,
+			NotificacioEventTipusEnumDto tipus,
+			boolean error);
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(
+			NotificacioEntity notificacio,
+			NotificacioEventTipusEnumDto tipus,
+			boolean error);
+	List<NotificacioEventEntity> findByEnviamentAndTipusAndErrorOrderByDataDescIdDesc(
+			NotificacioEnviamentEntity enviament,
+			NotificacioEventTipusEnumDto tipus,
+			boolean error);
 
 	List<NotificacioEventEntity> findByNotificacio(NotificacioEntity notificacio);
 
@@ -116,4 +141,15 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"	   ) ")
 	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId")Long notificacioId);
 
+	@Query("select ne " +
+			"  from NotificacioEventEntity ne " +
+			" where ne.id = ( " +
+			"		select max(e.id) " +
+			"		from NotificacioEventEntity e " +
+			"			left outer join e.notificacio n " +
+			"		where n.id = :notificacioId " +
+			"		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT" +
+			"	   )" +
+			" order by ne.callbackData asc nulls first, data asc")
+	NotificacioEventEntity findUltimEventEmailByNotificacioId(@Param("notificacioId")Long notificacioId);
 }

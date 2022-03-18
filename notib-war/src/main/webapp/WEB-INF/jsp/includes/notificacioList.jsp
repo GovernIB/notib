@@ -234,15 +234,20 @@
                     } else {
                         nif = destinatari.dir3Codi;
                     }
-                    destinataris += nomDest + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' (' + nif + '), ';
+                    nif = (nif == null) ? "" : "(" + nif + ")";
+                    destinataris += nomDest + ' ' + llinatge1Dest + ' ' + llinatge2Dest + ' ' + nif + ', ';
                 });
                 if (data[i].titular.nif != null) {
                     nif = data[i].titular.nif;
                 } else {
                     nif = data[i].titular.dir3Codi;
                 }
+                nif = (nif == null) ? "" : "(" + nif + ")";
+                if (data[i].perEmail) {
+                    nif += " - <span class='fa fa-envelope-o'></span> " + data[i].titular.email;
+                }
                 contingutTbody += '<tr data-toggle="modal" data-href="<c:url value="/notificacio/' + rowData.id + '/enviament/' + data[i].id + '"/>" style="cursor: pointer;">';
-                contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + '('+ nif +') </td>';
+                contingutTbody += '<td>' + nomTitular + ' ' + llinatge1 + ' ' + llinatge2 + ' '+ nif +'</td>';
                 if (destinataris != ''){
                     //Remove last white space
                     destinataris = destinataris.substr(0, destinataris.length-1);
@@ -254,6 +259,13 @@
                 contingutTbody += '<td>' + destinataris + '</td>';
                 contingutTbody += '<td>';
                 contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
+                if (data[i].notificaEstat == "FINALITZADA" && data[i].perEmail) {
+                    if (rowData.enviamentTipus == "NOTIFICACIO") {
+                        contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/>)"
+                    } else {
+                        contingutTbody += " (<spring:message code="notificacio.list.enviament.list.finalitzat.email"/>)"
+                    }
+                }
                 if (data[i].notificacioError) {
                     var errorTitle = '';
                     if (data[i].notificacioErrorDescripcio) {
@@ -302,7 +314,6 @@
                     var rowData = this.data();
                     let $parentTr = $("#" + this.id());
                     let isCollapsed = $parentTr.find("td:last span").hasClass('fa-caret-up')
-                    // debugger;
                     if (!shown && !isCollapsed) {
                         $('<tr data-row-info="true"><td colspan="' + $parentTr.children().length + '"></td></tr>').insertAfter($parentTr);
                         mostraEnviamentsNotificacio($('td', $parentTr.next()), rowData)
@@ -311,7 +322,6 @@
                         $(".table-enviaments").closest("tr").remove();
                     }
                 });
-                // debugger
                 if (!shown) {
                     $btnDesplegarEnvs.find("span").toggleClass('fa-caret-up');
                     $(".btn-rowInfo").find("span").removeClass('fa-caret-down');
@@ -359,6 +369,7 @@
 
         let eventMessages = {
             'confirm-reintentar-notificacio': "<spring:message code="enviament.list.user.reintentar.notificacio.misatge.avis"/>",
+            'confirm-reintentar-errors': "<spring:message code="enviament.list.user.reintentar.errors.misatge.avis"/>",
             'confirm-reintentar-consulta': "<spring:message code="enviament.list.user.reactivar.consulta.misatge.avis"/>",
             'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
             'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
@@ -576,6 +587,7 @@
 					<ul class="dropdown-menu">
 						<li><a style="cursor: pointer;" id="exportarODS"><spring:message code="notificacio.list.accio.massiva.exportar"/></a></li>
 						<li><a style="cursor: pointer;" id="reintentarNotificacio"><spring:message code="notificacio.list.accio.massiva.reintentar.notificacions"/></a></li>
+						<li><a style="cursor: pointer;" id="reintentarErrors"><spring:message code="notificacio.list.accio.massiva.reintentar.errors"/></a></li>
 						<li><a style="cursor: pointer;" id="updateEstat"><spring:message code="notificacio.list.accio.massiva.actualitzar.estat"/></a></li>
                         <li><a id="processarMassiu" href="<c:url value="/notificacio/processar/massiu"/>" data-toggle="modal" data-refresh-pagina="true"><spring:message code="notificacio.list.accio.massiva.processar"/></a></li>
                         <li><a href="<c:url value="/notificacio/eliminar"/>"><spring:message code="notificacio.list.accio.massiva.eliminar"/></a></li>
@@ -674,13 +686,13 @@
         <th data-col-name="createdByComplet" data-converter="String" width="150px"><spring:message code="notificacio.list.columna.enviament.creada"/></th>
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
-        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">
+<%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
         <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
                     <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-right">
                         <li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
                         <li><a href="<c:url value="/notificacio/{{:id}}/documentDescarregar/{{:documentId}}"/>" data-toggle="modal" data-height="300px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
                         {^{if envCerData != null }}

@@ -121,7 +121,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         Assert.assertEquals(1, eventRepository.findByEnviamentIdOrderByIdAsc(enviament.getId()).size());
 
         // Comprovam que no hi ha cap event de callback client
-        List<NotificacioEventEntity> eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacio,
+        List<NotificacioEventEntity> eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT, false);
         Assert.assertEquals(0, eventsCallback.size());
 
@@ -133,7 +133,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         Assert.assertEquals(CallbackEstatEnumDto.NOTIFICAT, eventNotificar.getCallbackEstat());
 
         // Verificam que s'ha asociat un event i no és d'error
-        eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacio,
+        eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT, false);
         Assert.assertEquals(1, eventsCallback.size());
 
@@ -170,7 +170,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         Assert.assertEquals(2, eventRepository.findByEnviamentIdOrderByIdAsc(enviament.getId()).size());
 
         // Comprovam que no hi ha cap event de callback client
-        List<NotificacioEventEntity> eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacio,
+        List<NotificacioEventEntity> eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT, false);
         Assert.assertEquals(0, eventsCallback.size());
 
@@ -186,7 +186,7 @@ public class CallbackHelperIT extends BaseServiceTestV2 {
         Assert.assertEquals(CallbackEstatEnumDto.ERROR, eventNotificarDarrerIntent.getCallbackEstat());
 
         // Verificam que s'ha asociat un event i que és d'error
-        eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacio,
+        eventsCallback = eventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio,
                 NotificacioEventTipusEnumDto.CALLBACK_CLIENT, true);
         Assert.assertEquals(1, eventsCallback.size());
 

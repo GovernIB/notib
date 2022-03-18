@@ -434,4 +434,9 @@ public interface NotificacioService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	boolean actualitzarReferencies();
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	boolean reenviarNotificacioAmbErrors(Long notificacioId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	boolean reactivarNotificacioAmbErrors(Long notificacioId);
 }

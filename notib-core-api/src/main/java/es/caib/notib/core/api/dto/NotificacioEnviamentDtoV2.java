@@ -86,8 +86,10 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String notificaCertificacioNumSeguiment;
 	private boolean notificaError;
 	private int notificaIntentNum;
+	private boolean notificaEstatFinal;
 
 	private boolean isEnviant;
+	private boolean perEmail;
 
 	public NotificacioEstatEnumDto getEstat() {
 		if (isEnviant){

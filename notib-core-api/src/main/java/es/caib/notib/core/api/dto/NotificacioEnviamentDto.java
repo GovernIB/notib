@@ -57,6 +57,8 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private String registreNumeroFormatat;
 	private NotificacioRegistreEstatEnumDto registreEstat;
 
+	private boolean perEmail;
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

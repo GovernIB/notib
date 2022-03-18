@@ -1,5 +1,6 @@
 package es.caib.notib.war.command;
 
+import es.caib.notib.core.api.dto.DocumentTipusEnumDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
@@ -29,6 +30,7 @@ public class PersonaCommand {
 	private String llinatge1;
 	@Size(max=30)
 	private String llinatge2;
+	private DocumentTipusEnumDto documentTipus;
 	@Size(max=9)
 	private String nif;
 	@Size(max=16)

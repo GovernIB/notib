@@ -255,13 +255,16 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" left outer join ne.destinataris d " +
 		    " where ne.notificacio.enviamentTipus = :tipus " +
 		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
-		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular))" +
+		    "   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular))" +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
-	Integer countEnviaments(
+	Integer countEnviamentsByNif(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
 			@Param("dataInicial") Date dataInicial,
@@ -276,13 +279,16 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" left outer join ne.destinataris d " +
 		    " where ne.notificacio.enviamentTipus =  :tipus " +
 		    "   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
-		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular)) " +
+			"   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular)) " +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
-	Page<NotificacioEnviamentEntity> findEnviaments(
+	Page<NotificacioEnviamentEntity> findEnviamentsByNif(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
 			@Param("dataInicial") Date dataInicial,

@@ -2,6 +2,7 @@ package es.caib.notib.war.validation;
 
 
 
+import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;
@@ -39,7 +40,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		try {
 			Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
 			// Validació del NIF/NIE/CIF
-			if (persona.getNif() != null && !persona.getNif().isEmpty()) {
+			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
 				if (!NifHelper.isvalid(persona.getNif())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
@@ -74,6 +75,23 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 					.addNode("nif")
 					.addConstraintViolation();
 				}
+				break;
+			case FISICA_SENSE_NIF:
+				valid = validarNom(persona, context, "notificacio.form.valid.fisica.nom");
+				if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale))
+							.addNode("llinatge1")
+							.addConstraintViolation();
+				}
+//				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
+//					valid = false;
+//					context.buildConstraintViolationWithTemplate(
+//									MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto", null, locale))
+//							.addNode("nif")
+//							.addConstraintViolation();
+//				}
 				break;
 			case JURIDICA:
 				valid = validarNom(persona, context, "notificacio.form.valid.juridica.rao");

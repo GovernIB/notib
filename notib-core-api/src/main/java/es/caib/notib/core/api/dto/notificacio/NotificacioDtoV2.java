@@ -58,7 +58,7 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 	private DocumentDto document5;
 
 	private boolean hasEnviamentsPendents;
-
+	private boolean justificantCreat;
 
 	private String registreLlibreNom;
 	private String registreOficinaNom;
@@ -71,6 +71,18 @@ public class NotificacioDtoV2 extends AuditoriaDto {
 		if (organGestorNom != null && !organGestorNom.isEmpty())
 			return organGestor + " - " + organGestorNom;
 		return organGestor;
+	}
+
+	public List<NotificacioEnviamentDtoV2> getEnviamentsFinalitzats() {
+		List<NotificacioEnviamentDtoV2> enviamentsFinalitzats = new ArrayList<>();
+		if (enviaments != null && !enviaments.isEmpty()) {
+			for(NotificacioEnviamentDtoV2 enviament: enviaments) {
+				if (enviament.isNotificaEstatFinal()) {
+					enviamentsFinalitzats.add(enviament);
+				}
+			}
+		}
+		return enviamentsFinalitzats;
 	}
 
 	@Override

@@ -115,7 +115,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                         // Then
                         assertNull(env.getNotificacioErrorEvent());
 //                        assertNull(notificacioEntity.getNotificaErrorEvent());
-                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacioEntity,
                                 NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
                                 true);
                         assertTrue(events == null || events.size()== 0);
@@ -157,7 +157,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                         // Then
                         assertNull(env.getNotificacioErrorEvent());
 //                        assertNull(notificacioEntity.getNotificaErrorEvent());
-                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacioEntity,
                                 NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO,
                                 true);
                         assertTrue(events == null || events.size()== 0);
@@ -200,7 +200,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                             notificacioEntity.updateEventAfegir(event);
                             notificacioEventRepository.saveAndFlush(event);
                         }
-                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacioEntity,
                                 NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
                                 true);
                         assertEquals(events.size(), 10);
@@ -209,7 +209,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
                         notificacioEventHelper.addNotificaConsultaInfoEvent(notificacioEntity, enviament, "DarrerErrorAfegit", true);
 
                         // Then
-                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataAsc(notificacioEntity,
+                        events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacioEntity,
                                 NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,
                                 true);
 

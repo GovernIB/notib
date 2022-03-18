@@ -51,7 +51,7 @@ public abstract class AbstractNotificaHelper {
 	
 	private boolean modeTest;
 	
-	public abstract NotificacioEntity notificacioEnviar(Long notificacioId);
+	public abstract NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail);
 
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException;
 
@@ -102,6 +102,7 @@ public abstract class AbstractNotificaHelper {
 				notificaDatatNumSeguiment,
 				notificaDatatErrorDescripcio);
 		boolean estatsEnviamentsFinals = true;
+		boolean estatsEnviamentsNotificaFinals = true;
 		Set<NotificacioEnviamentEntity> enviaments = enviament.getNotificacio().getEnviaments();
 		for (NotificacioEnviamentEntity env: enviaments) {
 			if (env.getId().equals(enviament.getId())) {
@@ -109,12 +110,17 @@ public abstract class AbstractNotificaHelper {
 			}
 			if (!env.isNotificaEstatFinal()) {
 				estatsEnviamentsFinals = false;
+				if (!env.isPerEmail())
+					estatsEnviamentsNotificaFinals = false;
 				break;
 			}
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
-		if (estatsEnviamentsFinals) {
-			auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
+		if (estatsEnviamentsNotificaFinals) {
+			if (estatsEnviamentsFinals)
+				auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
+			else
+				auditNotificacioHelper.updateEstatAFinalitzadaAmbError(notificaEstat.name(), enviament.getNotificacio());
 			
 			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 			NotificacioEntity notificacio = enviament.getNotificacio();

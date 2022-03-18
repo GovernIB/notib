@@ -35,8 +35,7 @@ public class NotEnviamentDatabaseDto extends AuditoriaDto {
 	private String detalls;
 	private String codiNotibEnviament;
 	private String notificaDataCaducitat;
-//	private Date caducitat;
-	
+
 	//Info notificació
 	private boolean entregaPostalActiva;
 	private boolean entregaDehActiva;

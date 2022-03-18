@@ -167,8 +167,10 @@ public class NotificacioFormController extends BaseUserController {
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
 
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
-                                                                   RolEnumDto.valueOf(RolHelper.getRolActual(request))
+        return procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organId.equals("-") ? null : organId,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request))
         );
     }
 
@@ -235,7 +237,14 @@ public class NotificacioFormController extends BaseUserController {
         notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
         if (bindingResult.hasErrors()) {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+            ompliModelFormulari(
+                    request,
+                    procedimentActual,
+                    entitatActual,
+                    notificacioCommand,
+                    bindingResult,
+                    tipusDocumentEnumDto,
+                    model);
             for (ObjectError error: bindingResult.getAllErrors()) {
                 log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
             }
@@ -261,7 +270,14 @@ public class NotificacioFormController extends BaseUserController {
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+            ompliModelFormulari(
+                    request,
+                    procedimentActual,
+                    entitatActual,
+                    notificacioCommand,
+                    bindingResult,
+                    tipusDocumentEnumDto,
+                    model);
             model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
@@ -756,14 +772,17 @@ public class NotificacioFormController extends BaseUserController {
                         ServeiTipusEnumDto.class,
                         "es.caib.notib.core.api.dto.NotificaServeiTipusEnumDto."));
         Enum<?>[] interessatsTipus;
+        Enum<?>[] interessatsTipusDest;
         if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.ADMINISTRACIO};
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
 
         } else if (TipusEnviamentEnumDto.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA};
-
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         } else {
-            interessatsTipus = new Enum<?>[]{InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA};
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         }
 
         model.addAttribute("interessatTipus",
@@ -771,6 +790,11 @@ public class NotificacioFormController extends BaseUserController {
                         InteressatTipusEnumDto.class,
                         "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
                         interessatsTipus));
+        model.addAttribute("interessatTipusDest",
+                EnumHelper.getOrderedOptionsForEnum(
+                        InteressatTipusEnumDto.class,
+                        "es.caib.notib.core.api.dto.interessatTipusEnumDto.",
+                        interessatsTipusDest));
         model.addAttribute("entregaPostalTipus",
                 EnumHelper.getOptionsForEnum(
                         NotificaDomiciliConcretTipusEnumDto.class,
@@ -805,6 +829,7 @@ public class NotificacioFormController extends BaseUserController {
                 "es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum.");
         Collections.sort(tipusDocumentals);
         model.addAttribute("tipusDocumentals", tipusDocumentals);
+        model.addAttribute("documentTipus", EnumHelper.getOptionsForEnum(DocumentTipusEnumDto.class, "es.caib.notib.core.api.dto.DocumentTipusEnum."));
     }
 
 

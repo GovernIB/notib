@@ -235,6 +235,9 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private EntregaPostalEntity entregaPostal;
 
+	@Column(name = "per_email")
+	private boolean perEmail;
+
 	@Transient
 	private String csvUuid;
 
@@ -298,7 +301,17 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaIntentData = new Date();
 		this.notificaEstatDataActualitzacio = new Date();
 	}
-	
+
+	public void updateNotificaEnviadaEmail() {
+		this.notificaEstatData = new Date();
+		this.notificaEstat = NotificacioEnviamentEstatEnumDto.FINALITZADA;
+		this.notificaEstatFinal = true;
+		this.notificaError = false;
+		this.notificacioErrorEvent = null;
+		this.notificaIntentData = new Date();
+		this.notificaEstatDataActualitzacio = new Date();
+	}
+
 	public void updateNotificaInformacio(
 			Date notificaDataCreacio,
 			Date notificaDataDisposicio,
@@ -458,6 +471,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		Date data = new Date();
 		this.notificaIntentData = data;
 		this.sirConsultaData = data;
+
+		this.perEmail = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && // Interessar sense NIF
+				(this.destinataris == null || this.destinataris.isEmpty()) &&							// No té destinataris (els destinataris tenen NIF obligatòriament)
+				this.entregaPostal == null;																// No s'envia per entrega postal
 	}
 
 
@@ -513,6 +530,10 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.notificaIntentData = data;
 			built.sirConsultaData = data;
 			built.notificaReferencia = referencia;
+
+			built.perEmail = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && 	// Interessar sense NIF
+					(built.destinataris == null || built.destinataris.isEmpty()) &&								// No té destinataris (els destinataris tenen NIF obligatòriament)
+					built.entregaPostal == null;																// No s'envia per entrega postal
 		}
 
 		public BuilderV2 destinataris(List<PersonaEntity> destinataris) {

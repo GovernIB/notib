@@ -9,14 +9,25 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto.TipusActIn
 import es.caib.notib.core.api.dto.cie.CieDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.*;
+import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioInfoDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
+import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
+import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -27,7 +38,6 @@ import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditReposito
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,13 +54,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -132,6 +144,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ProcSerOrganRepository procedimentOrganRepository;
 	@Autowired
 	private EnviamentTableRepository enviamentTableRepository;
+	@Autowired
+	private DocumentHelper documentHelper;
+	@Autowired
+	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1047,7 +1063,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String nomDocumetnDefault = "document";
 			NotificacioEntity entity = notificacioRepository.findById(notificacioId);
 			DocumentEntity document = entity.getDocument();
-			return documentToArxiuDto(nomDocumetnDefault, document);
+			return documentHelper.documentToArxiuDto(nomDocumetnDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1063,53 +1079,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 			String nomDocumentDefault = "document";
 			DocumentEntity document = documentRepository.findOne(documentId);
 //			DocumentEntity document = documentRepository.findByNotificacioIdAndId(notificacioId, documentId);
-			return documentToArxiuDto(nomDocumentDefault, document);
+			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
-	}
-
-	private ArxiuDto documentToArxiuDto(String nomDocumetnDefault, DocumentEntity document) {
-		if (document == null)
-			return null;
-		if(document.getArxiuGestdocId() != null) {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					document.getArxiuGestdocId(),
-					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
-					output);
-			return new ArxiuDto(
-					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-					null,
-					output.toByteArray(),
-					output.size());
-		}else if(document.getUuid() != null){
-			DocumentContingut dc = pluginHelper.arxiuGetImprimible(document.getUuid(), true);
-			return new ArxiuDto(
-					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-					dc.getTipusMime(),
-					dc.getContingut(),
-					dc.getTamany());
-		}else if(document.getCsv() != null){
-			DocumentContingut dc = pluginHelper.arxiuGetImprimible(document.getCsv(), false);
-			return new ArxiuDto(
-					document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-					dc.getTipusMime(),
-					dc.getContingut(),
-					dc.getTamany());
-		}else if(document.getUrl() != null){
-			try {
-				byte[] contingut = downloadUsingStream(document.getUrl(), "document");
-				return new ArxiuDto(
-						document.getArxiuNom() != null ? document.getArxiuNom() : nomDocumetnDefault,
-						"PDF",
-						contingut,
-						contingut.length);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -1120,8 +1093,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(),PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
-			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
+			pluginHelper.gestioDocumentalGet(
+					enviament.getNotificaCertificacioArxiuId(),
+					PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
+					output);
+			return new ArxiuDto(
+					calcularNomArxiuCertificacio(enviament),
+					enviament.getNotificaCertificacioMime(),
+					output.toByteArray(),
+					output.size());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1327,7 +1307,24 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public void notificacioEnviar(Long notificacioId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			notificaHelper.notificacioEnviar(notificacioId);
+		NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
+
+			// 3 possibles casuístiques
+			// 1. Tots els enviaments a Notifica
+			if (enviamentsSenseNifNoEnviats.isEmpty()) {
+				notificaHelper.notificacioEnviar(notificacio.getId());
+			}
+			// 2. Tots els enviaments per email
+			else if (notificacio.getEnviamentsNoEnviats().size() <= enviamentsSenseNifNoEnviats.size()) {
+				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, true);
+			}
+			// 3. Una part dels enviaments a Notifica i l'altre via email
+			else {
+				notificaHelper.notificacioEnviar(notificacio.getId(), true);
+				// Fa falta enviar els restants per email
+				emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
+			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1526,6 +1523,47 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}		
 	}
 
+	@Transactional
+	@Override
+	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+					null,
+					notificacioId);
+			if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+				notificacioEnviar(notificacioId);
+				return true;
+			}
+		} catch (Exception e) {
+			logger.debug("Error reenviant notificació amb errors (notificacioId=" + notificacioId + ")", e);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+		return false;
+	}
+
+	@Transactional
+	@Override
+	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
+			Timer.Context timer = metricsHelper.iniciMetrica();
+			try {
+				NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(
+						null,
+						notificacioId);
+				if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+					auditNotificacioHelper.updateNotificacioReintentaFinalitzadaAmbErrors(notificacio);
+					return true;
+				}
+			} catch (Exception e) {
+				logger.debug("Error reactivant notificació amb errors (notificacioId=" + notificacioId + ")", e);
+			} finally {
+				metricsHelper.fiMetrica(timer);
+			}
+			return false;
+	}
+
 	@Override
 	public void refrescarEnviamentsExpirats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -1601,7 +1639,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-
 	private int getRegistreEnviamentsProcessarMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.processar.max");
 	}
@@ -1652,21 +1689,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 
-	private byte[] downloadUsingStream(String urlStr, String file) throws IOException{
-        URL url = new URL(urlStr);
-        BufferedInputStream bis = new BufferedInputStream(url.openStream());
-        FileOutputStream fis = new FileOutputStream(file);
-        byte[] buffer = new byte[1024];
-        int count=0;
-        while((count = bis.read(buffer,0,1024)) != -1)
-        {
-            fis.write(buffer, 0, count);
-        }
-        fis.close();
-        bis.close();
-        return buffer;
-    }
-	
 	public boolean validarIdCsv (String idCsv) {
 		return idCsv.length() >= getMidaMinIdCsv() ? Boolean.TRUE : Boolean.FALSE;
 	}

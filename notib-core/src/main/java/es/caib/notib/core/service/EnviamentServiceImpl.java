@@ -1165,7 +1165,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		Date data = not.getEstatDate() != null ? not.getEstatDate() :
 				(NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) ? not.getRegistreData()
 						: NotificacioEstatEnumDto.PENDENT.equals(not.getEstat()) ? not.getCreatedDate()
-						: NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) ? not.getNotificaEnviamentData()
+						: (NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(not.getEstat())) ? not.getNotificaEnviamentData()
 						: not.getCreatedDate());
 
 		transmissio.setDataEstat(data);

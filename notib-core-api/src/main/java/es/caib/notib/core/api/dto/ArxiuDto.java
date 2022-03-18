@@ -3,66 +3,35 @@
  */
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import java.io.Serializable;
 
 /**
  * Informació d'un arxiu.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ArxiuDto implements Serializable {
 
 	private String nom;
 	private String contentType;
 	private byte[] contingut;
 	private long tamany;
-	
-	
-	public ArxiuDto(
-			String nom,
-			String contentType,
-			byte[] contingut,
-			long tamany) {
-		
-		super();
-		this.nom = nom;
-		this.contentType = contentType;
-		this.contingut = contingut;
-		this.tamany = tamany;
-	}
-	
-	public ArxiuDto() {}
-	
-	
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public String getContentType() {
-		return contentType;
-	}
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-	public byte[] getContingut() {
-		return contingut;
-	}
+
 	public void setContingut(byte[] contingut) {
 		this.contingut = contingut;
 		if (contingut != null)
 			this.tamany = contingut.length;
 		else
 			this.tamany = 0;
-	}
-	public long getTamany() {
-		return tamany;
-	}
-	public void setTamany(long tamany) {
-		this.tamany = tamany;
 	}
 
 	public String getExtensio() {
@@ -72,11 +41,6 @@ public class ArxiuDto implements Serializable {
 		} else {
 			return null;
 		}
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

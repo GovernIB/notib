@@ -13,6 +13,8 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
  */
 public interface SchedulledService {
 
+	void restartSchedulledTasks();
+
 	/**
 	 * Mètode d'execució periòdica per a fer els enviaments pendents
 	 * a Notific@.

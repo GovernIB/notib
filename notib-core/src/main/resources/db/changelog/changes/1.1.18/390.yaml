@@ -1,4 +1,12 @@
 databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
   - changeSet:
       id: 1634114082437-1
       author: limit
@@ -8,4 +16,4 @@ databaseChangeLog:
             columns:
               - column:
                   name: codi_pare
-                  type: varchar(32)
+                  type: varchar(32 ${varcharUnit})

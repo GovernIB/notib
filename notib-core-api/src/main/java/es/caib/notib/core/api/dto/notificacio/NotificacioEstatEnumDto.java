@@ -23,7 +23,9 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	NOTIFICADA(14),
 	REBUTJADA(20),
 	ENVIAT_SIR(27),
-	ENVIANT(40);
+	ENVIANT(40),
+	ENVIADA_AMB_ERRORS(5),
+	FINALITZADA_AMB_ERRORS(6);
 	
 	private Integer numVal;
 	

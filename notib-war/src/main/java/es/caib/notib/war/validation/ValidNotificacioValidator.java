@@ -255,7 +255,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.interessat.tipus", new Object[] {envCount + 1}, locale);
 						context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
 					}
-					
+
 					// Incapacitat -> Destinataris no null
 					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat()) {
 						if (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty()) {
@@ -282,11 +282,20 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 						}
 						if (senseNif) {
-							valid = false;
-							context.buildConstraintViolationWithTemplate(
-									MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[] {envCount + 1}, locale))
-							.addNode("enviaments["+envCount+"].titular.nif")
-							.addConstraintViolation();
+							if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+								valid = false;
+								context.buildConstraintViolationWithTemplate(
+												MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[]{envCount + 1}, locale))
+										.addNode("enviaments[" + envCount + "].titular.nif")
+										.addConstraintViolation();
+							} else if(enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva()) {
+								// Email obligatori si no té destinataris amb nif o enviament postal
+								valid = false;
+								context.buildConstraintViolationWithTemplate(
+												MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.sense.nif.email", null, locale))
+										.addNode("enviaments[" + envCount + "].titular.email")
+										.addConstraintViolation();
+							}
 						}
 					}
 

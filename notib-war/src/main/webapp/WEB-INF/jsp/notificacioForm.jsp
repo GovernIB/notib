@@ -92,6 +92,7 @@
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/formEnviament.js"/>"></script>
+	<script src="<c:url value="/js/bootbox.all.min.js"/>"></script>
 <style type="text/css">
 .help-block {
 	font-size: x-small;
@@ -163,9 +164,9 @@
 	background-color: #696666;
 	width: 12%;
 }
-.datepicker table tr td.today, .datepicker table tr td.today:hover { 
+.datepicker table tr td.today, .datepicker table tr td.today:hover {
 	color: #000000;
-	background: #a4a4a4 !important; 
+	background: #a4a4a4 !important;
 	background-color: #a4a4a4 !important;
 }
 
@@ -234,6 +235,11 @@
 .warningClass {
 	border: 2px solid orange;
 }
+.alerta-sense-nif {
+	display: none;
+	margin-right: 15px;
+	margin-left: 15px;
+}
 </style>
 </head>
 <body>
@@ -300,7 +306,7 @@
 	var interessatsTipus = new Array();
 	var interessatTipusOptions = "";
 	var numDocuments = 1;
-	<c:forEach items="${interessatTipus}" var="it" varStatus="status">
+	<c:forEach items="${interessatTipusDest}" var="it" varStatus="status">
 	interessatTipusOptions = interessatTipusOptions + "<option value=${it.value}" + (${status.index == 0} ? " selected='selected'" : "") + "><spring:message code='${it.text}'/></option>";
 	</c:forEach>
 	var locale = "${requestLocale}";
@@ -540,11 +546,72 @@
 				});
 		});
 		
-		$("#form").submit(function(event) {
-			for (indexId = 0; indexId < 5; indexId++) {
-				activarCampsMetadades(indexId);
+		$("#saveForm").click(function(event) {
+
+			event.stopImmediatePropagation();
+			event.preventDefault();
+
+			let continuar = true;
+
+			// Comprovarem si s'està intentant enviar una comunicació o comunicació sense nif.
+			// En cas afirmatiu mostrarem un confirm
+			const isComunicacio = ${enviamentTipus == 'COMUNICACIO'};
+			const isNotificacio = ${enviamentTipus == 'NOTIFICACIO'};
+
+			const comunicacioSenseNifMsg = "<spring:message code="notificacio.form.comunicacio.sense.nif.confirm" />";
+			const notificacioSenseNifMsg = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm" />";
+			const comunicacioSenseNifNiPostalMsg = "<spring:message code="notificacio.form.comunicacio.sense.nif.ni.postal.confirm" />";
+			const notificacioSenseNifNiPostalMsg = "<spring:message code="notificacio.form.notificacio.sense.nif.ni.postal.confirm" />";
+
+			if (isComunicacio || isNotificacio) {
+
+				let enviamentsSenseNif = [];
+				$(".enviamentsForm").each(function (index) {
+					let tipus = $(".interessat", $(this)).val();
+					let numDestinataris = $(".destinatariForm", $(this)).size();
+					let entregaPostalActiva = viewModel.ambEntregaCIE && $(".entrega-cie-activa", $(this)).closest("input").attr('checked');
+					if (tipus == "FISICA_SENSE_NIF" && numDestinataris == 0 && !entregaPostalActiva) {
+						enviamentsSenseNif.push(index);
+					}
+				});
+
+				if (enviamentsSenseNif.length > 0) {
+					continuar = false;
+					let missatge = "";
+					if (isNotificacio) {
+						missatge = viewModel.ambEntregaCIE ? notificacioSenseNifNiPostalMsg : notificacioSenseNifMsg;
+					} else {
+						missatge = viewModel.ambEntregaCIE ? comunicacioSenseNifNiPostalMsg : comunicacioSenseNifMsg;
+					}
+					missatge += "<ul>";
+					enviamentsSenseNif.forEach(function(item) {
+						missatge += "<li>Enviament " + (item + 1) + " - Titular: " + $("#enviaments\\[" + item +"\\]\\.titular\\.nom").val() + " " + $("#enviaments\\[" + item +"\\]\\.titular\\.llinatge1").val() + "</li>";
+					});
+					missatge += "</ul>";
+
+					bootbox.confirm({
+						title: "Enviar?",
+						size: "large",
+						message: missatge,
+						locale: 'ca',
+						callback: function(result){
+							if (result) {
+								for (indexId = 0; indexId < 5; indexId++) {
+									activarCampsMetadades(indexId);
+								}
+								$("#form").submit();
+							}
+						}
+					})
+				}
 			}
-			return;
+
+			if (continuar) {
+				for (indexId = 0; indexId < 5; indexId++) {
+					activarCampsMetadades(indexId);
+				}
+				$("#form").submit();
+			}
 		});
 		
 		$(".docArxiu").on('change', function() {
@@ -842,9 +909,15 @@
 			var llinatge2 = closest.find('.llinatge2');
 			var enviamentTipus = $('input#enviamentTipus').val();
 			var nif = closest.find('.nif');
+			var docTipus = closest.find('.docTipus');
+			var nifAlert = closest.find('.alerta-sense-nif');
 			var nifLabel = nif.find('label');
 			var dir3codi = closest.find('.dir3Codi');
 			var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
+			var noNifLabelText = "<spring:message code='notificacio.form.camp.titular.sense.nif'/>";
+			<%--var email = closest.find('.email');--%>
+			<%--var emailLabel = email.find('label');--%>
+			<%--var emailLabelText = "<spring:message code='notificacio.form.camp.titular.email'/>";--%>
 			var incapacitat = closest.find('.incapacitat');
 			var raoSocial = closest.find('.rao');
 			var index = closest.find(".rowId input").val();
@@ -859,30 +932,48 @@
 				$(dir3codi).removeClass('hidden');
 				$(incapacitat).addClass('hidden');
 				$(raoSocial).addClass('hidden');
+				$(docTipus).addClass('hidden');
 				if(enviamentTipus == 'COMUNICACIO_SIR'){
 					$(nifLabel).text(nifLabelText);
 					$(nif).addClass('hidden');
 				}else{
 					$(nifLabel).text(nifLabelText + " *");
 					$(nif).removeClass('hidden');
-
 				}
+				// $(emailLabel).text(emailLabelText);
 			} else if ($(this).val() == 'FISICA') {
 				$(llinatge1).removeClass('hidden');
 				$(llinatge2).removeClass('hidden');
 				$(nif).removeClass('hidden');
 				$(nifLabel).text(nifLabelText + " *");
+				$(nifAlert).hide();
+				$(docTipus).addClass('hidden');
 				$(dir3codi).addClass('hidden');
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
+				// $(emailLabel).text(emailLabelText);
+			} else if ($(this).val() == 'FISICA_SENSE_NIF') {
+				$(llinatge1).removeClass('hidden');
+				$(llinatge2).removeClass('hidden');
+				$(nif).removeClass('hidden');
+				$(nifLabel).text(noNifLabelText);
+				$(nifAlert).show();
+				$(docTipus).removeClass('hidden');
+				$(dir3codi).addClass('hidden');
+				$(incapacitat).removeClass('hidden');
+				$(raoSocial).removeClass('hidden');
+				// $(emailLabel).text(emailLabelText + " *");
 			} else {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
 				$(nif).removeClass('hidden');
+				$(nifAlert).hide();
+				$(docTipus).addClass('hidden');
 				$(dir3codi).addClass('hidden');
 				$(nifLabel).text(nifLabelText + " *");
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
+				// $(emailLabel).text(emailLabelText);
 			}
 
 			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
@@ -1477,13 +1568,26 @@
 								
 								<div class="personaForm">
 									<div class='rowId'><input class='hidden' value="${j}"/></div>
-									<div>
+									<div style="clear: both">
+										<div class="alert alert-warning alerta-sense-nif">
+											<span class="fa fa-warning"></span>
+											<c:choose>
+												<c:when test="${enviamentTipus == 'COMUNICACIO'}"><spring:message code="notificacio.form.camp.titular.sense.nif.alerta.comunicacio" /></c:when>
+												<c:when test="${enviamentTipus == 'NOTIFICACIO'}"><spring:message code="notificacio.form.camp.titular.sense.nif.alerta.notificacio" /></c:when>
+											</c:choose>
+											<button type="button" class="close-alertes pull-right" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
+										</div>
 										<input type="hidden" name="enviaments[${j}].titular.id" value="${enviament.titular.id}"/>
 										<!--  TIPUS INTERESSAT -->
 										<div class="col-md-6 interessatTipus<c:if test="${enviamentTipus == 'COMUNICACIO_SIR'}"> hidden</c:if>">
 											<not:inputSelect name="enviaments[${j}].titular.interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="4" optionItems="${interessatTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
 										</div>
-										
+
+										<!-- TIPUS DOCUMENT -->
+										<div class="col-md-6 docTipus hidden">
+											<not:inputSelect name="enviaments[${j}].titular.documentTipus" textKey="notificacio.form.camp.titular.tipus.document" optionItems="${documentTipus}" optionValueAttribute="value" optionTextKeyAttribute="text" />
+										</div>
+
 										<!-- NIF -->
 										<div class="col-md-6 nif">
 											<not:inputText name="enviaments[${j}].titular.nif" generalClass="titularNif" textKey="notificacio.form.camp.titular.nif"/>
@@ -1494,7 +1598,7 @@
 											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" inputMaxLength="${nomSize}" showsize="true"/>
 										</div>
 										
-										<!-- PRIMER LLINATGE -->										
+										<!-- PRIMER LLINATGE -->
 										<div class="col-md-6 llinatge1">
 											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" inputMaxLength="${llinatge1Size}" showsize="true"/>
 										</div>
@@ -1506,7 +1610,7 @@
 										
 										<!-- EMAIL -->
 										<c:if test="${enviamentTipus != 'COMUNICACIO_SIR'}">
-										<div class="col-md-6">
+										<div class="col-md-6 email">
 											<not:inputText name="enviaments[${j}].titular.email" textKey="notificacio.form.camp.titular.email" inputMaxLength="${emailSize}" showsize="true"/>
 										</div>
 										</c:if>
@@ -2089,7 +2193,7 @@
 
 				</div>
 				<div class="btn-group">
-					<button type="submit" class="btn btn-success saveForm">
+					<button id="saveForm" type="button" class="btn btn-success saveForm">
 						<span class="fa fa-paper-plane"></span>
 						<spring:message code="comu.boto.enviar.notificacio" />
 					</button>

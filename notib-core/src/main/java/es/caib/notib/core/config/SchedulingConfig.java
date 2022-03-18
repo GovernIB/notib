@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -23,6 +24,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
+@EnableAsync
 @EnableScheduling
 public class SchedulingConfig implements SchedulingConfigurer {
 
@@ -36,11 +38,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 	private ConfigHelper configHelper;
 
     private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
-	
+    private ScheduledTaskRegistrar taskRegistrar;
+
+    public void restartSchedulledTasks() {
+        if (taskRegistrar != null) {
+            taskRegistrar.destroy();
+            taskRegistrar.afterPropertiesSet();
+        }
+
+    }
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
     	taskRegistrar.setScheduler(taskScheduler);
+        this.taskRegistrar = taskRegistrar;
 
         // 1. Enviament de notificacions pendents al registre y notific@
         ////////////////////////////////////////////////////////////////
@@ -222,7 +233,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
         
-        // 6. Consulta certificació notificacions DEH finalitzades
+        // 8. Consulta certificació notificacions DEH finalitzades
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -250,7 +261,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
         
-        // 7. Consulta certificació notificacions CIE finalitzades
+        // 9. Consulta certificació notificacions CIE finalitzades
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -278,7 +289,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
 
-        // 8. Eliminiar arxius temporals
+        // 10. Eliminiar arxius temporals
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {

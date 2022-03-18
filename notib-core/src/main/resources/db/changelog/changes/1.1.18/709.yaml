@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - property:
+      name: fals
+      value: 0
+      dbms: oracle
+  - property:
+      name: fals
+      value: false
+      dbms: postgresql
+  - changeSet:
+      id: 1638376153806-3
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_persona
+            columns:
+              - column:
+                  name: document_tipus
+                  type: varchar(32 ${varcharUnit})
+        - modifyDataType:
+            tableName: not_notificacio_audit
+            columnName: estat
+            newDataType: varchar(32 ${varcharUnit})
+        - addColumn:
+            tableName: not_notificacio_env
+            columns:
+              - column:
+                  name: per_email
+                  type: boolean
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: justificant_creat
+                  type: boolean
+        - update:
+            tableName: not_notificacio_env
+            columns:
+              - column:
+                  name: per_email
+                  value: ${fals}
+        - update:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: justificant_creat
+                  value: ${fals}

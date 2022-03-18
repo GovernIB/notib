@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="interessatTipus" type="{http://www.caib.es/notib/ws/notificacio}interessatTipusEnumDto" minOccurs="0"/>
  *         &lt;element name="llinatge1" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="llinatge2" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="documentTipus" type="{http://www.caib.es/notib/ws/notificacio}documentTipusEnumDto" minOccurs="0"/>
  *         &lt;element name="nif" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="nom" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="raoSocial" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -45,6 +46,7 @@ import javax.xml.bind.annotation.XmlType;
     "interessatTipus",
     "llinatge1",
     "llinatge2",
+    "documentTipus",
     "nif",
     "nom",
     "raoSocial",
@@ -58,6 +60,7 @@ public class Persona {
     protected InteressatTipusEnumDto interessatTipus;
     protected String llinatge1;
     protected String llinatge2;
+    protected DocumentTipusEnumDto documentTipus;
     protected String nif;
     protected String nom;
     protected String raoSocial;
@@ -197,6 +200,29 @@ public class Persona {
      */
     public void setLlinatge2(String value) {
         this.llinatge2 = value;
+    }
+
+    /**
+     * Gets the value of the documentTipus property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public DocumentTipusEnumDto getDocumentTipus() {
+        return documentTipus;
+    }
+    /**
+     * Sets the value of the documentTipus property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setDocumentTipus(DocumentTipusEnumDto value) {
+        this.documentTipus = value;
     }
 
     /**

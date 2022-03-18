@@ -79,6 +79,8 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
 	private	NotificacioEventTipusEnumDto noticaErrorEventTipus;
 
+	private boolean justificantCreat;
+
 	public boolean isNotificaError() {
 		return notificaErrorData != null;
 	}
