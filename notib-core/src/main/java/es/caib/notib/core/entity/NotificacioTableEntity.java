@@ -100,7 +100,6 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	@Column(name = "estat_date")
 	private Date estatDate;
 
-
 	@Column(name = "ENTITAT_NOM")
 	private String entitatNom;
 	@Column(name = "PROCEDIMENT_CODI")
@@ -126,6 +125,8 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private Date estatProcessatDate;
 	@Column(name = "ENVIADA_DATE")
 	private Date enviadaDate;
+	@Column(name = "referencia", length = 36)
+	protected String referencia;
 
 	@Setter
 	@Transient

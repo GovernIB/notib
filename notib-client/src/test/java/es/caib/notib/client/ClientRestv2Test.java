@@ -25,7 +25,8 @@ import static org.junit.Assert.*;
 public class ClientRestv2Test extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
+	private static final String URL = "http://localhost:8080/notib";
+//	private static final String URL = "http://localhost:8280/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 
@@ -55,7 +56,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 				URL,
 				USERNAME,
 				PASSWORD,
-				false);
+				true); //tomcat = true jboss = false/true
 	}
 
 	@Test

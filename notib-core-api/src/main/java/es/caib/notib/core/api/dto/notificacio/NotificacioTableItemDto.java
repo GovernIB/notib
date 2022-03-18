@@ -56,6 +56,8 @@ public class NotificacioTableItemDto {
 	protected int registreEnviamentIntent;
 
 	private Long documentId;
+	private Date envCerData;
+	private String referencia;
 
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;

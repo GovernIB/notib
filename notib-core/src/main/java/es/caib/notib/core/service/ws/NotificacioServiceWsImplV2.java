@@ -386,7 +386,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 								notificacio.getNumExpedient(),
 								TipusUsuariEnumDto.APLICACIO,
 								procedimentOrgan,
-								notificacio.getIdioma())
+								notificacio.getIdioma(),
+								UUID.randomUUID().toString())
 						.document(documentEntity)
 						.document2(document2Entity)
 						.document3(document3Entity)

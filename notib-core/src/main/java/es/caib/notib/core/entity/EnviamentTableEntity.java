@@ -159,7 +159,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	@Column(name = "NOTIFICA_ESTAT", length = 50)
 	protected NotificacioEnviamentEstatEnumDto notificaEstat;
 
-	@Column(name = "NOTIFICA_REF", length = 20)
+	@Column(name = "NOTIFICA_REF", length = 36)
 	protected String notificaReferencia;
 
 }

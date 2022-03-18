@@ -211,32 +211,18 @@ public class NotificacioEventHelper {
     }
 
 
-    public void addEnviamentRegistreOKEvent(NotificacioEntity notificacio,
-                                            String registreNum,
-                                            Date registreData,
-                                            NotificacioRegistreEstatEnumDto registreEstat,
-                                            Set<NotificacioEnviamentEntity> enviaments,
-                                            boolean totsAdministracio) {
+    public void addEnviamentRegistreOKEvent(NotificacioEntity notificacio, String registreNum, Date registreData, NotificacioRegistreEstatEnumDto registreEstat,
+                                            Set<NotificacioEnviamentEntity> enviaments, boolean totsAdministracio) {
 
         //Crea un nou event
-        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(
-                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-                notificacio);
-
-        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
+        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, notificacio);
+        if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
             eventBuilder.callbackInicialitza();
+        }
         NotificacioEventEntity event = eventBuilder.build();
-
 //        log.info(" >>> Canvi estat a REGISTRADA ");
         for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
-            auditEnviamentHelper.updateRegistreEnviament(
-                    notificacio,
-                    enviamentEntity,
-                    registreNum,
-                    registreData,
-                    registreEstat,
-                    totsAdministracio,
-                    event);
+            auditEnviamentHelper.updateRegistreEnviament(notificacio, enviamentEntity, registreNum, registreData, registreEstat, totsAdministracio, event);
         }
         updateNotificacio(notificacio, event);
         notificacioEventRepository.saveAndFlush(event);

@@ -484,7 +484,7 @@ public class PluginHelperTest {
 		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitat, 
 				notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, 
 				null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, 
-				null, procedimentOrgan, null).document(initDocumentEntity(notificacioId, isCsv)).build();
+				null, procedimentOrgan, null, UUID.randomUUID().toString()).document(initDocumentEntity(notificacioId, isCsv)).build();
 
 		notificacioGuardada.updateEstat(NotificacioEstatEnumDto.PENDENT);
 

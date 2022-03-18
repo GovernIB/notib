@@ -99,12 +99,8 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
-	public List<OficinaDto> getOficinesSIRUnitat(
-			Map<String, NodeDir3> arbreUnitats,
-			String codiDir3Organ) {
-		return pluginHelper.oficinesSIRUnitat(
-				codiDir3Organ,
-				arbreUnitats);
+	public List<OficinaDto> getOficinesSIRUnitat(Map<String, NodeDir3> arbreUnitats, String codiDir3Organ) {
+		return pluginHelper.oficinesSIRUnitat(codiDir3Organ, arbreUnitats);
 	}
 
 	@Cacheable(value = "unitatPerCodi", key="#codi")
@@ -117,8 +113,7 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
-	public List<OficinaDto> getOficinesSIREntitat(
-			String codiDir3Entitat) {
+	public List<OficinaDto> getOficinesSIREntitat(String codiDir3Entitat) {
 		return pluginHelper.oficinesSIREntitat(codiDir3Entitat);
 	}
 	

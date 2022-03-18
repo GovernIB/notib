@@ -37,6 +37,7 @@
             function changedCallback(e, data) {
 
                 $(".datatable-dades-carregant").css("display", "block");
+                $("#detall").css("display", "none");
                 let text = data.node.text.split('(');
                 text = text[text.length-1].split(')')[0];
                 $.ajax({
@@ -48,6 +49,7 @@
                     },
                     error: err => console.log(err),
                     complete: () => {
+                        $("#detall").css("display", "block");
                         $(".datatable-dades-carregant").css("display", "none");
                     }
                 });

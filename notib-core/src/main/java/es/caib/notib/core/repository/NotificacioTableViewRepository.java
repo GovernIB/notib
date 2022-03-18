@@ -27,6 +27,11 @@ import java.util.List;
 @Eager
 public interface NotificacioTableViewRepository extends JpaRepository<NotificacioTableEntity, Long> {
 
+	@Modifying
+	@Query("update NotificacioTableEntity nte set nte.referencia =" +
+			" (select net.referencia from NotificacioEntity net where net.id = nte.id) where nte.referencia is null")
+	void updateReferenciesNules();
+
 	/**
 	 * Consulta de la taula de remeses sense filtres per al rol usuari
 	 */
@@ -154,7 +159,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"				from NotificacioEnviamentEntity env" +
 			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%')))) " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
-			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null)")
+			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
+			"and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
 	Page<NotificacioTableEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -196,6 +202,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("isReferenciaNull") boolean isReferenciaNull,
+			@Param("referencia") String referencia,
 			Pageable paginacio);
 
 	/**
@@ -236,7 +244,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"				from NotificacioEnviamentEntity env" +
 			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%'))))" +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
-			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null)")
+			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
+			"and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
 	Page<NotificacioTableEntity> findAmbFiltre(
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
 			@Param("entitatId") Long entitatId,
@@ -269,6 +278,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("isReferenciaNull") boolean isReferenciaNull,
+			@Param("referencia") String referencia,
 			Pageable paginacio);
 
 	/**
@@ -313,7 +324,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id in (select env.notificacio.id"
 			+ "				from NotificacioEnviamentEntity env"
-			+ "				where env.notificaIdentificador = :identificador)))")
+			+ "				where env.notificaIdentificador = :identificador))) " +
+			" and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
 	Page<NotificacioTableEntity> findAmbFiltreAndProcedimentCodiNotib(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -349,6 +361,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("isIdentificadorNull") boolean isReferenciaNull,
+			@Param("identificador") String referencia,
 			Pageable paginacio);
 
 

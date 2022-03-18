@@ -93,6 +93,17 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 	       " order by ne.callbackData asc nulls first, data asc")
 	List<Long> findEventsAmbCallbackPendentIds(Pageable page);
 
+	@Query("  from NotificacioEventEntity ne " +
+			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+			" order by ne.callbackData asc nulls first, data asc")
+	List<NotificacioEventEntity> findEventsAmbCallbackPendent();
+
+	@Query(" select ne.id from NotificacioEventEntity ne " +
+			" where ne.callbackEstat = es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
+			"and ne.notificacio.id = :notificacioId " +
+			"order by ne.callbackData asc nulls first, data asc")
+	List<Long> findEventsAmbCallbackPendentByNotificacioId(@Param("notificacioId") Long notificacioId);
+
 	@Query("select ne " + 
 			   "  from NotificacioEventEntity ne " +
 		       " where ne.id = ( " +

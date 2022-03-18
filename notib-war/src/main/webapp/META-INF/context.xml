@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Default set of monitored resources -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <Resource	name="jdbc/NotibDS" auth="Container" type="javax.sql.DataSource"
+                maxActive="10" maxIdle="5" maxWait="5000"
+                driverClassName="oracle.jdbc.driver.OracleDriver"
+                username="notib" password="notib"
+                url="jdbc:oracle:thin:@localhost:49161:xe"/>
+<!--    url="jdbc:oracle:thin:@10.35.3.242:1521:orcl"/>-->
+    <!--                 username="notib_test" password="notib_test"-->
+    <Resource	name="jdbc/UsuarisDS" auth="Container" type="javax.sql.DataSource"
+                 maxActive="10" maxIdle="5" maxWait="5000"
+                 username="seycon" password="seycon" driverClassName="oracle.jdbc.driver.OracleDriver"
+                url="jdbc:oracle:thin:@10.35.3.242:1521:orcl"/>
+<!--    url="jdbc:oracle:thin:@localhost:49161:xe"/>-->
+<!--    <Resource	name="mail/NotibSession" auth="Container"-->
+<!--                 type="javax.mail.Session"-->
+<!--                 mail.smtp.host="mail.limit.es"/>-->
+
+    <!--    <Resource name="mail/NotibSession" auth="Container"-->
+    <Resource name="mail/LimitSession" auth="Container"
+              type="javax.mail.Session"
+              username="proves_limit@limit.es"
+              password="R8lmu-98TRN"
+              mail.debug="false"
+              mail.transport.protocol="smtp"
+              mail.smtp.host= "correu.limit.es"
+              mail.smtp.auth= "false"
+              mail.smtp.port= "25"
+    />
+    <Realm		className="org.apache.catalina.realm.JDBCRealm"
+                  connectionName="seycon" connectionPassword="seycon"
+                  connectionURL="jdbc:oracle:thin:@10.35.3.242:1521:orcl"
+                  driverName="oracle.jdbc.driver.OracleDriver"
+                  userTable="sc_wl_usuari" userRoleTable="sc_wl_usugru_tomcat"
+                  userNameCol="usu_codi" userCredCol="usu_pass" roleNameCol="ugr_codgru"/>
+<!--                  connectionURL="jdbc:oracle:thin:@localhost:49161:xe"-->
+</Context>

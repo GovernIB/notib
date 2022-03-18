@@ -374,6 +374,7 @@
             'confirm-reintentar-sir': "<spring:message code="enviament.list.user.reactivar.sir.misatge.avis"/>",
             'confirm-update-estat': "<spring:message code="enviament.list.user.actualitzar.estat.misatge.avis"/>",
             'confirm-reactivar-callback': "<spring:message code="enviament.list.user.reactivar.callback.misatge.avis"/>",
+            'confirm-enviar-callback': "<spring:message code="enviament.list.user.enviar.callback.misatge.avis"/>",
         };
         initEvents($('#notificacio'), 'notificacio', eventMessages)
     });
@@ -561,6 +562,9 @@
                     suggestTextAddicional="nif"
                     inline="true"/>
         </div>
+        <div class="col-md-2">
+            <not:inputText name="referencia" inline="true" placeholderKey="notificacio.list.filtre.camp.referencia"/>
+        </div>
 
         <div class="col-md-2 pull-right form-buttons"  style="text-align: right;">
             <button id="nomesAmbErrorsBtn" title="<spring:message code="notificacio.list.filtre.camp.nomesAmbErrors"/>" class="btn btn-default <c:if test="${nomesAmbErrors}">active</c:if>" data-toggle="button"><span class="fa fa-warning"></span></button>
@@ -593,6 +597,7 @@
                             <li><a style="cursor: pointer;" id="reactivarConsulta"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.notifica"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarSir"><spring:message code="notificacio.list.accio.massiva.reactivar.consultes.sir"/></a></li>
                             <li><a style="cursor: pointer;" id="reactivarCallback"><spring:message code="notificacio.list.accio.massiva.reactivar.callbacks"/></a></li>
+                            <li><a style="cursor: pointer;" id="enviarCallback"><spring:message code="notificacio.list.accio.massiva.enviar.callbacks"/></a></li>
                         </c:if>
 					</ul>
 				</div>
@@ -724,23 +729,31 @@
         <th data-col-name="permisProcessar" data-visible="false">
         <th data-col-name="documentId" data-visible="false" style="visibility: hidden">
 <%--        <th data-col-name="enviamentId" data-visible="false" style="visibility: hidden">--%>
+        <th data-col-name="envCerData" data-visible="false" style="visibility: hidden">
         <th data-col-name="id" data-orderable="false" data-disable-events="true" data-template="#cellAccionsTemplate" width="60px" style="z-index:99999;">
             <script id="cellAccionsTemplate" type="text/x-jsrender">
                 <div class="dropdown">
                     <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li><a href="<c:url value="/notificacio/{{:id}}/info"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.detalls"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/documentDescarregar/{{:documentId}}"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
-                        <li><a href="<c:url value="/notificacio/{{:id}}/enviament/certificacionsDescarregar"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>
+                        <li><a href="<c:url value="/notificacio/{{:id}}/documentDescarregar/{{:documentId}}"/>" data-toggle="modal" data-height="300px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="notificacio.info.document.descarregar"/></a></li>
+                        {^{if envCerData != null }}
+                            <li><a href="<c:url value="/notificacio/{{:id}}/enviament/certificacionsDescarregar"/>" data-toggle="modal" data-height="300px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="enviament.info.notifica.certificacio.num.descarregar"/></a></li>
+                        {{/if}}
                     {^{if (~hlpIsAdministradorEntitat() && estat == 'FINALITZADA') || permisProcessar }}
                         <li><a href="<c:url value="/notificacio/{{:id}}/processar"/>" data-toggle="modal"><span class="fa fa-check-circle-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.processar"/></a></li>
                     {{/if}}
                     {{if !enviant}}
-                        {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}
-                            <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
-                            <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-                        {{/if}}
+                        <li><a href="<c:url value="/notificacio/{{:id}}/justificant"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-download"></span>&nbsp; <spring:message code="comu.boto.justificant"/></a></li>
+<%--                        {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan()) && hasEnviamentsPendentsRegistre }}--%>
+<%--                            <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>--%>
+<%--                            <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>--%>
+<%--                        {{/if}}--%>
+                    {{/if}}
+<%--                        MIRAR EL ^ QUE FA --%>
+                    {^{if (~hlpIsUsuari() || ~hlpIsAdministradorEntitat() || ~hlpIsAdministradorOrgan())  && (enviant || estat == 'PENDENT')}}
+                        <li><a href="<c:url value="/notificacio/{{:id}}/edit"/>"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.editar"/></a></li>
+                        <li><a href="<c:url value="/notificacio/{{:id}}/delete"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
                     {{/if}}
                     </ul>
                 </div>

@@ -77,8 +77,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						
 			//Validar si és comunicació
 			// TODO: Aquesta validació no té molt de sentit ara que hem dividit els formularis
-			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO ||
-					notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR) {
+			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO || notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR) {
 				if (notificacio.getEnviaments() != null) {
 					for (EnviamentCommand enviament : notificacio.getEnviaments()) {
 						if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
@@ -250,7 +249,13 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
 				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
-					
+
+					if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+						valid = false;
+						String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.interessat.tipus", new Object[] {envCount + 1}, locale);
+						context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
+					}
+
 					// Incapacitat -> Destinataris no null
 					if (enviament.getTitular() != null && enviament.getTitular().isIncapacitat()) {
 						if (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty()) {
@@ -293,7 +298,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 						}
 					}
-					
+
 					if (enviament.getEntregaDeh() != null && enviament.getEntregaDeh().isActiva()) {
 						if (enviament.getTitular() == null || enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
 							valid = false;
@@ -301,10 +306,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 									MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif", null, locale))
 							.addNode("enviaments["+envCount+"].titular.nif")
 							.addConstraintViolation();
-//							context.buildConstraintViolationWithTemplate(
-//									MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif"))
-//							.addNode("enviaments["+envCount+"].entregaDeh.emisorNif")
-//							.addConstraintViolation();
 						}
 					}
 					

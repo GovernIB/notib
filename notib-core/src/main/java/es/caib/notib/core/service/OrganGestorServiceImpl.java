@@ -1058,32 +1058,22 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<OficinaDto> getOficinesSIR(
-			Long entitatId,
-			String dir3codi,
-			boolean isFiltre) {
+	public List<OficinaDto> getOficinesSIR(Long entitatId, String dir3codi, boolean isFiltre) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
 			try {
 				if (!isFiltre) {
 					Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-					oficines = cacheHelper.getOficinesSIRUnitat(
-							arbreUnitats,
-							dir3codi);
-				} else {
-					oficines = cacheHelper.getOficinesSIREntitat(dir3codi);
+					oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, dir3codi);
+					return oficines;
 				}
-	 		} catch (Exception e) {
+				oficines = cacheHelper.getOficinesSIREntitat(dir3codi);
+			} catch (Exception e) {
 	 			String errorMessage = "No s'han pogut recuperar les oficines SIR [dir3codi=" + dir3codi + "]";
-				logger.error(
-						errorMessage, 
-						e.getMessage());
+				logger.error(errorMessage, e.getMessage());
 			}
 			return oficines;
 		} finally {

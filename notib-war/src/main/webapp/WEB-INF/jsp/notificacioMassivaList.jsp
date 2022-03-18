@@ -72,6 +72,8 @@
 			nomesAmbErrors = !$(this).hasClass('active');
 			$('#nomesAmbErrors').val(nomesAmbErrors);
 		});
+
+		// $(".botons").css("{display:flex; justify-content:flex-end; padding-top:8px;}");
 	});
 </script>
 </head>
@@ -115,6 +117,13 @@
 			</div>
 		</div>
 	</form:form>
+	<script id="botonsTemplate" type="text/x-jsrender">
+	 	<div class="text-right" style="padding-top:8px;">
+	 		<span class="estat_info">[<span class="fa fa-check"></span> <spring:message code="notificacio.massiva.llegenda.ok" />]</span>
+	 		<span class="estat_info">[<span class="fa fa-times"></span> <spring:message code="notificacio.massiva.llegenda.error" />]</span>
+			<span class="estat_info">[<span class="fa fa-ban"></span> <spring:message code="notificacio.massiva.llegenda.cancel" />]</span>
+	 	</div>
+	 </script>
 	<table
 		id="notificacio"
 		data-toggle="datatable"
@@ -126,6 +135,7 @@
 		style="width:100%"
 		data-filter="#filtre"
 		data-save-state="true"
+		data-botons-template="#botonsTemplate"
 		data-mantenir-paginacio="true">
 		<thead>
 			<tr>
@@ -156,6 +166,7 @@
 				<th data-col-name="notificacionsValidades" data-visible="false"></th>
 				<th data-col-name="notificacionsProcessades" data-visible="false"></th>
 				<th data-col-name="notificacionsProcessadesAmbError" data-visible="false"></th>
+				<th data-col-name="notificacionsCancelades" data-visible="false"></th>
 				<th data-col-name="estatValidacio" data-template="#cellEstatValidacioTemplate" width="200px">
 					<spring:message code="notificacio.massiva.list.columna.estat.validacio"/>
 					<script id="cellEstatValidacioTemplate" type="text/x-jsrender">
@@ -221,6 +232,18 @@
 								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
 								<span class="estat_info">[<span class="fa fa-times"></span> {{:notificacionsValidades}}]</span>
 							</span>
+						{{else estatProces == 'CANCELADA'}}
+							<span class="label label-warning">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsProcessades}}]</span>
+								<span class="estat_info">[<span class="fa fa-ban"></span> {{:notificacionsCancelades}}]</span>
+							</span>
+						{{else estatProces == 'FINALITZAT_PARCIAL'}}
+							<span class="label label-info">
+								{{:~eval('notificacioMassivaEstats["' + estatProces + '"]')}}
+								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsProcessades}} / <span class="fa fa-times"></span> {{:notificacionsProcessadesAmbError}}]</span>
+								<span class="estat_info">[<span class="fa fa-ban"></span> {{:notificacionsCancelades}}]</span>
+							</span>
 						{{/if}}
 					</script>
 				</th>
@@ -238,6 +261,9 @@
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/posposar"/>"><span class="fa fa-clock-o"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.posposar"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/reactivar"/>"><span class="fa fa-bolt"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.reactivar"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/remeses"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.remeses"/></a></li>
+								{{if estatProces == 'PENDENT' || estatProces == 'EN_PROCES' || estatProces == 'EN_PROCES_AMB_ERRORS'}}
+									<li><a href="<c:url value="/notificacio/massiva/{{:id}}/cancelar"/>"><span class="fa fa-ban"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.cancelar"/></a></li>
+								{{/if}}
 							</ul>
 						</div>
 					</script>

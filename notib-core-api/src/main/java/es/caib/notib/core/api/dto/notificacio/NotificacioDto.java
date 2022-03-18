@@ -23,6 +23,7 @@ import java.util.List;
 public class NotificacioDto extends AuditoriaDto {
 
 	private Long id;
+	private String referencia;
 	private String cifEntitat;
 	private NotificacioComunicacioTipusEnumDto comunicacioTipus;
 	private NotificaEnviamentTipusEnumDto enviamentTipus;

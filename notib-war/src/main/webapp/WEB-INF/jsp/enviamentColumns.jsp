@@ -84,6 +84,9 @@ input[type='checkbox']:checked{
 				<div class="col-md-2">
 					<not:inputCheckbox name="titularNif" textKey="enviament.list.niftitular" labelSize="10"/>
 				</div>
+				<div class="col-md-2">
+					<not:inputCheckbox name="referenciaNotificacio" textKey="enviament.list.identificador.notificacio" labelSize="10"/>
+				</div>
 			</div>
 			<div class="row col-xs-6">
 				<div class="col-md-3">

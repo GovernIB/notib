@@ -9,6 +9,7 @@ import es.caib.notib.core.entity.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -26,6 +27,14 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 	List<NotificacioEnviamentEntity> findByNotificacioId(Long notificacioId);
 	List<NotificacioEnviamentEntity> findByIdIn(Collection<Long> ids);
+
+	@Query("select id from NotificacioEnviamentEntity where notificaReferencia is null")
+	List<Long> findIdsSenseReferencia();
+
+	@Modifying
+	@Query("update NotificacioEnviamentEntity net set net.notificaReferencia = :referencia where net.id = :id")
+	void updateReferencia(@Param("id") Long id, @Param("referencia") String referencia);
+
 
 	@Query("select env.id from NotificacioEnviamentEntity env where env.notificacio.id in (:notificacioIdList)")
 	List<Long> findIdByNotificacioIdIn(@Param("notificacioIdList")  Collection<Long> notificacioIdList);

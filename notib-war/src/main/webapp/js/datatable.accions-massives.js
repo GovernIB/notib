@@ -157,6 +157,14 @@ function initEvents($table, url_prefix, eventMessages) {
             return false;
         });
 
+        $('#enviarCallback').on('click', function() {
+            if(confirm(eventMessages['confirm-enviar-callback'])){
+                location.href =  url_prefix + "/enviar/callback";
+                setTimeout(() => $table.DataTable().rows().deselect(), 100);
+            }
+            return false;
+        });
+
         $("#exportarODS").on("click", () => {
             // location.href = "notificacio/export/ODS";
             location.href = url_prefix + "/export/ODS";

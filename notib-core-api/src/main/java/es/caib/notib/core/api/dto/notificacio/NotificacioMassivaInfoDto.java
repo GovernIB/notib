@@ -39,5 +39,7 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
         private String tipoDocumental;
         private String pdfFirmado;
         private String errores;
+        private boolean cancelada;
+        private String estat;
     }
 }

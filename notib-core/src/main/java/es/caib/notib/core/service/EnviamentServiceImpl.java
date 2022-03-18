@@ -22,6 +22,7 @@ import es.caib.notib.core.repository.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class EnviamentServiceImpl implements EnviamentService {
 
@@ -95,6 +97,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ProcSerHelper procedimentHelper;
+	@Autowired
+	private AplicacioRepository aplicacioRepository;
+	@Autowired
+	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -299,15 +309,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de destinatari donat el seu id (" +
-					"destinatariId=" + enviamentId + ")");
+			logger.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					false,
-					false,
-					false);
+			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			return enviamentToDto(enviament);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -330,16 +335,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
 			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(
-					entitatId,
-					false,
-					isUsuariEntitat,
-					false);
-
+			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
 			Page<EnviamentTableEntity> pageEnviaments = null;
-			
 			logger.info("Consulta de taula d'enviaments ...");
-
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"enviamentDataProgramada"});
 			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"notificaIdentificador"});
@@ -359,6 +357,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("csvUuid", new String[] {"csv_uuid"});
 			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
 			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
+			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			NotificacioEnviamentFiltre filtreFields = getFiltre(entitatId, filtre);
@@ -451,6 +450,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.nomesSenseErrors,
 						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
 						filtreFields.hasZeronotificaEnviamentIntent.getField(),
+						filtreFields.referenciaNotificacio.isNull(),
+						filtreFields.referenciaNotificacio.getField(),
 						pageable);
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
@@ -511,6 +512,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.nomesSenseErrors,
 						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
 						filtreFields.hasZeronotificaEnviamentIntent.getField(),
+						filtreFields.referenciaNotificacio.isNull(),
+						filtreFields.referenciaNotificacio.getField(),
 						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
@@ -572,6 +575,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.nomesSenseErrors,
 						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
 						filtreFields.hasZeronotificaEnviamentIntent.getField(),
+						filtreFields.referenciaNotificacio.isNull(),
+						filtreFields.referenciaNotificacio.getField(),
 						pageable);
 				logger.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
@@ -688,6 +693,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				.nomesSenseErrors(nomesSenseErrors)
 				.nomesAmbErrors(nomesAmbErrors)
 				.hasZeronotificaEnviamentIntent(new FiltreField<Boolean>(hasZeronotificaEnviamentIntent))
+				.referenciaNotificacio(new StringField(filtreDto.getReferenciaNotificacio()))
 				.build();
 	}
 	@Builder
@@ -730,6 +736,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		private boolean nomesSenseErrors = false;
 		private boolean nomesAmbErrors = false;
 		private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
+		private StringField referenciaNotificacio;
 
 //		private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
 //		private FiltreField<Date> dataInici;
@@ -918,13 +925,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Transactional
 	@Override
-	public void columnesUpdate(
-			Long entitatId, 
-			ColumnesDto columnes) {
+	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			ColumnesEntity columnesEntity = columnesRepository.findOne(columnes.getId());
-	
 			columnesEntity.update(
 					columnes.isDataEnviament(), 
 					columnes.isDataProgramada(), 
@@ -947,7 +952,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					columnes.isCodiNotibEnviament(), 
 					columnes.isNumCertificacio(),
 					columnes.isCsvUuid(), 
-					columnes.isEstat());
+					columnes.isEstat(),
+					columnes.isReferenciaNotificacio());
 	
 			columnesRepository.saveAndFlush(columnesEntity);
 		} finally {
@@ -957,21 +963,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		
 	@Transactional(readOnly = true)	
 	@Override
-	public ColumnesDto getColumnesUsuari(
-			Long entitatId,
-			UsuariDto usuariDto) {
+	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuariDto) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			UsuariEntity usuari = usuariRepository.findByCodi(usuariDto.getCodi());
-			
-			ColumnesEntity columnes = columnesRepository.findByEntitatAndUser(
-					entitat, 
-					usuari);
-			
-			return conversioTipusHelper.convertir(
-					columnes, 
-					ColumnesDto.class);
+			ColumnesEntity columnes = columnesRepository.findByEntitatAndUser(entitat, usuari);
+			return conversioTipusHelper.convertir(columnes, ColumnesDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1014,12 +1013,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 				e.printStackTrace();
 
 				// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
-				callbackHelper.marcarEventNoProcessable(eventId,
-						e.getMessage(),
-						ExceptionUtils.getStackTrace(e));
+				callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
 				return false;
 			}
-
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1051,23 +1047,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 	}
 
-	private NotificacioEnviamentDto enviamentToDto(
-			NotificacioEnviamentEntity enviament) {
-//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
-		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(
-				enviament,
-				NotificacioEnviamentDto.class);
+	private NotificacioEnviamentDto enviamentToDto(NotificacioEnviamentEntity enviament) {
+
+		//		enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacioId()));
+		NotificacioEnviamentDto enviamentDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamentDto.class);
 		enviamentDto.setRegistreNumeroFormatat(enviament.getRegistreNumeroFormatat());
 		enviamentDto.setRegistreData(enviament.getRegistreData());
-		destinatariCalcularCampsAddicionals(
-				enviament,
-				enviamentDto);
+		destinatariCalcularCampsAddicionals(enviament, enviamentDto);
 		return enviamentDto;
 	}
 
-	private void destinatariCalcularCampsAddicionals(
-			NotificacioEnviamentEntity enviament,
-			NotificacioEnviamentDto enviamentDto) {
+	private void destinatariCalcularCampsAddicionals(NotificacioEnviamentEntity enviament, NotificacioEnviamentDto enviamentDto) {
+
 		if (enviament.isNotificaError()) {
 			NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
 			if (event != null) {
@@ -1075,12 +1066,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				enviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
 			}
 		}
-		enviamentDto.setNotificaCertificacioArxiuNom(
-				calcularNomArxiuCertificacio(enviament));
+		enviamentDto.setNotificaCertificacioArxiuNom(calcularNomArxiuCertificacio(enviament));
 	}
 
-	private String calcularNomArxiuCertificacio(
-			NotificacioEnviamentEntity enviament) {
+	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 	
@@ -1246,37 +1235,77 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Transactional
 	@Override
 	public void actualitzarEstat(Long enviamentId) {
+
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		auditEnviamentHelper.resetConsultaNotifica(enviament);
 		auditEnviamentHelper.resetConsultaSir(enviament);
-
 		// si l'enviament esta pendent de refrescar estat a notifica
-		if (enviament.isPendentRefrescarEstatNotifica())
+		if (enviament.isPendentRefrescarEstatNotifica()) {
 			notificacioService.enviamentRefrescarEstat(enviamentId);
-
+		}
 		// si l'enviament esta pendent de refrescar l'estat enviat SIR
-		if (enviament.isPendentRefrescarEstatRegistre())
+		if (enviament.isPendentRefrescarEstatRegistre()) {
 			notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+		}
 	}
 
 	@Transactional
 	@Override
 	public void activarCallback(Long enviamentId) {
+
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId,
-				CallbackEstatEnumDto.PENDENT);
-		if (
-				enviament.getNotificacio().isTipusUsuariAplicacio() &&
-				numEventsCallbackPendent == 0
-		) {
+		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
+		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
 			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
 			notificacioEventHelper.addCallbackActivarEvent(enviament);
-		} else {
+			return;
+		}
+		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
+					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+	}
+
+	@Transactional
+	@Override
+	public void enviarCallback(Long enviamentId) throws Exception {
+
+		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
+		if (!enviament.getNotificacio().isTipusUsuariAplicacio() || numEventsCallbackPendent == 0) {
 			logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
 					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+			return;
+		}
+		logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", enviamentId));
+		UsuariEntity usuari = enviament.getCreatedBy();
+		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
+		callbackHelper.notificaCanvi(enviament, aplicacio.getCallbackUrl());
+		NotificacioEntity not = enviament.getNotificacio();
+		//Marcar com a processada si la notificació s'ha fet des de una aplicació
+		if (not.getTipusUsuari() == TipusUsuariEnumDto.APLICACIO && callbackHelper.isAllEnviamentsEstatFinal(not)) {
+			log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
+			auditNotificacioHelper.updateNotificacioProcessada(not, "Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
+		}
 
+		int maxPendents = configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
+		Pageable page = new PageRequest(0, maxPendents);
+		List<NotificacioEventEntity> events = notificacioEventRepository.findEventsAmbCallbackPendent();
+		for (NotificacioEventEntity event : events) {
+			int intents = event.getCallbackIntents() + 1;
+			event.updateCallbackClient(CallbackEstatEnumDto.NOTIFICAT,  intents, null, callbackHelper.getIntentsPeriodeProperty());
+			auditNotificacioHelper.updateLastCallbackError(not, false);
+			IntegracioInfo info = new IntegracioInfo(
+					IntegracioHelper.INTCODI_CLIENT,
+					String.format("Enviament d'avís de canvi d'estat (%s)", aplicacio.getCallbackUrl()),
+					IntegracioAccioTipusEnumDto.ENVIAMENT,
+					new AccioParam("Identificador de l'event", String.valueOf(event.getId())),
+					new AccioParam("Identificador de la notificacio", String.valueOf(not.getId())),
+					new AccioParam("Callback", aplicacio.getCallbackUrl())
+			);
+			integracioHelper.addAccioOk(info);
+			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", event.getId(), not.getId()));
 		}
 	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 

@@ -24,6 +24,16 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEntity, Long> {
+
+	@Query("select id from EnviamentTableEntity where notificaReferencia is null")
+	List<Long> findIdsSenseReferencia();
+
+	@Modifying
+	@Query("update EnviamentTableEntity nte set nte.notificaReferencia =" +
+			" (select net.notificaReferencia from NotificacioEnviamentEntity net " +
+			"	where net.id = nte.id) where nte.notificaReferencia is null")
+	void updateReferenciesNules();
+
 	@Query( "select" +
 			"	nenv " +
 			"from" +
@@ -69,6 +79,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	(:hasZeronotificaEnviamentIntent = true and nenv.registreEnviamentIntent = 0) or " +
 			"	(:hasZeronotificaEnviamentIntent = false and nenv.registreEnviamentIntent > 0) " +
 			") " +
+			"and (:isReferenciaNotificacioNull = true or lower(nenv.notificacio.referencia) like '%'||lower(:referenciaNotificacio)||'%') " +
 			"and (:nomesSenseErrors = false or nenv.hasErrors = true) " +
 			"and (:nomesAmbErrors = false or nenv.hasErrors = false)"
 	)
@@ -137,6 +148,8 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("isReferenciaNotificacioNull") boolean isReferenciaNotificacioNull,
+			@Param("referenciaNotificacio") String referenciaNotificacio,
 			Pageable pageable);
 
 	@Query( "from" +
@@ -173,6 +186,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	(:hasZeronotificaEnviamentIntent = true and nenv.registreEnviamentIntent = 0) or " +
 			"	(:hasZeronotificaEnviamentIntent = false and nenv.registreEnviamentIntent > 0) " +
 			") " +
+			"and (:isReferenciaNotificacioNull = true or lower(nenv.notificacio.referencia) like '%'||lower(:referenciaNotificacio)||'%') " +
 			"and (:nomesSenseErrors = false or nenv.hasErrors = true) " +
 			"and (:nomesAmbErrors = false or nenv.hasErrors = false)"
 	)
@@ -233,6 +247,8 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("isReferenciaNotificacioNull") boolean isReferenciaNotificacioNull,
+			@Param("referenciaNotificacio") String referenciaNotificacio,
 			@Param("organs") List<String> organs,
 			Pageable pageable);
 
@@ -270,6 +286,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	(:hasZeronotificaEnviamentIntent = false and nenv.registreEnviamentIntent > 0) " +
 			") " +
 			"and (:nomesSenseErrors = false or nenv.hasErrors = true) " +
+			"and (:isReferenciaNotificacioNull = true or lower(nenv.notificacio.referencia) like '%'||lower(:referenciaNotificacio)||'%') " +
 			"and (:nomesAmbErrors = false or nenv.hasErrors = false)"
 	)
 	Page<EnviamentTableEntity> find4EntitatAdminRole(
@@ -329,6 +346,8 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+			@Param("isReferenciaNotificacioNull") boolean isReferenciaNotificacioNull,
+			@Param("referenciaNotificacio") String referenciaNotificacio,
 			Pageable pageable);
 	
 	@Modifying
@@ -346,4 +365,12 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 	void updateProcediment(@Param("procedimentComu") boolean procedimentComu,
 						   @Param("procedimentRequirePermission") boolean procedimentRequireDirectPermission,
 						   @Param("procedimentCodi") String procedimentCodi);
+
+	@Modifying
+	@Query("update EnviamentTableEntity nt " +
+			"set " +
+			" nt.notificaReferencia = :notificaReferencia " +
+			"where nt.id = :enviamentId ")
+	void updateNotificaReferencia(@Param("notificaReferencia") String notificaReferencia,
+								  @Param("enviamentId") Long procedimentCodi);
 }

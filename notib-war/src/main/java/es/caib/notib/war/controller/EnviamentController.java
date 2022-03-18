@@ -119,22 +119,18 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request,
-			Model model) throws ParseException {
+	public DatatablesResponse datatable(HttpServletRequest request, Model model) throws ParseException {
+
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
-
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
@@ -149,62 +145,31 @@ public class EnviamentController extends TableAccionsMassivesController {
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		}catch(SecurityException e) {
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request,
-							"enviament.controller.entitat.cap.assignada"));
+			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
 		}
-
-		return DatatablesHelper.getDatatableResponse(
-				request,
-				enviaments,
-				"id",
-				SESSION_ATTRIBUTE_SELECCIO);
+		return DatatablesHelper.getDatatableResponse(request, enviaments,"id", SESSION_ATTRIBUTE_SELECCIO);
 	}
 
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
-	public String visualitzar(
-			HttpServletRequest request,
-			Model model) {
+	public String visualitzar(HttpServletRequest request, Model model) {
+
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-
-		ColumnesDto columnes = enviamentService.getColumnesUsuari(
-				entitat.getId(),
-				usuari);
-
-		if (columnes != null) {
-			model.addAttribute(ColumnesCommand.asCommand(columnes));
-		} else {
-			model.addAttribute(new ColumnesCommand());
-		}
-
-
+		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
+		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}
 
 	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid ColumnesCommand columnesCommand,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) throws IOException {
 
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}
-
 		model.addAttribute(new NotificacioFiltreCommand());
-		enviamentService.columnesUpdate(
-					entitat.getId(),
-					ColumnesCommand.asDto(columnesCommand));
-
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:enviament",
-				"enviament.controller.modificat.ok");
+		enviamentService.columnesUpdate(entitat.getId(), ColumnesCommand.asDto(columnesCommand));
+		return getModalControllerReturnValueSuccess(request, "redirect:enviament", "enviament.controller.modificat.ok");
 	}
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {

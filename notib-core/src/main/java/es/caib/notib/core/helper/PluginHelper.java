@@ -482,60 +482,38 @@ public class PluginHelper {
 		return oficinesDto;
 	}
 	
-	public List<OficinaDto> oficinesSIRUnitat(
-			String unitatCodi, 
-			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+	public List<OficinaDto> oficinesSIRUnitat(String unitatCodi, Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir llista de les oficines SIR d'una unitat organitzativa", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Text de la cerca", unitatCodi));
-
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una unitat organitzativa",
+												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", unitatCodi));
 		List<OficinaSIR> oficinesTF = null;
 		List<OficinaDto> oficinesSIR = null;
 		try {
-			oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(
-					unitatCodi,
-					arbreUnitats);
-			oficinesSIR = conversioTipusHelper.convertirList(
-					oficinesTF, 
-					OficinaDto.class);
+			oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
+			oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les oficines d'una unitat organitzativa";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-	
 		return oficinesSIR;
 	}
 	
 	public List<OficinaDto> oficinesSIREntitat(String entitatCodi) throws SistemaExternException {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir llista de les oficines SIR d'una entitat", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Text de la cerca", entitatCodi));
 
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
+												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", entitatCodi));
 		List<OficinaSIR> oficinesTF = null;
 		List<OficinaDto> oficinesSIR = null;
 		try {
 			oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(entitatCodi);
-			oficinesSIR = conversioTipusHelper.convertirList(
-					oficinesTF, 
-					OficinaDto.class);
+			oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les oficines SIR d'una entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	
 		return oficinesSIR;

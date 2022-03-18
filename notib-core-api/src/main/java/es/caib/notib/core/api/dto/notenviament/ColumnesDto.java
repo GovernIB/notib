@@ -28,7 +28,8 @@ public class ColumnesDto implements Serializable{
 	private boolean codiNotibEnviament; 
 	private boolean numCertificacio; 
 	private boolean csvUuid; 
-	private boolean estat; 
+	private boolean estat;
+	private boolean referenciaNotificacio;
 
 	private static final long serialVersionUID = 3836618098904965344L;
 }

@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-5
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_massiva
+            columns:
+              - column:
+                  name: num_cancelades
+                  type: number(38,0)

@@ -119,9 +119,9 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	private boolean errorLastCallback;
 	@Column(name = "event_error")
 	private Long errorEventId;
-	
-	
-	
+	@Column(name = "referencia", length = 36)
+	protected String referencia;
+
 	public NotificacioAudit (
 			NotificacioEntity notificacioEntity,
 			NotificacioEventEntity lastErrorEvent,
@@ -161,6 +161,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 		this.notificaErrorTipus = lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null;
 		this.errorLastCallback = notificacioEntity.isErrorLastCallback();
 		this.errorEventId = lastErrorEvent != null ? lastErrorEvent.getId() : null;
+		this.referencia = notificacioEntity.getReferencia();
 	}
 
 	private static final long serialVersionUID = 7206301266966284277L;

@@ -14,6 +14,7 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,6 +29,9 @@ import java.util.List;
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
 
+	@Query("select id from NotificacioEntity where referencia is null")
+	List<Long> findIdsSenseReferencia();
+
 	NotificacioEntity findById(Long id);
 	
 	List<NotificacioEntity> findByTipusUsuari(TipusUsuariEnumDto tipusUsuari);
@@ -37,6 +41,10 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 	List<NotificacioEntity> findByEntitatId(Long entitatId);
 
 	List<NotificacioEntity> findByNotificacioMassivaEntityId(Long NotificacioMassivaEntityId);
+
+	@Modifying
+	@Query("update NotificacioEntity nt set nt.referencia = :referencia where nt.id = :id")
+	void updateReferencia(@Param("id") Long id, @Param("referencia") String referencia);
 
 	@Query(	"from " +
 			"    NotificacioEntity n " +

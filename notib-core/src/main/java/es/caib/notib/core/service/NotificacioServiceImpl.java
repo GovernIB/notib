@@ -32,15 +32,7 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.DocumentRepository;
-import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.PersonaRepository;
-import es.caib.notib.core.repository.ProcSerOrganRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.*;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -59,6 +51,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -89,6 +83,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private NotificacioRepository notificacioRepository;
+	@Autowired
+	private NotificacioEnviamentRepository enviamentRepository;
 	@Autowired
 	private NotificacioAuditRepository notificacioAuditRepository;
 	@Autowired
@@ -145,6 +141,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private ProcSerHelper procedimentHelper;
 	@Autowired
 	private ProcSerOrganRepository procedimentOrganRepository;
+	@Autowired
+	private EnviamentTableRepository enviamentTableRepository;
 	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
@@ -408,6 +406,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de la notificacio amb id (id=" + id + ")");
@@ -415,25 +414,23 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if(notificacio == null) {
 				return null;
 			}
-
 			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
 			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 
-			NotificacioInfoDto dto = conversioTipusHelper.convertir(
-					notificacio,
-					NotificacioInfoDto.class);
+			NotificacioInfoDto dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
+
+			List<Long> pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
+			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
 
 			// Emplena dades del procediment
 			ProcSerEntity procedimentEntity = notificacio.getProcediment();
 			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
 				EntregaCieEntity entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
-				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(),
-						OperadorPostalDataDto.class));
-				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(),
-						CieDataDto.class));
+				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(), OperadorPostalDataDto.class));
+				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
 			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
@@ -583,6 +580,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getNomesSenseErrors().getField(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+							filtreNetejat.getReferencia().isNull(),
+							filtreNetejat.getReferencia().getField(),
 							pageable);
 
 				} else if (isUsuariEntitat || isSuperAdmin) {
@@ -626,6 +625,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getNomesSenseErrors().getField(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+							filtreNetejat.getReferencia().isNull(),
+							filtreNetejat.getReferencia().getField(),
 							pageable);
 
 				} else if (isAdminOrgan) {
@@ -666,16 +667,22 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getNomesSenseErrors().getField(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
 							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+							filtreNetejat.getReferencia().isNull(),
+							filtreNetejat.getReferencia().getField(),
 							pageable);
 				}
 			}
 
 			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
 			List<NotificacioTableItemDto> nots = pag.getContingut();
-			for (NotificacioTableItemDto not : nots) {
+			for (int foo = 0; foo < nots.size(); foo++) {
+				NotificacioTableItemDto not = nots.get(foo);
 				NotificacioEntity e = notificacioRepository.findById(not.getId());
+				List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
+				Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
 				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
 				not.setDocumentId(id);
+				not.setEnvCerData(cerData);
 			}
 			return pag;
 		} finally {
@@ -1079,12 +1086,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ArxiuDto enviamentGetCertificacioArxiu(
-			Long enviamentId) {
+	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEnviamentEntity enviament =
-					notificacioEnviamentRepository.findOne(enviamentId);
+			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(
 					enviament.getNotificaCertificacioArxiuId(),
@@ -1105,8 +1111,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public boolean enviar(Long notificacioId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Intentant enviament de la notificació pendent (" +
-					"notificacioId=" + notificacioId + ")");
+			logger.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
 			NotificacioEntity notificacio = notificaHelper.notificacioEnviar(notificacioId);
 			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
 		} finally {
@@ -1127,21 +1132,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional
-	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
-			Long entitatId, 
-			Long enviamentId) {
+	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 //			enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacio().getId()));
 			notificaHelper.enviamentRefrescarEstat(enviament.getId());
-			NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(
-					enviament,
-					NotificacioEnviamenEstatDto.class);
-			estatCalcularCampsAddicionals(
-					enviament,
-					estatDto);
+			NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
+			estatCalcularCampsAddicionals(enviament, estatDto);
 			return estatDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1696,6 +1695,58 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean validarFormatCsv(String csv) {
 		return csv.matches("^([0-9a-f]{64})$") || csv.matches("^([0-9a-zA-Z_]+)$");
+	}
+
+	@Override
+	@Transactional
+	public boolean actualitzarReferencies() {
+
+		try {
+			List<Long> ids = notificacioRepository.findIdsSenseReferencia();
+			int size = ids != null ? ids.size() : 0;
+
+			// Obtenim el xifrador
+			Cipher cipher = Cipher.getInstance("RC4");
+			SecretKeySpec rc4Key = new SecretKeySpec(configHelper.getConfig("es.caib.notib.notifica.clau.xifrat.ids").getBytes(),"RC4");
+			cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
+
+			logger.info("Actualitzant not_notificacions");
+			for (int foo = 0; foo < size; foo++) {
+				Long notId = ids.get(foo);
+				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(notId.longValue()))));
+				notificacioRepository.updateReferencia(notId, referencia);
+//				notificacioTableViewRepository.updateReferencia(notId, referencia);
+			}
+
+			logger.info("Actualitzant not_notificacio_env");
+			ids = enviamentRepository.findIdsSenseReferencia();
+			size = ids != null ? ids.size() : 0;
+			for (int foo = 0; foo < size; foo++) {
+				Long id = ids.get(foo);
+				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(id.longValue()))));
+				enviamentRepository.updateReferencia(id, referencia);
+			}
+			//Taules auxiliar de notificacions
+			notificacioTableViewRepository.updateReferenciesNules();
+			notificacioAuditRepository.updateReferenciesNules();
+			//Taules auxiliar d'enviament
+			notificacioEnviamentAuditRepository.updateReferenciesNules();
+			enviamentTableRepository.updateReferenciesNules();
+
+			return true;
+		} catch (Exception ex) {
+			logger.error("Error actualitzant les referencies", ex);
+			return false;
+		}
+	}
+
+	private byte[] longToBytes(long l) {
+		byte[] result = new byte[Long.SIZE / Byte.SIZE];
+		for (int i = 7; i >= 0; i--) {
+			result[i] = (byte)(l & 0xFF);
+			l >>= 8;
+		}
+		return result;
 	}
 
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {

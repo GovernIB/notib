@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -336,66 +338,71 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
     @RequestMapping(value = {"/actualitzarestat", "{notificacioId}/notificacio/actualitzarestat"}, method = RequestMethod.GET)
     @ResponseBody
-    public String actualitzarEstat(
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    public String actualitzarEstat(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         String resposta = "";
         if (seleccio == null || seleccio.isEmpty()) {
-            MissatgesHelper.error(
-                    request,
-                    getMessage(
-                            request,
-                            "enviament.controller.actualitzarestat.buida"));
+            MissatgesHelper.error(request, getMessage(request, "enviament.controller.actualitzarestat.buida"));
             resposta = "error";
-        } else {
-            MissatgesHelper.info( request,
-                    getMessage(
-                            request,
-                            "enviament.controller.actualitzarestat.executant"));
+            return resposta;
+        }
 
-            log.info("Acualitzam estat dels enviaments: " + StringUtils.join(seleccio, ", "));
-            boolean hasErrors = false;
-            for(Long enviamentId : seleccio) {
-                try {
-                    enviamentService.actualitzarEstat(enviamentId);
-                } catch (Exception e) {
-                    hasErrors = true;
-                    MissatgesHelper.error(
-                            request,
-                            getMessage(
-                                    request,
-                                    "enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
-                }
+        MissatgesHelper.info( request, getMessage(request, "enviament.controller.actualitzarestat.executant"));
+        log.info("Acualitzam estat dels enviaments: " + StringUtils.join(seleccio, ", "));
+        boolean hasErrors = false;
+        for(Long enviamentId : seleccio) {
+            try {
+                enviamentService.actualitzarEstat(enviamentId);
+            } catch (Exception e) {
+                hasErrors = true;
+                MissatgesHelper.error(request,getMessage(request, "enviament.controller.actualitzarestat.KO") + " [" + enviamentId + "]");
             }
-            RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<Long>());
-            if (!hasErrors) {
-                MissatgesHelper.info(
-                        request,
-                        getMessage(
-                                request,
-                                "enviament.controller.actualitzarestat.OK"));
-                resposta = "ok";
-            }
+        }
+        RequestSessionHelper.actualitzarObjecteSessio(request, sessionAttributeSeleccio, new HashSet<Long>());
+        if (!hasErrors) {
+            MissatgesHelper.info(request, getMessage(request,"enviament.controller.actualitzarestat.OK"));
+            resposta = "ok";
         }
         return resposta;
     }
 
-    @RequestMapping(value = "/reactivar/callback", method = RequestMethod.GET)
-    public String reactivarCallbacks(
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    @RequestMapping(value = {"/enviar/callback", "{notifiacioId}/enviar/callback"}, method = RequestMethod.GET)
+    public String enviarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+
+        String[] path = request.getServletPath().split("/");
         Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
-        if (seleccio == null || seleccio.isEmpty()) {
-            MissatgesHelper.error(
-                    request,
-                    getMessage(
-                            request,
-                            "enviament.controller.reactivar.callback.buida"));
+        if ((seleccio == null || seleccio.isEmpty()) && (path.length == 0 || Strings.isNullOrEmpty(path[2]))) {
+            MissatgesHelper.error(request, getMessage(request,"enviament.controller.enviar.callback.buida"));
             return "redirect:" + request.getHeader("Referer");
         }
+        Long notificacioId = seleccio.isEmpty() ? Long.parseLong(path[2]) : null;
+        seleccio = notificacioId != null ? new HashSet<>(Arrays.asList(notificacioId)) : seleccio;
+        log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
+        boolean hasErrors = false;
+        for(Long enviamentId : seleccio) {
+            try {
+                enviamentService.enviarCallback(enviamentId);
+            } catch (Exception e) {
+                hasErrors = true;
+                MissatgesHelper.error(request, getMessage(request, "enviament.controller.enviar.callback.KO"));
+            }
+        }
+        if (!hasErrors) {
+            MissatgesHelper.info(request, getMessage(request,"enviament.controller.enviar.callback.OK"));
+        }
+        return "redirect:" + request.getHeader("Referer");
+    }
 
+    @RequestMapping(value = "/reactivar/callback", method = RequestMethod.GET)
+    public String reactivarCallbacks(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
+        if (seleccio == null || seleccio.isEmpty()) {
+            MissatgesHelper.error(request, getMessage(request,"enviament.controller.reactivar.callback.buida"));
+            return "redirect:" + request.getHeader("Referer");
+        }
         log.info("Reactivam callback dels enviaments: " + StringUtils.join(seleccio, ", "));
         boolean hasErrors = false;
         for(Long enviamentId : seleccio) {
@@ -403,50 +410,34 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
                 enviamentService.activarCallback(enviamentId);
             } catch (Exception e) {
                 hasErrors = true;
-                MissatgesHelper.error(
-                        request,
-                        getMessage(
-                                request,
-                                "enviament.controller.reactivar.callback.KO"));
+                MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.callback.KO"));
             }
         }
-
         if (!hasErrors) {
-            MissatgesHelper.info(
-                    request,
-                    getMessage(
-                            request,
-                            "enviament.controller.reactivar.callback.OK"));
+            MissatgesHelper.info(request, getMessage(request,"enviament.controller.reactivar.callback.OK"));
         }
-
         return "redirect:" + request.getHeader("Referer");
     }
 
     private boolean isAdministrador(HttpServletRequest request) {
         return RolHelper.isUsuariActualAdministrador(request);
     }
+
     private void mostraErrorReintentarNotificacio(HttpServletRequest request, Long notificacioId, NotificacioDtoV2 notificacio, Exception e) {
         String errorMessage = "";
-        if (e.getMessage() != null && !e.getMessage().isEmpty())
+        if (e.getMessage() != null && !e.getMessage().isEmpty()) {
             errorMessage = e.getMessage();
-        else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty())
+        } else if (e.getCause() != null && e.getCause().getMessage() != null && !e.getCause().getMessage().isEmpty()) {
             errorMessage = e.getCause().getMessage();
+        }
         if (e.getStackTrace() != null && e.getStackTrace().length > 2) {
             errorMessage += "<br/>";
             errorMessage += e.getStackTrace()[0] + "<br/>";
             errorMessage += e.getStackTrace()[1] + "<br/>";
             errorMessage += e.getStackTrace()[2] + "<br/>...";
         }
-        MissatgesHelper.error(
-                request,
-                getMessage(
-                        request,
-                        "enviament.controller.reintent.notificacio.pendents.error",
-                        new String[]{
-                                notificacioId.toString(),
-                                notificacio.getCreatedDateAmbFormat(),
-                                notificacio.getConcepte(),
-                                errorMessage})
+        MissatgesHelper.error(request, getMessage(request,"enviament.controller.reintent.notificacio.pendents.error",
+                        new String[]{notificacioId.toString(), notificacio.getCreatedDateAmbFormat(), notificacio.getConcepte(), errorMessage})
         );
     }
 

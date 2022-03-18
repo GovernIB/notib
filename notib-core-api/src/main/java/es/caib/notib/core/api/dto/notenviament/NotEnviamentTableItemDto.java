@@ -50,6 +50,7 @@ public class NotEnviamentTableItemDto implements Serializable {
 	private NotificacioEstatEnumDto estat;
 	private Long notificacioId;
 	private String csvUuid;
+	private String referenciaNotificacio;
 
 	//Registre
 	private Integer registreNumero;

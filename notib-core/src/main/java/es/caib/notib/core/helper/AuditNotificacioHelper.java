@@ -1,7 +1,7 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
@@ -44,9 +44,8 @@ public class AuditNotificacioHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateNotificacio(
-			NotificacioEntity notificacio,
-			NotificacioHelper.NotificacioData data) {
+	public NotificacioEntity updateNotificacio(NotificacioEntity notificacio, NotificacioHelper.NotificacioData data) {
+
 		notificacio.update(
 				data.getEntitat(),
 				data.getNotificacio().getEmisorDir3Codi(),
@@ -86,9 +85,8 @@ public class AuditNotificacioHelper {
 
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateEstatAFinalitzada(
-			String notificaEstatNom,
-			NotificacioEntity notificacio) {
+	public NotificacioEntity updateEstatAFinalitzada(String notificaEstatNom, NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacio.updateEstatDate(new Date());
@@ -110,17 +108,16 @@ public class AuditNotificacioHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateLastCallbackError(
-			NotificacioEntity notificacio,
-			boolean error) {
+	public NotificacioEntity updateLastCallbackError(NotificacioEntity notificacio, boolean error) {
+
 		notificacio.updateLastCallbackError(error);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
 	
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateNotificacioRegistre(RespostaConsultaRegistre arbResposta,
-													   NotificacioEntity notificacio) {
+	public NotificacioEntity updateNotificacioRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacio) {
+
 		notificacio.updateRegistreNumero(Integer.parseInt(arbResposta.getRegistreNumero()));
 		notificacio.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 		notificacio.updateRegistreData(arbResposta.getRegistreData());

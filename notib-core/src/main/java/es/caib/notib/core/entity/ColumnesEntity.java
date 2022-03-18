@@ -69,8 +69,10 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	@Column(name="csv_uuid")
 	private boolean csvUuid; 
 	@Column(name="estat")
-	private boolean estat; 
-	
+	private boolean estat;
+	@Column(name="referencia_notificacio")
+	private boolean referenciaNotificacio;
+
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "not_columnes_entitat_fk")
@@ -153,6 +155,9 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	public UsuariEntity getUser() {
 		return user;
 	}
+	public boolean isReferenciaNotificacio() {
+		return referenciaNotificacio;
+	}
 	
 	public void update(
 			boolean dataEnviament,
@@ -176,7 +181,8 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 			boolean codiNotibEnviament,
 			boolean numCertificacio,
 			boolean csvUuid,
-			boolean estat) {
+			boolean estat,
+			boolean referenciaNotificacio) {
 		this.dataEnviament = dataEnviament;
 		this.dataProgramada = dataProgramada;
 		this.notIdentificador = notIdentificador;
@@ -199,6 +205,7 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 		this.numCertificacio = numCertificacio;
 		this.csvUuid = csvUuid;
 		this.estat = estat;
+		this.referenciaNotificacio = referenciaNotificacio;
 	}
 	
 	public static Builder getBuilder(

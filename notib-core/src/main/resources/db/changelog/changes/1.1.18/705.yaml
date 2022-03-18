@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1634114082437-3
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio
+            columns:
+              - column:
+                  name: referencia
+                  type: varchar(36)
+        - addUniqueConstraint:
+              columnNames: referencia
+              constraintName: not_notificacio_ref_uk
+              tableName: not_notificacio
+       - addUniqueConstraint:
+             columnNames: referencia
+             constraintName: not_notificacio_table_ref_uk
+             tableName: not_notificacio_table
+
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: referencia
+                  type: varchar(36)
+        - addColumn:
+            tableName: not_notificacio_audit
+            columns:
+              - column:
+                  name: referencia
+                  type: varchar(36)
+        - modifyDataType:
+            tableName: not_notificacio_env
+            columnName: notifica_ref
+            newDataType: varchar(36)
+        - modifyDataType:
+            tableName: not_notificacio_env_table
+            columnName: notifica_ref
+            newDataType: varchar(36)
+        - modifyDataType:
+            tableName: not_notificacio_env_audit
+            columnName: notifica_ref
+            newDataType: varchar(36)
+        - addColumn:
+            tableName: not_columnes
+            columns:
+              - column:
+                  name: referencia_notificacio
+                  type: number(1,0)

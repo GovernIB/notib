@@ -39,26 +39,27 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 //			e.printStackTrace();
 //		}
 //		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		if (arb.getResumen().contains("RError")) {
+		if (arb.getResumen().contains("Error") || arb.getInteresados().get(0).getInteresado().getApellido1().equals("error")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
 			return resposta;
-		} else {
-			Date data = new Date();
-			Integer[] registre = readRegistreFile(data, true);
-			
-	        resposta.setRegistreData(data);
-	        resposta.setRegistreNumero(String.valueOf(registre[1]));
-	        resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
-	        resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-	        
-	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR))
-	        	resposta.setSirRecepecioData(data);
-	        if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT))
-	        	resposta.setSirRegistreDestiData(data);
-	//        resposta.setErrorCodi("OK");
-	        return resposta;
 		}
+		Date data = new Date();
+		Integer[] registre = readRegistreFile(data, true);
+
+		resposta.setRegistreData(data);
+		resposta.setRegistreNumero(String.valueOf(registre[1]));
+		resposta.setRegistreNumeroFormatat(registre[1] + "/" + registre[0]);
+		resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+
+		if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_SIR)) {
+			resposta.setSirRecepecioData(data);
+		}
+		if (resposta.getEstat().equals(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT)) {
+			resposta.setSirRegistreDestiData(data);
+		}
+//        resposta.setErrorCodi("OK");
+		return resposta;
 	}
 	
 	@Override

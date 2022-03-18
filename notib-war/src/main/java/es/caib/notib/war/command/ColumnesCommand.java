@@ -35,16 +35,13 @@ public class ColumnesCommand {
 	private boolean numCertificacio; 
 	private boolean csvUuid; 
 	private boolean estat;
+	private boolean referenciaNotificacio;
 
 	public static ColumnesCommand asCommand(ColumnesDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				ColumnesCommand.class);
+		return ConversioTipusHelper.convertir(dto, ColumnesCommand.class);
 	}
 	public static ColumnesDto asDto(ColumnesCommand command) {
-		return ConversioTipusHelper.convertir(
-				command,
-				ColumnesDto.class);
+		return ConversioTipusHelper.convertir(command, ColumnesDto.class);
 	}
 	
 	@Override
