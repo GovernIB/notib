@@ -141,12 +141,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         String organGestorCodi = null;
 
         try {
-            if (isUsuariEntitat) {
-                if (filtre != null) {
-                    filtre.setEntitatId(entitatActual.getId());
-                }
+            if (isUsuariEntitat && filtre != null) {
+                filtre.setEntitatId(entitatActual.getId());
             }
-
             if (isAdminOrgan && entitatActual != null) {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();

@@ -110,18 +110,19 @@ public abstract class AbstractNotificaHelper {
 			}
 			if (!env.isNotificaEstatFinal()) {
 				estatsEnviamentsFinals = false;
-				if (!env.isPerEmail())
+				if (!env.isPerEmail()) {
 					estatsEnviamentsNotificaFinals = false;
+				}
 				break;
 			}
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
 		if (estatsEnviamentsNotificaFinals) {
-			if (estatsEnviamentsFinals)
+			if (estatsEnviamentsFinals) {
 				auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
-			else
+			} else {
 				auditNotificacioHelper.updateEstatAFinalitzadaAmbError(notificaEstat.name(), enviament.getNotificacio());
-			
+			}
 			logger.info("Envio correu en cas d'usuaris no APLICACIÓ");
 			NotificacioEntity notificacio = enviament.getNotificacio();
 			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {

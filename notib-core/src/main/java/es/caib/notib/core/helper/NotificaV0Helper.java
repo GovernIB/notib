@@ -52,24 +52,25 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 	@UpdateNotificacioTable
-	public NotificacioEntity notificacioEnviar(
-			Long notificacioId,
-			boolean ambEnviamentPerEmail) {
+	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+												new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
+
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA.");
-			throw new ValidationException(
-					notificacioId,
-					NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
+			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
-		if (notificacio.getConcepte().startsWith("NError")) {
-			String errorDescripcio = "Error de notifica MOCK (" + System.currentTimeMillis() + ")";
-			log.error(errorDescripcio);
+//		if (notificacio.getConcepte().startsWith("NError")) {
+//			String errorDescripcio = "Error de notifica MOCK (" + System.currentTimeMillis() + ")";
+//			log.error(errorDescripcio);
 //			NotificacioEventEntity event = NotificacioEventEntity.builder()
 //					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
 //					.notificacio(notificacio)
@@ -79,20 +80,19 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 //					build();
 //			notificacio.updateEventAfegir(event);
 //			notificacioEventRepository.save(event);
-
-			notificacioEventHelper.addErrorEvent(
-					notificacio,
-					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-					errorDescripcio,
-					NotificacioErrorTipusEnumDto.ERROR_REMOT,
-					true);
-
-			boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-			if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-				auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
-			}
-			return notificacio;
-		}
+//
+//			notificacioEventHelper.addErrorEvent(					notificacio,
+//					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
+//					errorDescripcio,
+//					NotificacioErrorTipusEnumDto.ERROR_REMOT,
+//					true);
+//
+//			boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
+//			if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+//				auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
+//			}
+//			return notificacio;
+//		}
 		try {
 			log.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
@@ -100,11 +100,11 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				log.info(" >>> ... OK");
 
-				if (ambEnviamentPerEmail)
+				if (ambEnviamentPerEmail) {
 					auditNotificacioHelper.updateNotificacioMixtaEnviadaNotifica(notificacio);
-				else
+				} else {
 					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
-
+				}
 				//Crea un nou event
 				Map<NotificacioEnviamentEntity, String> identificadorsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
@@ -116,45 +116,18 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				}
 				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsEnviaments);
 			} else {
-				log.info(" >>> ... ERROR");
+				log.info(" >>> ... ERROR:");
 				//Crea un nou event
-				NotificacioEventEntity event = NotificacioEventEntity.builder()
-						.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
-						.notificacio(notificacio)
-						.error(true)
-						.errorTipus(NotificacioErrorTipusEnumDto.ERROR_REMOT)
-						.errorDescripcio("[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta())
-						.build();
-				
-				if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
-					event.callbackInicialitza();
-
-				notificacio.updateEventAfegir(event);
-				notificacioEventRepository.save(event);
-				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-					enviament.updateNotificaError(true, event);
-				}
+				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
+				log.info(" >>> " + errorDescripcio);
+				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT,true);
+				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
-			log.error(
-					ex.getMessage(),
-					ex);
-			String errorDescripcio;
-			if (ex instanceof SOAPFaultException) {
-				errorDescripcio = ex.getMessage();
-			} else {
-				errorDescripcio = ExceptionUtils.getStackTrace(ex);
-			}
-			NotificacioEventEntity event = NotificacioEventEntity.builder()
-					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
-					.notificacio(notificacio)
-					.error(true)
-					.errorDescripcio(errorDescripcio)
-					.errorTipus(NotificacioErrorTipusEnumDto.ERROR_XARXA)
-					.build();
-			notificacio.updateEventAfegir(event);
-			notificacioEventRepository.save(event);
-
+			log.error(ex.getMessage(), ex);
+			String errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
+			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,false);
+			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
 		if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
@@ -162,6 +135,16 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		}
 		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return notificacio;
+	}
+
+	private void updateEventWithEnviament(
+			NotificacioEntity notificacio,
+			String errorDescripcio,
+			NotificacioErrorTipusEnumDto notificacioErrorTipus,
+			boolean notificaError) {
+
+		notificacioEventHelper.addErrorEvent(notificacio,
+				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
 	}
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
@@ -408,12 +391,19 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	
 
 
-	public ResultadoAltaRemesaEnvios enviaNotificacio(
-			NotificacioEntity notificacio) throws Exception {
+	public ResultadoAltaRemesaEnvios enviaNotificacio(NotificacioEntity notificacio) throws Exception {
+
 		ResultadoAltaRemesaEnvios resultat = new ResultadoAltaRemesaEnvios();
 		resultat.setCodigoRespuesta("000");
 		resultat.setDescripcionRespuesta("OK");
 
+		if (notificacio.getConcepte().startsWith("throwEx")) {
+			throw new Exception("PROVA EXCEPCIO");
+		}
+		if (notificacio.getConcepte().startsWith("NError")) {
+			resultat.setCodigoRespuesta("003");
+			resultat.setDescripcionRespuesta("ERROR");
+		}
 		ResultadoEnvios resultadoEnvios = new ResultadoEnvios();
 		for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 			ResultadoEnvio resultatEnviament = new ResultadoEnvio();
@@ -422,7 +412,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			resultadoEnvios.getItem().add(resultatEnviament);
 		}
 		resultat.setResultadoEnvios(resultadoEnvios);
-			
 		return resultat;
 	}
 	

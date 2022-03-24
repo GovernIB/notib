@@ -39,10 +39,11 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"	NotificacioEventEntity ne " +
 			" where " +
 			"		ne.notificacio = :notificacio " +
-			"	and (ne.error = true " +
+			"	and ((ne.error = true and ne.tipus != es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT) " +
 			"  		 or (ne.tipus not in (es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, " +
 			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT," +
-			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO)" +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO," +
+			"							  es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT)" +
 			"			)" +
 			"		  or ne.callbackEstat <> es.caib.notib.core.api.dto.CallbackEstatEnumDto.PENDENT " +
 			") "

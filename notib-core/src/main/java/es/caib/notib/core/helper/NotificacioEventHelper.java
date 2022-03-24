@@ -37,6 +37,9 @@ public class NotificacioEventHelper {
      */
     public void clearOldUselessEvents(NotificacioEntity notificacio) {
         for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+            if (enviament.isNotificaError() && enviament.isPerEmail()) {
+                continue;
+            }
             auditEnviamentHelper.updateErrorNotifica(enviament, enviament.isNotificaError(), null);
         }
         notificacioEventRepository.deleteOldUselessEvents(notificacio);
@@ -373,6 +376,9 @@ public class NotificacioEventHelper {
 
         //Actualitza l'event per cada enviament
         for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
+            if (enviamentEntity.isPerEmail()) {
+                continue;
+            }
             //Crea un nou event
             NotificacioEventEntity event = NotificacioEventEntity.builder()
                     .tipus(eventTipus)

@@ -51,10 +51,11 @@ public class ClientBaseTest {
 			String notificacioId,
 			int numDestinataris,
 			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
+
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+			notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setOrganGestor(ambEnviamentPostal ? ORGAN_CODI_CIE : ORGAN_CODI);
@@ -83,12 +84,15 @@ public class ClientBaseTest {
 			titular.setNom("Siòn");
 			titular.setLlinatge1("Andreu");
 			titular.setLlinatge2("Nadal");
-			titular.setNif("00000000T");
 			titular.setTelefon("666010101");
-			titular.setEmail("sandreu@limit.es");
-			titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
+			if (i == 0) {
+				titular.setNif("00000000T");
+				titular.setEmail("sandreu@limit.es");
+			}
+			titular.setInteressatTipus(i != 0 ? InteressatTipusEnumDto.FISICA_SENSE_NIF : InteressatTipusEnumDto.FISICA);
+			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
+			}
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
 			destinatari.setNom("melcior");
@@ -98,9 +102,12 @@ public class ClientBaseTest {
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
 			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
+			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
 				destinatari.setDir3Codi(ORGAN_SIR_CODI);
-			enviament.getDestinataris().add(destinatari);
+			}
+			if (i == 0) {
+				enviament.getDestinataris().add(destinatari);
+			}
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
 				if (NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {

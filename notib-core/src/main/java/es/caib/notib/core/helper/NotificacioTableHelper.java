@@ -268,8 +268,9 @@ public class NotificacioTableHelper {
 //            }
 //        }
         NotificacioEstatEnumDto notificacioEstat = notificacio.getEstat();
-        return notificacioEstat.equals(NotificacioEstatEnumDto.ENVIADA) ||
+        return !notificacioEstat.equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) &&
+                (notificacioEstat.equals(NotificacioEstatEnumDto.ENVIADA) ||
                 (notificacioEstat.equals(NotificacioEstatEnumDto.PENDENT) && !hasRegistreIntents) ||
-                (notificacioEstat.equals(NotificacioEstatEnumDto.REGISTRADA) && !hasNotificaIntents);
+                (notificacioEstat.equals(NotificacioEstatEnumDto.REGISTRADA) && !hasNotificaIntents));
     }
 }

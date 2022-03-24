@@ -1,6 +1,7 @@
 package es.caib.notib.war.validation;
 
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
@@ -271,8 +272,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 					if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
 						boolean senseNif = true;
-						if (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
-							senseNif = false;
+						if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
+							if (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+								senseNif = false;
+							}
 						}
 						if (senseNif && enviament.getDestinataris() != null) {
 							for (PersonaCommand destinatari: enviament.getDestinataris()) {
@@ -281,14 +284,18 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 								}
 							}
 						}
-						if (senseNif) {
-							if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
-								valid = false;
-								context.buildConstraintViolationWithTemplate(
-												MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[]{envCount + 1}, locale))
-										.addNode("enviaments[" + envCount + "].titular.nif")
-										.addConstraintViolation();
-							} else if(enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva()) {
+
+						if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(
+											MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[]{envCount + 1}, locale))
+									.addNode("enviaments[" + envCount + "].titular.nif")
+									.addConstraintViolation();
+						}
+
+						// SI ES UNA PERSONA SENSE NIF I NO TÉ CAP DESTINATARI NI ENVIAMENT PER ENTREGA POSTAL ACTIVA -> EMAIL OBLIGATORI
+						if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+							if(senseNif && (enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva()) && Strings.isNullOrEmpty(enviament.getTitular().getEmail())) {
 								// Email obligatori si no té destinataris amb nif o enviament postal
 								valid = false;
 								context.buildConstraintViolationWithTemplate(
