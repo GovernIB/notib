@@ -68,31 +68,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
-//		if (notificacio.getConcepte().startsWith("NError")) {
-//			String errorDescripcio = "Error de notifica MOCK (" + System.currentTimeMillis() + ")";
-//			log.error(errorDescripcio);
-//			NotificacioEventEntity event = NotificacioEventEntity.builder()
-//					.tipus(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT)
-//					.notificacio(notificacio)
-//					.error(true)
-//					.errorTipus(NotificacioErrorTipusEnumDto.ERROR_XARXA)
-//					.errorDescripcio(errorDescripcio).
-//					build();
-//			notificacio.updateEventAfegir(event);
-//			notificacioEventRepository.save(event);
-//
-//			notificacioEventHelper.addErrorEvent(					notificacio,
-//					NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-//					errorDescripcio,
-//					NotificacioErrorTipusEnumDto.ERROR_REMOT,
-//					true);
-//
-//			boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-//			if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
-//				auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
-//			}
-//			return notificacio;
-//		}
 		try {
 			log.info(" >>> Enviant notificació...");
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
@@ -126,25 +101,22 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 			String errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
-			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,false);
+			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,true);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-		if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) || NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()))) {
 			auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
 		}
 		log.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		return notificacio;
 	}
 
-	private void updateEventWithEnviament(
-			NotificacioEntity notificacio,
-			String errorDescripcio,
-			NotificacioErrorTipusEnumDto notificacioErrorTipus,
-			boolean notificaError) {
+	private void updateEventWithEnviament(NotificacioEntity notificacio, String errorDescripcio,
+										  NotificacioErrorTipusEnumDto notificacioErrorTipus, boolean notificaError) {
 
-		notificacioEventHelper.addErrorEvent(notificacio,
-				NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
+		notificacioEventHelper.addErrorEvent(notificacio, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
+
 	}
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
@@ -192,10 +164,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				String errorDescripcio = "L'enviament no té identificador de Notifica";
 //				integracioHelper.addAccioError(info, errorDescripcio);
-				throw new ValidationException(
-						enviament,
-						NotificacioEnviamentEntity.class,
-						errorDescripcio);
+				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
 			InfoEnvioV2 infoEnvio = new InfoEnvioV2();
 			infoEnvio.setIdentificador(enviament.getNotificaIdentificador());

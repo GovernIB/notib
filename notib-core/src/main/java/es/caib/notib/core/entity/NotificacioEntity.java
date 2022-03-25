@@ -353,6 +353,10 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		return enviaments.size() > getEnviamentsPerEmail().size();
 	}
 
+	public boolean hasEnviamentsPerEmail() {
+		return getEnviamentsPerEmail().size() > 0;
+	}
+
 	public boolean hasEnviamentsEnviats() {
 		if (enviaments != null && !enviaments.isEmpty()) {
 			for(NotificacioEnviamentEntity enviament: enviaments) {

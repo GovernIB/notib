@@ -236,8 +236,8 @@ public class EmailNotificacioSenseNifHelper {
 			}
 		}
 
-		if ("salloza@limit.es".equals(emailDestinatari))
-			mailSender.send(missatge);
+//		if ("test@limit.es".equals(emailDestinatari))
+		mailSender.send(missatge);
 	}
 
 	private String getImageByteArrayMimeType(byte[] bytes) throws IOException {

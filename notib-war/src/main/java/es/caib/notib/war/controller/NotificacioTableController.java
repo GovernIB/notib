@@ -278,9 +278,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     }
 
     @RequestMapping(value = "/{notificacioId}/delete", method = RequestMethod.GET)
-    public String eliminar(
-            HttpServletRequest request,
-            Model model,
+    public String eliminar(HttpServletRequest request,             Model model,
             @PathVariable Long notificacioId) {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         String referer = request.getHeader("Referer");
