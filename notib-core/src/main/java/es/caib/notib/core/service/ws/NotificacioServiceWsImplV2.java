@@ -111,13 +111,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	@Transactional
 	@Override
-	public RespostaAlta alta(
-			NotificacioV2 notificacio) throws NotificacioServiceWsException {
+	public RespostaAlta alta(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+
 		RespostaAltaV2 resposta = altaV2(notificacio);
+
 		return RespostaAlta.builder()
 				.identificador(resposta.getIdentificador())
 				.estat(resposta.getEstat())
-				.referencies(resposta.getReferencies())
+				.referencies(resposta.getReferenciesAsV1())
 				.error(resposta.isError())
 				.errorDescripcio(resposta.getErrorDescripcio())
 				.build();
@@ -130,7 +131,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
-			
+
 			RespostaAltaV2 resposta;
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
@@ -399,7 +400,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				logger.debug(">> [ALTA] notificacio guardada");
 				
 				// Enviaments
-				List<EnviamentReferencia> referencies = new ArrayList<EnviamentReferencia>();
+				List<EnviamentReferenciaV2> referencies = new ArrayList<>();
 				for (Enviament enviament: notificacio.getEnviaments()) {
 					
 					// Comprovat titular
@@ -410,10 +411,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return setRespostaError(errorDescripcio);
 					}
 					
-					EnviamentReferencia ref = saveEnviament(
-							entitat,
-							notificacioGuardada,
-							enviament);
+					EnviamentReferenciaV2 ref = saveEnviament(entitat, notificacioGuardada, enviament);
 					referencies.add(ref);
 				}
 				logger.debug(">> [ALTA] enviaments creats");
@@ -424,10 +422,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
 					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
 						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
-						if (notificar)
+						if (notificar) {
 							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
+						}
 					}
-					
 				} else {
 					inicialitzaCallbacks(notificacioGuardada);
 				}
@@ -436,9 +434,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			} catch (Exception ex) {
 				logger.error("Error creant notificació", ex);
 				integracioHelper.addAccioError(info, "Error creant la notificació", ex);
-				throw new RuntimeException(
-						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error creant la " + notificacio.getEnviamentTipus().name() + ": " + ex.getMessage(),
-						ex);
+				throw new RuntimeException("[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error creant la " + notificacio.getEnviamentTipus().name() + ": " + ex.getMessage(), ex);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1075,19 +1071,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 
-	private RespostaAltaV2 generaResposta(
-			IntegracioInfo info,
-			NotificacioEntity notificacioGuardada,
-			List<EnviamentReferencia> referencies) {
+	private RespostaAltaV2 generaResposta(IntegracioInfo info, NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies) {
+
 		RespostaAltaV2 resposta = new RespostaAltaV2();
 		try {
 			resposta.setIdentificador(notificaHelper.xifrarId(notificacioGuardada.getId()));
 			logger.debug(">> [ALTA] identificador creat");
 		} catch (GeneralSecurityException ex) {
 			logger.debug(">> [ALTA] Error creant identificador");
-			throw new RuntimeException(
-					"No s'ha pogut crear l'identificador de la notificació",
-					ex);
+			throw new RuntimeException("No s'ha pogut crear l'identificador de la notificació", ex);
 		}
 		switch (notificacioGuardada.getEstat()) {
 			case PENDENT:
@@ -1144,36 +1136,23 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		logger.debug(">> [ALTA] callbacks de client inicialitzats");
 	}
 
-	private EnviamentReferencia saveEnviament(
-			EntitatEntity entitat,
-			NotificacioEntity notificacioGuardada,
-			Enviament enviament) {
+	private EnviamentReferenciaV2 saveEnviament(EntitatEntity entitat, NotificacioEntity notificacioGuardada, Enviament enviament) {
 
 		ServeiTipusEnumDto serveiTipus = getServeiTipus(enviament);
-		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
-			if (enviament.getEntregaPostal().getTipus() == null) {
-				throw new ValidationException(
-						"ENTREGA_POSTAL",
-						"L'entrega postal te el camp tipus buit");
-			}
+		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null && enviament.getEntregaPostal().getTipus() == null) {
+			throw new ValidationException("ENTREGA_POSTAL", "L'entrega postal te el camp tipus buit");
 		}
 
 		PersonaEntity titular = saveTitular(enviament);
 		List<PersonaEntity> destinataris = getDestinataris(enviament);
 
-		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(
-				entitat,
-				notificacioGuardada,
-				enviament,
-				serveiTipus,
-				titular,
-				destinataris);
-		EnviamentReferencia enviamentReferencia = new EnviamentReferencia();
+		NotificacioEnviamentEntity enviamentSaved = auditEnviamentHelper.desaEnviamentAmbReferencia(entitat, notificacioGuardada, enviament, serveiTipus, titular, destinataris);
+		EnviamentReferenciaV2 enviamentReferencia = new EnviamentReferenciaV2();
 		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
-		if (titular.getInteressatTipus() != InteressatTipusEnumDto.ADMINISTRACIO)
-			enviamentReferencia.setTitularNif(titular.getNif().toUpperCase());
-		else
-			enviamentReferencia.setTitularNif(titular.getDir3Codi().toUpperCase());
+		String titularNif = !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) ?
+							(!InteressatTipusEnumDto.ADMINISTRACIO.equals(titular.getInteressatTipus()) ? titular.getNif().toUpperCase() : titular.getDir3Codi().toUpperCase())
+							: null;
+		enviamentReferencia.setTitularNif(titularNif);
 		notificacioGuardada.addEnviament(enviamentSaved);
 		return enviamentReferencia;
 	}

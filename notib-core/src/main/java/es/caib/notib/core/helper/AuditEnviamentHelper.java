@@ -149,13 +149,9 @@ public class AuditEnviamentHelper {
 	}
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity updateErrorNotifica(
-			NotificacioEnviamentEntity enviament, 
-			boolean notificaError, 
-			NotificacioEventEntity event) {
-		enviament.updateNotificaError(
-				notificaError, 
-				event);
+	public NotificacioEnviamentEntity updateErrorNotifica(NotificacioEnviamentEntity enviament, boolean notificaError, NotificacioEventEntity event) {
+
+		enviament.updateNotificaError(notificaError, event);
 		notificacioEnviamentRepository.saveAndFlush(enviament);
 		return enviament;
 	}

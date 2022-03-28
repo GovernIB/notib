@@ -96,9 +96,8 @@ public class AuditNotificacioHelper {
 	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
-	public NotificacioEntity updateEstatAFinalitzadaAmbError(
-			String notificaEstatNom,
-			NotificacioEntity notificacio) {
+	public NotificacioEntity updateEstatAFinalitzadaAmbError(String notificaEstatNom, NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacio.updateEstatDate(new Date());

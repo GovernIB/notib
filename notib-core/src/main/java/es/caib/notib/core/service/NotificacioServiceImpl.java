@@ -463,11 +463,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
 			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					false, 
-					isUsuariEntitat,
-					false);
+			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
 
 			Page<NotificacioTableEntity> notificacions = null;
 			Pageable pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
@@ -486,15 +482,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, permisos);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
-				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(
-						auth,
-						entitatActual,
-						permisos);
+				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatActual, permisos);
 
 			} else if (isAdminOrgan && entitatActual != null) {
-				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitatActual.getDir3Codi(),
-						organGestorCodi);
+				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 			}
 
 			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());

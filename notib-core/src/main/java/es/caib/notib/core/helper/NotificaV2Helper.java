@@ -85,26 +85,18 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_NOTIFICA,
-				"Enviament d'una notificació",
-				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
+												new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
-
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			logger.error(" [NOT] la notificació no té l'estat REGISTRADA.");
 			integracioHelper.addAccioError(info, "La notificació no està registrada");
-			throw new ValidationException(
-					notificacioId,
-					NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
+			throw new ValidationException(notificacioId, NotificacioEntity.class, "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA);
 		}
-
 		try {
 			logger.info(" >>> Enviant notificació...");
 
@@ -113,17 +105,15 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			ResultadoAltaRemesaEnvios resultadoAlta = enviaNotificacio(notificacio);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
 			logger.info(" [TIMER-NOT] Notificació enviar (enviaNotificacio SOAP-QUERY)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
-
 			notificacio.updateNotificaEnviamentData();
 			if ("000".equals(resultadoAlta.getCodigoRespuesta()) && "OK".equalsIgnoreCase(resultadoAlta.getDescripcionRespuesta())) {
 				startTime = System.nanoTime();
 				logger.info(" >>> ... OK");
-
-				if (ambEnviamentPerEmail)
+				if (ambEnviamentPerEmail) {
 					auditNotificacioHelper.updateNotificacioMixtaEnviadaNotifica(notificacio);
-				else
-					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
-
+				} else {
+ 					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
+				}
 				//Crea un nou event
 				Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
@@ -136,39 +126,23 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsResultatsEnviaments);
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
-
 				integracioHelper.addAccioOk(info);
 			} else {
 				logger.info(" >>> ... ERROR:");
 				//Crea un nou event
 				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 				logger.info(" >>> " + errorDescripcio);
-				updateEventWithEnviament(
-						notificacio,
-						errorDescripcio,
-						NotificacioErrorTipusEnumDto.ERROR_REMOT,
-						true);
+				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT,true);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
-			logger.error(
-					ex.getMessage(),
-					ex);
-			String errorDescripcio;
-			if (ex instanceof SOAPFaultException) {
-				errorDescripcio = ex.getMessage();
-			} else {
-				errorDescripcio = ExceptionUtils.getStackTrace(ex);
-			}
-			updateEventWithEnviament(
-					notificacio,
-					errorDescripcio,
-					NotificacioErrorTipusEnumDto.ERROR_XARXA,
-					false);
+			logger.error(ex.getMessage(), ex);
+			String errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
+			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,true);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-		if (fiReintents && NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
+		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) || NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()))) {
 			auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");

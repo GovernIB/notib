@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,8 @@ public class NotificacioTableHelper {
     private NotificacioEventRepository notificacioEventRepository;
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
+    @Resource
+    private MessageHelper messageHelper;
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
@@ -97,9 +100,17 @@ public class NotificacioTableHelper {
                 tableViewItem.setNotificaErrorDescripcio(null);
 
             } else {
+
                 NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
                 tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
-                tableViewItem.setNotificaErrorDescripcio(lastEvent != null ? lastEvent.getErrorDescripcio() : null);
+                if (tableViewItem.getNotificaErrorDescripcio() == null) {
+                    // TODO MISSATGE MULTIDIOMA
+//                String desc = notificacio.hasEnviamentsPerEmail() ? messageHelper.getMessage("error.notificacio.enviaments")
+                    String desc = notificacio.hasEnviamentsPerEmail() ?
+                            "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
+                            : (lastEvent != null ? lastEvent.getErrorDescripcio() : null);
+                    tableViewItem.setNotificaErrorDescripcio(desc);
+                }
                 tableViewItem.setErrorLastEvent(isErrorLastEvent(notificacio, lastEvent));
             }
 
@@ -124,17 +135,13 @@ public class NotificacioTableHelper {
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
 
             if (notificacio.getNotificacioMassivaEntity() != null) {
-                updateMassiva(notificacio.getNotificacioMassivaEntity(),
-                        estatActual,
-                        hasErrorActual,
-                        tableViewItem.getEstat(),
-                        tableViewItem.getNotificaErrorData() != null);
+                updateMassiva(notificacio.getNotificacioMassivaEntity(), estatActual, hasErrorActual,
+                            tableViewItem.getEstat(),tableViewItem.getNotificaErrorData() != null);
                 notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
             }
         } catch (Exception ex) {
             log.error("No ha estat possible actualitzar la informació de la notificació " + notificacio.getId(), ex);
         }
-
     }
 
     public void updateMassiva(
@@ -268,8 +275,9 @@ public class NotificacioTableHelper {
 //            }
 //        }
         NotificacioEstatEnumDto notificacioEstat = notificacio.getEstat();
-        return notificacioEstat.equals(NotificacioEstatEnumDto.ENVIADA) ||
+        return !notificacioEstat.equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) &&
+                (notificacioEstat.equals(NotificacioEstatEnumDto.ENVIADA) ||
                 (notificacioEstat.equals(NotificacioEstatEnumDto.PENDENT) && !hasRegistreIntents) ||
-                (notificacioEstat.equals(NotificacioEstatEnumDto.REGISTRADA) && !hasNotificaIntents);
+                (notificacioEstat.equals(NotificacioEstatEnumDto.REGISTRADA) && !hasNotificaIntents));
     }
 }

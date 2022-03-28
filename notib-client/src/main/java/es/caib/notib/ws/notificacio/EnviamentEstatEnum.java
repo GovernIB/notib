@@ -77,7 +77,9 @@ public enum EnviamentEstatEnum {
     REGISTRADA,
     PROCESSADA,
     ANULADA,
-    ENVIAT_SIR;
+    ENVIAT_SIR,
+    ENVIADA_AMB_ERRORS,
+    FINALITZADA_AMB_ERRORS;
 
     public String value() {
         return name();

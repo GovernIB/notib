@@ -43,9 +43,7 @@ import java.util.List;
     "identificador",
     "referencies"
 })
-public class RespostaAltaV2
-    extends RespostaBase
-{
+public class RespostaAltaV2 extends RespostaBase {
 
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar dataCreacio;

@@ -122,11 +122,12 @@ public class CacheHelper {
 		Map<String, NodeDir3> organigrama = null;
 
 		String filenameOrgans = pluginHelper.getOrganGestorsFile();
+		File file = null;
 		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
 			filenameOrgans = filenameOrgans + "_" + entitatcodi + ".json";
+			file = new File(filenameOrgans);
 		}
-		File file = new File(filenameOrgans);
-		if (file.exists()) {
+		if (file != null && file.exists()) {
 			try {
 				ObjectMapper mapper = new ObjectMapper();
 				Map<String, Object> map = mapper.readValue(new FileReader(file), Map.class);

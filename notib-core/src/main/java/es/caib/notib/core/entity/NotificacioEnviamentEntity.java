@@ -380,9 +380,8 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaCertificacioNumSeguiment = notificaCertificacioNumSeguiment;
 	}
 	
-	public void updateNotificaError(
-			boolean notificaError,
-			NotificacioEventEntity notificaErrorEvent) {
+	public void updateNotificaError(boolean notificaError, NotificacioEventEntity notificaErrorEvent) {
+
 		this.notificaError = notificaError;
 		this.notificacioErrorEvent = notificaErrorEvent;
 	}

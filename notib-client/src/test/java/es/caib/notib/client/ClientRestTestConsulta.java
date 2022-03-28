@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 public class ClientRestTestConsulta {
 
 	
-	private static final String URL = "http://localhost:8180/notib";
+	private static final String URL = "http://localhost:8280/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 	private static final boolean BASIC_AUTH = false;

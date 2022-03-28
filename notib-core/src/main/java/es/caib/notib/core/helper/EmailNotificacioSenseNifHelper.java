@@ -65,6 +65,7 @@ public class EmailNotificacioSenseNifHelper {
 	@UpdateNotificacioTable
 	@Audita(entityType = AuditService.TipusEntitat.NOTIFICACIO, operationType = AuditService.TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviarEmail(List<NotificacioEnviamentEntity> enviamentsSenseNif, boolean totsEmail) {
+
 		NotificacioEntity notificacio = notificacioRepository.findById(enviamentsSenseNif.get(0).getNotificacio().getId());
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 
@@ -75,9 +76,7 @@ public class EmailNotificacioSenseNifHelper {
 
 		if (totsEmail && !NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA_AMB_ERRORS.");
-			throw new ValidationException(
-					notificacio.getId(),
-					NotificacioEntity.class,
+			throw new ValidationException(notificacio.getId(), NotificacioEntity.class,
 					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 		}
 
@@ -85,18 +84,14 @@ public class EmailNotificacioSenseNifHelper {
 		boolean hasErrors = false;
 		for (NotificacioEnviamentEntity enviament : enviamentsSenseNif) {
 			String error = sendEmailInfoEnviamentSenseNif(enviament);
-
-			notificacioEventHelper.addNotificacioEmailEvent(
-					notificacio,
-					enviament,
-					error != null,
-					error);
+			notificacioEventHelper.addNotificacioEmailEvent(notificacio, enviament,error != null, error);
 			hasErrors = hasErrors || error != null;
 		}
 
 		// Event Notificació x envaiment per email
 		if (hasErrors) {
 			notificacioEventHelper.addEnviamentEmailErrorEvent(notificacio);
+			auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
 		} else {
 			notificacioEventHelper.addEnviamentEmailOKEvent(notificacio);
 		}
@@ -106,10 +101,11 @@ public class EmailNotificacioSenseNifHelper {
 		boolean totsElsEnviamentsEnviats = !notificacio.hasEnviamentsNoEnviats();
 
 		if (totsElsEnviamentsEnviats) {
-			if (notificacioMixta)
+			if (notificacioMixta) {
 				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
-			else
+			} else {
 				auditNotificacioHelper.updateNotificacioEnviadaEmail(notificacio);
+			}
 		} else {
 			if (notificacio.hasEnviamentsEnviats()) {
 				boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
@@ -240,6 +236,7 @@ public class EmailNotificacioSenseNifHelper {
 			}
 		}
 
+//		if ("test@limit.es".equals(emailDestinatari))
 		mailSender.send(missatge);
 	}
 

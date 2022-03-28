@@ -25,8 +25,8 @@ import static org.junit.Assert.*;
 public class ClientRestv2Test extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8080/notib";
-//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String URL = "http://localhost:8080/notib";
+	private static final String URL = "http://localhost:8280/notib";
 	private static final String USERNAME = "admin";
 	private static final String PASSWORD = "admin";
 
@@ -56,22 +56,18 @@ public class ClientRestv2Test extends ClientBaseTest {
 				URL,
 				USERNAME,
 				PASSWORD,
-				true); //tomcat = true jboss = false/true
+				false); //tomcat = true jboss = false/true
 	}
 
 	@Test
 	public void test() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		String notificacioId = Long.toString(System.currentTimeMillis());
-		RespostaAltaV2 respostaAlta = client.alta(
-				generarNotificacioV2(
-						notificacioId,
-						1,
-						false));
+		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId, 2, false));
 
 		assertNotNull(respostaAlta);
 		if (respostaAlta.isError()) {
 			System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());
-
 		} else {
 			System.out.println(">>> Reposta Ok");
 		}
@@ -82,9 +78,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
-		assertEquals(
-				NotificacioEstatEnum.PENDENT,
-				respostaAlta.getEstat());
+		assertEquals(NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
 		System.out.println(">>> Identificador: " + respostaAlta.getIdentificador());
 		System.out.println(">>> Referencia: " + referencies.get(0).getReferencia());
 		System.out.println(">>> Informació resposta: " + respostaAlta.toString());
@@ -94,11 +88,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void testConsultaEstatNotificacio() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		String notificacioId = Long.toString(System.currentTimeMillis());
-		RespostaAltaV2 respostaAlta = client.alta(
-				generarNotificacioV2(
-						notificacioId,
-						1,
-						false));
+		RespostaAltaV2 respostaAlta = client.alta(generarNotificacioV2(notificacioId,1,false));
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
