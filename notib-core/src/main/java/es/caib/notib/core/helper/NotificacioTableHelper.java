@@ -100,6 +100,7 @@ public class NotificacioTableHelper {
                 tableViewItem.setNotificaErrorDescripcio(null);
 
             } else {
+
                 NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
                 tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
                 if (tableViewItem.getNotificaErrorDescripcio() == null) {
