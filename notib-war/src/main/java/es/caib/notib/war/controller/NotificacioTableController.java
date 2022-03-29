@@ -146,13 +146,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 OrganGestorDto organGestorActual = getOrganGestorActual(request);
                 organGestorCodi = organGestorActual.getCodi();
             }
-            notificacions = notificacioService.findAmbFiltrePaginat(
-                    entitatActual != null ? entitatActual.getId() : null,
-                    RolEnumDto.valueOf(RolHelper.getRolActual(request)),
-                    organGestorCodi,
-                    usuariActual.getCodi(),
-                    filtre,
-                    DatatablesHelper.getPaginacioDtoFromRequest(request));
+            Long entitatId = entitatActual != null ? entitatActual.getId() : null;
+            notificacions = notificacioService.findAmbFiltrePaginat(entitatId, RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi,
+                                                                    usuariActual.getCodi(), filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
 
             prepararColumnaEstat(request, notificacions.getContingut());
         } catch (SecurityException e) {
@@ -172,9 +168,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\">" :
                     NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
             String nomEstat = " " + getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "";
-            String error = item.isNotificaError() ? "<span class=\"fa fa-warning text-danger\" title=\"" + item.getNotificaErrorDescripcio() + " \"></span>" : "";
+            String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + item.getNotificaErrorDescripcio() + " \"></span>" : "";
             error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
-                    "<span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error\"/> \"></span>" : "";
+                    " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
             estat = "<span>" + estat + nomEstat + error + "</span>";
             String data = "\n";
             if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
@@ -192,7 +188,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Map<String, Integer>  registres = new HashMap<>();
             for (NotificacioEnviamentDatatableDto env : enviaments) {
                 if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
-                    notificaEstat += getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + env.getNotificaEstat()) + ", ";
+                    notificaEstat += getMessage(request, "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto." + env.getNotificaEstat()) + ", ";
                 }
                 if (env.getRegistreEstat() != null) {
                     if (registres.containsKey(env.getRegistreEstat().name())) {
