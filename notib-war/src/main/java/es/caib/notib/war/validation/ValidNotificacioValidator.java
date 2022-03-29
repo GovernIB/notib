@@ -14,6 +14,7 @@ import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.hibernate.validator.constraints.impl.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
@@ -318,10 +321,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					
 					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !isEmailValid(enviament.getTitular().getEmail())) {
 						valid = false;
-						context.buildConstraintViolationWithTemplate(
-								MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
-						.addNode("enviaments["+envCount+"].titular.email")
-						.addConstraintViolation();
+						context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
+						.addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
 					}
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
@@ -376,18 +377,17 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	    }
 	    return str;
 	}
-	
+
+	public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
 	private boolean isEmailValid(String email) {
-		boolean valid = true;
 		try {
-			InternetAddress emailAddr = new InternetAddress(email);
-			emailAddr.validate();
+			Matcher matcher = EMAIL_REGEX.matcher(email);
+			return matcher.find();
 		} catch (Exception e) {
-			valid = false; //no vàlid
+			return false;
 		}
-		return valid;
 	}
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);
 
 }
