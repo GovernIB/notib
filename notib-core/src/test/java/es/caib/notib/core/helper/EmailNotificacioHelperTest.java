@@ -10,6 +10,8 @@ import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,6 +33,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertNull;
 
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class EmailNotificacioHelperTest {
 
@@ -131,7 +134,7 @@ public class EmailNotificacioHelperTest {
 
 	}
 	
-//	@Test
+	@Test
 	public void whenSendEmailNotificacio_thenReturn() throws Exception {
 
 		// Given
@@ -180,7 +183,7 @@ public class EmailNotificacioHelperTest {
 		assertNull(resposta);
 	}
 
-//	@Test
+	@Test
 	public void whenSendEmailNotificacioSenseNif_thenReturn() throws Exception {
 
 		// Given
@@ -210,7 +213,7 @@ public class EmailNotificacioHelperTest {
 		assertNull(resposta);
 	}
 
-//	@Test
+	@Test
 	public void whenSendEmailComunicacioSenseNif_thenReturn() throws Exception {
 
 		// Given
