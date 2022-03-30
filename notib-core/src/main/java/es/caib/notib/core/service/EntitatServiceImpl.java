@@ -239,6 +239,7 @@ public class EntitatServiceImpl implements EntitatService {
 			if (!entitat.isEntregaCieActiva() && entregaCie != null) {
 				entregaCieRepository.delete(entregaCie);
 			}
+			permisosCacheable.evictAllFindEntitatsAccessiblesUsuari();
 			return conversioTipusHelper.convertir(
 					entity,
 					EntitatDto.class);
