@@ -432,7 +432,7 @@ public interface NotificacioService {
 	 * @return true si ok false altrament.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	boolean actualitzarReferencies();
+	void actualitzarReferencies();
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	boolean reenviarNotificacioAmbErrors(Long notificacioId);

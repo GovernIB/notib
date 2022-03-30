@@ -27,6 +27,7 @@ public class ActualitzarController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/referencies", method = RequestMethod.GET)
     public String actualitzarReferencies(HttpServletRequest request, Model model) {
-        return notificacioService.actualitzarReferencies() ? "Ok" : "Error: consultar el log";
+//        return notificacioService.actualitzarReferencies() ? "Ok" : "Error: consultar el log";
+        return "";
     }
 }

@@ -28,6 +28,7 @@ import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
 import es.caib.notib.core.api.ws.notificacio.Persona;
 import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
 import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.core.api.ws.notificacio.ProcessosInicialsEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -38,10 +39,12 @@ import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditReposito
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.plugins.arxiu.api.Document;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,8 +52,13 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -69,6 +77,7 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class NotificacioServiceImpl implements NotificacioService {
 	
@@ -102,6 +111,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private PersonaRepository personaRepository;
+	@Autowired
+	private ColumnesRepository columnesRepository;
 	@Autowired
 	private PersonaHelper personaHelper;
 	@Autowired
@@ -148,6 +159,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
+	@Autowired
+	private ProcessosInicialsRepository processosInicialsRepository;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -1691,7 +1704,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional
-	public boolean actualitzarReferencies() {
+	public void actualitzarReferencies() {
 
 		try {
 			List<Long> ids = notificacioRepository.findIdsSenseReferencia();
@@ -1724,13 +1737,40 @@ public class NotificacioServiceImpl implements NotificacioService {
 			//Taules auxiliar d'enviament
 			notificacioEnviamentAuditRepository.updateReferenciesNules();
 			enviamentTableRepository.updateReferenciesNules();
-
-			return true;
+			columnesRepository.refNotUpdateNulls();
 		} catch (Exception ex) {
 			logger.error("Error actualitzant les referencies", ex);
-			return false;
 		}
 	}
+
+
+//	@Autowired
+//	@Qualifier("transactionManager")
+//	protected PlatformTransactionManager txManager;
+//
+//	@PostConstruct
+//	@Transactional
+//	public void executarProcessosInicials() {
+//
+//		TransactionTemplate tmpl = new TransactionTemplate(txManager);
+//		tmpl.execute(new TransactionCallbackWithoutResult() {
+//			@Override
+//			protected void doInTransactionWithoutResult(TransactionStatus status) {
+//				try {
+//					List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
+//					for (ProcesosInicialsEntity proces : processos) {
+//						if (ProcessosInicialsEnum.ACTUALITZAR_REFERENCIES.equals(proces.getCodi())) {
+//							actualitzarReferencies();
+//							processosInicialsRepository.updateInit(proces.getId(), false);
+//							continue;
+//						}
+//					}
+//				} catch (Exception ex) {
+//					log.error("Errror executant els processos inicials", ex);
+//				}
+//			}
+//		});
+//	}
 
 	private byte[] longToBytes(long l) {
 		byte[] result = new byte[Long.SIZE / Byte.SIZE];
