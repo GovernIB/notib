@@ -39,27 +39,23 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 	public void close(MessageContext messageContext) {
 	}
 
-
-
 	private void log(SOAPMessageContext messageContext) {
-		if (LOGGER.isDebugEnabled()) {
-			StringBuilder sb = new StringBuilder();
-			Boolean outboundProperty = (Boolean)messageContext.get(
-					MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-			if (outboundProperty.booleanValue())
-				sb.append("Missarge sortint: ");
-			else
-				sb.append("Missarge entrant: ");
-			SOAPMessage message = messageContext.getMessage();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try {
-				message.writeTo(baos);
-				sb.append(baos.toString());
-			} catch (Exception ex) {
-				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
-			}
-			LOGGER.debug(sb.toString());
+
+		if (!LOGGER.isDebugEnabled()) {
+			return;
 		}
+		StringBuilder sb = new StringBuilder();
+		Boolean outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+		sb.append(outboundProperty.booleanValue() ? "Missarge sortint: " : "Missarge entrant: ");
+		SOAPMessage message = messageContext.getMessage();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			message.writeTo(baos);
+			sb.append(baos);
+		} catch (Exception ex) {
+			sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
+		}
+		LOGGER.debug(sb.toString());
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SOAPLoggingHandler.class);
