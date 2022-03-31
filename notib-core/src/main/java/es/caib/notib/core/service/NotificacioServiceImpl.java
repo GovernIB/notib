@@ -1720,7 +1720,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				Long notId = ids.get(foo);
 				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(notId.longValue()))));
 				notificacioRepository.updateReferencia(notId, referencia);
-//				notificacioTableViewRepository.updateReferencia(notId, referencia);
 			}
 
 			logger.info("Actualitzant not_notificacio_env");
@@ -1742,35 +1741,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			logger.error("Error actualitzant les referencies", ex);
 		}
 	}
-
-
-//	@Autowired
-//	@Qualifier("transactionManager")
-//	protected PlatformTransactionManager txManager;
-//
-//	@PostConstruct
-//	@Transactional
-//	public void executarProcessosInicials() {
-//
-//		TransactionTemplate tmpl = new TransactionTemplate(txManager);
-//		tmpl.execute(new TransactionCallbackWithoutResult() {
-//			@Override
-//			protected void doInTransactionWithoutResult(TransactionStatus status) {
-//				try {
-//					List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
-//					for (ProcesosInicialsEntity proces : processos) {
-//						if (ProcessosInicialsEnum.ACTUALITZAR_REFERENCIES.equals(proces.getCodi())) {
-//							actualitzarReferencies();
-//							processosInicialsRepository.updateInit(proces.getId(), false);
-//							continue;
-//						}
-//					}
-//				} catch (Exception ex) {
-//					log.error("Errror executant els processos inicials", ex);
-//				}
-//			}
-//		});
-//	}
 
 	private byte[] longToBytes(long l) {
 		byte[] result = new byte[Long.SIZE / Byte.SIZE];
