@@ -66,6 +66,8 @@
 
             $(document).ready(function() {
 
+                $('#arbreOrgans').jstree().open_all(null, 200);
+
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
                         var type = this.type, tag = this.tagName.toLowerCase();

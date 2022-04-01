@@ -1,9 +1,14 @@
 package es.caib.notib.core.api.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public class ArbreNode<T> implements Serializable {
 
     public ArbreNode<T> pare;
@@ -11,6 +16,7 @@ public class ArbreNode<T> implements Serializable {
     public List<ArbreNode<T>> fills;
     public long count = 0;
     public boolean mostrarCount = false;
+    public boolean filtresOk;
 
     public ArbreNode(ArbreNode<T> pare) {
         super();
