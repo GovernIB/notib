@@ -18,7 +18,8 @@ public class PersonaHelper {
     private PersonaRepository personaRepository;
 
     public PersonaEntity create(Persona persona, boolean incapacitat) {
-        return personaRepository.saveAndFlush(PersonaEntity.getBuilderV2(
+
+        PersonaEntity p = PersonaEntity.getBuilderV2(
                 persona.getInteressatTipus(),
                 persona.getEmail(),
                 persona.getLlinatge1(),
@@ -27,7 +28,9 @@ public class PersonaHelper {
                 persona.getNom(),
                 persona.getTelefon(),
                 persona.getRaoSocial(),
-                persona.getDir3Codi()).incapacitat(incapacitat).build());
+                persona.getDir3Codi()).incapacitat(incapacitat).build();
+        p.setDocumentTipus(persona.getDocumentTipus());
+        return personaRepository.saveAndFlush(p);
     }
 
     public PersonaEntity update(Persona persona, boolean incapacitat) {
