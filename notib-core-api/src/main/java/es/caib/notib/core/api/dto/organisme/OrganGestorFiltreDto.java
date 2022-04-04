@@ -52,6 +52,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 		boolean ok = false;
 		for (ArbreNode<OrganGestorDto> fill : fills) {
 			if (filtresOk(fill.getDades())) {
+				fill.setRetornatFiltre(true);
 				fillsFiltrats.add(fill);
 				ok = true;
 				continue;
@@ -59,6 +60,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 			boolean o = filtrar(fill);
 			if (o) {
 				ok = true;
+				fill.setRetornatFiltre(true);
 				fillsFiltrats.add(fill);
 			}
 		}
