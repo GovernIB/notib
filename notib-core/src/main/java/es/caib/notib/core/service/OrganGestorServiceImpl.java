@@ -1007,6 +1007,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(entitat.getDir3Codi()), OrganGestorDto.class));
 			arbre.setArrel(arrel);
 			arrel.setFills(generarFillsArbre(organs, arrel, entitat.getDir3Codi(), filtres));
+			if (!filtres.isEmpty()) {
+				if(!filtres.filtrar(arbre.getArrel())) {
+					arrel.setFills(new ArrayList<ArbreNode<OrganGestorDto>>());
+				}
+			}
 			return arbre;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1017,11 +1022,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 															  String codiEntitat, OrganGestorFiltreDto filtres) {
 
 		NodeDir3 organ = organs.get(codiEntitat);
-		List<NodeDir3> fills = organ.getFills();
 		OrganGestorDto organExsitent = buscarOrgan(organ.getCodi());
 		OrganGestorDto o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
 		List<ArbreNode<OrganGestorDto>> nodes = new ArrayList<>();
-		if (fills == null || fills.isEmpty() && filtres.filtresOk(o)) {
+		List<NodeDir3> fills = organ.getFills();
+		if (fills == null || fills.isEmpty()/* && filtres.filtresOk(o)*/) {
 			organsList.add(o);
 			return nodes;
 		}
@@ -1032,12 +1037,23 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
 			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, o);
 			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi(), filtres);
-			if (!filtres.filtresOk(o) && nets.isEmpty()) {
-				continue;
-			}
+//			if (!filtres.filtresOk(o) && nets.isEmpty()) {
+//				continue;
+//			}
+//			if (fills.isEmpty()) {
+//				String bar = "foo";
+//			}
+//			if (o.getCodi().equals("A04035966") || o.getCodi().equals("A04035964") || o.getCodi().equals("A04026906")) {
+//				String bar = "foo";
+//			}
+//			if (!filtres.filtresOk(actual)) {
+//				continue;
+//			}
+
 			actual.setFills(nets);
 			nodes.add(actual);
 		}
+
 		return nodes;
 	}
 
@@ -1081,9 +1097,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 
-
-
-
 	private List<OrganGestorEntity> recuperarOrgansPerProcedimentAmbPermis(
 			String usuari,
 			EntitatEntity entitat,
@@ -1104,18 +1117,14 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		List<OrganGestorEntity> organsGestorsProcediments = new ArrayList<>();
 		List<Long> procedimentsDisponiblesIds = new ArrayList<>();
-		for (ProcSerEntity pro : procedimentsDisponibles)
+		for (ProcSerEntity pro : procedimentsDisponibles) {
 			procedimentsDisponiblesIds.add(pro.getId());
-
+		}
 		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
 		if (!procedimentsDisponiblesIds.isEmpty())
 			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
 		// 2-recuperam els òrgans amb permís
-		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.getOrgansGestorsWithPermis(
-				usuari,
-				auth,
-				entitat,
-				permisos);
+		List<OrganGestorEntity> organsGestorsAmbPermis = organGestorHelper.getOrgansGestorsWithPermis(usuari, auth, entitat, permisos);
 		// 3-juntam tots els òrgans i ordenam per nom
 		List<OrganGestorEntity> organsGestors;
 		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
@@ -1129,8 +1138,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (!configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
 			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
 		}
-		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty())
+		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty()) {
 			throw new NoPermisosException("Usuari sense permios assignats");
+		}
 		return organsGestors;
 	}
 

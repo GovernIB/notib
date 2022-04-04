@@ -20,12 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface ColumnesRepository extends JpaRepository<ColumnesEntity, Long> {
 
-	ColumnesEntity findByEntitatAndUser(
-			EntitatEntity entitat,
-			UsuariEntity usuari);
+	ColumnesEntity findByEntitatAndUser(EntitatEntity entitat, UsuariEntity usuari);
 
 	@Transactional
 	@Modifying
 	@Query("DELETE FROM ColumnesEntity c WHERE c.entitat.id = :entitatId")
 	int deleteByEntitatId(@Param("entitatId") Long entitatId);
+
+	@Transactional
+	@Modifying
+	@Query("UPDATE ColumnesEntity c SET c.referenciaNotificacio = false WHERE c.referenciaNotificacio is NULL")
+	void refNotUpdateNulls();
 }

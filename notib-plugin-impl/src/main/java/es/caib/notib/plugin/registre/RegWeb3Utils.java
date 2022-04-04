@@ -1,6 +1,7 @@
 package es.caib.notib.plugin.registre;
 
 import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.notib.plugin.utils.SOAPLoggingHandler;
 import es.caib.regweb3.ws.api.v3.*;
 import org.apache.commons.io.IOUtils;
 
@@ -8,10 +9,13 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 //import org.fundaciobit.genapp.common.utils.Utils;
@@ -30,14 +34,13 @@ public abstract class RegWeb3Utils {
 	public static final String REGWEB3_REGISTRO_SALIDA = "RegWebRegistroSalida";
 	public static final String REGWEB3_INFO = "RegWebInfo";
 	public static final String REGWEB3_ASIENTO_REGISTRAL = "RegWebAsientoRegistral";
-	
-
 
 
 	public static String getEndPoint(String api) {
 		String url = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.url");
-		if (!url.endsWith("/"))
+		if (!url.endsWith("/")) {
 			url = url + "/";
+		}
 		return url + api;
 	}
 
@@ -49,16 +52,16 @@ public abstract class RegWeb3Utils {
 		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.registre.password");
 	}
 
-	public static void configAddressUserPassword(
-			String usr, 
-			String pwd,
-			String endpoint, 
-			Object api) {
+	public static void configAddressUserPassword(String usr, String pwd, String endpoint, Object api) {
 
-		Map<String, Object> reqContext = ((BindingProvider) api).getRequestContext();
+		BindingProvider bp = (BindingProvider) api;
+		Map<String, Object> reqContext = bp.getRequestContext();
 		reqContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
 		reqContext.put(BindingProvider.USERNAME_PROPERTY, usr);
 		reqContext.put(BindingProvider.PASSWORD_PROPERTY, pwd);
+		List<Handler> handlerChain = new ArrayList<>();
+		handlerChain.add(new SOAPLoggingHandler());
+		bp.getBinding().setHandlerChain(handlerChain);
 	}
 
 	public static RegWebHelloWorldWs getHelloWorldApi() throws Exception {
@@ -90,7 +93,6 @@ public abstract class RegWeb3Utils {
 		
 		return api;
 	}
-
 
 	public static RegWebPersonasWs getPersonasApi() throws Exception  {
 		
@@ -156,7 +158,6 @@ public abstract class RegWeb3Utils {
 
 		return api;
 	}
-
 
 	public static byte[] constructFitxerFromResource(String name) throws Exception  {
 		String filename;
