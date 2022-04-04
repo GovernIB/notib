@@ -1034,20 +1034,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			organExsitent = buscarOrgan(node.getCodi());
 			o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
 			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, o);
+			if (filtres.filtresOk(o)) {
+				actual.setRetornatFiltre(true);
+			}
 			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi(), filtres);
-//			if (!filtres.filtresOk(o) && nets.isEmpty()) {
-//				continue;
-//			}
-//			if (fills.isEmpty()) {
-//				String bar = "foo";
-//			}
-//			if (o.getCodi().equals("A04035966") || o.getCodi().equals("A04035964") || o.getCodi().equals("A04026906")) {
-//				String bar = "foo";
-//			}
-//			if (!filtres.filtresOk(actual)) {
-//				continue;
-//			}
-
 			actual.setFills(nets);
 			nodes.add(actual);
 		}
