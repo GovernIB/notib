@@ -1007,10 +1007,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(entitat.getDir3Codi()), OrganGestorDto.class));
 			arbre.setArrel(arrel);
 			arrel.setFills(generarFillsArbre(organs, arrel, entitat.getDir3Codi(), filtres));
-			if (!filtres.isEmpty()) {
-				if(!filtres.filtrar(arbre.getArrel())) {
-					arrel.setFills(new ArrayList<ArbreNode<OrganGestorDto>>());
-				}
+			if (!filtres.isEmpty() && !filtres.filtrar(arbre.getArrel())) {
+				arrel.setFills(new ArrayList<ArbreNode<OrganGestorDto>>());
 			}
 			return arbre;
 		} finally {

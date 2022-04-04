@@ -17,6 +17,7 @@ public class ArbreNode<T> implements Serializable {
     public long count = 0;
     public boolean mostrarCount = false;
     public boolean filtresOk;
+    public boolean retornatFiltre;
 
     public ArbreNode(ArbreNode<T> pare) {
         super();
