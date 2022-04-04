@@ -71,6 +71,11 @@ public class NotificacioTableItemDto {
 		return estat != null && estat.equals(NotificacioEstatEnumDto.PENDENT) && registreEnviamentIntent == 0 && !isNotificaError();
 	}
 
+	public boolean isJustificant() {
+		return estat != null && (!estat.equals(NotificacioEstatEnumDto.PENDENT) || !estat.equals(NotificacioEstatEnumDto.ENVIANT) || !estat.equals(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS));
+	}
+
+
 	public String getOrganGestorDesc() {
 		if (organNom != null && !organNom.isEmpty())
 			return organCodi + " - " + organNom;
