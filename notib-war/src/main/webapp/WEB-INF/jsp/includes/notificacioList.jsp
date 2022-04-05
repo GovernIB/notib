@@ -637,6 +637,7 @@
         <th data-col-name="notificaError" data-visible="false"></th>
         <th data-col-name="notificaErrorDescripcio" data-visible="false"></th>
         <th data-col-name="enviant" data-visible="false"></th>
+        <th data-col-name="justificant" data-visible="false"></th>
         <th data-col-name="enviamentTipus" data-template="#cellEnviamentTipusTemplate" class="enviamentTipusCol" width="5px">
 
             <script id="cellEnviamentTipusTemplate" type="text/x-jsrender">
