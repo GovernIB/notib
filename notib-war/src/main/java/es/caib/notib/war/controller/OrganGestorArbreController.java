@@ -76,6 +76,7 @@ public class OrganGestorArbreController extends BaseUserController {
             Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
             model.addAttribute("organs", organService.getOrgansAsList());
             model.addAttribute("arbreOrgans", arbre);
+            model.addAttribute("filtresEmpty", filtres.isEmpty());
             omplirModel(model, entitat, null);
         } catch (Exception ex) {
             String msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {

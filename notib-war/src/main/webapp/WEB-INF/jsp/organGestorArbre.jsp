@@ -65,9 +65,9 @@
 
 
             $(document).ready(function() {
-
-                $('#arbreOrgans').jstree().open_all(null, 200);
-
+                if ("${filtresEmpty}" === "false") {
+                    $('#arbreOrgans').jstree().open_all(null, 200);
+                }
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
                         var type = this.type, tag = this.tagName.toLowerCase();
@@ -142,12 +142,6 @@
                 <not:arbre id="arbreOrgans" atributId="codi" atributNom="nomCodi" arbre="${arbreOrgans}" fullesAtributId="id" fullesAtributNom="nomCodi"
                            fullesAtributPare="codi"  fullesIcona="fa fa-inbox fa-lg" changedCallback="changedCallback" isArbreSeleccionable="${true}"
                            isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"/>
-<%--                <not:arbre id="arbreOrgans" atributId="codi" atributNom="nom" arbre="${arbreOrgans}" fulles="${organs}" fullesAtributId="id" fullesAtributNom="nom"--%>
-<%--                           fullesAtributPare="unitatCodi" fullesAtributInfo="perDefecte" fullesAtributInfoText="${fullesAtributInfoText}"  fullesIcona="fa fa-inbox fa-lg"--%>
-<%--                           changedCallback="changedCallback" isArbreSeleccionable="${false}" isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="inactiva"--%>
-<%--                           fillsAtributInfoCondition="obsoleta" fillsAtributInfoText="${fillsAtributInfoText}"--%>
-<%--                />--%>
-
             </div>
             <div id="detall" class="col-md-7">
 

@@ -1,5 +1,6 @@
 package es.caib.notib.war.command;
 
+import com.google.common.base.Strings;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
@@ -32,6 +33,10 @@ public class OrganGestorFiltreCommand {
 	}
 	public OrganGestorFiltreDto asDto() {
 		return ConversioTipusHelper.convertir(this, OrganGestorFiltreDto.class);
+	}
+
+	public boolean isEmpty() {
+		return Strings.isNullOrEmpty(codi) && Strings.isNullOrEmpty(codiPare) && Strings.isNullOrEmpty(nom) && Strings.isNullOrEmpty(oficina) && estat == null;
 	}
 
 	@Override
