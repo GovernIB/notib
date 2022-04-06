@@ -45,11 +45,13 @@ public class PermisCommand {
 	private boolean aplicacio;
 	
 	private boolean processar;
-	private boolean notificacio;
 
 	private boolean comuns;
 
 	private boolean selectAll;
+
+	private boolean notificacio;
+	private boolean comunicacioSir;
 
 	public static List<PermisCommand> toPermisCommands(
 			List<PermisDto> dtos) {

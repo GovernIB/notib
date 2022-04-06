@@ -113,9 +113,10 @@ pageContext.setAttribute(
 				<div class="permisosInput">
 					<not:inputCheckbox name="read" labelSize="8" textKey="procediment.permis.form.camp.consulta"/>
 					<not:inputCheckbox name="processar" labelSize="8" textKey="procediment.permis.form.camp.processar"/>
-					<not:inputCheckbox name="notificacio" labelSize="8" textKey="procediment.permis.form.camp.notificacio"/>
 					<not:inputCheckbox name="administration" labelSize="8" textKey="procediment.permis.form.camp.gestio"/>
 					<not:inputCheckbox name="comuns" labelSize="8" textKey="organgestor.permis.form.camp.comuns"/>
+					<not:inputCheckbox name="notificacio" labelSize="8" textKey="procediment.permis.form.camp.notificacio"/>
+					<not:inputCheckbox name="comunicacioSir" labelSize="8" textKey="procediment.permis.form.camp.comunicacio.sir"/>
 				</div>
 				<not:inputCheckbox name="administrador" labelSize="8" textKey="procediment.permis.form.camp.administrador" disabled="${isRolActualAdministradorOrgan}"/>
 			</div>

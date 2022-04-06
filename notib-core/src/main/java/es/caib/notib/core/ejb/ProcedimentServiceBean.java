@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -358,17 +359,18 @@ public class ProcedimentServiceBean implements ProcedimentService {
     }
 
 	@Override
-	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol) {
+	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 		return delegate.getProcedimentsOrganNotificables(
 				entitatId,
 				organCodi,
-				rol);
+				rol,
+				enviamentTipus);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId) {
-		return delegate.hasProcedimentsComunsAndNotificacioPermission(entitatId);
+	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
+		return delegate.hasProcedimentsComunsAndNotificacioPermission(entitatId, enviamentTipus);
 	}
 
 	@Override

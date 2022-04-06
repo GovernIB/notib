@@ -1,12 +1,13 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 /**
@@ -401,6 +402,7 @@ public interface ProcedimentService {
 	 * @param entitatId Entitat de l'òrgan a consultar
 	 * @param organCodi Codi Dir3 de l'òrgan
 	 * @param rol Rol de l'usuari per seleccionar els procediments permesos per aquest rol
+	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
 	 *
 	 * @return Llistat amb la informació de tots els procediments seleccionats.
 	 *
@@ -409,15 +411,17 @@ public interface ProcedimentService {
 	List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(
 			Long entitatId,
 			String organCodi,
-			RolEnumDto rol);
+			RolEnumDto rol,
+			TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Consulta si l'usuari té permís de notificació a tots els procediments comuns per a algún òrgan gestor.
 	 *
 	 * @param entitatId Identificador de l'entitat actual
+	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
 	 * @return boleà indicant si es te permis de procediments comuns a algun òrgan
 	 */
-	boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId);
+	boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Actualitza el procediment indicat amb la informació del procediment actual

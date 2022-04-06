@@ -155,6 +155,7 @@ public class NotificacioHelperTest {
 				Mockito.eq(false),
 				Mockito.eq(false),
 				Mockito.eq(true),
+				Mockito.eq(false),
 				Mockito.eq(false))).thenReturn(procediment);
 		Mockito.when(organGestorHelper.createOrganGestorFromNotificacio(Mockito.any(NotificacioDatabaseDto.class), 
 				Mockito.any(EntitatEntity.class))).thenReturn(organGestor);

@@ -449,7 +449,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisConsulta,
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio) {
+			boolean comprovarPermisGestio,
+			boolean comprovarPermisComunicacioSir) {
 		
 		EntitatEntity entitatEntity = comprovarEntitat(entitatId);
 		
@@ -459,7 +460,8 @@ public class EntityComprovarHelper {
 				comprovarPermisConsulta,
 				comprovarPermisProcessar,
 				comprovarPermisNotificacio,
-				comprovarPermisGestio);
+				comprovarPermisGestio,
+				comprovarPermisComunicacioSir);
 	}
 	
 	public ProcSerEntity comprovarProcediment(
@@ -468,7 +470,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisConsulta,
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio) {
+			boolean comprovarPermisGestio,
+			boolean comprovarPermisComunicacioSir) {
 
 		ProcSerEntity procediment = comprovarProcediment(entitat, procedimentId);
 		
@@ -485,7 +488,10 @@ public class EntityComprovarHelper {
 		if (comprovarPermisGestio) {
 			checkPermisProcediment(procediment, auth, PermisEnum.GESTIO);
 		}
-		
+		if (comprovarPermisComunicacioSir) {
+			checkPermisProcediment(procediment, auth, PermisEnum.COMUNIACIO_SIR);
+		}
+
 		return procediment;
 	}
 	private void checkPermisProcediment(ProcSerEntity procediment, Authentication auth, PermisEnum permis) {
@@ -506,7 +512,8 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisConsulta,
 			boolean comprovarPermisProcessar,
 			boolean comprovarPermisNotificacio,
-			boolean comprovarPermisGestio) {
+			boolean comprovarPermisGestio,
+			boolean comprovarPermisComunicacioSir) {
 
 		ProcSerEntity procediment = comprovarProcediment(entitat, procedimentId);
 		
@@ -523,7 +530,9 @@ public class EntityComprovarHelper {
 		if (comprovarPermisGestio) {
 			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.GESTIO);
 		}
-		
+		if (comprovarPermisComunicacioSir) {
+			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.COMUNIACIO_SIR);
+		}
 		return procediment;
 	}
 	private void checkPermisProcedimentOrgan(
@@ -662,6 +671,7 @@ public class EntityComprovarHelper {
 		case PROCESSAR: return ExtendedPermission.PROCESSAR;
 		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
 		case GESTIO: return ExtendedPermission.ADMINISTRATION;
+		case COMUNIACIO_SIR: return ExtendedPermission.COMUNICACIO_SIR;
 		default: return null;
 		}
 	}
@@ -672,6 +682,7 @@ public class EntityComprovarHelper {
 			case "PROCESSAR": return ExtendedPermission.PROCESSAR;
 			case "NOTIFICACIO": return ExtendedPermission.NOTIFICACIO;
 			case "GESTIO": return ExtendedPermission.ADMINISTRATION;
+			case "COMUNICACIO_SIR": return ExtendedPermission.COMUNICACIO_SIR;
 			default: return null;
 		}
 	}
@@ -682,6 +693,7 @@ public class EntityComprovarHelper {
 		case PROCESSAR: return "PROCESSAR";
 		case NOTIFICACIO: return "NOTIFICACIO";
 		case GESTIO: return "ADMINISTRATION";
+		case COMUNIACIO_SIR: return "COMUNIACIO_SIR";
 		default: return null;
 		}
 	}

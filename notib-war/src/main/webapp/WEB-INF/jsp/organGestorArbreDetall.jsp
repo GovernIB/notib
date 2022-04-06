@@ -224,12 +224,6 @@
                             {{if processar}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" width="120px">
-                        <spring:message code="procediment.permis.columna.notificacio"/>
-                        <script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
-                            {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
-                        </script>
-                    </th>
                     <th data-col-name="administration" data-template="#cellPermisGestioTemplate" width="120px">
                         <spring:message code="procediment.permis.columna.gestio"/>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
@@ -242,6 +236,18 @@
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
+	                    <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" width="120px">
+						<spring:message code="procediment.permis.columna.notificacio"/>
+						<script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
+						{{if notificacio}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+					</th>
+					<th data-col-name="comunicacioSir" data-template="#cellPermisComunicacioSirTemplate" width="120px">
+						<spring:message code="procediment.permis.columna.comunicacio.sir"/>
+						<script id="cellPermisComunicacioSirTemplate" type="text/x-jsrender">
+						{{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+					</th>
                     <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" width="120px">
                         <spring:message code="procediment.permis.columna.administrador"/>
                         <script id="cellPermisAdministradorTemplate" type="text/x-jsrender">

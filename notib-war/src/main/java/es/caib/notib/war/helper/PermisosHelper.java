@@ -31,7 +31,9 @@ public class PermisosHelper {
 
 			if (entitatActual != null && usuariActual != null && RolHelper.isUsuariActualUsuari(request)) {
 				List<ProcSerSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentServeisWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-				request.setAttribute("permisNotificacio", !procedimentsDisponibles.isEmpty());
+				List<ProcSerSimpleDto> procedimentsDisponiblesPerSir = procedimentService.findProcedimentServeisWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
+				request.setAttribute("permisNotificacioComunicacio", !procedimentsDisponibles.isEmpty());
+				request.setAttribute("permisComunicacioSir", !procedimentsDisponiblesPerSir.isEmpty());
 			}
 		}
 	}

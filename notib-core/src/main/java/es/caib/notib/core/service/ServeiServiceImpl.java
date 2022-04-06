@@ -4,6 +4,7 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.*;
@@ -1185,11 +1186,13 @@ public class ServeiServiceImpl implements ServeiService{
 	}
 
 	@Override
-	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol) {
+	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<ServeiEntity> serveis;
 		if (RolEnumDto.NOT_ADMIN.equals(rol)) {
 			serveis = recuperarServeiSensePermis(entitat, organCodi);
+		} else if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)){
+			serveis = recuperarServeiAmbPermis(entitat, PermisEnum.COMUNIACIO_SIR, organCodi);
 		} else {
 			serveis = recuperarServeiAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
 		}
@@ -1198,13 +1201,21 @@ public class ServeiServiceImpl implements ServeiService{
 	}
 
 	@Override
-	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId) {
+	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Permission[] permisos = new Permission[]{
-				ExtendedPermission.COMUNS,
-				ExtendedPermission.NOTIFICACIO
-		};
+		Permission[] permisos = new Permission[]{};
+		if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)){
+			permisos = new Permission[]{
+					ExtendedPermission.COMUNS,
+					ExtendedPermission.COMUNICACIO_SIR
+			};
+		} else {
+			permisos = new Permission[]{
+					ExtendedPermission.COMUNS,
+					ExtendedPermission.NOTIFICACIO
+			};
+		}
 
 		List<OrganGestorEntity> organGestorsAmbPermis = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
 		return organGestorsAmbPermis != null && !organGestorsAmbPermis.isEmpty();
@@ -1268,7 +1279,7 @@ public class ServeiServiceImpl implements ServeiService{
 			procSerAmbPermis = addServeisOrgan(serveis, serveisOrgansAmbPermis, organFiltre);
 
 			boolean hasComunsPermission = hasPermisServeisComuns(entitat.getDir3Codi(), organFiltre);
-			if (hasComunsPermission && PermisEnum.NOTIFICACIO.equals(permis)) {
+			if (hasComunsPermission && (PermisEnum.NOTIFICACIO.equals(permis) || PermisEnum.COMUNIACIO_SIR.equals(permis))) {
 				List<ServeiEntity> serveisComuns = serveiRepository.findByEntitatAndComuTrue(entitat);
 				for (ServeiEntity servei: serveisComuns) {
 					if (!procSerAmbPermis.contains(servei))

@@ -1092,7 +1092,7 @@ public class PluginHelper {
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 
-	@Async
+//	@Async
 	public void getOrganigramaPerEntitatAsync(String entitatcodi) throws SistemaExternException {
 		getOrganigramaPerEntitat(entitatcodi);
 		if (organigramaCarregat.get(entitatcodi) == null) {
