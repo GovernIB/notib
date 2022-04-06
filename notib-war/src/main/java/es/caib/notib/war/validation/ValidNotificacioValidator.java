@@ -307,12 +307,15 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 
 					if (enviament.getEntregaDeh() != null && enviament.getEntregaDeh().isActiva()) {
+						if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.persona.sense.nif", null, locale))
+									.addNode("enviaments["+envCount+"].entregaDeh.activa").addConstraintViolation();
+						}
 						if (enviament.getTitular() == null || enviament.getTitular().getNif() == null || enviament.getTitular().getNif().isEmpty()) {
 							valid = false;
-							context.buildConstraintViolationWithTemplate(
-									MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif", null, locale))
-							.addNode("enviaments["+envCount+"].titular.nif")
-							.addConstraintViolation();
+							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.sensenif", null, locale))
+							.addNode("enviaments["+envCount+"].titular.nif").addConstraintViolation();
 						}
 					}
 					
