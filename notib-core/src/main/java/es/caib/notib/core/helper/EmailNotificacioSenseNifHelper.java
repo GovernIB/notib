@@ -1,6 +1,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -243,46 +244,40 @@ public class EmailNotificacioSenseNifHelper {
 	private String getImageByteArrayMimeType(byte[] bytes) throws IOException {
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 		String mimeType = URLConnection.guessContentTypeFromStream(byteArrayInputStream);
-		if (mimeType == null)
+		if (mimeType == null) {
 			mimeType = "image/x-png";
+		}
 		byteArrayInputStream.close();
 		return mimeType;
 	}
 
 	private String getNotificacioMailHtmlBody(NotificacioEnviamentEntity enviament) {
+
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		String htmlText =
-				"<div class=\"content\">" +
+		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
+		String htmlText = "<div class=\"content\">" +
 				"<br/>" +
-				"<h2>Avís de nova notificació</h2>" +
-				"<p>L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
-				getInformacioEnviamentHtml(enviament, true) +
-				"<p>Vosté rebrà aquesta notificació per via postal en els propers dies.</p>" +
-				"<hr />" +
-				"<br/>" +
-				"<h2>Aviso de nueva notificación</h2>" +
-				"<p>Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
-				getInformacioEnviamentHtml(enviament, true) +
-				"<p>Usted recibirá esta notificación por vía postal en los próximos dias.</p>" +
-				"</div>";
+				(IdiomaEnumDto.ES.equals(idioma) ?
+					"<h2>Aviso de nueva notificación</h2>" +
+							"<p>Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
+							getInformacioEnviamentHtml(enviament, false) +
+							"<p>Usted recibirá esta notificación por vía postal en los próximos dias.</p>"
+					:
+					"<h2>Avís de nova notificació</h2>" +
+							"<p>L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
+							getInformacioEnviamentHtml(enviament, true) +
+							"<p>Vosté rebrà aquesta notificació per via postal en els propers dies.</p>"
+					)
+				+ "</div>";
 		return htmlText;
 	}
 	private String getNotificacioMailPlainTextBody(NotificacioEnviamentEntity enviament) {
+
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-
-		String textBody =
-				"AVÍS DE PROPERA NOTIFICACIÓ\n" +
-				"\n" +
-				"L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme '" + organ.getNom() + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
-				"\n" +
-				getInformacioEnviamentPlainText(enviament, true) +
-				"\n" +
-				"Vosté rebrà aquesta notificació per via postal en els propers dies. \n" +
-				"\n" +
-				"\n" +
-				"-----------------------------------------------------------------------------------\n\n" +
+		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
+		String textBody = (IdiomaEnumDto.ES.equals(idioma) ?
 				"AVISO DE PRÓXIMA NOTIFICACIÓN\n" +
 				"\n" +
 				"Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo '" + organ.getNom() + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
@@ -291,36 +286,49 @@ public class EmailNotificacioSenseNifHelper {
 				"\n" +
 				"Usted recibirá esta notificación por vía postal en los próximos dias. \n" +
 				"\n" +
+				"\n"
+				:
+				"AVÍS DE PROPERA NOTIFICACIÓ\n" +
 				"\n" +
-				entitat.getNom().toUpperCase() + "\n";
+				"L'informam que en breu rebrà una nova notificació com a INTERESSAT, procedent de l'organisme '" + organ.getNom() + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
+				"\n" +
+				getInformacioEnviamentPlainText(enviament, true) +
+				"\n" +
+				"Vosté rebrà aquesta notificació per via postal en els propers dies. \n" +
+				"\n" +
+				"\n")
+				+ entitat.getNom().toUpperCase() + "\n";
 		return textBody;
 	}
 
 	private String getComunicacioMailHtmlBody(NotificacioEnviamentEntity enviament) {
+
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		String htmlText =
-				"<div class=\"content\">" +
+		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
+		String htmlText = "<div class=\"content\">" +
 				"<br/>" +
-				"<h2>Avís de nova comunicació</h2>" +
-				"<p>Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
-				getInformacioEnviamentHtml(enviament, true) +
-				"<p>La documentació d'aquesta comunicació s'ha adjuntat a aquest correu electrònic.</p>" +
-				"<hr />" +
-				"<br/>" +
-				"<h2>Aviso de nueva comunicación</h2>" +
-				"<p>Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
-				getInformacioEnviamentHtml(enviament, false) +
-				"<p>La documentación de esta comunicación se ha adjuntado a este correo electrónico.</p>" +
-				"</div>";
+				(IdiomaEnumDto.ES.equals(idioma) ?
+					"<h2>Aviso de nueva comunicación</h2>" +
+							"<p>Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
+							getInformacioEnviamentHtml(enviament, false) +
+							"<p>La documentación de esta comunicación se ha adjuntado a este correo electrónico.</p>"
+
+					:
+					"<h2>Avís de nova comunicació</h2>" +
+							"<p>Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' amb les següents dades:</p>" +
+							getInformacioEnviamentHtml(enviament, true) +
+							"<p>La documentació d'aquesta comunicació s'ha adjuntat a aquest correu electrònic.</p>")
+							+ "</div>";
 		return htmlText;
 	}
 
 	private String getComunicacioMailPlainTextBody(NotificacioEnviamentEntity enviament) {
+
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-
-		String textBody =
+		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
+		String textBody = (IdiomaEnumDto.ES.equals(idioma) ?
 				"NOVA COMUNICACIÓ\n" +
 				"\n" +
 				"Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme '" + organ.getNom() + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
@@ -329,8 +337,8 @@ public class EmailNotificacioSenseNifHelper {
 				"\n" +
 				"La documentació d'aquesta comunicació s'ha adjuntat a aquest correu electrònic. \n" +
 				"\n" +
-				"\n" +
-				"-----------------------------------------------------------------------------------\n\n" +
+				"\n"
+				:
 				"NUEVA COMUNICACIÓN\n" +
 				"\n" +
 				"Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo '" + organ.getNom() + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
@@ -339,8 +347,8 @@ public class EmailNotificacioSenseNifHelper {
 				"\n" +
 				"La documentación de esta comunicación se ha adjuntado a este correo electrónico. \n" +
 				"\n" +
-				"\n" +
-				entitat.getNom().toUpperCase() + "\n";
+				"\n")
+				+ entitat.getNom().toUpperCase() + "\n";
 		return textBody;
 	}
 
@@ -421,8 +429,9 @@ public class EmailNotificacioSenseNifHelper {
 	private String getFooter(String entitatNon, boolean tePeuLogo) {
 		String footer = "<div class=\"footer\">" +
 				"	<div class=\"left-footer\">Notib - " + entitatNon + "</div>";
-		if (tePeuLogo)
-				footer += "	<div class=\"right-footer\"><img src=\"cid:logo-peu\" height=\"60\"></div>";
+		if (tePeuLogo) {
+			footer += "	<div class=\"right-footer\"><img src=\"cid:logo-peu\" height=\"60\"></div>";
+		}
 		footer += "</div>" +
 				"</body>"+
 				"</html>";
@@ -430,39 +439,42 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private String getInformacioEnviamentPlainText(NotificacioEnviamentEntity enviament, boolean catala) {
-		if (catala) {
-			return "\t- Destinatari: " + enviament.getTitular().getNomSencer() + "\n" +
-					"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
-					"\t- Procediment: " + enviament.getNotificacio().getProcediment().getNom() + "\n" +
-					"\t- Concepte: " + enviament.getNotificacio().getConcepte() + "\n" +
-					"\t- Informació addicional: " + enviament.getNotificacio().getDescripcio() + "\n";
-		} else {
-			return "\t- Destinatario: " + enviament.getTitular().getNomSencer() + "\n" +
-					"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
-					"\t- Procedimiento: " + enviament.getNotificacio().getProcediment().getNom() + "\n" +
-					"\t- Concepto: " + enviament.getNotificacio().getConcepte() + "\n" +
-					"\t- Información adicional: " + enviament.getNotificacio().getDescripcio() + "\n";
-		}
+
+		String desc = enviament.getNotificacio().getDescripcio();
+		desc = desc != null ? desc : catala ? "Sense informació adicional" : "Sin información adicional";
+		return catala ?  "\t- Destinatari: " + enviament.getTitular().getNomSencer() + "\n" +
+				"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
+				"\t- Procediment: " + enviament.getNotificacio().getProcediment().getNom() + "\n" +
+				"\t- Concepte: " + enviament.getNotificacio().getConcepte() + "\n" +
+				"\t- Informació addicional: " + desc + "\n"
+				:
+				"\t- Destinatario: " + enviament.getTitular().getNomSencer() + "\n" +
+				"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
+				"\t- Procedimiento: " + enviament.getNotificacio().getProcediment().getNom() + "\n" +
+				"\t- Concepto: " + enviament.getNotificacio().getConcepte() + "\n" +
+				"\t- Información adicional: " + desc + "\n";
 	}
 
 	private String getInformacioEnviamentHtml(NotificacioEnviamentEntity enviament, boolean catala) {
-		if (catala) {
-			return 	"<ul>" +
-					"<li><span class='info-titol'>Destinatari:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
-					"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
-					"<li><span class='info-titol'>Procediment:</span><span class='info-desc'>" + enviament.getNotificacio().getProcediment().getNom() + "</span></li>" +
-					"<li><span class='info-titol'>Concepte:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
-					"<li><span class='info-titol'>Informació addicional:</span><span class='info-desc'>" + enviament.getNotificacio().getDescripcio() + "</span></li>" +
-					"</ul>";
-		} else {
-			return "<ul>" +
-					"<li><span class='info-titol'>Destinatario:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
-					"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
-					"<li><span class='info-titol'>Procedimiento:</span><span class='info-desc'>" + enviament.getNotificacio().getProcediment().getNom() + "</span></li>" +
-					"<li><span class='info-titol'>Concepto:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
-					"<li><span class='info-titol'>Información adicional:</span><span class='info-desc'>" + enviament.getNotificacio().getDescripcio() + "</span></li>" +
-					"</ul>";
-		}
+
+		String desc = enviament.getNotificacio().getDescripcio();
+		desc = desc != null ? desc : catala ? "Sense informació adicional" : "Sin información adicional";
+		return  catala ?
+			"<ul>" +
+				"<li><span class='info-titol'>Destinatari:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
+				"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
+				"<li><span class='info-titol'>Procediment:</span><span class='info-desc'>" + enviament.getNotificacio().getProcediment().getNom() + "</span></li>" +
+				"<li><span class='info-titol'>Concepte:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
+				"<li><span class='info-titol'>Informació addicional:</span><span class='info-desc'>" + desc + "</span></li>" +
+			"</ul>"
+			:
+			 "<ul>" +
+				"<li><span class='info-titol'>Destinatario:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
+				"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
+				"<li><span class='info-titol'>Procedimiento:</span><span class='info-desc'>" + enviament.getNotificacio().getProcediment().getNom() + "</span></li>" +
+				"<li><span class='info-titol'>Concepto:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
+				"<li><span class='info-titol'>Información adicional:</span><span class='info-desc'>" + desc + "</span></li>" +
+			"</ul>";
 	}
 
 	private String getRemitent() {
@@ -486,8 +498,9 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private String getNotBlankProperty(String property) {
-		if (property == null || property.trim().isEmpty())
+		if (property == null || property.trim().isEmpty()) {
 			return null;
+		}
 		return property.trim();
 	}
 }

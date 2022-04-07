@@ -299,3 +299,7 @@ table.dataTable tr.datatable-dades-carregant div {
 	display:flex;
 	justify-content: space-around;
 }
+
+.overflow-visible {
+	overflow: visible;
+}

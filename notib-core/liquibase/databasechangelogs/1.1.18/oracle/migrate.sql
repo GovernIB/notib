@@ -13,6 +13,11 @@ ALTER TABLE not_organ_gestor ADD codi_pare VARCHAR2(32 CHAR);
 -- Changeset db/changelog/changes/1.1.18/645.yaml::1634114082437-5::limit
 ALTER TABLE not_notificacio_massiva ADD num_cancelades NUMBER(38, 0);
 
+-- Changeset db/changelog/changes/1.1.18/695.yaml::1634114082437-4::limit
+CREATE TABLE NOT_PROCESSOS_INICIALS (ID NUMBER(19, 0) NOT NULL, CODI VARCHAR2(100 CHAR) NOT NULL, INIT NUMBER(1, 0) NOT NULL, CONSTRAINT NOT_PROCESSOS_INICIALS_PK PRIMARY KEY (ID));
+
+INSERT INTO NOT_PROCESSOS_INICIALS (id, codi, init) VALUES (1, 'ACTUALITZAR_REFERENCIES', 1);
+
 -- Changeset db/changelog/changes/1.1.18/701.yaml::1638376153806-2::limit
 ALTER TABLE not_notificacio MODIFY registre_data TIMESTAMP;
 

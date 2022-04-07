@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: type.pk
+      value: number(19,0)
+  - property:
+      dbms: postgresql
+      name: type.pk
+      value: SERIAL
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - property:
+      name: boolean.type
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolean.type
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolean.type
+      value: boolean
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-4
+      author: limit
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_PROCESSOS_INICIALS_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: CODI
+                  type: varchar(100 ${varcharUnit})
+              - column:
+                  constraints:
+                    nullable: false
+                    default: 0
+                  name: INIT
+                  type: ${boolean.type}
+            tableName: NOT_PROCESSOS_INICIALS
+        - sql: "INSERT INTO NOT_PROCESSOS_INICIALS (id, codi, init) VALUES (1, 'ACTUALITZAR_REFERENCIES', 1)"

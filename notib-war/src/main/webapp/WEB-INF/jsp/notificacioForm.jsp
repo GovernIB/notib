@@ -1484,7 +1484,8 @@
 	<%--								</div>--%>
 	<%--								<p class="comentari col-xs-12 col-xs-offset-"><spring:message code="notificacio.form.camp.caducitat.info"/></p>--%>
 								</div>
-								<p class="comentari col-xs-12 col-xs-offset-"><spring:message code="notificacio.form.camp.caducitat.info"/></p>
+								<p class="comentari col-xs-12 col-xs-offset-"><spring:message code="notificacio.form.camp.dies.naturals"/></p>
+								<p class="comentari col-xs-12 col-xs-offset-" style="padding-top:5px !important"><spring:message code="notificacio.form.camp.caducitat.info"/></p>
 							</div>
 						</div>
 					</div>
