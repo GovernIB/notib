@@ -15,6 +15,7 @@
             </c:otherwise>
         </c:choose>
     </title>
+    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
     <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
     <script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
     <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -32,6 +33,20 @@
     <link href="<c:url value="/css/jstree.min.css"/>" rel="stylesheet">
     <script src="<c:url value="/js/jstree.min.js"/>"></script>
 
+    <style>
+        table {
+            table-layout:fixed;
+        }
+        th {
+            width:50px;
+        }
+
+        td {
+            overflow:hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+
     <script type="text/javascript">
 
         $(document).on("click", "#expandAll", function() {
@@ -41,7 +56,6 @@
         $(document).on("click", "#closeAll", function() {
             $('#arbreOrgans').jstree().close_all(null, 300);
         });
-
 
         $.views.helpers({
             hlpIsAdminOrgan: isAdminOrgan
@@ -206,52 +220,52 @@
             </div>
         </div>
         <div class="panel-body">
-            <table id="permisos" data-toggle="datatable" data-url="<c:url value="/organgestor/${id}/permis/datatable"/>" data-search-enabled="false"
+            <table id="permisos" style="table-layout:fixed;" data-toggle="datatable" data-url="<c:url value="/organgestor/${id}/permis/datatable"/>" data-search-enabled="false"
                    data-paging-enabled="false" data-default-order="1" data-default-dir="asc" class="table table-striped table-bordered">
                 <thead>
                 <tr>
-                    <th data-col-name="tipus" data-renderer="enum(TipusEnumDto)" width="120px"><spring:message code="procediment.permis.columna.tipus" /></th>
-                    <th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
-                    <th data-col-name="read" data-template="#cellPermisReadTemplate" width="120px">
+                    <th data-col-name="tipus" data-renderer="enum(TipusEnumDto)" style="width:30px;"><spring:message code="procediment.permis.columna.tipus" /></th>
+                    <th data-col-name="nomSencerAmbCodi" style="width: 150px"><spring:message code="procediment.permis.columna.principal"/></th>
+                    <th data-col-name="read" data-template="#cellPermisReadTemplate">
                         <spring:message code="procediment.permis.columna.consulta"/>
                         <script id="cellPermisReadTemplate" type="text/x-jsrender">
                             {{if read}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="processar" data-template="#cellPermisProcessarTemplate" width="120px">
+                    <th data-col-name="processar" data-template="#cellPermisProcessarTemplate" style="width:55px;">
                         <spring:message code="procediment.permis.columna.processar"/>
                         <script id="cellPermisProcessarTemplate" type="text/x-jsrender">
                             {{if processar}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" width="120px">
+                    <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" style="width:60px;">
                         <spring:message code="procediment.permis.columna.notificacio"/>
                         <script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
                             {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="administration" data-template="#cellPermisGestioTemplate" width="120px">
+                    <th data-col-name="administration" data-template="#cellPermisGestioTemplate" style="width:35px;">
                         <spring:message code="procediment.permis.columna.gestio"/>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
                             {{if administration}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="comuns" data-template="#cellPermisComunsTemplate" width="120px">
-                        <spring:message code="organgestor.permis.columna.comuns"/>
+                    <th data-col-name="comuns" data-template="#cellPermisComunsTemplate">
+                        <spring:message code="organgestor.permis.columna.comuns.curt"/>
                         <script id="cellPermisComunsTemplate" type="text/x-jsrender">
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" width="120px">
-                        <spring:message code="procediment.permis.columna.administrador"/>
+                    <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" style="width:35px">
+                        <spring:message code="procediment.permis.columna.administrador.curt"/>
                         <script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
                             {{if administrador}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="100px">
+                    <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-class="overflow-visible">
                         <script id="cellAccionsTemplate" type="text/x-jsrender">
                             <div class="dropdown">
-                                <button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+                                <button aria-expanded="true" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
                                 <ul class="dropdown-menu">
                                     {^{if ~hlpIsAdminOrgan() && !administrador}}
                                         <li><a class="boto-permis" href="../modal/organgestor/idOrgan/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>

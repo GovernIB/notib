@@ -76,7 +76,7 @@
 	<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
 	<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
 	<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
-	
+<%--	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>--%>
 	<!-- Llibreria per a compatibilitat amb HTML5 -->
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
