@@ -578,7 +578,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				titular.setNif(InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getNif());
 				titular.setApellidos(concatenarLlinatges(enviament.getTitular().getLlinatge1(), enviament.getTitular().getLlinatge2()));
 				titular.setTelefono(enviament.getTitular().getTelefon());
-				titular.setEmail(enviament.getTitular().getEmail());
+				titular.setEmail(InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getEmail());
 				if (enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
 					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
 				} else {
