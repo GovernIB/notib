@@ -4,6 +4,7 @@
 package es.caib.notib.core.ejb;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -350,17 +351,18 @@ public class ServeiServiceBean implements ServeiService {
     }
 
 	@Override
-	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol) {
+	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 		return delegate.getServeisOrganNotificables(
 				entitatId,
 				organCodi,
-				rol);
+				rol, 
+				enviamentTipus);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId) {
-		return delegate.hasServeisComunsAndNotificacioPermission(entitatId);
+	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
+		return delegate.hasServeisComunsAndNotificacioPermission(entitatId, enviamentTipus);
 	}
 
 	@Override

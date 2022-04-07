@@ -6,6 +6,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -53,6 +54,8 @@ public class EntitatController extends BaseController {
 	private OperadorPostalService operadorPostalService;
 	@Autowired
 	private PagadorCieService cieService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( HttpServletRequest request, Model model) {
@@ -120,7 +123,11 @@ public class EntitatController extends BaseController {
 		String redirect = "redirect:entitat";
 		String msg = command.getId() != null ? "entitat.controller.modificada.ok" : "entitat.controller.creada.ok";
 		if (command.getId() != null) {
-			entitatService.update(command.asDto());
+			EntitatDto entitatDto = entitatService.update(command.asDto());
+			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+			if (entitatDto != null && entitatActual != null && entitatDto.equals(entitatActual)) {
+				EntitatHelper.actualitzarEntitatActualEnSessio(request, aplicacioService, entitatService);
+			}
 			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			return getModalControllerReturnValueSuccess(request,redirect + (isAdminEntitat ? "/" + command.getId() : ""), msg);
 		}

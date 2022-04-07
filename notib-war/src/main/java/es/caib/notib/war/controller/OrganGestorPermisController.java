@@ -2,8 +2,6 @@ package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -14,7 +12,6 @@ import es.caib.notib.war.command.PermisCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.PermisosHelper;
 import es.caib.notib.war.helper.RolHelper;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +24,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import javax.validation.Valid;
 import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
