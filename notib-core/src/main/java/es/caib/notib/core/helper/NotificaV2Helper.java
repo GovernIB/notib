@@ -118,7 +118,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
-						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						String nif = enviament.getTitular().getNif();
+						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
 							identificadorsResultatsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
@@ -142,7 +143,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) || NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()))) {
+		if (fiReintents && (NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat()) /*|| NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat())*/)) {
 			auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
 		}
 		logger.info(" [NOT] Fi enviament notificació: [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
