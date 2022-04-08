@@ -5,6 +5,8 @@ package es.caib.notib.war.command;
 
 import java.io.Serializable;
 
+import es.caib.notib.war.validation.ValidNotificacio;
+import es.caib.notib.war.validation.ValidUsuari;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -19,6 +21,7 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
+@ValidUsuari
 public class UsuariCommand implements Serializable {
 
 	private String codi;

@@ -67,6 +67,7 @@ public class UsuariController extends BaseController {
 	public String save(HttpServletRequest request, @Valid UsuariCommand command, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("usuariCommand", command);
 			return "usuariForm";
 		}
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));

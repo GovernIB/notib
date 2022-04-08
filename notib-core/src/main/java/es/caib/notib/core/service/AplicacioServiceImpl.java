@@ -113,7 +113,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			logger.debug("Actualitzant configuració de usuari actual");
 			UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
-			usuari.update(dto.getRebreEmailsNotificacio(), dto.getRebreEmailsNotificacioCreats(), dto.getIdioma());
+			usuari.update(UsuariEntity.hiddenBuilder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
+					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);

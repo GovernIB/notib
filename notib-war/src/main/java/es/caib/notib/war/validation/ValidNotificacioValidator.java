@@ -7,6 +7,7 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.PersonaCommand;
@@ -31,8 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
- * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -322,7 +321,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 					}
 					
-					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !isEmailValid(enviament.getTitular().getEmail())) {
+					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !EmailHelper.isEmailValid(enviament.getTitular().getEmail())) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
 						.addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
@@ -330,7 +329,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
 						for (PersonaCommand destinatari: enviament.getDestinataris()) {
-							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !isEmailValid(destinatari.getEmail())) {
+							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !EmailHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
@@ -379,16 +378,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	    	str.append(list.get(i));
 	    }
 	    return str;
-	}
-
-	public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
-	private boolean isEmailValid(String email) {
-		try {
-			Matcher matcher = EMAIL_REGEX.matcher(email);
-			return matcher.find();
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);

@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcSerEntity;
@@ -24,29 +25,28 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 	private MessageHelper messageHelper;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
-		String resposta = null;
+
 		try {
 			List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
-			if (destinataris != null && !destinataris.isEmpty()) {
-				for (UsuariDto usuariDto : destinataris) {
-					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
-						String email = usuariDto.getEmail().replaceAll("\\s+","");
-						log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
-						sendEmailNotificacio(
-								email,
-								notificacio);
-					}
-				}
-
-			} else {
+			if (destinataris == null || destinataris.isEmpty()) {
 				log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
+				return null;
 			}
+			for (UsuariDto usuariDto : destinataris) {
+				String email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
+				if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
+					continue;
+				}
+				email = email.replaceAll("\\s+","");
+				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
+				sendEmailNotificacio(email, notificacio);
+			}
+			return null;
 		} catch (Exception ex) {
 			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
 			log.error(errorDescripció);
-			resposta = errorDescripció;
+			return errorDescripció;
 		}
-		return resposta;
 	}
 
 	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(
