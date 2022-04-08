@@ -25,20 +25,17 @@ public class UsuariCommand implements Serializable {
 	private String nom;
 	private String nif;
 	private String email;
+	private String emailAlt;
 	private String idioma;
 	private String[] rols;
 	private Boolean rebreEmailsNotificacio;
 	private Boolean rebreEmailsNotificacioCreats;
 
 	public static UsuariCommand asCommand(UsuariDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				UsuariCommand.class);
+		return ConversioTipusHelper.convertir(dto, UsuariCommand.class);
 	}
 	public static UsuariDto asDto(UsuariCommand command) {
-		return ConversioTipusHelper.convertir(
-				command,
-				UsuariDto.class);
+		return ConversioTipusHelper.convertir(command, UsuariDto.class);
 	}
 
 	@Override
