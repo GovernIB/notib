@@ -580,7 +580,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         arxiu.setContingut(enviamentService.getDocumentJustificant(enviamentId));
         arxiu.setNom("justificant");
         String mimeType = ".pdf";
-        if (arxiu.getContingut() != null) {
+        if (arxiu.getContingut() == null) {
             response.setHeader("Set-cookie", "fileDownload=false; path=/");
             throw new RuntimeException("Hi ha hagut un error generant/descarregant el justificant");
         }
