@@ -1,6 +1,12 @@
 package es.caib.notib.plugin.registre;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AnexoWsDto;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.InteresadoWsDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.RegistreInteressatDocumentTipusDtoEnum;
+import es.caib.notib.core.api.dto.RegistreInteressatDto;
 import es.caib.regweb3.ws.api.v3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +16,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -249,9 +257,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
 		resposta.setRegistreNumeroFormatat(ar.getNumeroRegistroFormateado());
 		resposta.setRegistreNumero(Integer.toString(ar.getNumeroRegistro()));
-		resposta.setRegistreData(ar.getFechaRegistro());
-		resposta.setSirRecepecioData(ar.getFechaRecepcion());
-		resposta.setSirRegistreDestiData(ar.getFechaRegistroDestino());
+		resposta.setRegistreData(timeStampToDate(ar.getFechaRegistro()));
+		resposta.setSirRecepecioData(timeStampToDate(ar.getFechaRecepcion()));
+		resposta.setSirRegistreDestiData(timeStampToDate(ar.getFechaRegistroDestino()));
 		resposta.setNumeroRegistroDestino(ar.getNumeroRegistroDestino());
 		resposta.setMotivo(ar.getMotivo());
 		resposta.setCodigoEntidadRegistralProcesado(ar.getCodigoEntidadRegistralProcesado());
@@ -304,6 +312,14 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			resposta.setErrorDescripcio(ar.getDescripcionError());
 		}
 		return resposta;
+	}
+
+	private Date timeStampToDate(Timestamp timestamp) {
+		if (timestamp == null)
+			return null;
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timestamp.getTime());
+		return cal.getTime();
 	}
 	
 	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
