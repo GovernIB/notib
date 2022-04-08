@@ -1,5 +1,6 @@
 package es.caib.notib.war.helper;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class NifHelper {
@@ -17,7 +18,7 @@ public class NifHelper {
         }
         nif = nif.toUpperCase();
         String primerCaracter = nif.substring(0, 1);
-        boolean totNumeros = NumberUtils.isNumber(nif.substring(1,nif.length()-1));
+        boolean totNumeros = NumberUtils.isNumber(StringUtils.stripStart(nif.substring(1,nif.length()-1), "0"));
         if (LLETRES_CIF.contains(primerCaracter) && totNumeros) {
             return isCifValid(nif);
         }
