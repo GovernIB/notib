@@ -37,8 +37,8 @@ public class ValidUsuariValidator implements ConstraintValidator<ValidUsuari, Us
         try {
             if (!EmailHelper.isEmailValid(usuari.getEmailAlt())) {
                 valid = false;
-//                context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
-//                        .addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
+                context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
+                        .addNode("emailAlt").addConstraintViolation();
             }
         } catch (final Exception ex) {
             valid = false;

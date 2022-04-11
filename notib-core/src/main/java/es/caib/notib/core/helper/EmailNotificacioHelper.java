@@ -49,8 +49,8 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		}
 	}
 
-	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(
-			NotificacioEntity notificacio) {
+	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {
+
 		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
 		Set<String> usuaris = new HashSet<String>();
 		GrupEntity grup;
@@ -85,7 +85,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				if (enviar) {
 					UsuariDto u = new UsuariDto();
 					u.setCodi(usuari);
-					u.setEmail(dadesUsuari.getEmail());
+					u.setEmail(!Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() :dadesUsuari.getEmail());
 					destinataris.add(u);
 				}
 			}

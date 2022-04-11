@@ -34,7 +34,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertNull;
 
-@Ignore
+//@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class EmailNotificacioHelperTest {
 
@@ -42,10 +42,10 @@ public class EmailNotificacioHelperTest {
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
 //	private static final String EMAIL_PASS = "xxxxxx";
 	private static final String EMAIL_USER = "proves_limit@limit.es";
-	private static final String EMAIL_PASS = "xxxxxx";
+	private static final String EMAIL_PASS = "R8lmu-98TRN";
 //	private static final String EMAIL_DEST = "sandreu@limit.es";
-	private static final String EMAIL_DEST = "sion.limit@gmail.com";
-	private static final String FILE_PATH = "/home/siona/Documents/buit.pdf";
+	private static final String EMAIL_DEST = "salloza@limit.es";
+	private static final String FILE_PATH = "/home/salloza/Documentos/blankDocuments/blank.pdf";
 
 	@Mock
 	private GrupRepository grupRepository;

@@ -67,7 +67,16 @@ public class UsuariController extends BaseController {
 	public String save(HttpServletRequest request, @Valid UsuariCommand command, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("usuariCommand", command);
+			UsuariDto usuari = aplicacioService.getUsuariActual();
+			UsuariCommand uc = UsuariCommand.asCommand(usuari);
+			uc.setEmailAlt(command.getEmailAlt());
+			command.setNom(uc.getNom());
+			command.setEmail(uc.getEmail());
+			command.setCodi(uc.getCodi());
+			command.setRols(uc.getRols());
+			command.setNif(uc.getNif());
+			model.addAttribute(command);
+			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(IdiomaEnumDto.class,"usuari.form.camp.idioma.enum."));
 			return "usuariForm";
 		}
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
