@@ -9,3 +9,4 @@
 /.tern-project
 /notib-war.iml
 /pom.xml.versionsBackup
+/src/main/webapp/META-INF/context.xml
