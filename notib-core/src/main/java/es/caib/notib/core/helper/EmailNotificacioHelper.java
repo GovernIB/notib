@@ -85,7 +85,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				if (enviar) {
 					UsuariDto u = new UsuariDto();
 					u.setCodi(usuari);
-					u.setEmail(!Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() :dadesUsuari.getEmail());
+					u.setEmail(!Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() : dadesUsuari.getEmail());
 					destinataris.add(u);
 				}
 			}
