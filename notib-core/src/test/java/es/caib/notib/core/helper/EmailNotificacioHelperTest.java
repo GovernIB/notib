@@ -40,8 +40,7 @@ public class EmailNotificacioHelperTest {
 
 	// Dades per el Test
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
-	private static final String EMAIL_PASS = "xxxxxx";
-	private static final String EMAIL_USER = "proves_limit@limit.es";
+//	private static final String EMAIL_PASS = "xxxxxx";
 	private static final String EMAIL_USER = "proves_limit@limit.es";
 //	private static final String EMAIL_DEST = "sandreu@limit.es";
 	private static final String EMAIL_DEST = "salloza@limit.es";
