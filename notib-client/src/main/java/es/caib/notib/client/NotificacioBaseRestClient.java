@@ -22,7 +22,6 @@ import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -123,7 +122,8 @@ public abstract class NotificacioBaseRestClient {
 						ClientHandler ch = getNext();
 				        ClientResponse resp = ch.handle(request);
 
-				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
+						if (resp.getStatus()/100 != 3) {
+//				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
 				            return resp;
 				        } else {
 				            String redirectTarget = resp.getHeaders().getFirst("Location");
