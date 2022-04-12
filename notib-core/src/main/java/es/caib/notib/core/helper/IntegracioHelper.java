@@ -2,14 +2,16 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.repository.UsuariRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -17,11 +19,15 @@ import java.util.*;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class IntegracioHelper {
 
-	@Resource
-	private UsuariHelper usuariHelper;
+//	@Resource
+//	private UsuariHelper usuariHelper;
+
+	@Autowired
+	private UsuariRepository usuariRepository;
 	
 	public static final int DEFAULT_MAX_ACCIONS = 250;
 
@@ -207,28 +213,29 @@ public class IntegracioHelper {
 				accio);
 	}
 	
-	private void afegirParametreUsuari(
-			IntegracioAccioDto accio,
-			boolean obtenirUsuari) {
-		String usuariNomCodi = "";
-		if (obtenirUsuari) {
-			UsuariEntity usuari = null;
-			try {
-				usuari = usuariHelper.getUsuariAutenticat();
-			} catch (Exception e) {}
-			if (usuari != null) {
-				usuariNomCodi = usuari.getNom() + " (" + usuari.getCodi() + ")";
-			}
-		}
-		
-		if (usuariNomCodi.isEmpty()) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null)
-				usuariNomCodi = auth.getName();
-		}
-		if(accio.getParametres() == null)
+	private void afegirParametreUsuari(IntegracioAccioDto accio, boolean obtenirUsuari) {
+
+		if (accio.getParametres() == null) {
 			accio.setParametres(new ArrayList<AccioParam>());
-		accio.getParametres().add(new AccioParam("Usuari", usuariNomCodi));
+		}
+		accio.getParametres().add(new AccioParam("Usuari", getUsuariNomCodi(obtenirUsuari)));
+	}
+
+	private String getUsuariNomCodi(boolean obtenirUsuari) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			return "";
+		}
+		String usuariNomCodi = auth.getName();
+		if (!obtenirUsuari) {
+			return usuariNomCodi;
+		}
+		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+		if (usuari == null) {
+			log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+		}
+		return usuari.getNom() + " (" + usuari.getCodi() + ")";
 	}
 
 	private IntegracioDto novaIntegracio(
