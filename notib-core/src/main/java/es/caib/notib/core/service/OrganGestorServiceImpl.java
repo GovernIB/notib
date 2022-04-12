@@ -1026,10 +1026,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		NodeDir3 organ = organs.get(codiEntitat);
 		OrganGestorDto organExsitent = buscarOrgan(organ.getCodi());
 		OrganGestorDto o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
+		organsList.add(o);
 		List<ArbreNode<OrganGestorDto>> nodes = new ArrayList<>();
 		List<NodeDir3> fills = organ.getFills();
-		if (fills == null || fills.isEmpty()/* && filtres.filtresOk(o)*/) {
-			organsList.add(o);
+		if (fills == null || fills.isEmpty()) {
 			return nodes;
 		}
 

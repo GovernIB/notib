@@ -126,8 +126,8 @@
                     <not:inputHidden name="entregaCie"/>
                 </div>
                 <div class="col-md-3">
-                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.oficina" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
-                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.oficina.select"/>
+                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
+                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
                 </div>
             </div>
         </form:form>
