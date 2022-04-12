@@ -38,14 +38,14 @@ import java.util.Map;
 @Slf4j
 @Component
 public class CacheHelper {
-	@Resource
-	private OrganGestorRepository organGestorRepository;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private PermisosHelper permisosHelper;
+//	@Resource
+//	private OrganGestorRepository organGestorRepository;
+//	@Resource
+//	private EntityComprovarHelper entityComprovarHelper;
+//	@Resource
+//	private ConversioTipusHelper conversioTipusHelper;
+//	@Resource
+//	private PermisosHelper permisosHelper;
 
 	private PluginHelper pluginHelper;
 	@Resource
