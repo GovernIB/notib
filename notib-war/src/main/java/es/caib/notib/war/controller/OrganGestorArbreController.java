@@ -74,7 +74,6 @@ public class OrganGestorArbreController extends BaseUserController {
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
             Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
-            model.addAttribute("organs", organService.getOrgansAsList());
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             omplirModel(model, entitat, null);
@@ -182,6 +181,7 @@ public class OrganGestorArbreController extends BaseUserController {
 
         OrganGestorCommand command = organ != null ? OrganGestorCommand.asCommand(organ) : new OrganGestorCommand();
         command.setEntitatId(entitat.getId());
+        model.addAttribute("organsEntitat", organService.getOrgansAsList());
         model.addAttribute("id", organ != null && organ.getId() != null ? organ.getId() : 0);
         model.addAttribute("organGestorCommand", command);
         model.addAttribute("entitat", entitat);

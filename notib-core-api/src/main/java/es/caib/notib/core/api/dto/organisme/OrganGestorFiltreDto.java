@@ -37,6 +37,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	public boolean filtresOk(OrganGestorDto organ) {
 
 		return organ != null && (codi == null || codi.isEmpty() || organ.getCodi() != null &&  organ.getCodi().contains(codi.toUpperCase()))
+//				&& (codiPare == null || codiPare.isEmpty() || organ.getCodiPare() != null && organ.getCodiPare().equals(codiPare.toUpperCase()))
 				&& (nom == null || nom.isEmpty() || organ.getNom() != null && organ.getNom().toLowerCase().contains(nom.toLowerCase()))
 				&& (!entregaCie || organ.getCieId() != null)
 				&& (oficina == null || oficina.isEmpty() || organ.getOficina() != null && oficina.equals(organ.getOficina().getCodi()));

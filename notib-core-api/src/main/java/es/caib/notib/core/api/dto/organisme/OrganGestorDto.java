@@ -51,6 +51,10 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 		return nom + " (" + codi + ")";
 	}
 
+	public String getCodiNom() {
+		return codi + " - " + nom;
+	}
+
 	public String getLlibreCodiNom() {
 		if (llibre != null)
 			return llibre + " " + (llibreNom != null ? llibreNom : "");
