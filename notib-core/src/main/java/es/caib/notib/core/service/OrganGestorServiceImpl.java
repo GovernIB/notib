@@ -1,6 +1,7 @@
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
@@ -1007,6 +1008,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(entitat.getDir3Codi()), OrganGestorDto.class));
 			arbre.setArrel(arrel);
 			arrel.setFills(generarFillsArbre(organs, arrel, entitat.getDir3Codi(), filtres));
+			if (!Strings.isNullOrEmpty(filtres.getCodiPare())) {
+				filtres.filtrarOrganPare(arbre.getArrel());
+			}
 			if (!filtres.isEmpty() && !filtres.filtrar(arbre.getArrel())) {
 				arrel.setFills(new ArrayList<ArbreNode<OrganGestorDto>>());
 			}
