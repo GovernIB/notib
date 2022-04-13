@@ -79,13 +79,14 @@
                             this.selectedIndex = 0;
                         }
                     });
-                    $('#btn-entregaCieActiva').removeClass('active');
+                    $('#btn-entregaCie').removeClass('active');
                     $('#entregaCieActiva').val(false);
                     $('#form-filtre').submit();
                 });
-                $('#btn-entregaCieActiva').click(function() {
+                $('#btn-entregaCie').click(function() {
+                    console.log("entrega cie arbre");
                     let entregaCieActiva = !$(this).hasClass('active');
-                    $('#entregaCieActiva').val(entregaCieActiva);
+                    $('#entregaCie').val(entregaCieActiva);
                 })
                 $(".panel-heading:first").css({"display": "flex", "justify-content": "space-between"})
                 $(".panel-heading:first").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");

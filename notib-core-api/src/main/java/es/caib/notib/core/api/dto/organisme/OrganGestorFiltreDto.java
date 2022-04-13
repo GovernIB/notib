@@ -31,7 +31,7 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 
 	public boolean isEmpty() {
 		return (codi == null || codi == "") /*&& (codiPare == null || codiPare == "")*/ && (nom == null || nom == "")
-				&& (oficina == null || oficina == "") && estat == null;
+				&& (oficina == null || oficina == "") && estat == null && !entregaCie;
 	}
 
 	public boolean filtresOk(OrganGestorDto organ) {
