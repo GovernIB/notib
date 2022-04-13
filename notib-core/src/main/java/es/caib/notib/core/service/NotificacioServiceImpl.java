@@ -183,46 +183,37 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Transactional
 	@Override
-	public void delete(
-			Long entitatId, 
-			Long notificacioId) throws NotFoundException {
+	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					false, 
-					true, 
-					true, 
-					false);
+			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
 			
 			logger.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
 			NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
-			if (notificacio == null)
-				throw new NotFoundException(
-						notificacioId, 
-						NotificacioEntity.class,
-						"No s'ha trobat cap notificació amb l'id especificat");
-			
+			if (notificacio == null) {
+				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
+			}
 			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
 //			### Esborrar la notificació
-			if (enviamentsPendents != null && ! enviamentsPendents.isEmpty()) {
-				// esborram tots els seus events
-				notificacioEventRepository.deleteByNotificacio(notificacio);
-
-//				## El titular s'ha d'esborrar de forma individual
-				for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
-					PersonaEntity titular = enviament.getTitular();
-					if (HibernateHelper.isProxy(titular))
-						titular = HibernateHelper.deproxy(titular);
-					auditEnviamentHelper.deleteEnviament(enviament);
-					personaRepository.delete(titular);
-				}
-
-				auditNotificacioHelper.deleteNotificacio(notificacio);
-				logger.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
-			} else {
+			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot esborrar");
 			}
+			// esborram tots els seus events
+			notificacioEventRepository.deleteByNotificacio(notificacio);
+
+//				## El titular s'ha d'esborrar de forma individual
+			for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+				PersonaEntity titular = enviament.getTitular();
+				if (HibernateHelper.isProxy(titular)) {
+					titular = HibernateHelper.deproxy(titular);
+				}
+				auditEnviamentHelper.deleteEnviament(enviament);
+				personaRepository.delete(titular);
+			}
+
+			auditNotificacioHelper.deleteNotificacio(notificacio);
+			logger.debug("La notificació s'ha esborrat correctament (notificacioId=" + notificacioId + ")");
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
