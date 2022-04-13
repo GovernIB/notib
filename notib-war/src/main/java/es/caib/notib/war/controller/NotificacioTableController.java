@@ -149,6 +149,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             notificacions = notificacioService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null,
                                                     RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, usuariActual.getCodi(), filtre,
                                                     DatatablesHelper.getPaginacioDtoFromRequest(request));
+            prepararColumnaEstat(request, notificacions.getContingut());
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
