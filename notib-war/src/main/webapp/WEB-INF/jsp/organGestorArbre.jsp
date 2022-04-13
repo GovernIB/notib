@@ -80,7 +80,7 @@
                         }
                     });
                     $('#btn-entregaCie').removeClass('active');
-                    $('#entregaCieActiva').val(false);
+                    $('#entregaCie').val(false);
                     $('#form-filtre').submit();
                 });
                 $('#btn-entregaCie').click(function() {
