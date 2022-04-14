@@ -41,6 +41,9 @@ public class ConfigEntity {
     @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
     private ConfigTypeEntity type;
 
+    @Column(name = "entitat_codi", length = 64)
+    private String entitatCodi;
+
     @Column(name = "POSITION")
     private int position;
 //

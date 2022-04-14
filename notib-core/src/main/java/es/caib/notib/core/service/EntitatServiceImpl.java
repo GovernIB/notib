@@ -165,7 +165,7 @@ public class EntitatServiceImpl implements EntitatService {
 				}
 			}
 
-			entity.update(entitat.getCodi(), entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(), entitat.getDir3CodiReg(), entitat.getApiKey(),
+			entity.update(entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(), entitat.getDir3CodiReg(), entitat.getApiKey(),
 					entitat.isAmbEntregaDeh(), entitat.isEntregaCieActiva() ? entregaCie : null, entitat.getDescripcio(), logoCapActual, logoPeuActual,
 					entitat.getColorFons(), entitat.getColorLletra(), entitat.getTipusDocDefault().getTipusDocEnum(), entitat.getOficina(),
 					entitat.getNomOficinaVirtual(), entitat.isLlibreEntitat(), entitat.getLlibre(), entitat.getLlibreNom(), entitat.isOficinaEntitat());

@@ -4,6 +4,7 @@ import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.entity.config.ConfigGroupEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
@@ -58,11 +59,10 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional(readOnly = true)
     public List<ConfigGroupDto> findAll() {
-        log.info("Consulta totes les propietats");
-        List<ConfigGroupDto> configGroupDtoList =  conversioTipusHelper.convertirList(
-                configGroupRepository.findByParentCodeIsNull(new Sort(Sort.Direction.ASC, "position")),
-                ConfigGroupDto.class);
 
+        log.info("Consulta totes les propietats");
+        List<ConfigGroupEntity> groups = configGroupRepository.findByParentCodeIsNull(new Sort(Sort.Direction.ASC, "position"));
+        List<ConfigGroupDto> configGroupDtoList =  conversioTipusHelper.convertirList(groups, ConfigGroupDto.class);
         for (ConfigGroupDto cGroup: configGroupDtoList) {
             processPropertyValues(cGroup);
         }

@@ -90,15 +90,17 @@ public class EntitatController extends BaseController {
 		if (entitatId != null) {
 			entitat = entitatService.findById(entitatId);
 		}
+		boolean modificant = false;
+		EntitatCommand command = null;
 		if (entitat != null) {
-
-			EntitatCommand command = EntitatCommand.asCommand( entitat );
+			command = EntitatCommand.asCommand( entitat );
 			model.addAttribute("tipusDocumentDefault", command.getTipusDocDefault());
 			model.addAttribute("oficinaSelected", command.getOficina());
 			model.addAttribute( command );
-		} else {
-			model.addAttribute(new EntitatCommand());
+			modificant = true;
 		}
+		model.addAttribute(command != null ? command : new EntitatCommand());
+		model.addAttribute("modificant", modificant);
 		model.addAttribute("TipusDocumentEnumDto", TipusDocumentEnumDto.class);
 		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);

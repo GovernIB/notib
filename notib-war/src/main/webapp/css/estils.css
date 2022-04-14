@@ -303,3 +303,14 @@ table.dataTable tr.datatable-dades-carregant div {
 .overflow-visible {
 	overflow: visible;
 }
+
+.entitats-config {
+	background-color: #f2f2f2;
+	border-radius:4px;
+	display: none;
+}
+
+.margin-bottom {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}

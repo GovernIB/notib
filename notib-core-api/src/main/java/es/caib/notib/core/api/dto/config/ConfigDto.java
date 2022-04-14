@@ -11,7 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfigDto {
+public class
+
+ConfigDto {
     private String key;
     private String value;
     private String description;

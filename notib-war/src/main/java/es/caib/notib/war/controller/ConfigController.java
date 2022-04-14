@@ -1,9 +1,13 @@
 package es.caib.notib.war.controller;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.service.ConfigService;
+import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.command.ConfigCommand;
+import es.caib.notib.war.helper.DatatablesHelper;
+import es.caib.notib.war.helper.RolHelper;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,12 +37,19 @@ public class ConfigController extends BaseUserController{
 
     @Autowired
     private ConfigService configService;
+    @Autowired
+    private EntitatService entitatService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
 
         List<ConfigGroupDto> configGroups = configService.findAll();
+        List<EntitatDto> entitats = new ArrayList<>();
+        if (RolHelper.isUsuariActualAdministrador(request)) {
+            entitats = entitatService.findAll();
+        }
         model.addAttribute("config_groups", configGroups);
+        model.addAttribute("entitats", entitats);
         for (ConfigGroupDto cGroup: configGroups) {
             fillFormsModel(cGroup, model);
         }

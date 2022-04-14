@@ -275,6 +275,7 @@ function updateLlibre(dir3codi) {
 		<div class="tab-content">
 		<form:hidden path="id"/>
 		<div role="tabpanel" class="tab-pane active" id="dadesForm">
+<%--			<not:inputText name="codi" textKey="entitat.form.camp.codi" disabled="${modificant}"/>--%>
 			<not:inputText name="codi" textKey="entitat.form.camp.codi" required="true"/>
 			<not:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 			<not:inputSelect name="tipus" textKey="entitat.form.camp.tipus" optionEnum="EntitatTipusEnumDto" required="true"/>
