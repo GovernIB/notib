@@ -1,9 +1,17 @@
 package es.caib.notib.core.api.dto.notificacio;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.core.api.dto.AuditoriaDto;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
 package es.caib.notib.core.entity.cie;
 
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostal;
-import es.caib.notib.core.api.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
 
 /**
  * Classe del model de dades que representa els enviaments d'una

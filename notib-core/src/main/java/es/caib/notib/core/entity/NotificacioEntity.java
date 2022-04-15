@@ -1,16 +1,30 @@
 package es.caib.notib.core.entity;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Index;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**

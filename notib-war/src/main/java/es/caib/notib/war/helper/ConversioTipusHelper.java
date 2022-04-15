@@ -3,13 +3,25 @@
  */
 package es.caib.notib.war.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
-import es.caib.notib.war.command.*;
-import ma.glasnost.orika.*;
+import es.caib.notib.war.command.DocumentCommand;
+import es.caib.notib.war.command.EntregapostalCommand;
+import es.caib.notib.war.command.EnviamentCommand;
+import es.caib.notib.war.command.NotificacioCommand;
+import es.caib.notib.war.command.PersonaCommand;
+import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.CustomMapper;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;

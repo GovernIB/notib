@@ -3,7 +3,7 @@
  */
 package es.caib.notib.client;
 
-import es.caib.notib.ws.notificacio.*;
+import es.caib.notib.client.domini.*;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -2001,9 +2001,7 @@ public class NotificaWsTestIntegracioRest {
 		
 		notificacioV2.setRetard(0);
 		notificacioV2.setUsuariCodi("e43110511r");
-		notificacioV2.setCaducitat(
-				toXmlGregorianCalendar(
-						new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000)));
+		notificacioV2.setCaducitat(new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000));
 		DocumentV2 documentV2 = new DocumentV2();
 		documentV2.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		documentV2.setContingutBase64(Base64.encodeBase64String(arxiuBytes));

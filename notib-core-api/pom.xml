@@ -55,6 +55,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>es.caib.notib</groupId>
+			<artifactId>notib-client-intf</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>

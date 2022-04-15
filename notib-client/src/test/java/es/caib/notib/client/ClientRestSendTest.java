@@ -3,21 +3,19 @@
  */
 package es.caib.notib.client;
 
-import java.io.IOException;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import es.caib.notib.client.domini.NotificacioCanviClient;
 import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.filter.LoggingFilter;
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.IOException;
 
-import es.caib.notib.domini.NotificacioCanviClient;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.

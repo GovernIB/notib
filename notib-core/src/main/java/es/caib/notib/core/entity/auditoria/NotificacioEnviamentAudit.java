@@ -1,6 +1,11 @@
 package es.caib.notib.core.entity.auditoria;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.audit.NotibAuditoria;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -10,7 +15,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.List;
 

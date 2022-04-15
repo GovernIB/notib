@@ -1,9 +1,10 @@
 package es.caib.notib.core.service.ws;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.*;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -12,7 +13,13 @@ import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.PagadorCieRepository;
+import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.service.BaseServiceTestV2;
 import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.EntitatItemTest;

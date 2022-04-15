@@ -43,6 +43,7 @@
 		<module>notib-plugin</module>
 		<module>notib-plugin-impl</module>
 		<module>notib-war</module>
+		<module>notib-client-intf</module>
 	</modules>
 	<build>
 		<plugins>

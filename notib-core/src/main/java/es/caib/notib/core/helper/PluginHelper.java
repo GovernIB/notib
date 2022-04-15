@@ -1,15 +1,16 @@
 package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.DocumentEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;

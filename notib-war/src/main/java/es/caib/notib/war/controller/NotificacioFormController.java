@@ -1,5 +1,12 @@
 package es.caib.notib.war.controller;
 
+import es.caib.notib.client.domini.DocumentTipusEnumDto;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
@@ -12,11 +19,20 @@ import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.service.*;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
-import es.caib.notib.war.command.*;
-import es.caib.notib.war.helper.*;
+import es.caib.notib.war.command.DocumentCommand;
+import es.caib.notib.war.command.EntregapostalCommand;
+import es.caib.notib.war.command.EnviamentCommand;
+import es.caib.notib.war.command.NotificacioCommand;
+import es.caib.notib.war.command.NotificacioFiltreCommand;
+import es.caib.notib.war.command.OrganGestorFiltreCommand;
+import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.CaducitatHelper;
+import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.EnumHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.PropertiesHelper;
+import es.caib.notib.war.helper.RequestSessionHelper;
+import es.caib.notib.war.helper.RolHelper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -30,7 +46,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -38,7 +60,13 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.

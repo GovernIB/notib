@@ -1,10 +1,10 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;

@@ -3,7 +3,7 @@
  */
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.rest.consulta.AppInfo;
+import es.caib.notib.client.domini.AppInfo;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

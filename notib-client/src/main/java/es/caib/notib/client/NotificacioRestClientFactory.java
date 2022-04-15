@@ -20,7 +20,9 @@ public class NotificacioRestClientFactory {
 	 * @param password Contrasenya de l'usuari
 	 * @return Client per a interactuar amb Notib. El client per defecte està configurat amb autenticació tipus form,
 	 *  	(per defecte en entorn CAIB), i amb timeouts de 20s de connexió i 2 min de lectura
+	 * @deprecated
 	 */
+	@Deprecated
 	public static NotificacioRestClient getRestClient(
 			String baseUrl,
 			String username,
@@ -39,7 +41,9 @@ public class NotificacioRestClientFactory {
 	 * @param password Contrasenya de l'usuari
 	 * @param autenticacioBasic Indica si utilitzar autenticació basic. En cas negatiu s'utilitzarà autenticació form (per defecte en entorn CAIB).
 	 * @return Client per a interactuar amb Notib. El client per defecte està configurat timeouts de 20s de connexió i 2 min de lectura
+	 * @deprecated
 	 */
+	@Deprecated
 	public static NotificacioRestClient getRestClient(
 			String baseUrl,
 			String username,
@@ -62,7 +66,9 @@ public class NotificacioRestClientFactory {
 	 * @param connecTimeout Timeout de connexió en milisegons
 	 * @param readTimeout Timeout de lectura en milisegons
 	 * @return Client per a interactuar amb Notib.
+	 * @deprecated
 	 */
+	@Deprecated
 	public static NotificacioRestClient getRestClient(
 			String baseUrl,
 			String username,

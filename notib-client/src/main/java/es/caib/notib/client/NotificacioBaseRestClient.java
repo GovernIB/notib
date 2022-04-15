@@ -13,8 +13,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
-import es.caib.notib.ws.notificacio.PermisConsulta;
-import es.caib.notib.ws.notificacio.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

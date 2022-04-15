@@ -1,6 +1,12 @@
 package es.caib.notib.core.api.dto;
 
-import lombok.*;
+import es.caib.notib.client.domini.DocumentTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.io.Serializable;

@@ -1,6 +1,12 @@
 package es.caib.notib.core.test.data;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;

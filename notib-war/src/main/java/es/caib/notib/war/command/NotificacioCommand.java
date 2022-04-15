@@ -3,7 +3,16 @@
  */
 package es.caib.notib.war.command;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;

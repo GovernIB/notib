@@ -3,15 +3,13 @@
  */
 package es.caib.notib.war.validation;
 
-import java.lang.reflect.InvocationTargetException;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.war.helper.MessageHelper;
+import org.apache.commons.beanutils.BeanUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.apache.commons.beanutils.BeanUtils;
-
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.war.helper.MessageHelper;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Constraint de validació que controla que no es repeteixi

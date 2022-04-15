@@ -3,7 +3,14 @@
  */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.NotificacioEntity;

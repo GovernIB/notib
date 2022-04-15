@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.api.rest.consulta;
 
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import lombok.Data;

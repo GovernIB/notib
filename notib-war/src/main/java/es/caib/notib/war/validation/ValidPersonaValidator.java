@@ -1,8 +1,7 @@
 package es.caib.notib.war.validation;
 
 
-
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.MessageHelper;

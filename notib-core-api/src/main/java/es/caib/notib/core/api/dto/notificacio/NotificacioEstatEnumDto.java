@@ -40,4 +40,13 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	public Long getLongVal() {
 		return Long.parseLong(numVal.toString());
 	}
+
+	// Mètodes auxiliars
+	public static boolean isSirEnviat(NotificacioEstatEnumDto estat) {
+		return ENVIAT_SIR.equals(estat) || FINALITZADA.equals(estat) || PROCESSADA.equals(estat);
+	}
+
+	public static boolean isRegistrat(NotificacioEstatEnumDto estat) {
+		return !PENDENT.equals(estat);
+	}
 }

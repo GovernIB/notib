@@ -1,12 +1,12 @@
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
-
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import lombok.Builder;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * Resposta de la consulta a arxiu d'un document CSV o UUID.

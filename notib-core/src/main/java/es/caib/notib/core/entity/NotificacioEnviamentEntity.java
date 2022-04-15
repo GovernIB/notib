@@ -1,18 +1,35 @@
 package es.caib.notib.core.entity;
 
-import es.caib.notib.core.api.dto.*;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
 import es.caib.notib.core.entity.cie.EntregaPostalEntity;
-import lombok.*;
-import org.hibernate.annotations.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Classe del model de dades que representa els enviaments d'una
@@ -347,12 +364,25 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaEstatData = notificaEstatData;
 		this.notificaEstatFinal = notificaEstatFinal;
 		this.notificaEstatDescripcio = notificaEstatDescripcio;
-		this.notificaDatatOrigen = notificaDatatOrigen;
-		this.notificaDatatReceptorNif = notificaDatatReceptorNif;
-		this.notificaDatatReceptorNom = notificaDatatReceptorNom;
-		this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
+		if (!isBlank(notificaDatatOrigen))
+			this.notificaDatatOrigen = notificaDatatOrigen;
+		if (!isBlank(notificaDatatReceptorNif))
+			this.notificaDatatReceptorNif = notificaDatatReceptorNif;
+		if (!isBlank(notificaDatatReceptorNom))
+			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
+		if (!isBlank(notificaDatatNumSeguiment))
+			this.notificaDatatNumSeguiment = notificaDatatNumSeguiment;
 		this.notificaDatatErrorDescripcio = notificaDatatErrorDescripcio;
 		this.notificaEstatDataActualitzacio = new Date();
+	}
+
+	public void updateReceptorDatat(
+			String notificaDatatReceptorNif,
+			String notificaDatatReceptorNom) {
+		if (!isBlank(notificaDatatReceptorNif))
+			this.notificaDatatReceptorNif = notificaDatatReceptorNif;
+		if (!isBlank(notificaDatatReceptorNom))
+			this.notificaDatatReceptorNom = notificaDatatReceptorNom;
 	}
 	
 	public void updateNotificaCertificacio(
@@ -443,7 +473,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	
 	public void update(
-			Enviament enviament, 
+			Enviament enviament,
 			boolean isAmbEntregaDeh,
 			ServeiTipusEnumDto tipusServei,
 			NotificacioEntity notificacioGuardada,

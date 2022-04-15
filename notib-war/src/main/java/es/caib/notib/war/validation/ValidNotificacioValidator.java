@@ -2,7 +2,7 @@ package es.caib.notib.war.validation;
 
 
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;

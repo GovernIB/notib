@@ -1,6 +1,6 @@
 package es.caib.notib.core.api.dto.cie;
 
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

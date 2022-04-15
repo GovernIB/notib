@@ -1,13 +1,17 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import lombok.extern.slf4j.Slf4j;

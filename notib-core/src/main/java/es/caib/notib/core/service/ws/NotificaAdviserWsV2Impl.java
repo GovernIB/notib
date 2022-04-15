@@ -4,13 +4,23 @@
 package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioEventHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.wsdl.adviser.Acuse;
@@ -31,6 +41,8 @@ import javax.xml.ws.Holder;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Implementació del servei adviser de Notifica.
@@ -140,8 +152,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 	}
 
+	// TODO: Arreglar això --> No es crida AOP en crides dins la mateixa classe
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
-	public NotificacioEnviamentEntity updateEnviament(
+	private NotificacioEnviamentEntity updateEnviament(
 			String organismoEmisor,
 			String identificador,
 			BigInteger tipoEntrega,
@@ -173,12 +186,16 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 
 			if (enviament.isNotificaEstatFinal()) {
 				if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
-					logger.error(
+					logger.warn(
 							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
 					//Crea un nou event builder
 					createEvent = true;
 					eventInitialitzaCallback = false;
+
+					if (receptor != null && !isBlank(receptor.getNifReceptor())) {
+						enviament.updateReceptorDatat(receptor.getNifReceptor(), receptor.getNombreReceptor());
+					}
 
 					codigoRespuesta.value = "000";
 					descripcionRespuesta.value = "OK";
