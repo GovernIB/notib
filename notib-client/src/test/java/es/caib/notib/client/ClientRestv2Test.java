@@ -1,7 +1,6 @@
 package es.caib.notib.client;
 
-import es.caib.notib.domini.AppInfo;
-import es.caib.notib.ws.notificacio.*;
+import es.caib.notib.client.domini.*;
 import org.apache.commons.codec.DecoderException;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +74,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
 		assertEquals(NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
@@ -92,7 +91,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
 
@@ -121,7 +120,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaAlta.isError());
 		assertNull(respostaAlta.getErrorDescripcio());
 		assertNotNull(respostaAlta.getReferencies());
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
 		assertNotNull(referencies.get(0).getReferencia());
 
@@ -420,7 +419,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
@@ -432,7 +431,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaInfo.isError());
 
 		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
+		for (EnviamentReferenciaV2 referencia: referencies) {
 			//Si no hay error
 			RespostaConsultaEstatEnviamentV2 info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
@@ -451,7 +450,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
@@ -463,7 +462,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaInfo.isError());
 
 		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
+		for (EnviamentReferenciaV2 referencia: referencies) {
 			//Si no hay error
 			RespostaConsultaEstatEnviamentV2 info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
@@ -509,7 +508,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
@@ -521,7 +520,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaInfo.isError());
 
 		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
+		for (EnviamentReferenciaV2 referencia: referencies) {
 			//Si no hay error
 			RespostaConsultaEstatEnviamentV2 info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
@@ -565,7 +564,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
@@ -577,7 +576,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaInfo.isError());
 
 		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
+		for (EnviamentReferenciaV2 referencia: referencies) {
 			//Si no hay error
 			RespostaConsultaEstatEnviamentV2 info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);
@@ -627,7 +626,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertNotNull(respostaAlta);
 		assertFalse(respostaAlta.getErrorDescripcio(), respostaAlta.isError());
 
-		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
 		assertNotNull(referencies);
 		assertThat(
 				referencies.size(),
@@ -639,7 +638,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(respostaInfo.isError());
 
 		//Consulta estat enviament
-		for (EnviamentReferencia referencia: referencies) {
+		for (EnviamentReferenciaV2 referencia: referencies) {
 			//Si no hay error
 			RespostaConsultaEstatEnviamentV2 info = client.consultaEstatEnviament(referencia.getReferencia());
 			assertNotNull(info);

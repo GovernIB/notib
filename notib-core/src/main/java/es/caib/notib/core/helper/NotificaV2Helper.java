@@ -1,6 +1,13 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -16,19 +23,14 @@ import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.EntregaPostalEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Destinatarios;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Documento;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaDEH;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaPostal;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opcion;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opciones;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Persona;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.*;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.*;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import lombok.NonNull;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -48,7 +50,11 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
-import javax.xml.soap.*;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -59,7 +65,11 @@ import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Helper per a interactuar amb la versió 2 del servei web de Notific@.
@@ -74,7 +84,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
-	private ProcedimentRepository procedimentRepository;
+	private ProcSerRepository procSerRepository;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -389,7 +399,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		AltaRemesaEnvios envios = new AltaRemesaEnvios();
 		Integer retardPostal = null;
-				try {
+		try {
 //			envios.setCodigoOrganismoEmisor(notificacio.getEntitat().getDir3Codi());
 			if (!isCodiDir3Entitat() && notificacio.getOrganGestor() != null) { 
 				envios.setCodigoOrganismoEmisor(notificacio.getOrganGestor().getCodi());
@@ -527,7 +537,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			if(notificacio.getRetard() != null) {
 				retardPostal = notificacio.getRetard();
 			} else if (notificacio.getProcediment() != null) {
-				retardPostal = procedimentRepository.findOne(notificacio.getProcediment().getId()).getRetard();
+				ProcSerEntity procSer = procSerRepository.findOne(notificacio.getProcediment().getId());
+				retardPostal = procSer != null ? procSer.getRetard() : null;
 			}
 			
 			if (retardPostal != null) {
@@ -546,9 +557,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			}
 			envios.setOpcionesRemesa(opcionesRemesa);
 		} catch (Exception ex) {
-			logger.error(
-					"Error generant la petició (notificacioId=" + notificacio.getId() + ")",
-					ex);
+			logger.error("Error generant la petició (notificacioId=" + notificacio.getId() + ")", ex);
 		}
 		return envios;
 	}

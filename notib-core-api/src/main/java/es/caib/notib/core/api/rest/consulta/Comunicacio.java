@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.api.rest.consulta;
 
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import lombok.Data;
@@ -48,6 +48,7 @@ public class Comunicacio {
 
 	
 	public static Comunicacio toComunicacio(NotificacioEnviamentDto enviament, String basePath) {
+
 		Comunicacio comunicacio = new Comunicacio();
 		comunicacio.setId(enviament.getId());
 		comunicacio.setEmisor(enviament.getNotificacio().getEntitat().getCodi());
@@ -87,16 +88,14 @@ public class Comunicacio {
 	}
 	
 	protected static Persona toPersona(PersonaDto dto) {
+
 		Persona persona= new Persona();
 		persona.setNom(dto.getNom());
 		if (dto.getInteressatTipus() != null) {
 			persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
-			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus())) {
-				if (dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
-					persona.setNom(dto.getRaoSocial());
-				} else {
-					persona.setNom(dto.getNom());
-				}
+			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(dto.getInteressatTipus())
+				&& dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
+				persona.setNom(dto.getRaoSocial());
 			}
 		}
 		persona.setLlinatge1(dto.getLlinatge1());

@@ -1,11 +1,21 @@
 package es.caib.notib.core.helper;
 
 import com.sun.jersey.api.client.ClientResponse;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.ws.callback.NotificacioCanviClient;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.service.ws.NotificacioServiceWsImplV2;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,9 +166,10 @@ public class CallbackHelper {
 	}
 
 	public String notificaCanvi(@NonNull NotificacioEnviamentEntity enviament, @NonNull String urlBase) throws Exception {
-		NotificacioCanviClient notificacioCanvi = new NotificacioCanviClient(
-				notificaHelper.xifrarId(enviament.getNotificacio().getId()), 
-				notificaHelper.xifrarId(enviament.getId()));
+
+		NotificacioCanviClient notificacioCanvi = NotificacioServiceWsImplV2.isValidUUID(enviament.getNotificaReferencia()) ?
+				new NotificacioCanviClient(enviament.getNotificacio().getReferencia(), enviament.getNotificaReferencia()) :
+				new NotificacioCanviClient(notificaHelper.xifrarId(enviament.getNotificacio().getId()), notificaHelper.xifrarId(enviament.getId()));
 
 		// Completa la URL al mètode
 		String urlCallback = urlBase + (urlBase.endsWith("/") ? "" : "/") +  NOTIFICACIO_CANVI;

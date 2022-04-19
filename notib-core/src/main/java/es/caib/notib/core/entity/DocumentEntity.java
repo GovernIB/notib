@@ -1,8 +1,8 @@
 package es.caib.notib.core.entity;
 
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.audit.NotibAuditable;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

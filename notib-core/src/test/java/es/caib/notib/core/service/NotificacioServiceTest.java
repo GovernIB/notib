@@ -1,13 +1,19 @@
 package es.caib.notib.core.service;
 
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.PluginHelper;
-import es.caib.plugins.arxiu.api.*;
+import es.caib.plugins.arxiu.api.ContingutOrigen;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.DocumentTipus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

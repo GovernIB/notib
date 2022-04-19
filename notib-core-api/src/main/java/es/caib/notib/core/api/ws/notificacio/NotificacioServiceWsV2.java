@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.api.ws.notificacio;
 
+import es.caib.notib.client.domini.*;
+
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;

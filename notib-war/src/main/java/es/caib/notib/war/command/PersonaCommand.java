@@ -1,7 +1,7 @@
 package es.caib.notib.war.command;
 
-import es.caib.notib.core.api.dto.DocumentTipusEnumDto;
-import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.DocumentTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidPersona;

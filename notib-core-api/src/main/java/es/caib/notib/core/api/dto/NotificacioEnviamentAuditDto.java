@@ -1,5 +1,6 @@
 package es.caib.notib.core.api.dto;
 
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import lombok.Data;
 

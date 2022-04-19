@@ -1,7 +1,7 @@
 package es.caib.notib.core.helper;
 
 
-import es.caib.notib.core.api.ws.notificacio.Persona;
+import es.caib.notib.client.domini.Persona;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.PersonaRepository;
 import org.springframework.beans.factory.annotation.Autowired;

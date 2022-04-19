@@ -3,9 +3,9 @@
  */
 package es.caib.notib.client;
 
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.notib.ws.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.notib.ws.notificacio.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;

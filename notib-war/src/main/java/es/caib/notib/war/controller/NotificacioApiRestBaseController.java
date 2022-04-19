@@ -3,11 +3,11 @@
  */
 package es.caib.notib.war.controller;
 
+import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.util.UtilitatsNotib;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
-import es.caib.notib.core.api.ws.notificacio.PermisConsulta;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaJustificantEnviament;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ejb.EJBAccessException;

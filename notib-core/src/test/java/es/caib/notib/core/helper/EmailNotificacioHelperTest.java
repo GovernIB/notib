@@ -1,7 +1,6 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.*;

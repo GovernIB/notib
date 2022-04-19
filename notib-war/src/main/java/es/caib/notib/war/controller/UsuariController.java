@@ -3,7 +3,7 @@
  */
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.dto.IdiomaEnumDto;
+import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.UsuariCommand;

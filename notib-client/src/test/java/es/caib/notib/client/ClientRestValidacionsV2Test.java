@@ -3,15 +3,14 @@
  */
 package es.caib.notib.client;
 
-import es.caib.notib.ws.notificacio.DocumentV2;
-import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
-import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.ws.notificacio.NotificacioEstatEnum;
-import es.caib.notib.ws.notificacio.NotificacioV2;
-import es.caib.notib.ws.notificacio.Persona;
-import es.caib.notib.ws.notificacio.RespostaAlta;
-import es.caib.notib.ws.notificacio.RespostaAltaV2;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EnviamentTipusEnum;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificacioEstatEnum;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.RespostaAltaV2;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -21,9 +20,7 @@ import org.junit.Test;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test per al client REST del servei de notificacions de NOTIB.

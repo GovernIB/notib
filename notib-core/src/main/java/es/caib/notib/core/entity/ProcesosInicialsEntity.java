@@ -1,19 +1,15 @@
 package es.caib.notib.core.entity;
 
-import es.caib.notib.core.api.ws.notificacio.ProcessosInicialsEnum;
-import es.caib.notib.core.audit.NotibAuditable;
+import es.caib.notib.core.api.dto.ProcessosInicialsEnum;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;

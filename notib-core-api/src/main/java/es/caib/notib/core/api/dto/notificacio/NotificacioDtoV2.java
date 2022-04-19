@@ -1,6 +1,14 @@
 package es.caib.notib.core.api.dto.notificacio;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.core.api.dto.AuditoriaDto;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import lombok.Getter;
 import lombok.Setter;

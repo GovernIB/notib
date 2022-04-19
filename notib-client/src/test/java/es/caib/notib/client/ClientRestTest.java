@@ -1,6 +1,6 @@
 package es.caib.notib.client;
 
-import es.caib.notib.ws.notificacio.*;
+import es.caib.notib.client.domini.*;
 import org.apache.commons.codec.DecoderException;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,14 +24,14 @@ import static org.junit.Assert.*;
 public class ClientRestTest extends ClientBaseTest {
 
 	
-	private static final String URL = "http://localhost:8280/notib";
-	private static final String USERNAME = "admin";
-	private static final String PASSWORD = "admin";
+//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String USERNAME = "admin";
+//	private static final String PASSWORD = "admin";
 
 
-//	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+	private static final String URL = "https://dev.caib.es/notib";
+	private static final String USERNAME = "$ripea_notib";
+	private static final String PASSWORD = "ripea_notib";
 
 	// Indicar si el servidor esta configurat en mode síncron
 	private static final boolean SYNC_MODE = false;
@@ -736,5 +736,81 @@ public class ClientRestTest extends ClientBaseTest {
 //					new HTTPBasicAuthFilter(username, password));
 //		}
 //	}
+
+
+	@Test
+	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
+
+		// When
+		RespostaConsultaEstatNotificacio respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
+		assertNotNull(respostaConsultaEstatNotificacio);
+		if (respostaConsultaEstatNotificacio.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatNotificacio.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+		System.out.println(">>> Informació enviament: " + respostaConsultaEstatNotificacio.toString());
+		assertFalse(respostaConsultaEstatNotificacio.isError());
+		assertNull(respostaConsultaEstatNotificacio.getErrorDescripcio());
+	}
+
+	@Test
+	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
+
+		// When
+		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
+		assertNotNull(respostaConsultaEstatEnviament);
+		if (respostaConsultaEstatEnviament.isError()) {
+			System.out.println(">>> Reposta amb error: " + respostaConsultaEstatEnviament.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+		System.out.println(">>> Informació enviament: " + respostaConsultaEstatEnviament.toString());
+		assertFalse(respostaConsultaEstatEnviament.isError());
+		assertNull(respostaConsultaEstatEnviament.getErrorDescripcio());
+	}
+
+	@Test
+	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		DadesConsulta dadesConsulta = new DadesConsulta();
+		dadesConsulta.setReferencia("a4256bed-292b-4ad1-bb84-05f8f14a7f1c");
+		dadesConsulta.setAmbJustificant(true);
+
+		// When
+		RespostaConsultaDadesRegistre resposta = client.consultaDadesRegistre(dadesConsulta);
+		if (resposta.isError()) {
+			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
+		System.out.println(">>> Informació registre: " + resposta.toString());
+		assertFalse(resposta.isError());
+		assertNull(resposta.getErrorDescripcio());
+	}
+
+	@Test
+	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
+		// Given
+		DadesConsulta dadesConsulta = new DadesConsulta();
+		dadesConsulta.setReferencia("2d991961-cb95-46d9-b74c-6472952b296c");
+
+		// When
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("2d991961-cb95-46d9-b74c-6472952b296c");
+		if (resposta.isError()) {
+			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
+		} else {
+			System.out.println(">>> Reposta Ok");
+		}
+
+		System.out.println(">>> Informació registre: " + resposta.toString());
+		assertFalse(resposta.isError());
+		assertNull(resposta.getErrorDescripcio());
+	}
 
 }

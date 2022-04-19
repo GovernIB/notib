@@ -1,10 +1,8 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.service.NotificacioService;
-import es.caib.notib.core.api.ws.notificacio.ProcessosInicialsEnum;
 import es.caib.notib.core.entity.ProcesosInicialsEntity;
 import es.caib.notib.core.repository.ProcessosInicialsRepository;
-import es.caib.notib.core.service.NotificacioServiceImpl;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

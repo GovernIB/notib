@@ -262,4 +262,5 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("usuariCodi") String usuariCodi, 
 			@Param("maxReintents")Integer maxReintents);
 
+	NotificacioEntity findByReferencia(String identificador);
 }

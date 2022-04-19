@@ -1,6 +1,6 @@
 package es.caib.notib.war.command;
 
-import es.caib.notib.core.api.dto.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.war.validation.ValidEntregaPostal;
 import lombok.Getter;

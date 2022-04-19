@@ -1,10 +1,15 @@
 package es.caib.notib.core.service.ws;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.client.domini.*;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.GrupService;
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -13,9 +18,8 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
-import es.caib.notib.core.entity.ProcSerEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -45,10 +49,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificacioServiceWsV2Test {
@@ -276,7 +277,7 @@ public class NotificacioServiceWsV2Test {
 //		.thenReturn(documentArxiuCsv);
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
 		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), 
-				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class), 
+				Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class),
 				Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class),
 				Mockito.anyListOf(PersonaEntity.class))).thenReturn(enviamentSavedMock);
 		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);

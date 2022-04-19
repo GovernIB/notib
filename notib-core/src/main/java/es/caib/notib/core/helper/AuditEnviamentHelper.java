@@ -1,13 +1,17 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
 import es.caib.notib.core.aspect.Audita;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -78,18 +81,6 @@ public class AuditEnviamentHelper {
 						destinataris,
 						UUID.randomUUID().toString()).build());
 		log.debug(">> [ALTA] enviament creat");
-		
-		String referencia;
-		try {
-			referencia = notificaHelper.xifrarId(enviamentSaved.getId());
-			log.debug(">> [ALTA] referencia creada");
-		} catch (GeneralSecurityException ex) {
-			log.debug(">> [ALTA] Error creant referència");
-			throw new RuntimeException(
-					"No s'ha pogut crear la referencia per al destinatari",
-					ex);
-		}
-		enviamentSaved.updateNotificaReferencia(referencia);
 		return enviamentSaved;
 	}
 	

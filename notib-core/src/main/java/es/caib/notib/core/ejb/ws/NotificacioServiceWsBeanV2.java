@@ -3,9 +3,10 @@
  */
 package es.caib.notib.core.ejb.ws;
 
-import es.caib.notib.core.api.ws.notificacio.*;
+import es.caib.notib.client.domini.*;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
+import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.helper.UsuariHelper;
-import es.caib.notib.core.api.ws.notificacio.RespostaConsultaDadesRegistreV2;
 import org.jboss.annotation.security.SecurityDomain;
 import org.jboss.wsf.spi.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;

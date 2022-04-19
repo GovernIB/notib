@@ -3,10 +3,10 @@
  */
 package es.caib.notib.war.command;
 
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;

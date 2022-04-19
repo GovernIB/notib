@@ -4,6 +4,7 @@
 package es.caib.notib.core.service;
 
 import es.caib.loginModule.util.Base64.InputStream;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
@@ -22,6 +23,7 @@ import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
+import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
@@ -31,7 +33,6 @@ import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;

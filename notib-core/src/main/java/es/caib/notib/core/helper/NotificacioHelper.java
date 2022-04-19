@@ -1,5 +1,10 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -13,11 +18,6 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NoDocumentException;
 import es.caib.notib.core.api.exception.NoMetadadesException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
-import es.caib.notib.core.api.ws.notificacio.Enviament;
-import es.caib.notib.core.api.ws.notificacio.OrigenEnum;
-import es.caib.notib.core.api.ws.notificacio.Persona;
-import es.caib.notib.core.api.ws.notificacio.TipusDocumentalEnum;
-import es.caib.notib.core.api.ws.notificacio.ValidesaEnum;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
