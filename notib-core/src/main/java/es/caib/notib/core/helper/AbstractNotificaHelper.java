@@ -57,10 +57,6 @@ public abstract class AbstractNotificaHelper {
 
 	public abstract NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception;
 
-	public String generarReferencia(NotificacioEnviamentEntity notificacioDestinatari) throws GeneralSecurityException {
-		return xifrarId(notificacioDestinatari.getId());
-	}
-
 	public boolean isConnexioNotificaDisponible() {
 		return getNotificaUrlProperty() != null;
 	}

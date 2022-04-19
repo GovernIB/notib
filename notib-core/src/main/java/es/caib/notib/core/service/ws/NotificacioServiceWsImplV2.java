@@ -1099,13 +1099,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private RespostaAltaV2 generaResposta(IntegracioInfo info, NotificacioEntity notificacioGuardada, List<EnviamentReferenciaV2> referencies) {
 
 		RespostaAltaV2 resposta = new RespostaAltaV2();
-		try {
-			resposta.setIdentificador(notificaHelper.xifrarId(notificacioGuardada.getId()));
-			logger.debug(">> [ALTA] identificador creat");
-		} catch (GeneralSecurityException ex) {
-			logger.debug(">> [ALTA] Error creant identificador");
-			throw new RuntimeException("No s'ha pogut crear l'identificador de la notificació", ex);
-		}
+		resposta.setIdentificador(notificacioGuardada.getReferencia());
 		switch (notificacioGuardada.getEstat()) {
 			case PENDENT:
 				resposta.setEstat(NotificacioEstatEnum.PENDENT);

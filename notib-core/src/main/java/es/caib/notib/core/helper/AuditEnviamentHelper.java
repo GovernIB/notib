@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -82,18 +81,6 @@ public class AuditEnviamentHelper {
 						destinataris,
 						UUID.randomUUID().toString()).build());
 		log.debug(">> [ALTA] enviament creat");
-		
-		String referencia;
-		try {
-			referencia = notificaHelper.xifrarId(enviamentSaved.getId());
-			log.debug(">> [ALTA] referencia creada");
-		} catch (GeneralSecurityException ex) {
-			log.debug(">> [ALTA] Error creant referència");
-			throw new RuntimeException(
-					"No s'ha pogut crear la referencia per al destinatari",
-					ex);
-		}
-		enviamentSaved.updateNotificaReferencia(referencia);
 		return enviamentSaved;
 	}
 	
