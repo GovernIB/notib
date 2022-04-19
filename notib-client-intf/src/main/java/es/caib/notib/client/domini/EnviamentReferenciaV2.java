@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -24,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EnviamentReferenciaV2 {
 
 	private String titularNom;
