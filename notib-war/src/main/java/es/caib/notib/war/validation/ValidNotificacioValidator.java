@@ -52,6 +52,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		boolean comunicacioSenseAdministracio = false;
 		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
 		context.disableDefaultConstraintViolation();
+		String maxSizeError = "";
 		try {
 
 			// Validació del Concepte
@@ -240,10 +241,11 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 				}
 			}
+
 			if (fileTotalSize > fileTotalMaxSize) {
 				valid = false;
-				context.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.document.total.size", null, locale));
+				maxSizeError = MessageHelper.getInstance().getMessage("notificacio.form.valid.document.total.size", null, locale);
+				context.buildConstraintViolationWithTemplate(maxSizeError);
 			}
 
 			// ENVIAMENTS
@@ -351,7 +353,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		if (!valid) {
 			String msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())
 					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
-			msg = MessageHelper.getInstance().getMessage(msg, null, locale);
+			msg = MessageHelper.getInstance().getMessage(msg, null, locale) + " - " + maxSizeError;
 			context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
 		}
 		return valid;
