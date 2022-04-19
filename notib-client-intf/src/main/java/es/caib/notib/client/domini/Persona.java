@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -26,6 +28,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Persona {
 
     @XmlTransient

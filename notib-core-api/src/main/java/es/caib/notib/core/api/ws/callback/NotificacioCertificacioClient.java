@@ -1,12 +1,12 @@
 package es.caib.notib.core.api.ws.callback;
 
-import java.util.Date;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Date;
 
 /**
  * Informació sobre l'estat d'una notificació.
@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @JsonAutoDetect
 public class NotificacioCertificacioClient {
 
