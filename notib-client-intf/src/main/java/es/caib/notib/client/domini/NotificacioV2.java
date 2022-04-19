@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -167,4 +168,10 @@ public class NotificacioV2 {
      */
     private DocumentV2 document5;
 
+    public List<Enviament> getEnviaments() {
+        if (enviaments == null) {
+            enviaments = new ArrayList<>();
+        }
+        return this.enviaments;
+    }
 }

@@ -34,6 +34,13 @@ public class RespostaAltaV2 extends RespostaBase {
     private List<EnviamentReferenciaV2> referencies;
     private Date dataCreacio;
 
+    public List<EnviamentReferenciaV2> getReferencies() {
+        if (referencies == null) {
+            referencies = new ArrayList<>();
+        }
+        return this.referencies;
+    }
+
     public List<EnviamentReferencia> getReferenciesAsV1() {
         List<EnviamentReferencia> v1 = new ArrayList<>();
         if (referencies == null || referencies.isEmpty()) {

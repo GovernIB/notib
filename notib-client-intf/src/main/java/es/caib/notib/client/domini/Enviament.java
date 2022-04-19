@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -37,4 +38,10 @@ public class Enviament {
     private EntregaDeh entregaDeh;
     private NotificaServeiTipusEnumDto serveiTipus;
 
+    public List<Persona> getDestinataris() {
+        if (destinataris == null) {
+            destinataris = new ArrayList<>();
+        }
+        return this.destinataris;
+    }
 }

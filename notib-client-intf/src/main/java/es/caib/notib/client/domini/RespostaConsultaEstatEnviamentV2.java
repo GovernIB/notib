@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,5 +46,12 @@ public class RespostaConsultaEstatEnviamentV2 extends RespostaBase {
     private Sir sir;
     private Datat datat;
     private Certificacio certificacio;
+
+    public List<Persona> getRepresentants() {
+        if (representants == null) {
+            representants = new ArrayList<>();
+        }
+        return this.representants;
+    }
 
 }

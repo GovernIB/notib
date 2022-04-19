@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,4 +34,10 @@ public class RespostaAlta {
     private boolean error;
     private String errorDescripcio;
 
+    public List<EnviamentReferencia> getReferencies() {
+        if (referencies == null) {
+            referencies = new ArrayList<>();
+        }
+        return this.referencies;
+    }
 }
