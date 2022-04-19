@@ -60,7 +60,7 @@ public class ConfigController extends BaseUserController{
     @RequestMapping(value="/update", method = RequestMethod.POST)
     public SimpleResponse updateConfig(HttpServletRequest request, Model model, @Valid ConfigCommand configCommand, BindingResult bindingResult) {
 
-        if (bindingResult.hasErrors()) {
+         if (bindingResult.hasErrors()) {
             return SimpleResponse.builder().status(0).message(getMessage(request, "config.controller.edit.error")).build();
         }
         String msg = "config.controller.edit.ok";

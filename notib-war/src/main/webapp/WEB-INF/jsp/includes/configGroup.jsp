@@ -90,13 +90,14 @@
                     </div>
                     <div class="col-sm-1">
                         <c:if test="${not config.jbossProperty}">
-                            <button class="btn btn-success"><i class="fa fa-edit"></i></button>
+                            <button class="btn btn-success"><i class="fa fa-save"></i></button>
                         </c:if>
                         <a href="#" class="btn btn-default btn-sm btn-rowInfo entitats"><span class="fa fa-caret-down"></span></a>
                     </div>
                 </div>
                 <div class="form-group entitats-config" >
                     <c:forEach var="entitat" items="${entitats}">
+                        <form:input id="${entitat.codi}_${config.key}" path="entitatCodi" value="${entitat.codi}"/>
                         <label for="entitat_config_${entitat.id}" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">${entitat.nom}</label>
                         <div class="col-sm-8 margin-bottom">
                             <c:choose>
@@ -144,7 +145,7 @@
                         </div>
                         <div class="col-sm-1 margin-bottom">
                             <c:if test="${not config.jbossProperty}">
-                                <button class="btn btn-success"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-success"><i class="fa fa-save"></i></button>
                             </c:if>
                         </div>
                     </c:forEach>
