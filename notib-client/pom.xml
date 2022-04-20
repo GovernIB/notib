@@ -159,7 +159,7 @@
 <!-- 		</repository> -->
 		<repository>
 			<id>archiva.default</id>
-			<url>http://gforge.caib.es/archiva/repository/internal</url>
+			<url>https://gforge.caib.es/archiva/repository/internal</url>
 		</repository>
 		<repository>
 			<id>mvn-local-repo</id>

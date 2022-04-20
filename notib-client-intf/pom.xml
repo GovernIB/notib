@@ -6,7 +6,7 @@
     <parent>
         <artifactId>notib</artifactId>
         <groupId>es.caib.notib</groupId>
-        <version>1.1.18</version>
+        <version>1.1.19</version>
     </parent>
     <artifactId>notib-client-intf</artifactId>
 
