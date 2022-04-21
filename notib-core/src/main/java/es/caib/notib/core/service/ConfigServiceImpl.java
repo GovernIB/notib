@@ -1,5 +1,6 @@
 package es.caib.notib.core.service;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.service.ConfigService;
@@ -45,8 +46,13 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
+
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
-        ConfigEntity configEntity = configRepository.findOne(property.getKey());
+        ConfigEntity configEntity = !Strings.isNullOrEmpty(property.getEntitatCodi()) ?
+                configRepository.findByKeyAndEntitatCodi(property.getKey(), property.getEntitatCodi()) : configRepository.findOne(property.getKey());
+        if (configEntity == null) {
+
+        }
         configEntity.update(property.getValue());
         pluginHelper.reloadProperties(configEntity.getGroupCode());
         if (property.getKey().endsWith(".class")){

@@ -14,4 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
 
+    ConfigEntity findByKeyAndEntitatCodi(String key, String entitatCodi);
+
 }

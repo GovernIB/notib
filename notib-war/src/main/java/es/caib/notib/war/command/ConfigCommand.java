@@ -19,23 +19,21 @@ public class ConfigCommand {
     private String entitatCodi;
     private String entitatKey;
 
-    public void setEntitatCodi(String entitat) {
-
-        this.entitatCodi = entitat;
-        String [] split = key.split("es.caib.notib");
-        if (Strings.isNullOrEmpty(entitat) || split == null || split.length == 0 || split.length != 2) {
-            return;
-        }
-        entitatKey = split[0] + entitat + split[1];
-    }
-
     public boolean isBooleanValue() {
         return value!=null && value.equals("true");
     }
-
     public void setBooleanValue(boolean booleanValue) {
         this.value = booleanValue ? "true" : "false";
     }
+
+    public boolean isEntitatBooleanValue() {
+        return entitatKey!=null && entitatKey.equals("true");
+    }
+
+    public void setEntitatBooleanValue(boolean booleanValue) {
+        this.entitatKey = booleanValue ? "true" : "false";
+    }
+
 
     public ConfigDto asDto() {
         return ConfigDto.builder().key(this.key).value(this.value).build();

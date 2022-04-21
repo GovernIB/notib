@@ -54,11 +54,13 @@
             });
         });
 
+
         <c:url var="urlEdit" value="/config/update"/>
         $(".form-update-config").submit(function(e) {
 
             e.preventDefault();
             let formData = new FormData(this);
+            console.log(this);
             let id = "config_" + formData.get("key");
             let spinner;
             if (!document.getElementById(id + "_spinner")) {

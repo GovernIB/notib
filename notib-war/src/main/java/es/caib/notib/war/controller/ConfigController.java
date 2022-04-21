@@ -49,9 +49,8 @@ public class ConfigController extends BaseUserController{
             entitats = entitatService.findAll();
         }
         model.addAttribute("config_groups", configGroups);
-        model.addAttribute("entitats", entitats);
         for (ConfigGroupDto cGroup: configGroups) {
-            fillFormsModel(cGroup, model);
+            fillFormsModel(cGroup, model, entitats);
         }
         return "config";
     }
@@ -60,7 +59,7 @@ public class ConfigController extends BaseUserController{
     @RequestMapping(value="/update", method = RequestMethod.POST)
     public SimpleResponse updateConfig(HttpServletRequest request, Model model, @Valid ConfigCommand configCommand, BindingResult bindingResult) {
 
-         if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return SimpleResponse.builder().status(0).message(getMessage(request, "config.controller.edit.error")).build();
         }
         String msg = "config.controller.edit.ok";
@@ -87,15 +86,20 @@ public class ConfigController extends BaseUserController{
         }
     }
 
-    private void fillFormsModel(ConfigGroupDto cGroup, Model model){
+    private void fillFormsModel(ConfigGroupDto cGroup, Model model, List<EntitatDto> entitats){
+        String key = null;
         for (ConfigDto config: cGroup.getConfigs()) {
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+            for (EntitatDto entitat : entitats) {
+                key = config.addEntitatKey(entitat);
+//                model.addAttribute("entitat_config_" + key.replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+            }
         }
         if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()){
             return;
         }
         for (ConfigGroupDto child : cGroup.getInnerConfigs()){
-            fillFormsModel(child, model);
+            fillFormsModel(child, model, entitats);
         }
     }
 
