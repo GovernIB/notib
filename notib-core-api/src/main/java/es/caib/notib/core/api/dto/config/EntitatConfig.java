@@ -8,4 +8,5 @@ public class EntitatConfig {
     private String codi;
     private String id;
     private String configKey;
+    private String configValue;
 }

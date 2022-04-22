@@ -30,7 +30,6 @@
         $(".entitat-save").unbind("click").click(e =>  {
 
             if($("#entitatCodi").length) {
-                console.log(document.getElementById("entitatCodi"));
                 $("#entitatCodi").val(e.target.id);
                 return;
             }

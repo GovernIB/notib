@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
@@ -87,14 +88,21 @@ public class ConfigController extends BaseUserController{
     }
 
     private void fillFormsModel(ConfigGroupDto cGroup, Model model, List<EntitatDto> entitats){
+
         String key = null;
+        List<ConfigDto> confs = new ArrayList<>();
         for (ConfigDto config: cGroup.getConfigs()) {
+//            if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
+//                continue;
+//            }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             for (EntitatDto entitat : entitats) {
                 key = config.addEntitatKey(entitat);
 //                model.addAttribute("entitat_config_" + key.replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             }
+            confs.add(config);
         }
+        cGroup.setConfigs(confs);
         if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()){
             return;
         }

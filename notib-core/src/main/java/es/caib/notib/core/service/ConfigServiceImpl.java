@@ -48,12 +48,18 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigDto updateProperty(ConfigDto property) {
 
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
-        ConfigEntity configEntity = !Strings.isNullOrEmpty(property.getEntitatCodi()) ?
-                configRepository.findByKeyAndEntitatCodi(property.getKey(), property.getEntitatCodi()) : configRepository.findOne(property.getKey());
-        if (configEntity == null) {
+        boolean entitatCodi = !Strings.isNullOrEmpty(property.getEntitatCodi());
+        ConfigEntity configEntity = entitatCodi ? configRepository.findByKeyAndEntitatCodi(property.crearEntitatKey(), property.getEntitatCodi())
+                                    : configRepository.findOne(property.getKey());
+           /*
 
-        }
-        configEntity.update(property.getValue());
+            INSERT INTO NOT_CONFIG ("KEY", VALUE, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, ENTITAT_CODI)
+            SELECT "KEY", null, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, 'CAIB'
+            FROM NOT_CONFIG nc
+            WHERE nc."KEY" = 'es.caib.notib.emprar.sir'
+
+            */
+        configEntity.update(entitatCodi ? property.getEntitatValue(): property.getValue());
         pluginHelper.reloadProperties(configEntity.getGroupCode());
         if (property.getKey().endsWith(".class")){
             pluginHelper.resetPlugins();

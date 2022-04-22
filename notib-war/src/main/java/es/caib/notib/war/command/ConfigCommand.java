@@ -17,7 +17,7 @@ public class ConfigCommand {
     private String value;
 
     private String entitatCodi;
-    private String entitatKey;
+    private String entitatValue;
 
     public boolean isBooleanValue() {
         return value!=null && value.equals("true");
@@ -27,15 +27,15 @@ public class ConfigCommand {
     }
 
     public boolean isEntitatBooleanValue() {
-        return entitatKey!=null && entitatKey.equals("true");
+        return entitatValue!=null && entitatValue.equals("true");
     }
 
     public void setEntitatBooleanValue(boolean booleanValue) {
-        this.entitatKey = booleanValue ? "true" : "false";
+        this.entitatValue = booleanValue ? "true" : "false";
     }
 
 
     public ConfigDto asDto() {
-        return ConfigDto.builder().key(this.key).value(this.value).build();
+        return ConfigDto.builder().key(this.key).value(this.value).entitatCodi(entitatCodi).entitatValue(entitatValue).build();
     }
 }
