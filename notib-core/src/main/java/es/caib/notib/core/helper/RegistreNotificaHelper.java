@@ -64,7 +64,7 @@ public class RegistreNotificaHelper {
 		AccioParam sirActivat = new AccioParam("Sir activat", String.valueOf(isSirActivat()));
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_REGISTRE, desc, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnv, sirActivat);
 
-		String codiDir3 = notificacioEntity.getEntitat().getDir3CodiReg() != null ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi();
+		String codiDir3 = notificacioEntity.getEntitat().getDir3CodiReg() != null  && !notificacioEntity.getEntitat().getDir3CodiReg().isEmpty() ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi();
 		boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
 		long startTime;
 		double elapsedTime;
