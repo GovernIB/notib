@@ -112,6 +112,8 @@ public class EntitatServiceImpl implements EntitatService {
 					entitatTipusDocRepository.save(tipusDocEntity);
 				}
 			}
+
+			configHelper.crearConfigsEntitat(entitat.getCodi());
 			return conversioTipusHelper.convertir(entitatSaved, EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -220,6 +222,7 @@ public class EntitatServiceImpl implements EntitatService {
 			columnesRepository.deleteByEntitatId(id);
 			entitatRepository.delete(entitat);
 			permisosHelper.deleteAcl(entitat.getId(), EntitatEntity.class);
+			configHelper.deleteConfigEntitat(entitat.getCodi());
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -1,5 +1,6 @@
 package es.caib.notib.core.entity.config;
 
+import es.caib.notib.core.entity.EntitatEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
@@ -71,5 +72,16 @@ public class ConfigEntity {
 
     public void update(String value) {
         this.value = value;
+    }
+
+    public void crearConfigNova(String key, String entitatCodi, ConfigEntity entitat) {
+
+        this.key = key;
+        this.value = null;
+        this.description = entitat.getDescription();
+        this.jbossProperty = entitat.isJbossProperty();
+        this.groupCode = entitat.getGroupCode();
+        this.type = entitat.getType();
+        this.entitatCodi = entitatCodi;
     }
 }

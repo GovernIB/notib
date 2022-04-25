@@ -105,6 +105,16 @@ public class ConfigServiceImpl implements ConfigService {
         return editedProperties;
     }
 
+    @Override
+    public List<ConfigDto> findEntitatsConfigByKey(String key) {
+
+        if (Strings.isNullOrEmpty(key)) {
+            return new ArrayList<>();
+        }
+        // la key no ha de ser unica i s'ha de buscar per key i codi entitat no null. tambe s'ha de modificar el guardar entitat si finalment es fa aixi
+        return conversioTipusHelper.convertirList(configRepository.findByKeyContainsKeyAndEntitatCodiIsNotNull(key), ConfigDto.class);
+    }
+
     private void processPropertyValues(ConfigGroupDto cGroup) {
         for (ConfigDto config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){

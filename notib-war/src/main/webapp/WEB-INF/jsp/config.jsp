@@ -60,7 +60,6 @@
 
             e.preventDefault();
             let formData = new FormData(this);
-            console.log(this);
             let id = "config_" + formData.get("key");
             let spinner;
             if (!document.getElementById(id + "_spinner")) {

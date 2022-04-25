@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.command.ConfigCommand;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -54,6 +56,18 @@ public class ConfigController extends BaseUserController{
             fillFormsModel(cGroup, model, entitats);
         }
         return "config";
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/entitat/{key}", method = RequestMethod.GET)
+    public List<ConfigDto> getEntitatConfigByKey(HttpServletRequest request, @PathVariable String key, Model model) {
+
+        try {
+            return configService.findEntitatsConfigByKey(key.replace("-", "."));
+        } catch (Exception ex) {
+            log.error("Error obtinguent les configuracions d'entitat per la key " + key, ex);
+            return new ArrayList<>();
+        }
     }
 
     @ResponseBody
