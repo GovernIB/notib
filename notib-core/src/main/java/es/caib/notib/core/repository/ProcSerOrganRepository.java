@@ -2,6 +2,7 @@ package es.caib.notib.core.repository;
 
 import java.util.List;
 
+import es.caib.notib.core.entity.OrganGestorEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,4 +39,5 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
 
+    List<ProcSerOrganEntity> findByProcSerIdAndOrganGestorCodiIn(Long procSerId, List<String> unitatsEntitat);
 }

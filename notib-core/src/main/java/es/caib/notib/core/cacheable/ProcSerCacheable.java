@@ -45,7 +45,7 @@ public class ProcSerCacheable {
     @Autowired
     private OrganigramaHelper organigramaHelper;
     @Autowired
-    private ProcSerOrganRepository procedimentOrganRepository;
+    private ProcSerOrganRepository procSerOrganRepository;
 
     /**
      * Obté un llistat de tots els procediments sobre els que l'usuari actual té els permisos indicats.
@@ -150,7 +150,7 @@ public class ProcSerCacheable {
             Permission[] permisos) {
         // 1. Obtenim els procediments amb permisos per procediment
         List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
-        List<ProcSerOrganEntity> procedimentOrgans = procedimentOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
+        List<ProcSerOrganEntity> procedimentOrgans = procSerOrganRepository.findProcedimentsOrganByEntitatAndGrup(entitat, grups);
         List<ProcSerOrganEntity> procedimentOrgansAmbPermis = new ArrayList<ProcSerOrganEntity>(procedimentOrgans);
         permisosHelper.filterGrantedAny(
                 procedimentOrgansAmbPermis,

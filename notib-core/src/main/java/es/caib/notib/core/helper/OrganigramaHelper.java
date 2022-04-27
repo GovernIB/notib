@@ -1,9 +1,12 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.Procediment;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +24,8 @@ public class OrganigramaHelper {
 
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private ProcSerOrganRepository procSerOrganRepository;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
 	
@@ -91,6 +96,14 @@ public class OrganigramaHelper {
 		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
 		if (!unitatsEntitat.isEmpty())
 			return organGestorRepository.findByCodiIn(unitatsEntitat);
+		else
+			return new ArrayList<>();
+	}
+
+	public List<ProcSerOrganEntity> getProcSerOrgansGestorsParesExistentsByOrgan(Long procedimentId, String codiDir3Entitat, String codiDir3Organ) {
+		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
+		if (!unitatsEntitat.isEmpty())
+			return procSerOrganRepository.findByProcSerIdAndOrganGestorCodiIn(procedimentId, unitatsEntitat);
 		else
 			return new ArrayList<>();
 	}

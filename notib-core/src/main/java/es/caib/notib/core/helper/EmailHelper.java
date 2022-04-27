@@ -21,16 +21,11 @@ import java.util.List;
 @Component
 public abstract class EmailHelper<T> {
     private static final String PREFIX_NOTIB = "[NOTIB]";
-    @Resource
-    protected ProcSerHelper procedimentHelper;
+
     @Resource
     protected CacheHelper cacheHelper;
     @Resource
     protected UsuariRepository usuariRepository;
-    @Resource
-    protected GrupRepository grupRepository;
-    @Resource
-    protected GrupProcSerRepository grupProcedimentRepository;
     @Autowired
     protected ConfigHelper configHelper;
     @Resource

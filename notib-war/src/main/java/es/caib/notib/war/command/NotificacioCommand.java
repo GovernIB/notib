@@ -111,6 +111,15 @@ public class NotificacioCommand {
 		return null;
 	}
 
+	public boolean isComunicacioSIR() {
+		for (EnviamentCommand enviament : enviaments) {
+			if (InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static NotificacioCommand asCommand(NotificacioDtoV2 dto) {
 		if (dto == null) {
 			return null;

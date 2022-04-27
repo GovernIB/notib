@@ -200,7 +200,11 @@ public class CacheHelper {
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)
 	public void evictUnitatPerCodi() {
 	}
-	
+
+	@CacheEvict(value = "findUsuarisAmbPermis", key="#procedimentId.concat('-').concat(#codiOrgan)")
+	public void evictFindUsuarisAmbPermis(Long procedimentId, String codiOrgan) {
+	}
+
 	public void clearCache(String cacheName) {
 		cacheManager.getCache(cacheName).clear();
 	}

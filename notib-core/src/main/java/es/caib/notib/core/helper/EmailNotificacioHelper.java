@@ -1,9 +1,12 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.GrupProcSerEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
@@ -20,74 +23,54 @@ import java.util.*;
 @Slf4j
 @Component
 public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
+
 	@Resource
 	private MessageHelper messageHelper;
+	@Resource ProcSerHelper proceSerHelper;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
-		String resposta = null;
+
 		try {
 			List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
-			if (destinataris != null && !destinataris.isEmpty()) {
-				for (UsuariDto usuariDto : destinataris) {
-					if (usuariDto.getEmail() != null && !usuariDto.getEmail().isEmpty()) {
-						String email = usuariDto.getEmail().replaceAll("\\s+","");
-						log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
-						sendEmailNotificacio(
-								email,
-								notificacio);
-					}
-				}
-
-			} else {
+			if (destinataris == null || destinataris.isEmpty()) {
 				log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
+				return null;
 			}
+			for (UsuariDto usuariDto : destinataris) {
+				if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
+					continue;
+				}
+				String email = usuariDto.getEmail().replaceAll("\\s+","");
+				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
+				sendEmailNotificacio(email, notificacio);
+			}
+			return null;
 		} catch (Exception ex) {
 			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
 			log.error(errorDescripció);
-			resposta = errorDescripció;
+			return errorDescripció;
 		}
-		return resposta;
 	}
 
-	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(
-			NotificacioEntity notificacio) {
-		List<UsuariDto> destinataris = new ArrayList<UsuariDto>();
-		Set<String> usuaris = new HashSet<String>();
-		GrupEntity grup;
-		
-		if (notificacio.getProcediment() == null) {
-			return destinataris;
-		}
+	private List<UsuariDto> obtenirCodiDestinatarisPerProcediment(NotificacioEntity notificacio) {
 
-		if (notificacio.getGrupCodi() != null) {
-			grup = grupRepository.findByCodiAndEntitat(notificacio.getGrupCodi(), notificacio.getEntitat());
-			if (grup != null)
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(grup, notificacio.getProcediment());
-		} else {
-			List<GrupProcSerEntity> grupsProcediment = grupProcedimentRepository.findByProcSer(notificacio.getProcediment());
+		List<UsuariDto> destinataris = new ArrayList<>();
+//		ProcSerEntity proc = notificacio.getProcediment();
 
-			if (notificacio.getProcediment().isAgrupar() && !grupsProcediment.isEmpty()) {
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerGrup(notificacio.getProcediment());
-			} else {
-				usuaris = procedimentHelper.findUsuarisAmbPermisReadPerProcediment(notificacio.getProcediment());
-			}
-		}
-
+		Set<String> usuaris = proceSerHelper.findUsuaris(notificacio);
 		for (String usuari: usuaris) {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
-			if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
-				UsuariEntity user = usuariRepository.findOne(usuari);
+			if (dadesUsuari == null || Strings.isNullOrEmpty(dadesUsuari.getEmail())) {
+				continue;
+			}
+			UsuariEntity user = usuariRepository.findOne(usuari);
+			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats()
+				|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().getCodi())))) {
 
-				boolean enviar = user == null
-									|| (user.isRebreEmailsNotificacio()
-											&& (!user.isRebreEmailsNotificacioCreats()
-													|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().getCodi())));
-				if (enviar) {
-					UsuariDto u = new UsuariDto();
-					u.setCodi(usuari);
-					u.setEmail(dadesUsuari.getEmail());
-					destinataris.add(u);
-				}
+				UsuariDto u = new UsuariDto();
+				u.setCodi(usuari);
+				u.setEmail(dadesUsuari.getEmail());
+				destinataris.add(u);
 			}
 		}
 		return destinataris;

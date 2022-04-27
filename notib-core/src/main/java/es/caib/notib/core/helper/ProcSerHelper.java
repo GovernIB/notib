@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
@@ -11,6 +12,7 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.GrupProcSerRepository;
+import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.repository.ServeiRepository;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,6 +64,8 @@ public class ProcSerHelper {
 	private MessageHelper messageHelper;
 	@Resource
 	private ProcSerCacheable procedimentsCacheable;
+	@Resource
+	private OrganigramaHelper organigramaHelper;
 
 	/**
 	 * Retorna el codi de tots els procediments que tenen un determinat permís per a totes les notificacions.
@@ -70,15 +75,10 @@ public class ProcSerHelper {
 	 * @param permisos
 	 * @return
 	 */
-	public List<String> findCodiProcedimentsWithPermis(Authentication auth,
-														EntitatEntity entitat,
-														Permission[] permisos) {
+	public List<String> findCodiProcedimentsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
 
 		// Procediments comuns amb permís a un òrgan gestor
-		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
-				auth.getName(),
-				entitat,
-				permisos);
+		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
 		Set<String> codis = new HashSet<>();
 		for (ProcSerEntity procediment : procediments) {
 			codis.add(procediment.getCodi());
@@ -95,113 +95,115 @@ public class ProcSerHelper {
 	 * @param permisos
 	 * @return
 	 */
-	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth,
-													   EntitatEntity entitat,
-													   Permission[] permisos) {
-		List<ProcSerOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(
-				auth,
-				entitat,
-				permisos);
+	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
+
+		List<ProcSerOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
 		List<String> codisProcedimentsOrgans = new ArrayList<>();
 		for (ProcSerOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
 			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcSer().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
 		}
-
 		return codisProcedimentsOrgans;
 	}
 
-	public void omplirPermisos(
-			ProcSerDto procediment,
-			boolean ambLlistaPermisos) {
+	public void omplirPermisos(ProcSerDto procediment, boolean ambLlistaPermisos) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		procediment.setUsuariActualRead(
-				permisosHelper.isGrantedAll(
-						procediment.getId(),
-						ProcedimentEntity.class,
-						new Permission[] {ExtendedPermission.READ},
-						auth));
-		procediment.setUsuariActualProcessar(
-				permisosHelper.isGrantedAll(
-						procediment.getId(),
-						ProcedimentEntity.class,
-						new Permission[] {ExtendedPermission.PROCESSAR},
-						auth));
-		procediment.setUsuariActualNotificacio(
-				permisosHelper.isGrantedAll(
-						procediment.getId(),
-						ProcedimentEntity.class,
-						new Permission[] {ExtendedPermission.NOTIFICACIO},
-						auth));
-		procediment.setUsuariActualAdministration(
-				permisosHelper.isGrantedAll(
-						procediment.getId(),
-						ProcedimentEntity.class,
-						new Permission[] {ExtendedPermission.ADMINISTRATION},
-						auth));
-		if (ambLlistaPermisos) {
-			List<PermisDto> permisos = permisosHelper.findPermisos(
-					procediment.getId(),
-					ProcedimentEntity.class);
-			procediment.setPermisos(permisos);
+		procediment.setUsuariActualRead(permisosHelper.isGrantedAll(procediment.getId(), ProcedimentEntity.class, new Permission[] {ExtendedPermission.READ}, auth));
+		procediment.setUsuariActualProcessar(permisosHelper.isGrantedAll(procediment.getId(), ProcedimentEntity.class, new Permission[] {ExtendedPermission.PROCESSAR}, auth));
+		procediment.setUsuariActualNotificacio(permisosHelper.isGrantedAll(procediment.getId(), ProcedimentEntity.class, new Permission[] {ExtendedPermission.NOTIFICACIO}, auth));
+		procediment.setUsuariActualAdministration(permisosHelper.isGrantedAll(procediment.getId(), ProcedimentEntity.class, new Permission[] {ExtendedPermission.ADMINISTRATION}, auth));
+		if (!ambLlistaPermisos) {
+			return;
 		}
+		List<PermisDto> permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
+		procediment.setPermisos(permisos);
 	}
 
-	public Set<String> findUsuarisAmbPermisReadPerProcediment(
-			ProcSerEntity procediment) {
+	@Cacheable(value = "findUsuarisAmbPermis", key = "#notificacio.getProcediment().getId().toString().concat('-').concat(#notificacio.getOrganGestor().getCodi())")
+	public Set<String> findUsuaris(NotificacioEntity notificacio) {
+
+		if (notificacio.getProcediment() == null) {
+			return new HashSet<>();
+		}
+		Set<String> usuarisAmbPermis = findUsuarisAmbPermisReadPerProcediment(notificacio);
+		if(usuarisAmbPermis.isEmpty() || !notificacio.getProcediment().isAgrupar() || Strings.isNullOrEmpty(notificacio.getGrupCodi())) {
+			return usuarisAmbPermis;
+		}
+		List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(notificacio.getGrupCodi());
+		if (usuarisGrup == null) {
+			return usuarisAmbPermis;
+		}
+		List<String> usuarisDelGrup = new ArrayList<>();
+		for (DadesUsuari u : usuarisGrup) {
+			usuarisDelGrup.add(u.getCodi());
+		}
+		usuarisAmbPermis.retainAll(usuarisDelGrup);
+		return usuarisAmbPermis;
+	}
+
+	public Set<String> findUsuarisAmbPermisReadPerProcediment(NotificacioEntity not) {
+
+		ProcSerEntity procediment = not.getProcediment();
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
 		List<PermisDto> permisos;
-		permisos = permisosHelper.findPermisos(
-				procediment.getId(),
-				ProcedimentEntity.class);
+		permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 
+		List<OrganGestorEntity> organs = new ArrayList<>();
 		if (!procediment.isComu() && procediment.getOrganGestor() != null ) {
-			List<PermisDto> permisosOrgan = permisosHelper.findPermisos(
-					procediment.getOrganGestor().getId(),
-					OrganGestorEntity.class);
-			permisos.addAll(permisosOrgan);
+			organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), procediment.getOrganGestor().getCodi());
 		}
+
+		if (procediment.isComu() && not.getOrganGestor() != null) {
+			organs = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
+
+			List<ProcSerOrganEntity> procSerOrgansGestorsParesExistentsByOrgan = organigramaHelper.getProcSerOrgansGestorsParesExistentsByOrgan(procediment.getId(), not.getEntitat().getDir3Codi(), not.getOrganGestor().getCodi());
+			for (ProcSerOrganEntity po: procSerOrgansGestorsParesExistentsByOrgan) {
+				permisos.addAll(permisosHelper.findPermisos(po.getId(), ProcSerOrganEntity.class));
+			}
+		}
+		for (OrganGestorEntity po: organs) {
+			permisos.addAll(permisosHelper.findPermisos(po.getId(), OrganGestorEntity.class));
+		}
+
+
+
 		Set<String> usuaris = new HashSet<String>();
 		for (PermisDto permis: permisos) {
-			if (permis.isRead()) {
-				switch (permis.getTipus()) {
-					case USUARI:
-						usuaris.add(permis.getPrincipal());
-						sb.append(" usuari ").append(permis.getPrincipal());
-						break;
-					case ROL:
-						List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
-								permis.getPrincipal());
-						sb.append(" rol ").append(permis.getPrincipal()).append(" (");
-						if (usuarisGrup != null) {
-							for (DadesUsuari usuariGrup : usuarisGrup) {
-								usuaris.add(usuariGrup.getCodi());
-								sb.append(" ").append(usuariGrup.getCodi());
-							}
-						}
-						sb.append(")");
-						break;
+			if (!permis.isRead()) {
+				continue;
+			}
+			switch (permis.getTipus()) {
+				case USUARI:
+				usuaris.add(permis.getPrincipal());
+				sb.append(" usuari ").append(permis.getPrincipal());
+				break;
+				case ROL:
+				List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(permis.getPrincipal());
+				sb.append(" rol ").append(permis.getPrincipal()).append(" (");
+				if (usuarisGrup != null) {
+					for (DadesUsuari usuariGrup : usuarisGrup) {
+						usuaris.add(usuariGrup.getCodi());
+						sb.append(" ").append(usuariGrup.getCodi());
+					}
 				}
+				sb.append(")");
+				break;
 			}
 		}
 		logger.debug(sb.toString());
 		return usuaris;
 	}
 	
-	public Set<String> findUsuarisAmbPermisReadPerGrup(
-			ProcSerEntity procediment) {
+	public Set<String> findUsuarisAmbPermisReadPerGrup(ProcSerEntity procediment) {
+
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
 		List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
-		List<PermisDto> permisos = new ArrayList<PermisDto>();
-		permisos = permisosHelper.findPermisos(
-				procediment.getId(),
-				ProcedimentEntity.class);
-		
+		List<PermisDto> permisos = new ArrayList<>();
+		permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 		Set<String> usuaris = new HashSet<String>();
 		for (GrupProcSerEntity permisGrup: grupsProcediment) {
-			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
-					permisGrup.getGrup().getCodi());
+			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(permisGrup.getGrup().getCodi());
 			sb.append(" rol ").append(permisGrup.getGrup().getCodi()).append(" (");
-
 			if (usuarisGrup != null) {
 				for (DadesUsuari usuariGrup: usuarisGrup) {
 					for (PermisDto permis : permisos) {
@@ -213,25 +215,20 @@ public class ProcSerHelper {
 				}
 			}
 			sb.append(")");
-			
 		}
 		logger.debug(sb.toString());
 		return usuaris;
 	}
 
-	public Set<String> findUsuarisAmbPermisReadPerGrupNotificacio(
-			GrupEntity grup,
-			ProcSerEntity procediment) {
+	public Set<String> findUsuarisAmbPermisReadPerGrupNotificacio(GrupEntity grup, ProcSerEntity procediment) {
+
 		StringBuilder sb = new StringBuilder("Preparant la llista d'usuaris per enviar l'email: ");
 		GrupProcSerEntity grupProcediment = grupProcSerRepository.findByGrupAndProcSer(grup, procediment);
 		List<PermisDto> permisos = new ArrayList<PermisDto>();
-		permisos = permisosHelper.findPermisos(
-				procediment.getId(),
-				ProcedimentEntity.class);
+		permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 		Set<String> usuaris = new HashSet<String>();
 		if (grupProcediment != null) {
-			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(
-					grupProcediment.getGrup().getCodi());
+			List<DadesUsuari> usuarisGrup = pluginHelper.dadesUsuariConsultarAmbGrup(grupProcediment.getGrup().getCodi());
 			sb.append(" rol ").append(grupProcediment.getGrup().getCodi()).append(" (");
 			if (usuarisGrup != null) {
 				for (DadesUsuari usuariGrup: usuarisGrup) {
@@ -244,7 +241,6 @@ public class ProcSerHelper {
 				}
 			}
 			sb.append(")");
-
 		}
 		logger.debug(sb.toString());
 		return usuaris;
@@ -263,11 +259,9 @@ public class ProcSerHelper {
 	 *
 	 * @return Si el procediment s'ha d'actualitzar
 	 */
-	private boolean procedimentHasToBeUpdated(
-			ProcSerDataDto procedimentGda,
-			ProcedimentEntity procedimentEntity,
-			Map<String, OrganismeDto> organigramaEntitat,
-			ProgresActualitzacioDto progres) {
+	private boolean procedimentHasToBeUpdated(ProcSerDataDto procedimentGda, ProcedimentEntity procedimentEntity,
+											  Map<String, OrganismeDto> organigramaEntitat, ProgresActualitzacioDto progres) {
+
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 //			logger.debug(">>>> Procediment DESCARTAT: No disposa de Codi SIA");
 //			logger.debug(">>>> ..........................................................................");
@@ -302,11 +296,8 @@ public class ProcSerHelper {
 		return true;
 	}
 
-	private boolean serveiHasToBeUpdated(
-			ProcSerDataDto serveiGda,
-			ServeiEntity serveiEntity,
-			Map<String, OrganismeDto> organigramaEntitat,
-			ProgresActualitzacioDto progres) {
+	private boolean serveiHasToBeUpdated(ProcSerDataDto serveiGda, ServeiEntity serveiEntity, Map<String, OrganismeDto> organigramaEntitat, ProgresActualitzacioDto progres) {
+
 		if (serveiGda.getCodi() == null || serveiGda.getCodi().isEmpty()) {
 //			logger.debug(">>>> Servei DESCARTAT: No disposa de Codi SIA");
 //			logger.debug(">>>> ..........................................................................");
