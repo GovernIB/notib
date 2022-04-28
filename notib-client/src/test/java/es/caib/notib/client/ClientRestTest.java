@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 public class ClientRestTest extends ClientBaseTest {
 
 	
-//	private static final String URL = "http://localhost:8280/notib";
+//	private static final String URL = "http://localhost:8080/notib";
 //	private static final String USERNAME = "admin";
 //	private static final String PASSWORD = "admin";
 
@@ -741,7 +741,9 @@ public class ClientRestTest extends ClientBaseTest {
 	@Test
 	public void consultaEstatNotificacioTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
+//		String referencia = "43573ddf-4f26-40d9-ae80-5bc9dcafbb96";
+//		String referencia = "8vzkicOY8Nc=";
+		String referencia = "4a125809-08a9-4073-8eaf-edfe1aef45c3";
 
 		// When
 		RespostaConsultaEstatNotificacio respostaConsultaEstatNotificacio = client.consultaEstatNotificacio(referencia);
@@ -759,7 +761,9 @@ public class ClientRestTest extends ClientBaseTest {
 	@Test
 	public void consultaEstatEnviamentTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
+//		String referencia = "a4256bed-292b-4ad1-bb84-05f8f14a7f1c";
+//		String referencia = "8vzkicOY8NM=";
+		String referencia = "8154b056-6458-4913-a5dd-248686846c1d";
 
 		// When
 		RespostaConsultaEstatEnviament respostaConsultaEstatEnviament = client.consultaEstatEnviament(referencia);
@@ -778,7 +782,8 @@ public class ClientRestTest extends ClientBaseTest {
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("a4256bed-292b-4ad1-bb84-05f8f14a7f1c");
+//		dadesConsulta.setReferencia("a4256bed-292b-4ad1-bb84-05f8f14a7f1c");
+		dadesConsulta.setReferencia("8154b056-6458-4913-a5dd-248686846c1d");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -798,7 +803,8 @@ public class ClientRestTest extends ClientBaseTest {
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("2d991961-cb95-46d9-b74c-6472952b296c");
+//		dadesConsulta.setReferencia("2d991961-cb95-46d9-b74c-6472952b296c");
+		dadesConsulta.setReferencia("8154b056-6458-4913-a5dd-248686846c1d");
 
 		// When
 		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("2d991961-cb95-46d9-b74c-6472952b296c");
