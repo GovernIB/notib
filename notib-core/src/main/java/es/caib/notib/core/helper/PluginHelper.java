@@ -1861,8 +1861,10 @@ public class PluginHelper {
 
 	private DatosInteresadoWsDto persona2DatosInteresadoWsDto(PersonaEntity persona) {
 		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
-		if (persona.getInteressatTipus() != null)
-			interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
+		if (persona.getInteressatTipus() != null) {
+			Long tipo = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) ? 2l: persona.getInteressatTipus().getLongVal();
+			interessatDades.setTipoInteresado(tipo);
+		}
 		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
 			interessatDades.setDocumento(persona.getDir3Codi() != null ? persona.getDir3Codi().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("O");
