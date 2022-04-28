@@ -108,10 +108,11 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public List<ConfigDto> findEntitatsConfigByKey(String key) {
 
-        if (Strings.isNullOrEmpty(key)) {
+        if (Strings.isNullOrEmpty(key) || !key.contains(ConfigDto.prefix)) {
             return new ArrayList<>();
         }
         // la key no ha de ser unica i s'ha de buscar per key i codi entitat no null. tambe s'ha de modificar el guardar entitat si finalment es fa aixi
+        String [] split = key.split(ConfigDto.prefix);
         return conversioTipusHelper.convertirList(configRepository.findByKeyContainsKeyAndEntitatCodiIsNotNull(key), ConfigDto.class);
     }
 

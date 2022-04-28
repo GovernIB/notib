@@ -32,7 +32,7 @@ ConfigDto {
         entitatsConfig = new ArrayList<>();
     }
 
-    private static final String prefix = "es.caib.notib";
+    public static final String prefix = "es.caib.notib";
 
     public String addEntitatKey(EntitatDto entitat) {
 
