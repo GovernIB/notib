@@ -833,7 +833,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
 
-		Path path = Paths.get("/home/siona/Feina/AppData/Notib/" + dadesConsulta.getReferencia() + ".pdf");
+		Path path = Paths.get("/var/tmp/" + dadesConsulta.getReferencia() + ".pdf");
 		Files.write(path, resposta.getJustificant());
 	}
 
