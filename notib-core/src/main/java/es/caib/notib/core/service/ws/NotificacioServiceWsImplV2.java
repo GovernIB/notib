@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static es.caib.notib.client.domini.InteressatTipusEnumDto.FISICA_SENSE_NIF;
@@ -2399,16 +2400,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	    }
 	    return str;
 	}
-	
+
+	public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
 	private boolean isEmailValid(String email) {
-		boolean valid = true;
 		try {
-			InternetAddress emailAddr = new InternetAddress(email);
-			emailAddr.validate();
+			Matcher matcher = EMAIL_REGEX.matcher(email);
+			return matcher.find();
 		} catch (Exception e) {
-			valid = false; //no vàlid
+			return false;
 		}
-		return valid;
 	}
 	
 	private boolean isFormatValid(String docBase64) {
