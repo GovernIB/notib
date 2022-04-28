@@ -7,6 +7,9 @@ import org.junit.Test;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -815,8 +818,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-//		dadesConsulta.setReferencia("a4256bed-292b-4ad1-bb84-05f8f14a7f1c");
-		dadesConsulta.setReferencia("8154b056-6458-4913-a5dd-248686846c1d");
+		dadesConsulta.setReferencia("d9ef4a35-c91e-425d-95d5-da0644af7177");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -830,6 +832,9 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Informació registre: " + resposta.toString());
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
+
+		Path path = Paths.get("/home/siona/Feina/AppData/Notib/" + dadesConsulta.getReferencia() + ".pdf");
+		Files.write(path, resposta.getJustificant());
 	}
 
 	@Test
