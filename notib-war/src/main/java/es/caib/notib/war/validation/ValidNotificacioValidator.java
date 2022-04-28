@@ -274,7 +274,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							.addConstraintViolation();
 						}
 					}
-					if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
+					if (!notificacio.isComunicacioSIR()) {
 						boolean senseNif = true;
 						if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 							if (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
@@ -353,7 +353,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 		if (!valid) {
 			String msg = TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())
 					? "notificacio.form.errors.validacio.notificacio" : "notificacio.form.errors.validacio.comunicacio";
-			msg = MessageHelper.getInstance().getMessage(msg, null, locale) + " - " + maxSizeError;
+			msg = MessageHelper.getInstance().getMessage(msg, null, locale) + (!Strings.isNullOrEmpty(maxSizeError) ? " - " + maxSizeError : "");
 			context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();
 		}
 		return valid;

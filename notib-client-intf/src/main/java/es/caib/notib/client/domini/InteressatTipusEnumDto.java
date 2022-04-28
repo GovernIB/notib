@@ -13,7 +13,7 @@ public enum InteressatTipusEnumDto implements Serializable {
     ADMINISTRACIO(1L),
     FISICA(2L),
     JURIDICA(3L),
-    FISICA_SENSE_NIF(2L);
+    FISICA_SENSE_NIF(4L);
 
     private final Long val;
 
