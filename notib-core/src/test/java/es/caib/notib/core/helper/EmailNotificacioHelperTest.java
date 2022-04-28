@@ -41,9 +41,8 @@ public class EmailNotificacioHelperTest {
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
 	private static final String EMAIL_PASS = "xxxxxx";
 	private static final String EMAIL_USER = "proves_limit@limit.es";
-//	private static final String EMAIL_DEST = "sandreu@limit.es";
-	private static final String EMAIL_DEST = "salloza@limit.es";
-	private static final String FILE_PATH = "/home/salloza/Documentos/blankDocuments/blank.pdf";
+	private static final String EMAIL_DEST = "sandreu@limit.es";
+	private static final String FILE_PATH = "";
 
 	@Mock
 	private GrupRepository grupRepository;
@@ -166,7 +165,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(grupRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(grupNotificacio);
 		Mockito.when(grupProcedimentRepository.findByProcSer(Mockito.any(ProcSerEntity.class))).thenReturn(new ArrayList<GrupProcSerEntity>());
 		Mockito.when(procedimentHelper.findUsuarisAmbPermisReadPerGrupNotificacio(Mockito.any(GrupEntity.class), Mockito.any(ProcSerEntity.class))).thenReturn(usuaris);
-		Mockito.when(procedimentHelper.findUsuarisAmbPermisReadPerProcediment(Mockito.any(ProcSerEntity.class))).thenReturn(usuaris);
+		Mockito.when(procedimentHelper.findUsuarisAmbPermisReadPerProcediment(Mockito.any(NotificacioEntity.class))).thenReturn(usuaris);
 		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 		Mockito.when(usuariRepository.findOne(Mockito.anyString())).thenReturn(usuari);
 
@@ -178,7 +177,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.verify(grupRepository, Mockito.times(0)).findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class));
 		Mockito.verify(procedimentHelper, Mockito.times(0)).findUsuarisAmbPermisReadPerGrupNotificacio(Mockito.any(GrupEntity.class), Mockito.any(ProcSerEntity.class));
 		Mockito.verify(procedimentHelper, Mockito.times(0)).findUsuarisAmbPermisReadPerGrup(Mockito.any(ProcSerEntity.class));
-		Mockito.verify(procedimentHelper, Mockito.times(1)).findUsuarisAmbPermisReadPerProcediment(Mockito.any(ProcSerEntity.class));
+		Mockito.verify(procedimentHelper, Mockito.times(1)).findUsuarisAmbPermisReadPerProcediment(Mockito.any(NotificacioEntity.class));
 		assertNull(resposta);
 	}
 
