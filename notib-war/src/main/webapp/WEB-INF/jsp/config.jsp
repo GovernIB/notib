@@ -35,6 +35,27 @@
 </head>
 <body>
 <script>
+    let addSpinner = id => {
+
+        let spinner;
+        if (!document.getElementById(id + "_spinner")) {
+            spinner = document.createElement("span");
+            spinner.setAttribute("aria-hidden", true);
+            spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
+            spinner.setAttribute("id", id + "_spinner");
+            console.log(id+"_key");
+            let elem = document.getElementById(id + "_key");
+            elem.append(spinner);
+        }
+        return spinner;
+    };
+
+    let removeSpinner = spinner =>  {
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+
     $(document).ready(function() {
         $("#btn-sync").on("click", function () {
             $.get('<c:url value="/config/sync"/>', function( data ) {
@@ -54,22 +75,15 @@
             });
         });
 
-
         <c:url var="urlEdit" value="/config/update"/>
         $(".form-update-config").submit(function(e) {
 
             e.preventDefault();
             let formData = new FormData(this);
             let id = "config_" + formData.get("key");
-            let spinner;
-            if (!document.getElementById(id + "_spinner")) {
-                spinner = document.createElement("span");
-                spinner.setAttribute("aria-hidden", true);
-                spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
-                spinner.setAttribute("id", id + "_spinner");
-                let elem = document.getElementById(id + "_key");
-                elem.append(spinner);
-            }
+            let spinner = addSpinner(id);
+
+            console.log($(".form-update-config"));
             $.ajax({
                 url: "${urlEdit}",
                 type: "post",
@@ -78,9 +92,7 @@
                 enctype: "multipart/form-data",
                 data: formData,
                 success: data => {
-                    if (spinner) {
-                        spinner.remove();
-                    }
+                    removeSpinner(spinner);
                     let elem = document.getElementById(id);
                     elem = !elem ? document.getElementById(id + "_1") : elem;
                     let msgId = elem.getAttribute("id") + "_msg";

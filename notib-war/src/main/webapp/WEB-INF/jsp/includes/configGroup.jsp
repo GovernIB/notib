@@ -18,35 +18,95 @@
 
         $(".entitats").unbind("click").click(e => {
 
-            console.log(e.target.name);
+            // e.preventDefault();
+            e.stopPropagation();
 
+            let div = $(e.target).parent().parent().next();
+            div.empty();
+            let span = $(e.target).find("span");
+            if ($(div).is(":visible")) {
+                span.removeClass("fa-caret-up");
+                span.addClass("fa-caret-down");
+                div.toggle();
+                return;
+            }
             $.ajax({
                 type: "GET",
                 url: "config/entitat/" + e.target.name.replace(/\./g,"-"),
-                success: data => {
-                    console.log(data);
+                success: entitats => {
 
-                    let entitats = $(e.target).parent().parent().next();
-                    entitats.toggle();
-                    let span = $(e.target).find("span");
-                    if ($(entitats).is(":visible")) {
+                    if (!entitats) {
+                        return;
+                    }
+                    console.log(entitats);
+                    div.toggle();
+                    if ($(div).is(":visible")) {
                         span.removeClass("fa-caret-down");
                         span.addClass("fa-caret-up");
-                    } else {
-                        span.removeClass("fa-caret-up");
-                        span.addClass("fa-caret-down");
                     }
+
+                    for (let entitat of entitats) {
+                        console.log(entitat);
+                        let string = '<div>';
+                        string += '<label for="entitat_config_' + entitat.key.replaceAll('.', '_') + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">' +  entitat.key +'</label>';
+                        string += '<div class="col-sm-8 margin-bottom">';
+
+                        switch (entitat.typeCode) {
+                            case "INT":
+                                break;
+                            case "FLOAT":
+                                break;
+                            case "INT":
+                                break;
+                            case "CREDENTIALS":
+                                break;
+                            case "BOOL":
+                                string += '<input id="' + entitat.key.replaceAll('.', '_') + '" name="booleanValue" class="visualitzar" type="checkbox" value="' + entitat.value + '">';
+                                break;
+                            default:
+                        }
+                        // TODO FALTEN 2 WHENS I EL OTHERWISE
+                        string +='<div id="'+ entitat.key.replaceAll('.', '_') + '_key"><span class="help-block display-inline"> ' + entitat.key + '</span></div>';
+                        string += '</div>'
+                        string += '<div class="col-sm-1 margin-bottom">';
+                        if (!entitat.jbossProperty) {
+                            string += '<button id="' + entitat.key.replaceAll('.', '_') + '" name=' + entitat.entitatCodi+ ' type="button" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>';
+                        }
+                        string += '</div>';
+                        string += '</div>';
+                        div.append(string);
+                    }
+
+                    $(".entitat-save").unbind("click").click(e =>  {
+                        let configKey = e.target.id;
+                        let configKeyReplaced = configKey.replaceAll("_",".");
+                        let spinner = addSpinner(configKey);
+                        let elem = $("#" + configKey);
+                        console.log(elem);
+                        let formData = new FormData();
+                        console.log("value: " + $(elem).val() + " replaced: " + configKeyReplaced);
+                        formData.append("key", configKeyReplaced);
+                        formData.append("value", $(elem).is(":checked"));
+                        $.ajax({
+                            url: "/notib/config/update",
+                            type: "post",
+                            processData: false,
+                            contentType: false,
+                            enctype: "multipart/form-data",
+                            data: formData,
+                            success: data => {
+                                removeSpinner(spinner);
+                                console.log(data);
+                            }
+                        });
+                        // if($("#entitatCodi").length) {
+                        //     $("#entitatCodi").val(e.target.id);
+                        //     return;
+                        // }
+                        // $(".form-update-config").append('<input id="' + e.target.name+ '" type="hidden" name="entitatCodi" value="' + e.target.id + '" />');
+                    });
                 }
             });
-        });
-
-        $(".entitat-save").unbind("click").click(e =>  {
-
-            if($("#entitatCodi").length) {
-                $("#entitatCodi").val(e.target.id);
-                return;
-            }
-            $(".form-update-config").append('<input id="entitatCodi" type="hidden" name="entitatCodi" value="' + e.target.id + '" />');
         });
     });
 
@@ -116,8 +176,7 @@
                         <a href="#" class="btn btn-default btn-sm btn-rowInfo entitats" name="${config.key}"><span class="fa fa-caret-down"></span></a>
                     </div>
                 </div>
-                <div class="form-group entitats-config" >
-                    config
+                <div class="form-group entitats-config">
 <%--                    <c:forEach var="entitat" items="${config.entitatsConfig}">--%>
 <%--                        <form:form method="post" cssClass="config-form form-horizontal" action="config/update" commandName="config_${entitat.configKey}">--%>
 <%--                            <label for="entitat_config_${entitat.codi}" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">${entitat.codi}</label>--%>

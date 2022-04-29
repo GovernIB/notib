@@ -49,8 +49,8 @@ public class ConfigServiceImpl implements ConfigService {
 
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
         boolean entitatCodi = !Strings.isNullOrEmpty(property.getEntitatCodi());
-        ConfigEntity configEntity = entitatCodi ? configRepository.findByKeyAndEntitatCodi(property.crearEntitatKey(), property.getEntitatCodi())
-                                    : configRepository.findOne(property.getKey());
+//        ConfigEntity configEntity = entitatCodi ? configRepository.findByKeyAndEntitatCodi(property.crearEntitatKey(), property.getEntitatCodi())
+//                                    : configRepository.findOne(property.getKey());
            /*
 
             INSERT INTO NOT_CONFIG ("KEY", VALUE, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, ENTITAT_CODI)
@@ -59,6 +59,7 @@ public class ConfigServiceImpl implements ConfigService {
             WHERE nc."KEY" = 'es.caib.notib.emprar.sir'
 
             */
+        ConfigEntity configEntity = configRepository.findOne(property.getKey());
         configEntity.update(entitatCodi ? property.getEntitatValue(): property.getValue());
         pluginHelper.reloadProperties(configEntity.getGroupCode());
         if (property.getKey().endsWith(".class")){
@@ -106,14 +107,14 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public List<ConfigDto> findEntitatsConfigByKey(String key) {
+    @Transactional
+    public List<ConfigDto>  findEntitatsConfigByKey(String key) {
 
         if (Strings.isNullOrEmpty(key) || !key.contains(ConfigDto.prefix)) {
             return new ArrayList<>();
         }
-        // la key no ha de ser unica i s'ha de buscar per key i codi entitat no null. tambe s'ha de modificar el guardar entitat si finalment es fa aixi
         String [] split = key.split(ConfigDto.prefix);
-        return conversioTipusHelper.convertirList(configRepository.findByKeyContainsKeyAndEntitatCodiIsNotNull(key), ConfigDto.class);
+        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNull(split[1]), ConfigDto.class);
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {
