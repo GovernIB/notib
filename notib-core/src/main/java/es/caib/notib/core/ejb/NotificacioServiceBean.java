@@ -387,7 +387,7 @@ public class NotificacioServiceBean implements NotificacioService {
 	}
 
 	@Override
-//	@RolesAllowed({"NOT_SUPER"})
+	@RolesAllowed({"NOT_SUPER"})
 	public void actualitzarReferencies() {
 		 delegate.actualitzarReferencies();
 	}

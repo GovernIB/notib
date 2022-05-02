@@ -431,7 +431,7 @@ public interface NotificacioService {
 	 * Actualitza el camp NOTIFICA_REFERENCIA de la taula NOT_NOTIFICACIO_ENV si es null
 	 * @return true si ok false altrament.
 	 */
-//	@PreAuthorize("hasRole('NOT_SUPER')")/
+	@PreAuthorize("hasRole('NOT_SUPER')")
 	void actualitzarReferencies();
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
