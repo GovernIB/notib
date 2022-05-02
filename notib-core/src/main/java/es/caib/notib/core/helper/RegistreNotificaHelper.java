@@ -112,9 +112,10 @@ public class RegistreNotificaHelper {
 			}
 		}
 		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
-			notificacioEntity.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
+			boolean isSir = notificacioEntity.isComunicacioSir();
+			notificacioEntity.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
 			notificacioTableHelper.actualitzarRegistre(notificacioEntity);
-			enviarANotifica = true;
+			enviarANotifica = !isSir;
 		}
 		integracioHelper.addAccioOk(info);
 		return enviarANotifica;

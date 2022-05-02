@@ -49,6 +49,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private String notificaCertificacioCsv;
 	private String notificaReferencia;
 	private String notificaIdentificador;
+	private boolean notificaEstatFinal;
 	private NotificaCertificacioTipusEnumDto notificaCertificacioTipus;
 	private NotificaCertificacioArxiuTipusEnumDto notificaCertificacioArxiuTipus;
 	private String notificaCertificacioNumSeguiment;
@@ -78,7 +79,17 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 		sb.append(")");
 		return sb.toString();
 	}
-	
+
+	public boolean isEnviamentEnviat() {
+		return !NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT.equals(notificaEstat) && !NotificacioEnviamentEstatEnumDto.REGISTRADA.equals(notificaEstat);
+	}
+	public boolean isEnviamentFinalitzat() {
+		return notificaEstatFinal || NotificacioEnviamentEstatEnumDto.FINALITZADA.equals(notificaEstat);
+	}
+	public boolean isEnviamentProcessat() {
+		return NotificacioEnviamentEstatEnumDto.PROCESSADA.equals(notificaEstat);
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

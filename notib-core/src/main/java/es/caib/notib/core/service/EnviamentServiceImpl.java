@@ -1189,7 +1189,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			transmissio.setDataEnviament(dataProgramada);
 		}
 
-		transmissio.setEstat(Estat.valueOf(not.getEstat().name()));
+		transmissio.setEstat(getEstat(enviament));
 		Date data = not.getEstatDate() != null ? not.getEstatDate() :
 				(NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) ? not.getRegistreData()
 						: NotificacioEstatEnumDto.PENDENT.equals(not.getEstat()) ? not.getCreatedDate()
@@ -1236,6 +1236,37 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 
 		return transmissio;
+	}
+
+	// Recuperar l'estat a partir de l'enviament, i no de la notificació.
+	//  A més, no s'han d'eliminar els estat enviada_amb_errors i finalitzada_amb_errors.
+	private Estat getEstat(NotificacioEnviamentDto enviament) {
+		NotificacioDto notificacio = enviament.getNotificacio();
+
+		switch (notificacio.getEstat()) {
+			case PENDENT:
+				return Estat.PENDENT;
+			case REGISTRADA:
+				return Estat.REGISTRADA;
+			case ENVIADA:
+				return enviament.isEnviamentFinalitzat() ? Estat.FINALITZADA : Estat.ENVIADA;
+			case FINALITZADA:
+				return Estat.FINALITZADA;
+			case PROCESSADA:
+				return Estat.PROCESSADA;
+			case FINALITZADA_AMB_ERRORS:
+				return enviament.isEnviamentProcessat() ? Estat.PROCESSADA :
+						enviament.isEnviamentFinalitzat() ? Estat.FINALITZADA : Estat.REGISTRADA;
+			case ENVIADA_AMB_ERRORS:
+				return enviament.isEnviamentProcessat() ? Estat.PROCESSADA :
+						enviament.isEnviamentFinalitzat() ? Estat.FINALITZADA :
+						enviament.isEnviamentEnviat() ? Estat.ENVIADA : Estat.REGISTRADA;
+			default:
+				return enviament.isEnviamentProcessat() ? Estat.PROCESSADA :
+						enviament.isEnviamentFinalitzat() ? Estat.FINALITZADA :
+						enviament.isEnviamentEnviat() ? Estat.ENVIADA :
+						NotificacioEnviamentEstatEnumDto.REGISTRADA.equals(enviament.getNotificaEstat()) ? Estat.REGISTRADA : Estat.PENDENT;
+		}
 	}
 	
 	private Persona toPersona(PersonaDto dto) {
