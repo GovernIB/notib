@@ -28,11 +28,12 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Synchronized
     @Transactional
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        log.info("Executant processos inicials. Counter: " + counter);
         counter++;
         if (counter != 2) {
             return;
         }
-        log.info("Executant processos inicials");
         try {
             List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
             for (ProcesosInicialsEntity proces : processos) {
