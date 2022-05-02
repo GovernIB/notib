@@ -58,7 +58,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 					notificacio,
 					progres);
 			int numEnviament = 1;
-			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviamentsFinalitzats()) {
+			for (NotificacioEnviamentDtoV2 enviament : notificacio.getEnviaments()) {
 				progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.taula.enviament", new Object[]{numEnviament}));
 				crearTaulaEnviaments(
 						justificant,
@@ -188,7 +188,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			String introduccioEnviaments = messageHelper.getMessage("es.caib.notib.justificant.enviaments.titol",
 					new Object[] {
 							messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(),
-							notificacio.getEnviamentsFinalitzats().size()
+							notificacio.getEnviaments().size()
 			});
 			Paragraph justificantIntroduccioEnviaments = new Paragraph();
 			setParametersBold(justificantIntroduccioEnviaments, introduccioEnviaments);
@@ -279,7 +279,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 				new Object[] {
 						(NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && enviament.isPerEmail() ?  messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.titol.notificacio.email") + " " : "") + messageHelper.getMessage("es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()).toLowerCase(),
 						numEnviament, 
-						notificacio.getEnviamentsFinalitzats().size()});
+						notificacio.getEnviaments().size()});
 		Paragraph titolParagraph = new Paragraph(titolEnviamentMessage, calibriWhiteBold);
 		titolParagraph.setAlignment(Element.ALIGN_CENTER);
 		titolCell.addElement(titolParagraph);
