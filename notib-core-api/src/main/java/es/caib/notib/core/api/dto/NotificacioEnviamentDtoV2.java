@@ -98,6 +98,11 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 		return this.estat;
 	}
 
+
+	public boolean isEnviat() {
+		return !NotificacioEstatEnumDto.ENVIANT.equals(estat) || !NotificacioEstatEnumDto.PENDENT.equals(estat) ||  !NotificacioEstatEnumDto.REGISTRADA.equals(estat);
+	}
+
 	private static final long serialVersionUID = -139254994389509932L;
 
 }
