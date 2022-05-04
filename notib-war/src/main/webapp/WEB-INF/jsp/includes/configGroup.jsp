@@ -18,7 +18,6 @@
 
         $(".entitats").unbind("click").click(e => {
 
-            // e.preventDefault();
             e.stopPropagation();
 
             let div = $(e.target).parent().parent().next();
@@ -32,13 +31,12 @@
             }
             $.ajax({
                 type: "GET",
-                url: "config/entitat/" + e.target.name.replace(/\./g,"-"),
+                url: "config/entitat/" + e.target.id.replace(/\./g,"-"),
                 success: entitats => {
 
                     if (!entitats) {
                         return;
                     }
-                    console.log(entitats);
                     div.toggle();
                     if ($(div).is(":visible")) {
                         span.removeClass("fa-caret-down");
@@ -46,31 +44,48 @@
                     }
 
                     for (let entitat of entitats) {
-                        console.log(entitat);
+                        // console.log(entitat);
+                        let keyReplaced = entitat.key.replaceAll('.', '_');
+                        console.log("keyReplaced: " + keyReplaced);
                         let string = '<div>';
-                        string += '<label for="entitat_config_' + entitat.key.replaceAll('.', '_') + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">' +  entitat.key +'</label>';
+                        string += '<label for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;"></label>';
                         string += '<div class="col-sm-8 margin-bottom">';
+                        let disabled = entitat.jbossProperty ? 'disabled' : '';
+                        let placeHolder = "placeholder=" + entitat.key;
+                        if (entitat.typeCode === "INT") {
+                            string += '<input id="' + keyReplaced + '" class="form-control" type="number" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
+                        } else if(entitat.typeCode === "FLOAT") {
+                            string += '<input id="' + keyReplaced + '" class="form-control" type="number" step="0.01" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
+                        } else if(entitat.typeCode === "CREDENTIALS") {
+                           string += '<input id="' + keyReplaced + '" class="form-control" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
+                        } else if(entitat.typeCode === "BOOL") {
+                           let checked = entitat.value === "true" ? 'checked' : '';
+                           string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar" type="checkbox" ' + disabled + ' ' + checked + '>';
+                        } else if (entitat.validValues && entitat.validValues.length > 2) {
+                            string += '<select>';
+                            entitat.validValues.map(x => string += '<option value="' + x + '">' + x + '</option>');
+                            string += '<select>';
+                        } else if (entitat.validValues && entitat.validValues.length === 2) {
+                            let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
+                            let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
 
-                        switch (entitat.typeCode) {
-                            case "INT":
-                                break;
-                            case "FLOAT":
-                                break;
-                            case "INT":
-                                break;
-                            case "CREDENTIALS":
-                                break;
-                            case "BOOL":
-                                string += '<input id="' + entitat.key.replaceAll('.', '_') + '" name="booleanValue" class="visualitzar" type="checkbox" value="' + entitat.value + '">';
-                                break;
-                            default:
+                            string += '<div id="' + keyReplaced + '"><label for="' + keyReplaced + '_1" class="radio-inline">'
+                                + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + '>'
+                                + entitat.validValues[0]
+                                + '</label>'
+                                + '<label for="' + keyReplaced+ '_2" class="radio-inline">'
+                                + '<input id="' + keyReplaced + '_2" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[1] + '"' + ' ' + checked2 + '>'
+                                + entitat.validValues[1]
+                                + '</label></div>';
+                        } else {
+                            string += '<input id="' + keyReplaced + '" class="form-control" type="text" maxlength="2048" value="'
+                                    + entitat.value + '"' + disabled + '' + placeHolder + '>';
                         }
-                        // TODO FALTEN 2 WHENS I EL OTHERWISE
-                        string +='<div id="'+ entitat.key.replaceAll('.', '_') + '_key"><span class="help-block display-inline"> ' + entitat.key + '</span></div>';
+                        string +='<div id="'+ keyReplaced + '_key"><span class="help-block display-inline"> ' + entitat.key + '</span></div>';
                         string += '</div>'
                         string += '<div class="col-sm-1 margin-bottom">';
                         if (!entitat.jbossProperty) {
-                            string += '<button id="' + entitat.key.replaceAll('.', '_') + '" name=' + entitat.entitatCodi+ ' type="button" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_save" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>';
                         }
                         string += '</div>';
                         string += '</div>';
@@ -78,15 +93,17 @@
                     }
 
                     $(".entitat-save").unbind("click").click(e =>  {
-                        let configKey = e.target.id;
+                        let configKey = e.target.id.replace("_button_save", "");
+                        console.log("configKey: " + configKey);
                         let configKeyReplaced = configKey.replaceAll("_",".");
                         let spinner = addSpinner(configKey);
                         let elem = $("#" + configKey);
-                        console.log(elem);
+                        console.info(elem);
+                        let value = elem.is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val();
+                        console.log("value: " + value);
                         let formData = new FormData();
-                        console.log("value: " + $(elem).val() + " replaced: " + configKeyReplaced);
                         formData.append("key", configKeyReplaced);
-                        formData.append("value", $(elem).is(":checked"));
+                        formData.append("value", value);
                         $.ajax({
                             url: "/notib/config/update",
                             type: "post",
@@ -96,14 +113,11 @@
                             data: formData,
                             success: data => {
                                 removeSpinner(spinner);
+
+                                mostrarMissatge(configKey + "_key", data);
                                 console.log(data);
                             }
                         });
-                        // if($("#entitatCodi").length) {
-                        //     $("#entitatCodi").val(e.target.id);
-                        //     return;
-                        // }
-                        // $(".form-update-config").append('<input id="' + e.target.name+ '" type="hidden" name="entitatCodi" value="' + e.target.id + '" />');
                     });
                 }
             });
@@ -173,66 +187,10 @@
                         <c:if test="${not config.jbossProperty}">
                             <button class="btn btn-success"><i class="fa fa-save"></i></button>
                         </c:if>
-                        <a href="#" class="btn btn-default btn-sm btn-rowInfo entitats" name="${config.key}"><span class="fa fa-caret-down"></span></a>
+                        <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
                     </div>
                 </div>
-                <div class="form-group entitats-config">
-<%--                    <c:forEach var="entitat" items="${config.entitatsConfig}">--%>
-<%--                        <form:form method="post" cssClass="config-form form-horizontal" action="config/update" commandName="config_${entitat.configKey}">--%>
-<%--                            <label for="entitat_config_${entitat.codi}" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">${entitat.codi}</label>--%>
-<%--                            <div class="col-sm-8 margin-bottom">--%>
-<%--                                <c:choose>--%>
-<%--                                    <c:when test="${config.typeCode == 'INT'}">--%>
-<%--                                        <form:input  id="entitat_config_${entitat.configKey}" cssClass="form-control" path="value" placeholder="${entitat.configKey}"--%>
-<%--                                                     type="number" maxlength="2048" disabled="${config.jbossProperty}"/>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:when test="${config.typeCode == 'FLOAT'}">--%>
-<%--                                        <form:input  id="entitat_config_${entitat.configKey}" cssClass="form-control" path="value" placeholder="${entitat.configKey}"--%>
-<%--                                                     type="number" step="0.01" maxlength="2048" disabled="${config.jbossProperty}"/>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:when test="${config.typeCode == 'CREDENTIALS'}">--%>
-<%--                                        <form:input  id="entitat_config_${entitat.configKey}" cssClass="form-control" path="value" placeholder="${entitat.configKey}"--%>
-<%--                                                     type="password" maxlength="2048" disabled="${config.jbossProperty}"/>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:when test="${config.typeCode == 'BOOL'}">--%>
-<%--                                        <div class="checkbox checkbox-primary">--%>
-<%--                                            <label>--%>
-<%--                                                <form:checkbox path="EntitatBooleanValue" id="${entitat.configKey}" cssClass="config-form visualitzar"--%>
-<%--                                                               disabled="${config.jbossProperty}"/>--%>
-<%--                                            </label>--%>
-<%--                                        </div>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:when test="${config.validValues != null and fn:length(config.validValues) > 2}">--%>
-<%--                                        <form:select path="value" cssClass="form-control" id="entitat_config_${entitat.configKey}" disabled="${config.jbossProperty}" style="width:100%" data-toggle="select2"--%>
-<%--                                                     data-placeholder="${config.description}">--%>
-<%--                                            <c:forEach var="opt" items="${config.validValues}">--%>
-<%--                                                <form:option value="${opt}"/>--%>
-<%--                                            </c:forEach>--%>
-<%--                                        </form:select>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:when test="${config.validValues != null and fn:length(config.validValues) == 2}">--%>
-<%--                                        <label id="entitat_config_${entitat.configKey}_1" class="radio-inline">--%>
-<%--                                            <form:radiobutton path="value" value="${config.validValues[0]}"/> ${config.validValues[0]}--%>
-<%--                                        </label>--%>
-<%--                                        <label id="entitat_config_${entitat.configKey}_2" class="radio-inline">--%>
-<%--                                            <form:radiobutton path="value" value="${config.validValues[1]}"/> ${config.validValues[1]}--%>
-<%--                                        </label>--%>
-<%--                                    </c:when>--%>
-<%--                                    <c:otherwise>--%>
-<%--                                        <form:input  id="entitat_config_${entitat.configKey}" cssClass="form-control" path="value" placeholder="${entitat.configKey}"--%>
-<%--                                                     type="text" maxlength="2048" disabled="${config.jbossProperty}"/>--%>
-<%--                                    </c:otherwise>--%>
-<%--                                </c:choose>--%>
-<%--                                <div id="entitat_config_${entitat.configKey}_key"><span class="help-block display-inline">${entitat.configKey}</span></div>--%>
-<%--                            </div>--%>
-<%--                            <div class="col-sm-1 margin-bottom">--%>
-<%--                                <c:if test="${not config.jbossProperty}">--%>
-<%--                                    <button id="${entitat.codi}" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>--%>
-<%--                                </c:if>--%>
-<%--                            </div>--%>
-<%--                        </form:form>--%>
-<%--                    </c:forEach>--%>
-                </div>
+                <div class="form-group entitats-config"></div>
             </form:form>
         </c:forEach>
 

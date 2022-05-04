@@ -35,6 +35,15 @@
 </head>
 <body>
 <script>
+
+    let getValueRadio = elem => {
+        let inputs = $(elem).find("input");
+        if (!inputs || (inputs && inputs.length !== 2)) {
+            return null;
+        }
+        return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
+    }
+
     let addSpinner = id => {
 
         let spinner;
@@ -43,7 +52,6 @@
             spinner.setAttribute("aria-hidden", true);
             spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
             spinner.setAttribute("id", id + "_spinner");
-            console.log(id+"_key");
             let elem = document.getElementById(id + "_key");
             elem.append(spinner);
         }
@@ -54,6 +62,27 @@
         if (spinner) {
             spinner.remove();
         }
+    }
+
+    let mostrarMissatge = (id, data) => {
+
+        let elem = document.getElementById(id);
+        elem = !elem ? document.getElementById(id + "_1") : elem;
+        let tagId = elem.getAttribute("id") + "_msg";
+        let msg = document.getElementById(tagId);
+        if (msg) {
+            document.getElementById(msgId).remove();
+        }
+        let div = document.createElement("div");
+        div.setAttribute("id", tagId);
+        div.className = "flex-space-between alert-config " +  (data.status === 1 ?  "alert-config-ok" : "alert-config-error");
+        div.append(data.message);
+        let span = document.createElement("span");
+        span.className = "fa fa-times alert-config-boto";
+        div.append(span);
+        elem.closest(".col-sm-8").append(div);
+        span.addEventListener("click", () => div.remove());
+        window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
     }
 
     $(document).ready(function() {
@@ -93,23 +122,7 @@
                 data: formData,
                 success: data => {
                     removeSpinner(spinner);
-                    let elem = document.getElementById(id);
-                    elem = !elem ? document.getElementById(id + "_1") : elem;
-                    let msgId = elem.getAttribute("id") + "_msg";
-                    let msg = document.getElementById(msgId);
-                    if (msg) {
-                        document.getElementById(msgId).remove();
-                    }
-                    let div = document.createElement("div");
-                    div.setAttribute("id", msgId);
-                    div.className = "flex-space-between alert-config " +  (data.status === 1 ?  "alert-config-ok" : "alert-config-error");
-                    div.append(data.message);
-                    let span = document.createElement("span");
-                    span.className = "fa fa-times alert-config-boto";
-                    div.append(span);
-                    elem.closest(".col-sm-8").append(div);
-                    span.addEventListener("click", () => div.remove());
-                    window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
+                    mostrarMissatge(id, data);
                 }
             });
         });

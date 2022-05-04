@@ -106,9 +106,9 @@ public class ConfigController extends BaseUserController{
         String key = null;
         List<ConfigDto> confs = new ArrayList<>();
         for (ConfigDto config: cGroup.getConfigs()) {
-//            if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
-//                continue;
-//            }
+            if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
+                continue;
+            }
             model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             for (EntitatDto entitat : entitats) {
                 key = config.addEntitatKey(entitat);

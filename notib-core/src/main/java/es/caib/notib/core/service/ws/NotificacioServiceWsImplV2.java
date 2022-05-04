@@ -696,7 +696,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					IntegracioAccioTipusEnumDto.RECEPCIO); 
 			
 			NotificacioEnviamentEntity enviament = null;
-			try {
+			try { //TODO FER IGUAL QUE LA NOTIFICACIO
 				Long enviamentId = notificaHelper.desxifrarId(referencia);
 				enviament = notificacioEnviamentRepository.findById(enviamentId);
 				info.getParams().add(new AccioParam("Identificador xifrat de l'enviament", referencia));
