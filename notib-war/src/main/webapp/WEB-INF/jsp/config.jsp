@@ -44,6 +44,8 @@
         return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
     }
 
+    let removeValueRadio = elem => $(elem).find('input:radio').attr("checked", false);
+
     let addSpinner = id => {
 
         let spinner;
@@ -71,7 +73,10 @@
         let tagId = elem.getAttribute("id") + "_msg";
         let msg = document.getElementById(tagId);
         if (msg) {
-            document.getElementById(msgId).remove();
+            let el = document.getElementById(msg);
+            if (el) {
+                el.remove();
+            }
         }
         let div = document.createElement("div");
         div.setAttribute("id", tagId);
@@ -84,6 +89,29 @@
         span.addEventListener("click", () => div.remove());
         window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
     }
+
+    let guardarPropietat = (configKey, natejar) => {
+
+        let configKeyReplaced = configKey.replaceAll("_",".");
+        let spinner = addSpinner(configKey);
+        let elem = $("#" + configKey);
+        let value = !natejar ? (elem.is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val()) : null;
+        let formData = new FormData();
+        formData.append("key", configKeyReplaced);
+        formData.append("value", value);
+        $.ajax({
+            url: "/notib/config/update",
+            type: "post",
+            processData: false,
+            contentType: false,
+            enctype: "multipart/form-data",
+            data: formData,
+            success: data => {
+                removeSpinner(spinner);
+                mostrarMissatge(configKey + "_key", data);
+            }
+        });
+    };
 
     $(document).ready(function() {
         $("#btn-sync").on("click", function () {
@@ -112,7 +140,6 @@
             let id = "config_" + formData.get("key");
             let spinner = addSpinner(id);
 
-            console.log($(".form-update-config"));
             $.ajax({
                 url: "${urlEdit}",
                 type: "post",

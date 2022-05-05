@@ -47,10 +47,6 @@ public class ConfigServiceImpl implements ConfigService {
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
 
-        log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
-        boolean entitatCodi = !Strings.isNullOrEmpty(property.getEntitatCodi());
-//        ConfigEntity configEntity = entitatCodi ? configRepository.findByKeyAndEntitatCodi(property.crearEntitatKey(), property.getEntitatCodi())
-//                                    : configRepository.findOne(property.getKey());
            /*
 
             INSERT INTO NOT_CONFIG ("KEY", VALUE, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, ENTITAT_CODI)
@@ -59,8 +55,9 @@ public class ConfigServiceImpl implements ConfigService {
             WHERE nc."KEY" = 'es.caib.notib.emprar.sir'
 
             */
+        log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
-        configEntity.update(entitatCodi ? property.getEntitatValue(): property.getValue());
+        configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         pluginHelper.reloadProperties(configEntity.getGroupCode());
         if (property.getKey().endsWith(".class")){
             pluginHelper.resetPlugins();
