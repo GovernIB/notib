@@ -21,6 +21,7 @@ import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.SessioHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import java.util.Locale;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Slf4j
 @Controller
 @RequestMapping("/organgestorArbre")
 public class OrganGestorArbreController extends BaseUserController {
@@ -78,6 +80,7 @@ public class OrganGestorArbreController extends BaseUserController {
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             omplirModel(model, entitat, null);
         } catch (Exception ex) {
+            log.error("Error generant l'arbre d'òrgans", ex);
             String msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {
                     "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
                             "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
