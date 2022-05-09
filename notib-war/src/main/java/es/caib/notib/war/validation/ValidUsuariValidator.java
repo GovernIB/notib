@@ -1,12 +1,10 @@
 package es.caib.notib.war.validation;
 
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.helper.EmailHelper;
-import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.UsuariCommand;
+import es.caib.notib.war.helper.EmailValidHelper;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +34,7 @@ public class ValidUsuariValidator implements ConstraintValidator<ValidUsuari, Us
         Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
         context.disableDefaultConstraintViolation();
         try {
-            if (!Strings.isNullOrEmpty(usuari.getEmailAlt()) && !EmailHelper.isEmailValid(usuari.getEmailAlt())) {
+            if (!Strings.isNullOrEmpty(usuari.getEmailAlt()) && !EmailValidHelper.isEmailValid(usuari.getEmailAlt())) {
                 valid = false;
                 context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
                         .addNode("emailAlt").addConstraintViolation();

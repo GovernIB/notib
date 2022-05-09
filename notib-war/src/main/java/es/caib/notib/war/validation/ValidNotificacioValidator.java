@@ -7,10 +7,10 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.helper.EmailHelper;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.EmailValidHelper;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -185,7 +185,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 								boolean formatValid = true;
 								if (comunicacioAmbAdministracio) {
 									log.info("NOTIFICACIO-VAL: > Extensió: '{}'", extensio);
-									if (!extensionsDisponibles.contains(extensio)) {
+									if (!extensionsDisponibles.contains(extensio.toLowerCase())) {
 										log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
 										formatValid = false;
 										valid = false;
@@ -323,7 +323,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 					}
 					
-					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !EmailHelper.isEmailValid(enviament.getTitular().getEmail())) {
+					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !EmailValidHelper.isEmailValid(enviament.getTitular().getEmail())) {
 						valid = false;
 						context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
 						.addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
@@ -331,7 +331,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
 						for (PersonaCommand destinatari: enviament.getDestinataris()) {
-							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !EmailHelper.isEmailValid(destinatari.getEmail())) {
+							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
