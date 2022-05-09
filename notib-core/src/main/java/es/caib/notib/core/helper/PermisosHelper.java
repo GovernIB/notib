@@ -570,10 +570,12 @@ public class PermisosHelper {
 						permis.setAplicacio(true);
 					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
 						permis.setProcessar(true);
-					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
-						permis.setNotificacio(true);
 					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
 						permis.setComuns(true);
+					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
+						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
+						permis.setComunicacioSir(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -627,10 +629,12 @@ public class PermisosHelper {
 						permis.setAplicacio(true);
 					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
 						permis.setProcessar(true);
-					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
-						permis.setNotificacio(true);
 					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
 						permis.setComuns(true);
+					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
+						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
+						permis.setComunicacioSir(true);
 				}
 			}
 		}
@@ -755,10 +759,12 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.ADMINISTRATION);
 		if (permis.isProcessar())
 			permissions.add(ExtendedPermission.PROCESSAR);
-		if (permis.isNotificacio())
-			permissions.add(ExtendedPermission.NOTIFICACIO);
 		if (permis.isComuns())
 			permissions.add(ExtendedPermission.COMUNS);
+		if (permis.isNotificacio())
+			permissions.add(ExtendedPermission.NOTIFICACIO);
+		if (permis.isComunicacioSir())
+			permissions.add(ExtendedPermission.COMUNICACIO_SIR);
 
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
@@ -825,6 +831,8 @@ public class PermisosHelper {
 			case "administrador":
 				comp = desc ? PermisDto.decending(PermisDto.sortByAdministrador()) : PermisDto.sortByAdministrador();
 				break;
+			case "comunicacioSir":
+				comp = desc ? PermisDto.decending(PermisDto.sortByComunicacioSir()) : PermisDto.sortByComunicacioSir();
 			default:
 				break;
 		}

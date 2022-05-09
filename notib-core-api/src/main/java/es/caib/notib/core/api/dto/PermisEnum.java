@@ -3,6 +3,7 @@ package es.caib.notib.core.api.dto;
 public enum PermisEnum {
 	CONSULTA,
 	PROCESSAR,
-	NOTIFICACIO,
-	GESTIO
+	NOTIFICACIO, // Notificacions i comunicacions NO SIR
+	GESTIO,
+	COMUNIACIO_SIR // Comunicacions SIR
 }

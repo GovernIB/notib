@@ -82,7 +82,8 @@ public class CallbackHelper {
 				String.format("Enviament d'avís de canvi d'estat (%s)", aplicacio.getCallbackUrl()),
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Identificador de l'event", String.valueOf(event.getId())),
-				new AccioParam("Identificador de la notificacio", String.valueOf(notificacio.getId())),
+				new AccioParam("Identificador de la notificació", String.valueOf(notificacio.getId())),
+				new AccioParam("Codi aplicació", aplicacio.getUsuariCodi()),
 				new AccioParam("Callback", aplicacio.getCallbackUrl())
 		);
 
@@ -202,6 +203,7 @@ public class CallbackHelper {
 					"Enviament d'avís de canvi d'estat",
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					new AccioParam("Identificador de l'event", String.valueOf(event.getId())),
+					new AccioParam("Codi aplicació", aplicacio.getUsuariCodi()),
 					new AccioParam("Identificador de la notificacio", String.valueOf(enviament.getNotificacio().getId()))
 			);
 			event.updateCallbackClient(

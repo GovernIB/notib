@@ -23,6 +23,7 @@ public class UsuariDto implements Serializable {
 	private String nom;
 	private String nif;
 	private String email;
+	private String emailAlt;
 	private String idioma;
 	private String[] rols;
 	private String ultimRol;

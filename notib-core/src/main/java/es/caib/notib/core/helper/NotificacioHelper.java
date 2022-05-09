@@ -1,11 +1,13 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.RegistreIdDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -277,14 +279,19 @@ public class NotificacioHelper {
 			}
 
 			if (checkProcedimentPermissions) {
+				NotificaEnviamentTipusEnumDto enviamentTipus = notificacio.getEnviamentTipus();
+				boolean checkProcedimentNotificacioPermis = (enviamentTipus.equals(NotificaEnviamentTipusEnumDto.NOTIFICACIO));
+				boolean checkProcedimentComunicacioPermis = (enviamentTipus.equals(NotificaEnviamentTipusEnumDto.COMUNICACIO) && isAllEnviamentsAAdministracio(notificacio));
+				
 				procSer = entityComprovarHelper.comprovarProcedimentOrgan(
 						entitat,
 						notificacio.getProcediment().getId(),
 						procedimentOrgan,
 						false,
 						false,
-						true,
-						false);
+						checkProcedimentNotificacioPermis,
+						false,
+						checkProcedimentComunicacioPermis);
 			}
 		}
 
@@ -322,7 +329,16 @@ public class NotificacioHelper {
 				.build();
 	}
 
+	private boolean isAllEnviamentsAAdministracio(NotificacioDatabaseDto notificacio) {
 
+		for(NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	private DocumentEntity getDocumentEntity(DocumentDto document, Map<String, Long> documentsProcessatsMassiu) {
 		DocumentEntity documentEntity = null;
 		if (document == null) {

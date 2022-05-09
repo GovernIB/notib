@@ -6,9 +6,11 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -67,49 +69,32 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
 			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
 			if (usuari == null) {
-				logger.debug("Consultant plugin de dades d'usuari (" +
-						"usuariCodi=" + auth.getName() + ")");
+				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
 				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
-				if (dadesUsuari != null) {
-					usuari = usuariRepository.save(
-							UsuariEntity.getBuilder(
-									dadesUsuari.getCodi(),
-									dadesUsuari.getEmail(),
-									idioma).
-							nom(dadesUsuari.getNom()).
-							llinatges(dadesUsuari.getLlinatges()).
-							nomSencer(dadesUsuari.getNomSencer()).
-							build());
-				} else {
-					throw new NotFoundException(
-							auth.getName(),
-							DadesUsuari.class);
+				if (dadesUsuari == null) {
+					throw new NotFoundException(auth.getName(), DadesUsuari.class);
 				}
+				usuari = usuariRepository.save(UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom())
+						.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build());
+
 			} else {
 				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
 				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				if (dadesUsuari != null) {
-					if (dadesUsuari.getNomSencer() != null) {
-						usuari.update(
-								dadesUsuari.getNomSencer(),
-								dadesUsuari.getEmail());
-					} else {
-						usuari.update(
-								dadesUsuari.getNom(),
-								dadesUsuari.getLlinatges(),
-								dadesUsuari.getEmail());
-					}
+				if (dadesUsuari == null) {
+					throw new NotFoundException(auth.getName(), DadesUsuari.class);
+				}
+				if (dadesUsuari.getNomSencer() != null) {
+					usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getEmail());
 				} else {
-					throw new NotFoundException(
-							auth.getName(),
-							DadesUsuari.class);
+					usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 				}
 			}
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
@@ -123,15 +108,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant configuració de usuari actual");
 			UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
-			usuari.update(
-					dto.getRebreEmailsNotificacio(),
-					dto.getRebreEmailsNotificacioCreats(),
-					dto.getIdioma());
-			
+			usuari.update(UsuariEntity.hiddenBuilder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
+					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
 			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -141,6 +124,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void updateRolUsuariActual(String rol) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Actualitzant úlrim rol de usuari actual");
@@ -171,15 +155,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto getUsuariActual() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Obtenint usuari actual");
-			if (auth == null){
-				return null;
-			} else {
-				return toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName()));
-			}
+			return auth != null ? toUsuariDtoAmbRols(usuariRepository.findOne(auth.getName())) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -188,6 +169,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<String> findRolsUsuariAmbCodi(String codi) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Obtenint els rols de l'usuari amb codi (codi=" + codi + ")");
@@ -200,6 +182,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<String> findRolsUsuariActual() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Obtenint els rols de l'usuari actual");
@@ -213,12 +196,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
-			return conversioTipusHelper.convertir(
-					usuariRepository.findOne(codi),
-					UsuariDto.class);
+			return conversioTipusHelper.convertir(usuariRepository.findOne(codi), UsuariDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -227,12 +209,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<UsuariDto> findUsuariAmbText(String text) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consultant usuaris amb text (text=" + text + ")");
-			return conversioTipusHelper.convertirList(
-					usuariRepository.findByText(text),
-					UsuariDto.class);
+			return conversioTipusHelper.convertirList(usuariRepository.findByText(text), UsuariDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -240,6 +221,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consultant les integracions");
@@ -250,12 +232,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
+	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant les darreres accions per a la integració (" +
-					"codi=" + codi + ")");
-			return integracioHelper.findAccionsByIntegracioCodi(codi);
+			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
+			String filtre = paginacio.getFiltre();
+			return "CALLBACK".equals(codi)  && !Strings.isNullOrEmpty(filtre)? integracioHelper.findAccions(codi, filtre)
+					:  integracioHelper.findAccionsByIntegracioCodi(codi);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -263,10 +247,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public void excepcioSave(Throwable exception) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Emmagatzemant excepció (" +
-					"exception=" + exception + ")");
+			logger.debug("Emmagatzemant excepció (exception=" + exception + ")");
 			excepcioLogHelper.addExcepcio(exception);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -275,6 +259,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public ExcepcioLogDto excepcioFindOne(Long index) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta d'una excepció (index=" + index + ")");
@@ -286,6 +271,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<ExcepcioLogDto> excepcioFindAll() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta de les excepcions disponibles");
@@ -297,6 +283,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.info("Consulta dels rols definits a les ACLs");
@@ -308,10 +295,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public String propertyGet(String property) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta del valor de la property (" +
-					"property=" + property + ")");
+			logger.debug("Consulta del valor de la property (property=" + property + ")");
 			return configHelper.getConfig(property);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -320,13 +307,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Override
 	public String propertyGet(String property, String defaultValue) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consulta del valor de la property (property=" + property + ", default=" + defaultValue + ")");
 			String propertyValue = configHelper.getConfig(property);
-			if (propertyValue == null || propertyValue.trim().isEmpty())
-				return defaultValue;
-			return propertyValue;
+			return propertyValue == null || propertyValue.trim().isEmpty() ? defaultValue : propertyValue;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -334,16 +320,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public String getMetrics() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consultant les mètriques de l'aplicació");
 			try {
 				ObjectMapper mapper = new ObjectMapper();
-				mapper.registerModule(
-						new MetricsModule(
-								TimeUnit.SECONDS,
-								TimeUnit.MILLISECONDS,
-								false));
+				mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS,false));
 				return mapper.writeValueAsString(metricsHelper.getMetricRegistry());
 			} catch (Exception ex) {
 				logger.error("Error al generar les mètriques de l'aplicació", ex);
@@ -363,22 +346,22 @@ public class AplicacioServiceImpl implements AplicacioService {
 		CacheHelper.appVersion = appVersion;
 	}
 
-	private UsuariDto toUsuariDtoAmbRols(
-			UsuariEntity usuari) {
-		if (usuari == null)
+	private UsuariDto toUsuariDtoAmbRols(UsuariEntity usuari) {
+
+		if (usuari == null) {
 			return null;
-		UsuariDto dto = conversioTipusHelper.convertir(
-				usuari,
-				UsuariDto.class);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth.getAuthorities() != null) {
-			String[] rols = new String[auth.getAuthorities().size()];
-			int index = 0;
-			for (GrantedAuthority grantedAuthority: auth.getAuthorities()) {
-				rols[index++] = grantedAuthority.getAuthority();
-			}
-			dto.setRols(rols);
 		}
+		UsuariDto dto = conversioTipusHelper.convertir(usuari, UsuariDto.class);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth.getAuthorities() == null) {
+			return dto;
+		}
+		String[] rols = new String[auth.getAuthorities().size()];
+		int index = 0;
+		for (GrantedAuthority grantedAuthority: auth.getAuthorities()) {
+			rols[index++] = grantedAuthority.getAuthority();
+		}
+		dto.setRols(rols);
 		return dto;
 	}
 

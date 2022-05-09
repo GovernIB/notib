@@ -39,6 +39,7 @@
 			$('#form-filtre').submit();
 		});
 		$('#btn-entregaCie').click(function() {
+			console.log("entrega cie list");
 			let entregaCie = !$(this).hasClass('active');
 			$('#entregaCie').val(entregaCie);
 		})

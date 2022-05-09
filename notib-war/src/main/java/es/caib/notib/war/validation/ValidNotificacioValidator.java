@@ -10,10 +10,12 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.PersonaCommand;
+import es.caib.notib.war.helper.EmailValidHelper;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.hibernate.validator.constraints.impl.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Constraint de validació que controla que camp email és obligatori si està habilitada l'entrega a la Direcció Electrònica Hablitada (DEH)
- * 
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Slf4j
@@ -183,7 +185,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 								boolean formatValid = true;
 								if (comunicacioAmbAdministracio) {
 									log.info("NOTIFICACIO-VAL: > Extensió: '{}'", extensio);
-									if (!extensionsDisponibles.contains(extensio)) {
+									if (!extensionsDisponibles.contains(extensio.toLowerCase())) {
 										log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
 										formatValid = false;
 										valid = false;
@@ -321,17 +323,15 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 					}
 					
-					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !isEmailValid(enviament.getTitular().getEmail())) {
+					if (enviament.getTitular() != null && enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty() && !EmailValidHelper.isEmailValid(enviament.getTitular().getEmail())) {
 						valid = false;
-						context.buildConstraintViolationWithTemplate(
-								MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
-						.addNode("enviaments["+envCount+"].titular.email")
-						.addConstraintViolation();
+						context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
+						.addNode("enviaments["+envCount+"].titular.email").addConstraintViolation();
 					}
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
 						for (PersonaCommand destinatari: enviament.getDestinataris()) {
-							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !isEmailValid(destinatari.getEmail())) {
+							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
@@ -381,18 +381,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	    }
 	    return str;
 	}
-	
-	private boolean isEmailValid(String email) {
-		boolean valid = true;
-		try {
-			InternetAddress emailAddr = new InternetAddress(email);
-			emailAddr.validate();
-		} catch (Exception e) {
-			valid = false; //no vàlid
-		}
-		return valid;
-	}
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);
 
 }

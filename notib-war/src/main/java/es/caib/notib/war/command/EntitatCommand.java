@@ -61,7 +61,7 @@ public class EntitatCommand {
 	private String llibre;
 	private String llibreNom;
 	
-	private boolean oficinaEntitat = true;
+	private boolean oficinaEntitat;
 	private String oficina;
 	private String nomOficinaVirtual;
 

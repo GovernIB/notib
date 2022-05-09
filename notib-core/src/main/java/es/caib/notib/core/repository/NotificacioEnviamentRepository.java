@@ -261,10 +261,15 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 		    "   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
-		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
-		    "   or (upper(d.nif) = :nif)) ")
-	Integer countEnviamentsByNif(
-			@Param("nif") String dniTitular,
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular))" +
+			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
+			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
+	Integer countEnviaments(
+			@Param("dniTitular") String dniTitular,
+			@Param("esDataInicialNull") boolean esDataInicialNull,
+			@Param("dataInicial") Date dataInicial,
+			@Param("esDataFinalNull") boolean esDataFinalNull,
+			@Param("dataFinal") Date dataFinal,
 			@Param("tipus") NotificaEnviamentTipusEnumDto tipus,
 			@Param("esEstatFinalNull") boolean esEstatFinalNull,
 			@Param("estatFinal") Boolean estatFinal);
@@ -280,13 +285,17 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 			"   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
-		    "   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :nif) " +
-		    "   or (upper(d.nif) = :nif)) ")
-	Page<NotificacioEnviamentEntity> findEnviamentsByNif(
-			@Param("nif") String dniTitular,
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular)) " +
+			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
+			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
+	Page<NotificacioEnviamentEntity> findEnviaments(
+			@Param("dniTitular") String dniTitular,
+			@Param("esDataInicialNull") boolean esDataInicialNull,
+			@Param("dataInicial") Date dataInicial,
+			@Param("esDataFinalNull") boolean esDataFinalNull,
+			@Param("dataFinal") Date dataFinal,
 			@Param("tipus") NotificaEnviamentTipusEnumDto tipus,
 			@Param("esEstatFinalNull") boolean esEstatFinalNull,
 			@Param("estatFinal") Boolean estatFinal,
 			Pageable pageable);
-	
 }

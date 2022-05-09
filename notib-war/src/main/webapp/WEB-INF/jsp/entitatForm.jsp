@@ -65,30 +65,40 @@
 </style>
 <script type="text/javascript">
 
-var oficinaActual = '${oficinaSelected}';
+var oficinaActual = '${entitatCommand.oficina}';
 var codiDir3Actual =  '${entitatCommand.dir3Codi}';
 var codiDir3RegActual = '${entitatCommand.dir3CodiReg}';
+var llibreChecked = "${entitatCommand.llibreEntitat}" === "false" ? false : true;
 
 $(document).ready(function() {
 
+
 	var entitatId = document.getElementById('id').value;
-	if (entitatId != '') {
-		
-		
+
+	if (entitatId != '' && !"${tipusDocSelected}") {
 		var getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
 		 $.get(getUrl).done(function(data) {
 			 var dataMod =[]
-			 
 		 	$("#tipusDocName").webutilInputSelect2(data);
 		 });
 	} else {
 		$("#tipusDocName").webutilInputSelect2(null);
 	}
-	
-	$("#tipusDocName").webutilInputSelect2();
-	
+
+	<c:choose>
+		<c:when test="${not empty tipusDocSelected}">
+			let tipusDoc = [];
+			<c:forEach items="${tipusDocSelected}" var="tipus">
+			tipusDoc.push({codi:"${tipus.codi}", valor:"${tipus.valor}", desc:"${tipus.desc}"});
+			</c:forEach>
+			$("#tipusDocName").webutilInputSelect2(tipusDoc);
+		</c:when>
+		<c:otherwise>
+			$("#tipusDocName").webutilInputSelect2();
+		</c:otherwise>
+	</c:choose>
 	var data = new Array();
-	
+
 	$('.customSelect').on("select2:select select2:unselect select2-loaded", function (e) {
 		var data = [];
 		$.each($("#tipusDocName :selected"), function(index, option) {
@@ -99,15 +109,15 @@ $(document).ready(function() {
 		});
 	    addDefault(data);
 
-	  
+
 	});
-	
+
 	$('#colorFons, #colorLletra').colorpicker();
-	
+
 	$('#dir3Codi').on("change", function() {
 		let dir3codi = $(this).val();
 		let dir3codiReg = $("#dir3CodiReg").val();
-		
+
 		if (dir3codi !== undefined && dir3codi !== '') {
 			if (dir3codiReg == undefined || dir3codiReg == '') {
 				updateOficines(dir3codi);
@@ -122,7 +132,7 @@ $(document).ready(function() {
 		let codi = '';
 		let dir3codiReg = $(this).val();
 		let dir3codi = $("#dir3Codi").val();
-		
+
 		if (dir3codiReg !== undefined && dir3codiReg !== '') {
 			codi = dir3codiReg
 		} else if (dir3codi !== undefined && dir3codi !== ''){
@@ -142,7 +152,7 @@ $(document).ready(function() {
 	$('#refreshLlibre').on("click", function() {
 		let dir3codiReg = $("#dir3CodiReg").val();
 		let dir3codi = $("#dir3Codi").val();
-		
+
 		if (dir3codiReg !== undefined && dir3codiReg !== '') {
 			updateLlibre(dir3codiReg);
 		} else if (dir3codi !== undefined && dir3codi !== ''){
@@ -163,7 +173,11 @@ $(document).ready(function() {
 	if (!$('#llibreEntitat').checked) {
 		$('#llibre-entitat').hide();
 	}
-	
+
+	if (llibreChecked) {
+		$('#llibre-entitat').show();
+	}
+
 	$('#oficinaEntitat').change(function() {
 		if (this.checked) {
 			$('#oficina').closest('.form-group').show();
@@ -185,12 +199,12 @@ $(document).ready(function() {
 	if (!$('#entregaCieActiva')[0].checked) {
 		$('#entrega-cie-form').hide();
 	}
-});	
+});
 
 function loadOficines() {
 	let dir3codiReg = $("#dir3CodiReg").val();
 	let dir3codi = $("#dir3Codi").val();
-	
+
 	if (dir3codiReg !== undefined && dir3codiReg !== '') {
 		updateOficines(dir3codiReg);
 	} else if (dir3codi !== undefined && dir3codi !== ''){
@@ -214,7 +228,7 @@ function updateOficines(dir3codi) {
 							"id": val.codi,
 							"text": val.codi + " - " + val.nom
 						});
-						selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");									
+						selOficines.append("<option value=\"" + val.codi + "\"" + (oficinaActual == val.codi ? "selected" :  "") + ">" + val.codi + " - " + val.nom + "</option>");
 					});
 				}
 			$(".loading-screen").hide();
@@ -261,6 +275,7 @@ function updateLlibre(dir3codi) {
 		<div class="tab-content">
 		<form:hidden path="id"/>
 		<div role="tabpanel" class="tab-pane active" id="dadesForm">
+<%--			<not:inputText name="codi" textKey="entitat.form.camp.codi" disabled="${modificant}"/>--%>
 			<not:inputText name="codi" textKey="entitat.form.camp.codi" required="true"/>
 			<not:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 			<not:inputSelect name="tipus" textKey="entitat.form.camp.tipus" optionEnum="EntitatTipusEnumDto" required="true"/>

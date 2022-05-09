@@ -33,6 +33,8 @@ public class UsuariEntity implements Serializable {
 	private String nomSencer;
 	@Column(name = "email", length = 200)
 	private String email;
+	@Column(name = "email_alt", length = 200)
+	private String emailAlt;
 	@Column(name = "rebre_emails")
 	@Builder.Default
 	private boolean rebreEmailsNotificacio = true;
@@ -49,28 +51,22 @@ public class UsuariEntity implements Serializable {
 	@Version
 	private long version = 0;
 
-	public void update(
-			String nom,
-			String llinatges,
-			String email) {
+	public void update(String nom, String llinatges, String email) {
 		this.nom = nom;
 		this.llinatges = llinatges;
 		this.email = email;
 	}
-	public void update(
-			String nomSencer,
-			String email) {
+	public void update(String nomSencer, String email) {
 		this.nomSencer = nomSencer;
 		this.email = email;
 	}
 	
-	public void update(
-			boolean rebreEmailsNotificacio,
-			boolean rebreEmailsNotificacioCreats,
-			String idioma) {
-		this.rebreEmailsNotificacio = rebreEmailsNotificacio;
-		this.rebreEmailsNotificacioCreats = rebreEmailsNotificacioCreats;
-		this.idioma = idioma;
+	public void update(UsuariEntity usuari) {
+
+		this.rebreEmailsNotificacio = usuari.isRebreEmailsNotificacio();
+		this.rebreEmailsNotificacioCreats = usuari.isRebreEmailsNotificacioCreats();
+		this.idioma = usuari.getIdioma();
+		this.emailAlt = usuari.getEmailAlt();
 	}
 	
 	public void updateUltimRol(String ultimRol) {
@@ -82,14 +78,8 @@ public class UsuariEntity implements Serializable {
 	}
 
 	
-	public static UsuariEntityBuilder getBuilder(
-			String codi,
-			String email,
-			String idioma) {
-		return hiddenBuilder()
-				.codi(codi)
-				.email(email)
-				.idioma(idioma);
+	public static UsuariEntityBuilder getBuilder(String codi, String email,	String idioma) {
+		return hiddenBuilder().codi(codi).email(email).idioma(idioma);
 	}
 
 	@Override

@@ -39,12 +39,10 @@ public class EmailNotificacioHelperTest {
 
 	// Dades per el Test
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
-//	private static final String EMAIL_PASS = "xxxxxx";
-	private static final String EMAIL_USER = "proves_limit@limit.es";
 	private static final String EMAIL_PASS = "xxxxxx";
-//	private static final String EMAIL_DEST = "sandreu@limit.es";
-	private static final String EMAIL_DEST = "sion.limit@gmail.com";
-	private static final String FILE_PATH = "/home/siona/Documents/buit.pdf";
+	private static final String EMAIL_USER = "proves_limit@limit.es";
+	private static final String EMAIL_DEST = "sandreu@limit.es";
+	private static final String FILE_PATH = "";
 
 	@Mock
 	private GrupRepository grupRepository;

@@ -6,6 +6,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
+import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.PagadorCieService;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -52,57 +54,53 @@ public class EntitatController extends BaseController {
 	private OperadorPostalService operadorPostalService;
 	@Autowired
 	private PagadorCieService cieService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get( 
-			HttpServletRequest request,
-			Model model) {
+	public String get( HttpServletRequest request, Model model) {
 		return "entitatList";
 	}
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable( HttpServletRequest request ) {
+
 		if (RolHelper.isUsuariActualAdministrador(request)) {
-			return DatatablesHelper.getDatatableResponse(
-					request,
-					entitatService.findAllPaginat(
-							DatatablesHelper.getPaginacioDtoFromRequest(request)));
-		} else if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+			return DatatablesHelper.getDatatableResponse(request, entitatService.findAllPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
+		}
+		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-			return DatatablesHelper.getDatatableResponse(
-					request,
-					Arrays.asList(entitat));
+			return DatatablesHelper.getDatatableResponse(request, Arrays.asList(entitat));
 		}
 		return null;
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String getNew(HttpServletRequest request,
-						 Model model) {
+	public String getNew(HttpServletRequest request, Model model) {
 		if (!RolHelper.isUsuariActualAdministrador(request)) {
 			return "entitatList";
 		}
 		return get(request, null, model);
 	}
 	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long entitatId,
-			Model model) {
+	public String get(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
+
 		EntitatDto entitat = null;
 		if (entitatId != null) {
 			entitat = entitatService.findById(entitatId);
 		}
+		boolean modificant = false;
+		EntitatCommand command = null;
 		if (entitat != null) {
-		
-			EntitatCommand command = EntitatCommand.asCommand( entitat );
+			command = EntitatCommand.asCommand( entitat );
 			model.addAttribute("tipusDocumentDefault", command.getTipusDocDefault());
 			model.addAttribute("oficinaSelected", command.getOficina());
 			model.addAttribute( command );
-		} else {
-			model.addAttribute(new EntitatCommand());
+			modificant = true;
 		}
+		model.addAttribute(command != null ? command : new EntitatCommand());
+		model.addAttribute("modificant", modificant);
 		model.addAttribute("TipusDocumentEnumDto", TipusDocumentEnumDto.class);
 		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);
@@ -120,12 +118,18 @@ public class EntitatController extends BaseController {
 			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
 			model.addAttribute("cieList", cieList);
 			model.addAttribute("errors", bindingResult.getAllErrors());
+			model.addAttribute("oficinaSelected", command.getOficina());
+			model.addAttribute("tipusDocSelected", getTipusDocSelected(request, command.getTipusDocName()));
 			return "entitatForm";
 		}
 		String redirect = "redirect:entitat";
 		String msg = command.getId() != null ? "entitat.controller.modificada.ok" : "entitat.controller.creada.ok";
 		if (command.getId() != null) {
-			entitatService.update(command.asDto());
+			EntitatDto entitatDto = entitatService.update(command.asDto());
+			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+			if (entitatDto != null && entitatActual != null && entitatDto.equals(entitatActual)) {
+				EntitatHelper.actualitzarEntitatActualEnSessio(request, aplicacioService, entitatService);
+			}
 			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			return getModalControllerReturnValueSuccess(request,redirect + (isAdminEntitat ? "/" + command.getId() : ""), msg);
 		}
@@ -134,25 +138,35 @@ public class EntitatController extends BaseController {
 
 	}
 
+	public List<CodiValorDescDto> getTipusDocSelected(HttpServletRequest request, String[] tipusDocName) {
+
+		if (tipusDocName == null || tipusDocName.length == 0) {
+			return null;
+		}
+		List<CodiValorDescDto> valors = new ArrayList<>();
+		for (int foo = 0; foo < tipusDocName.length; foo++) {
+			TipusDocumentEnumDto tipus = TipusDocumentEnumDto.toEnum(tipusDocName[foo]);
+			if (tipus == null) {
+				continue;
+			}
+			CodiValorDescDto valor = new CodiValorDescDto();
+			valor.setCodi(tipus.getText());
+			valor.setValor(tipus.name());
+			valor.setDesc(MessageHelper.getInstance().getMessage("tipus.document.enum." + tipus.name(),null, getLocale(request)));
+			valors.add(valor);
+		}
+		return valors;
+	}
+
 	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long entitatId) {
+	public String enable(HttpServletRequest request, @PathVariable Long entitatId) {
 		entitatService.updateActiva(entitatId, true);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"entitat.controller.activada.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "entitat.controller.activada.ok");
 	}
 	@RequestMapping(value = "/{entitatId}/disable", method = RequestMethod.GET)
-	public String disable(
-			HttpServletRequest request,
-			@PathVariable Long entitatId) {
+	public String disable(HttpServletRequest request, @PathVariable Long entitatId) {
 		entitatService.updateActiva(entitatId, false);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"entitat.controller.desactivada.ok");
+		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "entitat.controller.desactivada.ok");
 	}
 
 	@RequestMapping(value = "/{entitatId}/delete", method = RequestMethod.GET)
@@ -168,123 +182,90 @@ public class EntitatController extends BaseController {
 		} catch(Exception ex) {
 			msg = "entitat.controller.esborrada.ko";
 			return getAjaxControllerReturnValueError(request, "redirect:../../entitat", msg);
-
 		}
 	}
 	
 	@RequestMapping(value = "/getEntitatLogoCap", method = RequestMethod.GET)
-	public String getEntitatLogoCap(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public String getEntitatLogoCap(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		
-		if (entitatActual != null) {
-			if (entitatActual.getLogoCapBytes() != null) {
-				writeFileToResponse(
-						"Logo_cap.png",
-						entitatActual.getLogoCapBytes(),
-						response);
-			} else {
-				try {
-					writeFileToResponse(
-							"Logo_cap.png", 
-							entitatService.getCapLogo(), 
-							response);
-				} catch (Exception ex) {
-					logger.debug("Error al obtenir el logo de la capçalera", ex);
-				}
-			}
+		if (entitatActual == null) {
+			return null;
+		}
+		if (entitatActual.getLogoCapBytes() != null) {
+			writeFileToResponse("Logo_cap.png", entitatActual.getLogoCapBytes(), response);
+			return null;
+		}
+		try {
+			writeFileToResponse("Logo_cap.png", entitatService.getCapLogo(), response);
+		} catch (Exception ex) {
+			logger.debug("Error al obtenir el logo de la capçalera", ex);
 		}
 		return null;
 	}
 	
 	@RequestMapping(value = "/getEntitatLogoPeu", method = RequestMethod.GET)
-	public String getEntitatLogoPeu(
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public String getEntitatLogoPeu(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		
-		if (entitatActual != null) {
-			if (entitatActual.getLogoPeuBytes() != null) {
-				writeFileToResponse(
-						"Logo_peu.png",
-						entitatActual.getLogoPeuBytes(),
-						response);
-			} else {
-				try {
-					writeFileToResponse(
-							"Logo_peu.png", 
-							entitatService.getPeuLogo(), 
-							response);
-				} catch (Exception ex) {
-					logger.debug("Error al obtenir el logo del peu", ex);
-				}
-			}
+		if (entitatActual == null) {
+			return null;
+		}
+		if (entitatActual.getLogoPeuBytes() != null) {
+			writeFileToResponse("Logo_peu.png", entitatActual.getLogoPeuBytes(), response);
+			return null;
+		}
+		try {
+			writeFileToResponse("Logo_peu.png", entitatService.getPeuLogo(), response);
+		} catch (Exception ex) {
+			logger.debug("Error al obtenir el logo del peu", ex);
 		}
 		return null;
 	}
 	
 	@RequestMapping(value = "/{entitatId}/tipusDocument", method = RequestMethod.GET)
 	@ResponseBody
-	public CodiValorDescDto[] getTipusDocument(
-			@PathVariable Long entitatId,
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public CodiValorDescDto[] getTipusDocument(@PathVariable Long entitatId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
 		CodiValorDescDto[] tipusDoc = null;
 		List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatId);
-		if (tipusDocuments != null && !tipusDocuments.isEmpty()) {
-			tipusDoc = new CodiValorDescDto[tipusDocuments.size()];
-			for (int i = 0; i < tipusDocuments.size(); i++) {
-				tipusDoc[i] = new CodiValorDescDto(String.valueOf(i),tipusDocuments.get(i).getTipusDocEnum().name(),MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request)));
-			}
+		if (tipusDocuments == null || tipusDocuments.isEmpty()) {
+			return tipusDoc;
+		}
+		tipusDoc = new CodiValorDescDto[tipusDocuments.size()];
+		for (int i = 0; i < tipusDocuments.size(); i++) {
+			tipusDoc[i] = new CodiValorDescDto(String.valueOf(i),tipusDocuments.get(i).getTipusDocEnum().name(),
+					MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request)));
 		}
 		return tipusDoc;
 	}
 	
 	@RequestMapping(value = "/oficines/{dir3codi}", method = RequestMethod.GET)
 	@ResponseBody
-	private List<OficinaDto> getOficines(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String dir3codi) {
+	private List<OficinaDto> getOficines(HttpServletRequest request, Model model, @PathVariable String dir3codi) {
 		return entitatService.findOficinesEntitat(dir3codi);
 	}
 	
 	@RequestMapping(value = "/llibre/{dir3codi}", method = RequestMethod.GET)
 	@ResponseBody
-	private LlibreDto getLlibreEntitat(
-		HttpServletRequest request,
-		Model model,
-		@PathVariable String dir3codi) {
+	private LlibreDto getLlibreEntitat(HttpServletRequest request, Model model, @PathVariable String dir3codi) {
 		return entitatService.getLlibreEntitat(dir3codi);
 	}
-	
+
 	@RequestMapping(value = "/localerequest", method = RequestMethod.GET)
 	@ResponseBody
-	private Locale getLocale(
-		HttpServletRequest request) {
-		LocaleResolver localeResolver = RequestContextUtils
-				.getLocaleResolver(request);
-		Locale locale;
-		if (localeResolver != null) {
-			locale = localeResolver.resolveLocale(request);
-		} else {
-			locale = request.getLocale();
-		}
-		return locale;
+	private Locale getLocale(HttpServletRequest request) {
+
+		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+		return localeResolver != null ? localeResolver.resolveLocale(request) : request.getLocale();
 	}
-	
+
 	@RequestMapping(value = "/organigrama/{entitatCodi}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, OrganismeDto> getOrganigrama(
-			@PathVariable String entitatCodi,
-			HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		
+	public Map<String, OrganismeDto> getOrganigrama(@PathVariable String entitatCodi, HttpServletRequest request,HttpServletResponse response) throws IOException {
 		return entitatService.findOrganigramaByEntitat(entitatCodi);
-		
 	}
-	
+
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);
 }

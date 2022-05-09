@@ -1,5 +1,7 @@
 package es.caib.notib.war.helper;
 
+import com.google.common.base.Strings;
+
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -14,8 +16,25 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EmailValidHelper {
+
+    public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
+    public static boolean isEmailValid(String email) {
+
+        if (Strings.isNullOrEmpty(email)) {
+            return false;
+        }
+        try {
+            Matcher matcher = EMAIL_REGEX.matcher(email);
+            return matcher.find();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
     private static int hear( BufferedReader in ) throws IOException {
         String line = null;

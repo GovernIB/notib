@@ -41,17 +41,17 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(
-			final EntitatCommand entitatCommand, 
-			final ConstraintValidatorContext context) {
+	public boolean isValid(final EntitatCommand entitatCommand, final ConstraintValidatorContext context) {
+
 		try {
 			final Long id = entitatCommand.getId();
 			final String codi = entitatCommand.getCodi();
 			final String dir3 = entitatCommand.getDir3Codi();
 			boolean valid = true;
+
 			// Comprovar codi no repetit
 			EntitatDto entitat = entitatService.findByCodi(codi);
-			if (entitat != null && (id != null && !id.equals(entitat.getId()) && codi.equals(entitat.getCodi()) || id == null && codi.equals(entitat.getCodi()))) {
+			if (entitat != null  && (id != null && !id.equals(entitat.getId()) && codi.equals(entitat.getCodi()) || id == null && codi.equals(entitat.getCodi()))) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entitat.validation.codi.repetit")).addNode("codi").addConstraintViolation();

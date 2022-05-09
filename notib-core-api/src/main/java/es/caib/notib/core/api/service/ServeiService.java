@@ -1,6 +1,7 @@
 package es.caib.notib.core.api.service;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.*;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -400,6 +401,7 @@ public interface ServeiService {
 	 * @param entitatId Entitat de l'òrgan a consultar
 	 * @param organCodi Codi Dir3 de l'òrgan
 	 * @param rol Rol de l'usuari per seleccionar els serveis permesos per aquest rol
+	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
 	 *
 	 * @return Llistat amb la informació de tots els serveis seleccionats.
 	 *
@@ -408,15 +410,17 @@ public interface ServeiService {
 	List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(
             Long entitatId,
             String organCodi,
-            RolEnumDto rol);
+            RolEnumDto rol,
+            TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Consulta si l'usuari té permís de notificació a tots els serveis comuns per a algún òrgan gestor.
 	 *
 	 * @param entitatId Identificador de l'entitat actual
+	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
 	 * @return boleà indicant si es te permis de serveis comuns a algun òrgan
 	 */
-	boolean hasServeisComunsAndNotificacioPermission(Long entitatId);
+	boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Actualitza el servei indicat amb la informació del servei actual

@@ -79,13 +79,14 @@
                             this.selectedIndex = 0;
                         }
                     });
-                    $('#btn-entregaCieActiva').removeClass('active');
-                    $('#entregaCieActiva').val(false);
+                    $('#btn-entregaCie').removeClass('active');
+                    $('#entregaCie').val(false);
                     $('#form-filtre').submit();
                 });
-                $('#btn-entregaCieActiva').click(function() {
+                $('#btn-entregaCie').click(function() {
+                    console.log("entrega cie arbre");
                     let entregaCieActiva = !$(this).hasClass('active');
-                    $('#entregaCieActiva').val(entregaCieActiva);
+                    $('#entregaCie').val(entregaCieActiva);
                 })
                 $(".panel-heading:first").css({"display": "flex", "justify-content": "space-between"})
                 $(".panel-heading:first").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
@@ -124,6 +125,10 @@
                         <span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
                     </button>
                     <not:inputHidden name="entregaCie"/>
+                </div>
+                <div class="col-md-3">
+                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
+                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
                 </div>
             </div>
         </form:form>

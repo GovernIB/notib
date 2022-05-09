@@ -92,7 +92,6 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	private long version = 0;
 
 	public void update(
-			String codi,
 			String nom,
 			EntitatTipusEnumDto tipus,
 			String dir3Codi,
@@ -112,7 +111,7 @@ public class EntitatEntity extends NotibAuditable<Long> {
 			String llibre,
 			String llibreNom,
 			boolean oficinaEntitat) {
-		this.codi = codi;
+
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.tipus = tipus;

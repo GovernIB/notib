@@ -57,46 +57,28 @@ public class IntegracioController extends BaseUserController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		return getAmbCodi(request, "USUARIS", model);
 	}
+
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
-	public String getAmbCodi(
-			HttpServletRequest request,
-			@PathVariable @NonNull String codi,
-			Model model) {
+	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
+
 		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
 		for (IntegracioDto integracio: integracions) {
 			for (IntegracioEnumDto integracioEnum: IntegracioEnumDto.values()) {
-				if (integracio.getCodi() == integracioEnum.name()) {
-					integracio.setNom(
-							EnumHelper.getOneOptionForEnum(
-									IntegracioEnumDto.class,
-									"integracio.list.pipella." + integracio.getCodi()).getText());
+				if (integracio.getCodi().equals(integracioEnum.name())) {
+					integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class,"integracio.list.pipella." + integracio.getCodi()).getText());
 				}
 			}
 		}
-		model.addAttribute(
-				"integracions",
-				integracions);
-
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_FILTRE,
-				codi);
-
-		model.addAttribute(
-				"codiActual",
-				RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						SESSION_ATTRIBUTE_FILTRE));
+		model.addAttribute("integracions", integracions);
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, codi);
+		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
 		try {
-			model.addAttribute("data",
-					(new ObjectMapper()).writeValueAsString(aplicacioService.integracioFindDarreresAccionsByCodi(codi))
-			);
+			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(aplicacioService.integracioFindDarreresAccionsByCodi(codi, paginacio)));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -105,53 +87,36 @@ public class IntegracioController extends BaseUserController {
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
-		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_FILTRE);
-		List<IntegracioAccioDto> accions = null;
-		if (codi != null) {
-			accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
-		} else {
-			accions = new ArrayList<IntegracioAccioDto>();
-		}
-		
-		DatatablesResponse dtr = null;
+	public DatatablesResponse datatable(HttpServletRequest request) {
+
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		if (paginacio.getPaginaTamany() < accions.size()) {
-			int inici = paginacio.getPaginaNum() * paginacio.getPaginaTamany();
-			PaginaDto<IntegracioAccioDto> dto = new PaginaDto<IntegracioAccioDto>();
-			dto.setNumero(paginacio.getPaginaNum());
-			dto.setTamany(paginacio.getPaginaTamany());
-			dto.setTotal((int)Math.ceil(accions.size() / paginacio.getPaginaTamany()));
-			dto.setElementsTotal(accions.size());
-			dto.setAnteriors(false);
-			dto.setPrimera(true);
-			dto.setPosteriors(false);
-			dto.setDarrera(true);
-			accions = accions.subList(inici, inici + paginacio.getPaginaTamany());
-			dto.setContingut(accions);
-			dtr = DatatablesHelper.getDatatableResponse(request, dto);
-		} else {
-			dtr = DatatablesHelper.getDatatableResponse(
-				request,
-				accions);
+		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
+		List<IntegracioAccioDto> accions = codi != null ? aplicacioService.integracioFindDarreresAccionsByCodi(codi, paginacio) : new ArrayList<IntegracioAccioDto>();
+		if (accions.size() < paginacio.getPaginaTamany()) {
+			return 	DatatablesHelper.getDatatableResponse(request, accions);
 		}
-		return dtr;
+		int inici = paginacio.getPaginaNum() * paginacio.getPaginaTamany();
+		PaginaDto<IntegracioAccioDto> dto = new PaginaDto<>();
+		dto.setNumero(paginacio.getPaginaNum());
+		dto.setTamany(paginacio.getPaginaTamany());
+		dto.setTotal((int)Math.ceil(accions.size() / paginacio.getPaginaTamany()));
+		dto.setElementsTotal(accions.size());
+		dto.setAnteriors(false);
+		dto.setPrimera(true);
+		dto.setPosteriors(false);
+		dto.setDarrera(true);
+		accions = accions.subList(inici, inici + paginacio.getPaginaTamany());
+		dto.setContingut(accions);
+		return DatatablesHelper.getDatatableResponse(request, dto);
 	}
 
 	@RequestMapping(value = "/{codi}/{index}", method = RequestMethod.GET)
-	public String detall(
-			HttpServletRequest request,
-			@PathVariable String codi,
-			@PathVariable int index,
-			Model model) {
-		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
+	public String detall(HttpServletRequest request, @PathVariable String codi, @PathVariable int index, Model model) {
+
+		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi, paginacio);
 		if (index < accions.size()) {
-			model.addAttribute(
-					"integracio",
-					accions.get(index));
+			model.addAttribute("integracio", accions.get(index));
 		}
 		model.addAttribute("codiActual", codi);
 		return "integracioDetall";
