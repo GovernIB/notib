@@ -234,7 +234,7 @@ public class IntegracioHelper {
 		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
 		if (usuari == null) {
 			log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
-			//return usuariNomCodi;
+			return usuariNomCodi;
 		}
 		return usuari.getNom() + " (" + usuari.getCodi() + ")";
 	}

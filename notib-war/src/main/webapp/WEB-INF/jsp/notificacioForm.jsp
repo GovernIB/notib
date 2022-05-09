@@ -994,7 +994,7 @@
 		});
 
 		$('.interessat').trigger('change');
-		$('.tipusDocument').trigger('change');
+		// $('.tipusDocument').trigger('change');
 		$('.enviamentTipus').trigger('change');
 
 		//Contado descripció
