@@ -1,4 +1,12 @@
 databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
   - changeSet:
       id: 1634114082437-3
       author: limit
@@ -8,4 +16,4 @@ databaseChangeLog:
             columns:
               - column:
                   name: email_alt
-                  type: varchar(200)
+                  type: varchar(200 ${varcharUnit})
