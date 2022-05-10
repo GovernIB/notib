@@ -37,11 +37,12 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				return null;
 			}
 			for (UsuariDto usuariDto : destinataris) {
-				String email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
 				if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
+					log.error("usuari sense email. Codi: " + usuariDto.getCodi());
 					continue;
 				}
-				email = usuariDto.getEmail().replaceAll("\\s+","");
+				String email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
+				email = email.replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 				sendEmailNotificacio(email, notificacio);
 			}
