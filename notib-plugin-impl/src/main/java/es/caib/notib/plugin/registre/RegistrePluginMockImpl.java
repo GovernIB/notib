@@ -1,6 +1,7 @@
 package es.caib.notib.plugin.registre;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.plugin.PropertiesHelper;
 import org.slf4j.Logger;
@@ -39,7 +40,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 //			e.printStackTrace();
 //		}
 //		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		if (arb.getResumen().startsWith("Error") || arb.getInteresados().get(0).getInteresado().getApellido1().equals("error")) {
+		DatosInteresadoWsDto interesado = arb.getInteresados().get(0).getInteresado();
+		if (arb.getResumen().startsWith("Error") || interesado.getApellido1() != null && interesado.getApellido1().equals("error")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
 			return resposta;
