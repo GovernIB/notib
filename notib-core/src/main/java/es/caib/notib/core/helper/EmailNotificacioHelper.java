@@ -2,11 +2,7 @@ package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.GrupProcSerEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.ProcSerEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +22,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	@Resource
 	private MessageHelper messageHelper;
-	@Resource ProcSerHelper proceSerHelper;
+	@Resource ProcSerHelper procSerHelper;
 
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
@@ -59,7 +55,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		List<UsuariDto> destinataris = new ArrayList<>();
 //		ProcSerEntity proc = notificacio.getProcediment();
 
-		Set<String> usuaris = proceSerHelper.findUsuaris(notificacio);
+		Set<String> usuaris = procSerHelper.findUsuaris(notificacio);
 		for (String usuari: usuaris) {
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari == null || Strings.isNullOrEmpty(dadesUsuari.getEmail())) {
