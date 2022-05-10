@@ -240,7 +240,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				cacheHelper.evictFindProcedimentServeisWithPermis();
 				cacheHelper.evictFindProcedimentsOrganWithPermis();
 				if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {
-					cacheHelper.evictFindUsuarisAmbPermis(procediment.getId(), organGestor.getCodi());
+					cacheHelper.evictFindUsuarisAmbPermis(procediment.getId() + "", organGestor.getCodi());
 				}
 			}
 			procedimentEntity.update(
@@ -1652,7 +1652,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindProcedimentsOrganWithPermis();
 			if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {
-				cacheHelper.evictFindUsuarisAmbPermis(procediment.getId(), organGestor.getCodi());
+				cacheHelper.evictFindUsuarisAmbPermis(procediment.getId() + "", organGestor.getCodi());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1681,7 +1681,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindProcedimentsOrganWithPermis();
 			if (!Strings.isNullOrEmpty(organCodi)) {
-				cacheHelper.evictFindUsuarisAmbPermis(procedimentId, organCodi);
+				cacheHelper.evictFindUsuarisAmbPermis(procedimentId + "", organCodi);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);

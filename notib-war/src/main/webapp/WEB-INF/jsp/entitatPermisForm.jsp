@@ -52,12 +52,13 @@
 				formatRolUsuari();
 			});
 
-			$("#guardar").click(() => {
-				let principal = $("#principal").val();
+			$("#guardar").click(e => {
+
 				<c:if test="${not empty permisCommand.id}">
 					$("#permis-form").submit();
+					return;
 				</c:if>
-
+				let principal = $("#principal").val();
 				$.ajax({type: "GET", url: principal + "/existeix", error: err => console.error(err),
 					success: existeix => {
 						if (!existeix || confirm("<spring:message code="entitat.permis.form.confirmar.upsert"/>")) {
@@ -92,6 +93,7 @@
 	<form:form id="permis-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto" />
+		<form:hidden path="tipus"/>
 		<not:inputText name="principal" textKey="entitat.permis.form.camp.principal" readonly="${not empty permisCommand.id}" inputMaxLength="${principalSize}" showsize="true"/>
 		<not:inputCheckbox name="usuari" textKey="entitat.permis.form.camp.usuari"/>
 		<not:inputCheckbox name="administradorEntitat" textKey="entitat.permis.form.camp.administradorentitat"/>

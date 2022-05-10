@@ -453,24 +453,12 @@ public class PermisosHelper {
 			return new HashMap<Long, List<PermisDto>>();
 		}
 	}
-	public void updatePermis(
-			Long objectIdentifier,
-			Class<?> objectClass,
-			PermisDto permis) {
+	public void updatePermis(Long objectIdentifier, Class<?> objectClass, PermisDto permis) {
+
 		if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
-			assignarPermisos(
-					new PrincipalSid(permis.getPrincipal()),
-					objectClass,
-					objectIdentifier,
-					getPermissionsFromPermis(permis),
-					true);
+			assignarPermisos(new PrincipalSid(permis.getPrincipal()), objectClass, objectIdentifier, getPermissionsFromPermis(permis),true);
 		} else if (TipusEnumDto.ROL.equals(permis.getTipus())) {
-			assignarPermisos(
-					new GrantedAuthoritySid(getMapeigRol(permis.getPrincipal())),
-					objectClass,
-					objectIdentifier,
-					getPermissionsFromPermis(permis),
-					true);
+			assignarPermisos(new GrantedAuthoritySid(getMapeigRol(permis.getPrincipal())), objectClass, objectIdentifier, getPermissionsFromPermis(permis),true);
 		}
 	}
 	public void deletePermis(
@@ -641,12 +629,8 @@ public class PermisosHelper {
 		return permis;
 	}
 	
-	private void assignarPermisos(
-			Sid sid,
-			Class<?> objectClass,
-			Serializable objectIdentifier,
-			Permission[] permissions,
-			boolean netejarAbans) {
+	private void assignarPermisos(Sid sid, Class<?> objectClass, Serializable objectIdentifier, Permission[] permissions, boolean netejarAbans) {
+
 		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 		MutableAcl acl = null;
 		try {
@@ -659,17 +643,14 @@ public class PermisosHelper {
 			// es reorganitzen els índexos
 			for (int i = acl.getEntries().size() - 1; i >= 0; i--) {
 				AccessControlEntry ace = acl.getEntries().get(i);
-				if (ace.getSid().equals(sid))
+				if (ace.getSid().equals(sid)) {
 					acl.deleteAce(i);
+				}
 			}
 		}
 		aclService.updateAcl(acl);
 		for (Permission permission: permissions) {
-			acl.insertAce(
-					acl.getEntries().size(),
-					permission,
-					sid,
-					true);
+			acl.insertAce(acl.getEntries().size(), permission, sid,true);
 		}
 		aclService.updateAcl(acl);
 	}

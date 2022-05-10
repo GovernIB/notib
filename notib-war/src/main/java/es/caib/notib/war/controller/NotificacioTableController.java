@@ -459,7 +459,11 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
         boolean totbe = !enviamentEstat.isNotificaError();
         String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-        MissatgesHelper.error(request, getMessage(request, msg));
+        if (totbe) {
+            MissatgesHelper.success(request, getMessage(request, msg));
+        } else {
+            MissatgesHelper.error(request, getMessage(request, msg));
+        }
         emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
         return "enviamentInfo";
     }

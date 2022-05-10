@@ -37,10 +37,11 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				return null;
 			}
 			for (UsuariDto usuariDto : destinataris) {
+				String email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
 				if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
 					continue;
 				}
-				String email = usuariDto.getEmail().replaceAll("\\s+","");
+				email = usuariDto.getEmail().replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 				sendEmailNotificacio(email, notificacio);
 			}
@@ -69,7 +70,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 				UsuariDto u = new UsuariDto();
 				u.setCodi(usuari);
-				u.setEmail(dadesUsuari.getEmail());
+				u.setEmail(!Strings.isNullOrEmpty(user.getEmailAlt()) ? user.getEmailAlt() : dadesUsuari.getEmail());
 				destinataris.add(u);
 			}
 		}

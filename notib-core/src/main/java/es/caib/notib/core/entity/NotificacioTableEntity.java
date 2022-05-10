@@ -135,6 +135,11 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 
 	@Setter
 	@Transient
+	private Long documentId;
+
+
+	@Setter
+	@Transient
 	private boolean permisProcessar;
 	@Setter
 	@Transient
