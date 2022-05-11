@@ -194,7 +194,8 @@ body {
 						</c:choose>
 					</div>
 					<div id="app-logo" class="pull-left">
-						<img src="<c:url value="/img/logo.png"/>" alt="NOTIB" />
+						<img src="<c:url value="/img/logo.png"/>" alt="FPP" />
+						<div id="text-logo-div"><span id="text-logo">NOTIB</span></div>
 					</div>
 				</div>
 			</div>

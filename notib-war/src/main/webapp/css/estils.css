@@ -32,8 +32,23 @@
 	padding: 0px 24px 0px 0;
 }
 #app-logo {
-	display: block;
+	display: flex;
 	padding: 18px 0 0 12px;
+}
+
+
+#text-logo-div {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	padding-top: 10px;
+}
+
+#text-logo {
+	font-size: 1.8em;
+	color: white;
+	margin-left: 10px;
+	font-weight: bold;
 }
 
 .container-main, .container-foot {
