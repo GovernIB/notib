@@ -112,12 +112,11 @@
                                          optionTextAttribute="nom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.oficina.select"/>
                     </div>
                 </c:if>
-                <div class="col-md-2 pull-right">
-                    <div class="pull-right">
-                        <button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-                        <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
-                    </div>
+                <div class="col-md-3">
+                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
+                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
                 </div>
+
             </div>
             <div class="row">
                 <div class="col-md-2">
@@ -126,9 +125,11 @@
                     </button>
                     <not:inputHidden name="entregaCie"/>
                 </div>
-                <div class="col-md-3">
-                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
-                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
+                <div class="col-md-2 pull-right">
+                    <div class="pull-right">
+                        <button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+                        <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+                    </div>
                 </div>
             </div>
         </form:form>

@@ -368,9 +368,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				organs = findAmbFiltrePaginatByAdminOrgan(entitat, organActualCodiDir3, filtre, pageable);
 			}
 			PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
+			Map<String, NodeDir3> organigrama = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 			for (OrganGestorDto organ: paginaOrgans.getContingut()) {
 				List<PermisDto> permisos = permisosHelper.findPermisos(organ.getId(), OrganGestorEntity.class);
 				organ.setPermisos(permisos);
+				NodeDir3 node = organigrama.get(organ.getCodiPare());
+				organ.setNomPare(node != null ? node.getDenominacio() : "");
 			}
 			return paginaOrgans;
 		} finally {
