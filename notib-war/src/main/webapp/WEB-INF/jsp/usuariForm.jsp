@@ -43,7 +43,7 @@ $(document).ready(function() {
 		<not:inputText name="nom" textKey="usuari.form.camp.nom" disabled="true"/>
 		<not:inputText name="nif" textKey="usuari.form.camp.nif" disabled="true"/>
 		<not:inputText name="email" textKey="usuari.form.camp.email" disabled="true"/>
-		<not:inputText name="emailAlt" textKey="usuari.form.camp.email"/>
+		<not:inputText name="emailAlt" textKey="usuari.form.camp.email.alternatiu"/>
 		<not:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
 <%--		<label class="control-label col-xs-4"></label>--%>
 <%--		<div class="col-xs-8">--%>
