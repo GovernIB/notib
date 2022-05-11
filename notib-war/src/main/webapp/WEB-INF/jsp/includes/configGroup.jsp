@@ -192,7 +192,7 @@
                         <c:if test="${not config.jbossProperty}">
                             <button class="btn btn-success"><i class="fa fa-save"></i></button>
                         </c:if>
-                        <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
+                        <div style="display:none" class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
                     </div>
                 </div>
                 <div class="form-group entitats-config"></div>
