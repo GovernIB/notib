@@ -165,7 +165,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			vars = new Object[] {MAX_SIZE_NOM};
 		}
 		if (!ok) {
-			String node = isJuridica ? "raoSocial" : "nomInput";
+			String node = isJuridica ? "raoSocialInput" : "nomInput";
 			String msg = MessageHelper.getInstance().getMessage(msgKey, vars, locale);
 			context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 		}

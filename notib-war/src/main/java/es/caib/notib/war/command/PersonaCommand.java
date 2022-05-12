@@ -28,6 +28,7 @@ public class PersonaCommand {
 	private String nom;
 	private String nomInput;
 	private String raoSocialInput;
+	private String raoSocial;
 	@Size(max=30)
 	private String llinatge1;
 	@Size(max=30)
