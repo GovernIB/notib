@@ -24,8 +24,10 @@ public class PersonaCommand {
 	private Long id;
 	private boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
-	@Size(max=255)
+//	@Size(max=255)
 	private String nom;
+	private String nomInput;
+	private String raoSocialInput;
 	@Size(max=30)
 	private String llinatge1;
 	@Size(max=30)
@@ -39,24 +41,29 @@ public class PersonaCommand {
 	private String email;
 	@Size(max=9)	
 	private String dir3Codi;
-	
+
+//	private void setNom(String nom) {
+//		this.nom = InteressatTipusEnumDto.JURIDICA.equals(interessatTipus) ? raoSocial : nomInput;
+//	}
 	
 	public static PersonaCommand asCommand(PersonaDto dto) {
 		if (dto == null) {
 			return null;
 		}
-		PersonaCommand command = ConversioTipusHelper.convertir(
-				dto,
-				PersonaCommand.class );
+		PersonaCommand command = ConversioTipusHelper.convertir(dto, PersonaCommand.class );
+//		if (InteressatTipusEnumDto.JURIDICA.equals(command.getInteressatTipus())) {
+//			command.setRaoSocial(dto.getNom());
+//		} else {
+//			command.setNomInput(dto.getNom());
+//		}
 		return command;
 	}
 	public static PersonaDto asDto(PersonaCommand command) {
 		if (command == null) {
 			return null;
 		}
-		PersonaDto dto = ConversioTipusHelper.convertir(
-				command,
-				PersonaDto.class);
+		PersonaDto dto = ConversioTipusHelper.convertir(command, PersonaDto.class);
+//		dto.setNom(InteressatTipusEnumDto.JURIDICA.equals(command.getInteressatTipus()) ? command.getNomInput() : command.getRaoSocial());
 		return dto;
 	}
 
@@ -66,8 +73,9 @@ public class PersonaCommand {
 	}
 
 	public String getNif() {
-		if (nif == null || nif.trim().length() == 0)
+		if (nif == null || nif.trim().length() == 0) {
 			return null;
+		}
 		return Character.isDigit(nif.trim().charAt(0)) && nif.trim().length() < 9 ? afegirZerosNif() : nif.trim();
 	}
 

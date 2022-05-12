@@ -27,7 +27,6 @@
                 <div class="col-md-12 destinatariForm destenv_${j} personaForm_${j}_${i}">
                         <%-- 												<input id="isMultiple" class="hidden" value="${isMultiplesDestinataris}"> --%>
                     <input type="hidden" name="enviaments[${j}].destinataris[${i}].id" value="${destinatari.id}"/>
-
                     <!-- TIPUS INTERESSAT -->
                     <div class="col-md-3 interessatTipus">
                         <not:inputSelect name="enviaments[${j}].destinataris[${i}].interessatTipus" generalClass="interessat" textKey="notificacio.form.camp.interessatTipus" labelSize="12" inputSize="12" optionItems="${interessatTipusDest}" optionValueAttribute="value" optionTextKeyAttribute="text" />
@@ -37,19 +36,22 @@
                         <not:inputText name="enviaments[${j}].destinataris[${i}].nif" textKey="notificacio.form.camp.titular.nif" labelSize="12" inputSize="12" />
                     </div>
                     <!-- NOM / RAÓ SOCIAL -->
-                    <div class="col-md-3 rao">
-                        <not:inputText name="enviaments[${j}].destinataris[${i}].nom" textKey="notificacio.form.camp.titular.nom" labelSize="12" inputSize="12" required="true" inputMaxLength="${concepteSize}" showsize="true"/>
+                    <div class="col-md-3 rao nomInput">
+                        <not:inputText name="enviaments[${j}].destinataris[${i}].nomInput" textKey="notificacio.form.camp.titular.nom.sol" labelSize="12" inputSize="12" required="true" inputMaxLength="${nomSize}" showsize="true"/>
+                    </div>
+                    <div class="col-md-3 rao raoSocialInput">
+                        <not:inputText name="enviaments[${j}].destinataris[${i}].raoSocialInput" textKey="notificacio.form.camp.titular.rao.social" labelSize="12" inputSize="12" required="true" inputMaxLength="${raoSocialSize}" showsize="true"/>
                     </div>
                     <!-- PRIMER LLINATGE -->
                     <div class="col-md-3 llinatge1">
                         <not:inputText name="enviaments[${j}].destinataris[${i}].llinatge1"
                                        textKey="notificacio.form.camp.titular.llinatge1"
                                        labelSize="12" inputSize="12" required="true"
-                                       inputMaxLength="${concepteSize}" showsize="true"/>
+                                       inputMaxLength="${llinatge1Size}" showsize="true"/>
                     </div>
                     <!-- SEGON LLINATGE -->
                     <div class="col-md-3 llinatge2">
-                        <not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12" inputMaxLength="${concepteSize}" showsize="true"/>
+                        <not:inputText name="enviaments[${j}].destinataris[${i}].llinatge2" textKey="notificacio.form.camp.titular.llinatge2" labelSize="12" inputSize="12" inputMaxLength="${llinatge1Size}" showsize="true"/>
                     </div>
                     <!-- TELÈFON -->
                     <div class="col-md-3">

@@ -1,6 +1,7 @@
 package es.caib.notib.war.validation;
 
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.war.command.PersonaCommand;
@@ -22,7 +23,8 @@ import java.util.Locale;
  */
 public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, PersonaCommand> {
 
-	private final int MAX_SIZE_NOM = 80;
+	public static final int MAX_SIZE_NOM = 30;
+	public static final int MAX_SIZE_RAO_SOCIAL = 80;
 
 	@Autowired
 	private AplicacioService aplicacioService;
@@ -52,22 +54,22 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			// Validacions per tipus de persona
 			switch (persona.getInteressatTipus()) {
 			case FISICA:
-				valid = validarNom(persona, context, "notificacio.form.valid.fisica.nom");
-				if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
+				valid = validarNom(persona, context);
+				if (Strings.isNullOrEmpty(persona.getLlinatge1())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale))
 					.addNode("llinatge1")
 					.addConstraintViolation();
 				}
-				if (persona.getNif() == null || persona.getNif().isEmpty()) {
+				if (Strings.isNullOrEmpty(persona.getNif())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.nif", null, locale))
 					.addNode("nif")
 					.addConstraintViolation();
 				}
-				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
+				if (!Strings.isNullOrEmpty(persona.getNif()) && !NifHelper.isValidNifNie(persona.getNif())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.tipoDocumentoIncorrecto", null, locale))
@@ -76,7 +78,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 				}
 				break;
 			case FISICA_SENSE_NIF:
-				valid = validarNom(persona, context, "notificacio.form.valid.fisica.nom");
+				valid = validarNom(persona, context);
 				if (persona.getLlinatge1() == null || persona.getLlinatge1().isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
@@ -93,7 +95,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 //				}
 				break;
 			case JURIDICA:
-				valid = validarNom(persona, context, "notificacio.form.valid.juridica.rao");
+				valid = validarNom(persona, context);
 				if (persona.getNif() == null || persona.getNif().isEmpty()) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
@@ -110,14 +112,14 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 				}
 				break;
 			case ADMINISTRACIO:
-				if (persona.getNom() == null || persona.getNom().isEmpty()) {
+				if (Strings.isNullOrEmpty(persona.getRaoSocialInput())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.nom", null, locale))
 					.addNode("nom")
 					.addConstraintViolation();
 				}
-				if (persona.getDir3Codi() == null || persona.getDir3Codi().isEmpty()) {
+				if (Strings.isNullOrEmpty(persona.getDir3Codi())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.administracio.dir3", null, locale))
@@ -138,14 +140,34 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		return valid;
 	}
 
-	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context, String messageKey) {
+	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context) {
 		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
-		if (persona.getNom() == null || persona.getNom().isEmpty() || persona.getNom().length() > MAX_SIZE_NOM) {
-			context.buildConstraintViolationWithTemplate(
-					MessageHelper.getInstance().getMessage(messageKey, null ,locale))
-					.addNode("nom")
-					.addConstraintViolation();
-			return false;
+		boolean isJuridica = InteressatTipusEnumDto.JURIDICA.equals(persona.getInteressatTipus());
+		String msgKey = "";
+		boolean ok = true;
+		Object [] vars = null;
+		if (Strings.isNullOrEmpty(persona.getRaoSocialInput()) && isJuridica) {
+			ok = false;
+			msgKey = "notificacio.form.valid.juridica.rao";
+		}
+		if (Strings.isNullOrEmpty(persona.getNomInput()) && !isJuridica) {
+			ok = false;
+			msgKey = "notificacio.form.valid.fisica.nom";
+		}
+		if (isJuridica && persona.getRaoSocialInput().length() > MAX_SIZE_RAO_SOCIAL) {
+			ok = false;
+			msgKey = "notificacio.form.valid.administracio.nom.max.length";
+			vars = new Object[] {MAX_SIZE_RAO_SOCIAL};
+		}
+		if (!isJuridica && persona.getNomInput().length() > MAX_SIZE_NOM) {
+			ok = false;
+			msgKey = "notificacio.form.valid.fisica.nom.max.length";
+			vars = new Object[] {MAX_SIZE_NOM};
+		}
+		if (!ok) {
+			String node = isJuridica ? "raoSocial" : "nomInput";
+			String msg = MessageHelper.getInstance().getMessage(msgKey, vars, locale);
+			context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 		}
 		return true;
 	}

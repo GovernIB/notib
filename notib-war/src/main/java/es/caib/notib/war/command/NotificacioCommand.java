@@ -22,6 +22,8 @@ import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import es.caib.notib.war.validation.ValidNotificacio;
+import es.caib.notib.war.validation.ValidNotificacioValidator;
+import es.caib.notib.war.validation.ValidPersonaValidator;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -159,9 +161,8 @@ public class NotificacioCommand {
 		return command;
 	}
 	public NotificacioDatabaseDto asDatabaseDto() {
-		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(
-				this,
-				NotificacioDatabaseDto.class);
+
+		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(this, NotificacioDatabaseDto.class);
 		ProcSerDto procedimentDto = new ProcSerDto();
 		if ("PROCEDIMENT".equals(tipusProcSer)) {
 //		if (procedimentId != null) {
@@ -178,16 +179,17 @@ public class NotificacioCommand {
 		// Format de municipi i província
 		if (dto.getEnviaments() != null) {
 			for (NotEnviamentDatabaseDto enviament: dto.getEnviaments()) {
-				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty())
-					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+",""));
-				
+				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty()) {
+					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+", ""));
+				}
+
 				establecerCamposPersona(enviament.getTitular());
 
 				if (enviament.getDestinataris() != null) {
 					for (PersonaDto destinatari : enviament.getDestinataris()) {
-						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty())
-							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+",""));
-						
+						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty()) {
+							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+", ""));
+						}
 						establecerCamposPersona(destinatari);
 						destinatari.setIncapacitat(Boolean.FALSE);
 					}
@@ -241,14 +243,18 @@ public class NotificacioCommand {
 	}
 	
 	public int getNomDefaultSize() {
-		int concepteSize = 0;
-		try {
-			Field concepte = PersonaCommand.class.getDeclaredField("nom");
-			concepteSize = concepte.getAnnotation(Size.class).max();
-		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud del nom: " + ex.getMessage());
-		}
-		return concepteSize;
+//		int concepteSize = 0;
+//		try {
+//			Field concepte = PersonaCommand.class.getDeclaredField("nom");
+//			concepteSize = concepte.getAnnotation(Size.class).max();
+//		} catch (Exception ex) {
+//			logger.error("No s'ha pogut recuperar la longitud del nom: " + ex.getMessage());
+//		}
+		return ValidPersonaValidator.MAX_SIZE_NOM;
+	}
+
+	public int getRaoSocialDefaultsize() {
+		return ValidPersonaValidator.MAX_SIZE_RAO_SOCIAL;
 	}
 	
 	public int getLlinatge1DefaultSize() {
