@@ -1727,15 +1727,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				return setRespostaError(messageHelper.getMessage("error.validacio.interessat.tipus.titular.enviament.no.null"));
 			}
 			// - Nom
-			if(enviament.getTitular().getNom() != null && enviament.getTitular().getNom().length() > 255) {
+			if(enviament.getTitular().getNom() != null && enviament.getTitular().getNom().length() > 30) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nom.titular.longitud.max"));
 			}
 			// - Llinatge 1
-			if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 40) {
+			if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 30) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max"));
 			}
 			// - Llinatge 2
-			if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 40) {
+			if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 30) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.llinatge2.titular.longitud.max"));
 			}
 			// - Nif
