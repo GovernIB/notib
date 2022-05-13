@@ -568,8 +568,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
 						resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
-						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						integracioHelper.addAplicacioAccioParam(info, null);
+						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						return resposta;
 					}
 				}
@@ -578,8 +578,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + identificador);
-					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					integracioHelper.addAplicacioAccioParam(info, null);
+					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
 
@@ -707,8 +707,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap enviament amb la referencia " + referencia);
-					integracioHelper.addAccioError(info, "No existeix cap enviament amb l'identificador especificat");
 					integracioHelper.addAplicacioAccioParam(info, null);
+					integracioHelper.addAccioError(info, "No existeix cap enviament amb l'identificador especificat");
 					return resposta;
 				}
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
@@ -902,6 +902,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
 						resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + dadesConsulta.getIdentificador());
+						integracioHelper.addAplicacioAccioParam(info, null);
 						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						return resposta;
 					}
@@ -911,8 +912,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + dadesConsulta.getIdentificador());
-					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					integracioHelper.addAplicacioAccioParam(info, null);
+					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
@@ -938,7 +939,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if (!notificacio.getEnviaments().isEmpty()) {
 					enviament = notificacio.getEnviaments().iterator().next();
 				}
-				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus()) && enviament != null &&
 						InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 				resposta.setEnviamentSir(esSir);
@@ -962,6 +962,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap enviament amb la referència" + dadesConsulta.getReferencia());
+					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap enviament amb la referència especificada");
 					return resposta;
 				}
@@ -969,6 +970,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = enviament.getRegistreNumeroFormatat();
 				codiDir3Entitat = enviament.getNotificacio().getEmisorDir3Codi();
+				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				if (numeroRegistreFormatat == null) {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
@@ -991,9 +993,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			}
 			if (dadesConsulta.isAmbJustificant()) {
-				RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(
-						codiDir3Entitat,
-						numeroRegistreFormatat);
+				RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(codiDir3Entitat, numeroRegistreFormatat);
+				integracioHelper.addAplicacioAccioParam(info, null);
 				if (justificant.getErrorCodi() == null) {
 					resposta.setJustificant(justificant.getJustificant());
 				} else {
@@ -1039,8 +1040,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
 						resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
-						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						integracioHelper.addAplicacioAccioParam(info, null);
+						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						return resposta;
 					}
 				}
@@ -1048,11 +1049,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + identificador);
-					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					integracioHelper.addAplicacioAccioParam(info, null);
+					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
 			} catch (Exception ex) {
+				integracioHelper.addAplicacioAccioParam(info, null);
 				integracioHelper.addAccioError(info, "Error al obtenir la informació de la notificació", ex);
 				throw new RuntimeException(
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
