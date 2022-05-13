@@ -21,14 +21,26 @@ public class PersonaDto implements Serializable{
 	boolean incapacitat;
 	private InteressatTipusEnumDto interessatTipus;
 	private String nom;
+	private String nomInput;
 	private String llinatge1;
 	private String llinatge2;
 	private String raoSocial;
+	private String raoSocialInput;
 	private DocumentTipusEnumDto documentTipus;
 	private String nif;
 	private String telefon;
 	private String email;
 	private String dir3Codi;
+
+	public void setNomInput(String nomInput) {
+		this.nomInput = nomInput;
+		this.nom = nomInput;
+	}
+
+	public void setRaoSocialInput(String raoSocialInput) {
+		this.raoSocialInput = raoSocialInput;
+		this.nom = raoSocialInput;
+	}
 	
 	public String getLlinatges() {
 		return concatenarLlinatges() != null ? concatenarLlinatges() : "";
