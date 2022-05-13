@@ -86,7 +86,7 @@ public class CallbackHelper {
 				new AccioParam("Codi aplicació", aplicacio.getUsuariCodi()),
 				new AccioParam("Callback", aplicacio.getCallbackUrl())
 		);
-		info.setAplicacio(aplicacio.getUsuariCodi());
+		info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 		int intents = event.getCallbackIntents() + 1;
 		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
 				intents, event.getId(), notificacio.getId()));
@@ -206,7 +206,7 @@ public class CallbackHelper {
 					new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""),
 					new AccioParam("Identificador de la notificacio", String.valueOf(enviament.getNotificacio().getId()))
 			);
-			info.setAplicacio(aplicacio.getUsuariCodi());
+			info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
 			event.updateCallbackClient(
 					CallbackEstatEnumDto.ERROR,
 					getEventsIntentsMaxProperty(),

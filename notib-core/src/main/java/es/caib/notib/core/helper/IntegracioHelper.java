@@ -237,7 +237,7 @@ public class IntegracioHelper {
 		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 		info.setAplicacio(usuariCodi);
 		if (entitatId == null) {
-			String msg = "No existeix una aplicació amb el codi '" + usuariCodi + "' per l'entitat amb id " + entitatId;
+			String msg = "No existeix una aplicació amb el codi '" + usuariCodi;
 			info.getParams().add(new AccioParam("Codi aplicació", msg));
 			return;
 		}
