@@ -1358,6 +1358,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					new AccioParam("Identificador de la notificacio", String.valueOf(not.getId())),
 					new AccioParam("Callback", aplicacio.getCallbackUrl())
 			);
+			integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 			integracioHelper.addAccioOk(info);
 			log.info(String.format("[Callback] Enviament del callback [Id: %d] de la notificacio [Id: %d] exitós", event.getId(), not.getId()));
 		}

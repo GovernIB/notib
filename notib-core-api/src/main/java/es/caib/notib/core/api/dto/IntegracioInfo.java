@@ -2,11 +2,13 @@ package es.caib.notib.core.api.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class IntegracioInfo {
 
@@ -27,9 +29,9 @@ public class IntegracioInfo {
 		for (AccioParam param: params) {
 			this.params.add(param);
 		}
-		if ("CALLBACK".equals(this.codi)) {
-			this.aplicacio = params.length == 4 ? params[2].getValor() : params.length == 3 ? params[2].getValor() : null;
-		}
+//		if ("CALLBACK".equals(this.codi)) {
+//			this.aplicacio = params.length == 4 ? params[2].getValor() : params.length == 3 ? params[2].getValor() : null;
+//		}
 	}
 
 	public void addParam(String key, String value) {

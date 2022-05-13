@@ -1,7 +1,10 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -28,6 +31,8 @@ public class IntegracioHelper {
 
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private AplicacioRepository aplicacioRepository;
 	
 	public static final int DEFAULT_MAX_ACCIONS = 250;
 
@@ -139,7 +144,8 @@ public class IntegracioHelper {
 			boolean esborrada = false;
 			if ("CALLBACK".equals(integracioCodi) && filtres != null) {
 				for (int foo = 0; foo < filtres.length; foo++) {
-					if (accio.getAplicacio() != null && !accio.getAplicacio().contains(filtres[foo])) {
+					String filtre = filtres[foo] != null ? filtres[foo] : "";
+					if (accio.getAplicacio() != null && !accio.getAplicacio().toLowerCase().contains(filtre)) {
 						esborrada = true;
 						indexBorrar.add(accio);
 						continue;
@@ -225,7 +231,20 @@ public class IntegracioHelper {
 		}
 		return integracio;
 	}
-	
+
+	public void addAplicacioAccioParam(IntegracioInfo info, Long entitatId) {
+
+		String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+		info.setAplicacio(usuariCodi);
+		if (entitatId == null) {
+			String msg = "No existeix una aplicació amb el codi '" + usuariCodi + "' per l'entitat amb id " + entitatId;
+			info.getParams().add(new AccioParam("Codi aplicació", msg));
+			return;
+		}
+		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
+		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(IntegracioHelper.class);
 	
 }
