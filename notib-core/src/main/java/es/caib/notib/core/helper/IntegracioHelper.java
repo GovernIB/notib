@@ -145,7 +145,7 @@ public class IntegracioHelper {
 			if ("CALLBACK".equals(integracioCodi) && filtres != null) {
 				for (int foo = 0; foo < filtres.length; foo++) {
 					String filtre = filtres[foo] != null ? filtres[foo] : "";
-					if (accio.getAplicacio() != null && !accio.getAplicacio().toLowerCase().contains(filtre)) {
+					if (accio.getAplicacio() != null && !accio.getAplicacio().toLowerCase().contains(filtre.toLowerCase())) {
 						esborrada = true;
 						indexBorrar.add(accio);
 						continue;
