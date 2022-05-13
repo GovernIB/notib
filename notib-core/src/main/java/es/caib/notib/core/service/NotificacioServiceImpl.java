@@ -1687,7 +1687,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout = 1800)
 	public void actualitzarReferencies() {
 
 		try {
