@@ -421,7 +421,7 @@
 		<div class="form-group"> \
 			<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].dir3Codi"><spring:message code="notificacio.form.camp.titular.dir3codi"/></label> \
 			<div class="col-xs-12"> \
-				<div class="input-group" id="$searchOrgan#num_enviament##num_destinatari#" onclick="obrirModalOrganismesDestinatari(#num_enviament#,#num_destinatari#,${urlOrganigrama},${urlComunitatsAutonomes},${urlNivellAdministracions},${urlCercaUnitats})"> \
+				<div class="input-group" id="$searchOrgan#num_enviament##num_destinatari#" onclick="obrirModalOrganismesDestinatari(#num_enviament#,#num_destinatari#,&quot;${urlOrganigrama}&quot;,&quot;${urlComunitatsAutonomes}&quot;,&quot;${urlNivellAdministracions}&quot;,&quot;${urlCercaUnitats}&quot;)"> \
 					<input id="searchOrgan#num_enviament##num_destinatari#" class="form-control " readonly="true" type="text" value=""> \
 					<span class="input-group-addon habilitat">  \
 						<a><span class="fa fa-search"></span></a> \
@@ -923,6 +923,8 @@
 			var index = closest.find(".rowId input").val();
 			var raoSocialDesc = raoSocial.find('input').val();
 			var dir3Desc = closest.find('.codiDir3 input').val();
+			var dir3Label = dir3codi.find('label');
+			var dir3LabelText = "<spring:message code='notificacio.form.camp.titular.dir3codi'/>";
 			console.log($(this));
 			console.log("Formulari destinatari: " + $(this).val());
 			console.log(enviamentTipus)
@@ -930,6 +932,7 @@
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
 				$(dir3codi).removeClass('hidden');
+				$(dir3Label).html(dir3LabelText + " *");
 				$(incapacitat).addClass('hidden');
 				$(raoSocial).addClass('hidden');
 				$(docTipus).addClass('hidden');
@@ -974,6 +977,8 @@
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
 				$(emailLabel).text(emailLabelText);
+				$(dir3codi).removeClass('hidden');
+				$(dir3Label).html(dir3LabelText);
 			}
 
 			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
