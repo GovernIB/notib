@@ -993,10 +993,23 @@ public class OrganGestorServiceImpl implements OrganGestorService{
     }
 
 	@Override
-	public List<OrganGestorDto> getOrgansAsList() {
+	public List<OrganGestorDto> getOrgansAsList(EntitatDto entitat) {
+
+		if (organsList != null) {
+			return organsList;
+		}
+		Map<String, NodeDir3> organs = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+		organsList = new ArrayList<>();
+		for (NodeDir3 node : organs.values()) {
+			organsList.add(conversioTipusHelper.convertir(node, OrganGestorDto.class));
+		}
 		return organsList;
 	}
 
+	@Override
+	public List<OrganGestorDto> getOrgansAsList() {
+		return organsList;
+	}
 
 	@Override
 	@Transactional(readOnly = true)

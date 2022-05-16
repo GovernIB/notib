@@ -64,7 +64,9 @@
 				<not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputText name="codiPare" inline="true" placeholderKey="organgestor.list.columna.codi.pare"/>
+<%--				<not:inputText name="codiPare" inline="true" placeholderKey="organgestor.list.columna.codi.pare"/>--%>
+				<not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
+								 optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
 			</div>
 			<div class="col-md-2">
 				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>

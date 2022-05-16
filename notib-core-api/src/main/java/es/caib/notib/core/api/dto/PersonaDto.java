@@ -39,7 +39,9 @@ public class PersonaDto implements Serializable{
 
 	public void setRaoSocialInput(String raoSocialInput) {
 		this.raoSocialInput = raoSocialInput;
-		this.nom = raoSocialInput;
+		if (InteressatTipusEnumDto.JURIDICA.equals(interessatTipus) || InteressatTipusEnumDto.ADMINISTRACIO.equals(interessatTipus)) {
+			this.nom = raoSocialInput;
+		}
 	}
 	
 	public String getLlinatges() {
