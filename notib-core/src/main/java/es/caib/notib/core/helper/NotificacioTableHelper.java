@@ -227,7 +227,7 @@ public class NotificacioTableHelper {
             if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
                 && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
                     || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
-                return notificacio.getRegistreData();
+                return env.getRegistreData();
             }
 
             if (!env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)

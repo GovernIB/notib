@@ -676,7 +676,7 @@ function loadOrgansGestors(urlCercaUnitats){
                             '<td width="85%">' + item.codi + ' - '+ item.nom + '</td>' +
                             '<td>'+(socSir)+'</td>' +
                             '<td>';
-                        if (enviamentTipus === 'NOTIFICACIO' || comSir) {
+                        if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO'  || comSir) {
                             list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
                         }
                         list_html += '</td></tr>';
