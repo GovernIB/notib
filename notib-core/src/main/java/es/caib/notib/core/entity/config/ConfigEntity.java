@@ -46,6 +46,9 @@ public class ConfigEntity {
     @Column(name = "entitat_codi", length = 64)
     private String entitatCodi;
 
+    @Column(name = "CONFIGURABLE")
+    private boolean configurable;
+
     @Column(name = "POSITION")
     private int position;
 //
@@ -78,11 +81,12 @@ public class ConfigEntity {
     public void crearConfigNova(String key, String entitatCodi, ConfigEntity entitat) {
 
         this.key = key;
+        this.entitatCodi = entitatCodi;
         this.value = null;
         this.description = entitat.getDescription();
         this.jbossProperty = entitat.isJbossProperty();
         this.groupCode = entitat.getGroupCode();
         this.type = entitat.getType();
-        this.entitatCodi = entitatCodi;
+        this.configurable = entitat.isConfigurable();
     }
 }

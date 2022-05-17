@@ -24,8 +24,8 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
 
     List<ConfigEntity> findByEntitatCodiIsNull();
 
-    @Query("FROM ConfigEntity c WHERE c.key like concat('%', lower(:key), '%') AND c.entitatCodi IS NOT NULL")
-    List<ConfigEntity> findLikeKeyEntitatNotNull(@Param("key") String key);
+    @Query("FROM ConfigEntity c WHERE c.key like concat('%', :key, '%') AND c.entitatCodi IS NOT NULL AND c.configurable = true")
+    List<ConfigEntity> findLikeKeyEntitatNotNullAndConfigurable(@Param("key") String key);
 
     @Transactional
     @Modifying

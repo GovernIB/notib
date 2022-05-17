@@ -1,0 +1,117 @@
+databaseChangeLog:
+  - property:
+      name: tipus
+      value: NUMBER(1,0)
+      dbms: oracle
+  - property:
+      name: tipus
+      value: boolean
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-8
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_config
+            columns:
+              - column:
+                  name: CONFIGURABLE
+                  type: ${tipus}
+                  defaultValue: 0
+
+        - sql:
+            sql: "UPDATE NOT_CONFIG SET CONFIGURABLE = 1 WHERE 
+                  KEY LIKE '%columna.entitat' OR
+                  KEY LIKE '%columna.num.expedient' OR
+                  KEY LIKE '%email.footer' OR
+                  KEY LIKE '%justificant.capsalera.codi' OR
+                  KEY LIKE '%justificant.capsalera.direccio' OR
+                  KEY LIKE '%justificant.capsalera.email' OR
+                  KEY LIKE '%justificant.capsalera.logo' OR
+                  KEY LIKE '%justificant.capsalera.nif' OR
+                  KEY LIKE '%justificant.peu.logo' OR
+                  KEY LIKE '%justificant.peu.titol' OR
+                  KEY LIKE '%plugin.arxiu.caib.aplicacio.codi' OR
+                  KEY LIKE '%plugin.arxiu.caib.base.url' OR
+                  KEY LIKE '%plugin.arxiu.caib.contrasenya' OR
+                  KEY LIKE '%plugin.arxiu.caib.conversio.imprimible.contrasenya' OR
+                  KEY LIKE '%plugin.arxiu.caib.conversio.imprimible.url.csv' OR
+                  KEY LIKE '%plugin.arxiu.caib.conversio.imprimible.url.uuid' OR
+                  KEY LIKE '%plugin.arxiu.caib.conversio.imprimible.usuari' OR
+                  KEY LIKE '%plugin.arxiu.caib.csv.definicio' OR
+                  KEY LIKE '%plugin.arxiu.caib.timeout.connect' OR
+                  KEY LIKE '%plugin.arxiu.caib.timeout.read' OR
+                  KEY LIKE '%plugin.arxiu.caib.usuari' OR
+                  KEY LIKE '%plugin.arxiu.class' OR
+                  KEY LIKE '%plugin.arxiu.csv.base.url' OR
+                  KEY LIKE '%plugin.arxiu.document.versionable' OR
+                  KEY LIKE '%plugin.arxiu.escriptori.classificacio' OR
+                  KEY LIKE '%plugin.arxiu.escriptori.serie.documental' OR
+                  KEY LIKE '%plugin.arxiu.gestionar.carpetes' OR
+                  KEY LIKE '%plugin.arxiu.gestionar.documents' OR
+                  KEY LIKE '%plugin.arxiu.gestionar.expedients' OR
+                  KEY LIKE '%plugin.arxiu.suporta.metadades' OR
+                  KEY LIKE '%plugin.arxiu.verificacio.baseurl' OR
+                  KEY LIKE '%plugin.dades.usuari.class' OR
+                  KEY LIKE '%plugin.dades.usuari.jdbc.datasource.jndi.name' OR
+                  KEY LIKE '%plugin.dades.usuari.jdbc.query.codi' OR
+                  KEY LIKE '%plugin.dades.usuari.jdbc.query.grup' OR
+                  KEY LIKE '%plugin.dades.usuari.jdbc.query.nif' OR
+                  KEY LIKE '%plugin.dades.usuari.jdbc.query.rols' OR
+                  KEY LIKE '%plugin.firmaservidor.class' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.auth.password' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.auth.username' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.endpoint' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.location' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.perfil' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.signerEmail' OR
+                  KEY LIKE '%plugin.firmaservidor.portafib.username' OR
+                  KEY LIKE '%plugin.gesconadm.base.url' OR
+                  KEY LIKE '%plugin.gesconadm.basic.authentication' OR
+                  KEY LIKE '%plugin.gesconadm.class' OR
+                  KEY LIKE '%plugin.gesconadm.password' OR
+                  KEY LIKE '%plugin.gesconadm.username' OR
+                  KEY LIKE '%plugin.gesdoc.class' OR
+                  KEY LIKE '%plugin.gesdoc.filesystem.base.dir' OR
+                  KEY LIKE '%plugin.registre.class' OR
+                  KEY LIKE '%plugin.registre.documents.enviar' OR
+                  KEY LIKE '%plugin.registre.enviamentSir.tipusDocumentEnviar' OR
+                  KEY LIKE '%plugin.registre.generar.justificant' OR
+                  KEY LIKE '%plugin.registre.namespaceuri' OR
+                  KEY LIKE '%plugin.registre.port.name' OR
+                  KEY LIKE '%plugin.registre.segons.entre.peticions' OR
+                  KEY LIKE '%plugin.registre.service.name' OR
+                  KEY LIKE '%plugin.regweb.mock.justificant' OR
+                  KEY LIKE '%plugin.regweb.mock.sequencia' OR
+                  KEY LIKE '%plugin.unitats.class' OR
+                  KEY LIKE '%plugin.unitats.dir3.password' OR
+                  KEY LIKE '%plugin.unitats.dir3.protocol' OR
+                  KEY LIKE '%plugin.unitats.dir3.url' OR
+                  KEY LIKE '%plugin.unitats.dir3.username' OR
+                  KEY LIKE '%plugin.unitats.fitxer' OR
+                  KEY LIKE '%tasca.callback.pendents.actiu' OR
+                  KEY LIKE '%tasca.callback.pendents.notifica.events.intents.max' OR
+                  KEY LIKE '%tasca.enviament.actualitzacio.certificacio.finalitzades.actiu' OR
+                  KEY LIKE '%tasca.enviament.actualitzacio.estat.actiu' OR
+                  KEY LIKE '%tasca.enviament.actualitzacio.estat.reintents.maxim' OR
+                  KEY LIKE '%tasca.enviament.actualitzacio.estat.registre.actiu' OR
+                  KEY LIKE '%tasca.enviament.actualitzacio.estat.registre.reintents.maxim' OR
+                  KEY LIKE '%tasca.notifica.enviaments.actiu' OR
+                  KEY LIKE '%tasca.notifica.enviaments.reintents.maxim' OR
+                  KEY LIKE '%tasca.registre.enviaments.reintents.maxim' OR
+                  KEY LIKE '%tasques.actives' OR
+                  KEY LIKE '%actualitzacio.procediments.actiu' OR
+                  KEY LIKE '%actualitzacio.procediments.eliminar.organs' OR
+                  KEY LIKE '%actualitzacio.procediments.modificar' OR
+                  KEY LIKE '%destinatari.multiple' OR
+                  KEY LIKE '%document.consulta.id.csv.mida.min' OR
+                  KEY LIKE '%document.metadades.por.defecto' OR
+                  KEY LIKE '%documents.metadades.from.arxiu' OR
+                  KEY LIKE '%plugin.codi.dir3.entitat' OR
+                  KEY LIKE '%procediment.alta.auto.caducitat' OR
+                  KEY LIKE '%procediment.alta.auto.retard' OR
+                  KEY LIKE '%titular.incapacitat' OR
+                  KEY LIKE '%emprar.sir' OR
+                  KEY LIKE '%adviser.actiu' OR
+                  KEY LIKE '%enviament.massiu.prioritat' OR
+                  KEY LIKE '%notifica.dir3.entitat.permes'"

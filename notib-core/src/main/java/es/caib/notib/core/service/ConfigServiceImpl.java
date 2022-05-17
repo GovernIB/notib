@@ -108,10 +108,15 @@ public class ConfigServiceImpl implements ConfigService {
     public List<ConfigDto>  findEntitatsConfigByKey(String key) {
 
         if (Strings.isNullOrEmpty(key) || !key.contains(ConfigDto.prefix)) {
+            log.error("Entitat config key buida o no conté el prefix. Key: " + key);
             return new ArrayList<>();
         }
         String [] split = key.split(ConfigDto.prefix);
-        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNull(split[1]), ConfigDto.class);
+        if (split[1] == null) {
+            log.error("Entitat config key no trobada. Key: " + key);
+            return new ArrayList<>();
+        }
+        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(split[1]), ConfigDto.class);
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {

@@ -42,7 +42,7 @@
             return null;
         }
         return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
-    }
+    };
 
     let removeValueRadio = elem => $(elem).find('input:radio').attr("checked", false);
 
@@ -64,7 +64,7 @@
         if (spinner) {
             spinner.remove();
         }
-    }
+    };
 
     let mostrarMissatge = (id, data) => {
 
@@ -88,14 +88,26 @@
         elem.closest(".col-sm-8").append(div);
         span.addEventListener("click", () => div.remove());
         window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
-    }
+    };
+
+    let afegirCssSiValueNull = (elem, value) => {
+
+        let closest = $(elem).parent();
+        if (value) {
+            $(elem).removeClass("entitat-no-configurada");
+            return;
+        }
+        $(elem).addClass("entitat-no-configurada");
+    };
+
+    let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val());
 
     let guardarPropietat = (configKey, natejar) => {
 
         let configKeyReplaced = configKey.replaceAll("_",".");
         let spinner = addSpinner(configKey);
         let elem = $("#" + configKey);
-        let value = !natejar ? (elem.is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val()) : null;
+        let value = !natejar ? getInputValue(elem) : null;
         let formData = new FormData();
         formData.append("key", configKeyReplaced);
         formData.append("value", value);
@@ -108,6 +120,7 @@
             data: formData,
             success: data => {
                 removeSpinner(spinner);
+                afegirCssSiValueNull(elem, value);
                 mostrarMissatge(configKey + "_key", data);
             }
         });
