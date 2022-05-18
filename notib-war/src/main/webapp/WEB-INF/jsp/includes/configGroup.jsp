@@ -46,7 +46,8 @@
                     for (let entitat of entitats) {
                         let keyReplaced = entitat.key.replaceAll('.', '_');
                         let string = '<div>';
-                        string += '<label for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;"></label>';
+                        console.log(entitat);
+                        string += '<label for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">- ' + entitat.entitatCodi + '</label>';
                         string += '<div class="col-sm-8 margin-bottom">';
                         let disabled = entitat.jbossProperty ? 'disabled' : '';
                         let placeHolder = "placeholder=" + entitat.key;
@@ -59,11 +60,11 @@
                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input' + configurable + '" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
                         } else if(entitat.typeCode === "BOOL") {
                            let checked = entitat.value === "true" ? 'checked' : '';
-                           string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar entitat-input" type="checkbox" ' + disabled + ' ' + checked + '>';
+                           string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar entitat-input ' + configurable + '" type="checkbox" ' + disabled + ' ' + checked + '>';
                         } else if (entitat.validValues && entitat.validValues.length > 2) {
                             string += '<select id="' + keyReplaced + '" class="form-control ' + configurable + '">';
                             let selected = "";
-                            string += '<option value=""></option>';
+                            string += '<option value="" class="entitat-no-configurada"></option>';
                             entitat.validValues.map(x => {
                                 selected = x === entitat.value ? "selected" : "";
                                 string += '<option value="' + x + '"' + ' ' + selected + '>' + x + '</option>';
@@ -72,7 +73,7 @@
                         } else if (entitat.validValues && entitat.validValues.length === 2) {
                             let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
                             let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
-                            string += '<div id="' + keyReplaced + '"><label for="' + keyReplaced + '_1" class="radio-inline">'
+                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input ' + configurable + '"><label for="' + keyReplaced + '_1" class="radio-inline">'
                                 + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + '>'
                                 + entitat.validValues[0]
                                 + '</label>'
@@ -111,7 +112,7 @@
                             $(elem).removeClass(classe);
                             return;
                         }
-                        if (!value && !noConfigurada) {
+                        if (!value && value + "" != "false" && !noConfigurada) {
                             $(elem).addClass(classe);
                         }
                     });

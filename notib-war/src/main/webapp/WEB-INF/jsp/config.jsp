@@ -91,8 +91,6 @@
     };
 
     let afegirCssSiValueNull = (elem, value) => {
-
-        let closest = $(elem).parent();
         if (value) {
             $(elem).removeClass("entitat-no-configurada");
             return;
@@ -100,7 +98,7 @@
         $(elem).addClass("entitat-no-configurada");
     };
 
-    let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val());
+    let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) : $(elem).val());
 
     let guardarPropietat = (configKey, natejar) => {
 
