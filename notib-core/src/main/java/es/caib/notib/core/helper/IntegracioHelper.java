@@ -2,7 +2,6 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -73,7 +72,22 @@ public class IntegracioHelper {
 	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi) {
 		return getLlistaAccions(integracioCodi);
 	}
-
+	
+	public Map<String, Integer> countErrorsGroupByCodi() {
+		Map<String ,Integer> errorsGroupByCodi = new HashMap<String, Integer>();
+		errorsGroupByCodi.put(INTCODI_USUARIS,countErrors(INTCODI_USUARIS));
+		errorsGroupByCodi.put(INTCODI_REGISTRE,countErrors(INTCODI_REGISTRE));
+		errorsGroupByCodi.put(INTCODI_NOTIFICA,countErrors(INTCODI_NOTIFICA));
+		errorsGroupByCodi.put(INTCODI_ARXIU,countErrors(INTCODI_ARXIU));
+		errorsGroupByCodi.put(INTCODI_CLIENT,countErrors(INTCODI_CLIENT));
+		errorsGroupByCodi.put(INTCODI_GESDOC,countErrors(INTCODI_GESDOC));
+		errorsGroupByCodi.put(INTCODI_UNITATS,countErrors(INTCODI_UNITATS));
+		errorsGroupByCodi.put(INTCODI_GESCONADM,countErrors(INTCODI_GESCONADM));
+		errorsGroupByCodi.put(INTCODI_PROCEDIMENT,countErrors(INTCODI_PROCEDIMENT));
+		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_FIRMASERV));
+		return errorsGroupByCodi;
+	}
+	
 	public void addAccioOk(IntegracioInfo info) {
 		addAccioOk(info, true);
 	}
@@ -130,6 +144,18 @@ public class IntegracioHelper {
 				throwable);
 	}
 
+	private Integer countErrors(String codi) {
+		Integer accionsAmbError = 0;
+		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(codi);
+		if (accions != null) {
+			for (IntegracioAccioDto integracioAccioDto : accions) {
+				if (integracioAccioDto.getEstat().equals(IntegracioAccioEstatEnumDto.ERROR))
+					accionsAmbError++;
+			}
+		}
+		return accionsAmbError;
+	}
+	
 	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, String ... filtres) {
 		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 		if (accions == null) {

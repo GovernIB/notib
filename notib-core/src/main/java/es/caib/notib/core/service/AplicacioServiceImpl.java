@@ -6,11 +6,7 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -46,7 +42,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private AclSidRepository aclSidRepository;
-
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -55,8 +50,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ProcSerCacheable procedimentsCacheable;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired
@@ -214,32 +207,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 		try {
 			logger.debug("Consultant usuaris amb text (text=" + text + ")");
 			return conversioTipusHelper.convertirList(usuariRepository.findByText(text), UsuariDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	public List<IntegracioDto> integracioFindAll() {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Consultant les integracions");
-			return integracioHelper.findAll();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
-			String filtre = paginacio.getFiltre();
-			return "CALLBACK".equals(codi)  && !Strings.isNullOrEmpty(filtre)? integracioHelper.findAccions(codi, filtre)
-					:  integracioHelper.findAccionsByIntegracioCodi(codi);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
