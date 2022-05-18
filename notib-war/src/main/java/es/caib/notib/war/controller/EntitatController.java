@@ -109,6 +109,12 @@ public class EntitatController extends BaseController {
 		return "entitatForm";
 	}
 
+	@RequestMapping(value = "/{entitatId}/configurar", method = RequestMethod.GET)
+	public String configEntitat(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
+
+		return "configEntitat";
+	}
+
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid EntitatCommand command, BindingResult bindingResult, Model model) throws NotFoundException, IOException {
 
