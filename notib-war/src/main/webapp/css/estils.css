@@ -325,9 +325,25 @@ table.dataTable tr.datatable-dades-carregant div {
 	display: none;
 }
 
+.separador {
+	border-bottom: 1px solid #DDDDDD;
+}
+
 .entitat-no-configurada {
 	background: pink;
 	outline: 3px solid pink;
+}
+
+.padding-bottom-4 {
+	padding-bottom: 4px;
+}
+
+.text-gray {
+	color: #c0c0c7;
+}
+
+.no-display {
+	display: none;
 }
 
 input.entitat-no-configurada[type="checkbox"]  {

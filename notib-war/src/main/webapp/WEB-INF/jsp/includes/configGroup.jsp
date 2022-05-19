@@ -26,6 +26,7 @@
             if ($(div).is(":visible")) {
                 span.removeClass("fa-caret-up");
                 span.addClass("fa-caret-down");
+                addSeparador(e.target);
                 div.toggle();
                 return;
             }
@@ -37,6 +38,7 @@
                     if (!entitats) {
                         return;
                     }
+                    removeSeparador(e.currentTarget);
                     div.toggle();
                     if ($(div).is(":visible")) {
                         span.removeClass("fa-caret-down");
@@ -46,26 +48,25 @@
                     for (let entitat of entitats) {
                         let keyReplaced = entitat.key.replaceAll('.', '_');
                         let string = '<div>';
-                        console.log(entitat);
-                        string += '<label for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;">- ' + entitat.entitatCodi + '</label>';
-                        string += '<div class="col-sm-8 margin-bottom">';
                         let disabled = entitat.jbossProperty || !entitat.value ? 'disabled' : '';
+                        let textGray = disabled ? "text-gray" : "";
+                        string += '<label id="' + keyReplaced+ '_codi_entitat" for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom ' + textGray + '" style="word-wrap: break-word;">- ' + entitat.entitatCodi + '</label>';
+                        string += '<div class="col-sm-8 margin-bottom">';
                         let placeHolder = "placeholder=" + entitat.key;
-                        // let configurable = !entitat.value ? ' entitat-no-configurada' : "";
                         let configurable = "";
                         if (entitat.typeCode === "INT") {
-                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input' + configurable + '" type="number" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
+                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input" type="number" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
                         } else if(entitat.typeCode === "FLOAT") {
-                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input' + configurable + '" type="number" step="0.01" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
+                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input" type="number" step="0.01" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
                         } else if(entitat.typeCode === "CREDENTIALS") {
-                           string += '<input id="' + keyReplaced + '" class="form-control entitat-input' + configurable + '" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
+                           string += '<input id="' + keyReplaced + '" class="form-control entitat-input" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
                         } else if(entitat.typeCode === "BOOL") {
                            let checked = entitat.value === "true" ? 'checked' : '';
-                           string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar entitat-input ' + configurable + '" type="checkbox" ' + disabled + ' ' + checked + '>';
+                           string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar entitat-input" type="checkbox" ' + disabled + ' ' + checked + '>';
                         } else if (entitat.validValues && entitat.validValues.length > 2) {
-                            string += '<select id="' + keyReplaced + '" class="form-control ' + configurable + ' ' + disables + '">';
+                            string += '<select id="' + keyReplaced + '" class="form-control" ' + disabled + '>';
                             let selected = "";
-                            string += '<option value="" class="entitat-no-configurada"></option>';
+                            string += '<option value=""></option>';
                             entitat.validValues.map(x => {
                                 selected = x === entitat.value ? "selected" : "";
                                 string += '<option value="' + x + '"' + ' ' + selected + '>' + x + '</option>';
@@ -74,27 +75,28 @@
                         } else if (entitat.validValues && entitat.validValues.length === 2) {
                             let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
                             let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
-                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input ' + configurable + '"><label for="' + keyReplaced + '_1" class="radio-inline">'
+                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input">'
+                                + '<label id="' + keyReplaced+ '_radio_1" for="' + keyReplaced + '_1" class="radio-inline ' + textGray + '">'
                                 + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + ' ' + disabled + '>'
                                 + entitat.validValues[0]
                                 + '</label>'
-                                + '<label for="' + keyReplaced+ '_2" class="radio-inline">'
+                                + '<label id="' + keyReplaced+ '_radio_2" for="' + keyReplaced+ '_2" class="radio-inline ' + textGray + '">'
                                 + '<input id="' + keyReplaced + '_2" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[1] + '"' + ' ' + checked2 + ' ' + disabled + '>'
                                 + entitat.validValues[1]
                                 + '</label></div>';
                         } else {
-                            string += '<input id="' + keyReplaced + '" class="form-control ' + configurable+ '" type="text" maxlength="2048" value="'
+                            string += '<input id="' + keyReplaced + '" class="form-control" type="text" maxlength="2048" value="'
                                     + (entitat.value ? entitat.value : "" )+ '"' + disabled + ' ' + placeHolder + '>';
                         }
-                        string +='<div><div id="'+ keyReplaced + '_key" class="display-inline"><span class="help-block display-inline"> ' + entitat.key + '</span></div>';
+                        string +='<div><div id="'+ keyReplaced + '_key" class="display-inline"><span id="' + keyReplaced+ '_key_entitat" class="help-block display-inline ' + textGray + '"> ' + entitat.key + '</span></div>';
                         string += '</div></div>'
                         string += '<div class="col-sm-1 margin-bottom flex-space-between">';
-                        if (!entitat.jbossProperty && entitat.value) {
-                            string += '<button id="' + keyReplaced + '_button_save" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>';
-                            string += '<button id="' + keyReplaced + '_button_trash" name=' + entitat.entitatCodi + ' type="button" class="btn btn-danger entitat-trash"><i class="fa fa-trash"></i></button>';
-                        }
-                        if (!entitat.jbossProperty && !entitat.value) {
-                            string += '<button id="' + keyReplaced + '_button_config" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-config"><i class="fa fa-pencil"></i></button>';
+                        if (!entitat.jbossProperty) {
+                            let saveDelete = entitat.value ? "" : "no-display";
+                            let config = !entitat.value ? "" : "no-display";
+                            string += '<button id="' + keyReplaced + '_button_save" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-save ' + saveDelete + '"><i class="fa fa-save"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_trash" name=' + entitat.entitatCodi + ' type="button" class="btn btn-danger entitat-trash ' + saveDelete + '"><i class="fa fa-trash"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_config" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-config ' + config + '"><i class="fa fa-pencil"></i></button>';
                         }
                         string += '</div></div>';
                         div.append(string);
@@ -107,19 +109,19 @@
                         placeholder: ""
                     });
 
-                    $(".entitat-input").unbind("change").change(e => {
-                        let elem = e.currentTarget;
-                        let value = getInputValue(elem);
-                        let classe = "entitat-no-configurada";
-                        let noConfigurada = $(elem).hasClass(classe);
-                        if (value && classe) {
-                            $(elem).disable();
-                            return;
-                        }
-                        if (!value && value + "" != "false" && !noConfigurada) {
-                            $(elem).enable();
-                        }
-                    });
+                    // $(".entitat-input").unbind("change").change(e => {
+                    //     let elem = e.currentTarget;
+                    //     let value = getInputValue(elem);
+                    //     let classe = "entitat-no-configurada";
+                    //     let noConfigurada = $(elem).hasClass(classe);
+                    //     if (value && classe) {
+                    //         $(elem).disable();
+                    //         return;
+                    //     }
+                    //     if (!value && value + "" != "false" && !noConfigurada) {
+                    //         $(elem).enable();
+                    //     }
+                    // });
 
                     $(".entitat-save").unbind("click").click(e =>  {
                         let configKey = e.currentTarget.id.replace("_button_save", "");
@@ -127,20 +129,40 @@
                     });
 
                     $(".entitat-trash").unbind("click").click(e => {
+
                         let configKey = e.currentTarget.id.replace("_button_trash", "");
+                        $("#" + configKey + "_button_trash").addClass("no-display");
+                        $("#" + configKey + "_button_save").addClass("no-display");
+                        $("#" + configKey + "_button_config").removeClass("no-display");
+                        $("#" + configKey + "_key_entitat").addClass("text-gray");
+                        $("#" + configKey + "_codi_entitat").addClass("text-gray");
+                        $("#" + configKey + "_radio_1").addClass("text-gray");
+                        $("#" + configKey + "_radio_2").addClass("text-gray");
                         let elem = $("#" + configKey);
                         if (elem.is(':checkbox')) {
                             $(elem).prop("checked", false);
                         } else if ($(elem).is("div") ) {
                             removeValueRadio(elem);
                         } else if ($(elem).is("select")) {
-                            let options = $("#" + elem[0].id + " option");
-                            $(elem).empty();
-                            $(elem).append(options);
+                            $(elem).val("").trigger("change");
                         } else {
                             elem.val("");
                         }
+                        $(elem).attr("disabled", true);
                         guardarPropietat(configKey, true);
+                    });
+
+                    $(".entitat-config").unbind("click").click(e => {
+
+                        let current = e.currentTarget;
+                        $(current).addClass("no-display");
+                        $("#" + current.id.replace("_button_config", "_button_save")).removeClass("no-display");
+                        $("#" + current.id.replace("_button_config", "_button_trash")).removeClass("no-display");
+                        $("#" + current.id.replace("_button_config", "")).removeAttr("disabled");
+                        $("#" + current.id.replace("_button_config", "_key_entitat")).removeClass("text-gray");
+                        $("#" + current.id.replace("_button_config", "_codi_entitat")).removeClass("text-gray");
+                        $("#" + current.id.replace("_button_config", "_radio_1")).removeClass("text-gray");
+                        $("#" + current.id.replace("_button_config", "_radio_2")).removeClass("text-gray");
                     });
                 }
             });
@@ -159,7 +181,7 @@
 
             <form:form method="post" cssClass="config-form form-update-config form-horizontal" action="config/update" commandName="config_${configKey}">
                 <form:hidden path="key"/>
-                <div class="form-group">
+                <div class="form-group separador padding-bottom-4">
                     <label for="config_${config.key}" class="col-sm-3 control-label" style="word-wrap: break-word;">${ config.description }</label>
                     <div class="col-sm-8">
                         <c:choose>
@@ -215,7 +237,7 @@
                         </c:if>
                 </div>
                 </div>
-                <div class="form-group entitats-config"></div>
+                <div class="form-group entitats-config separador"></div>
             </form:form>
         </c:forEach>
 
