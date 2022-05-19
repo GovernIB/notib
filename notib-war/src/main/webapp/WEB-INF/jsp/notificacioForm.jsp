@@ -601,7 +601,7 @@
 					}
 					missatge += "<ul>";
 					enviamentsSenseNif.forEach(function(item) {
-						missatge += "<li>Enviament " + (item + 1) + " - Titular: " + $("#enviaments\\[" + item +"\\]\\.titular\\.nom").val() + " " + $("#enviaments\\[" + item +"\\]\\.titular\\.llinatge1").val() + "</li>";
+						missatge += "<li>Enviament " + (item + 1) + " - Titular: " + $("#enviaments\\[" + item +"\\]\\.titular\\.nomInput").val() + " " + $("#enviaments\\[" + item +"\\]\\.titular\\.llinatge1").val() + "</li>";
 					});
 					missatge += "</ul>";
 

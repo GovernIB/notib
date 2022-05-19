@@ -18,12 +18,7 @@ import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ejb.CreateException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
 import javax.ws.rs.core.UriBuilder;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 ;
@@ -140,7 +135,7 @@ public abstract class NotificacioBaseRestClient {
 			Client jerseyClient,
 			String urlAmbMetode,
 			String username,
-			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+			String password) throws Exception {
 		if (!autenticacioBasic) {
 			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
