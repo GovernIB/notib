@@ -66,6 +66,10 @@
         }
     };
 
+    let addSeparador = tag => $(tag).closest(".form-group").addClass("separador");
+
+    let removeSeparador = tag => $(tag).closest(".form-group").removeClass("separador");
+
     let mostrarMissatge = (id, data) => {
 
         let elem = document.getElementById(id);
@@ -90,14 +94,6 @@
         window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
     };
 
-    let afegirCssSiValueNull = (elem, value) => {
-        if (value) {
-            $(elem).removeClass("entitat-no-configurada");
-            return;
-        }
-        $(elem).addClass("entitat-no-configurada");
-    };
-
     let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) : $(elem).val());
 
     let guardarPropietat = (configKey, natejar) => {
@@ -118,7 +114,6 @@
             data: formData,
             success: data => {
                 removeSpinner(spinner);
-                afegirCssSiValueNull(elem, value);
                 mostrarMissatge(configKey + "_key", data);
             }
         });
