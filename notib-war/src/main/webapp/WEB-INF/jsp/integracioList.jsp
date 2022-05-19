@@ -110,7 +110,11 @@
 	<ul class="nav nav-tabs" role="tablist">
 		<c:forEach var="integracio" items="${integracions}">
 			<li<c:if test="${integracio.codi == codiActual}"> class="active pestanya"</c:if>>
-				<a href="<c:url value="/integracio/${integracio.codi}"/>"><spring:message code="${integracio.nom}"/></a>
+				<a href="<c:url value="/integracio/${integracio.codi}"/>"><spring:message code="${integracio.nom}"/>
+					<c:if test="${integracio.numErrors > 0}">
+						<span class="badge small" style="background-color: #d9534f;">${integracio.numErrors}</span>
+					</c:if>	
+				</a>
 			</li>
 		</c:forEach>
 	</ul>

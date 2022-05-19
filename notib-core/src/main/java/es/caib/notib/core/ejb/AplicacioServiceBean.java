@@ -4,19 +4,15 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 
@@ -67,18 +63,6 @@ public class AplicacioServiceBean implements AplicacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return delegate.findUsuariAmbText(text);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioDto> integracioFindAll() {
-		return delegate.integracioFindAll();
-	}
-
-	@Override
-	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
-		return delegate.integracioFindDarreresAccionsByCodi(codi, paginacio);
 	}
 
 	@Override
