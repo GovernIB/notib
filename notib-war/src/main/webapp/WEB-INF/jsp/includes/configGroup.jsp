@@ -75,7 +75,7 @@
                         } else if (entitat.validValues && entitat.validValues.length === 2) {
                             let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
                             let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
-                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input">'
+                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input radio-div">'
                                 + '<label id="' + keyReplaced+ '_radio_1" for="' + keyReplaced + '_1" class="radio-inline ' + textGray + '">'
                                 + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + ' ' + disabled + '>'
                                 + entitat.validValues[0]
@@ -94,9 +94,9 @@
                         if (!entitat.jbossProperty) {
                             let saveDelete = entitat.value ? "" : "no-display";
                             let config = !entitat.value ? "" : "no-display";
-                            string += '<button id="' + keyReplaced + '_button_save" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-save ' + saveDelete + '"><i class="fa fa-save"></i></button>';
-                            string += '<button id="' + keyReplaced + '_button_trash" name=' + entitat.entitatCodi + ' type="button" class="btn btn-danger entitat-trash ' + saveDelete + '"><i class="fa fa-trash"></i></button>';
-                            string += '<button id="' + keyReplaced + '_button_config" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-config ' + config + '"><i class="fa fa-pencil"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_save" name="' + entitat.entitatCodi + '" type="button" class="btn btn-success entitat-save ' + saveDelete + '"><i class="fa fa-save"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_trash" name="' + entitat.entitatCodi + '" type="button" class="btn btn-danger entitat-trash ' + saveDelete + '"><i class="fa fa-trash"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_config" name="' + entitat.entitatCodi + '" type="button" class="btn btn-success entitat-config ' + config + '"><i class="fa fa-pencil"></i></button>';
                         }
                         string += '</div></div>';
                         div.append(string);
@@ -109,20 +109,6 @@
                         placeholder: ""
                     });
 
-                    // $(".entitat-input").unbind("change").change(e => {
-                    //     let elem = e.currentTarget;
-                    //     let value = getInputValue(elem);
-                    //     let classe = "entitat-no-configurada";
-                    //     let noConfigurada = $(elem).hasClass(classe);
-                    //     if (value && classe) {
-                    //         $(elem).disable();
-                    //         return;
-                    //     }
-                    //     if (!value && value + "" != "false" && !noConfigurada) {
-                    //         $(elem).enable();
-                    //     }
-                    // });
-
                     $(".entitat-save").unbind("click").click(e =>  {
                         let configKey = e.currentTarget.id.replace("_button_save", "");
                         guardarPropietat(configKey);
@@ -131,13 +117,19 @@
                     $(".entitat-trash").unbind("click").click(e => {
 
                         let configKey = e.currentTarget.id.replace("_button_trash", "");
+                        let tag = $("#" + configKey);
+                        if ($(tag).hasClass("radio-div")) {
+                            $("#" + configKey + "_1").attr("disabled", true);
+                            $("#" + configKey + "_2").attr("disabled", true);
+                            $("#" + configKey + "_radio_1").addClass("text-gray");
+                            $("#" + configKey + "_radio_2").addClass("text-gray");
+                        }
                         $("#" + configKey + "_button_trash").addClass("no-display");
                         $("#" + configKey + "_button_save").addClass("no-display");
                         $("#" + configKey + "_button_config").removeClass("no-display");
                         $("#" + configKey + "_key_entitat").addClass("text-gray");
                         $("#" + configKey + "_codi_entitat").addClass("text-gray");
-                        $("#" + configKey + "_radio_1").addClass("text-gray");
-                        $("#" + configKey + "_radio_2").addClass("text-gray");
+
                         let elem = $("#" + configKey);
                         if (elem.is(':checkbox')) {
                             $(elem).prop("checked", false);
@@ -148,21 +140,30 @@
                         } else {
                             elem.val("");
                         }
-                        $(elem).attr("disabled", true);
+                        if (!$(elem).hasClass("radio-div")) {
+                            $(elem).attr("disabled", true);
+                        }
                         guardarPropietat(configKey, true);
                     });
 
                     $(".entitat-config").unbind("click").click(e => {
 
                         let current = e.currentTarget;
+                        let tag = $("#" + current.id.replace("_button_config", ""));
+                        if ($(tag).hasClass("radio-div")) {
+                            $("#" + current.id.replace("_button_config", "_1")).first().removeAttr("disabled");
+                            $("#" + current.id.replace("_button_config", "_2")).first().removeAttr("disabled");
+                            $("#" + current.id.replace("_button_config", "_radio_1")).removeClass("text-gray");
+                            $("#" + current.id.replace("_button_config", "_radio_2")).removeClass("text-gray");
+                        } else {
+                            $("#" + current.id.replace("_button_config", "")).removeAttr("disabled");
+                        }
                         $(current).addClass("no-display");
                         $("#" + current.id.replace("_button_config", "_button_save")).removeClass("no-display");
                         $("#" + current.id.replace("_button_config", "_button_trash")).removeClass("no-display");
-                        $("#" + current.id.replace("_button_config", "")).removeAttr("disabled");
                         $("#" + current.id.replace("_button_config", "_key_entitat")).removeClass("text-gray");
                         $("#" + current.id.replace("_button_config", "_codi_entitat")).removeClass("text-gray");
-                        $("#" + current.id.replace("_button_config", "_radio_1")).removeClass("text-gray");
-                        $("#" + current.id.replace("_button_config", "_radio_2")).removeClass("text-gray");
+
                     });
                 }
             });

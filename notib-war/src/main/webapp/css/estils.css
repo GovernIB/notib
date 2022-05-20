@@ -338,12 +338,31 @@ table.dataTable tr.datatable-dades-carregant div {
 	padding-bottom: 4px;
 }
 
+.padding-top-bottom {
+	padding-top: 10px;
+	padding-bottom:10px;
+}
+
+.padding-top-7 {
+	padding-top: 7px;
+}
+
 .text-gray {
 	color: #c0c0c7;
 }
 
 .no-display {
 	display: none;
+}
+
+.label-config {
+	text-align: right;
+	padding-top: 7px !important;
+}
+
+.no-side-padding {
+	padding-left: 0px !important;
+	padding-right: 0px !important;
 }
 
 input.entitat-no-configurada[type="checkbox"]  {

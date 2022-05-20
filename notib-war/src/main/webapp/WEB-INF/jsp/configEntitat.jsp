@@ -1,11 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: limit
-  Date: 9/7/21
-  Time: 14:45
-
-  Pagina per a la gestió de les propietats de configuració de l'aplicació.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -34,6 +26,11 @@
     <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 </head>
 <body>
+<%
+    pageContext.setAttribute(
+            "isRolActualAdministrador",
+            es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+%>
 <script>
 
     let getValueRadio = elem => {
@@ -54,6 +51,7 @@
             spinner.setAttribute("aria-hidden", true);
             spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
             spinner.setAttribute("id", id + "_spinner");
+            console.log(id);
             let elem = document.getElementById(id + "_key");
             elem.append(spinner);
         }
@@ -65,6 +63,10 @@
             spinner.remove();
         }
     };
+
+    let addSeparador = tag => $(tag).closest(".form-group").addClass("separador");
+
+    let removeSeparador = tag => $(tag).closest(".form-group").removeClass("separador");
 
     let mostrarMissatge = (id, data) => {
 
@@ -90,14 +92,6 @@
         window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
     };
 
-    let afegirCssSiValueNull = (elem, value) => {
-        if (value) {
-            $(elem).removeClass("entitat-no-configurada");
-            return;
-        }
-        $(elem).addClass("entitat-no-configurada");
-    };
-
     let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) : $(elem).val());
 
     let guardarPropietat = (configKey, natejar) => {
@@ -118,7 +112,6 @@
             data: formData,
             success: data => {
                 removeSpinner(spinner);
-                afegirCssSiValueNull(elem, value);
                 mostrarMissatge(configKey + "_key", data);
             }
         });
@@ -169,6 +162,9 @@
 </script>
 <div class="text-right" data-toggle="botons-titol">
     <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
+    <c:if test="${isRolActualAdministrador}">
+        <a class="btn btn-default" href="<c:url value="/entitat"/>" data-datatable-id="permisos"><span class="fa fa-reply"></span>&nbsp;<spring:message code="entitat.permis.list.boto.tornar"/></a>
+    </c:if>
 </div>
 <div id="syncModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
