@@ -82,4 +82,10 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.eliminarDocumentsTemporals();
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
+	public void actualitzarServeis() {
+		delegate.actualitzarServeis();
+	}
+
 }

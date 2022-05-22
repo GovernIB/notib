@@ -64,4 +64,9 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a refrescar totes les notificacions CIE finalitzades sense certificació (cas pooling)
 	 */
 	void eliminarDocumentsTemporals();
+
+	/**
+	 * Mètode d'execució periòdica per a actualitzar els serveis a partir de les dades de Rolsac
+	 */
+	void actualitzarServeis();
 }

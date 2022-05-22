@@ -8,6 +8,7 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
+import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -55,7 +56,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private EnviamentHelper enviamentHelper;
-
+	@Autowired
+	private ServeiService serveiService;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
@@ -252,7 +254,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
+	
+	//8. Esborra documents temporals
+	//////////////////////////////////////////////////////////////////
 	@Override
 	public void eliminarDocumentsTemporals() {
 
@@ -271,7 +275,34 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
+	
+	// 9. Actualització dels serveis a partir de la informació de Rolsac
+	/////////////////////////////////////////////////////////////////////////
+	@Override
+	public void actualitzarServeis() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			if (isActualitzacioServeisActiuProperty()) {
+				addAdminAuthentication();
+				logger.info("[SER] Cercant entitats per a actualitzar els serveis");
+				List<EntitatDto> entitats = entitatService.findAll();
+				if (entitats != null && !entitats.isEmpty()) {
+					logger.info("[SER] Realitzant actualització de serveis per a " + entitats.size() + " entitats");
+					for (EntitatDto entitat: entitats) {
+						logger.info(">>> Actualitzant serveis de la entitat: " + entitat.getNom());
+						serveiService.actualitzaServeis(entitat);
+					}
+				} else {
+					logger.info("[SER] No hi ha entitats per actualitzar");
+				}
+			} else {
+				logger.info("[SER] L'actualització de serveis està deshabilitada");
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}	
+	}
+	
 	private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
@@ -352,7 +383,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private boolean isEnviamentActualitzacioCertificacioActiva() {
 		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.certificacio.finalitzades.actiu");
 	}
-	
+	private boolean isActualitzacioServeisActiuProperty() {
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
+	}
 	private boolean isSemaforInUse() {
 		boolean inUse = true;
 		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
