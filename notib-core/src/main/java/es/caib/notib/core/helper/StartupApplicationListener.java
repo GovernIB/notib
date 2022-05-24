@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.ProcesosInicialsEntity;
 import es.caib.notib.core.repository.ProcessosInicialsRepository;
@@ -28,6 +29,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private NotificacioService notificacioService;
 
     @Autowired
+    private ConfigService configService;
+
+    @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
 
     public static int counter = 0;
@@ -47,6 +51,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                 switch (proces.getCodi()) {
                     case ACTUALITZAR_REFERENCIES:
                         notificacioService.actualitzarReferencies();
+                        break;
+                    case PROPIETATS_CONFIG_ENTITATS:
+                        configService.crearPropietatsConfigPerEntitats();
                         break;
                     default:
                         log.error("Procés inicial no definit");

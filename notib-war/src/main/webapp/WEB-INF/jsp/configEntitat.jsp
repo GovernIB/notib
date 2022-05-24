@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-    <title><spring:message code="config.titol"/></title>
+    <title><spring:message code="config.titol"/> - ${entitatNom}</title>
     <script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
     <script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
     <link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -24,100 +24,27 @@
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
     <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
+    <script src="<c:url value="/js/configProperties/configProperties.js"/>"></script>
 </head>
 <body>
 <%
-    pageContext.setAttribute(
-            "isRolActualAdministrador",
-            es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
+pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.war.helper.RolHelper.isUsuariActualAdministrador(request));
 %>
 <script>
 
-    let getValueRadio = elem => {
-        let inputs = $(elem).find("input");
-        if (!inputs || (inputs && inputs.length !== 2)) {
-            return null;
-        }
-        return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
-    };
-
-    let removeValueRadio = elem => $(elem).find('input:radio').attr("checked", false);
-
-    let addSpinner = id => {
-
-        let spinner;
-        if (!document.getElementById(id + "_spinner")) {
-            spinner = document.createElement("span");
-            spinner.setAttribute("aria-hidden", true);
-            spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
-            spinner.setAttribute("id", id + "_spinner");
-            console.log(id);
-            let elem = document.getElementById(id + "_key");
-            elem.append(spinner);
-        }
-        return spinner;
-    };
-
-    let removeSpinner = spinner =>  {
-        if (spinner) {
-            spinner.remove();
-        }
-    };
-
-    let addSeparador = tag => $(tag).closest(".form-group").addClass("separador");
-
-    let removeSeparador = tag => $(tag).closest(".form-group").removeClass("separador");
-
-    let mostrarMissatge = (id, data) => {
-
-        let elem = document.getElementById(id);
-        elem = !elem ? document.getElementById(id + "_1") : elem;
-        let tagId = elem.getAttribute("id") + "_msg";
-        let msg = document.getElementById(tagId);
-        if (msg) {
-            let el = document.getElementById(msg);
-            if (el) {
-                el.remove();
-            }
-        }
-        let div = document.createElement("div");
-        div.setAttribute("id", tagId);
-        div.className = "flex-space-between alert-config " +  (data.status === 1 ?  "alert-config-ok" : "alert-config-error");
-        div.append(data.message);
-        let span = document.createElement("span");
-        span.className = "fa fa-times alert-config-boto";
-        div.append(span);
-        elem.closest(".col-sm-8").append(div);
-        span.addEventListener("click", () => div.remove());
-        window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
-    };
-
-    let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) : $(elem).val());
-
-    let guardarPropietat = (configKey, natejar) => {
-
-        let configKeyReplaced = configKey.replaceAll("_",".");
-        let spinner = addSpinner(configKey);
-        let elem = $("#" + configKey);
-        let value = !natejar ? getInputValue(elem) : null;
-        let formData = new FormData();
-        formData.append("key", configKeyReplaced);
-        formData.append("value", value);
-        $.ajax({
-            url: "/notib/config/update",
-            type: "post",
-            processData: false,
-            contentType: false,
-            enctype: "multipart/form-data",
-            data: formData,
-            success: data => {
-                removeSpinner(spinner);
-                mostrarMissatge(configKey + "_key", data);
-            }
-        });
-    };
-
     $(document).ready(function() {
+
+        $(".selector2").select2({
+            theme: "bootstrap",
+            allowClear: true,
+            minimumResultsForSearch: -1,
+            placeholder: ""
+        });
+
+        $(".entitat-save").click(e =>  entitatSave(e));
+        $(".entitat-trash").click(e => entitatTrash(e));
+        $(".entitat-config").click(e => entitatConfig(e));
+
         $("#btn-sync").on("click", function () {
             $.get('<c:url value="/config/sync"/>', function( data ) {
                 $('#syncModal-body').html(
@@ -136,27 +63,6 @@
             });
         });
 
-        <c:url var="urlEdit" value="/config/update"/>
-        $(".form-update-config").submit(function(e) {
-
-            e.preventDefault();
-            let formData = new FormData(this);
-            let id = "config_" + formData.get("key");
-            let spinner = addSpinner(id);
-
-            $.ajax({
-                url: "${urlEdit}",
-                type: "post",
-                processData: false,
-                contentType: false,
-                enctype: "multipart/form-data",
-                data: formData,
-                success: data => {
-                    removeSpinner(spinner);
-                    mostrarMissatge(id, data);
-                }
-            });
-        });
         $('.a-config-group:first').tab('show');
     });
 </script>

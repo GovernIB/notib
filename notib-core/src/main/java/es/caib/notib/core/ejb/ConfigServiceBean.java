@@ -49,4 +49,10 @@ public class ConfigServiceBean implements ConfigService {
 	public List<ConfigDto> findEntitatsConfigByKey(String key) {
 		return delegate.findEntitatsConfigByKey(key);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void crearPropietatsConfigPerEntitats() {
+		delegate.crearPropietatsConfigPerEntitats();
+	}
 }

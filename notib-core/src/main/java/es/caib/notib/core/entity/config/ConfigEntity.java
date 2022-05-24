@@ -1,6 +1,8 @@
 package es.caib.notib.core.entity.config;
 
 import es.caib.notib.core.entity.EntitatEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
@@ -15,6 +17,8 @@ import java.util.List;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@AllArgsConstructor
 @Getter
 @Entity
 @Table(	name = "NOT_CONFIG")

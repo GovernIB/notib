@@ -48,5 +48,8 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	List<ConfigDto> findEntitatsConfigByKey(String key);
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void crearPropietatsConfigPerEntitats();
+
 }
 

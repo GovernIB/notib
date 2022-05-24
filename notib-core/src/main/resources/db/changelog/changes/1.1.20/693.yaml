@@ -20,7 +20,9 @@ databaseChangeLog:
                   defaultValue: 0
 
         - sql:
-            sql: "UPDATE NOT_CONFIG SET CONFIGURABLE = 1 WHERE 
+            sql: "
+            INSERT INTO NOT_PROCESSOS_INICIALS (codi, init, id) VALUES ('PROPIETATS_CONFIG_ENTITATS', 1, 2);
+            UPDATE NOT_CONFIG SET CONFIGURABLE = 1 WHERE 
                   KEY LIKE '%columna.entitat' OR
                   KEY LIKE '%columna.num.expedient' OR
                   KEY LIKE '%email.footer' OR

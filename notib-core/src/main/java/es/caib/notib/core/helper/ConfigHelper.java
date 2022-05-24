@@ -27,6 +27,8 @@ public class ConfigHelper {
     @Autowired
     private ConfigGroupRepository configGroupRepository;
 
+    public static final String prefix = "es.caib.notib";
+
     @Transactional(readOnly = true)
     public String getConfig(String key) throws NotDefinedConfigException {
         ConfigEntity configEntity = configRepository.findOne(key);
@@ -225,5 +227,14 @@ public class ConfigHelper {
 
     public void deleteConfigEntitat(String codiEntitat) {
         configRepository.deleteByEntitatCodi(codiEntitat);
+    }
+
+    public String crearEntitatKey(String entitatCodi, String key) {
+
+        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+            return null;
+        }
+        String [] split = key.split(prefix);
+        return (prefix + "." + entitatCodi + split[1]);
     }
 }

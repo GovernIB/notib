@@ -123,6 +123,7 @@ public class EntitatController extends BaseController {
 		List<ConfigGroupDto> configGroups = configService.findAll();
 		model.addAttribute("config_groups", configGroups);
 		EntitatDto entitat = entitatService.findById(entitatId);
+		model.addAttribute("entitatNom", entitat.getNom());
 		if (entitat == null || Strings.isNullOrEmpty(entitat.getCodi())) {
 			return "configEntitat";
 		}

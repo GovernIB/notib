@@ -329,6 +329,10 @@ table.dataTable tr.datatable-dades-carregant div {
 	border-bottom: 1px solid #DDDDDD;
 }
 
+.width-100 {
+	width:100% !important;
+}
+
 .entitat-no-configurada {
 	background: pink;
 	outline: 3px solid pink;
