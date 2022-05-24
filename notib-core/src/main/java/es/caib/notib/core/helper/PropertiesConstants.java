@@ -35,4 +35,7 @@ public class PropertiesConstants {
     // 9. Consulta certificació notificacions CIE finalitzades
     public static final String ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE = "es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.periode";
     public static final String ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY = "es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.retard.inicial";
+    
+    // 10. Actualització dels serveis a partir de la informació de Rolsac
+    public static final String ACTUALITZAR_SERVEIS_CRON = "es.caib.notib.actualitzacio.serveis.cron";
 }
