@@ -45,29 +45,10 @@ pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.war.helper.Ro
         $(".entitat-trash").click(e => entitatTrash(e));
         $(".entitat-config").click(e => entitatConfig(e));
 
-        $("#btn-sync").on("click", function () {
-            $.get('<c:url value="/config/sync"/>', function( data ) {
-                $('#syncModal-body').html(
-                    '<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
-                    '	<span class="fa fa-circle-o-notch fa-spin fa-3x"></span> <br>' +
-                    '   Sincronitzant propietats de l\'aplicació ' +
-                    '</div>');
-                if (data.status) {
-                    let message = "S'han actualitzat satisfactoriament les següents propietats: ";
-                    data.editedProperties.forEach( element => message += element + ", ");
-                    alert(message);
-                    document.location.reload();
-                } else {
-                    alert("Error actualitzant les propietats desde JBoss.");
-                }
-            });
-        });
-
         $('.a-config-group:first').tab('show');
     });
 </script>
 <div class="text-right" data-toggle="botons-titol">
-    <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
     <c:if test="${isRolActualAdministrador}">
         <a class="btn btn-default" href="<c:url value="/entitat"/>" data-datatable-id="permisos"><span class="fa fa-reply"></span>&nbsp;<spring:message code="entitat.permis.list.boto.tornar"/></a>
     </c:if>
