@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -17,9 +18,16 @@ public class ZipFileUtils {
         try {
             ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
             ZipEntry entrada;
-            while (null != (entrada=zip.getNextEntry()) ){
+            try {
+            	entrada = zip.getNextEntry();
+            } catch (IllegalArgumentException iae) {
+            	zip = new ZipInputStream(new ByteArrayInputStream(fitxer), Charset.forName("Cp437")); // Si falla ho provam de llegir amb la codificació Cp437
+            	entrada = zip.getNextEntry();
+            }
+            while (null != (entrada) ){
                 names.add(entrada.getName());
                 zip.closeEntry();
+                entrada = zip.getNextEntry();
             }
             zip.close();
         } catch (Exception e) {
@@ -33,9 +41,15 @@ public class ZipFileUtils {
         ByteArrayOutputStream baos;
         byte arxiuBytes[] = null;
         try {
-            ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
-            ZipEntry entrada;
-            while (null != (entrada=zip.getNextEntry()) ){
+        	 ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
+             ZipEntry entrada;
+             try {
+             	entrada = zip.getNextEntry();
+             } catch (IllegalArgumentException iae) {
+             	zip = new ZipInputStream(new ByteArrayInputStream(fitxer), Charset.forName("Cp437")); // Si falla ho provam de llegir amb la codificació Cp437
+             	entrada = zip.getNextEntry();
+             }
+            while (null != (entrada) ){
                 if (fileName.equalsIgnoreCase(entrada.getName())) {
                     baos = new ByteArrayOutputStream();
                     int leido;
@@ -48,6 +62,7 @@ public class ZipFileUtils {
                     baos.close();
                     zip.closeEntry();
                 }
+                entrada = zip.getNextEntry();
             }
             zip.close();
         } catch (Exception e) {
