@@ -174,7 +174,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
-				") OR pro.comu = true " +
+				") " +
 			"order by pro.nom asc")
 	List<ProcSerEntity> findProcedimentsAccesiblesPerOrganGestor(
             @Param("organsCodis") List<String> organsCodis,
