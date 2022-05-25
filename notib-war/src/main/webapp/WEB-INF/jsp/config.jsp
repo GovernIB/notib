@@ -35,6 +35,84 @@
 </head>
 <body>
 <script>
+
+    let getValueRadio = elem => {
+        let inputs = $(elem).find("input");
+        if (!inputs || (inputs && inputs.length !== 2)) {
+            return null;
+        }
+        return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
+    }
+
+    let removeValueRadio = elem => $(elem).find('input:radio').attr("checked", false);
+
+    let addSpinner = id => {
+
+        let spinner;
+        if (!document.getElementById(id + "_spinner")) {
+            spinner = document.createElement("span");
+            spinner.setAttribute("aria-hidden", true);
+            spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
+            spinner.setAttribute("id", id + "_spinner");
+            let elem = document.getElementById(id + "_key");
+            elem.append(spinner);
+        }
+        return spinner;
+    };
+
+    let removeSpinner = spinner =>  {
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+
+    let mostrarMissatge = (id, data) => {
+
+        let elem = document.getElementById(id);
+        elem = !elem ? document.getElementById(id + "_1") : elem;
+        let tagId = elem.getAttribute("id") + "_msg";
+        let msg = document.getElementById(tagId);
+        if (msg) {
+            let el = document.getElementById(msg);
+            if (el) {
+                el.remove();
+            }
+        }
+        let div = document.createElement("div");
+        div.setAttribute("id", tagId);
+        div.className = "flex-space-between alert-config " +  (data.status === 1 ?  "alert-config-ok" : "alert-config-error");
+        div.append(data.message);
+        let span = document.createElement("span");
+        span.className = "fa fa-times alert-config-boto";
+        div.append(span);
+        elem.closest(".col-sm-8").append(div);
+        span.addEventListener("click", () => div.remove());
+        window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
+    }
+
+    let guardarPropietat = (configKey, natejar) => {
+
+        let configKeyReplaced = configKey.replaceAll("_",".");
+        let spinner = addSpinner(configKey);
+        let elem = $("#" + configKey);
+        let value = !natejar ? (elem.is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val()) : null;
+        let formData = new FormData();
+        formData.append("key", configKeyReplaced);
+        formData.append("value", value);
+        $.ajax({
+            url: "/notib/config/update",
+            type: "post",
+            processData: false,
+            contentType: false,
+            enctype: "multipart/form-data",
+            data: formData,
+            success: data => {
+                removeSpinner(spinner);
+                mostrarMissatge(configKey + "_key", data);
+            }
+        });
+    };
+
     $(document).ready(function() {
         $("#btn-sync").on("click", function () {
             $.get('<c:url value="/config/sync"/>', function( data ) {
@@ -57,39 +135,24 @@
         <c:url var="urlEdit" value="/config/update"/>
         $(".form-update-config").submit(function(e) {
 
-            //prevent Default functionality
             e.preventDefault();
-
-            let self = this;
             let formData = new FormData(this);
-            $('#syncModal-body').html(
-                '<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
-                '	<span class="fa fa-circle-o-notch fa-spin fa-3x"></span> <br>' +
-                '   Sincronitzant la propietat: ' + formData.get('key') +
-                '</div>');
-            $("#syncModal").modal("show");
+            let id = "config_" + formData.get("key");
+            let spinner = addSpinner(id);
 
-            //do your own request an handle the results
             $.ajax({
-                url: '${urlEdit}',
-                type: 'post',
+                url: "${urlEdit}",
+                type: "post",
                 processData: false,
                 contentType: false,
-                enctype: 'multipart/form-data',
+                enctype: "multipart/form-data",
                 data: formData,
-                success: function(data) {
-                    $("#syncModal").modal("hide");
-                    if (data.status === 1) {
-                        alert("La propietat " + formData.get('key') + " s'ha editat satisfactoriament");
-                    } else {
-                        alert("Hi ha hagut un error editant la propietat");
-                        document.location.reload();
-                    }
+                success: data => {
+                    removeSpinner(spinner);
+                    mostrarMissatge(id, data);
                 }
             });
-
         });
-
         $('.a-config-group:first').tab('show');
     });
 </script>
@@ -111,7 +174,6 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Tanca</button>
             </div>
         </div>
-
     </div>
 </div>
     <div class="row">

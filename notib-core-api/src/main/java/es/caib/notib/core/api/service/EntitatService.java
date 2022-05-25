@@ -204,9 +204,7 @@ public interface EntitatService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	public void permisUpdate(
-			Long entitatId,
-			PermisDto permis) throws NotFoundException;
+	void permisUpdate(Long entitatId, PermisDto permis) throws NotFoundException;
 	
 	/**
 	 * Esborra els permisos d'un usuari o d'un rol per a una entitat com a
@@ -246,5 +244,8 @@ public interface EntitatService {
 	
 	@PreAuthorize("hasRole('tothom')")
 	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi);
+
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
+	boolean existeixPermis(Long entitatId, String principal) throws Exception;
 
 }

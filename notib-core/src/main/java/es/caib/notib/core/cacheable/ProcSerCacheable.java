@@ -197,6 +197,7 @@ public class ProcSerCacheable {
 
                     cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
                     cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
+                    cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.COMUNIACIO_SIR.name()));
                     cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
                 }
             }

@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -16,6 +17,8 @@ import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Component
@@ -75,6 +78,21 @@ public abstract class EmailHelper<T> {
         }
         mailSender.send(missatge);
     }
+
+    public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);
+    public static boolean isEmailValid(String email) {
+
+        if (Strings.isNullOrEmpty(email)) {
+            return false;
+        }
+        try {
+            Matcher matcher = EMAIL_REGEX.matcher(email);
+            return matcher.find();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
     public String getRemitent() {
         return configHelper.getConfig("es.caib.notib.email.remitent");

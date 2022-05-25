@@ -1,13 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>es.caib.notib</groupId>
-		<artifactId>notib</artifactId>
-		<version>1.1.18</version>
-	</parent>
-<!-- 	<version>1.2</version> -->
+	<groupId>es.caib.notib</groupId>
 	<artifactId>notib-client</artifactId>
+	<version>1.1.19</version>
+
+	<properties>
+		<jackson.version>2.6.3</jackson.version>
+		<slf4j.version>1.6.6</slf4j.version>
+		<lombok.version>1.18.12</lombok.version>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+	</properties>
+
 	<dependencies>
 		<dependency>
 		    <groupId>com.sun.jersey</groupId>
@@ -18,24 +23,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>es.caib.jboss</groupId>
-			<artifactId>seyconsession-common</artifactId>
-			<version>1.5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.ejb</groupId>
-			<artifactId>ejb-api</artifactId>
-			<version>3.0</version>
-			<scope>provided</scope>
-		</dependency>
-  		<dependency>
-			<groupId>jboss</groupId>
-			<artifactId>jboss-jmx</artifactId>
-			<version>4.2.2.GA</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -75,95 +62,89 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<!--
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxws-maven-plugin</artifactId>
-				<version>2.4.1</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.12</version>
+				<configuration>
+					<message>Maven artifacts for ${project.version}</message>
+					<outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+					<noJekyll>true</noJekyll>
+					<branch>refs/heads/gh-pages</branch>
+					<includes><include>**/*</include></includes>
+					<path>maven</path>
+					<!-- github repo name -->
+					<repositoryName>maven</repositoryName>
+					<!-- github username or organization  -->
+					<repositoryOwner>GovernIB</repositoryOwner>
+					<server>github_governib_maven</server>
+					<merge>true</merge>
+					<dryRun>false</dryRun>
+				</configuration>
 				<executions>
 					<execution>
-						<id>generate-reports-ws-code</id>
-						<phase>generate-sources</phase>
 						<goals>
-							<goal>wsimport</goal>
+							<goal>site</goal>
 						</goals>
-						<configuration>
-							<wsdlUrls>
-								<wsdlUrl>${basedir}/src/main/resources/es/caib/notib/client/wsdl/NotificacioServiceWsV2.wsdl</wsdlUrl>
-							</wsdlUrls>
-							<vmArgs>
-								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-							</vmArgs>
-							<verbose>true</verbose>
-							<sourceDestDir>${basedir}/src/main/java</sourceDestDir>
-						</configuration>
+						<phase>deploy</phase>
 					</execution>
 				</executions>
 			</plugin>
-			-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.8.1</version>
+			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+				</configuration>
+				<version>2.2.0</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.4</version>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
 			</plugin>
-			<!--
 			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-source-plugin</artifactId>
-			  <executions>
-			    <execution>
-			      <id>attach-sources</id>
-			      <goals>
-			        <goal>jar</goal>
-			      </goals>
-			    </execution>
-			  </executions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>7</source>
+					<target>7</target>
+				</configuration>
 			</plugin>
-			-->
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-		           	<artifactId>lifecycle-mapping</artifactId>
-		           	<version>1.0.0</version>
-		           	<configuration>
-		           		<lifecycleMappingMetadata>
-		           			<pluginExecutions>
-		           				<pluginExecution>
-		           					<pluginExecutionFilter>
-		           						<groupId>org.codehaus.mojo</groupId>
-		           						<artifactId>flatten-maven-plugin</artifactId>
-		           						<versionRange>[0.0,)</versionRange>
-		           						<goals>
-		           							<goal>flatten</goal>
-		           						</goals>
-		           					</pluginExecutionFilter>
-		           					<action>
-		           						<ignore/>
-		           					</action>
-		           				</pluginExecution>
-		           			</pluginExecutions>
-		           		</lifecycleMappingMetadata>
-		           	</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<finalName>notib-client</finalName>
 	</build>
 	<repositories>
-<!-- 		<repository> -->
-<!-- 			<id>central</id> -->
-<!-- 			<url>https://repo.maven.apache.org/maven2</url> -->
-<!-- 		</repository> -->
 		<repository>
-			<id>archiva.default</id>
-			<url>http://gforge.caib.es/archiva/repository/internal</url>
-		</repository>
-		<repository>
-			<id>mvn-local-repo</id>
-			<url>file://${basedir}/../local-repo</url>
+			<id>github-governib-maven-repos</id>
+			<name>GitHub GovernIB Maven Repository</name>
+			<url>https://GovernIB.github.io/maven/maven/</url>
 		</repository>
 	</repositories>
 </project>

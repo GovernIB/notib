@@ -18,6 +18,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.ws.rs.PathParam;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,9 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface NotificacioRepository extends JpaRepository<NotificacioEntity, Long> {
+
+	@Query("select document.id from NotificacioEntity where id = :id")
+	Long findDOcumentId(@Param("id") Long id);
 
 	@Query("select id from NotificacioEntity where referencia is null")
 	List<Long> findIdsSenseReferencia();

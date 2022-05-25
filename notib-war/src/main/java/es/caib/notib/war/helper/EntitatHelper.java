@@ -114,7 +114,15 @@ public class EntitatHelper {
 		return REQUEST_PARAMETER_CANVI_ENTITAT;
 	}
 
-
+	public static void actualitzarEntitatActualEnSessio(
+			HttpServletRequest request, 
+			AplicacioService aplicacioService, 
+			EntitatService entitatService) {
+		// És necessari tornar a consultar la informació de les entitats de la BBDD
+		request.removeAttribute(REQUEST_ATTRIBUTE_ENTITATS);
+		request.getSession().removeAttribute(SESSION_ATTRIBUTE_ENTITAT_ACTUAL);
+		getEntitatActual(request, aplicacioService, entitatService);
+	}
 
 	private static void canviEntitatActual(
 			HttpServletRequest request,

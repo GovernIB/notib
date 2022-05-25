@@ -1,5 +1,6 @@
 package es.caib.notib.core.entity.config;
 
+import es.caib.notib.core.entity.EntitatEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
@@ -37,9 +38,13 @@ public class ConfigEntity {
     private String groupCode;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)
+//    @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)
+    @JoinColumn(name = "TYPE_CODE", updatable = false)
     @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
     private ConfigTypeEntity type;
+
+    @Column(name = "entitat_codi", length = 64)
+    private String entitatCodi;
 
     @Column(name = "POSITION")
     private int position;
@@ -68,5 +73,16 @@ public class ConfigEntity {
 
     public void update(String value) {
         this.value = value;
+    }
+
+    public void crearConfigNova(String key, String entitatCodi, ConfigEntity entitat) {
+
+        this.key = key;
+        this.value = null;
+        this.description = entitat.getDescription();
+        this.jbossProperty = entitat.isJbossProperty();
+        this.groupCode = entitat.getGroupCode();
+        this.type = entitat.getType();
+        this.entitatCodi = entitatCodi;
     }
 }

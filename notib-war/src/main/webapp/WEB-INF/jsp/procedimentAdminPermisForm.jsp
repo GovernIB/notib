@@ -122,8 +122,9 @@
 		<div class="permisosInput">
 			<not:inputCheckbox name="read" textKey="procediment.permis.form.camp.consulta"/>
 			<not:inputCheckbox name="processar" textKey="procediment.permis.form.camp.processar"/>
-			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
 			<not:inputCheckbox name="administration" textKey="procediment.permis.form.camp.gestio"/>
+			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
+			<not:inputCheckbox name="comunicacioSir" textKey="procediment.permis.form.camp.comunicacio.sir"/>
 		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

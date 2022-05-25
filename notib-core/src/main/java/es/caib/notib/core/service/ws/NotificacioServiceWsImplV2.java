@@ -489,15 +489,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
-				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(
-						entitat,
-						permisConsulta.getProcedimentCodi());
-				
-	
-				List<PermisDto> permisos = permisosHelper.findPermisos(
-						procediment.getId(),
-						ProcedimentEntity.class);
-				
+				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
+				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
+
+				List<PermisDto> permisos = permisosHelper.findPermisos(procediment.getId(), ProcedimentEntity.class);
 				if (permisos == null || permisos.isEmpty()) {
 					PermisDto permisNou = new PermisDto();
 					permisos = new ArrayList<PermisDto>();
@@ -516,19 +511,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				for (PermisDto permisDto : permisos) {
 					if (permisDto.getPrincipal().equals(permisConsulta.getUsuariCodi())) {
 						permisDto.setRead(permisConsulta.isPermisConsulta());
-						permisosHelper.updatePermis(
-								procediment.getId(),
-								ProcedimentEntity.class,
-								permisDto);
+						permisosHelper.updatePermis(procediment.getId(), ProcedimentEntity.class, permisDto);
 					}
 				}
 				totbe = true;
 				integracioHelper.addAccioOk(info);
 			} catch (Exception ex) {
 				integracioHelper.addAccioError(info, "Error donant permís de consulta", ex);
-				throw new RuntimeException(
-						"No s'ha pogut assignar el permís a l'usuari: " + permisConsulta.getUsuariCodi(),
-						ex);
+				throw new RuntimeException("No s'ha pogut assignar el permís a l'usuari: " + permisConsulta.getUsuariCodi(), ex);
 			}
 			return totbe;
 		} finally {
@@ -578,6 +568,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
 						resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
+						integracioHelper.addAplicacioAccioParam(info, null);
 						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						return resposta;
 					}
@@ -587,10 +578,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + identificador);
+					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
 
+				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				switch (notificacio.getEstat()) {
 				case PENDENT:
 					resposta.setEstat(NotificacioEstatEnum.PENDENT);
@@ -690,22 +683,22 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviamentV2(String referencia) throws NotificacioServiceWsException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			IntegracioInfo info = new IntegracioInfo(
-					IntegracioHelper.INTCODI_CLIENT, 
-					"Consulta de l'estat d'un enviament", 
-					IntegracioAccioTipusEnumDto.RECEPCIO); 
-			
+			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_CLIENT,"Consulta de l'estat d'un enviament", IntegracioAccioTipusEnumDto.RECEPCIO);
 			NotificacioEnviamentEntity enviament = null;
-			try {
-				Long enviamentId = notificaHelper.desxifrarId(referencia);
+			Long enviamentId = null;
+			try { //TODO FER IGUAL QUE LA NOTIFICACIO
+				enviamentId = notificaHelper.desxifrarId(referencia);
 				enviament = notificacioEnviamentRepository.findById(enviamentId);
-				info.getParams().add(new AccioParam("Identificador xifrat de l'enviament", referencia));
-				info.getParams().add(new AccioParam("Identificador desxifrat de l'enviament", String.valueOf(enviamentId)));
 			} catch (Exception e) {
+				logger.error("Error consultatEStatEnviamentV2 -> Referencia: " + referencia + " enviament id: " + enviamentId);
+			}
+			if (enviament != null) {
+				info.getParams().add(new AccioParam("Identificador xifrat de l'enviament", referencia));
+				info.getParams().add(new AccioParam("Identificador desxifrat de l'enviament", String.valueOf(enviament.getId())));
+			} else  {
+				enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
 				info.getParams().add(new AccioParam("Referència de l'enviament", referencia));
 			}
-			if (enviament == null)
-				enviament = notificacioEnviamentRepository.findByNotificaReferencia(referencia);
 
 			logger.debug("Consultant estat enviament amb referencia: " + referencia);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
@@ -714,16 +707,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap enviament amb la referencia " + referencia);
+					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap enviament amb l'identificador especificat");
 					return resposta;
 				}
-
+				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				//Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
 				// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
 				// serà necessari consultar l'estat de la notificació a Notifica
-				if (	!notificaHelper.isAdviserActiu() &&
-						!enviament.isNotificaEstatFinal() &&
-						!enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
+				if (!notificaHelper.isAdviserActiu() && !enviament.isNotificaEstatFinal()
+					&& !enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
 					logger.debug("Consultat estat de l'enviament amb referencia " + referencia + " a Notifica.");
 					enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
 				}
@@ -735,8 +728,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				resposta.setDehNif(enviament.getDehNif());
 				resposta.setDehObligat(enviament.getDehObligat() != null ? enviament.getDehObligat() : false);
 				resposta.setEntragaPostalActiva(enviament.getEntregaPostal() != null);
-				if (enviament.getEntregaPostal() != null)
+				if (enviament.getEntregaPostal() != null) {
 					resposta.setAdressaPostal(enviament.getEntregaPostal().toString());
+				}
 				boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
 						InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 				resposta.setEnviamentSir(esSir);
@@ -908,6 +902,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
 						resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + dadesConsulta.getIdentificador());
+						integracioHelper.addAplicacioAccioParam(info, null);
 						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						return resposta;
 					}
@@ -917,10 +912,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + dadesConsulta.getIdentificador());
+					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
-
+				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = notificacio.getRegistreNumeroFormatat();
 				codiDir3Entitat = notificacio.getEmisorDir3Codi();
@@ -966,6 +962,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap enviament amb la referència" + dadesConsulta.getReferencia());
+					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap enviament amb la referència especificada");
 					return resposta;
 				}
@@ -973,6 +970,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = enviament.getRegistreNumeroFormatat();
 				codiDir3Entitat = enviament.getNotificacio().getEmisorDir3Codi();
+				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				if (numeroRegistreFormatat == null) {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
@@ -995,9 +993,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				}
 			}
 			if (dadesConsulta.isAmbJustificant()) {
-				RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(
-						codiDir3Entitat,
-						numeroRegistreFormatat);
+				RespostaJustificantRecepcio justificant = pluginHelper.obtenirJustificant(codiDir3Entitat, numeroRegistreFormatat);
+				integracioHelper.addAplicacioAccioParam(info, null);
 				if (justificant.getErrorCodi() == null) {
 					resposta.setJustificant(justificant.getJustificant());
 				} else {
@@ -1043,6 +1040,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						resposta.setError(true);
 						resposta.setErrorData(new Date());
 						resposta.setErrorDescripcio("No s'ha pogut desxifrar l'identificador de la notificació " + identificador);
+						integracioHelper.addAplicacioAccioParam(info, null);
 						integracioHelper.addAccioError(info, "Error al desxifrar l'identificador de la notificació a consultar", ex);
 						return resposta;
 					}
@@ -1051,15 +1049,18 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
 					resposta.setErrorDescripcio("Error: No s'ha trobat cap notificació amb l'identificador " + identificador);
+					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
 			} catch (Exception ex) {
+				integracioHelper.addAplicacioAccioParam(info, null);
 				integracioHelper.addAccioError(info, "Error al obtenir la informació de la notificació", ex);
 				throw new RuntimeException(
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
 						ex);
 			}
+			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() < 100) {
 				// Ja hi ha un altre procés generant el justificant
@@ -1464,12 +1465,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		try {
 			json = mapper.writeValueAsString(notificacio);
 		} catch (Exception e) { }
-
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_CLIENT,
 				"Alta de notificació",
 				IntegracioAccioTipusEnumDto.RECEPCIO,
 				new AccioParam("Notificacio", json));
+		integracioHelper.addAplicacioAccioParam(info, null);
 		return info;
 	}
 
@@ -1727,15 +1728,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				return setRespostaError(messageHelper.getMessage("error.validacio.interessat.tipus.titular.enviament.no.null"));
 			}
 			// - Nom
-			if(enviament.getTitular().getNom() != null && enviament.getTitular().getNom().length() > 255) {
+			if(enviament.getTitular().getNom() != null && enviament.getTitular().getNom().length() > 30) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nom.titular.longitud.max"));
 			}
 			// - Llinatge 1
-			if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 40) {
+			if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 30) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max"));
 			}
 			// - Llinatge 2
-			if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 40) {
+			if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 30) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.llinatge2.titular.longitud.max"));
 			}
 			// - Nif

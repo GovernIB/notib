@@ -1,5 +1,7 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
 import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.entity.config.ConfigGroupEntity;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -127,10 +131,7 @@ public class ConfigHelper {
         }
 
         public String getProperty(String key) {
-            if (llegirSystem)
-                return System.getProperty(key);
-            else
-                return super.getProperty(key);
+            return llegirSystem ? System.getProperty(key) : super.getProperty(key);
         }
         public String getProperty(String key, String defaultValue) {
             String val = getProperty(key);
@@ -195,8 +196,7 @@ public class ConfigHelper {
                     if (key instanceof String) {
                         String keystr = (String)key;
                         if (prefix == null || keystr.startsWith(prefix)) {
-                            properties.put(
-                                    keystr,
+                            properties.put(keystr,
                                     getProperty(keystr));
                         }
                     }
@@ -204,5 +204,26 @@ public class ConfigHelper {
             }
             return properties;
         }
+    }
+
+    public void crearConfigsEntitat(String codiEntitat) {
+
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        ConfigDto dto = new ConfigDto();
+        dto.setEntitatCodi(codiEntitat);
+        ConfigEntity nova;
+        List<ConfigEntity> confs = new ArrayList<>();
+        for (ConfigEntity config : configs) {
+            dto.setKey(config.getKey());
+            String key = dto.crearEntitatKey();
+            nova = new ConfigEntity();
+            nova.crearConfigNova(key, codiEntitat, config);
+            confs.add(nova);
+        }
+        configRepository.save(confs);
+    }
+
+    public void deleteConfigEntitat(String codiEntitat) {
+        configRepository.deleteByEntitatCodi(codiEntitat);
     }
 }

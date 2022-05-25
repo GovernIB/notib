@@ -48,11 +48,14 @@ public class OrganGestorController extends BaseUserController{
 	private OperadorPostalService operadorPostalService;
 	@Autowired
 	private PagadorCieService cieService;
+	@Autowired
+	private OrganGestorService organService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+		model.addAttribute("organsEntitat", organService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class,
 				"es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));

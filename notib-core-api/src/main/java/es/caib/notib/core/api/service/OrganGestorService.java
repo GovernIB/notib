@@ -196,6 +196,9 @@ public interface OrganGestorService {
 	Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	List<OrganGestorDto> getOrgansAsList(EntitatDto entitat);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	List<OrganGestorDto> getOrgansAsList();
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")

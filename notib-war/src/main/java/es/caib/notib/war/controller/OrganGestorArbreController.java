@@ -21,6 +21,7 @@ import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.SessioHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import java.util.Locale;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Slf4j
 @Controller
 @RequestMapping("/organgestorArbre")
 public class OrganGestorArbreController extends BaseUserController {
@@ -74,11 +76,11 @@ public class OrganGestorArbreController extends BaseUserController {
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
             Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
-            model.addAttribute("organs", organService.getOrgansAsList());
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             omplirModel(model, entitat, null);
         } catch (Exception ex) {
+            log.error("Error generant l'arbre d'òrgans", ex);
             String msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {
                     "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
                             "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
@@ -182,6 +184,7 @@ public class OrganGestorArbreController extends BaseUserController {
 
         OrganGestorCommand command = organ != null ? OrganGestorCommand.asCommand(organ) : new OrganGestorCommand();
         command.setEntitatId(entitat.getId());
+        model.addAttribute("organsEntitat", organService.getOrgansAsList());
         model.addAttribute("id", organ != null && organ.getId() != null ? organ.getId() : 0);
         model.addAttribute("organGestorCommand", command);
         model.addAttribute("entitat", entitat);

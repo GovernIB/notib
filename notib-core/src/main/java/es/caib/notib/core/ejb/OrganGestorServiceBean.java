@@ -207,6 +207,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<OrganGestorDto> getOrgansAsList(EntitatDto entitat) {
+		return delegate.getOrgansAsList(entitat);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<OrganGestorDto> getOrgansAsList() {
 		return delegate.getOrgansAsList();
 	}

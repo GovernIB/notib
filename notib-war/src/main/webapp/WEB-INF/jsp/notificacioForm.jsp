@@ -347,18 +347,34 @@
 				</div> \
 			</div> \
 		</div> \
-		<div class="col-md-3 rao"> \
+		<div class="col-md-3 rao nomInput"> \
 			<div class="form-group"> \
-				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom"><spring:message code="notificacio.form.camp.titular.nom"/> *</label> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].nomInput"><spring:message code="notificacio.form.camp.titular.nom.sol"/> *</label> \
 				<div class="col-xs-12"> \
-					<input maxlength="${nomSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nom" class="form-control " type="text" value=""> \
+					<input maxlength="${nomSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].nomInput" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].nomInput" class="form-control " type="text" value=""> \
 					<p class="info-length text-success"> \
 						<span class="glyphicon glyphicon-info-sign"></span> \
-						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].nom">0</span> \
+						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].nomInput">0</span> \
 							<spring:message code="notificacio.form.camp.logitud"/> \
 						<span> ${nomSize}</span> \
 					</p> \
 				</div> \
+				\
+			</div> \
+		</div> \
+		\<div class="col-md-3 rao raoSocialInput"> \
+			<div class="form-group"> \
+				<label class="control-label col-xs-12 " for="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput"><spring:message code="notificacio.form.camp.titular.rao.social"/> *</label> \
+				<div class="col-xs-12"> \
+					<input maxlength="${raoSocialSize}" id="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput" name="enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput" class="form-control " type="text" value=""> \
+					<p class="info-length text-success"> \
+						<span class="glyphicon glyphicon-info-sign"></span> \
+						<span class="inputCurrentLength_enviaments[#num_enviament#].destinataris[#num_destinatari#].raoSocialInput">0</span> \
+							<spring:message code="notificacio.form.camp.logitud"/> \
+						<span> ${raoSocialSize}</span> \
+					</p> \
+				</div> \
+				\
 			</div> \
 		</div> \
 		<div class="col-md-3 llinatge1 hidden"> \
@@ -585,7 +601,7 @@
 					}
 					missatge += "<ul>";
 					enviamentsSenseNif.forEach(function(item) {
-						missatge += "<li>Enviament " + (item + 1) + " - Titular: " + $("#enviaments\\[" + item +"\\]\\.titular\\.nom").val() + " " + $("#enviaments\\[" + item +"\\]\\.titular\\.llinatge1").val() + "</li>";
+						missatge += "<li>Enviament " + (item + 1) + " - Titular: " + $("#enviaments\\[" + item +"\\]\\.titular\\.nomInput").val() + " " + $("#enviaments\\[" + item +"\\]\\.titular\\.llinatge1").val() + "</li>";
 					});
 					missatge += "</ul>";
 
@@ -923,9 +939,9 @@
 			var index = closest.find(".rowId input").val();
 			var raoSocialDesc = raoSocial.find('input').val();
 			var dir3Desc = closest.find('.codiDir3 input').val();
+			let raoSocialInput = closest.find(".raoSocialInput");
+			let nomInput = closest.find(".nomInput");
 			console.log($(this));
-			console.log("Formulari destinatari: " + $(this).val());
-			console.log(enviamentTipus)
 			if ($(this).val() == 'ADMINISTRACIO') {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
@@ -941,6 +957,8 @@
 					$(nif).removeClass('hidden');
 				}
 				$(emailLabel).text(emailLabelText);
+				$(raoSocialInput).hide();
+				$(nomInput).hide();
 			} else if ($(this).val() == 'FISICA') {
 				$(llinatge1).removeClass('hidden');
 				$(llinatge2).removeClass('hidden');
@@ -952,6 +970,8 @@
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
 				$(emailLabel).text(emailLabelText);
+				$(raoSocialInput).hide();
+				$(nomInput).show();
 			} else if ($(this).val() == 'FISICA_SENSE_NIF') {
 				$(llinatge1).removeClass('hidden');
 				$(llinatge2).removeClass('hidden');
@@ -963,6 +983,8 @@
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
 				$(emailLabel).text(emailLabelText + " *");
+				$(raoSocialInput).hide();
+				$(nomInput).show();
 			} else {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
@@ -974,6 +996,8 @@
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
 				$(emailLabel).text(emailLabelText);
+				$(raoSocialInput).show();
+				$(nomInput).hide();
 			}
 
 			if((raoSocialDesc != null && raoSocialDesc != "") && (dir3Desc != null && dir3Desc != "")){
@@ -1595,10 +1619,12 @@
 										</div>
 										
 										<!-- NOM / RAÓ SOCIAL -->
-										<div class="col-md-6 rao">
-											<not:inputText name="enviaments[${j}].titular.nom" textKey="notificacio.form.camp.titular.nom" required="true" inputMaxLength="${nomSize}" showsize="true"/>
+										<div class="col-md-6 rao nomInput">
+											<not:inputText name="enviaments[${j}].titular.nomInput" textKey="notificacio.form.camp.titular.nom.sol" required="true" inputMaxLength="${nomSize}" showsize="true"/>
 										</div>
-										
+										<div class="col-md-6 rao raoSocialInput">
+											<not:inputText name="enviaments[${j}].titular.raoSocialInput" textKey="notificacio.form.camp.titular.rao.social" required="true" inputMaxLength="${raoSocialSize}" showsize="true"/>
+										</div>
 										<!-- PRIMER LLINATGE -->
 										<div class="col-md-6 llinatge1">
 											<not:inputText name="enviaments[${j}].titular.llinatge1" textKey="notificacio.form.camp.titular.llinatge1" required="true" inputMaxLength="${llinatge1Size}" showsize="true"/>

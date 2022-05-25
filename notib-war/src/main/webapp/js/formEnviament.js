@@ -587,16 +587,16 @@ function setPersonaAdministracio (from, index, codi, denominacio, ocodi, cif) {
     var organCif;
     if(from === 'Tit'){
         dir3Codi = document.getElementById("enviaments[" + index + "].titular.dir3Codi");
-        raoSocial = document.getElementById("enviaments[" + index + "].titular.nom");
+        raoSocial = document.getElementById("enviaments[" + index + "].titular.raoSocialInput");
         dir3CodiDesc =  document.getElementById("searchOrganTit" + index).getElementsByTagName('input')[0];
         organCif = document.getElementById("enviaments[" + index + "].titular.nif");
     }else{
         dir3Codi = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].dir3Codi");
-        raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nom");
+        raoSocial = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].raoSocialInput");
         dir3CodiDesc =  document.getElementById("searchOrgan" + from + index);
         organCif = document.getElementById("enviaments[" + from + "].destinataris[" + index + "].nif");
     }
-
+    console.log("denominacio: " + denominacio);
     dir3Codi.value = codi;
     raoSocial.value = denominacio;
     dir3CodiDesc.value = ocodi;

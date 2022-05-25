@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1634114082437-3
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_config
+            columns:
+              - column:
+                  name: entitat_codi
+                  type: varchar(64 ${varcharUnit})

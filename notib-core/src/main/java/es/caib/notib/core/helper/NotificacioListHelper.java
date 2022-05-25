@@ -14,6 +14,7 @@ import es.caib.notib.core.entity.*;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.repository.ServeiRepository;
@@ -45,6 +46,8 @@ public class NotificacioListHelper {
     private OrganGestorRepository organGestorRepository;
     @Autowired
     private OrganGestorService organGestorService;
+    @Autowired
+    private NotificacioRepository notificacioRepository;
 
     public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
         Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
@@ -96,16 +99,13 @@ public class NotificacioListHelper {
                 permisProcessar = codisOrgansProcessables.contains(notificacio.getOrganCodi());
             }
             notificacio.setPermisProcessar(permisProcessar);
-
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
             if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {
                 notificacio.setHasEnviamentsPendentsRegistre(true);
             }
+            notificacio.setDocumentId(notificacioRepository.findDOcumentId(notificacio.getId()));
         }
-
-        return paginacioHelper.toPaginaDto(
-                notificacions,
-                NotificacioTableItemDto.class);
+        return paginacioHelper.toPaginaDto(notificacions, NotificacioTableItemDto.class);
     }
 
     public NotificacioFiltre getFiltre(NotificacioFiltreDto filtreDto) {

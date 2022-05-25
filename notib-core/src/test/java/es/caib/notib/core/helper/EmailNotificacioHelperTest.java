@@ -39,12 +39,10 @@ public class EmailNotificacioHelperTest {
 
 	// Dades per el Test
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
-//	private static final String EMAIL_PASS = "xxxxxx";
-	private static final String EMAIL_USER = "proves_limit@limit.es";
 	private static final String EMAIL_PASS = "xxxxxx";
-//	private static final String EMAIL_DEST = "sandreu@limit.es";
-	private static final String EMAIL_DEST = "sion.limit@gmail.com";
-	private static final String FILE_PATH = "/home/siona/Documents/buit.pdf";
+	private static final String EMAIL_USER = "proves_limit@limit.es";
+	private static final String EMAIL_DEST = "";
+	private static final String FILE_PATH = "";
 
 	@Mock
 	private GrupRepository grupRepository;
@@ -62,6 +60,8 @@ public class EmailNotificacioHelperTest {
 	private DocumentHelper documentHelper;
 	@Mock
 	private MessageHelper messageHelper;
+	@Mock
+	protected ProcSerHelper procSerHelper;
 	@Spy
 	private JavaMailSender mailSender = getMailSender();
 
@@ -170,7 +170,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(procedimentHelper.findUsuarisAmbPermisReadPerProcediment(Mockito.any(NotificacioEntity.class))).thenReturn(usuaris);
 		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 		Mockito.when(usuariRepository.findOne(Mockito.anyString())).thenReturn(usuari);
-
+		Mockito.when(procSerHelper.findUsuaris(Mockito.any(NotificacioEntity.class))).thenReturn(usuaris);
 
 		// When	
 		String resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioMock);

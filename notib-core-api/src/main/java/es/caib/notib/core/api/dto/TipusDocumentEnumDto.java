@@ -29,7 +29,7 @@ public enum TipusDocumentEnumDto implements Serializable {
 		if (text == null)
 			return null;
 		for (TipusDocumentEnumDto valor : TipusDocumentEnumDto.values()) {
-			if (text.equals(valor.getText())) {
+			if (text.equals(valor.getText()) || text.equals(valor.name())) {
 				return valor;
 			}
 		}

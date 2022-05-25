@@ -73,7 +73,7 @@ public class ConversioTipusHelper {
             @Override
             public void mapAtoB(PersonaDto personaDto, PersonaCommand personaCommand, MappingContext context) {
                 if (InteressatTipusEnumDto.JURIDICA.equals(personaDto.getInteressatTipus())) {
-                	personaCommand.setNom(personaDto.getRaoSocial() != null ? personaDto.getRaoSocial() : personaDto.getNom());
+                	personaCommand.setNom(personaDto.getRaoSocial() != null ? personaDto.getRaoSocial() : personaDto.getNomInput());
                 }
             }                   
         })

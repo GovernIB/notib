@@ -164,20 +164,8 @@ public class EnviamentServiceBean implements EnviamentService {
 	
 	@Override
 	@RolesAllowed({"NOT_CARPETA", "NOT_SUPER"})
-	public Resposta findEnviamentsByNif(
-			String dniTitular,
-			NotificaEnviamentTipusEnumDto tipus,
-			Boolean estatFinal,
-			String basePath,
-			Integer pagina,
-			Integer mida) {
-		return delegate.findEnviamentsByNif(
-				dniTitular, 
-				tipus, 
-				estatFinal, 
-				basePath, 
-				pagina, 
-				mida);
+	public Resposta findEnviaments(ApiConsulta consulta) {
+		return delegate.findEnviaments(consulta);
 	}
 
 	@Override

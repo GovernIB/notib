@@ -43,9 +43,9 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private boolean incapacitat;
 	@Column(name = "email", length = 255)
 	private String email;
-	@Column(name = "llinatge1", length = 40)
+	@Column(name = "llinatge1", length = 30)
 	private String llinatge1;
-	@Column(name = "llinatge2", length = 40)
+	@Column(name = "llinatge2", length = 30)
 	private String llinatge2;
 	@Column(name = "document_tipus", nullable = true)
 	@Enumerated(EnumType.STRING)

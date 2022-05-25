@@ -45,5 +45,8 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	List<String> syncFromJBossProperties();
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	List<ConfigDto> findEntitatsConfigByKey(String key);
+
 }
 

@@ -55,35 +55,35 @@ public class UsuariController extends BaseController {
 	}
 
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
-	public String getConfiguracio(
-			HttpServletRequest request,
-			Model model) {
+	public String getConfiguracio(HttpServletRequest request, Model model) {
+
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
-		model.addAttribute(
-				"idiomaEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						IdiomaEnumDto.class,
-						"usuari.form.camp.idioma.enum."));
+		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(IdiomaEnumDto.class,"usuari.form.camp.idioma.enum."));
 		return "usuariForm";
 	}
+
 	@RequestMapping(value = "/configuracio", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid UsuariCommand command,
-			BindingResult bindingResult,
-			Model model) {
+	public String save(HttpServletRequest request, @Valid UsuariCommand command, BindingResult bindingResult, Model model) {
+
 		if (bindingResult.hasErrors()) {
+			UsuariDto usuari = aplicacioService.getUsuariActual();
+			UsuariCommand uc = UsuariCommand.asCommand(usuari);
+			uc.setEmailAlt(command.getEmailAlt());
+			command.setNom(uc.getNom());
+			command.setEmail(uc.getEmail());
+			command.setCodi(uc.getCodi());
+			command.setRols(uc.getRols());
+			command.setNif(uc.getNif());
+			model.addAttribute(command);
+			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(IdiomaEnumDto.class,"usuari.form.camp.idioma.enum."));
 			return "usuariForm";
 		}
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
-		
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:/",
-					"usuari.controller.modificat.ok");
+		return getModalControllerReturnValueSuccess(request,"redirect:/","usuari.controller.modificat.ok");
 	}
+
 	@RequestMapping(value = "/configuracio/idioma", method = RequestMethod.GET)
 	@ResponseBody
 	public String getIdioma() {
@@ -92,16 +92,13 @@ public class UsuariController extends BaseController {
 
 	// Només funciona amb JBoss
 	@RequestMapping(value = "/{codi}/refrescarRols", method = RequestMethod.GET)
-	public String refrescarRols(
-			HttpServletRequest request,
-			@PathVariable String codi,
-			Model model) {
+	public String refrescarRols(HttpServletRequest request, @PathVariable String codi, Model model) {
+
 		try {
 			FlushAuthCacheHelper.flushAuthenticationCache(codi);
+			return getAjaxControllerReturnValueSuccess(request, "redirect:/", "usuari.controller.refresh.roles.ok");
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(request, "redirect:/", "usuari.controller.refresh.roles.error");
 		}
-		return getAjaxControllerReturnValueSuccess(request, "redirect:/", "usuari.controller.refresh.roles.ok");
 	}
-	
 }

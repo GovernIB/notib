@@ -1915,7 +1915,7 @@ public class PluginHelper {
 		DadesOficina dadesOficina = new DadesOficina();
 		String dir3Codi;
 
-		if (notificacio.getEntitat().getDir3CodiReg() != null) {
+		if (notificacio.getEntitat().getDir3CodiReg() != null && !notificacio.getEntitat().getDir3CodiReg().isEmpty()) {
 			dir3Codi = notificacio.getEntitat().getDir3CodiReg();
 		} else {
 			dir3Codi = notificacio.getEmisorDir3Codi();

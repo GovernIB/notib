@@ -166,7 +166,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 
 	@Query(
 			"from ProcSerEntity pro " +
-			"where pro.organGestor.codi in (:organsCodis) " +
+			"where (pro.organGestor.codi in (:organsCodis) " +
 			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -174,6 +174,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
+				") " +
 			"order by pro.nom asc")
 	List<ProcSerEntity> findProcedimentsAccesiblesPerOrganGestor(
             @Param("organsCodis") List<String> organsCodis,

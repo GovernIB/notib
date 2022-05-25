@@ -38,8 +38,11 @@
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
 	pageContext.setAttribute(
-			"permisNotificacio",
-			request.getAttribute("permisNotificacio"));
+			"permisNotificacioComunicacio",
+			request.getAttribute("permisNotificacioComunicacio"));
+	pageContext.setAttribute(
+			"permisComunicacioSir",
+			request.getAttribute("permisComunicacioSir"));
 	pageContext.setAttribute(
 			"sessionOrgans",
 			es.caib.notib.war.helper.OrganGestorHelper.getOrgansGestorsUsuariActual(request));
@@ -192,6 +195,7 @@ body {
 					</div>
 					<div id="app-logo" class="pull-left">
 						<img src="<c:url value="/img/logo.png"/>" alt="NOTIB" />
+						<div id="text-logo-div"><span id="text-logo">NOTIB</span></div>
 					</div>
 				</div>
 			</div>
@@ -331,9 +335,13 @@ body {
 												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
 											</button>
 											<ul class="dropdown-menu">
-												<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
-												<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
-												<li><a id="me_sir" href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
+												<c:if test="${permisNotificacioComunicacio}">
+													<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+													<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
+												</c:if>
+												<c:if test="${permisComunicacioSir}">
+													<li><a id="me_sir" href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
+												</c:if>
 											</ul>
 										</div>
 									</div>

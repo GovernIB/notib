@@ -37,9 +37,10 @@ public class PermisDto implements Serializable {
 	private boolean aplicacio;
 	
 	private boolean processar;
-	private boolean notificacio;
-
 	private boolean comuns;
+	
+	private boolean notificacio;
+	private boolean comunicacioSir;
 	
 	// Booleà per a indicar si en cas de procediment comú, 
 	// l'usuari administrador d'òrgan pot editar el permís
@@ -83,6 +84,7 @@ public class PermisDto implements Serializable {
 	private static Comparator<PermisDto> comunsComparator;
 	private static Comparator<PermisDto> administrationComparator;
 	private static Comparator<PermisDto> administradorComparator;
+	private static Comparator<PermisDto> comunicacioSirComparator;
 	
 	public static Comparator<PermisDto> decending(final Comparator<PermisDto> other) {
         return new Comparator<PermisDto>() {
@@ -124,6 +126,9 @@ public class PermisDto implements Serializable {
 	
 	public static Comparator<PermisDto> sortByAdministrador() {
 		return administradorComparator != null ? administradorComparator : new AdministradorComparator();
+    }
+	public static Comparator<PermisDto> sortByComunicacioSir() {
+		return comunicacioSirComparator != null ? comunicacioSirComparator : new ComunicacioSirComparator();
     }
 
 	private static class TipusComparator implements java.util.Comparator<PermisDto> {
@@ -190,7 +195,11 @@ public class PermisDto implements Serializable {
         	return p1.isAdministrador() == p2.isAdministrador() ? 0 : (p1.isAdministrador() ? 1 : -1);
         }  
     }
-	 
+	private static class ComunicacioSirComparator implements java.util.Comparator<PermisDto> {
+        public int compare(PermisDto p1, PermisDto p2) {  
+        	return p1.isComunicacioSir() == p2.isComunicacioSir() ? 0 : (p1.isComunicacioSir() ? 1 : -1);
+        }  
+    }
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

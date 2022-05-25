@@ -453,24 +453,12 @@ public class PermisosHelper {
 			return new HashMap<Long, List<PermisDto>>();
 		}
 	}
-	public void updatePermis(
-			Long objectIdentifier,
-			Class<?> objectClass,
-			PermisDto permis) {
+	public void updatePermis(Long objectIdentifier, Class<?> objectClass, PermisDto permis) {
+
 		if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
-			assignarPermisos(
-					new PrincipalSid(permis.getPrincipal()),
-					objectClass,
-					objectIdentifier,
-					getPermissionsFromPermis(permis),
-					true);
+			assignarPermisos(new PrincipalSid(permis.getPrincipal()), objectClass, objectIdentifier, getPermissionsFromPermis(permis),true);
 		} else if (TipusEnumDto.ROL.equals(permis.getTipus())) {
-			assignarPermisos(
-					new GrantedAuthoritySid(getMapeigRol(permis.getPrincipal())),
-					objectClass,
-					objectIdentifier,
-					getPermissionsFromPermis(permis),
-					true);
+			assignarPermisos(new GrantedAuthoritySid(getMapeigRol(permis.getPrincipal())), objectClass, objectIdentifier, getPermissionsFromPermis(permis),true);
 		}
 	}
 	public void deletePermis(
@@ -570,10 +558,12 @@ public class PermisosHelper {
 						permis.setAplicacio(true);
 					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
 						permis.setProcessar(true);
-					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
-						permis.setNotificacio(true);
 					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
 						permis.setComuns(true);
+					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
+						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
+						permis.setComunicacioSir(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -627,22 +617,20 @@ public class PermisosHelper {
 						permis.setAplicacio(true);
 					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
 						permis.setProcessar(true);
-					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
-						permis.setNotificacio(true);
 					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
 						permis.setComuns(true);
+					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
+						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
+						permis.setComunicacioSir(true);
 				}
 			}
 		}
 		return permis;
 	}
 	
-	private void assignarPermisos(
-			Sid sid,
-			Class<?> objectClass,
-			Serializable objectIdentifier,
-			Permission[] permissions,
-			boolean netejarAbans) {
+	private void assignarPermisos(Sid sid, Class<?> objectClass, Serializable objectIdentifier, Permission[] permissions, boolean netejarAbans) {
+
 		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 		MutableAcl acl = null;
 		try {
@@ -655,17 +643,14 @@ public class PermisosHelper {
 			// es reorganitzen els índexos
 			for (int i = acl.getEntries().size() - 1; i >= 0; i--) {
 				AccessControlEntry ace = acl.getEntries().get(i);
-				if (ace.getSid().equals(sid))
+				if (ace.getSid().equals(sid)) {
 					acl.deleteAce(i);
+				}
 			}
 		}
 		aclService.updateAcl(acl);
 		for (Permission permission: permissions) {
-			acl.insertAce(
-					acl.getEntries().size(),
-					permission,
-					sid,
-					true);
+			acl.insertAce(acl.getEntries().size(), permission, sid,true);
 		}
 		aclService.updateAcl(acl);
 	}
@@ -755,10 +740,12 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.ADMINISTRATION);
 		if (permis.isProcessar())
 			permissions.add(ExtendedPermission.PROCESSAR);
-		if (permis.isNotificacio())
-			permissions.add(ExtendedPermission.NOTIFICACIO);
 		if (permis.isComuns())
 			permissions.add(ExtendedPermission.COMUNS);
+		if (permis.isNotificacio())
+			permissions.add(ExtendedPermission.NOTIFICACIO);
+		if (permis.isComunicacioSir())
+			permissions.add(ExtendedPermission.COMUNICACIO_SIR);
 
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
@@ -825,6 +812,8 @@ public class PermisosHelper {
 			case "administrador":
 				comp = desc ? PermisDto.decending(PermisDto.sortByAdministrador()) : PermisDto.sortByAdministrador();
 				break;
+			case "comunicacioSir":
+				comp = desc ? PermisDto.decending(PermisDto.sortByComunicacioSir()) : PermisDto.sortByComunicacioSir();
 			default:
 				break;
 		}
