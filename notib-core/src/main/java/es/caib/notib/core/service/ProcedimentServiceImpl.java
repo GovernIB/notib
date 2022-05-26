@@ -1043,6 +1043,23 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 	@Override
 	@Transactional(readOnly = true)
+	@Cacheable(value = "procsersPermisMenu", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+	public List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
+			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+			List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermisMenu(usuariCodi, entitat, permisos);
+			// 7. Convertim els procediments/serveis a dto
+			return conversioTipusHelper.convertirList(procediments, ProcSerSimpleDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<ProcSerDto> findProcedimentsByOrganGestor(String organGestorCodi) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();

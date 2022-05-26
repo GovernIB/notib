@@ -38,11 +38,11 @@
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
 	pageContext.setAttribute(
-			"permisNotificacioComunicacio",
-			request.getAttribute("permisNotificacioComunicacio"));
+			"permisNotificacioComunicacioMenu",
+			request.getAttribute("permisNotificacioComunicacioMenu"));
 	pageContext.setAttribute(
-			"permisComunicacioSir",
-			request.getAttribute("permisComunicacioSir"));
+			"permisComunicacioSirMenu",
+			request.getAttribute("permisComunicacioSirMenu"));
 	pageContext.setAttribute(
 			"sessionOrgans",
 			es.caib.notib.war.helper.OrganGestorHelper.getOrgansGestorsUsuariActual(request));
@@ -335,11 +335,11 @@ body {
 												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
 											</button>
 											<ul class="dropdown-menu">
-												<c:if test="${permisNotificacioComunicacio}">
+												<c:if test="${permisNotificacioComunicacioMenu}">
 													<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
 													<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
 												</c:if>
-												<c:if test="${permisComunicacioSir}">
+												<c:if test="${permisComunicacioSirMenu}">
 													<li><a id="me_sir" href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
 												</c:if>
 											</ul>

@@ -74,6 +74,34 @@ public class ProcSerCacheable {
         // 2. Consulta els procediments amb permís per òrgan gestor
         List<ProcSerEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
 
+        // 5. Juntam els procediments amb permís per òrgan gestor amb els procediments amb permís per procediment
+        Set<ProcSerEntity> procedimentsList = new HashSet<>(procedimentsAmbPermis);
+        procedimentsList.addAll(procedimentsAmbPermisOrgan);
+        List<ProcSerEntity> procs = Lists.newArrayList(procedimentsList);
+
+        // 6. Ordenam els procediments
+        Collections.sort(procs, new Comparator<ProcSerEntity>() {
+            @Override
+            public int compare(ProcSerEntity p1, ProcSerEntity p2) {
+                return (p1.getNom()==null?"":p1.getNom()).compareTo(p2.getNom()==null?"":p2.getNom());
+            }
+        });
+
+        return procs;
+    }
+
+    @Cacheable(value = "procedimentEntitiesPermisMenu",
+            key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+    public List<ProcSerEntity> getProcedimentsWithPermisMenu(String usuariCodi, EntitatEntity entitat, Permission[] permisos) {
+
+        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+
+        // 1. Obtenim els procediments amb permisos per procediment
+        List<ProcSerEntity> procedimentsAmbPermis = getProcedimentsAmbPermisDirecte(entitat, permisos, grups);
+
+        // 2. Consulta els procediments amb permís per òrgan gestor
+        List<ProcSerEntity> procedimentsAmbPermisOrgan = getProcedimentsAmbPermisOrganGestor(entitat, permisos, grups);
+
         // 2.1
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         List<ProcSerOrganEntity> c = getProcedimentOrganWithPermis(auth, entitat, permisos);
@@ -199,6 +227,10 @@ public class ProcSerCacheable {
                     cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
                     cacheManager.getCache("procedimentEntitiesPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
 
+                    cacheManager.getCache("procedimentEntitiesPermisMenu").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
+                    cacheManager.getCache("procedimentEntitiesPermisMenu").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
+                    cacheManager.getCache("procedimentEntitiesPermisMenu").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+
 //                    cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
                     cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
                     cacheManager.getCache("procedimentEntitiessOrganPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
@@ -214,6 +246,11 @@ public class ProcSerCacheable {
                     cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
                     cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.COMUNIACIO_SIR.name()));
                     cacheManager.getCache("procsersPermis").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
+
+                    cacheManager.getCache("procsersPermisMenu").evict(cacheKeyPrefix.concat(PermisEnum.CONSULTA.name()));
+                    cacheManager.getCache("procsersPermisMenu").evict(cacheKeyPrefix.concat(PermisEnum.NOTIFICACIO.name()));
+                    cacheManager.getCache("procsersPermisMenu").evict(cacheKeyPrefix.concat(PermisEnum.COMUNIACIO_SIR.name()));
+                    cacheManager.getCache("procsersPermisMenu").evict(cacheKeyPrefix.concat(PermisEnum.GESTIO.name()));
                 }
             }
         }

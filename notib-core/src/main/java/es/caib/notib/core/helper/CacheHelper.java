@@ -185,7 +185,7 @@ public class CacheHelper {
 		return cacheManager.getCacheNames(); 
 	}
 
-	@CacheEvict(value = {"procsersPermis", "procedimentEntitiesPermis"}, allEntries = true)
+	@CacheEvict(value = {"procsersPermis", "procedimentEntitiesPermis", "procsersPermisMenu", "procedimentEntitiesPermisMenu"}, allEntries = true)
 	public void evictFindProcedimentServeisWithPermis() {
 	}
 	
