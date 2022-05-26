@@ -1,6 +1,8 @@
 package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -98,8 +100,8 @@ public abstract class EmailHelper<T> {
         return configHelper.getConfig("es.caib.notib.email.remitent");
     }
 
-    public String getEmailFooter() {
-        return configHelper.getConfig("es.caib.notib.email.footer");
+    public String getEmailFooter(String entitatCodi) {
+        return configHelper.getConfigKeyByEntitat(entitatCodi, "es.caib.notib.email.footer");
     }
 
     @AllArgsConstructor

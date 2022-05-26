@@ -6,12 +6,14 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -258,6 +260,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public String propertyGet(String property, EntitatDto entitat) {
+
+		if (entitat == null | entitat.getCodi() == null) {
+			return propertyGet(property);
+		}
+		return configHelper.getConfigKeyByEntitat(entitat.getCodi(), property);
 	}
 
 	@Override

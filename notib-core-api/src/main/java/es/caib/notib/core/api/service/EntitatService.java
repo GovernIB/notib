@@ -240,12 +240,21 @@ public interface EntitatService {
 	byte[] getPeuLogo() throws NoSuchFileException, IOException;
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public LlibreDto getLlibreEntitat(String dir3Codi);
+	LlibreDto getLlibreEntitat(String dir3Codi);
 	
 	@PreAuthorize("hasRole('tothom')")
-	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi);
+	Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi);
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	boolean existeixPermis(Long entitatId, String principal) throws Exception;
 
+	/**
+	 * Afegeix l'entitat que està activada a l'aplicació per poder accedir a les
+	 * seves propietats
+	 *
+	 * @param entitatDto
+	 *            Atribut entitatDto
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	void setConfigEntitat(EntitatDto entitatDto);
 }

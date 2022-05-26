@@ -6,6 +6,7 @@ package es.caib.notib.war.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -28,19 +29,15 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-			EntitatHelper.findEntitatsAccessibles(
-					request,
-					aplicacioService,
-					entitatService);
-			EntitatHelper.processarCanviEntitats(
-					request,
-					aplicacioService,
-					entitatService);
+			EntitatHelper.findEntitatsAccessibles(request, aplicacioService, entitatService);
+			EntitatHelper.processarCanviEntitats(request, aplicacioService, entitatService);
+		}
+		EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+		if (entitatDto != null) {
+			entitatService.setConfigEntitat(entitatDto);
 		}
 		return true;
 	}

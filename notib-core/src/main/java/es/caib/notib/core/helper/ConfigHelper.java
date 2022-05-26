@@ -1,6 +1,7 @@
 package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
 import es.caib.notib.core.entity.config.ConfigEntity;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Component
+@Slf4j
 public class ConfigHelper {
 
     @Autowired
@@ -28,6 +30,42 @@ public class ConfigHelper {
     private ConfigGroupRepository configGroupRepository;
 
     public static final String prefix = "es.caib.notib";
+
+    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
+
+    public static ThreadLocal<EntitatDto> getEntitat() {
+        return entitat;
+    }
+
+    public static void setEntitat(EntitatDto entitat) {
+        ConfigHelper.entitat.set(entitat);
+    }
+
+    @Transactional(readOnly = true)
+    public String getConfigKeyByEntitat(String property) {
+
+        if (entitat == null || entitat.get() == null) {
+            log.error("No hi ha entitat en el thread per poder buscar la propietat. Entitat -> " + entitat);
+            throw new NotDefinedConfigException(property);
+        }
+        return getConfigKeyByEntitat(entitat.get().getCodi(), property);
+    }
+
+    @Transactional(readOnly = true)
+    public String getConfigKeyByEntitat(String entitatCodi, String property) {
+
+        String key = crearEntitatKey(entitatCodi, property);
+        ConfigEntity configEntity = configRepository.findOne(key);
+        if (configEntity != null) {
+            return getConfig(configEntity);
+        }
+        configEntity = configRepository.findOne(property);
+        if (configEntity != null) {
+            return getConfig(configEntity);
+        }
+        log.error("No s'ha trobat la propietat -> key global: " + property + " key entitat: " + key);
+        throw new NotDefinedConfigException(property);
+    }
 
     @Transactional(readOnly = true)
     public String getConfig(String key) throws NotDefinedConfigException {

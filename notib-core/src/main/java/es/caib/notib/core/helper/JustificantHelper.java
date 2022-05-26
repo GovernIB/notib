@@ -182,7 +182,7 @@ public abstract class JustificantHelper<T> {
         }
 
         private String getCodiDireccio() {
-            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.codi"));
+            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.codi"));
         }
 
         private String getEmailDireccio() {

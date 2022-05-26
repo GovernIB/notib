@@ -127,7 +127,7 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 				"</div>" +
 				"<div class=\"footer\">"+
 				"	<span class=\"footerText\">"+
-				getEmailFooter() +
+				getEmailFooter(item.getEntitat() != null ? item.getEntitat().getCodi() : "") +
 				"	</span>"+
 				"</div>"+
 				"</body>"+

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.service;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -101,6 +102,16 @@ public interface AplicacioService {
 	 * @return La llista amb els rols.
 	 */
 	public List<String> permisosFindRolsDistinctAll();
+
+	/**
+	 * Retorna el valor d'un paràmetre de configuració per la entitat especificada
+	 *
+	 * @param property
+	 *             El codi del paràmetre
+	 * @return el valor del paràmetre
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	public String propertyGet(String property, EntitatDto entitat);
 
 	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.

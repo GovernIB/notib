@@ -9,6 +9,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -85,6 +86,12 @@ public class AplicacioServiceBean implements AplicacioService {
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
 		return delegate.permisosFindRolsDistinctAll();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public String propertyGet(String property, EntitatDto entitat) {
+		return delegate.propertyGet(property, entitat);
 	}
 
 	@Override
