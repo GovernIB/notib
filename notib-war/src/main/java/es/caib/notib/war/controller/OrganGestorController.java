@@ -275,6 +275,7 @@ public class OrganGestorController extends BaseUserController{
 			return organGestorFiltreCommand;
 		}
 		organGestorFiltreCommand = new OrganGestorFiltreCommand();
+		organGestorFiltreCommand.setEstat(OrganGestorEstatEnum.VIGENT);
 		RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
 		return organGestorFiltreCommand;
 	}

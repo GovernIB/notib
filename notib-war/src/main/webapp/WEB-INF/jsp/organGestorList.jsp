@@ -30,6 +30,7 @@
 					this.value = '';
 				} else if (type == 'checkbox' || type == 'radio') {
 					this.checked = false;
+					$(this).parent().removeClass('active');
 				} else if (tag == 'select') {
 					this.selectedIndex = 0;
 				}
@@ -48,8 +49,24 @@
 		$("#canviarVistaOrganGestor").click(function(){
 			window.location.replace("/notib/organgestorArbre");
 		});
+		
+		var $estatRadioButton = $('input[type=radio][name=estat]');
+		$estatRadioButton.on('change', function() {
+			if ($(this).is(':checked')) {
+				$estatRadioButton.parent().removeClass('active');
+				$(this).parent().addClass('active');
+			} else {
+				$(this).parent().removeClass('active');
+			}
+			$('#btnFiltrar').click();
+		});
 	});
 	</script>
+	<style type="text/css">
+		.filtreEstat > label {
+			width: 47%;
+		}
+</style>
 </head>
 <body>
 	<div id="botoVistes" class="row">
@@ -68,8 +85,8 @@
 				<not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
 								 optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
 			</div>
-			<div class="col-md-2">
-				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
+			<div class="col-md-2 filtreEstat">
+				<not:inputRadio name="estat" botons="true" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" />
 			</div>
 			<c:if test="${setOficina}">
 				<div class="col-md-3">
@@ -101,7 +118,7 @@
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+					<button id="btnFiltrar" type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
 		</div>
