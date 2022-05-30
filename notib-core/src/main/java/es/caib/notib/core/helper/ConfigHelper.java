@@ -52,7 +52,7 @@ public class ConfigHelper {
 
         String key = crearEntitatKey(entitatCodi, property);
         ConfigEntity configEntity = configRepository.findOne(key);
-        if (configEntity != null) {
+        if (configEntity != null && configEntity.getValue() != null) {
             return getConfig(configEntity);
         }
         configEntity = configRepository.findOne(property);
