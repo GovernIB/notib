@@ -100,8 +100,8 @@ public abstract class EmailHelper<T> {
         return configHelper.getConfig("es.caib.notib.email.remitent");
     }
 
-    public String getEmailFooter(String entitatCodi) {
-        return configHelper.getConfigKeyByEntitat(entitatCodi, "es.caib.notib.email.footer");
+    public String getEmailFooter() {
+        return configHelper.getConfigKeyByEntitat("es.caib.notib.email.footer");
     }
 
     @AllArgsConstructor

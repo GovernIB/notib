@@ -72,8 +72,8 @@ public class NotificacioListHelper {
 				"es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
 		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
 				"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
-		model.addAttribute("mostrarColumnaEntitat", aplicacioService.propertyGet("es.caib.notib.columna.entitat", entitatActual));
-		model.addAttribute("mostrarColumnaNumExpedient", aplicacioService.propertyGet("es.caib.notib.columna.num.expedient", entitatActual));
+		model.addAttribute("mostrarColumnaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.entitat"));
+		model.addAttribute("mostrarColumnaNumExpedient", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.num.expedient"));
 	}
 
 	public void ompleProcediments(EntitatDto entitatActual, OrganGestorDto organGestorActual, HttpServletRequest request, Model model) {

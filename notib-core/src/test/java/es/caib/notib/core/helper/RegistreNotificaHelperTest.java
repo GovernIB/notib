@@ -53,7 +53,7 @@ public class RegistreNotificaHelperTest {
 						Mockito.anyString(), Mockito.any(AsientoRegistralBeanDto.class), Mockito.nullable(long.class), Mockito.anyLong(), Mockito.anyString(), Mockito.anyBoolean()
 				)
 		).thenReturn(new RespostaConsultaRegistre());
-		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
+		Mockito.when(configHelper.getAsBooleanByEntitat(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
 
 	}
 

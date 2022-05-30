@@ -2400,8 +2400,7 @@ public class PluginHelper {
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
-		return configHelper.getAsBoolean(
-				"es.caib.notib.documents.metadades.from.arxiu");
+		return configHelper.getAsBooleanByEntitat("es.caib.notib.documents.metadades.from.arxiu");
 	}
 
 	private static boolean isDocumentEstranger(String nie) {

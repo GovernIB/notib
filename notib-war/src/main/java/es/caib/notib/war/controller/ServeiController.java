@@ -72,7 +72,7 @@ public class ServeiController extends BaseUserController{
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
-		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		
 		return "serveiListPage";
 	}
@@ -89,7 +89,7 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("organCodi", organCodi);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
-		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGet("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		return "serveiListModal";
 	}
 

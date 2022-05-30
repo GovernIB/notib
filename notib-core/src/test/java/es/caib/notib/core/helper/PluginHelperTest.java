@@ -84,8 +84,8 @@ public class PluginHelperTest {
     public void setUp() throws Exception {
         Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.plugin.registre.segons.entre.peticions"))).thenReturn(secondsBetweenCalls);
 //        Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.class"))).thenReturn("");
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
     }
 
     static int secondsBetweenCalls = 2;
@@ -529,8 +529,8 @@ public class PluginHelperTest {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"1",
 				"",
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
 				false,
 				null, // organGestor

@@ -15,6 +15,8 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.helper.ContingutEstaticHelper;
 import es.caib.notib.war.helper.EntitatHelper;
 
+import java.security.Principal;
+
 /**
  * Interceptor per a gestionar la llista d'entitats a cada pàgina.
  * 

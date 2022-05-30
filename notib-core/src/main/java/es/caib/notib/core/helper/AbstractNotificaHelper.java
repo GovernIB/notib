@@ -399,7 +399,7 @@ public abstract class AbstractNotificaHelper {
 		return llinatges.toString();
 	}
 	public boolean isAdviserActiu() {
-		return configHelper.getAsBoolean("es.caib.notib.adviser.actiu");
+		return configHelper.getAsBooleanByEntitat("es.caib.notib.adviser.actiu");
 	}
 	protected String getNotificaUrlProperty() {
 		return configHelper.getConfig("es.caib.notib.notifica.url");

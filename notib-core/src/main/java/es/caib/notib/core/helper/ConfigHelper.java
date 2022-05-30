@@ -44,11 +44,7 @@ public class ConfigHelper {
     @Transactional(readOnly = true)
     public String getConfigKeyByEntitat(String property) {
 
-        if (entitat == null || entitat.get() == null) {
-            log.error("No hi ha entitat en el thread per poder buscar la propietat. Entitat -> " + entitat);
-            throw new NotDefinedConfigException(property);
-        }
-        return getConfigKeyByEntitat(entitat.get().getCodi(), property);
+        return entitat == null || entitat.get() == null ? getConfig(property) : getConfigKeyByEntitat(entitat.get().getCodi(), property);
     }
 
     @Transactional(readOnly = true)
@@ -99,12 +95,26 @@ public class ConfigHelper {
         }
     }
 
+    public boolean getAsBooleanByEntitat(String key) {
+        return Boolean.parseBoolean(getConfigKeyByEntitat(key));
+    }
+
     public boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(getConfig(key));
     }
+
+    public int getAsIntByEntitat(String key) {
+        return new Integer(getConfigKeyByEntitat(key));
+    }
+
     public int getAsInt(String key) {
         return new Integer(getConfig(key));
     }
+
+    public long getAsLongByEntitat(String key) {
+        return new Long(getConfigKeyByEntitat(key));
+    }
+
     public long getAsLong(String key) {
         return new Long(getConfig(key));
     }

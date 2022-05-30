@@ -1647,7 +1647,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	private int getMidaMinIdCsv() {
-		return configHelper.getAsInt("es.caib.notib.document.consulta.id.csv.mida.min");
+		return configHelper.getAsIntByEntitat("es.caib.notib.document.consulta.id.csv.mida.min");
 	}
 	
 	

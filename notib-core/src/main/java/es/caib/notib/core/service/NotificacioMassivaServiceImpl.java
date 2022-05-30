@@ -1221,7 +1221,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         NotificacioMassivaPrioritatDto tipus = NotificacioMassivaPrioritatDto.BAIXA;
 
         try {
-            String tipusStr = configHelper.getConfig("es.caib.notib.enviament.massiu.prioritat");
+            String tipusStr = configHelper.getConfigKeyByEntitat("es.caib.notib.enviament.massiu.prioritat");
             if (tipusStr != null && !tipusStr.isEmpty())
                 tipus = NotificacioMassivaPrioritatDto.valueOf(tipusStr);
         } catch (Exception ex) {

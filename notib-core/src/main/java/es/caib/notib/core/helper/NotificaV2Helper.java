@@ -783,7 +783,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	private boolean isCodiDir3Entitat() {
-		return configHelper.getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
+		return configHelper.getAsBooleanByEntitat("es.caib.notib.plugin.codi.dir3.entitat");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
 

@@ -73,8 +73,8 @@ public class NotificacioHelperTest {
 	
 	@Before
 	public void setUp() {
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 	}
 	
 	@Test
@@ -89,8 +89,8 @@ public class NotificacioHelperTest {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
 				entidad,
 				false,
 				null, // organGestor

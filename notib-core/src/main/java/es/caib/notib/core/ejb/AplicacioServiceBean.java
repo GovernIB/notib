@@ -90,8 +90,8 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
-	public String propertyGet(String property, EntitatDto entitat) {
-		return delegate.propertyGet(property, entitat);
+	public String propertyGetByEntitat(String property) {
+		return delegate.propertyGetByEntitat(property);
 	}
 
 	@Override
@@ -104,6 +104,12 @@ public class AplicacioServiceBean implements AplicacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property, String defaultValue) {
 		return delegate.propertyGet(property, defaultValue);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public String propertyGetByEntitat(String property, String defaultValue) {
+		return delegate.propertyGetByEntitat(property, defaultValue);
 	}
 
 	@Override

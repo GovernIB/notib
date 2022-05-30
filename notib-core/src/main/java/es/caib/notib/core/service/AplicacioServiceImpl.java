@@ -6,6 +6,7 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.UsuariDto;
@@ -263,12 +264,16 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public String propertyGet(String property, EntitatDto entitat) {
+	public String propertyGetByEntitat(String property, String defaultValue) {
 
-		if (entitat == null | entitat.getCodi() == null) {
-			return propertyGet(property);
-		}
-		return configHelper.getConfigKeyByEntitat(entitat.getCodi(), property);
+		String value = configHelper.getConfigKeyByEntitat(property);
+		return Strings.isNullOrEmpty(value) ? defaultValue : value;
+	}
+
+	@Override
+	public String propertyGetByEntitat(String property) {
+
+		return configHelper.getConfigKeyByEntitat(property);
 	}
 
 	@Override

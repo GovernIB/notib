@@ -106,12 +106,11 @@ public interface AplicacioService {
 	/**
 	 * Retorna el valor d'un paràmetre de configuració per la entitat especificada
 	 *
-	 * @param property
-	 *             El codi del paràmetre
+	 * @param property El codi del paràmetre
 	 * @return el valor del paràmetre
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public String propertyGet(String property, EntitatDto entitat);
+	 String propertyGetByEntitat(String property);
 
 	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
@@ -133,7 +132,17 @@ public interface AplicacioService {
 	 * @return el valor del paràmetre
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public String propertyGet(String property, String defaultValue);
+	String propertyGet(String property, String defaultValue);
+
+	/**
+	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
+	 *
+	 * @param property El codi del paràmetre
+	 * @param defaultValue El valor per defecte en cas que el paràmetre no s'hagi definit
+	 * @return el valor del paràmetre
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	String propertyGetByEntitat(String property, String defaultValue);
 
 	/**
 	 * Modifica la configuració de l'usuari actual

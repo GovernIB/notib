@@ -194,7 +194,7 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 				"</div>"+
 				"<div class=\"footer\">"+
 				"	<span class=\"footerText\">"+
-				getEmailFooter(notificacio.getEntitat() != null ? notificacio.getEntitat().getCodi() : "") +
+				getEmailFooter() +
 				"	</span>"+
 				"</div>"+
 				"</body>"+

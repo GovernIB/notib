@@ -806,8 +806,8 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("serveis", serveisDisponibles);
 
 
-        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat", "true"));
-        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple", "false"));
+        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGetByEntitat("es.caib.notib.titular.incapacitat", "true"));
+        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGetByEntitat("es.caib.notib.destinatari.multiple", "false"));
         model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 
         model.addAttribute("comunicacioTipus",
