@@ -8,6 +8,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ServeiEntity;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.repository.ServeiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class ProcSerUpdateHelper {
 	@Autowired
 	private ServeiRepository serveiRepository;
 	@Autowired
+	private OrganGestorRepository organGestorRepository;
+	@Autowired
 	private ConfigHelper configHelper;
 
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.UPDATE)
@@ -37,7 +40,7 @@ public class ProcSerUpdateHelper {
 			OrganGestorEntity organGestor) {
 		procediment.update(
 				procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null,
-				organGestor,
+				procedimentGda.isComu() ? organGestorRepository.findByCodi(procediment.getEntitat().getDir3Codi()) : organGestor,
 				procedimentGda.isComu());
 		procediment.updateDataActualitzacio(new Date());
 		return procedimentRepository.save(procediment);
@@ -53,7 +56,7 @@ public class ProcSerUpdateHelper {
 				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				false,
-				organGestor,
+				procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
 				null,
 				null,
 				null,
@@ -72,7 +75,7 @@ public class ProcSerUpdateHelper {
 			OrganGestorEntity organGestor) {
 		servei.update(
 				serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
-				organGestor,
+				serveiGda.isComu() ? organGestorRepository.findByCodi(serveiGda.getEntitat().getDir3Codi()) : organGestor,
 				serveiGda.isComu());
 		servei.updateDataActualitzacio(new Date());
 		return serveiRepository.save(servei);
@@ -87,7 +90,7 @@ public class ProcSerUpdateHelper {
 				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				false,
-				organGestor,
+				serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
 				null,
 				null,
 				null,

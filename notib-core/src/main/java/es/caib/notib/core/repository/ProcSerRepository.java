@@ -166,7 +166,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 
 	@Query(
 			"from ProcSerEntity pro " +
-			"where pro.organGestor.codi in (:organsCodis) " +
+			"where (pro.organGestor.codi in (:organsCodis) " +
 			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -174,6 +174,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"		from GrupProcSerEntity gp " +
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
+				") " +
 			"order by pro.nom asc")
 	List<ProcSerEntity> findProcedimentsAccesiblesPerOrganGestor(
             @Param("organsCodis") List<String> organsCodis,
@@ -189,6 +190,24 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 	ProcSerEntity findByEntitatAndCodiProcediment(
 			@Param("entitatActual") EntitatEntity entitat,
 			@Param("codiProcediment") String codiProcediment);
+
+	@Query(	"select p " +
+			"from ProcSerEntity p " +
+			"where p.entitat = :entitat " +
+			"  and p.requireDirectPermission = false " +
+			"  and p.comu = true " +
+			"  and (p.agrupar = false " +
+			"  	or (p.agrupar = true " +
+			"  and p in (select distinct gp.procSer " +
+			"		from GrupProcSerEntity gp " +
+			"		left outer join gp.grup g " +
+			"		where g.entitat = :entitat " +
+			"		  and g.codi in (:grups))) ) " +
+			"order by p.nom asc")
+	List<ProcSerEntity> findComusByEntitatSenseAccesDirecte(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups
+	);
 
 //	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsFills);
 //

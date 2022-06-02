@@ -175,6 +175,11 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	}
 
 	@Override
+	public List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return delegate.findProcedimentServeisWithPermisMenu(entitatId, usuariCodi, permis);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcSerDto> findProcedimentsSenseGrups(Long entitatId) {
 		return delegate.findProcedimentsSenseGrups(entitatId);

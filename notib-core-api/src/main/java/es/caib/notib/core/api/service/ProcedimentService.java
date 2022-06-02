@@ -192,6 +192,8 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	List<ProcSerSimpleDto> findProcedimentServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis);
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcSerDto> findProcedimentsSenseGrups(Long entitatId);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcSerDto> findProcedimentsAmbGrups(Long entitatId, List<String> grups);
