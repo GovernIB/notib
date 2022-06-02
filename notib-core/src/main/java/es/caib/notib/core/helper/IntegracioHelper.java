@@ -100,6 +100,7 @@ public class IntegracioHelper {
 		accio.setAplicacio(info.getAplicacio());
 		accio.setParametres(info.getParams());
 		accio.setTipus(info.getTipus());
+		accio.setCodiEntitat(info.getCodiEntitat());
 		accio.setTempsResposta(info.getTempsResposta());
 		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
 		addAccio(info.getCodi(), accio, obtenirUsuari);
@@ -128,6 +129,7 @@ public class IntegracioHelper {
 		accio.setAplicacio(info.getAplicacio());
 		accio.setParametres(info.getParams());
 		accio.setTipus(info.getTipus());
+		accio.setCodiEntitat(info.getCodiEntitat());
 		accio.setTempsResposta(info.getTempsResposta());
 		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
 		accio.setErrorDescripcio(errorDescripcio);

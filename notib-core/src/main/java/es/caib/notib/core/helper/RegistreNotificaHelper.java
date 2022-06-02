@@ -6,6 +6,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -52,10 +53,14 @@ public class RegistreNotificaHelper {
 //	private NotificacioMassivaHelper notificacioMassivaHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+
 
 	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
 
 		logger.info(" [REG-NOT] Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
+		configHelper.setEntitat(conversioTipusHelper.convertir(notificacioEntity.getEntitat(), EntitatDto.class));
 		boolean enviarANotifica = false;
 		boolean isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
 		long t0 = System.currentTimeMillis();
@@ -63,7 +68,7 @@ public class RegistreNotificaHelper {
 		AccioParam tipusEnv = new AccioParam("Tipus enviament: ", notificacioEntity.getEnviamentTipus().name());
 		AccioParam sirActivat = new AccioParam("Sir activat", String.valueOf(isSirActivat()));
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_REGISTRE, desc, IntegracioAccioTipusEnumDto.ENVIAMENT, tipusEnv, sirActivat);
-
+		info.setCodiEntitat(notificacioEntity.getEntitat().getCodi());
 		String codiDir3 = notificacioEntity.getEntitat().getDir3CodiReg() != null  && !notificacioEntity.getEntitat().getDir3CodiReg().isEmpty() ? notificacioEntity.getEntitat().getDir3CodiReg() : notificacioEntity.getEntitat().getDir3Codi();
 		boolean totsAdministracio = isAllEnviamentsAAdministracio(notificacioEntity);
 		long startTime;

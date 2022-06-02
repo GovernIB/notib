@@ -91,20 +91,6 @@ databaseChangeLog:
                   KEY LIKE '%plugin.unitats.dir3.url' OR
                   KEY LIKE '%plugin.unitats.dir3.username' OR
                   KEY LIKE '%plugin.unitats.fitxer' OR
-                  KEY LIKE '%tasca.callback.pendents.actiu' OR
-                  KEY LIKE '%tasca.callback.pendents.notifica.events.intents.max' OR
-                  KEY LIKE '%tasca.enviament.actualitzacio.certificacio.finalitzades.actiu' OR
-                  KEY LIKE '%tasca.enviament.actualitzacio.estat.actiu' OR
-                  KEY LIKE '%tasca.enviament.actualitzacio.estat.reintents.maxim' OR
-                  KEY LIKE '%tasca.enviament.actualitzacio.estat.registre.actiu' OR
-                  KEY LIKE '%tasca.enviament.actualitzacio.estat.registre.reintents.maxim' OR
-                  KEY LIKE '%tasca.notifica.enviaments.actiu' OR
-                  KEY LIKE '%tasca.notifica.enviaments.reintents.maxim' OR
-                  KEY LIKE '%tasca.registre.enviaments.reintents.maxim' OR
-                  KEY LIKE '%tasques.actives' OR
-                  KEY LIKE '%actualitzacio.procediments.actiu' OR
-                  KEY LIKE '%actualitzacio.procediments.eliminar.organs' OR
-                  KEY LIKE '%actualitzacio.procediments.modificar' OR
                   KEY LIKE '%destinatari.multiple' OR
                   KEY LIKE '%document.consulta.id.csv.mida.min' OR
                   KEY LIKE '%document.metadades.por.defecto' OR

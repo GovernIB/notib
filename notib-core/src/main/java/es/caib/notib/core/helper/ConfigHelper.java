@@ -42,6 +42,12 @@ public class ConfigHelper {
     }
 
     @Transactional(readOnly = true)
+    public String getEntitatActualCodi() {
+
+        return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
+    }
+
+    @Transactional(readOnly = true)
     public String getConfigKeyByEntitat(String property) {
 
         return entitat == null || entitat.get() == null ? getConfig(property) : getConfigKeyByEntitat(entitat.get().getCodi(), property);

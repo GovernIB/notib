@@ -95,13 +95,9 @@
 
 		$(".pestanya").click(() => {
 			let codi = "${codiActual}";
-			console.log(codi);
 			if (codi === "CALLBACK") {
-				console.log("show");
-				console.log($("#missatges-integracions_filter"));
 				$("#missatges-integracions_filter").show();
 			} else {
-				console.log("hide");
 				$("#missatges-integracions_filter").hide();
 			}
 		});
@@ -139,6 +135,7 @@
 					<th data-col-name="aplicacio" data-orderable="false"><spring:message code="integracio.list.columna.aplicacio"/></th>
 				</c:if>
 				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
+				<th data-col-name="codiEntitat" data-orderable="false"><spring:message code="integracio.list.columna.entitat"/></th>
 				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
 					<spring:message code="integracio.list.columna.temps.resposta"/>
 					<script id="cellTempsTemplate" type="text/x-jsrender">{{:tempsResposta}} ms</script>

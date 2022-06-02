@@ -29,6 +29,7 @@ public class IntegracioAccioDto implements Serializable {
 	private long tempsResposta;
 	private IntegracioAccioEstatEnumDto estat;
 	private EntitatDto entitat;
+	private String codiEntitat;
 	private String errorDescripcio;
 	private String excepcioMessage;
 	private String excepcioStacktrace;

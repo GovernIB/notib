@@ -1,6 +1,7 @@
 package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -12,11 +13,13 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.exception.DocumentNotFoundException;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -94,12 +97,12 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_MASSIUS_INFORMES = "massius_informes";
 
 	private DadesUsuariPlugin dadesUsuariPlugin;
-	private GestioDocumentalPlugin gestioDocumentalPlugin;
-	private RegistrePlugin registrePlugin;
-	private IArxiuPlugin arxiuPlugin;
-	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
-	private GestorContingutsAdministratiuPlugin gestorDocumentalAdministratiuPlugin;
-	private FirmaServidorPlugin firmaServidorPlugin;
+	private Map<String, GestioDocumentalPlugin> gestioDocumentalPlugin = new HashMap<>();
+	private Map<String, RegistrePlugin> registrePlugin = new HashMap<>();
+	private Map<String, IArxiuPlugin> arxiuPlugin = new HashMap<>();
+	private Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugin = new HashMap<>();
+	private Map<String, GestorContingutsAdministratiuPlugin> gestorDocumentalAdministratiuPlugin = new HashMap<>();
+	private Map<String, FirmaServidorPlugin> firmaServidorPlugin = new HashMap<>();
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -109,38 +112,34 @@ public class PluginHelper {
 	private ConfigHelper configHelper;
 	@Resource
 	private CacheManager cacheManager;
+	@Resource
+	private EntitatRepository entitatRepository;
 
 	public static Map<String, Boolean> organigramaCarregat = new HashMap<>();
 
 	// REGISTRE
 	// /////////////////////////////////////////////////////////////////////////////////////
-	
-	public RespostaConsultaRegistre crearAsientoRegistral(
-			String codiDir3Entitat, 
-			AsientoRegistralBeanDto arb,
-			Long tipusOperacio,
-			Long notificacioId,
-			String enviamentIds,
-			boolean generarJustificant) {
-		
+
+	public RespostaConsultaRegistre crearAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio,
+														  Long notificacioId, String enviamentIds, boolean generarJustificant) {
+
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_REGISTRE, 
-				"Enviament notificació a registre (SIR activat)", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				IntegracioHelper.INTCODI_REGISTRE,
+				"Enviament notificació a registre (SIR activat)",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Id de la notificacio", String.valueOf(notificacioId)),
 				new AccioParam("Ids dels enviaments", enviamentIds),
 				new AccioParam("Tipus d'operacio", String.valueOf(tipusOperacio)));
-		
+
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		
 		try {
-			resposta = getRegistrePlugin().salidaAsientoRegistral(
-					codiDir3Entitat, 
-					arb, 
-					tipusOperacio,
-					generarJustificant);
-			
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			resposta = getRegistrePlugin(entitat.getCodi()).salidaAsientoRegistral(codiDir3Entitat, arb, tipusOperacio, generarJustificant);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
 			} else {
@@ -154,16 +153,10 @@ public class PluginHelper {
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
 		}
-	
 		return resposta;
-
 	}
-	
-	public RespostaConsultaRegistre obtenerAsientoRegistral(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat, 
-			Long tipusRegistre, 
-			boolean ambAnnexos) {
+
+	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistreFormatat, Long tipusRegistre,  boolean ambAnnexos) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -173,22 +166,19 @@ public class PluginHelper {
 				new AccioParam("Número de registre", numeroRegistreFormatat),
 				new AccioParam("Tipus de registre", String.valueOf(tipusRegistre)),
 				new AccioParam("Amb annexos?", String.valueOf(ambAnnexos)));
-
 		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
-		
 		try {
-			resposta = getRegistrePlugin().obtenerAsientoRegistral(
-					codiDir3Entitat, 
-					numeroRegistreFormatat, 
-					tipusRegistre, 
-					ambAnnexos);
-			
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			resposta = getRegistrePlugin(entitat.getCodi()).obtenerAsientoRegistral(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre, ambAnnexos);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
 			} else {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 			}
-		
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
@@ -197,7 +187,6 @@ public class PluginHelper {
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
 		}
-		
 		return resposta;
 	}
 
@@ -211,13 +200,7 @@ public class PluginHelper {
 				exec.shutdown();
 			}
 		};
-
-		exec.scheduleAtFixedRate(
-				clearBlockedRunnable ,
-				getSegonsEntreReintentRegistreProperty(),
-				getSegonsEntreReintentRegistreProperty(),
-				TimeUnit.SECONDS);
-
+		exec.scheduleAtFixedRate(clearBlockedRunnable, getSegonsEntreReintentRegistreProperty(), getSegonsEntreReintentRegistreProperty(), TimeUnit.SECONDS);
 	}
 
 	/**
@@ -230,9 +213,8 @@ public class PluginHelper {
 	 * @return
 	 * 		Retorna un objecte amb la resposta del regweb (data, numero i numero formatejat)
 	 */
-	public RespostaJustificantRecepcio obtenirJustificant(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat) {
+	public RespostaJustificantRecepcio obtenirJustificant(String codiDir3Entitat, String numeroRegistreFormatat) {
+
 		if (blockedObtenirJustificant == null){
 			initObtenirJustificant();
 		}
@@ -246,21 +228,19 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Número de registre", numeroRegistreFormatat));
-		
 		RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
-		
 		try {
-			resposta = getRegistrePlugin().obtenerJustificante(
-				codiDir3Entitat, 
-				numeroRegistreFormatat, 
-				2);
-			
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			resposta = getRegistrePlugin(entitat.getCodi()).obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat,2);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
 			} else {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 			}
-		
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
@@ -268,18 +248,12 @@ public class PluginHelper {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-		
 		return resposta;
 	}
 	
-	public RespostaJustificantRecepcio obtenirOficiExtern(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat) {
+	public RespostaJustificantRecepcio obtenirOficiExtern(String codiDir3Entitat, String numeroRegistreFormatat) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -287,20 +261,19 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Número de registre", numeroRegistreFormatat));
-			
 		RespostaJustificantRecepcio resposta = new RespostaJustificantRecepcio();
-		
 		try {
-			resposta = getRegistrePlugin().obtenerOficioExterno(
-					codiDir3Entitat, 
-					numeroRegistreFormatat);
-			
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			resposta = getRegistrePlugin(entitat.getCodi()).obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat);
 			if (resposta.getErrorCodi() == null) {
 				integracioHelper.addAccioOk(info);
 			} else {
 				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
 			}
-		
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de registre";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
@@ -308,57 +281,10 @@ public class PluginHelper {
 				errorDescripcio += " :" + ex.getCause().getMessage();
 			}
 			resposta.setErrorDescripcio(errorDescripcio);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-		
 		return resposta;
 	}
-
-//	public RegistreIdDto registreAnotacioSortida(
-//			NotificacioDtoV2 notificacio, 
-//			List<NotificacioEnviamentDtoV2> enviaments, 
-//			Long tipusOperacio) throws Exception {
-//		
-//		IntegracioInfo info = new IntegracioInfo(
-//				IntegracioHelper.INTCODI_REGISTRE, 
-//				"Enviament notificació a registre (SIR desactivat)", 
-//				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-//				new AccioParam("Id de la notificacio", String.valueOf(notificacio.getId())));
-//		
-//		RegistreIdDto rs = new RegistreIdDto();
-//		try {
-//			RespostaAnotacioRegistre resposta = getRegistrePlugin().registrarSalida(
-//					toRegistreSortida(
-//							notificacio,
-//							enviaments),
-//					"notib");
-//			if (resposta.getErrorDescripcio() != null) {
-//				rs.setDescripcioError(resposta.getErrorDescripcio());
-//				integracioHelper.addAccioError(info, resposta.getErrorDescripcio());
-//			} else {
-//				rs.setNumeroRegistreFormat(resposta.getNumeroRegistroFormateado());
-//				rs.setData(resposta.getData());
-//				integracioHelper.addAccioOk(info);
-//			}
-//		} catch (Exception ex) {
-//			String errorDescripcio = "Error al accedir al plugin de registre";
-//			integracioHelper.addAccioError(info, errorDescripcio, ex);
-//			if (ex.getCause() != null) {
-//				errorDescripcio += " :" + ex.getCause().getMessage();
-//				rs.setDescripcioError(errorDescripcio);
-//				return rs;
-//			} else {
-//				throw new SistemaExternException(
-//				IntegracioHelper.INTCODI_REGISTRE,
-//				errorDescripcio,
-//				ex);
-//			}
-//		}
-//		return rs;
-//	}
 	
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws SistemaExternException {
 
@@ -367,25 +293,19 @@ public class PluginHelper {
 				"Obtenir llista de tipus d'assumpte", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatCodi));
-		
-		List<TipusAssumpte> tipusAssumptes = null;
+		info.setCodiEntitat(entitatCodi);
 		try {
-			tipusAssumptes = getRegistrePlugin().llistarTipusAssumpte(entitatCodi);
+			List<TipusAssumpte> tipusAssumptes = getRegistrePlugin(entitatCodi).llistarTipusAssumpte(entitatCodi);
 			integracioHelper.addAccioOk(info);
+			return tipusAssumptes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els tipus d'assumpte";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-		return tipusAssumptes;
 	}
 
-	public List<CodiAssumpte> llistarCodisAssumpte(
-			String entitatcodi,
-			String tipusAssumpte) throws SistemaExternException {
+	public List<CodiAssumpte> llistarCodisAssumpte(String entitatcodi, String tipusAssumpte) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -393,29 +313,19 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Tipus d'assumpte", tipusAssumpte));
-
-		List<CodiAssumpte> assumptes = null;
+		info.setCodiEntitat(entitatcodi);
 		try {
-			assumptes = getRegistrePlugin().llistarCodisAssumpte(
-					entitatcodi, 
-					tipusAssumpte);
+			List<CodiAssumpte> assumptes = getRegistrePlugin(entitatcodi).llistarCodisAssumpte(entitatcodi, tipusAssumpte);
 			integracioHelper.addAccioOk(info);
+			return assumptes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els codis d'assumpte";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-
-		return assumptes;
 	}
 	
-	public OficinaDto llistarOficinaVirtual(
-			String entitatcodi,
-			String nomOficinaVirtual,
-			TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
+	public OficinaDto llistarOficinaVirtual(String entitatcodi, String nomOficinaVirtual, TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -423,12 +333,10 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
+		info.setCodiEntitat(entitatcodi);
 		OficinaDto oficinaDto = new OficinaDto();
 		try {
-			Oficina oficina = getRegistrePlugin().llistarOficinaVirtual(
-					entitatcodi, 
-					nomOficinaVirtual,
-					autoritzacio.getValor());
+			Oficina oficina = getRegistrePlugin(entitatcodi).llistarOficinaVirtual(entitatcodi, nomOficinaVirtual, autoritzacio.getValor());
 			if (oficina != null) {
 				oficinaDto.setCodi(oficina.getCodi());
 				oficinaDto.setNom(oficina.getNom());
@@ -437,31 +345,23 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir la oficina virtual";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-
 		return oficinaDto;
 	}
 	
-	public List<OficinaDto> llistarOficines(
-			String entitatcodi,
-			AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
+	public List<OficinaDto> llistarOficines(String entitatcodi, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_REGISTRE, 
-				"Obtenir la llista de oficines", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
+				IntegracioHelper.INTCODI_REGISTRE,
+				"Obtenir la llista de oficines",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
-		
-		List<OficinaDto> oficinesDto = new ArrayList<OficinaDto>();
+		info.setCodiEntitat(entitatcodi);
+		List<OficinaDto> oficinesDto = new ArrayList<>();
 		try {
-			List<Oficina> oficines = getRegistrePlugin().llistarOficines(
-					entitatcodi, 
-					autoritzacio.getValor());
+			List<Oficina> oficines = getRegistrePlugin(entitatcodi).llistarOficines(entitatcodi, autoritzacio.getValor());
 			if (oficines != null) {
 				for (Oficina oficina : oficines) {
 					OficinaDto oficinaDto = new OficinaDto();
@@ -474,12 +374,8 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les oficines";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-	
 		return oficinesDto;
 	}
 	
@@ -487,43 +383,37 @@ public class PluginHelper {
 		
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una unitat organitzativa",
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", unitatCodi));
-		List<OficinaSIR> oficinesTF = null;
-		List<OficinaDto> oficinesSIR = null;
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
-			oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
+			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
+			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
+			return oficinesSIR;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les oficines d'una unitat organitzativa";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		return oficinesSIR;
 	}
 	
 	public List<OficinaDto> oficinesSIREntitat(String entitatCodi) throws SistemaExternException {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", entitatCodi));
-		List<OficinaSIR> oficinesTF = null;
-		List<OficinaDto> oficinesSIR = null;
+		info.setCodiEntitat(entitatCodi);
 		try {
-			oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(entitatCodi);
-			oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
+			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(entitatCodi);
+			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
+			return oficinesSIR;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les oficines SIR d'una entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-	
-		return oficinesSIR;
 	}
 	
-	public List<LlibreOficina> llistarLlibresOficines(
-			String entitatCodi,
-			String usuariCodi,
-			TipusRegistreRegweb3Enum tipusRegistre) throws SistemaExternException{
+	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, TipusRegistreRegweb3Enum tipusRegistre) throws SistemaExternException{
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -532,42 +422,34 @@ public class PluginHelper {
 				new AccioParam("Codi Dir3 de l'entitat", entitatCodi),
 				new AccioParam("Codi de l'usuari", usuariCodi),
 				new AccioParam("Tipud de registre", tipusRegistre.name()));
-		
-		List<LlibreOficina> llibresOficines = null; 
+		info.setCodiEntitat(entitatCodi);
 		try {
-			llibresOficines = getRegistrePlugin().llistarLlibresOficines(
-					entitatCodi, 
-					usuariCodi,
-					tipusRegistre.getValor());
+			List<LlibreOficina> llibresOficines = getRegistrePlugin(entitatCodi).llistarLlibresOficines(entitatCodi, usuariCodi, tipusRegistre.getValor());
 			integracioHelper.addAccioOk(info);
+			return llibresOficines;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els llibres amb oficina";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-
-	
-		return llibresOficines;
 	}
 	
-	public LlibreDto llistarLlibreOrganisme(
-			String entitatCodi,
-			String organismeCodi) throws SistemaExternException{
+	public LlibreDto llistarLlibreOrganisme(String entitatCodiDir3, String organismeCodi) throws SistemaExternException{
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir la llista de llibres per organisme", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatCodi),
+				new AccioParam("Codi Dir3 de l'entitat", entitatCodiDir3),
 				new AccioParam("Codi de l'organisme", organismeCodi));
 		LlibreDto llibreDto = new LlibreDto();
 		try {
-			Llibre llibre = getRegistrePlugin().llistarLlibreOrganisme(
-					entitatCodi, 
-					organismeCodi);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(entitatCodiDir3);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + entitatCodiDir3+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			Llibre llibre = getRegistrePlugin(entitat.getCodi()).llistarLlibreOrganisme(entitatCodiDir3, organismeCodi);
 			if (llibre != null) {
 				llibreDto.setCodi(llibre.getCodi());
 				llibreDto.setNomCurt(llibre.getNomCurt());
@@ -578,20 +460,12 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els llibres d'un organisme";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-		
 		return llibreDto;
-
 	}
 	
-	public List<LlibreDto> llistarLlibres(
-			String entitatcodi,
-			String oficina,
-			AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
+	public List<LlibreDto> llistarLlibres(String entitatcodi, String oficina, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
@@ -599,13 +473,10 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
 				new AccioParam("Oficina", oficina));
-		
-		List<LlibreDto> llibresDto = new ArrayList<LlibreDto>();
+		info.setCodiEntitat(entitatcodi);
+		List<LlibreDto> llibresDto = new ArrayList<>();
 		try {
-			List<Llibre> llibres = getRegistrePlugin().llistarLlibres(
-					entitatcodi, 
-					oficina, 
-					autoritzacio.getValor());
+			List<Llibre> llibres = getRegistrePlugin(entitatcodi).llistarLlibres(entitatcodi, oficina, autoritzacio.getValor());
 			if (llibres != null) {
 				for (Llibre llibre : llibres) {
 					LlibreDto llibreDto = new LlibreDto();
@@ -620,12 +491,8 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els llibres d'una oficina";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-
 		return llibresDto;
 	}
 	
@@ -636,35 +503,26 @@ public class PluginHelper {
 				"Obtenir llista d'organismes", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
-		
-		List<Organisme> organismes = null;
+		info.setCodiEntitat(entitatcodi);
 		try {
-			organismes = getRegistrePlugin().llistarOrganismes(entitatcodi);
+			List<Organisme> organismes = getRegistrePlugin(entitatcodi).llistarOrganismes(entitatcodi);
 			integracioHelper.addAccioOk(info);
+			return organismes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar organismes";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_REGISTRE,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, errorDescripcio, ex);
 		}
-	
-		return organismes;
 	}
 	
 	// USUARIS
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
-	public List<String> consultarRolsAmbCodi(
-			String usuariCodi) {
+	public List<String> consultarRolsAmbCodi(String usuariCodi) {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_USUARIS, 
-				"Consulta rols usuari amb codi", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi d'usuari", usuariCodi));
-		
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_USUARIS,"Consulta rols usuari amb codi",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
+//		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			List<String> rols = getDadesUsuariPlugin().consultarRolsAmbCodi(usuariCodi);
 			info.addParam("Rols Consultats: ", StringUtils.join(rols, ", "));
@@ -673,22 +531,15 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_USUARIS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
 	
-	public DadesUsuari dadesUsuariConsultarAmbCodi(
-			String usuariCodi) {
+	public DadesUsuari dadesUsuariConsultarAmbCodi(String usuariCodi) {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_USUARIS, 
-				"Consulta d'usuari amb codi", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi d'usuari", usuariCodi));
-		
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_USUARIS,"Consulta d'usuari amb codi",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi d'usuari", usuariCodi));
+//		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			DadesUsuari dadesUsuari = getDadesUsuariPlugin().consultarAmbCodi(usuariCodi);
 			integracioHelper.addAccioOk(info, false);
@@ -696,53 +547,34 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_USUARIS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
 	
-	public List<DadesUsuari> dadesUsuariConsultarAmbGrup(
-			String grupCodi) {
+	public List<DadesUsuari> dadesUsuariConsultarAmbGrup(String grupCodi) {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_USUARIS, 
-				"Consulta d'usuaris d'un grup", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi de grup", grupCodi));
-		
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_USUARIS,"Consulta d'usuaris d'un grup",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi de grup", grupCodi));
+//		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			List<DadesUsuari> dadesUsuari = getDadesUsuariPlugin().consultarAmbGrup(
-					grupCodi);
+			List<DadesUsuari> dadesUsuari = getDadesUsuariPlugin().consultarAmbGrup(grupCodi);
 			integracioHelper.addAccioOk(info, false);
 			return dadesUsuari;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de dades d'usuari";
 			integracioHelper.addAccioError(info, errorDescripcio, ex, false);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_USUARIS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, errorDescripcio, ex);
 		}
 	}
 
 	// ARXIU 
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
-	public Document arxiuDocumentConsultar(
-			String arxiuUuid,
-			String versio,
-			boolean isUuid) {
-		
+	public Document arxiuDocumentConsultar(String arxiuUuid, String versio, boolean isUuid) {
 		return arxiuDocumentConsultar(arxiuUuid, versio, false, isUuid);
 	}
 
-	public Document arxiuDocumentConsultar(
-			String identificador,
-			String versio,
-			boolean ambContingut,
-			boolean isUuid) throws DocumentNotFoundException{
+	public Document arxiuDocumentConsultar(String identificador, String versio, boolean ambContingut, boolean isUuid) throws DocumentNotFoundException{
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_ARXIU,
@@ -750,28 +582,20 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				new AccioParam("identificador del document", identificador),
 				new AccioParam("Versio", versio));
-
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			identificador = isUuid ? "uuid:" + identificador : "csv:" + identificador;
-			Document documentDetalls = getArxiuPlugin().documentDetalls(
-					identificador,
-					versio,
-					ambContingut);
+			Document documentDetalls = getArxiuPlugin().documentDetalls(identificador, versio, ambContingut);
 			integracioHelper.addAccioOk(info);
 			return documentDetalls;
 		} catch (Exception ex) {
-			DocumentNotFoundException ex1 = new DocumentNotFoundException(
-					isUuid ? "UUID" : "CSV",
-					identificador,
-					ex);
+			DocumentNotFoundException ex1 = new DocumentNotFoundException(isUuid ? "UUID" : "CSV", identificador, ex);
 			integracioHelper.addAccioError(info, ex1.getMessage(), ex1);
 			throw ex1;
 		}
 	}
 	
-	public DocumentContingut arxiuGetImprimible(
-			String id,
-			boolean isUuid) {
+	public DocumentContingut arxiuGetImprimible(String id, boolean isUuid) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_ARXIU, 
@@ -779,21 +603,17 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Identificador del document", id),
 				new AccioParam("Tipus d'identificador", isUuid ? "uuid" : "csv"));
-		
-		DocumentContingut documentContingut = null;
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			id = isUuid ? "uuid:" + id : "csv:" + id;
-			documentContingut = getArxiuPlugin().documentImprimible(id);
+			DocumentContingut documentContingut = getArxiuPlugin().documentImprimible(id);
 			integracioHelper.addAccioOk(info);
+			return documentContingut;
 		} catch (Exception ex) {
 			String errorDescripcio = "No s'ha pogut recuperar el document amb " + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_ARXIU,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
-		return documentContingut;	
 	}
 	
 	
@@ -801,9 +621,7 @@ public class PluginHelper {
 	// /////////////////////////////////////////////////////////////////////////////////////
 
 	@Synchronized
-	public String gestioDocumentalCreate(
-			String agrupacio,
-			byte[] contingut) {
+	public String gestioDocumentalCreate(String agrupacio, byte[] contingut) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_GESDOC, 
@@ -811,29 +629,21 @@ public class PluginHelper {
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Agrupacio", agrupacio),
 				new AccioParam("Núm bytes", (contingut != null) ? Integer.toString(contingut.length) : "0"));
-		
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			String gestioDocumentalId = getGestioDocumentalPlugin().create(
-					agrupacio,
-					new ByteArrayInputStream(contingut));
+			String gestioDocumentalId = getGestioDocumentalPlugin().create(agrupacio, new ByteArrayInputStream(contingut));
 			info.getParams().add(new AccioParam("Id retornat", gestioDocumentalId));
 			integracioHelper.addAccioOk(info);
 			return gestioDocumentalId;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al crear document a dins la gestió documental";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
 
 	@Synchronized
-	public void gestioDocumentalUpdate(
-			String id,
-			String agrupacio,
-			byte[] contingut) {
+	public void gestioDocumentalUpdate(String id, String agrupacio, byte[] contingut) {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_GESDOC, 
@@ -842,74 +652,48 @@ public class PluginHelper {
 				new AccioParam("Id del document", id),
 				new AccioParam("Agrupacio", agrupacio),
 				new AccioParam("Núm bytes", (contingut != null) ? Integer.toString(contingut.length) : "0"));
-		
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			getGestioDocumentalPlugin().update(
-					id,
-					agrupacio,
-					new ByteArrayInputStream(contingut));
+			getGestioDocumentalPlugin().update(id, agrupacio, new ByteArrayInputStream(contingut));
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de gestió documental";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
 	
-	public void gestioDocumentalDelete(
-			String id,
-			String agrupacio) {
+	public void gestioDocumentalDelete(String id, String agrupacio) {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESDOC, 
-				"Eliminació d'un arxiu", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Id del document", id),
-				new AccioParam("Agrupacio", agrupacio));
-		
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESDOC,"Eliminació d'un arxiu", IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("Id del document", id), new AccioParam("Agrupacio", agrupacio));
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			getGestioDocumentalPlugin().delete(
-					id,
-					agrupacio);
+			getGestioDocumentalPlugin().delete(id, agrupacio);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de gestió documental";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
 	
-	public void gestioDocumentalGet(
-			String id,
-			String agrupacio,
-			OutputStream contingutOut) {
+	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {
 		
 		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESDOC, 
-				"Consultant arxiu de la gestió documental", 
+				IntegracioHelper.INTCODI_GESDOC,
+				"Consultant arxiu de la gestió documental",
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Id del document", id),
 				new AccioParam("Agrupacio", agrupacio));
-		
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			getGestioDocumentalPlugin().get(
-					id,
-					agrupacio,
-					contingutOut);
+			getGestioDocumentalPlugin().get(id, agrupacio, contingutOut);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de gestió documental per a obtenir el document amb id: " + (agrupacio != null ? agrupacio + "/" : "") + id;
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESDOC,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
 		}
 	}
 	
@@ -917,16 +701,14 @@ public class PluginHelper {
 	// /////////////////////////////////////////////////////////////////////////////////////
 	
 	public List<ProcSerDto> getProcedimentsGda() {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESCONADM, 
-				"Obtenir tots els procediments", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<ProcSerDto> procediments = new ArrayList<ProcSerDto>();
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir tots els procediments", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
+		List<ProcSerDto> procediments = new ArrayList<>();
 		try {
 			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getAllProcediments();
-			if (procs != null)
-				for (GcaProcediment proc: procs) {
+			if (procs != null) {
+				for (GcaProcediment proc : procs) {
 					ProcSerDto dto = new ProcSerDto();
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
@@ -936,24 +718,20 @@ public class PluginHelper {
 					}
 					procediments.add(dto);
 				}
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESCONADM,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
-		
 		return procediments;
 	}
 	
 	public int getTotalProcediments(String codiDir3) {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESCONADM, 
-				"Recuperant el total de procediments", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Recuperant el total de procediments", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		int totalElements = 0;
 		try {
 			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalProcediments(codiDir3);
@@ -961,12 +739,8 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir el número total d'elemetns";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESCONADM,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
-		
 		return totalElements;
 	}
 
@@ -974,6 +748,7 @@ public class PluginHelper {
 
 		String msg = "Obtenint " + (isServei ? "servei" : "procediment") + " amb codi SIA " + codiSia + " del gestor documental administratiu";
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM, msg, IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
 			GesconAdm proc = getGestorDocumentalAdministratiuPlugin().getProcSerByCodiSia(codiSia, isServei);
 			if (proc == null) {
@@ -993,21 +768,15 @@ public class PluginHelper {
 		}
 	}
 	
-	public List<ProcSerDto> getProcedimentsGdaByEntitat(
-			String codiDir3,
-			int numPagina) {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESCONADM, 
-				"Obtenir procediments per entitat", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<ProcSerDto> procediments = new ArrayList<ProcSerDto>();
+	public List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir procediments per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
+		List<ProcSerDto> procediments = new ArrayList<>();
 		try {
-			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(
-					codiDir3,
-					numPagina);
-			if (procs != null)
-				for (GcaProcediment proc: procs) {
+			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3, numPagina);
+			if (procs != null) {
+				for (GcaProcediment proc : procs) {
 					ProcSerDto dto = new ProcSerDto();
 					dto.setCodi(proc.getCodiSIA());
 					dto.setNom(proc.getNom());
@@ -1018,24 +787,20 @@ public class PluginHelper {
 					}
 					procediments.add(dto);
 				}
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESCONADM,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
-		
 		return procediments;
 	}
 
 	public int getTotalServeis(String codiDir3) {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESCONADM,
-				"Recuperant el total de serveis",
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Recuperant el total de serveis", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		int totalElements = 0;
 		try {
 			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalServeis(codiDir3);
@@ -1043,30 +808,20 @@ public class PluginHelper {
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir el número total d'elemetns";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESCONADM,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
-
 		return totalElements;
 	}
 
-	public List<ProcSerDto> getServeisGdaByEntitat(
-			String codiDir3,
-			int numPagina) {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_GESCONADM,
-				"Obtenir serveis per entitat",
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
+	public List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {
 
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir serveis per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		List<ProcSerDto> serveis = new ArrayList<>();
 		try {
-			List<GcaServei> servs = getGestorDocumentalAdministratiuPlugin().getServeisByUnitat(
-					codiDir3,
-					numPagina);
-			if (servs != null)
-				for (GcaServei servei: servs) {
+			List<GcaServei> servs = getGestorDocumentalAdministratiuPlugin().getServeisByUnitat(codiDir3, numPagina);
+			if (servs != null) {
+				for (GcaServei servei : servs) {
 					ProcSerDto dto = new ProcSerDto();
 					dto.setCodi(servei.getCodiSIA());
 					dto.setNom(servei.getNom());
@@ -1077,16 +832,13 @@ public class PluginHelper {
 					}
 					serveis.add(dto);
 				}
+			}
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_GESCONADM,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
-
 		return serveis;
 	}
 	
@@ -1102,286 +854,198 @@ public class PluginHelper {
 		}
 	}
 
-	public Map<String, NodeDir3> getOrganigramaPerEntitat(String entitatcodi) throws SistemaExternException {
-		logger.info("Obtenir l'organigrama per entitat");
+	public Map<String, NodeDir3> getOrganigramaPerEntitat(String codiDir3Entitat) throws SistemaExternException {
 
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS,
-				"Obtenir organigrama per entitat",
-				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
+		logger.info("Obtenir l'organigrama per entitat");
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir organigrama per entitat",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat));
 
 		String protocol = configHelper.getConfig("es.caib.notib.plugin.unitats.dir3.protocol");
-
 		Map<String, NodeDir3> organigrama = null;
 		String filenameOrgans = getOrganGestorsFile();
 		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-			filenameOrgans = filenameOrgans + "_" + entitatcodi + ".json";
+			filenameOrgans = filenameOrgans + "_" + codiDir3Entitat + ".json";
 		}
 		try {
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				logger.info("Obtenir l'organigrama per entitat SOAP");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(entitatcodi, null, null);
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(codiDir3Entitat, null, null);
 			} else {
 				logger.info("Obtenir l'organigrama per entitat REST");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(entitatcodi);
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);
 			}
 			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
 				ObjectMapper mapper = new ObjectMapper();
 				mapper.writeValue(new File(filenameOrgans), organigrama);
 			}
-
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			logger.info("Error al obtenir l'organigrama per entitat");
 			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 		return organigrama;
 	}
 
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir llista d'organismes per entitat", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
-		
-		List<ObjetoDirectorio> organismes = null;
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir llista d'organismes per entitat",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			organismes = getUnitatsOrganitzativesPlugin().unitatsPerEntitat(entitatcodi, true);
+			List<ObjetoDirectorio> organismes = getUnitatsOrganitzativesPlugin().unitatsPerEntitat(entitatcodi, true);
 			integracioHelper.addAccioOk(info);
+			return organismes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar organismes per entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-	
-		return organismes;
 	}
 	
 	public String getDenominacio(String codiDir3) {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir denominació d'organisme", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'organisme", codiDir3));
-		
-		String denominacio = null;
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir denominació d'organisme",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi Dir3 de l'organisme", codiDir3));
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			denominacio = getUnitatsOrganitzativesPlugin().unitatDenominacio(codiDir3);
+			String denominacio = getUnitatsOrganitzativesPlugin().unitatDenominacio(codiDir3);
 			integracioHelper.addAccioOk(info);
+			return denominacio;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir denominació de organisme";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		return denominacio;
-		
 	}
 	
-	
-	public List<OrganGestorDto> cercaUnitats(
-			String codi, 
-			String denominacio,
-			Long nivellAdministracio, 
-			Long comunitatAutonoma, 
-			Boolean ambOficines, 
-			Boolean esUnitatArrel,
-			Long provincia, 
-			String municipi) throws SistemaExternException {
+	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma,
+											 Boolean ambOficines, Boolean esUnitatArrel, Long provincia,String municipi) throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir llista de tots els organismes a partir d'un text", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Text de la cerca", codi));
-
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir llista de tots els organismes a partir d'un text",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", codi));
+		info.setCodiEntitat(getCodiEntitatActual());
 		// Eliminam espais
 		codi = codi != null ? codi.trim() : null;
 		municipi = municipi != null ? municipi.trim() : null;
-
-		List<NodeDir3> organismesNodeDir3 = null;
-		List<OrganGestorDto> organismes = null;
 		try {
 			if (denominacio != null) {
 				denominacio = denominacio.replaceAll(" ", "%20");
 			}
-			organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
-			organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
+			List<NodeDir3> organismesNodeDir3 = getUnitatsOrganitzativesPlugin().cercaUnitats(codi, denominacio, nivellAdministracio,
+					comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
+			List<OrganGestorDto> organismes = conversioTipusHelper.convertirList(organismesNodeDir3, OrganGestorDto.class);
 			integracioHelper.addAccioOk(info);
+			return organismes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-	
-		return organismes;
 	}
-	
-	
+
 	public List<OrganGestorDto> unitatsPerCodi(String codi) throws SistemaExternException {
 		return cercaUnitats(codi,null,null,null,null,null,null,null);
 	}
-	
-	
+
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenir llista de tots els organismes a partir d'un text", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Text de la cerca", denominacio));
-
-		List<ObjetoDirectorio> organismesDir3 = null;
-		List<OrganGestorDto> organismes = null;
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir llista de tots els organismes a partir d'un text",
+				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", denominacio));
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			organismesDir3 = getUnitatsOrganitzativesPlugin().unitatsPerDenominacio(denominacio);
-			organismes = conversioTipusHelper.convertirList(organismesDir3, OrganGestorDto.class);
+			List<ObjetoDirectorio> organismesDir3 = getUnitatsOrganitzativesPlugin().unitatsPerDenominacio(denominacio);
+			List<OrganGestorDto> organismes = conversioTipusHelper.convertirList(organismesDir3, OrganGestorDto.class);
 			integracioHelper.addAccioOk(info);
+			return organismes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar organismes  a partir d'un text";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-	
-		return organismes;
 	}
-	
 	
 	public List<CodiValor> llistarNivellsAdministracions() throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenint llista dels nivells de les administracions", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<CodiValor> nivellsAdministracio = null;
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,
+				"Obtenint llista dels nivells de les administracions", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			nivellsAdministracio = getUnitatsOrganitzativesPlugin().nivellsAdministracio();
+			List<CodiValor> nivellsAdministracio = getUnitatsOrganitzativesPlugin().nivellsAdministracio();
 			integracioHelper.addAccioOk(info);
+			return nivellsAdministracio;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar els nivells de les administracions";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		
-		return nivellsAdministracio;
 	}
 	
 	public List<CodiValor> llistarComunitatsAutonomes() throws SistemaExternException {
-		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenint llista les comunitats autònomes", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<CodiValor> comunitatsAutonomes = null;
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,
+				"Obtenint llista les comunitats autònomes", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			comunitatsAutonomes = getUnitatsOrganitzativesPlugin().comunitatsAutonomes();
+			List<CodiValor> comunitatsAutonomes = getUnitatsOrganitzativesPlugin().comunitatsAutonomes();
 			integracioHelper.addAccioOk(info);
+			return comunitatsAutonomes;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar les comunitats autònomes";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		
-		return comunitatsAutonomes;
 	}
 
-	
-
 	public List<CodiValorPais> llistarPaisos() throws SistemaExternException {
-		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenint llista de països", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<CodiValorPais> paisos = null;
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenint llista de països", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			paisos = getUnitatsOrganitzativesPlugin().paisos();
+			List<CodiValorPais> paisos = getUnitatsOrganitzativesPlugin().paisos();
 			integracioHelper.addAccioOk(info);
+			return paisos;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistar països";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		
-		return paisos;
 	}
 
 	public List<CodiValor> llistarProvincies() throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenint llista de províncies", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<CodiValor> provincies = null;
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenint llista de províncies", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			provincies = getUnitatsOrganitzativesPlugin().provincies();
+			List<CodiValor> provincies = getUnitatsOrganitzativesPlugin().provincies();
 			integracioHelper.addAccioOk(info);
+			return provincies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistat províncies";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		
-		return provincies;
 	}
 	
 	public List<CodiValor> llistarProvincies(String codiCA) throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_UNITATS, 
-				"Obtenint llista de províncies", 
-				IntegracioAccioTipusEnumDto.ENVIAMENT);
-		
-		List<CodiValor> provincies = null;
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenint llista de províncies", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			provincies = getUnitatsOrganitzativesPlugin().provincies(codiCA);
+			List<CodiValor> provincies = getUnitatsOrganitzativesPlugin().provincies(codiCA);
 			integracioHelper.addAccioOk(info);
+			return provincies;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistat províncies";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		
-		return provincies;
 	}
 	
 	public List<CodiValor> llistarLocalitats(String codiProvincia) throws SistemaExternException {
@@ -1391,49 +1055,35 @@ public class PluginHelper {
 				"Obtenint llista de localitats d'una província", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("Codi de la província", codiProvincia));
-		
-		List<CodiValor> localitats = null;
+		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			localitats = getUnitatsOrganitzativesPlugin().localitats(codiProvincia);
+			List<CodiValor> localitats = getUnitatsOrganitzativesPlugin().localitats(codiProvincia);
 			integracioHelper.addAccioOk(info);
+			return localitats;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al llistat els municipis d'una província";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-		
-		return localitats;
 	}
 
-	public byte[] firmaServidorFirmar(
-			NotificacioEntity notificacio,
-			FitxerDto fitxer,
-			TipusFirma tipusFirma,
-			String motiu,
-			String idioma) {
+	public byte[] firmaServidorFirmar(NotificacioEntity notificacio, FitxerDto fitxer, TipusFirma tipusFirma, String motiu, String idioma) {
+
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_FIRMASERV, 
 				"Firma en servidor d'un document", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
 				new AccioParam("notificacioId", notificacio.getId().toString()),
 				new AccioParam("títol", fitxer.getNom()));
+		info.setCodiEntitat(notificacio.getEntitat().getCodi());
 		try {
 			byte [] firmaContingut = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), tipusFirma, idioma);
 			integracioHelper.addAccioOk(info);
 			return firmaContingut;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de firma en servidor: " + ex.getMessage();
-			integracioHelper.addAccioError(
-					info,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_FIRMASERV,
-					errorDescripcio,
-					ex);
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, errorDescripcio, ex);
 		}
 	}
 	
@@ -2060,21 +1710,17 @@ public class PluginHelper {
 		}
 	}
 
-	public boolean isRegistrePluginDisponible() {
-		String pluginClass = getPropertyPluginRegistre();
-		if (pluginClass != null && pluginClass.length() > 0) {
-			try {
-				return getRegistrePlugin() != null;
-			} catch (SistemaExternException sex) {
-				logger.error(
-						"Error al obtenir la instància del plugin de registre",
-						sex);
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
+//	public boolean isRegistrePluginDisponible() {
+//		String pluginClass = getPropertyPluginRegistre();
+//		if (pluginClass != null && pluginClass.length() > 0) {
+//			try {
+//				return getRegistrePlugin() != null;
+//			} catch (SistemaExternException sex) {
+//				logger.error("Error al obtenir la instància del plugin de registre", sex);
+//			}
+//		}
+//		return false;
+//	}
 
 	public boolean isArxiuPluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
@@ -2082,181 +1728,181 @@ public class PluginHelper {
 			try {
 				return getArxiuPlugin() != null;
 			} catch (SistemaExternException sex) {
-				logger.error(
-						"Error al obtenir la instància del plugin d'arxiu",
-						sex);
-				return false;
+				logger.error("Error al obtenir la instància del plugin d'arxiu", sex);
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
+
 		loadPluginProperties("USUARIS");
-		if (dadesUsuariPlugin == null) {
-			String pluginClass = getPropertyPluginDadesUsuari();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					dadesUsuariPlugin = (DadesUsuariPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_USUARIS,
-							"Error al crear la instància del plugin de dades d'usuari",
-							ex);
-				}
-			} else {
-				logger.error("La classe del plugin d'usuari no està definida");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_USUARIS,
-						"La classe del plugin de dades d'usuari no està configurada");
-			}
+		if (dadesUsuariPlugin != null) {
+			return dadesUsuariPlugin;
 		}
-		return dadesUsuariPlugin;
+		String pluginClass = getPropertyPluginDadesUsuari();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String msg = "La classe del plugin d'usuari no està definida";
+			logger.error(msg);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, msg);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			return dadesUsuariPlugin = (DadesUsuariPlugin)clazz.newInstance();
+		} catch (Exception ex) {
+			logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "Error al crear la instància del plugin de dades d'usuari", ex);
+		}
+	}
+
+	private String getCodiEntitatActual() {
+
+		String codiEntitat = configHelper.getEntitatActualCodi();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi de l'entitat no pot ser null");
+		}
+		return codiEntitat;
 	}
 
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
+
+		String codiEntitat = getCodiEntitatActual();
+		GestioDocumentalPlugin plugin = gestioDocumentalPlugin.get(codiEntitat);
 		loadPluginProperties("GES_DOC");
-		if (gestioDocumentalPlugin == null) {
-			String pluginClass = getPropertyPluginGestioDocumental();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin de gestió documental (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_GESDOC,
-							"Error al crear la instància del plugin de gestió documental",
-							ex);
-				}
-			} else {
-				logger.error("La classe del plugin de gestió documental no està definida");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_USUARIS,
-						"La classe del plugin de gestió documental no està configurada");
-			}
+		if (plugin != null) {
+			return plugin;
 		}
-		return gestioDocumentalPlugin;
+		String pluginClass = getPropertyPluginGestioDocumental();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String msg = "La classe del plugin de gestió documental no està configurada";
+			logger.error(msg);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, msg);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (GestioDocumentalPlugin)clazz.newInstance();
+			gestioDocumentalPlugin.put(codiEntitat, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			String msg = "Error al crear la instància del plugin de gestió documental (" + pluginClass + ") ";
+			logger.error(msg, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, msg, ex);
+		}
 	}
 
-	private RegistrePlugin getRegistrePlugin() {
+	private RegistrePlugin getRegistrePlugin(String codiEntitat) {
+
+		RegistrePlugin plugin = registrePlugin.get(codiEntitat);
 		loadPluginProperties("REGISTRE");
-		if (registrePlugin == null) {
-			String pluginClass = getPropertyPluginRegistre();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					registrePlugin = (RegistrePlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin de registre (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_REGISTRE,
-							"Error al crear la instància del plugin de registre",
-							ex);
-				}
-			} else {
-				logger.error("La classe del plugin de registre no està definida");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_REGISTRE,
-						"La classe del plugin de registre no està configurada");
-			}
+		if (plugin != null) {
+			return plugin;
 		}
-		return registrePlugin;
+		String pluginClass = getPropertyPluginRegistre();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String msg = "\"La classe del plugin de registre no està definida\"";
+			logger.error(msg);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, msg);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (RegistrePlugin)clazz.newInstance();
+			registrePlugin.put(codiEntitat, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			String msg = "\"Error al crear la instància del plugin de registre (\" + pluginClass + \") \"";
+			logger.error(msg, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, msg, ex);
+		}
 	}
 	
 	private IArxiuPlugin getArxiuPlugin() {
+
+		String codiEntitat = getCodiEntitatActual();
+		IArxiuPlugin plugin = arxiuPlugin.get(codiEntitat);
 		loadPluginProperties("ARXIU");
-		if (arxiuPlugin == null) {
-			String pluginClass = getPropertyPluginArxiu();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
-						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-								String.class).newInstance(
-								"es.caib.notib.");
-					} else {
-						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-								String.class,
-								Properties.class).newInstance(
-								"es.caib.notib.",
-								ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
-					}
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin d'arxiu digital (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_ARXIU,
-							"Error al crear la instància del plugin d'arxiu digital",
-							ex);
-				}
-			} else {
-				logger.error("La classe del plugin d'arxiu digital no està definida");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_ARXIU,
-						"No està configurada la classe per al plugin d'arxiu digital");
-			}
+		if (plugin != null) {
+			return plugin;
 		}
-		return arxiuPlugin;
+		String pluginClass = getPropertyPluginArxiu();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String msg = "La classe del plugin d'arxiu digital no està definida";
+			logger.error(msg);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, msg);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem() ?
+					(IArxiuPlugin)clazz.getDeclaredConstructor(String.class).newInstance("es.caib.notib.")
+					: (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+						.newInstance("es.caib.notib.", ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
+			arxiuPlugin.put(codiEntitat, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			String msg = "Error al crear la instància del plugin d'arxiu digital (" + pluginClass + ") ";
+			logger.error(msg, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, msg, ex);
+		}
 	}
 
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+
+		String codiEntitat = getCodiEntitatActual();
+		UnitatsOrganitzativesPlugin plugin = unitatsOrganitzativesPlugin.get(codiEntitat);
 		loadPluginProperties("DIR3");
-		if (unitatsOrganitzativesPlugin == null) {
-			String pluginClass = getPropertyPluginUnitats();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin de DIR3 (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_REGISTRE,
-							"Error al crear la instància del plugin de DIR3",
-							ex);
-				}
-			} else {
-				logger.error("La classe del plugin de DIR3 no està configurada");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_REGISTRE,
-						"La classe del plugin de DIR3 no està configurada");
-			}
+		if (plugin != null) {
+			return plugin;
 		}
-		
-		return unitatsOrganitzativesPlugin;
+		String pluginClass = getPropertyPluginUnitats();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String msg = "La classe del plugin de DIR3 no està configurada";
+			logger.error(msg);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, msg);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
+			unitatsOrganitzativesPlugin.put(codiEntitat, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			String msg = "Error al crear la instància del plugin de DIR3 (" + pluginClass + ") ";
+			logger.error(msg, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_REGISTRE, msg, ex);
+		}
 	}
 	
 	private GestorContingutsAdministratiuPlugin getGestorDocumentalAdministratiuPlugin() {
+
+		String codiEntitat = getCodiEntitatActual();
+		GestorContingutsAdministratiuPlugin plugin = gestorDocumentalAdministratiuPlugin.get(codiEntitat);
 		loadPluginProperties("GESCONADM");
-		if (gestorDocumentalAdministratiuPlugin == null) {
-			String pluginClass = getPropertyPluginGestorDocumentalAdministratu();
-			if (pluginClass != null && pluginClass.length() > 0) {
-				try {
-					Class<?> clazz = Class.forName(pluginClass);
-					gestorDocumentalAdministratiuPlugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
-				} catch (Exception ex) {
-					logger.error("Error al crear la instància del plugin de gestor documental administratiu (" + pluginClass + "): ", ex);
-					throw new SistemaExternException(
-							IntegracioHelper.INTCODI_GESCONADM,
-							"Error al crear la instància del plugin de gestor documental administratiu",
-							ex);
-				}
-			} else {
-				logger.error("La classe del plugin del gestor documental administratiu no està configurada");
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_GESCONADM,
-						"La classe del plugin del gestor documental administratiu no està configurada");
-			}
+		if (plugin != null) {
+			return plugin;
 		}
-		
-		return gestorDocumentalAdministratiuPlugin;
+		String pluginClass = getPropertyPluginGestorDocumentalAdministratu();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String msg = "La classe del plugin del gestor documental administratiu no està configurada";
+			logger.error(msg);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, msg);
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
+			gestorDocumentalAdministratiuPlugin.put(codiEntitat, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			String msg = "Error al crear la instància del plugin de gestor documental administratiu (" + pluginClass + ") ";
+			logger.error(msg, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, msg, ex);
+		}
 	}
+
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
+
+		String codiEntitat = getCodiEntitatActual();
+		FirmaServidorPlugin plugin = firmaServidorPlugin.get(codiEntitat);
 		loadPluginProperties("FIRMA");
-		if (firmaServidorPlugin != null) {
-			return firmaServidorPlugin;
+		if (plugin != null) {
+			return plugin;
 		}
 		String pluginClass = getPropertyPluginFirmaServidor();
 //		String pluginClass = configHelper.getConfig("es.caib.notib.plugin.signatura.class");;
@@ -2267,9 +1913,10 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
+			plugin = (FirmaServidorPlugin)clazz.newInstance();
+			firmaServidorPlugin.put(codiEntitat, plugin);
 //			signaturaPlugin = (SignaturaPlugin)clazz.newInstance();
-			return firmaServidorPlugin;
+			return plugin;
 		} catch (Exception ex) {
 			String error = "Error al crear la instància del plugin de firma en servidor" ;
 			logger.error(error + " (" + pluginClass + "): ", ex);
@@ -2298,36 +1945,50 @@ public class PluginHelper {
 		if (propertiesLoaded.containsKey(codeProperties))
 			propertiesLoaded.put(codeProperties, false);
 	}
+
 	public void resetPlugins() {
-		registrePlugin = null;
-		gestorDocumentalAdministratiuPlugin = null;
 		dadesUsuariPlugin = null;
-		unitatsOrganitzativesPlugin = null;
-		arxiuPlugin = null;
-		gestioDocumentalPlugin = null;
-		firmaServidorPlugin = null;
+		registrePlugin = new HashMap<>();
+		gestorDocumentalAdministratiuPlugin = new HashMap<>();
+		unitatsOrganitzativesPlugin = new HashMap<>();
+		arxiuPlugin = new HashMap<>();
+		gestioDocumentalPlugin = new HashMap<>();
+		firmaServidorPlugin = new HashMap<>();
 	}
+
+
+	// PROPIETATS PLUGIN
+
 	private String getPropertyPluginUnitats() {
-		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");
+		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.unitats.class");
 	}
 	private String getPropertyPluginDadesUsuari() {
 		return configHelper.getConfig("es.caib.notib.plugin.dades.usuari.class");
 	}
 	private String getPropertyPluginGestioDocumental() {
-		return configHelper.getConfig("es.caib.notib.plugin.gesdoc.class");
+		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.gesdoc.class");
 	}
 	private String getPropertyPluginRegistre() {
-		return configHelper.getConfig("es.caib.notib.plugin.registre.class");
+		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.registre.class");
 	}
 	private String getPropertyPluginArxiu() {
-		return configHelper.getConfig("es.caib.notib.plugin.arxiu.class");
+		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.arxiu.class");
 	}
 	private String getPropertyPluginGestorDocumentalAdministratu() {
-		return configHelper.getConfig("es.caib.notib.plugin.gesconadm.class");
+		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.gesconadm.class");
 	}
 	private String getPropertyPluginFirmaServidor() {
-		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
+		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.firmaservidor.class");
 	}
+	public int getSegonsEntreReintentRegistreProperty() {
+		return configHelper.getAsIntByEntitat("es.caib.notib.plugin.registre.segons.entre.peticions");
+	}
+	public String getOrganGestorsFile() {
+		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
+	}
+
+	// PROPIETATS TASQUES EN SEGON PLA
+
 	public int getRegistreReintentsPeriodeProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
 	}
@@ -2339,9 +2000,6 @@ public class PluginHelper {
 	}
 	public int getConsultaSirReintentsPeriodeProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
-	}
-	public int getSegonsEntreReintentRegistreProperty() {
-		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
 	}
 	public int getRegistreReintentsMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
@@ -2361,9 +2019,7 @@ public class PluginHelper {
 	public int getConsultaSirReintentsMaxProperty() {
 		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
 	}
-	public String getOrganGestorsFile() {
-		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
-	}
+
 
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {
 		NotificacioComunicacioTipusEnumDto tipus = NotificacioComunicacioTipusEnumDto.SINCRON;
@@ -2384,19 +2040,19 @@ public class PluginHelper {
 	}
 	
 	public void setGestioDocumentalPlugin(GestioDocumentalPlugin gestioDocumentalPlugin) {
-		this.gestioDocumentalPlugin = gestioDocumentalPlugin;
+		this.gestioDocumentalPlugin.put(getCodiEntitatActual(), gestioDocumentalPlugin);
 	}
 	
 	public void setRegistrePlugin(RegistrePlugin registrePlugin) {
-		this.registrePlugin = registrePlugin;
+		this.registrePlugin.put(getCodiEntitatActual(), registrePlugin);
 	}
 	
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
-		this.arxiuPlugin = arxiuPlugin;
+		this.arxiuPlugin.put(getCodiEntitatActual(), arxiuPlugin);
 	}
 	
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
-		this.unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugin;
+		this.unitatsOrganitzativesPlugin.put(getCodiEntitatActual(), unitatsOrganitzativesPlugin);
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
@@ -2433,7 +2089,6 @@ public class PluginHelper {
 				
 		return tipus;
 	}
-	
 
 	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 
