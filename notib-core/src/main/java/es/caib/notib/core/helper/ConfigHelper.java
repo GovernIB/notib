@@ -156,32 +156,32 @@ public class ConfigHelper {
             return getProperties(null);
         }
         public static JBossPropertiesHelper getProperties(String path) {
+
             String propertiesPath = path;
             if (propertiesPath == null) {
                 propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
             }
-            if (instance == null) {
-                instance = new JBossPropertiesHelper();
-                if (propertiesPath != null) {
-                    instance.llegirSystem = false;
-                    log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
-                    try {
-                        if (propertiesPath.startsWith("classpath:")) {
-                            instance.load(
-                                    JBossPropertiesHelper.class.getClassLoader().getResourceAsStream(
-                                            propertiesPath.substring("classpath:".length())));
-                        } else if (propertiesPath.startsWith("file://")) {
-                            FileInputStream fis = new FileInputStream(
-                                    propertiesPath.substring("file://".length()));
-                            instance.load(fis);
-                        } else {
-                            FileInputStream fis = new FileInputStream(propertiesPath);
-                            instance.load(fis);
-                        }
-                    } catch (Exception ex) {
-                        log.error("No s'han pogut llegir els properties", ex);
-                    }
+            if (instance != null) {
+                return instance;
+            }
+            instance = new JBossPropertiesHelper();
+            if (propertiesPath == null) {
+                return instance;
+            }
+            instance.llegirSystem = false;
+            log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
+            try {
+                if (propertiesPath.startsWith("classpath:")) {
+                    instance.load(JBossPropertiesHelper.class.getClassLoader().getResourceAsStream(propertiesPath.substring("classpath:".length())));
+                } else if (propertiesPath.startsWith("file://")) {
+                    FileInputStream fis = new FileInputStream(propertiesPath.substring("file://".length()));
+                    instance.load(fis);
+                } else {
+                    FileInputStream fis = new FileInputStream(propertiesPath);
+                    instance.load(fis);
                 }
+            } catch (Exception ex) {
+                log.error("No s'han pogut llegir els properties", ex);
             }
             return instance;
         }

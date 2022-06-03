@@ -48,11 +48,11 @@ public class IntegracioHelper {
 	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	
-	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<String, LinkedList<IntegracioAccioDto>>();
-	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
+	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<>();
+	private Map<String, Integer> maxAccionsIntegracio = new HashMap<>();
 
 	public List<IntegracioDto> findAll() {
-		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
+		List<IntegracioDto> integracions = new ArrayList<>();
 		integracions.add(novaIntegracio(INTCODI_USUARIS));
 		integracions.add(novaIntegracio(INTCODI_REGISTRE));
 		integracions.add(novaIntegracio(INTCODI_NOTIFICA));
@@ -183,8 +183,14 @@ public class IntegracioHelper {
 	}
 
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio, boolean obtenirUsuari) {
+
 		afegirParametreUsuari(accio, obtenirUsuari);
-		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi, null);
+		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
+		if (accions == null) {
+			accions = new LinkedList<>();
+			accions.add(accio);
+			return;
+		}
 		int max = getMaxAccions(integracioCodi);
 		while (accions.size() >= max) {
 			accions.remove(accions.size() - 1);
