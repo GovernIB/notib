@@ -728,13 +728,17 @@ public class PluginHelper {
 		return procediments;
 	}
 	
-	public int getTotalProcediments(String codiDir3) {
+	public int getTotalProcediments(String codiDir3Entitat) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Recuperant el total de procediments", IntegracioAccioTipusEnumDto.ENVIAMENT);
-		info.setCodiEntitat(getCodiEntitatActual());
 		int totalElements = 0;
 		try {
-			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalProcediments(codiDir3);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalProcediments(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al obtenir el número total d'elemetns";
@@ -870,6 +874,9 @@ public class PluginHelper {
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
 			if (entitat == null) {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
+			}
+			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
+				configHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
 			}
 			info.setCodiEntitat(entitat.getCodi());
 			if ("SOAP".equalsIgnoreCase(protocol)) {
@@ -1831,10 +1838,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem() ?
-					(IArxiuPlugin)clazz.getDeclaredConstructor(String.class).newInstance("es.caib.notib.")
-					: (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance("es.caib.notib.", ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
+			plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+					.newInstance("es.caib.notib.", ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
 			arxiuPlugin.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {

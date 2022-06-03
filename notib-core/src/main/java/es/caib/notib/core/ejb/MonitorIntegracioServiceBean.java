@@ -10,6 +10,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.notib.core.api.dto.IntegracioFiltreDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -39,8 +40,8 @@ public class MonitorIntegracioServiceBean implements MonitorIntegracioService {
 	
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
-		return delegate.integracioFindDarreresAccionsByCodi(codi, paginacio);
+	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
+		return delegate.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre);
 	}
 	
 	@Override

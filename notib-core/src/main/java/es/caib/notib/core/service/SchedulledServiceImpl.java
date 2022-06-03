@@ -310,7 +310,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 		Path path = Paths.get(dir);
 		DirectoryStream<Path> files = Files.newDirectoryStream(path);
-		long now = new Date().getTime();
 		for (Path file : files) {
 			if (Files.isDirectory(file)) {
 				esborrarTemporals(file.toString());

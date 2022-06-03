@@ -10,6 +10,8 @@ import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.service.MonitorIntegracioService;
+import es.caib.notib.war.command.IntegracioFiltreCommand;
+import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
@@ -40,6 +42,7 @@ import java.util.Map;
 public class IntegracioController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
+	private static final String INTEGRACIO_FILTRE = "integracio_filtre";
 
 	@Autowired
 	private MonitorIntegracioService monitorIntegracioService;
@@ -62,6 +65,13 @@ public class IntegracioController extends BaseUserController {
 		return getAmbCodi(request, "USUARIS", model);
 	}
 
+	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
+	public String post(HttpServletRequest request, @PathVariable @NonNull String codi, IntegracioFiltreCommand command, Model model) {
+
+		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
+		return getAmbCodi(request, codi, model);
+	}
+
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
@@ -80,13 +90,16 @@ public class IntegracioController extends BaseUserController {
 				integracio.setNumErrors(errors.get(integracio.getCodi()).intValue());
 			}
 		}
-		model.addAttribute("integracions", integracions);
+		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		model.addAttribute("integracioFiltreCommand", command);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, codi);
+		model.addAttribute("integracions", integracions);
+		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
 		try {
 			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio)));
+			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto())));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -99,7 +112,9 @@ public class IntegracioController extends BaseUserController {
 
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
-		List<IntegracioAccioDto> accions = codi != null ? monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio) : new ArrayList<IntegracioAccioDto>();
+		IntegracioFiltreCommand filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		List<IntegracioAccioDto> accions = codi != null ? monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre.asDto())
+				: new ArrayList<IntegracioAccioDto>();
 		if (accions.size() < paginacio.getPaginaTamany()) {
 			return 	DatatablesHelper.getDatatableResponse(request, accions);
 		}
@@ -122,7 +137,8 @@ public class IntegracioController extends BaseUserController {
 	public String detall(HttpServletRequest request, @PathVariable String codi, @PathVariable int index, Model model) {
 
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		List<IntegracioAccioDto> accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio);
+		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		List<IntegracioAccioDto> accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto());
 		if (index < accions.size()) {
 			model.addAttribute("integracio", accions.get(index));
 		}

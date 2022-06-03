@@ -269,6 +269,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	private Datado getDarrerDatat(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, IntegracioInfo info) throws DatatypeConfigurationException {
 
+		info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 		if (resultadoInfoEnvio.getDatados() == null) {
 			String errorDescripcio = "La resposta rebuda de Notifica no conté informació de datat";
 			integracioHelper.addAccioError(info, errorDescripcio);

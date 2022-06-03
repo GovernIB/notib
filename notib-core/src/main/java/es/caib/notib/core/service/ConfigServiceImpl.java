@@ -61,6 +61,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         pluginHelper.reloadProperties(configEntity.getGroupCode());
+        pluginHelper.resetPlugins(); // TODO FALTARIA NOMES FER RESET AL PLUGIN QUE TOCA
         if (property.getKey().endsWith(".class")){
             pluginHelper.resetPlugins();
         }

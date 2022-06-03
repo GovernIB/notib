@@ -32,6 +32,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private String baseUrl;
 
+//	public GestorContingutsAdministratiuPluginRolsac(String baseUrl, Properties properties) {
+//		this.baseUrl = baseUrl;
+//	}
+
 	@Override
 	public GesconAdm getProcSerByCodiSia(String codiSia, boolean isServei) throws SistemaExternException {
 

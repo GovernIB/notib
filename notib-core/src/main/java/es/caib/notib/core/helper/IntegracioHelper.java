@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
@@ -65,12 +66,9 @@ public class IntegracioHelper {
 		return integracions;
 	}
 
-	public List<IntegracioAccioDto> findAccions(String integracioCodi, String filtre) {
-		return getLlistaAccions(integracioCodi, filtre);
-	}
+	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
 
-	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi) {
-		return getLlistaAccions(integracioCodi);
+		return getLlistaAccions(integracioCodi, filtre);
 	}
 	
 	public Map<String, Integer> countErrorsGroupByCodi() {
@@ -158,34 +156,22 @@ public class IntegracioHelper {
 		return accionsAmbError;
 	}
 	
-	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, String ... filtres) {
+	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, IntegracioFiltreDto filtre) {
+
 		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 		if (accions == null) {
 			accions = new LinkedList<>();
 			accionsIntegracio.put(integracioCodi, accions);
 			return accions;
 		}
-		int index = 0;
-		List<IntegracioAccioDto>  indexBorrar = new ArrayList<>();
 		LinkedList<IntegracioAccioDto> accionsBones = new LinkedList<>();
 		for (IntegracioAccioDto accio: accions) {
-			boolean esborrada = false;
-			if ("CALLBACK".equals(integracioCodi) && filtres != null) {
-				for (int foo = 0; foo < filtres.length; foo++) {
-					String filtre = filtres[foo] != null ? filtres[foo] : "";
-					if (accio.getAplicacio() != null && !accio.getAplicacio().toLowerCase().contains(filtre.toLowerCase())) {
-						esborrada = true;
-						indexBorrar.add(accio);
-						continue;
-					}
-					accionsBones.add(accio);
-				}
+			if (filtre != null && !filtre.filtresOK(accio, integracioCodi)) {
+				continue;
 			}
-			if (!esborrada) {
-				accio.setIndex(new Long(index++));
-			}
+			accionsBones.add(accio);
 		}
-		return accionsBones.size() > 0 || filtres.length > 0 ? accionsBones : accions;
+		return accionsBones;
 	}
 	private int getMaxAccions(String integracioCodi) {
 		Integer max = maxAccionsIntegracio.get(integracioCodi);
@@ -198,7 +184,7 @@ public class IntegracioHelper {
 
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio, boolean obtenirUsuari) {
 		afegirParametreUsuari(accio, obtenirUsuari);
-		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi);
+		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi, null);
 		int max = getMaxAccions(integracioCodi);
 		while (accions.size() >= max) {
 			accions.remove(accions.size() - 1);

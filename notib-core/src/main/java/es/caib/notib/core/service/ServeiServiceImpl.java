@@ -417,7 +417,8 @@ public class ServeiServiceImpl implements ServeiService{
 					"Actualització de serveis", 
 					IntegracioAccioTipusEnumDto.PROCESSAR, 
 					new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
-
+			info.setCodiEntitat(entitatDto.getCodi());
+			ConfigHelper.setEntitat(entitatDto);
 			logger.debug("[SERVEIS] Inici actualitzar serveis");
 			// Comprova si hi ha una altre instància del procés en execució
 			ProgresActualitzacioDto progres = progresActualitzacioServeis.get(entitatDto.getDir3Codi());

@@ -38,12 +38,9 @@ public class PropertiesHelper extends Properties {
 				log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
 				try {
 					if (propertiesPath.startsWith("classpath:")) {
-						instance.load(
-								PropertiesHelper.class.getClassLoader().getResourceAsStream(
-										propertiesPath.substring("classpath:".length())));
+						instance.load(PropertiesHelper.class.getClassLoader().getResourceAsStream(propertiesPath.substring("classpath:".length())));
 					} else if (propertiesPath.startsWith("file://")) {
-						FileInputStream fis = new FileInputStream(
-								propertiesPath.substring("file://".length()));
+						FileInputStream fis = new FileInputStream(propertiesPath.substring("file://".length()));
 						instance.load(fis);
 					} else {
 						FileInputStream fis = new FileInputStream(propertiesPath);
@@ -60,6 +57,7 @@ public class PropertiesHelper extends Properties {
 	public String getProperty(String key) {
 		return super.getProperty(key);
 	}
+
 	public String getProperty(String key, String defaultValue) {
 		String val = getProperty(key);
         return (val == null) ? defaultValue : val;

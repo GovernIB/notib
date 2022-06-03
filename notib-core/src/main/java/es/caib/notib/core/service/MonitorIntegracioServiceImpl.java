@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import es.caib.notib.core.api.dto.IntegracioFiltreDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -58,14 +59,12 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	}
 
 	@Override
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
+	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
-			String filtre = paginacio.getFiltre();
-			return "CALLBACK".equals(codi)  && !Strings.isNullOrEmpty(filtre)? integracioHelper.findAccions(codi, filtre)
-					:  integracioHelper.findAccionsByIntegracioCodi(codi);
+			return integracioHelper.findAccions(codi, filtre);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

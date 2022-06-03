@@ -74,7 +74,6 @@ databaseChangeLog:
                   KEY LIKE '%plugin.gesconadm.password' OR
                   KEY LIKE '%plugin.gesconadm.username' OR
                   KEY LIKE '%plugin.gesdoc.class' OR
-                  KEY LIKE '%plugin.gesdoc.filesystem.base.dir' OR
                   KEY LIKE '%plugin.registre.class' OR
                   KEY LIKE '%plugin.registre.documents.enviar' OR
                   KEY LIKE '%plugin.registre.enviamentSir.tipusDocumentEnviar' OR
@@ -103,3 +102,5 @@ databaseChangeLog:
                   KEY LIKE '%adviser.actiu' OR
                   KEY LIKE '%enviament.massiu.prioritat' OR
                   KEY LIKE '%notifica.dir3.entitat.permes'"
+
+

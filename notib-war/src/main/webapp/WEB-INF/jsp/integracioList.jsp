@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <html>
 <head>
@@ -103,6 +104,26 @@
 		});
 	});
 </script>
+
+<form:form id="filtre" action="" method="post" cssClass="well" commandName="integracioFiltreCommand">
+	<div class="row">
+		<div class="col-md-2">
+			<not:inputText name="entitatCodi" inline="true" placeholderKey="integracio.filtre.codi.entitat"/>
+		</div>
+		<c:if test="${'CALLBACK' == codiActual}">
+			<div class="col-md-2">
+				<not:inputText name="aplicacio" inline="true" placeholderKey="integracio.filtre.codi.aplicacio"/>
+			</div>
+		</c:if>
+		<div class="col-md-2 pull-right">
+			<div class="pull-right">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+			</div>
+		</div>
+	</div>
+</form:form>
+
 	<ul class="nav nav-tabs" role="tablist">
 		<c:forEach var="integracio" items="${integracions}">
 			<li<c:if test="${integracio.codi == codiActual}"> class="active pestanya"</c:if>>
@@ -118,7 +139,7 @@
 <script id="botonsTemplate" type="text/x-jsrender">
 
 	</script>
-	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
+	<table id="missatges-integracions" data-toggle="datatable" data-filter="#filtre" data-url="<c:url value="/integracio/datatable"/>"
 			<c:if test="${codiActual == 'CALLBACK'}">
 			   data-search-enabled="true"
 			   data-info-type="search"

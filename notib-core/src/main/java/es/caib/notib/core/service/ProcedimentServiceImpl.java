@@ -417,7 +417,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					"Actualització de procediments", 
 					IntegracioAccioTipusEnumDto.PROCESSAR, 
 					new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
-
+			info.setCodiEntitat(entitatDto.getCodi());
 			logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 			// Comprova si hi ha una altre instància del procés en execució
 			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
@@ -574,7 +574,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
-	private int getTotalProcediments(String codiDir3) {		
+	private int getTotalProcediments(String codiDir3) {
 		logger.debug(">>>> >> Obtenir total procediments Rolsac...");
 		Long t1 = System.currentTimeMillis();
 		int totalElements = pluginHelper.getTotalProcediments(codiDir3);
@@ -583,24 +583,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		return totalElements;
 	}
 	
-	private List<ProcSerDto> getProcedimentsGdaByEntitat(
-			String codiDir3,
-			int numPagina) {
+	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
+
 		ProgresActualitzacioDto progres = progresActualitzacio.get(codiDir3);
-		
 		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		Long t1 = System.currentTimeMillis();
-		
-		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(
-				codiDir3,
-				numPagina);
-		
+		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
 		Long t2 = System.currentTimeMillis();
 		logger.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
-		
 		return procedimentsEntitat;
 	}
 	
