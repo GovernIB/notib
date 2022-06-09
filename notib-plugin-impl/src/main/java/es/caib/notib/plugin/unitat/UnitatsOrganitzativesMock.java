@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.
@@ -27,7 +28,13 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
 	private static final String WS_UNITATS = "ws/Dir3CaibObtenerUnidades";
 	private static final String WS_OFICINA = "ws/Dir3CaibObtenerOficinas";
-	
+
+	private final Properties properties;
+
+	public UnitatsOrganitzativesMock(Properties properties) {
+		this.properties = properties;
+	}
+
 	@Override
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
 		Map<String, NodeDir3>  organigrama = new HashMap<>();

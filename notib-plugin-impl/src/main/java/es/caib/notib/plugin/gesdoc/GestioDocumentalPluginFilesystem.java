@@ -1,6 +1,5 @@
 package es.caib.notib.plugin.gesdoc;
 
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 
 /**
  * Implementació del plugin de gestió documental que emmagatzema els arxius
@@ -24,6 +24,12 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 	@Getter
 	private static final long MAX_FILES_IN_FOLDER = 5000;
+
+	private final Properties properties;
+
+	public GestioDocumentalPluginFilesystem(Properties properties) {
+		this.properties = properties;
+	}
 
 	@Override
 	public String create(String agrupacio, InputStream contingut) throws SistemaExternException {
@@ -143,8 +149,7 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 	}
 
 	private String getBaseDir(String agrupacio) {
-		String baseDir = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		String baseDir = properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		if (baseDir != null) {
 			if (baseDir.endsWith("/")) {
 				return baseDir + agrupacio;

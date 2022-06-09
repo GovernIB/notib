@@ -3,14 +3,13 @@
  */
 package es.caib.notib.plugin.firmaservidor;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import es.caib.notib.plugin.SistemaExternException;
 import org.apache.commons.io.IOUtils;
 
-import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementació del plugin de firma en servidor emprant PortaFIB.
@@ -18,6 +17,10 @@ import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class FirmaServidorPluginMock implements FirmaServidorPlugin {
+
+	public FirmaServidorPluginMock(Properties properties) {
+
+	}
 
 	@Override
 	public byte[] firmar(

@@ -31,5 +31,4 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
     @Modifying
     @Query("DELETE FROM ConfigEntity c WHERE c.entitatCodi = :entitatCodi")
     int deleteByEntitatCodi(@Param("entitatCodi") String entitatCodi);
-
 }

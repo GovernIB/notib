@@ -12,8 +12,13 @@ import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.helper.*;
-import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.CreacioSemaforDto;
+import es.caib.notib.core.helper.EnviamentHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +36,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -324,7 +328,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 
 	private String getBaseDir(String agrupacio) {
-		String baseDir = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		// TODO: Això es global o per entitat???!!!
+		String baseDir = configHelper.getConfig("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		if (baseDir == null) {
 			return null;
 		}

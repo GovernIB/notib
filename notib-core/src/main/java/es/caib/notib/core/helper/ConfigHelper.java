@@ -1,6 +1,5 @@
 package es.caib.notib.core.helper;
 
-import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
@@ -133,6 +132,19 @@ public class ConfigHelper {
     }
     public String getJBossProperty(String key, String defaultValue) {
         return JBossPropertiesHelper.getProperties().getProperty(key, defaultValue);
+    }
+
+    @Transactional(readOnly = true)
+    public Properties getAllEntityProperties(String entitatCodi) {
+        Properties properties = new Properties();
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        for (ConfigEntity config: configs) {
+            String value = entitatCodi != null ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
+            if (value != null) {
+                properties.put(config.getKey(), value);
+            }
+        }
+        return properties;
     }
 
     private String getConfig(ConfigEntity configEntity) throws NotDefinedConfigException {

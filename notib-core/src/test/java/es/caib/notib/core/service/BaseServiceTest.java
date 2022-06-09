@@ -23,7 +23,6 @@ import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
@@ -118,7 +117,7 @@ public class BaseServiceTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+//		PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
 	}
 
 	@AfterClass
@@ -360,8 +359,10 @@ public class BaseServiceTest {
 		ConfigEntity configEntity = new ConfigEntity(key, value);
 		configRepository.save(configEntity);
 	}
-	protected void setDefaultConfigs() {
-		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
+	protected void setDefaultConfigs() throws IOException {
+		Properties props = new Properties(System.getProperties());
+		props.load(getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/test.properties"));
+//		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
 		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
 			addConfig(entry.getKey().toString(), entry.getValue().toString());
 		}

@@ -2,11 +2,14 @@ package es.caib.notib.plugin.gesconadm;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.*;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandler;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
@@ -32,9 +36,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private String baseUrl;
 
-//	public GestorContingutsAdministratiuPluginRolsac(String baseUrl, Properties properties) {
-//		this.baseUrl = baseUrl;
-//	}
+	private final Properties properties;
+
+	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
+		this.properties = properties;
+	}
 
 	@Override
 	public GesconAdm getProcSerByCodiSia(String codiSia, boolean isServei) throws SistemaExternException {
@@ -464,7 +470,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	
 	private String getBaseUrl() {
 		if (baseUrl == null || baseUrl.isEmpty()) {
-			baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.base.url");
+			baseUrl = properties.getProperty("es.caib.notib.plugin.gesconadm.base.url");
 			if (baseUrl != null && !baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
 				baseUrl = baseUrl + "/";
 			}
@@ -473,15 +479,15 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	}
 	
 	private String getUsernameServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.username");
+		return properties.getProperty("es.caib.notib.plugin.gesconadm.username");
 	}
 
 	private String getPasswordServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.password");
+		return properties.getProperty("es.caib.notib.plugin.gesconadm.password");
 	}
 	
 	private boolean isServiceBasicAuthentication() {
-		String isBasicAuth = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
+		String isBasicAuth = properties.getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
 		if (isBasicAuth == null || isBasicAuth.isEmpty()) {
 			return true;
 		} else {

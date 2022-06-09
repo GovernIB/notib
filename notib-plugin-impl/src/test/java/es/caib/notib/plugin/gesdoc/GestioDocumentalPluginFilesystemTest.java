@@ -1,14 +1,18 @@
 package es.caib.notib.plugin.gesdoc;
 
 import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.PropertiesHelper;
 import junit.framework.TestCase;
 import org.junit.Before;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
 
 public class GestioDocumentalPluginFilesystemTest extends TestCase {
 
@@ -19,11 +23,9 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
 
     @Before
     public void setUp() throws Exception {
-//        PropertiesHelper.getProperties().setLlegirSystem(false);
-        PropertiesHelper.getProperties().setProperty(
-                "es.caib.notib.plugin.gesdoc.filesystem.base.dir",
-                BASE_DIR);
-        plugin = new GestioDocumentalPluginFilesystem();
+        Properties properties = new Properties();
+        properties.put("es.caib.notib.plugin.gesdoc.filesystem.base.dir", BASE_DIR);
+        plugin = new GestioDocumentalPluginFilesystem(properties);
     }
 
     public void testCreate() {
@@ -124,8 +126,7 @@ public class GestioDocumentalPluginFilesystemTest extends TestCase {
     }
 
     private String getBaseDir(String agrupacio) {
-        String baseDir = PropertiesHelper.getProperties().getProperty(
-                "es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+        String baseDir = BASE_DIR; // properties.getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
         if (baseDir != null) {
             if (baseDir.endsWith("/")) {
                 return baseDir + agrupacio;

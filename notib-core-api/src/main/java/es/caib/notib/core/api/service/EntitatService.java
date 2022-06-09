@@ -252,6 +252,5 @@ public interface EntitatService {
 	 * Afegeix l'entitat que està activada a l'aplicació per poder accedir a les
 	 * seves propietats
 	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
 	void setConfigEntitat(EntitatDto entitatDto);
 }

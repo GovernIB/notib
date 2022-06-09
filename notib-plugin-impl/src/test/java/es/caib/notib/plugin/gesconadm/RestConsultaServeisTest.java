@@ -4,8 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Properties;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RestConsultaServeisTest {
 
@@ -15,16 +17,21 @@ public class RestConsultaServeisTest {
 	private static final String ROLSAC_PASSWORD = "notib_rolsac";
 	private static final Boolean ROLSAC_BASICAUTH = true;
 
-	GestorContingutsAdministratiuPluginRolsac pluginRolsac = new GestorContingutsAdministratiuPluginRolsac();
+	GestorContingutsAdministratiuPluginRolsac pluginRolsac;
 
 	@Before
 	public void setUp() throws Exception {
+		Properties properties = new Properties();
 		String keystorePath = RestConsultaServeisTest.class.getResource("/es/caib/notib/plugin/truststore.jks").toURI().getPath();
 		System.setProperty("javax.net.ssl.trustStore", keystorePath);
 		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
-		System.setProperty("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
-		System.setProperty("es.caib.notib.plugin.gesconadm.username", "$notib_rolsac");
-		System.setProperty("es.caib.notib.plugin.gesconadm.password", "notib_rolsac");
+//		System.setProperty("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
+//		System.setProperty("es.caib.notib.plugin.gesconadm.username", "$notib_rolsac");
+//		System.setProperty("es.caib.notib.plugin.gesconadm.password", "notib_rolsac");
+		properties.put("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
+		properties.put("es.caib.notib.plugin.gesconadm.username", "$notib_rolsac");
+		properties.put("es.caib.notib.plugin.gesconadm.base.url", "https://dev.caib.es/rolsac");
+		pluginRolsac = new GestorContingutsAdministratiuPluginRolsac(properties);
 	}
 
 	@Test

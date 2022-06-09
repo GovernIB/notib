@@ -3,9 +3,10 @@
  */
 package es.caib.notib.plugin.usuari;
 
-import java.util.List;
-
 import es.caib.notib.plugin.SistemaExternException;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementació de test del plugin de consulta de dades d'usuaris.
@@ -13,6 +14,12 @@ import es.caib.notib.plugin.SistemaExternException;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class DadesUsuariPluginMock implements DadesUsuariPlugin {
+
+	private final Properties properties;
+
+	public DadesUsuariPluginMock(Properties properties) {
+		this.properties = properties;
+	}
 
 	@Override
 	public DadesUsuari consultarAmbCodi(

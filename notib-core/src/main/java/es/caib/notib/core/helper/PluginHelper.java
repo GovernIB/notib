@@ -20,7 +20,6 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.exception.DocumentNotFoundException;
 import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.notib.plugin.gesconadm.GcaProcediment;
@@ -1717,18 +1716,6 @@ public class PluginHelper {
 		}
 	}
 
-//	public boolean isRegistrePluginDisponible() {
-//		String pluginClass = getPropertyPluginRegistre();
-//		if (pluginClass != null && pluginClass.length() > 0) {
-//			try {
-//				return getRegistrePlugin() != null;
-//			} catch (SistemaExternException sex) {
-//				logger.error("Error al obtenir la instància del plugin de registre", sex);
-//			}
-//		}
-//		return false;
-//	}
-
 	public boolean isArxiuPluginDisponible() {
 		String pluginClass = getPropertyPluginRegistre();
 		if (pluginClass != null && pluginClass.length() > 0) {
@@ -1743,7 +1730,6 @@ public class PluginHelper {
 
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 
-		loadPluginProperties("USUARIS");
 		if (dadesUsuariPlugin != null) {
 			return dadesUsuariPlugin;
 		}
@@ -1755,7 +1741,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			return dadesUsuariPlugin = (DadesUsuariPlugin)clazz.newInstance();
+			return dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(null));
 		} catch (Exception ex) {
 			logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "Error al crear la instància del plugin de dades d'usuari", ex);
@@ -1775,7 +1762,6 @@ public class PluginHelper {
 
 		String codiEntitat = getCodiEntitatActual();
 		GestioDocumentalPlugin plugin = gestioDocumentalPlugin.get(codiEntitat);
-		loadPluginProperties("GES_DOC");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -1787,7 +1773,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (GestioDocumentalPlugin)clazz.newInstance();
+			plugin = (GestioDocumentalPlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(codiEntitat));
 			gestioDocumentalPlugin.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -1800,7 +1787,6 @@ public class PluginHelper {
 	private RegistrePlugin getRegistrePlugin(String codiEntitat) {
 
 		RegistrePlugin plugin = registrePlugin.get(codiEntitat);
-		loadPluginProperties("REGISTRE");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -1812,7 +1798,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (RegistrePlugin)clazz.newInstance();
+			plugin = (RegistrePlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(codiEntitat));
 			registrePlugin.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -1826,7 +1813,6 @@ public class PluginHelper {
 
 		String codiEntitat = getCodiEntitatActual();
 		IArxiuPlugin plugin = arxiuPlugin.get(codiEntitat);
-		loadPluginProperties("ARXIU");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -1853,7 +1839,6 @@ public class PluginHelper {
 
 		String codiEntitat = getCodiEntitatActual();
 		UnitatsOrganitzativesPlugin plugin = unitatsOrganitzativesPlugin.get(codiEntitat);
-		loadPluginProperties("DIR3");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -1865,7 +1850,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
+			plugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(codiEntitat));
 			unitatsOrganitzativesPlugin.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -1879,7 +1865,6 @@ public class PluginHelper {
 
 		String codiEntitat = getCodiEntitatActual();
 		GestorContingutsAdministratiuPlugin plugin = gestorDocumentalAdministratiuPlugin.get(codiEntitat);
-		loadPluginProperties("GESCONADM");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -1891,7 +1876,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (GestorContingutsAdministratiuPlugin)clazz.newInstance();
+			plugin = (GestorContingutsAdministratiuPlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(codiEntitat));
 			gestorDocumentalAdministratiuPlugin.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -1905,7 +1891,6 @@ public class PluginHelper {
 
 		String codiEntitat = getCodiEntitatActual();
 		FirmaServidorPlugin plugin = firmaServidorPlugin.get(codiEntitat);
-		loadPluginProperties("FIRMA");
 		if (plugin != null) {
 			return plugin;
 		}
@@ -1918,9 +1903,9 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			plugin = (FirmaServidorPlugin)clazz.newInstance();
+			plugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(Properties.class)
+					.newInstance(configHelper.getAllEntityProperties(codiEntitat));
 			firmaServidorPlugin.put(codiEntitat, plugin);
-//			signaturaPlugin = (SignaturaPlugin)clazz.newInstance();
 			return plugin;
 		} catch (Exception ex) {
 			String error = "Error al crear la instància del plugin de firma en servidor" ;
@@ -1929,29 +1914,34 @@ public class PluginHelper {
 		}
 	}
 
-	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
-	private synchronized void loadPluginProperties(String codeProperties) {
-		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
-			propertiesLoaded.put(codeProperties, true);
-			Map<String, String> pluginProps = configHelper.getGroupProperties(codeProperties);
-			for (Map.Entry<String, String> entry : pluginProps.entrySet() ) {
-				String value = entry.getValue() == null ? "" : entry.getValue();
-				PropertiesHelper.getProperties().setProperty(entry.getKey(), value);
-			}
+	public void resetPlugins(String grup) {
+		switch (grup) {
+			case "ARXIU":
+				arxiuPlugin = new HashMap<>();
+				break;
+			case "USUARIS":
+				dadesUsuariPlugin = null;
+				break;
+			case "FIRMA":
+				firmaServidorPlugin = new HashMap<>();
+				break;
+			case "GESCONADM":
+				gestorDocumentalAdministratiuPlugin = new HashMap<>();
+				break;
+			case "GES_DOC":
+				gestioDocumentalPlugin = new HashMap<>();
+				break;
+			case "REGISTRE":
+				registrePlugin = new HashMap<>();
+				break;
+			case "DIR3":
+				unitatsOrganitzativesPlugin = new HashMap<>();
+				break;
 		}
+
 	}
 
-	/**
-	 * Esborra les properties del grup indicat per paràmetre de la memòria.
-	 *
-	 * @param codeProperties Codi del grup de propietats que vols esborrar de memòria.
-	 */
-	public void reloadProperties(String codeProperties) {
-		if (propertiesLoaded.containsKey(codeProperties))
-			propertiesLoaded.put(codeProperties, false);
-	}
-
-	public void resetPlugins() {
+	public void resetAllPlugins() {
 		dadesUsuariPlugin = null;
 		registrePlugin = new HashMap<>();
 		gestorDocumentalAdministratiuPlugin = new HashMap<>();

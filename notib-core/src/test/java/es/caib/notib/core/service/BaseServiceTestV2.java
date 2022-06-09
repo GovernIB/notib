@@ -1,6 +1,9 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -12,11 +15,14 @@ import es.caib.notib.core.test.AuthenticationTest;
 import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.notib.core.test.data.DatabaseItemTest;
 import es.caib.notib.core.test.data.EntitatItemTest;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.notib.plugin.registre.*;
-import es.caib.notib.plugin.unitat.*;
+import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.plugin.unitat.CodiValorPais;
+import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
 import es.caib.plugins.arxiu.api.Document;
@@ -39,7 +45,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.Assert.fail;
@@ -198,8 +212,10 @@ public class BaseServiceTestV2 {
 		ConfigEntity configEntity = new ConfigEntity(key, value);
 		configRepository.save(configEntity);
 	}
-	protected void setDefaultConfigs() {
-		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
+	protected void setDefaultConfigs() throws IOException {
+		Properties props = new Properties(System.getProperties());
+		props.load(getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/test.properties"));
+//		Properties props = PropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties").findAll();
 		for (Map.Entry<Object, Object> entry : props.entrySet() ) {
 			addConfig(entry.getKey().toString(), entry.getValue().toString());
 		}
