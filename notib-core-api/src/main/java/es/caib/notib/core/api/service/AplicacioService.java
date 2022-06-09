@@ -19,6 +19,8 @@ import java.util.List;
 public interface AplicacioService {
 
 
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	void actualitzarEntiatThreadLocal(EntitatDto entitat);
 	/**
 	 * Processa l'autenticació d'un usuari.
 	 * 
