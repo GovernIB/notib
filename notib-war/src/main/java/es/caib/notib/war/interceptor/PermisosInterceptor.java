@@ -6,6 +6,7 @@ package es.caib.notib.war.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.caib.notib.core.api.service.OrganGestorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -24,21 +25,16 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
+	private OrganGestorService organGestorService;
+	@Autowired
 	private AplicacioService aplicacioService;
 	@Autowired
 	private NotificacioService notificacioService;
 	
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		
-		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(
-				request,
-				procedimentService,
-				notificacioService,
-				aplicacioService);
+		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(request, procedimentService, organGestorService, aplicacioService);
 		return true;
 	}
 
