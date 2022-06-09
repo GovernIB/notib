@@ -29,7 +29,13 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Autowired
 	AplicacioService delegate;
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		delegate.actualitzarEntiatThreadLocal(entitat);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void processarAutenticacioUsuari() {

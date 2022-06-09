@@ -62,6 +62,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private MessageHelper messageHelper;
 
+	@Override
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		configHelper.setEntitat(entitat);
+	}
+
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari() {
@@ -93,6 +98,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 					usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 				}
 			}
+
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 
