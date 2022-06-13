@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
@@ -57,7 +58,7 @@ public class ConfigHelper {
 
         String key = crearEntitatKey(entitatCodi, property);
         ConfigEntity configEntity = configRepository.findOne(key);
-        if (configEntity != null && configEntity.getValue() != null) {
+        if (configEntity != null && (configEntity.isJbossProperty() && configEntity.getValue() == null || configEntity.getValue() != null)) {
             return getConfig(configEntity);
         }
         configEntity = configRepository.findOne(property);
@@ -137,9 +138,9 @@ public class ConfigHelper {
     @Transactional(readOnly = true)
     public Properties getAllEntityProperties(String entitatCodi) {
         Properties properties = new Properties();
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        List<ConfigEntity> configs = !Strings.isNullOrEmpty(entitatCodi) ? configRepository.findConfigEntitaCodiAndGlobals(entitatCodi) : configRepository.findByEntitatCodiIsNull();
         for (ConfigEntity config: configs) {
-            String value = entitatCodi != null ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
+            String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
             if (value != null) {
                 properties.put(config.getKey(), value);
             }

@@ -438,42 +438,32 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		return jerseyClient;
 	}
 
-	private void autenticarClient(
-			Client jerseyClient,
-			String urlAmbMetode) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+	private void autenticarClient(Client jerseyClient, String urlAmbMetode) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+
 		String username = getUsernameServiceUrl();
 		String password = getPasswordServiceUrl();
-		
-		if (!isServiceBasicAuthentication()) {
-			logger.debug(
-					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			jerseyClient.resource(urlAmbMetode).get(String.class);
-			Form form = new Form();
-			form.putSingle("j_username", username);
-			form.putSingle("j_password", password);
-			jerseyClient.
-				resource(baseUrl + "j_security_check").
-				type("application/x-www-form-urlencoded").
-				post(form);
-		} else {
-			logger.debug(
-					"Autenticant REST amb autenticació de tipus HTTP basic (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
+		if (isServiceBasicAuthentication()) {
+			logger.debug("Autenticant REST amb autenticació de tipus HTTP basic (" + "urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
 			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+			return;
 		}
+		logger.debug("Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
+					"urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
+		jerseyClient.resource(urlAmbMetode).get(String.class);
+		Form form = new Form();
+		form.putSingle("j_username", username);
+		form.putSingle("j_password", password);
+		jerseyClient.resource(baseUrl + "j_security_check").type("application/x-www-form-urlencoded").post(form);
 	}
 	
 	private String getBaseUrl() {
-		if (baseUrl == null || baseUrl.isEmpty()) {
-			baseUrl = properties.getProperty("es.caib.notib.plugin.gesconadm.base.url");
-			if (baseUrl != null && !baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
-				baseUrl = baseUrl + "/";
-			}
+
+		if (baseUrl != null && !baseUrl.isEmpty()) {
+			return baseUrl;
+		}
+		baseUrl = properties.getProperty("es.caib.notib.plugin.gesconadm.base.url");
+		if (baseUrl != null && !baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
+			baseUrl = baseUrl + "/";
 		}
 		return baseUrl;
 	}
@@ -488,11 +478,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	
 	private boolean isServiceBasicAuthentication() {
 		String isBasicAuth = properties.getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
-		if (isBasicAuth == null || isBasicAuth.isEmpty()) {
-			return true;
-		} else {
-			return new Boolean(isBasicAuth).booleanValue();
-		}
+		return isBasicAuth == null || isBasicAuth.isEmpty() ? true : new Boolean(isBasicAuth).booleanValue();
 	}
 
 	@Getter @Setter

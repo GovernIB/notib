@@ -51,5 +51,7 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void crearPropietatsConfigPerEntitats();
 
+	String getPropertyValue(String key);
+
 }
 

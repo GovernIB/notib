@@ -55,4 +55,9 @@ public class ConfigServiceBean implements ConfigService {
 	public void crearPropietatsConfigPerEntitats() {
 		delegate.crearPropietatsConfigPerEntitats();
 	}
+
+	@Override
+	public String getPropertyValue(String key) {
+		return delegate.getPropertyValue(key);
+	}
 }

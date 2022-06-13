@@ -132,6 +132,11 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
+    @Override
+    public String getPropertyValue(String key) {
+        return configHelper.getConfig(key);
+    }
+
     private void processPropertyValues(ConfigGroupDto cGroup) {
         for (ConfigDto config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){
