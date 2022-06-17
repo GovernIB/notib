@@ -143,7 +143,7 @@ public class ConfigHelper {
         Properties properties = new Properties();
         List<ConfigEntity> configs = !Strings.isNullOrEmpty(entitatCodi) ? configRepository.findConfigEntitaCodiAndGlobals(entitatCodi) : configRepository.findByEntitatCodiIsNull();
         for (ConfigEntity config: configs) {
-            String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
+             String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
             if (value != null) {
                 properties.put(config.getKey(), value);
             }

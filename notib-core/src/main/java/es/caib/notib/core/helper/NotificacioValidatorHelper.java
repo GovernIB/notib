@@ -40,17 +40,12 @@ public class NotificacioValidatorHelper {
 	@Autowired
 	private MessageHelper messageHelper;
 
-	public List<String> validarNotificacioMassiu(
-			@NonNull NotificacioDatabaseDto notificacio,
-			@NonNull EntitatEntity entitat,
-			Map<String, Long> documentsProcessatsMassiu) {
-		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
+	public List<String> validarNotificacioMassiu(@NonNull NotificacioDatabaseDto notificacio, @NonNull EntitatEntity entitat, Map<String, Long> documentsProcessatsMassiu) {
 
+		log.info("[NOT-VALIDACIO] Validació notificació de nova notificacio massiva");
 		List<String> errors = notificacio.getErrors();
 		boolean comunicacioSenseAdministracio = false;
-
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
-
 		Map<String, OrganismeDto> organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
 
 		// Emisor
@@ -126,11 +121,11 @@ public class NotificacioValidatorHelper {
 						errors.add(messageHelper.getMessage("error.validacio.nom.titular.longitud.max"));
 					}
 					// - Llinatge 1
-					if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 40) {
+					if (enviament.getTitular().getLlinatge1() != null && enviament.getTitular().getLlinatge1().length() > 30) {
 						errors.add(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max"));
 					}
 					// - Llinatge 2
-					if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 40) {
+					if (enviament.getTitular().getLlinatge2() != null && enviament.getTitular().getLlinatge2().length() > 30) {
 						errors.add(messageHelper.getMessage("error.validacio.llinatge2.titular.longitud.max"));
 					}
 					// - Nif

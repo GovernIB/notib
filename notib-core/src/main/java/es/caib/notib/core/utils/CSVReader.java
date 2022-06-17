@@ -35,8 +35,9 @@ public class CSVReader {
                 }
                 index++;
             }
-            if( listReader != null )
+            if( listReader != null ) {
                 listReader.close();
+            }
         } catch (IOException e) {
             log.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
             return null;
