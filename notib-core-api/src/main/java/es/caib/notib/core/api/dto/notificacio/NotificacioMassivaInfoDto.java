@@ -16,6 +16,7 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
     @Getter
     @Builder
     public static class NotificacioInfo {
+
         private String codiDir3UnidadRemisora;
         private String concepto;
         private String enviamentTipus;
@@ -39,6 +40,7 @@ public class NotificacioMassivaInfoDto extends NotificacioMassivaDataDto {
         private String tipoDocumental;
         private String pdfFirmado;
         private String errores;
+        private String errorsExecucio;
         private boolean cancelada;
         private String estat;
     }

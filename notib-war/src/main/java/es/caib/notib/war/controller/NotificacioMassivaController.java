@@ -164,11 +164,20 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
 
-    @RequestMapping(value = "/{id}/errors/download", method = RequestMethod.GET)
-    public void errorsDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
+    @RequestMapping(value = "/{id}/errors/validacio/download", method = RequestMethod.GET)
+    public void errorsValidacioDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        FitxerDto file = notificacioMassivaService.getErrorsFile(entitatActual.getId(), id);
+        FitxerDto file = notificacioMassivaService.getErrorsValidacioFile(entitatActual.getId(), id);
+        response.setHeader("Set-cookie", "fileDownload=true; path=/");
+        writeFileToResponse(file.getNom(), file.getContingut(), response);
+    }
+
+    @RequestMapping(value = "/{id}/errors/execucio/download", method = RequestMethod.GET)
+    public void errorsExecucioDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
+
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        FitxerDto file = notificacioMassivaService.getErrorsExecucioFile(entitatActual.getId(), id);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }

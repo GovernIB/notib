@@ -406,7 +406,7 @@ public class NotificacioMassivaServiceTest {
 	@Test
 	public void whenGetErrorsFile_ThenCallGestioDocumentalGet() throws Exception {
 		// When
-		FitxerDto fitxer = notificacioMassivaService.getErrorsFile(entitatId, notMassivaId);
+		FitxerDto fitxer = notificacioMassivaService.getErrorsValidacioFile(entitatId, notMassivaId);
 
 		// Then
 		Mockito.verify(pluginHelper, Mockito.times(1)).gestioDocumentalGet(

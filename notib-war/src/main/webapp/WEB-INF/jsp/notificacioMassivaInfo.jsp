@@ -165,6 +165,8 @@ $(document).ready(function() {
 <%--								code="notificacio.massiva.info.resum.origen" /></strong></th>--%>
 						<th><strong><spring:message
 								code="notificacio.massiva.info.resum.errors" /></strong></th>
+						<th><strong><spring:message
+								code="notificacio.massiva.list.accio.errors.execucio.download" /></strong></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -177,6 +179,7 @@ $(document).ready(function() {
 						<td>${notInfo.nombre} ${notInfo.apellidos} - ${notInfo.cifNif}</td>
 <%--						<td>${notInfo.origen}</td>--%>
 						<td>${notInfo.errores}</td>
+						<td>${notInfo.errorsExecucio}</td>
 						<c:choose>
                             <c:when test="${notInfo.cancelada}">
 							    <td><strong><spring:message code="notificacio.massiva.info.resum.cancelada" /></strong></td>
