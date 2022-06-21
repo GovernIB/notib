@@ -184,13 +184,15 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 builder.cancelada(true);
             }
 
-            NotificacioEntity not = notificacioMassiva.getNotificacions().get(foo);
-            String error = "";
-            List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdAndErrorIsTrue(not.getId());
-            for (NotificacioEventEntity event : events) {
-                error += !Strings.isNullOrEmpty(event.getErrorDescripcio()) ? "\n" +  event.getErrorDescripcio() : "";
+            if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()) {
+                NotificacioEntity not = notificacioMassiva.getNotificacions().get(foo);
+                String error = "";
+                List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioIdAndErrorIsTrue(not.getId());
+                for (NotificacioEventEntity event : events) {
+                    error += !Strings.isNullOrEmpty(event.getErrorDescripcio()) ? "\n" + event.getErrorDescripcio() : "";
+                }
+                builder.errorsExecucio(error);
             }
-            builder.errorsExecucio(error);
             info.add(builder.build());
         }
         NotificacioMassivaInfoDto dto = conversioTipusHelper.convertir(notificacioMassiva, NotificacioMassivaInfoDto.class);
