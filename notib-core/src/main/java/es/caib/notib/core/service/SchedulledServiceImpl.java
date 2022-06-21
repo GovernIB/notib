@@ -286,6 +286,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void actualitzarServeis() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			logger.info("[SER] Actualitzant serveis...");
 			if (!isActualitzacioServeisActiuProperty()) {
 				logger.info("[SER] L'actualització de serveis està deshabilitada");
 				return;
@@ -293,7 +294,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			addAdminAuthentication();
 			logger.info("[SER] Cercant entitats per a actualitzar els serveis");
 			List<EntitatDto> entitats = entitatService.findAll();
-			if (entitats != null && !entitats.isEmpty()) {
+			if (entitats == null || entitats.isEmpty()) {
 				logger.info("[SER] No hi ha entitats per actualitzar");
 				return;
 			}
