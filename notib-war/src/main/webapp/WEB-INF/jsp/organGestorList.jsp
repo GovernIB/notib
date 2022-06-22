@@ -149,7 +149,7 @@
 				</th>
 				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
 				<th data-col-name="codiPare"><spring:message code="organgestor.list.columna.codi.pare"/></th>
-				<th data-col-name="nomPare"><spring:message code="organgestor.list.columna.nom.pare"/></th>
+				<th data-col-name="nomPare" data-orderable="false"><spring:message code="organgestor.list.columna.nom.pare"/></th>
 				<c:if test="${setLlibre}">
 					<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				</c:if>

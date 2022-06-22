@@ -196,7 +196,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			String msg = MessageHelper.getInstance().getMessage(msgKey, vars, locale);
 			context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 		}
-		return true;
+		return ok;
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidPersonaValidator.class);
