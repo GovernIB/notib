@@ -2030,18 +2030,26 @@ public class PluginHelper {
 		return tipus;
 	}
 
+
+	// Mètodes pels tests
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}
-	
+
 	public void setGestioDocumentalPlugin(GestioDocumentalPlugin gestioDocumentalPlugin) {
 		this.gestioDocumentalPlugin.put(getCodiEntitatActual(), gestioDocumentalPlugin);
+	}
+	public void setGestioDocumentalPlugin(Map<String, GestioDocumentalPlugin> gestioDocumentalPlugin) {
+		this.gestioDocumentalPlugin = gestioDocumentalPlugin;
 	}
 	
 	public void setRegistrePlugin(RegistrePlugin registrePlugin) {
 		this.registrePlugin.put(getCodiEntitatActual(), registrePlugin);
 	}
-	
+	public void setRegistrePlugin(Map<String, RegistrePlugin> registrePlugin) {
+		this.registrePlugin = registrePlugin;
+	}
+
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
 		this.arxiuPlugin.put(getCodiEntitatActual(), arxiuPlugin);
 	}
@@ -2051,6 +2059,13 @@ public class PluginHelper {
 	
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
 		this.unitatsOrganitzativesPlugin.put(getCodiEntitatActual(), unitatsOrganitzativesPlugin);
+	}
+	public void setUnitatsOrganitzativesPlugin(Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugin) {
+		this.unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugin;
+	}
+
+	public void setGestorDocumentalAdministratiuPlugin(Map<String, GestorContingutsAdministratiuPlugin> gestorDocumentalAdministratiuPlugin) {
+		this.gestorDocumentalAdministratiuPlugin = gestorDocumentalAdministratiuPlugin;
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
