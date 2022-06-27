@@ -8,7 +8,7 @@ databaseChangeLog:
       value: boolean
       dbms: postgresql
   - changeSet:
-      id: 1634114082437-8
+      id: 1634114082437-9
       author: limit
       changes:
         - addColumn:

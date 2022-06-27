@@ -367,7 +367,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 //		ClassLoader classLoader = getClass().getClassLoader();
 //		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/justificant.pdf").getFile());
-		File file = new File(getJustificantPath());
+		String justificantPath = getJustificantPath();
+		File file = new File(justificantPath);
 		
 		try {
 		

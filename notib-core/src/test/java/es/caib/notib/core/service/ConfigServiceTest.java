@@ -50,7 +50,7 @@ public class ConfigServiceTest {
                 conversioTipusHelper.convertir(Mockito.any(ConfigEntity.class), Mockito.eq(ConfigDto.class))
         ).thenCallRealMethod();
 
-        ConfigEntity configEntity = new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE");
+        ConfigEntity configEntity = ConfigEntity.builder().key("PROPERTY_KEY").value("PROPERTY_VALUE").configurable(true).build();
         Mockito.when(
                 configRepository.findOne(Mockito.eq("PROPERTY_KEY"))
         ).thenReturn(configEntity);

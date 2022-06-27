@@ -2045,6 +2045,9 @@ public class PluginHelper {
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
 		this.arxiuPlugin.put(getCodiEntitatActual(), arxiuPlugin);
 	}
+	public void setArxiuPlugin(Map<String, IArxiuPlugin> arxiuPlugin) {
+		this.arxiuPlugin = arxiuPlugin;
+	}
 	
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
 		this.unitatsOrganitzativesPlugin.put(getCodiEntitatActual(), unitatsOrganitzativesPlugin);
