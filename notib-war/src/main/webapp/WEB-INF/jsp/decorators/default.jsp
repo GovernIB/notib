@@ -430,7 +430,7 @@ body {
 	</div>
 	<div class="container container-main container-custom">
 	
-		<c:if test="${not empty avisos}">
+		<c:if test="${not empty avisos and not desactivarAvisos}">
 			<div id="accordion">
 				<c:forEach var="avis" items="${avisos}" varStatus="status">
 						<div class="card avisCard ${avis.avisNivell == 'INFO' ? 'avisCardInfo':''} ${avis.avisNivell == 'WARNING' ? 'avisCardWarning':''} ${avis.avisNivell == 'ERROR' ? 'avisCardError':''}">

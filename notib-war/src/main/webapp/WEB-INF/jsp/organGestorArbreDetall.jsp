@@ -212,7 +212,7 @@
         </div>
     </form:form>
 
-    <div id="permisosPanel" class="panel panel-default" style="margin-top:20px; <c:if test="${empty id}">display:none;"</c:if>">
+    <div id="permisosPanel" class="panel panel-default" style='margin-top:20px; <c:if test="${empty id}">display:none;"</c:if>'>
         <div class="panel-heading flex-space-between">
             <h2><spring:message code="organgestor.permis.titol"/><small></small></h2>
             <div class="flex-column-center">

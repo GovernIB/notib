@@ -162,6 +162,7 @@ public class OrganGestorArbreController extends BaseUserController {
     public String getOrgan(HttpServletRequest request, @PathVariable("codiSia") String codiSia, Model model) {
 
         try {
+            model.addAttribute("desactivarAvisos", true);
             EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
             OrganGestorDto o = organService.findByCodi(entitat.getId(), codiSia);
             o = o == null ? organService.getOrganNou(codiSia) : o;
