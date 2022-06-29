@@ -34,9 +34,19 @@
     <script src="<c:url value="/js/jstree.min.js"/>"></script>
 
     <style>
-        #permisos {
+
+        table {
             table-layout:fixed;
         }
+        th {
+            width:50px;
+        }
+
+        td {
+            overflow:hidden;
+            text-overflow: ellipsis;
+        }
+
         #permisos th {
             writing-mode:vertical-lr;
         }
@@ -56,6 +66,10 @@
         .th-checkbox {
             padding-right: 1px !important;
             max-width: 5px !important;
+        }
+
+        .th-boto-accions {
+            width: 6% !important;
         }
 
         #permisos td {
@@ -142,18 +156,6 @@
                  $('#entrega-cie-form').hide();
              }
 
-             // $("#guardar").click(e => {
-             //     console.log("clicked");
-             //     e.preventDefault();
-             //    $.ajax({
-             //        url: "/organgestorArbre/guardar",
-             //        type: "POST",
-             //        data: $("#dadesOrgan").serialize(),
-             //        dataType: "json",
-             //        success: () => {},
-             //        error: () => {}
-             //    })
-             // });
         });
 
     </script>
@@ -220,11 +222,6 @@
                     <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/>
                 </a>
             </div>
-<%--            <div>--%>
-<%--                <a id="guardar" class="btn btn-success" href="" data-toggle="modal" data-adjust-height="false" data-height="650px">--%>
-<%--                    <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="comu.boto.guardar"/>--%>
-<%--                </a>--%>
-<%--            </div>--%>
             <button id="guardar" type="" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
         </div>
     </form:form>
@@ -256,7 +253,7 @@
                         </script>
                     </th>
                     <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.notificacio"/>
+                        <spring:message code="procediment.permis.columna.notificacio.arbre"/>
                         <script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
                             {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
                         </script>
@@ -274,7 +271,7 @@
                         </script>
                     </th>
                     <th data-col-name="comuns" data-template="#cellPermisComunsTemplate" class="th-checkbox">
-                        <spring:message code="organgestor.permis.columna.comuns.curt"/>
+                        <spring:message code="organgestor.permis.columna.coms.sir"/>
                         <script id="cellPermisComunsTemplate" type="text/x-jsrender">
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
@@ -285,7 +282,7 @@
                             {{if administrador}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-class="overflow-visible">
+                    <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-class="overflow-visible" class="th-boto-accions">
                         <script id="cellAccionsTemplate" type="text/x-jsrender">
                             <div class="dropdown">
                                 <button aria-expanded="true" class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;&nbsp;<span class="caret"></span></button>
