@@ -173,7 +173,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		}
 		if (isJuridica && raoSocialInteressat.length() > MAX_SIZE_RAO_SOCIAL) {
 			ok = false;
-			msgKey = "notificacio.form.valid.administracio.nom.max.length";
+			msgKey = "notificacio.form.valid.juridica.rao.max.length";
 			vars = new Object[] {MAX_SIZE_RAO_SOCIAL};
 		}
 		if (isJuridica && !raoSocialInteressat.isEmpty() && raoSocialInteressat.length() < MIN_SIZE_NOM_RAO) {
