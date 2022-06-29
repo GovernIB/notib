@@ -626,8 +626,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		return true;
 	}
 
-	private boolean updateEstat(OrganGestorEntity organGestor,
-								Map<String, NodeDir3> arbreUnitats) {
+	private boolean updateEstat(OrganGestorEntity organGestor, Map<String, NodeDir3> arbreUnitats) {
+
 		logger.info("Ini - updateEstat del òrgan gestor: " + organGestor.getCodi() + "-" + organGestor.getNom());
 		if (!arbreUnitats.containsKey(organGestor.getCodi())) {
 			logger.trace(String.format("Organ Gestor (%s) no trobat a l'organigrama", organGestor.getCodi()));
@@ -636,7 +636,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 		NodeDir3 nodeOrgan = arbreUnitats.get(organGestor.getCodi());
 		organGestor.updateEstat(organGestorHelper.getEstatOrgan(nodeOrgan));
-
 		return true;
 	}
 
