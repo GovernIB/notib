@@ -42,6 +42,10 @@
             width:50px;
         }
 
+        th:first-child {
+            width: 4% !important;
+        }
+
         td {
             overflow:hidden;
             text-overflow: ellipsis;
@@ -55,9 +59,9 @@
             writing-mode: horizontal-tb !important;
         }
 
-        .writing-horitzontal {
-            width: 30px !important;
-        }
+        /*.writing-horitzontal {*/
+        /*    width: 30px !important;*/
+        /*}*/
 
         .nom-principal {
             width: 40% !important;
@@ -72,10 +76,6 @@
             width: 6% !important;
         }
 
-        #permisos td {
-            overflow:hidden;
-            text-overflow: ellipsis;
-        }
     </style>
 
     <script type="text/javascript">
