@@ -119,7 +119,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Transactional
     public void crearPropietatsConfigPerEntitats() {
 
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
         List<EntitatEntity> entitats = entitatRepository.findAll();
         ConfigEntity nova;
         for (ConfigEntity config : configs) {
