@@ -262,6 +262,7 @@ public class NotificacioFormController extends BaseUserController {
                 log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
             }
             model.addAttribute(notificacioCommand);
+            emplenarModelNotificacio(request, model, notificacioCommand);
             return "notificacioForm";
         }
 
@@ -535,7 +536,7 @@ public class NotificacioFormController extends BaseUserController {
             model.addAttribute("concepteSize", notificacioCommand.getConcepteDefaultSize());
             model.addAttribute("descripcioSize", notificacioCommand.getDescripcioDefaultSize());
             model.addAttribute("nomSize", notificacioCommand.getNomDefaultSize());
-            model.addAttribute("raoSocialSize", notificacioCommand.getRaoSocialDefaultsize());
+            model.addAttribute( "raoSocialSize", notificacioCommand.getRaoSocialDefaultsize());
             model.addAttribute("llinatge1Size", notificacioCommand.getLlinatge1DefaultSize());
             model.addAttribute("llinatge2Size", notificacioCommand.getLlinatge2DefaultSize());
             model.addAttribute("emailSize", notificacioCommand.getEmailDefaultSize());
