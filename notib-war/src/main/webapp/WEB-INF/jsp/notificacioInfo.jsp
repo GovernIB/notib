@@ -212,17 +212,70 @@ $(document).ready(function() {
 				<table class="table table-bordered" style="width: 100%">
 					<tbody>
 						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.tipus" /></strong></td>
+							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
+						</tr>
+						<tr>
 							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
-							<td>${notificacio.organGestorNom}<br>
-							<small>${notificacio.organGestorCodi}</small></td>
+							<td>${notificacio.organGestorCodi} - ${notificacio.organGestorNom}</td>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.proc.ser" /></strong></td>
+							<td>${notificacio.procediment.codi} - ${notificacio.procediment.nom}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.num.expedient" /></strong></td>
+							<td>${notificacio.numExpedient}</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.concepte" /></strong></td>
 							<td>${notificacio.concepte}</td>
 						</tr>
+						<c:if test="${notificacio.descripcio}">
+							<tr>
+								<td><strong><spring:message code="notificacio.info.dada.descripcio" /></strong></td>
+								<td>${notificacio.descripcio}</td>
+							</tr>
+						</c:if>
 						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.descripcio" /></strong></td>
-							<td>${notificacio.descripcio}</td>
+							<td><strong><spring:message code="notificacio.info.dada.idioma" /></strong></td>
+							<td>${notificacio.idioma}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.creacio.data" /></strong></td>
+							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.creacio.usuari" /></strong></td>
+							<td>${notificacio.createdBy.nom}
+								(${notificacio.createdBy.codi})</td>
+						</tr>
+						<c:if test="${notificacio.enviamentDataProgramada != null}">
+							<tr>
+								<td><strong><spring:message code="notificacio.info.dada.enviament.programada.data"/></strong></td>
+								<td><fmt:formatDate value="${notificacio.enviamentDataProgramada}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+							</tr>
+						</c:if>
+						<c:if test="${notificacio.estatDate != null}">
+							<tr>
+								<td><strong><spring:message code="notificacio.info.dada.finalitzada.dada"/></strong></td>
+								<td><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+							</tr>
+						</c:if>
+						<c:if test="${notificacio.estatProcessatDate != null}">
+							<tr>estatProcessatDate
+								<td><strong><spring:message code="notificacio.info.dada.processada.dada"/></strong></td>
+								<td><fmt:formatDate value="${notificacio.estatProcessatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+							</tr>
+						</c:if>
+						<c:if test="${notificacio.caducitat != null}">
+							<tr>
+								<td><strong><spring:message code="notificacio.info.dada.caducitat"/></strong></td>
+								<td><fmt:formatDate value="${notificacio.caducitat}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+							</tr>
+						</c:if>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.retard" /></strong></td>
+							<td>${notificacio.retard}</td>
 						</tr>
 						<c:if test="${notificacio.estat != null && notificacio.estat != ''}">
 						<tr>
@@ -278,42 +331,7 @@ $(document).ready(function() {
 							</td>
 						</tr>
 						</c:if>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.creacio.data" /></strong></td>
-							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.finalitzada.dada"/></strong></td>
-							<td><fmt:formatDate value="${notificacio.estatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.processada.dada"/></strong></td>
-							<td><fmt:formatDate value="${notificacio.estatProcessatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.creacio.usuari" /></strong></td>
-							<td>${notificacio.createdBy.nom}
-								(${notificacio.createdBy.codi})</td>
-						</tr>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.tipus" /></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
-						</tr>
-						<tr>
-							<td><strong>
-								<c:choose>
-									<c:when test="${notificacio.procediment.tipus == 'SERVEI'}">
-										<spring:message code="notificacio.info.dada.servei" />
-										<br />
-									</c:when>
-									<c:otherwise>
-										<spring:message code="notificacio.info.dada.procediment" />
-										<br />
-									</c:otherwise>
-								</c:choose>
-							</strong></td>
-							<td>${notificacio.procediment.codi}-${notificacio.procediment.nom}</td>
-						</tr>
+
 						<c:if test="${!notificacio.hasEnviamentsPendents || notificacio.estat == 'FINALITZADA_AMB_ERRORS'}">
 							<tr>
 								<td colspan="2">
