@@ -325,6 +325,7 @@
 		"comu.si": "<spring:message code="comu.si"/>",
 		"comu.no": "<spring:message code="comu.no"/>",
 		"comu.boto.seleccionar": "<spring:message code="comu.boto.seleccionar"/>",
+		"notificacio.sir.emprar.valib": "<spring:message code="notificacio.sir.emprar.valib"/>",
 	};
 
 	var destinatariHTMLTemplate =' \
