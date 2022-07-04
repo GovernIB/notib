@@ -3,11 +3,12 @@
  */
 package es.caib.notib.plugin.unitat;
 
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.plugin.SistemaExternException;
+
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-
-import es.caib.notib.plugin.SistemaExternException;
 
 
 /**
@@ -205,13 +206,13 @@ public interface UnitatsOrganitzativesPlugin {
 	 */
 	public List<OficinaSIR> oficinesSIRUnitat(
 			String unitat, 
-			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException;
+			Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException;
 
 	/**
 	 * @return recupera el llistat de les oficines SIR d'una entitat
 	 * 
-	 * @param unitat
-	 * 			Codi de la unitat
+	 * @param entitat
+	 * 			Codi de la entitat
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar les oficines SIR
 	 */

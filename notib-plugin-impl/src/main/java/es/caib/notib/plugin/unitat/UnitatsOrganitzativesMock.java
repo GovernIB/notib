@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.unitat;
 
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +126,7 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	@Override
 	public List<OficinaSIR> oficinesSIRUnitat(
 			String unitat,
-			Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+			Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 		return null;
 	}
 	

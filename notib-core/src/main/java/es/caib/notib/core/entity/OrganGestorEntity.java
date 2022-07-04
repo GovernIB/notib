@@ -60,28 +60,31 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@ForeignKey(name = "NOT_ORGAN_ENTREGA_CIE_FK")
 	private EntregaCieEntity entregaCie;
 
-	public void update(
-			String codi,
-			String nom,
-			String llibre,
-			String llibreNom,
-			String oficina,
-			String oficinaNom) {
-		this.codi = codi;
-		this.nom = nom;
-		this.llibre = llibre;
-		this.llibreNom = llibreNom;
-		this.oficina = oficina;
-		this.oficinaNom = oficinaNom;
-	}
+	@Column(name = "sir")
+	private Boolean sir;
 
-	public void update(String nom) {
-		this.nom = nom;
-	}
+//	public void update(
+//			String codi,
+//			String nom,
+//			String llibre,
+//			String llibreNom,
+//			String oficina,
+//			String oficinaNom) {
+//		this.codi = codi;
+//		this.nom = nom;
+//		this.llibre = llibre;
+//		this.llibreNom = llibreNom;
+//		this.oficina = oficina;
+//		this.oficinaNom = oficinaNom;
+//	}
 
-	public void updateCodiPare(String codiPare) {
-		this.codiPare = codiPare;
-	}
+//	public void update(String nom) {
+//		this.nom = nom;
+//	}
+//
+//	public void updateCodiPare(String codiPare) {
+//		this.codiPare = codiPare;
+//	}
 	
 	public void updateLlibre(
 			String llibre,
@@ -100,9 +103,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 		this.entregaCie = entregaCie;
 	}
 
-	public void updateEstat(OrganGestorEstatEnum estat) {
-		this.estat = estat;
-	}
+//	public void updateEstat(OrganGestorEstatEnum estat) {
+//		this.estat = estat;
+//	}
 	public static OrganGestorEntityBuilder builder(
 			String codi,
 			String nom,
@@ -112,7 +115,8 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 			String llibreNom,
 			String oficina,
 			String oficinaNom,
-			OrganGestorEstatEnum estat) {
+			OrganGestorEstatEnum estat,
+			Boolean sir) {
 		return new OrganGestorEntityBuilder()
 				.entitat(entitat)
 				.codi(codi)
@@ -122,7 +126,8 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 				.oficina(oficina)
 				.oficinaNom(oficinaNom)
 				.estat(estat)
-				.codiPare(codiPare);
+				.codiPare(codiPare)
+				.sir(sir);
 	}
 
 	@Override

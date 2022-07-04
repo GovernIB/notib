@@ -15,6 +15,7 @@ import es.caib.dir3caib.ws.api.oficina.OficinaTF;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -482,7 +483,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 	
 	@Override
-	public List<OficinaSIR> oficinesSIRUnitat(String unitat, Map<String, NodeDir3> arbreUnitats) throws SistemaExternException {
+	public List<OficinaSIR> oficinesSIRUnitat(String unitat, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 
 		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
 		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
@@ -519,18 +520,17 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 		}
 	}
 
-	private void getOficinesUnitatSuperior(String unitat, List<OficinaTF> oficinesWS, Map<String, NodeDir3> arbreUnitats) throws MalformedURLException {
+	private void getOficinesUnitatSuperior(String unitat, List<OficinaTF> oficinesWS, Map<String, OrganismeDto> arbreUnitats) throws MalformedURLException {
 
-		NodeDir3 arbre = arbreUnitats.get(unitat);
+		OrganismeDto arbre = arbreUnitats.get(unitat);
 		List<OficinaTF> oficinesUnitatActual = getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(unitat);
 		if (arbre != null) {
-			String unitatSuperiorCurrentUnitat = arbre.getSuperior();
+			String unitatSuperiorCurrentUnitat = arbre.getPare();
 			// Cerca de forma recursiva a l'unitat superior si l'unitat actual no disposa d'una oficina
-			if (oficinesUnitatActual.isEmpty() && !unitatSuperiorCurrentUnitat.isEmpty() && !unitatSuperiorCurrentUnitat.equals(arbre.getArrel())) {
-				String u = unitatSuperiorCurrentUnitat.substring(0, unitatSuperiorCurrentUnitat.indexOf(' '));
-				getOficinesUnitatSuperior(u, oficinesUnitatActual, arbreUnitats);
+			if (oficinesUnitatActual.isEmpty() && unitatSuperiorCurrentUnitat != null) {
+				getOficinesUnitatSuperior(unitatSuperiorCurrentUnitat, oficinesUnitatActual, arbreUnitats);
 			// No cercar més si l'oficina actual és l'oficina arrel
-			} else if (oficinesUnitatActual.isEmpty() && !unitatSuperiorCurrentUnitat.isEmpty() && unitatSuperiorCurrentUnitat.equals(arbre.getArrel())) {
+			} else if (oficinesUnitatActual.isEmpty()) {
 				oficinesWS.addAll(getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(arbre.getCodi()));
 			}
 		}

@@ -27,17 +27,17 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public OrganGestorDto update(OrganGestorDto dto);
 
-	/**
-	 * Actualitza les dades de l'organ gestor indicat de la base de dades
-	 * amb la informació de dir3
-	 *
-	 * @param entitatId Identificador de l'entitat en curs
-	 * @param organGestorCodi Codi Dir3 de l'òrgan gestor a actualitzar
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	void updateOne(
-			Long entitatId, 
-			String organGestorCodi);
+//	/**
+//	 * Actualitza les dades de l'organ gestor indicat de la base de dades
+//	 * amb la informació de dir3
+//	 *
+//	 * @param entitatId Identificador de l'entitat en curs
+//	 * @param organGestorCodi Codi Dir3 de l'òrgan gestor a actualitzar
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	void updateOne(
+//			Long entitatId,
+//			String organGestorCodi);
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi);
@@ -51,17 +51,17 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	boolean isUpdatingOrgans(EntitatDto entitatDto);
 
-	/**
-	 * Actualitza les dades dels organs gestors de la base de dades
-	 * amb la informació de dir3
-	 *
-	 * @param entitatId Identificador de l'entitat en curs
-	 * @param organActualCodiDir3 Codi Dir3 del pare dels òrgans gestors a actualitzar
-	 *                            null per actualitzar-los a tots
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	void updateAll(
-			Long entitatId, String organActualCodiDir3);
+//	/**
+//	 * Actualitza les dades dels organs gestors de la base de dades
+//	 * amb la informació de dir3
+//	 *
+//	 * @param entitatId Identificador de l'entitat en curs
+//	 * @param organActualCodiDir3 Codi Dir3 del pare dels òrgans gestors a actualitzar
+//	 *                            null per actualitzar-los a tots
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	void updateAll(
+//			Long entitatId, String organActualCodiDir3);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean organGestorEnUs(Long organId);

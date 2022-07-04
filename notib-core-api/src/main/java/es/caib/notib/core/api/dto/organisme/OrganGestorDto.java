@@ -45,7 +45,7 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 
 	public void setOrganGestorEstatEnum(OrganGestorEstatEnum estat) {
 		this.estat = estat;
-		actiu = estat != null && OrganGestorEstatEnum.VIGENT.equals(estat);
+		actiu = estat != null && OrganGestorEstatEnum.V.equals(estat);
 	}
 
 	public String getNomCodi() {

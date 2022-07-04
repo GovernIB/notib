@@ -2,14 +2,17 @@ package es.caib.notib.core.cacheable;
 
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.helper.CacheHelper;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilitat per a accedir a les caches dels organs gestors. Els mètodes cacheables es
@@ -27,14 +30,7 @@ public class OrganGestorCachable {
 
     @Cacheable(value = "organigrama", key="#entitatcodi")
     public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatcodi) {
-        Map<String, OrganismeDto> organigrama = new HashMap<String, OrganismeDto>();
-        Map<String, NodeDir3> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
-        if (organigramaDir3 != null) {
-            for (String organ : organigramaDir3.keySet()) {
-                organigrama.put(organ, nodeDir3ToOrganisme(organigramaDir3.get(organ)));
-            }
-        }
-        return organigrama;
+        return cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
     }
 
     @Cacheable(value = "codisOrgansFills", key="#codiDir3Entitat.concat('-').concat(#codiDir3Organ)")
@@ -76,15 +72,12 @@ public class OrganGestorCachable {
 
     @Cacheable(value = "organismes", key="#entitatcodi")
     public List<OrganismeDto> findOrganismesByEntitat(String entitatcodi) {
-        List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
-        Map<String, NodeDir3> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
-        for (String codi: organigramaDir3.keySet()) {
-            OrganismeDto organisme = new OrganismeDto();
-            NodeDir3 node = organigramaDir3.get(codi);
-            organisme.setCodi(node.getCodi());
-            organisme.setNom(node.getDenominacio());
-            organismes.add(organisme);
-        }
+        List<OrganismeDto> organismes = new ArrayList<>();
+        Map<String, OrganismeDto> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
+        if (organigramaDir3 == null || organigramaDir3.isEmpty())
+            return organismes;
+
+        organismes = new ArrayList<>(organigramaDir3.values());
         Collections.sort(organismes, new Comparator<OrganismeDto>() {
             @Override
             public int compare(OrganismeDto o1, OrganismeDto o2) {
@@ -106,29 +99,6 @@ public class OrganGestorCachable {
             }
         }
         return unitats;
-    }
-
-    private OrganismeDto nodeDir3ToOrganisme(NodeDir3 node) {
-        OrganismeDto organisme = new OrganismeDto();
-        organisme.setCodi(node.getCodi());
-        organisme.setNom(node.getDenominacio());
-        String pare = node.getSuperior();
-        if (pare != null && !pare.isEmpty()) {
-            int size = pare.indexOf(" - ");
-            if (size > 0)
-                pare = pare.substring(0, pare.indexOf(" - "));
-        }
-        organisme.setPare(pare);
-        List<String> fills = null;
-        if (node.getFills() != null && !node.getFills().isEmpty()) {
-            fills = new ArrayList<String>();
-            for (NodeDir3 fill: node.getFills()) {
-                fills.add(fill.getCodi());
-            }
-        }
-        organisme.setFills(fills);
-
-        return organisme;
     }
 
     @CacheEvict(value = "organigrama", key="#entitatcodi")

@@ -1,13 +1,14 @@
 package es.caib.notib.core.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,10 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +36,13 @@ import java.util.Map;
 @Slf4j
 @Component
 public class CacheHelper {
-//	@Resource
-//	private OrganGestorRepository organGestorRepository;
+
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 //	@Resource
 //	private EntityComprovarHelper entityComprovarHelper;
-//	@Resource
-//	private ConversioTipusHelper conversioTipusHelper;
+	@Resource
+	private ConversioTipusHelper conversioTipusHelper;
 //	@Resource
 //	private PermisosHelper permisosHelper;
 
@@ -106,7 +105,7 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
-	public List<OficinaDto> getOficinesSIRUnitat(Map<String, NodeDir3> arbreUnitats, String codiDir3Organ) {
+	public List<OficinaDto> getOficinesSIRUnitat(Map<String, OrganismeDto> arbreUnitats, String codiDir3Organ) {
 		return pluginHelper.oficinesSIRUnitat(codiDir3Organ, arbreUnitats);
 	}
 
@@ -125,39 +124,60 @@ public class CacheHelper {
 	}
 	
 	@Cacheable(value = "organigramaOriginal", key="#entitatcodi")
-	public Map<String, NodeDir3> findOrganigramaNodeByEntitat(final String entitatcodi) {
-		Map<String, NodeDir3> organigrama = null;
+	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
+		Map<String, OrganismeDto> organigrama = new HashMap<>();
 
-		String filenameOrgans = pluginHelper.getOrganGestorsFile();
-		File file = null;
-		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-			filenameOrgans = filenameOrgans + "_" + entitatcodi + ".json";
-			file = new File(filenameOrgans);
-		}
-		if (file != null && file.exists()) {
-			try {
-				ObjectMapper mapper = new ObjectMapper();
-				Map<String, Object> map = mapper.readValue(new FileReader(file), Map.class);
-				organigrama = new HashMap<>();
-
-				for (Map.Entry<String, Object> entry : map.entrySet()) {
-					NodeDir3 node = mapper.convertValue(entry.getValue(), NodeDir3.class);
-					organigrama.put(entry.getKey(), node);
-				}
-
-			} catch (IOException e) {
-				log.error("Error al procesar map l'organigrama per entitat a partir de fitxer", e);
-			}
-		}
-		if (organigrama == null) {
-			organigrama = pluginHelper.getOrganigramaPerEntitat(entitatcodi);
-		} else {
-			pluginHelper.getOrganigramaPerEntitatAsync(entitatcodi);
+		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
+		if (organs == null || organs.isEmpty()) {
+			return organigrama;
 		}
 
+		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitatDir3Codi);
+		HashMap<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
+		organToOrganigrama(arrel, organsMap, organigrama);
 		return organigrama;
 	}
-	
+
+	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
+		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
+		for (OrganGestorEntity organ: organs) {
+			if (OrganGestorEstatEnum.V.equals(organ.getEstat()) || OrganGestorEstatEnum.T.equals(organ.getEstat())) {    // Unitats Vigents o Transitòries
+				if (organsMap.containsKey(organ.getCodiPare())) {
+					List<OrganGestorEntity> fills = organsMap.get(organ.getCodiPare());
+					fills.add(organ);
+				} else {
+					List<OrganGestorEntity> fills = new ArrayList<>();
+					fills.add(organ);
+					organsMap.put(organ.getCodiPare(), fills);
+				}
+			}
+		}
+		return organsMap;
+	}
+
+	private void organToOrganigrama(final OrganGestorEntity organ, final HashMap<String, List<OrganGestorEntity>> organsMap, Map<String, OrganismeDto> organigrama) {
+		List<OrganGestorEntity> fills = organsMap.get(organ.getCodi());
+		List<String> codisFills = null;
+		if (fills != null && !fills.isEmpty()) {
+			codisFills = new ArrayList<>();
+			for (OrganGestorEntity fill: fills) {
+				codisFills.add(fill.getCodi());
+			}
+		}
+		organigrama.put(
+				organ.getCodi(),
+				OrganismeDto.builder()
+						.codi(organ.getCodi())
+						.nom(organ.getNom())
+						.pare(organ.getCodiPare())
+						.fills(codisFills)
+						.build());
+
+		if (fills != null)
+			for (OrganGestorEntity fill : fills)
+				organToOrganigrama(fill, organsMap, organigrama);
+	}
+
 	@Cacheable(value = "llistarNivellsAdministracions")
 	public List<CodiValor> llistarNivellsAdministracions() {
 		return pluginHelper.llistarNivellsAdministracions();

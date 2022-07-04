@@ -23,6 +23,7 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.entity.*;
@@ -315,6 +316,11 @@ public class ConversioTipusHelper {
 			field("tieneOficinaSir", "sir").
 			byDefault().
 			register();
+
+		mapperFactory.classMap(OrganismeDto.class, OrganGestorDto.class).
+				field("pare", "codiPare").
+				byDefault().
+				register();
 		
 		mapperFactory.classMap(ObjetoDirectorio.class, OrganGestorDto.class).
 			field("denominacio", "nom").
@@ -474,15 +480,16 @@ public class ConversioTipusHelper {
 		@Override
 		public OrganGestorEstatEnum convert(String source, Type<? extends OrganGestorEstatEnum> destinationType) {
 			if (source == null){
-				return OrganGestorEstatEnum.ALTRES;
+				return OrganGestorEstatEnum.E;
 			}
 
-			source = source.toLowerCase(Locale.ROOT);
-			if (source.equals("v") || source.equals("vigente")) {
-				return OrganGestorEstatEnum.VIGENT;
+			source = source.substring(0, 1).toUpperCase(Locale.ROOT);
+			switch (source) {
+				case "V": return OrganGestorEstatEnum.V;
+				case "T": return OrganGestorEstatEnum.T;
+				case "A": return OrganGestorEstatEnum.A;
+				default: return OrganGestorEstatEnum.E;
 			}
-
-			return OrganGestorEstatEnum.ALTRES;
 		}
 	}
 	private MapperFacade getMapperFacade() {

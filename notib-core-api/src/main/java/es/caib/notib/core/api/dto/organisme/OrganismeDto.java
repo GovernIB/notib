@@ -1,5 +1,6 @@
 package es.caib.notib.core.api.dto.organisme;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,13 +8,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Getter @Setter
 public class OrganismeDto implements Serializable{
 
 	private String codi;
 	private String nom;
 	private String pare;
-	private List<String> fills = new ArrayList<String>();
+	private List<String> fills = new ArrayList<>();
+	private Boolean sir;
 	
 	public String getNomComplet() {
 		return codi + " - " + nom;
