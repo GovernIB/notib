@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,19 +130,48 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					ex);
 		}
 	}
-	
+
+	@Override
+	public List<NodeDir3> findAmbPare(String pareCodi, Timestamp dataActualitzacio, Timestamp dataSincronitzacio) throws SistemaExternException {
+		try {
+			List<NodeDir3> unitats = new ArrayList<NodeDir3>();
+			List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
+					pareCodi,
+					dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
+					dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
+
+			if (unidades != null) {
+				for (UnidadTF unidad : unidades) {
+					unitats.add(toNodeDir3(unidad));
+				}
+			}
+			return unitats;
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS ("
+					+ "pareCodi=" + pareCodi + ")", ex);
+		}
+	}
+
+	@Override
+	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
+		UnidadTF unidad = getObtenerUnidadesService().obtenerUnidad(
+				pareCodi,
+				dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
+				dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
+		return unidad != null ? toNodeDir3(unidad) : null;
+	}
+
 	private NodeDir3 toNodeDir3(UnidadTF unidadTF) {
-		NodeDir3 node = new NodeDir3(
-				unidadTF.getCodigo(), 				// codi
-				unidadTF.getDenominacion(), 		// denominacio 
-				unidadTF.getCodigoEstadoEntidad(),	// estat
-				unidadTF.getCodUnidadRaiz(), 		// arrel 
-				unidadTF.getCodUnidadSuperior(),	// superior 
-				unidadTF.getDescripcionLocalidad(),	// localitat 
-				unidadTF.getCodUnidadSuperior(),	// idPare
-				null,
-				null,
-				null );						// fills
+		NodeDir3 node = NodeDir3.builder()
+				.codi(unidadTF.getCodigo())
+				.denominacio(unidadTF.getDenominacion())
+				.estat(unidadTF.getCodigoEstadoEntidad())
+				.arrel(unidadTF.getCodUnidadRaiz())
+				.superior(unidadTF.getCodUnidadSuperior())
+				.localitat(unidadTF.getDescripcionLocalidad())
+				.idPare(unidadTF.getCodUnidadSuperior())
+				.historicosUO(unidadTF.getHistoricosUO())
+				.build();
 		return node;
 	}
 

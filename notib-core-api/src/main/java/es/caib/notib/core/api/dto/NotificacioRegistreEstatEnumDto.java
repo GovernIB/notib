@@ -21,14 +21,14 @@ public enum NotificacioRegistreEstatEnumDto implements Serializable {
 	PENDENT(3, "P", "#c1bcbc"),
 	OFICI_EXTERN(4, "E", "#c1bcbc"),
 	OFICI_INTERN(5, "I", "#c1bcbc"),
-	OFICI_ACCEPTAT(6, "A", "#999999"),
+	OFICI_ACCEPTAT(6, "A", "#999999"), 	// SIR
 	DISTRIBUIT(7, "D", "#999999"),
 	ANULAT(8, "X", "#955959"),
 	RECTIFICAT(9, "RC", "#c1bcbc"),
-	REBUTJAT(10, "RB", "#955959"),
-	REENVIAT(11, "RE", "#c1bcbc"),
+	REBUTJAT(10, "RB", "#955959"),		// SIR
+	REENVIAT(11, "RE", "#c1bcbc"),		// SIR
 	DISTRIBUINT(12, "DT", "#c1bcbc"),
-	OFICI_SIR(13, "S", "#c1bcbc");
+	OFICI_SIR(13, "S", "#c1bcbc");		// SIR
 	
 	private Integer numVal;
 	private String budget;

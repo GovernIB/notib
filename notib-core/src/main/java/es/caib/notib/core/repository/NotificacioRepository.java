@@ -3,13 +3,12 @@
  */
 package es.caib.notib.core.repository;
 
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioMassivaEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.ws.rs.PathParam;
 import java.util.Date;
 import java.util.List;
 
@@ -267,4 +265,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("maxReintents")Integer maxReintents);
 
 	NotificacioEntity findByReferencia(String identificador);
+
+	@Query(	"select count(n.id) from NotificacioEntity n where n.organGestor = :organGestor")
+	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 }

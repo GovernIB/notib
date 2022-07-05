@@ -6,7 +6,9 @@ package es.caib.notib.plugin.unitat;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +38,46 @@ public interface UnitatsOrganitzativesPlugin {
 			String pareCodi,
 			Timestamp fechaActualizacion,
 			Timestamp fechaSincronizacion) throws SistemaExternException;
+
+	/**
+	 * Retorna la llista d'unitats organitzatives filles donada
+	 * una unitat pare.
+	 * If you put fechaActualizacion==null and fechaSincronizacion==null it returns all unitats that are now vigent (current tree)
+	 * If you put fechaActualizacion!=null and fechaSincronizacion!=null it returns all the changes in unitats from the time of last syncronization (@param fechaActualizacion) to now
+	 *
+	 * @param pareCodi
+	 *            Codi de la unitat pare. It doesnt have to be arrel
+	 * @param dataActualitzacio
+	 *            Data de la darrera actualització.
+	 * @param dataSincronitzacio
+	 *            Data de la primera sincronització.
+	 * @return La llista d'unitats organitzatives.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public List<NodeDir3> findAmbPare(
+			String pareCodi,
+			Date dataActualitzacio,
+			Date dataSincronitzacio) throws SistemaExternException;
+
+	/**
+	 * Retorna la unitat organtizativa donat el pareCodi
+	 *
+	 * @param pareCodi
+	 *            Codi de la unitat pare.
+	 * @param dataActualitzacio
+	 *            Data de la darrera actualització.
+	 * @param dataSincronitzacio
+	 *            Data de la primera sincronització.
+	 * @return La unitat organitzativa trobada.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public NodeDir3 findAmbCodi(
+			String pareCodi,
+			Date dataActualitzacio,
+			Date dataSincronitzacio) throws MalformedURLException;
+
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
 	 * 

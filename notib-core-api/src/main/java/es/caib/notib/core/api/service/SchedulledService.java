@@ -69,4 +69,6 @@ public interface SchedulledService {
 	 * Mètode d'execució periòdica per a actualitzar els serveis a partir de les dades de Rolsac
 	 */
 	void actualitzarServeis();
+
+	void consultaCanvisOrganigrama();
 }

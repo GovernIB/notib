@@ -1,14 +1,13 @@
 package es.caib.notib.core.repository;
 
-import java.util.List;
-
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.ProcSerOrganEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -40,4 +39,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("grups") List<String> grups);
 
     List<ProcSerOrganEntity> findByProcSerIdAndOrganGestorCodiIn(Long procSerId, List<String> unitatsEntitat);
+
+	@Query(	"select count(pog.id) from ProcSerOrganEntity pog where pog.organGestor = :organGestor")
+	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 }

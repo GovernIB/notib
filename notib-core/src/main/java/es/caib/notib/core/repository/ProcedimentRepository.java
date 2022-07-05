@@ -214,5 +214,7 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 	List<ProcedimentEntity> findByNomAndEntitat(
 			@Param("nomProcediment") String nomProcediment,
 			@Param("entitatActual") EntitatEntity entitat);
+
+	Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 	
 }

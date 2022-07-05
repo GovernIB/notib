@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.dto.organisme.PrediccioSincronitzacio;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -50,6 +51,20 @@ public interface OrganGestorService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	boolean isUpdatingOrgans(EntitatDto entitatDto);
+
+	/**
+	 * Actualitza els organs gestors de la base de dades amb els de Dir3
+	 *
+	 * @param entitatId Identificador de l'entitat actual
+	 * @return Indica si la sincronització ha tengut èxit
+	 * @throws Exception
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
+
 
 //	/**
 //	 * Actualitza les dades dels organs gestors de la base de dades

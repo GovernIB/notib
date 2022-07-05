@@ -1,10 +1,15 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.AvisNivellEnumDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
+import es.caib.notib.core.entity.AvisEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.repository.AvisRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +41,8 @@ public class OrganGestorHelper {
 	private OrganigramaHelper organigramaHelper;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private AvisRepository avisRepository;
 	@Resource
 	private CacheHelper cacheHelper;
 	@Resource
@@ -42,6 +51,10 @@ public class OrganGestorHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private PermisosCacheable permisosCacheable;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+
+	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
 	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
 	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
@@ -193,4 +206,34 @@ public class OrganGestorHelper {
 //	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
+
+	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
+		Date ara = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(ara);
+		calendar.add(Calendar.YEAR, 1);
+
+		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+				conversioTipusHelper.convertir(entitat, EntitatDto.class),
+				entitat.getDir3Codi(),
+				entitat.getDataActualitzacio(),
+				entitat.getDataSincronitzacio());
+
+		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
+		if (avisosSinc != null && !avisosSinc.isEmpty()) {
+			avisRepository.delete(avisosSinc);
+		}
+
+		if (unitatsWs != null && !unitatsWs.isEmpty()) {
+			AvisEntity avis = AvisEntity.getBuilder(
+					ORGAN_NO_SYNC,
+					"Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.",
+					ara,
+					calendar.getTime(),
+					AvisNivellEnumDto.ERROR,
+					true,
+					entitat.getId()).build();
+			avisRepository.save(avis);
+		}
+	}
 }

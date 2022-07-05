@@ -467,4 +467,7 @@ public interface ProcedimentService {
 	ProcSerDto findByNom(
 			Long entitatId,
 			String nomProcediment) throws NotFoundException;
+
+
+	Integer getProcedimentsAmbOrganNoSincronitzat(Long entitatId);
 }

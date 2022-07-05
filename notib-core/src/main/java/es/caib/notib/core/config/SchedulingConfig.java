@@ -330,6 +330,29 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
+
+        // 12. Consulta de canvis en l'organigrama
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        schedulledService.consultaCanvisOrganigrama();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        String cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA);
+                        if (cron == null)
+                            cron = "0 45 2 * * *";
+                        CronTrigger trigger = new CronTrigger(cron);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
     }
 
     private long calcularDelay() {

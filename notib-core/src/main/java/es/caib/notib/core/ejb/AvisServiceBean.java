@@ -67,4 +67,10 @@ public class AvisServiceBean implements AvisService {
 		return delegate.findActive();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<AvisDto> findActiveAdmin(Long entitatId) {
+		return delegate.findActiveAdmin(entitatId);
+	}
+
 }

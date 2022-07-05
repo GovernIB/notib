@@ -8,8 +8,10 @@ import es.caib.notib.plugin.SistemaExternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,16 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 			Timestamp fechaSincronizacion) throws SistemaExternException {
 		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
 		return organigrama;
+	}
+
+	@Override
+	public List<NodeDir3> findAmbPare(String pareCodi, Timestamp dataActualitzacio, Timestamp dataSincronitzacio) throws SistemaExternException {
+		return null;
+	}
+
+	@Override
+	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
+		return null;
 	}
 
 	@Override

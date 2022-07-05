@@ -1,9 +1,11 @@
 package es.caib.notib.war.helper;
 
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import es.caib.notib.core.api.dto.AvisDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.service.AvisService;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Utilitat per obtenir els avisos de sessió.
@@ -19,8 +21,14 @@ public class AvisHelper {
 	public static void findAvisos(HttpServletRequest request, AvisService avisService) {
 		
 		List<AvisDto> avisos = (List<AvisDto>) request.getAttribute(REQUEST_PARAMETER_AVISOS);
-		if (avisos == null && !isError(request) && avisService != null) {
-			avisos = avisService.findActive();
+		boolean canviRol = request.getParameter(RolHelper.getRequestParameterCanviRol()) != null;
+		if ((avisos == null && !RequestSessionHelper.isError(request) && avisService != null) || canviRol) {
+			if (RolHelper.isUsuariActualAdministrador(request)) {
+				EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+				avisos = avisService.findActiveAdmin(entitatActual.getId());
+			}
+			else
+				avisos = avisService.findActive();
 			request.setAttribute(REQUEST_PARAMETER_AVISOS, avisos);
 		}
 	}

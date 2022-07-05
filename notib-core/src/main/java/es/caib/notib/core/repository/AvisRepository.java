@@ -1,13 +1,12 @@
 package es.caib.notib.core.repository;
 
-import java.util.Date;
-import java.util.List;
-
+import es.caib.notib.core.entity.AvisEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.notib.core.entity.AvisEntity;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Repositori per gestionar una entitat de base de dades del tipus avís.
@@ -20,7 +19,19 @@ public interface AvisRepository extends JpaRepository<AvisEntity, Long> {
 			"    AvisEntity a " +
 			"where " +
 			"    a.actiu = true " +
+			"and (a.entitatId is null or a.entitatId = :entitatId)" +
 			"and a.dataInici <= :currentDate " +
 			"and a.dataFinal >= :currentDate")
-	List<AvisEntity> findActive(@Param("currentDate") Date currentDate);	
+	List<AvisEntity> findActiveAdmin(@Param("currentDate") Date currentDate, @Param("entitatId") Long entitatId);
+
+	@Query(	"from " +
+			"    AvisEntity a " +
+			"where " +
+			"    a.actiu = true " +
+			"and a.avisAdministrador = false " +
+			"and a.dataInici <= :currentDate " +
+			"and a.dataFinal >= :currentDate")
+	List<AvisEntity> findActive(@Param("currentDate") Date currentDate);
+
+	List<AvisEntity> findByEntitatIdAndAssumpte(Long entitatId, String assumpte);
 }

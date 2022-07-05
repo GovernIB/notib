@@ -35,6 +35,9 @@ public interface AvisService {
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_SUPER')")
 	List<AvisDto> findActive();
 
+	@PreAuthorize("hasRole('tothom')")
+	List<AvisDto> findActiveAdmin(Long entitatId);
+
 
 }
 

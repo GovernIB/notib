@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -849,14 +848,14 @@ public class PluginHelper {
 	// UNITATS ORGANITZATIVES
 	// /////////////////////////////////////////////////////////////////////////////////////
 
-	@Async
-	public void getOrganigramaPerEntitatAsync(String entitatcodi) throws SistemaExternException {
-		getOrganigramaPerEntitat(entitatcodi);
-		if (organigramaCarregat.get(entitatcodi) == null) {
-			organigramaCarregat.put(entitatcodi, true);
-			cacheManager.getCache("organigramaOriginal").evict(entitatcodi);
-		}
-	}
+//	@Async
+//	public void getOrganigramaPerEntitatAsync(String entitatcodi) throws SistemaExternException {
+//		getOrganigramaPerEntitat(entitatcodi);
+//		if (organigramaCarregat.get(entitatcodi) == null) {
+//			organigramaCarregat.put(entitatcodi, true);
+//			cacheManager.getCache("organigramaOriginal").evict(entitatcodi);
+//		}
+//	}
 
 	public Map<String, NodeDir3> getOrganigramaPerEntitat(String codiDir3Entitat) throws SistemaExternException {
 
@@ -898,6 +897,46 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 		return organigrama;
+	}
+
+	public List<NodeDir3> unitatsOrganitzativesFindByPare(
+			EntitatDto entitat,
+			String pareCodi,
+			Date dataActualitzacio,
+			Date dataSincronitzacio) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_UNITATS,
+				"Consulta llista d'unitats donat un pare",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("unitatPare", pareCodi),
+				new AccioParam("fechaActualizacion", dataActualitzacio == null ? null : dataActualitzacio.toString()),
+				new AccioParam("fechaSincronizacion", dataSincronitzacio == null ? null : dataSincronitzacio.toString()));
+		try {
+			configHelper.setEntitat(entitat);
+			info.setCodiEntitat(entitat.getCodi());
+			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(
+					pareCodi,
+					dataActualitzacio,
+					dataSincronitzacio);
+
+			if (unitatsOrganitzatives != null && !unitatsOrganitzatives.isEmpty()) {
+				integracioHelper.addAccioOk(info);
+				return unitatsOrganitzatives;
+			} else {
+				String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
+				integracioHelper.addAccioError(info, errorMissatge);
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_UNITATS,
+						errorMissatge);
+			}
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					errorDescripcio,
+					ex);
+		}
 	}
 
 	public List<ObjetoDirectorio> llistarOrganismesPerEntitat(String entitatcodi) throws SistemaExternException {

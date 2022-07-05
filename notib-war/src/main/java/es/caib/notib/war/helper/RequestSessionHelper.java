@@ -34,4 +34,9 @@ public class RequestSessionHelper {
 		return request.getSession().getAttribute(clau) != null;
 	}
 
+	public static boolean isError(
+			HttpServletRequest request) {
+		return request.getAttribute("javax.servlet.error.request_uri") != null;
+	}
+
 }

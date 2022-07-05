@@ -8,9 +8,9 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.api.dto.organisme.PrediccioSincronitzacio;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -45,11 +45,11 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.delete(entitatId, organId);
 	}
 	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void updateOne(Long entitatId, String organGestorCodi) {
-		delegate.updateOne(entitatId, organGestorCodi);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public void updateOne(Long entitatId, String organGestorCodi) {
+//		delegate.updateOne(entitatId, organGestorCodi);
+//	}
 
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {
@@ -62,10 +62,21 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public void updateAll(Long entitatId, String organActualCodiDir3) {
-		delegate.updateAll(entitatId,organActualCodiDir3);
+	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
+		return delegate.syncDir3OrgansGestors(entitatId);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
+		return delegate.predictSyncDir3OrgansGestors(entitatId);
+	}
+
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public void updateAll(Long entitatId, String organActualCodiDir3) {
+//		delegate.updateAll(entitatId,organActualCodiDir3);
+//	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})

@@ -38,4 +38,7 @@ public class PropertiesConstants {
     
     // 10. Actualització dels serveis a partir de la informació de Rolsac
     public static final String ACTUALITZAR_SERVEIS_CRON = "es.caib.notib.actualitzacio.serveis.cron";
+
+    // 11. Consulta de canvis en l'organigrama
+    public static final String CONSULTA_CANVIS_ORGANIGRAMA = "es.caib.notib.organs.consulta.canvis";
 }

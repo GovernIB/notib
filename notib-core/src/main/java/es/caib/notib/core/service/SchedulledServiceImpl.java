@@ -10,6 +10,7 @@ import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.config.SchedulingConfig;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.ConfigHelper;
@@ -18,7 +19,10 @@ import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.PropertiesConstants;
+import es.caib.notib.core.repository.EntitatRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -45,7 +50,9 @@ import java.util.List;
  */
 @Service
 public class SchedulledServiceImpl implements SchedulledService {
-	
+
+	@Resource
+	private EntitatRepository entitatRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
@@ -66,6 +73,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private SchedulingConfig schedulingConfig;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -307,8 +316,20 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}	
 	}
-	
-	private void esborrarTemporals(String dir) throws Exception {
+
+    @Override
+    public void consultaCanvisOrganigrama() {
+		logger.debug("Execució tasca periòdica: Actualitzar procedimetns");
+
+		if (configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA) == null)	// Tasca en segon pla no configurada
+			return;
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		for(EntitatEntity entitat: entitats) {
+			organGestorHelper.consultaCanvisOrganigrama(entitat);
+		}
+    }
+
+    private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
 			return;

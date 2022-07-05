@@ -41,3 +41,88 @@ databaseChangeLog:
                   name: sir
                   tyoe: boolean
                   defaultValue: ${booleanFalse}
+        - addColumn:
+            tableName: not_procediment
+            columns:
+              - column:
+                  name: organ_no_sinc
+                  type: boolean
+                  valueBoolean: false
+              - addColumn:
+                  tableName: not_entitat
+                  columns:
+                    - column:
+                        name: data_sincronitzacio
+                        type: timestamp
+                    - column:
+                        name: data_actualitzacio
+                        type: timestamp
+        - addColumn:
+          tableName: not_avis
+          columns:
+            - column:
+                name: avis_admin
+                type: BOOLEAN
+                defaultValue: ${booleanFalse}
+            - addColumn:
+                tableName: not_avis
+                columns:
+                  - column:
+                      name: entitat_id
+                      type: BIGINT
+        - createTable:
+            tableName: not_og_sinc_rel
+            columns:
+              - column:
+                  name: antic_og
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nou_og
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: antic_og
+            baseTableName: not_og_sinc_rel
+            constraintName: not_organ_antic_fk
+            referencedColumnNames: id
+            referencedTableName: not_organ_gestor
+        - addForeignKeyConstraint:
+            baseColumnNames: nou_og
+            baseTableName: not_og_sinc_rel
+            constraintName: not_organ_nou_fk
+            referencedColumnNames: id
+            referencedTableName: not_organ_gestor
+        - addUniqueConstraint:
+            tableName: not_og_sinc_rel
+            constraintName: not_uo_sinc_rel_mult_uk
+            columnNames: antic_og, nou_og
+        - insert:
+            tableName: pbl_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.notib.organs.consulta.canvis
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Cron per a la consulta de canvis a l'organigrama
+              - column:
+                  name: group_code
+                  value: SCHEDULLED
+              - column:
+                  name: position
+                  value: 2
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: TEXT
+        - sql:
+            dbms: oracle
+            sql: grant select, update, insert, delete on not_og_sinc_rel to www_ripea;

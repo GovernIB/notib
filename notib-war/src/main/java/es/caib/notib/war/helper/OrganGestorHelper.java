@@ -3,13 +3,14 @@
  */
 package es.caib.notib.war.helper;
 
-import java.util.List;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.ProcedimentService;
 
 import javax.servlet.http.HttpServletRequest;
-
-import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.service.OrganGestorService;
+import java.util.List;
 
 /**
  * Utilitat per a gestionar les entitats de l'usuari actual.
@@ -21,6 +22,7 @@ public class OrganGestorHelper {
 	private static final String ORGANS_ACCESSIBLES= "organs.accessiblesUsuari";
 	private static final String ORGAN_ACTUAL= "organs.actual";
 	private static final String REQUEST_PARAMETER_CANVI_ORGAN= "canviOrgan";
+	private static final String SESSION_ATTRIBUTE_ORGANS_NO_SYNC = "OrganGestorHelper.organsNoSincronitzats";
 	
 	public static List<OrganGestorDto> getOrgansGestorsUsuariActual(
 			HttpServletRequest request) {
@@ -98,6 +100,20 @@ public class OrganGestorHelper {
 	public static String getRequestParameterCanviOrgan() {
 		return REQUEST_PARAMETER_CANVI_ORGAN;
 	}
+
+	public static void setOrgansNoSincronitzats(HttpServletRequest request, ProcedimentService procedimentService) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		if (entitatActual != null && procedimentService != null)
+			request.getSession().setAttribute(
+					OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_NO_SYNC,
+					procedimentService.getProcedimentsAmbOrganNoSincronitzat(entitatActual.getId()));
+	}
+
+	public static Integer getOrgansNoSincronitzats(HttpServletRequest request) {
+		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_NO_SYNC);
+		return organsNoSincronitzats != null ? organsNoSincronitzats : 0;
+	}
+
 //	private static final Logger LOGGER = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 }

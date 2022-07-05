@@ -88,4 +88,9 @@ public class SchedulledServiceBean implements SchedulledService {
 		delegate.actualitzarServeis();
 	}
 
+    @Override
+    public void consultaCanvisOrganigrama() {
+        delegate.consultaCanvisOrganigrama();
+    }
+
 }

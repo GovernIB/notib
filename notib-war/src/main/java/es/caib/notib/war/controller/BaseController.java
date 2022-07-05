@@ -3,20 +3,18 @@
  */
 package es.caib.notib.war.controller;
 
-import java.io.IOException;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
-import org.springframework.web.servlet.support.RequestContext;
-
 import es.caib.notib.core.api.exception.PluginException;
 import es.caib.notib.war.helper.AjaxHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.ModalHelper;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
+import org.springframework.web.servlet.support.RequestContext;
+
+import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Controlador base que implementa funcionalitats comunes.
@@ -124,6 +122,22 @@ public class BaseController implements MessageSourceAware {
 		}
 	}
 
+	protected String getAjaxControllerReturnValueErrorMessage(
+			HttpServletRequest request,
+			String url,
+			String message) {
+		if (message != null) {
+			MissatgesHelper.error(
+					request,
+					message);
+		}
+		if (AjaxHelper.isAjax(request)) {
+			return ajaxUrlOk();
+		} else {
+			return url;
+		}
+	}
+
 	protected String getModalControllerReturnValueSuccess(
 			HttpServletRequest request,
 			String url,
@@ -176,6 +190,22 @@ public class BaseController implements MessageSourceAware {
 							request, 
 							messageKey,
 							messageArgs));
+		}
+		if (ModalHelper.isModal(request)) {
+			return modalUrlTancar();
+		} else {
+			return url;
+		}
+	}
+
+	protected String getModalControllerReturnValueErrorMessageText(
+			HttpServletRequest request,
+			String url,
+			String message) {
+		if (message != null) {
+			MissatgesHelper.error(
+					request,
+					message);
 		}
 		if (ModalHelper.isModal(request)) {
 			return modalUrlTancar();

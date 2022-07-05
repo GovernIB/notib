@@ -128,8 +128,8 @@ $(document).ready(function() {
 				<th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate"><spring:message code="procediment.list.columna.organGestor"/>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organGestorDesc}}
-						{{if organGestorEstat != 'VIGENT'}}
-							<span class="fa fa-warning text-danger" title="<spring:message code='procediment.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+						{{if organGestorEstat != 'V'}}<span class="fa fa-warning text-danger" title="<spring:message code='procediment.list.columna.organGestor.obsolet'/>"></span>{{/if}}
+						{{if organNoSincronitzat}}<span class="fa fa-warning text-danger" title="<spring:message code='procediment.actualitzacio.organ.no.sync'/>"></span>{{/if}}
 					</script>
 				</th>
 			</c:if>
@@ -188,6 +188,7 @@ $(document).ready(function() {
 					</script>
 				</th>
 			</c:if>
+			<th data-col-name="organNoSincronitzat" data-visible="false"></th>
 		</tr>
 	</thead>
 </table>

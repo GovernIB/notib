@@ -11,10 +11,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Classe del model de dades que representa una entitat.
@@ -81,6 +83,14 @@ public class EntitatEntity extends NotibAuditable<Long> {
 	protected String llibreNom;
 	@Column(name = "oficina_entitat")
 	private boolean oficinaEntitat;
+	@Setter
+	@Column(name = "data_sincronitzacio")
+	@Temporal(TemporalType.TIMESTAMP)
+	Date dataSincronitzacio;
+	@Setter
+	@Column(name = "data_actualitzacio")
+	@Temporal(TemporalType.TIMESTAMP)
+	Date dataActualitzacio;
 //	@OneToMany(
 //			mappedBy = "entitat",
 //			fetch = FetchType.LAZY,

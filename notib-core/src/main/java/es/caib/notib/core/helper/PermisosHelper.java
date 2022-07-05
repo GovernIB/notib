@@ -6,7 +6,13 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.acl.AclClassEntity;
+import es.caib.notib.core.entity.acl.AclEntryEntity;
+import es.caib.notib.core.entity.acl.AclObjectIdentityEntity;
 import es.caib.notib.core.entity.acl.AclSidEntity;
+import es.caib.notib.core.repository.acl.AclClassRepository;
+import es.caib.notib.core.repository.acl.AclEntryRepository;
 import es.caib.notib.core.repository.acl.AclObjectIdentityRepository;
 import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.core.security.ExtendedPermission;
@@ -18,7 +24,14 @@ import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.*;
+import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.AclCache;
+import org.springframework.security.acls.model.MutableAcl;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +58,10 @@ public class PermisosHelper {
 	private CacheHelper cacheHelper;
 	@Resource
 	private AclSidRepository aclSidRepository;
+	@Resource
+	private AclEntryRepository aclEntryRepository;
+	@Resource
+	private AclClassRepository aclClassRepository;
 	@Resource
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
 	@Autowired
@@ -823,6 +840,88 @@ public class PermisosHelper {
 		return permisos;
 	}
 
+
+	public void actualitzarPermisosOrgansObsolets(
+			List<OrganGestorEntity> organsDividits,
+			List<OrganGestorEntity> organsFusionats,
+			List<OrganGestorEntity> organsSubstituits) {
+
+		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
+
+		for (OrganGestorEntity organDividit: organsDividits) {
+			for (OrganGestorEntity nou: organDividit.getNous()) {
+				duplicaPermisos(classname, organDividit, nou);
+			}
+		}
+
+		Set<OrganGestorEntity> organsFusio = new HashSet<>();
+		for (OrganGestorEntity organFusionat: organsFusionats) {
+			organsFusio.add(organFusionat.getNous().get(0));
+		}
+		for (OrganGestorEntity organFusio: organsFusio) {
+			duplicaPermisos(classname, organFusio);
+		}
+
+		for (OrganGestorEntity organSubstituit: organsSubstituits) {
+			OrganGestorEntity organNou = organSubstituit.getNous().get(0);
+			duplicaPermisos(classname, organSubstituit, organNou);
+		}
+	}
+
+	private void duplicaPermisos(AclClassEntity classname, OrganGestorEntity organFusio) {
+		Set<AclEntryEntity> permisosNous = new HashSet<>();
+		List<AclEntryEntity> permisosAntics = new ArrayList<>();
+		for (OrganGestorEntity antic: organFusio.getAntics()) {
+			AclObjectIdentityEntity objectIdentity = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, antic.getId());
+			if (objectIdentity != null) {
+				permisosAntics.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentity));
+			}
+		}
+		if (permisosAntics == null) {
+			return;
+		}
+		duplicaEntradesPermisos(classname, organFusio, permisosAntics.get(0).getAclObjectIdentity(), permisosAntics, permisosNous);
+		aclEntryRepository.save(permisosNous);
+	}
+
+	private void duplicaPermisos(AclClassEntity classname, OrganGestorEntity organAntic, OrganGestorEntity organNou) {
+		Set<AclEntryEntity> permisosNous = new HashSet<>();
+		List<AclEntryEntity> permisosAntics = new ArrayList<>();
+		AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organAntic.getId());
+		if (objectIdentityAntic == null) {
+			return;
+		}
+		permisosAntics.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
+		duplicaEntradesPermisos(classname, organNou, objectIdentityAntic, permisosAntics, permisosNous);
+	}
+
+	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclObjectIdentityEntity objectIdentityAntic, List<AclEntryEntity> permisosAntics, Set<AclEntryEntity> permisosNous) {
+		AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
+		if (objectIdentityNou == null) {
+			objectIdentityNou = AclObjectIdentityEntity.builder()
+					.classname(classname)
+					.objectId(organNou.getId())
+					.ownerSid(objectIdentityAntic.getOwnerSid())
+					.build();
+		}
+		for (AclEntryEntity permisAntic : permisosAntics) {
+			AclEntryEntity aclEntry = AclEntryEntity.builder()
+					.aclObjectIdentity(objectIdentityNou)
+					.sid(permisAntic.getSid())
+					.order(permisosNous.size())
+					.mask(permisAntic.getMask())
+					.granting(permisAntic.getGranting())
+					.build();
+			permisosNous.add(aclEntry);
+		}
+	}
+
+	public void eliminarPermisosOrgan(OrganGestorEntity organGestor) {
+		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
+		AclObjectIdentityEntity objectIdentity = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organGestor.getId());
+		List<AclEntryEntity> permisos = aclEntryRepository.findByAclObjectIdentity(objectIdentity);
+		aclEntryRepository.deleteInBatch(permisos);
+	}
 
 	public interface ObjectIdentifierExtractor<T> {
 		public Long getObjectIdentifier(T object);

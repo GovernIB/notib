@@ -49,4 +49,6 @@ public class ProcSerDataDto extends AuditoriaDto implements Serializable {
 
 	private ProcSerTipusEnum tipus;
 
+	private boolean organNoSincronitzat;
+
 }

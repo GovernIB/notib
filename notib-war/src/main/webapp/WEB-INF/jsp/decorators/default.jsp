@@ -55,6 +55,9 @@
 	pageContext.setAttribute(
 			"avisos",
 			es.caib.notib.war.helper.AvisHelper.getAvisos(request));
+	pageContext.setAttribute(
+			"organsNoSincronitzats",
+			es.caib.notib.war.helper.OrganGestorHelper.getOrgansNoSincronitzats(request));
 	
 //	pageContext.setAttribute(
 //			"versioMajorActual",
@@ -382,7 +385,7 @@ body {
 											<li><a id="mc_permisos" href="<c:url value="/entitat/${entitatActual.id}/permis"/>"><spring:message code="decorator.menu.entitat.permisos"/></a></li>
 											<li><a id="mc_aplicacions" href="<c:url value="/entitat/${entitatActual.id}/aplicacio"/>"><spring:message code="decorator.menu.entitat.aplicacions"/></a></li>
 											<li class="divider"></li>
-											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='procediment.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
 											<li><a id="mc_serveis" href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
 											<li><a id="mc_organs" href="<c:url value="/organgestorArbre"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 											<li class="divider"></li>
@@ -404,7 +407,7 @@ body {
 									<div class="btn-group">
 										<button id="m_conf" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 										<ul class="dropdown-menu">
-											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/></a></li>
+											<li><a id="mc_procediments" href="<c:url value="/procediment"/>"><spring:message code="decorator.menu.procediment"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='procediment.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
 											<li><a id="mc_serveis" href="<c:url value="/servei"/>"><spring:message code="decorator.menu.servei"/></a></li>
 											<li><a id="mc_organs" href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organGestor"/></a></li>
 											<li><a id="mc_grups" href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>

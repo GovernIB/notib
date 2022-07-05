@@ -480,7 +480,7 @@ public class ServeiServiceImpl implements ServeiService{
 						numPagina++;
 						reintents++;
 //						Elements no actualitzats
-						totalElements -= ((totalElements - progres.getNumProcedimentsActualitzats()) < 30) ? ((totalElements - progres.getNumProcedimentsActualitzats())) : (30);
+						totalElements -= ((totalElements - progres.getNumOperacionsRealitzades()) < 30) ? ((totalElements - progres.getNumOperacionsRealitzades())) : (30);
 						continue;
 					}
 					
@@ -488,7 +488,7 @@ public class ServeiServiceImpl implements ServeiService{
 //					logger.debug(">>>> obtinguts " + serveisGda.size() + " serveis (" + (t2 - t1) + "ms)");
 					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.obtenir.serveis.result", new Object[] {serveisGda.size()}));
 					progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
-					progres.setNumProcediments(totalElements);
+					progres.setNumOperacions(totalElements);
 
 //					logger.debug(">>>> ==========================================================================");
 //					logger.debug(">>>> Processar serveis");
@@ -545,7 +545,7 @@ public class ServeiServiceImpl implements ServeiService{
 //				logger.debug(">>>> ==========================================================================");
 				Long tf = System.currentTimeMillis();
 				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.fi.resultat", new Object[] {progres.getNumProcedimentsActualitzats(), totalElementsCons}));
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.fi.resultat", new Object[] {progres.getNumOperacionsRealitzades(), totalElementsCons}));
 				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("servei.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
 				for (ActualitzacioInfo inf: progres.getInfo()) {
 					if (inf.getText() != null)

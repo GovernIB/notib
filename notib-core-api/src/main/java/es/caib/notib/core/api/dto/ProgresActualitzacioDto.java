@@ -22,8 +22,8 @@ public class ProgresActualitzacioDto {
 	}
 
 	Integer progres = 0;
-	Integer numProcediments;
-	Integer numProcedimentsActualitzats = 0;
+	Integer numOperacions;
+	Integer numOperacionsRealitzades = 0;
 	List<ActualitzacioInfo> info = new ArrayList<ProgresActualitzacioDto.ActualitzacioInfo>();
 	boolean finished = false;
 	
@@ -38,12 +38,12 @@ public class ProgresActualitzacioDto {
 		info.add(new ActualitzacioInfo(TipusInfo.SEPARADOR, ""));
 	}
 	
-	public void incrementProcedimentsActualitzats() {
-		if (numProcediments == null) {
+	public void incrementOperacionsRealitzades() {
+		if (numOperacions == null) {
 			return;
 		}
-		this.numProcedimentsActualitzats++;
-		double auxprogres = (this.numProcedimentsActualitzats.doubleValue()  / this.numProcediments.doubleValue()) * 100;
+		this.numOperacionsRealitzades++;
+		double auxprogres = (this.numOperacionsRealitzades.doubleValue()  / this.numOperacions.doubleValue()) * 100;
 		this.progres = (int) auxprogres;
 	}
 	

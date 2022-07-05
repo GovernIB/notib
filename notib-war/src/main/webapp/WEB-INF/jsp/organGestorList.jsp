@@ -187,7 +187,7 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="organgestor/{{:id}}" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>
+<%--								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>--%>
 								<li><a href="procediment/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="650px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.procediment"/></a></li>
 								<li><a href="servei/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="650px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/></a></li>
 								<li><a href="organgestor/{{:codi}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
@@ -202,12 +202,12 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
 			<a id="procediment-boto-update"
-					class="btn btn-default" href="organgestor/update/auto"
+					class="btn btn-default" href="organgestor/sync/dir3"
 					data-toggle="modal"
 					data-maximized="false">
 					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
 			</a>
-			<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/new" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a>
+<%--			<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/new" data-toggle="modal" data-adjust-height="false" data-height="400px"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a>--%>
 		</p>
 	</script>
 	

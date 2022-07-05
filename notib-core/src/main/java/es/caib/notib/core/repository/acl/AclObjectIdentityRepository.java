@@ -1,5 +1,6 @@
 package es.caib.notib.core.repository.acl;
 
+import es.caib.notib.core.entity.acl.AclClassEntity;
 import es.caib.notib.core.entity.acl.AclObjectIdentityEntity;
 import es.caib.notib.core.entity.acl.AclSidEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,4 +45,6 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			@Param("classname") String classname,
 			@Param("sids") List<AclSidEntity> sids,
 			@Param("masks") List<Integer> masks);
+
+	AclObjectIdentityEntity findByClassnameAndObjectId(AclClassEntity classname, Long id);
 }

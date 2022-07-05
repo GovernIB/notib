@@ -432,4 +432,9 @@ public class ProcedimentServiceBean implements ProcedimentService {
 			String nomProcediment) throws NotFoundException {
 		return delegate.findByNom(entitatId, nomProcediment);
 	}
+
+	@Override
+	public Integer getProcedimentsAmbOrganNoSincronitzat(Long entitatId) {
+		return delegate.getProcedimentsAmbOrganNoSincronitzat(entitatId);
+	}
 }

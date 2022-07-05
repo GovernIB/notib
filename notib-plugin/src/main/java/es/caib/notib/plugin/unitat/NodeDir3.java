@@ -6,6 +6,7 @@ package es.caib.notib.plugin.unitat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -19,7 +20,8 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter 
+@Getter @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -46,7 +48,10 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	@JsonProperty("tieneOficinaSir")
 	private Boolean tieneOficinaSir = false;
 	@JsonProperty("hijos")
-	private List<NodeDir3> fills; 
+	private List<NodeDir3> fills;
+
+	protected List<String> historicosUO;
+	private List<NodeDir3> lastHistoricosUnitats;
 	
 	@Override
 	public int compareTo(NodeDir3 o) {

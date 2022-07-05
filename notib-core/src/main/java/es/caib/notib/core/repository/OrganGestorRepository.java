@@ -23,6 +23,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
+	OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 	OrganGestorEntity findByCodi(String codi);
 
 	@Query("from OrganGestorEntity og where og.entitat.dir3Codi = :entitatDir3Codi order by og.codi asc")
@@ -157,4 +158,14 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			" and e.id = :entitatId ")
 	boolean isAnyOfEntitat(@Param("organsIds") List<Long> organsIds,
 						   @Param("entitatId") Long entitatId);
+
+	public List<OrganGestorEntity> findByEntitatIdAndEstat(Long entitatId, OrganGestorEstatEnum estat);
+
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and og.estat != es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V ")
+	List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
+
 }

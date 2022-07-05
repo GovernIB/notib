@@ -1,6 +1,9 @@
 package es.caib.notib.core.entity.acl;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.*;
@@ -12,6 +15,9 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "not_acl_object_identity")
 public class AclObjectIdentityEntity extends AbstractPersistable<Long> {
