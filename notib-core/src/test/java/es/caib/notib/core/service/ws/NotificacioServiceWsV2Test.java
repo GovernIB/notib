@@ -326,7 +326,7 @@ public class NotificacioServiceWsV2Test {
 			"Pau, Test, Test, Jordinnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Test, error.validacio.nom.destinatari.longitud.max",
 			"Pau, Test, Test, Jordi, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, error.validacio.llinatge1.destinatari.longitud.max",
 			"Pau, Test, Test, Jordi, Test, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, error.validacio.llinatge2.destinatari.longitud.max",
-	}, named = "Validacio {index}: {6}")
+	})
 	public void whenAlta_thenValidate(String titularNom, String titularLlinatge1, String titularLlinatge2,
 									  String destNom, String destLlinatge1, String destLlinatge2, String missatgeEsperat) throws IOException {
 		// Given
