@@ -1,5 +1,13 @@
 databaseChangeLog:
   - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - property:
       name: tipus
       value: NUMBER(1,0)
       dbms: oracle
@@ -14,6 +22,9 @@ databaseChangeLog:
         - addColumn:
             tableName: not_config
             columns:
+              - column:
+                  name: entitat_codi
+                  type: varchar(64 ${varcharUnit})
               - column:
                   name: CONFIGURABLE
                   type: ${tipus}

@@ -1741,8 +1741,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			return dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(Properties.class)
-					.newInstance(configHelper.getAllEntityProperties(null));
+			dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(null));
+			return dadesUsuariPlugin;
 		} catch (Exception ex) {
 			logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "Error al crear la instància del plugin de dades d'usuari", ex);
