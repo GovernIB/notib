@@ -232,20 +232,12 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 	
 	@Override
-	public List<NodeDir3> cercaUnitats(
-			String codi, 
-			String denominacio,
-			Long nivellAdministracio, 
-			Long comunitatAutonoma, 
-			Boolean ambOficines, 
-			Boolean esUnitatArrel,
-			Long provincia, 
-			String municipi) throws SistemaExternException {
+	public List<NodeDir3> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel,
+										Long provincia, String municipi) throws SistemaExternException {
+
 		List<NodeDir3> unitats = new ArrayList<NodeDir3>();
 		try {
-			URL url = new URL(getServiceUrl() + SERVEI_CERCA
-					+ "organismos?"
-					+ "codigo=" + (codi != null ? codi : "")
+			URL url = new URL(getServiceUrl() + SERVEI_CERCA + "organismos?" + "codigo=" + (codi != null ? codi : "")
 					+ "&denominacion=" + (denominacio != null ? denominacio : "")
 					+ "&codNivelAdministracion=" + (nivellAdministracio != null ? nivellAdministracio : "-1")
 					+ "&codComunidadAutonoma=" + (comunitatAutonoma != null ? comunitatAutonoma : "-1")
@@ -263,11 +255,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			byte[] response = IOUtils.toByteArray(httpConnection.getInputStream());
 			if (response != null && response.length > 0) {
-				unitats = mapper.readValue(
-						response,
-						TypeFactory.defaultInstance().constructCollectionType(
-								List.class,  
-								NodeDir3.class));
+				unitats = mapper.readValue(response, TypeFactory.defaultInstance().constructCollectionType(List.class, NodeDir3.class));
 				Collections.sort(unitats);
 			}
 			return unitats;

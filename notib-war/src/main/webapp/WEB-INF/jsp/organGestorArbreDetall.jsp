@@ -241,7 +241,12 @@
                 <thead>
                 <tr>
                     <th data-col-name="tipus" class="writing-horitzontal" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus" /></th>
-                    <th data-col-name="nomSencerAmbCodi" class="writing-horitzontal nom-principal"><spring:message code="procediment.permis.columna.principal"/></th>
+                    <th data-col-name="nomSencerAmbCodi" data-template="#cellNomTemplate" class="writing-horitzontal nom-principal">
+                        <spring:message code="procediment.permis.columna.principal"/>
+                        <script id="cellNomTemplate" type="text/x-jsrender">
+                            <span title="{{:nomSencerAmbCodi}}">{{:nomSencerAmbCodi}}</span>
+                        </script>
+                    </th>
                     <th data-col-name="read" data-template="#cellPermisReadTemplate" class="th-checkbox">
                         <spring:message code="procediment.permis.columna.consulta"/>
                         <script id="cellPermisReadTemplate" type="text/x-jsrender">

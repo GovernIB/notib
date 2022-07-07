@@ -888,32 +888,39 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
     }
 
-    private boolean setDocument(
-            NotificacioDatabaseDto notificacio,
-            DocumentDto document,
-            String[] linia,
-            List<String> fileNames,
-            byte[] ficheroZipBytes,
-            Map<String, Long> documentsProcessatsMassiu) {
+    private boolean setDocument(NotificacioDatabaseDto notificacio, DocumentDto document, String[] linia, List<String> fileNames, byte[] ficheroZipBytes, Map<String, Long> documentsProcessatsMassiu) {
 
         boolean llegirMetadades = false;
-
         if (linia[4] == null || linia[4].isEmpty()) {
             notificacio.setDocument(null);
             return llegirMetadades;
         }
-
-        if (fileNames != null && fileNames.contains(linia[4])) { // Archivo físico
-            document.setArxiuNom(linia[4]);
+        String arxiuNom = linia[4];
+        int count = 0;
+        String nom = "";
+        for (String name : fileNames) {
+            if (name.contains(arxiuNom)) {
+                nom = name;
+                count++;
+            }
+        }
+        if (count != 1) {
+            String msg = count == 0 ? messageHelper.getMessage("error.document.no.trobat.dins.zip") : messageHelper.getMessage("error.document.indeterminat.dins.zip");
+            notificacio.getErrors().add(msg);
+        } else {
+            arxiuNom = nom;
+        }
+        if (fileNames != null && fileNames.contains(arxiuNom)) { // Archivo físico
+            document.setArxiuNom(arxiuNom);
             byte[] arxiuBytes;
             if (documentsProcessatsMassiu.isEmpty() || !documentsProcessatsMassiu.containsKey(document.getArxiuNom()) ||
                     (documentsProcessatsMassiu.containsKey(document.getArxiuNom()) && documentsProcessatsMassiu.get(document.getArxiuNom()) == null)) {
 
-                arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, linia[4]);
+                arxiuBytes = ZipFileUtils.readZipFile(ficheroZipBytes, arxiuNom);
                 document.setContingutBase64(Base64.encodeBase64String(arxiuBytes));
                 document.setNormalitzat("Si".equalsIgnoreCase(linia[5]));
                 document.setGenerarCsv(false);
-                document.setMediaType(URLConnection.guessContentTypeFromName(linia[4]));
+                document.setMediaType(URLConnection.guessContentTypeFromName(arxiuNom));
                 document.setMida(Long.valueOf(arxiuBytes.length));
                 if (registreNotificaHelper.isSendDocumentsActive()) {
                     llegirMetadades = true;
@@ -923,7 +930,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             notificacio.setDocument(document);
             return llegirMetadades;
         }
-        String[] docSplit = linia[4].split("\\.");
+        String[] docSplit = arxiuNom.split("\\.");
+//        String[] docSplit = linia[4].split("\\.");
         if (docSplit.length > 1 && Arrays.asList("JPG", "JPEG", "ODT", "ODP", "ODS", "ODG", "DOCX", "XLSX", "PPTX",
                 "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP")
                 .contains(docSplit[1].toUpperCase())) {
@@ -943,6 +951,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 llegirMetadades = true;
 //                            leerMetadadesDelCsv(notificacio, document, linia);
             }
+            notificacio.setDocument(document);
             return llegirMetadades;
         }
         // Csv

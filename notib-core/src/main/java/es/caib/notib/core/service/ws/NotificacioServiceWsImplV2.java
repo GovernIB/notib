@@ -152,8 +152,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	@Transactional
 	@Override
-	public RespostaAltaV2 altaV2(
-			NotificacioV2 notificacio) throws NotificacioServiceWsException {
+	public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
@@ -177,15 +177,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] usuariCodi: " + usuariCodi);
 			
 			AplicacioEntity aplicacio = null;
-			if (entitat != null && usuariCodi != null)
+			if (entitat != null && usuariCodi != null) {
 				aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
+			}
 			logger.debug(">> [ALTA] aplicacio: " + (aplicacio == null ? "null" : aplicacio.getUsuariCodi()));
 			
-			resposta = validarNotificacio(
-					notificacio,
-					emisorDir3Codi,
-					entitat,
-					aplicacio);
+			resposta = validarNotificacio(notificacio, emisorDir3Codi, entitat, aplicacio);
 			logger.debug(">> [ALTA] validacio: [error=" + resposta.isError() + ", estat=" + resposta.getEstat() + ", descripcio=" + resposta.getErrorDescripcio() + "]");
 			
 			if (resposta.isError()) {
@@ -200,9 +197,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				// Obtenir dades depenents de procediment (Procediment NO obligatori per a comunicacions a administracions)
 				if (notificacio.getProcedimentCodi() != null) {
-					procediment = procSerRepository.findByCodiAndEntitat(
-							notificacio.getProcedimentCodi(), 
-							entitat);
+					procediment = procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat);
 
 					if (procediment != null) {
 
@@ -1512,9 +1507,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1101 | El camp 'serveiTipus' d'un enviament no pot ser null
 	// 1110 | El titular d'un enviament no pot ser null
 	// 1111 | El camp 'interessat_tipus' del titular d'un enviament no pot ser null
-	// 1112 | El camp 'nom' del titular no pot ser tenir una longitud superior a 255 caràcters
-	// 1113 | El camp 'llinatge1' del titular no pot ser major que 40 caràcters
-	// 1114 | El camp 'llinatge2' del titular no pot ser major que 40 caràcters
+	// 1112 | El camp 'nom' del titular no pot ser tenir una longitud superior a 30 caràcters
+	// 1113 | El camp 'llinatge1' del titular no pot ser major que 30 caràcters
+	// 1114 | El camp 'llinatge2' del titular no pot ser major que 30 caràcters
 	// 1115 | El camp 'nif' del titular d'un enviament no pot tenir una longitud superior a 9 caràcters
 	// 1116 | El 'nif' del titular no és vàlid
 	// 1117 | El camp 'email' del titular no pot ser major que 160 caràcters
@@ -1536,9 +1531,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1154 | El camp 'dir3codi' fa referència a una administració de la pròpia entitat. No es pot utilitzar Notib per enviar comunicacions dins la pròpia entitat
 	// 1160 | El numero de destinatais està limitat a un destinatari
 	// 1170 | El camp 'interessat_tipus' del destinatari d'un enviament no pot ser null
-	// 1171 | El camp 'nom' del titular no pot tenir una longitud superior a 255 caràcters
-	// 1172 | El camp 'llinatge1' del destinatari no pot ser major que 40 caràcters
-	// 1173 | El camp 'llinatge2' del destinatari no pot ser major que 40 caràcters
+	// 1171 | El camp 'nom' del titular no pot tenir una longitud superior a 30 caràcters
+	// 1172 | El camp 'llinatge1' del destinatari no pot ser major que 30 caràcters
+	// 1173 | El camp 'llinatge2' del destinatari no pot ser major que 30 caràcters
 	// 1174 | El camp 'nif' del destinatari d'un enviament no pot tenir una longitud superior a 9 caràcters
 	// 1175 | El 'nif' del destinatari no és vàlid
 	// 1176 | El camp 'email' del destinatari no pot ser major que 255 caràcters
@@ -1864,15 +1859,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return setRespostaError(messageHelper.getMessage("error.validacio.interessat.tipus.enviament.no.null"));
 					}
 					// - Nom
-					if(destinatari.getNom() != null && destinatari.getNom().length() > 255) {
-						return setRespostaError(messageHelper.getMessage("error.validacio.nom.titular.destinatari.longitud.max"));
+					if(destinatari.getNom() != null && destinatari.getNom().length() > 30) {
+						return setRespostaError(messageHelper.getMessage("error.validacio.nom.destinatari.longitud.max"));
 					}
 					// - Llinatge 1
-					if (destinatari.getLlinatge1() != null && destinatari.getLlinatge1().length() > 40) {
+					if (destinatari.getLlinatge1() != null && destinatari.getLlinatge1().length() > 30) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.llinatge1.destinatari.longitud.max"));
 					}
 					// - Llinatge 2
-					if (destinatari.getLlinatge2() != null && destinatari.getLlinatge2().length() > 40) {
+					if (destinatari.getLlinatge2() != null && destinatari.getLlinatge2().length() > 30) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.llinatge2.destinatari.longitud.max"));
 					}
 					// - Nif

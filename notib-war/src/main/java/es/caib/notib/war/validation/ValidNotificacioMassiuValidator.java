@@ -47,7 +47,6 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 					.addNode("ficheroZip")
 					.addConstraintViolation();
 		}
-		
 		return valid;
 	}
 

@@ -25,6 +25,7 @@ import java.util.Date;
 @Getter @Setter
 @ValidNotificacioMassiu
 public class NotificacioMassivaCommand {
+
 	private MultipartFile ficheroCsv;
 	private String fitxerCSVGestdocId;
 	private String fitxerCSVNom;
@@ -40,29 +41,22 @@ public class NotificacioMassivaCommand {
 	private Long pagadorPostalId;
 
 	public static NotificacioMassivaCommand asCommand(NotificacioMassivaDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				NotificacioMassivaCommand.class);
+		return ConversioTipusHelper.convertir(dto, NotificacioMassivaCommand.class);
 	}
 	public NotificacioMassivaDto asDto(GestioDocumentalService gestioDocumentalService) throws IOException {
 		
-		NotificacioMassivaDto notificacioMassivaDto = ConversioTipusHelper.convertir(
-				this,
-				NotificacioMassivaDto.class);
+		NotificacioMassivaDto notificacioMassivaDto = ConversioTipusHelper.convertir(this, NotificacioMassivaDto.class);
 
 		if (fitxerCSVGestdocId == null || fitxerCSVGestdocId.isEmpty() ) {
 			notificacioMassivaDto.setFicheroCsvBytes(this.getFicheroCsv().getBytes());
 			notificacioMassivaDto.setFicheroCsvNom(this.getFicheroCsv().getOriginalFilename());
-
 		} else {
 			notificacioMassivaDto.setFicheroCsvBytes(gestioDocumentalService.obtenirArxiuTemporal(fitxerCSVGestdocId));
 			notificacioMassivaDto.setFicheroCsvNom(fitxerCSVNom);
-
 		}
 		if (fitxerZIPGestdocId == null || fitxerZIPGestdocId.isEmpty() ) {
 			notificacioMassivaDto.setFicheroZipBytes(this.getFicheroZip().getBytes());
 			notificacioMassivaDto.setFicheroZipNom(this.getFicheroZip().getOriginalFilename());
-
 		} else {
 			notificacioMassivaDto.setFicheroZipBytes(gestioDocumentalService.obtenirArxiuTemporal(fitxerZIPGestdocId));
 			notificacioMassivaDto.setFicheroZipNom(fitxerZIPNom);
@@ -71,6 +65,7 @@ public class NotificacioMassivaCommand {
 	}
 	
 	public int getEmailDefaultSize() {
+
 		int emailSize = 0;
 		try {
 			Field email = this.getClass().getDeclaredField("email");

@@ -879,15 +879,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<OrganGestorDto> cercaUnitats(
-			String codi, 
-			String denominacio,
-			Long nivellAdministracio, 
-			Long comunitatAutonoma, 
-			Boolean ambOficines, 
-			Boolean esUnitatArrel,
-			Long provincia, 
-			String municipi) {
+	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines,
+											 Boolean esUnitatArrel, Long provincia, String municipi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			return pluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);

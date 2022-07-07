@@ -1,10 +1,12 @@
 package es.caib.notib.core.service.ws;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -30,14 +32,20 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -51,8 +59,11 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(JUnitParamsRunner.class)
 public class NotificacioServiceWsV2Test {
+
+	@Rule
+	public MockitoRule rule = MockitoJUnit.rule();
 
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 	protected static final String ORGAN_CODI = "A04003003";
@@ -129,6 +140,8 @@ public class NotificacioServiceWsV2Test {
 	private NotificacioEventEntity notificacioEventEntityMock;
 	@Mock
 	private ConfigHelper configHelper;
+	@Mock
+	private MessageHelper messageHelper;
 
 	private AplicacioEntity aplicacio;
 	
@@ -139,12 +152,21 @@ public class NotificacioServiceWsV2Test {
 	
 	@Before
 	public void setUp() {
+
+//		MockitoAnnotations.initMocks(this);
 		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
 		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
 //		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
 		Mockito.when(configHelper.getAsBooleanByEntitat(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
 		Mockito.when(auth.getName()).thenReturn("mockedName");
+		Mockito.when(messageHelper.getMessage("error.validacio.nom.titular.longitud.max")).thenReturn("error.validacio.nom.titular.longitud.max");
+		Mockito.when(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max")).thenReturn("error.validacio.llinatge1.titular.longitud.max");
+		Mockito.when(messageHelper.getMessage("error.validacio.llinatge2.titular.longitud.max")).thenReturn("error.validacio.llinatge2.titular.longitud.max");
+		Mockito.when(messageHelper.getMessage("error.validacio.nom.destinatari.longitud.max")).thenReturn("error.validacio.nom.destinatari.longitud.max");
+		Mockito.when(messageHelper.getMessage("error.validacio.llinatge1.destinatari.longitud.max")).thenReturn("error.validacio.llinatge1.destinatari.longitud.max");
+		Mockito.when(messageHelper.getMessage("error.validacio.llinatge2.destinatari.longitud.max")).thenReturn("error.validacio.llinatge2.destinatari.longitud.max");
+//		Mockito.when(messageHelper.getMessage(Mockito.anyString())).thenReturn("Missatge traduit");
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
 	
@@ -227,22 +249,10 @@ public class NotificacioServiceWsV2Test {
 //		Document documentArxiuCsv = initDocument(document3.getCsv());
 		Document documentArxiuUuid = initDocument(document2.getUuid());
 		
-		NotificacioV2 notificacio = generarNotificacioV2(notificacioId, 1, false, null, document2, null);
+		NotificacioV2 notificacio = generarNotificacioV2(notificacioId, 1, false, null, document2, null, null, null);
 		
-		aplicacio = AplicacioEntity.builder()
-                .usuariCodi("")
-                .callbackUrl("")
-                .activa(true)
-                .entitat(entitatMock)
-                .build();
-
-		PersonaEntity personaEntity = PersonaEntity.builder()
-				.email("sandreu@limit.es")
-				.llinatge1("Andreu")
-				.llinatge2("Nadal")
-				.nif("00000000T")
-				.nom("Siòn")
-				.telefon("666010101").build();
+		aplicacio = AplicacioEntity.builder().usuariCodi("").callbackUrl("").activa(true).entitat(entitatMock).build();
+		PersonaEntity personaEntity = PersonaEntity.builder().email("sandreu@limit.es").llinatge1("Andreu").llinatge2("Nadal").nif("00000000T").nom("Siòn").telefon("666010101").build();
 		OrganGestorDto organ = new OrganGestorDto();
 		organ.setSir(true);
 		
@@ -303,10 +313,81 @@ public class NotificacioServiceWsV2Test {
 		assertNull(respostaAlta.getErrorDescripcio());
 		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
 		assertEquals(1, referencies.size());
-		assertEquals(
-				NotificacioEstatEnum.PENDENT, //ASINCRON
-				respostaAlta.getEstat());
+		assertEquals(NotificacioEstatEnum.PENDENT, /*ASINCRON*/ respostaAlta.getEstat());
+	}
 
+
+	@Test
+	@Parameters(value = {
+			"Paunnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Test, Jordi, Test, Test, error.validacio.nom.titular.longitud.max",
+			"Pau, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Jordi, Test, Test, error.validacio.llinatge1.titular.longitud.max",
+			"Pau, Test, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Jordi, Test, Test, error.validacio.llinatge2.titular.longitud.max",
+			"Pau, Test, Test, Jordinnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, Test, error.validacio.nom.destinatari.longitud.max",
+			"Pau, Test, Test, Jordi, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, Test, error.validacio.llinatge1.destinatari.longitud.max",
+			"Pau, Test, Test, Jordi, Test, Testnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn, error.validacio.llinatge2.destinatari.longitud.max",
+	})
+	public void whenAlta_thenValidate(String titularNom, String titularLlinatge1, String titularLlinatge2,
+									  String destNom, String destLlinatge1, String destLlinatge2, String missatgeEsperat) throws IOException {
+		// Given
+		String notificacioId = Long.toString(System.currentTimeMillis());
+		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", "nom", null, "dir3Codi", "dir3CodiReg", "apiKey", false, null, null, "colorFons", "colorLletra", null, "oficina", "nomOficinaVirtual", false, "llibre", "llibreNom", false).build();
+		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
+		ProcedimentEntity procediment = ProcedimentEntity.getBuilder("", "", configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"), configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"), entitatMock, false, null, /* organGestor*/ null, null, null, null, false, false).build();
+
+		List<GrupDto> grups = new ArrayList<GrupDto>();
+		GrupDto grupDto = new GrupDto();
+		grupDto.setId(1L);
+		grups.add(grupDto);
+
+		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, null, entitatMock, null, null, null, null, null).build();
+		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
+		DocumentV2 document2 = new DocumentV2();
+		document2.setUuid(UUID.randomUUID().toString());
+		document2.setNormalitzat(false);
+		document2.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
+		Document documentArxiuUuid = initDocument(document2.getUuid());
+		Persona titular = crearPersona("00000000T", titularNom, titularLlinatge1, titularLlinatge2, "666010101", "pau@limit.es");
+		Persona destinatari = crearPersona("18225486x", destNom, destLlinatge1, destLlinatge2, "666020202", "jordi@limit.es");
+		NotificacioV2 notificacio = generarNotificacioV2(notificacioId, 1, false, null, document2, null, titular, destinatari);
+		aplicacio = AplicacioEntity.builder().usuariCodi("").callbackUrl("").activa(true).entitat(entitatMock).build();
+		PersonaEntity personaEntity = PersonaEntity.builder().email("sandreu@limit.es").llinatge1("Andreu").llinatge2("Nadal").nif("00000000T").nom("Siòn").telefon("666010101").build();
+		OrganGestorDto organ = new OrganGestorDto();
+		organ.setSir(true);
+		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
+
+		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
+
+		// When
+		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
+		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
+//		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.any(EntitatEntity.class))).thenReturn(procediment);
+//		Mockito.when(organGestorRepository.findByCodi(notificacio.getOrganGestor())).thenReturn(organGestor);
+		Mockito.when(pluginHelper.llistarLlibreOrganisme(Mockito.anyString(), Mockito.anyString())).thenReturn(llibreOrganMock);
+		Mockito.when(pluginHelper.getModeFirma(Mockito.any(Document.class), Mockito.anyString())).thenReturn(1); //TRUE
+		Mockito.when(pluginHelper.arxiuGetImprimible(Mockito.anyString(), Mockito.eq(true))).thenReturn(documentArxiuUuid.getContingut());
+		Mockito.when(pluginHelper.arxiuDocumentConsultar(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true), Mockito.eq(true))).thenReturn(documentArxiuUuid);
+		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(Long.toString(new Random().nextLong()));
+//		Mockito.when(auditEnviamentHelper.desaEnviamentAmbReferencia(Mockito.any(EntitatEntity.class), Mockito.nullable(NotificacioEntity.class), Mockito.any(Enviament.class), Mockito.any(ServeiTipusEnumDto.class), Mockito.any(PersonaEntity.class), Mockito.anyListOf(PersonaEntity.class))).thenReturn(enviamentSavedMock);
+//		Mockito.when(personaRepository.save(Mockito.any(PersonaEntity.class))).thenReturn(personaEntity);
+//		Mockito.when(auditNotificacioHelper.desaNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
+//		Mockito.when(notificacioRepository.saveAndFlush(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioGuardada);
+//		Mockito.when(pluginHelper.getNotibTipusComunicacioDefecte()).thenReturn(NotificacioComunicacioTipusEnumDto.ASINCRON);
+//		Mockito.when(notificacioEnviamentRepository.findByNotificacio(Mockito.any(NotificacioEntity.class))).thenReturn(listaNotificacioGuardada);
+		Mockito.when(notificacioHelper.getNotificaErrorEvent(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioEventEntity);
+//		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
+		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
+
+		// Then
+		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
+		String msg = respostaAlta.isError() ? ">>> Reposta amb error: " + respostaAlta.getErrorDescripcio() : ">>> Reposta Ok";
+		System.out.println(msg);
+		assertNotNull(respostaAlta);
+		assertTrue(respostaAlta.isError());
+		assertNotNull(respostaAlta.getErrorDescripcio());
+		assertEquals(respostaAlta.getErrorDescripcio(), missatgeEsperat);
+//		List<EnviamentReferencia> referencies = respostaAlta.getReferencies();
+//		assertEquals(1, referencies.size());
+		assertEquals(NotificacioEstatEnum.PENDENT, /*ASINCRON*/ respostaAlta.getEstat());
 	}
 
 	private Document initDocument(String identificador) {
@@ -340,53 +421,32 @@ public class NotificacioServiceWsV2Test {
 		Mockito.reset(pluginHelper);
 	}
 	
-	private NotificacioV2 generarNotificacioV2(
-			String notificacioId,
-			int numDestinataris,
-			boolean ambEnviamentPostal,
-			DocumentV2 document, DocumentV2 document2, DocumentV2 document3) {
+	private NotificacioV2 generarNotificacioV2(String notificacioId, int numDestinataris, boolean ambEnviamentPostal, DocumentV2 document, DocumentV2 document2,
+											   DocumentV2 document3, Persona titular, Persona destinatari) {
 
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 		notificacio.setUsuariCodi(USUARI_CODI);
-//		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setOrganGestor(ORGAN_CODI);
 		notificacio.setConcepte("concepte_" + notificacioId);
 		notificacio.setDescripcio("descripcio_" + notificacioId);
 		notificacio.setEnviamentDataProgramada(null);
 		notificacio.setRetard(5);
 		notificacio.setCaducitat(new Date(System.currentTimeMillis() + 12 * 24 * 3600 * 1000));
-		
 		notificacio.setDocument(document2);
-//		notificacio.setDocument(document);
-//		notificacio.setDocument2(document2);
-//		notificacio.setDocument3(document3);
 		
 		for (int i = 0; i < numDestinataris; i++) {
+
 			Enviament enviament = new Enviament();
-			Persona titular = new Persona();
-			titular.setNom("Siòn");
-			titular.setLlinatge1("Andreu");
-			titular.setLlinatge2("Nadal");
-			titular.setNif("00000000T");
-			titular.setTelefon("666010101");
-			titular.setEmail("sandreu@limit.es");
-			titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
-				titular.setDir3Codi(ENTITAT_DIR3CODI);
+			if (titular == null) {
+				titular = crearPersona("00000000T","Pau","Test","Test", "666010101","pau@limit.es");
+			}
 			enviament.setTitular(titular);
-			Persona destinatari = new Persona();
-			destinatari.setNom("melcior");
-			destinatari.setLlinatge1("Andreu");
-			destinatari.setLlinatge2("Nadal");
-			destinatari.setNif("18225486x");
-			destinatari.setTelefon("666020202");
-			destinatari.setEmail("sandreu@limit.es");
-			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO))
-				destinatari.setDir3Codi(ENTITAT_DIR3CODI);
+			if (destinatari == null) {
+				destinatari = crearPersona("18225486x","Jordi","Test1","Test1", "666020202","jordi@limit.es");;
+			}
 			enviament.setDestinataris(new ArrayList<Persona>());
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
@@ -427,6 +487,17 @@ public class NotificacioServiceWsV2Test {
 			notificacio.getEnviaments().add(enviament);
 		}
 		return notificacio;
+	}
+
+	private Persona crearPersona(String nif, String nom, String llinatge1, String llinatge2, String telefon, String email) {
+
+		Persona persona = Persona.builder().nif(Strings.isNullOrEmpty(nif) ? "00000000T" : nif).nom(nom).llinatge1(llinatge1).llinatge2(llinatge2)
+						.telefon(Strings.isNullOrEmpty(telefon) ? "666010101" : telefon).email(Strings.isNullOrEmpty(email)  ? "test@limit.es" : email)
+						.interessatTipus(InteressatTipusEnumDto.ADMINISTRACIO).build();
+		if (persona.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			persona.setDir3Codi(ENTITAT_DIR3CODI);
+		}
+		return persona;
 	}
 
 }
