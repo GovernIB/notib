@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sun.misc.BASE64Encoder;
 
 import javax.jws.WebService;
-import javax.mail.internet.InternetAddress;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -269,14 +268,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if (organGestor == null) {
 					organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestor());
 					if (organGestor == null) {
-						Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
-						if (!organigramaEntitat.containsKey(notificacio.getOrganGestor())) {
+//						Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+//						if (!organigramaEntitat.containsKey(notificacio.getOrganGestor())) {
 							logger.debug(">> [ALTA] Organ gestor desconegut");
 							String errorDescripcio = messageHelper.getMessage("error.validacio.organ.gestor.no.organ.entitat");
 							integracioHelper.addAccioError(info, errorDescripcio);
 							return setRespostaError(errorDescripcio);
-						}
-						organGestor = organGestorHelper.crearOrganGestor(entitat, notificacio.getOrganGestor());
+//						}
+//						organGestor = organGestorHelper.crearOrganGestor(entitat, notificacio.getOrganGestor());
 					}
 				}
 				if (procediment != null && procediment.isComu() && organGestor != null) {

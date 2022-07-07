@@ -146,8 +146,7 @@ public class NotificacioHelperTest {
                 .grup(grupDto)
                 .build();
 
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null,null, entidad, null,
-				null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
 		String documentGesdocId = "documentGesdocId";
@@ -171,8 +170,7 @@ public class NotificacioHelperTest {
 				Mockito.eq(true),
 				Mockito.eq(false),
 				Mockito.eq(false))).thenReturn(procediment);
-		Mockito.when(organGestorHelper.createOrganGestorFromNotificacio(Mockito.any(NotificacioDatabaseDto.class), 
-				Mockito.any(EntitatEntity.class))).thenReturn(organGestor);
+//		Mockito.when(organGestorHelper.createOrganGestorFromNotificacio(Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class))).thenReturn(organGestor);
 		Mockito.when(grupRepository.findOne(Mockito.anyLong())).thenReturn(grupNotificacio);
 		Mockito.when(documentRepository.findOne(Mockito.anyLong())).thenReturn(documentEntity);
 		Mockito.when(documentRepository.save(Mockito.any(DocumentEntity.class))).thenReturn(documentEntity2, documentEntity3);

@@ -1,7 +1,5 @@
 package es.caib.notib.core.api.dto.organisme;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
-import es.caib.notib.core.api.dto.Arbre;
 import es.caib.notib.core.api.dto.ArbreNode;
 import es.caib.notib.core.api.dto.AuditoriaDto;
 import lombok.Getter;
@@ -10,7 +8,6 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Filtre per a la consulta de procediments.

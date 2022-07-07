@@ -1,7 +1,6 @@
 package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
@@ -10,16 +9,21 @@ import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
-import es.caib.notib.core.entity.*;
-import es.caib.notib.core.repository.AvisRepository;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.GrupProcSerEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.ServeiEntity;
 import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.repository.ServeiRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.usuari.DadesUsuari;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,12 +66,8 @@ public class ProcSerHelper {
 	private ServeiRepository serveiRepository;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private AvisRepository avisRepository;
 	@Resource
 	private OrganGestorService organGestorService;
-	@Resource
-	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private MessageHelper messageHelper;
 	@Resource
@@ -336,13 +334,14 @@ public class ProcSerHelper {
 
 
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
-	public Boolean actualitzarProcedimentFromGda(
+	public void actualitzarProcedimentFromGda(
 			ProgresActualitzacioDto progres,
 			ProcSerDataDto procedimentGda,
 			EntitatEntity entitat,
-			Map<String, OrganismeDto> organigramaEntitat, 
+			Map<String, OrganismeDto> organigramaEntitat,
 			boolean modificar,
-			List<OrganGestorEntity> organsGestorsModificats) {
+			List<OrganGestorEntity> organsGestorsModificats,
+			Map<String, String[]> avisosProcedimentsOrgans) {
 		
 		Long t1 = System.currentTimeMillis();
 		OrganGestorEntity organGestorGda = null;
@@ -351,7 +350,7 @@ public class ProcSerHelper {
 			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
 
 			if (!procedimentHasToBeUpdated(procedimentGda, procediment, organigramaEntitat, progres)) {
-				return false;
+				return;
 			}
 
 			// Organ gestor
@@ -372,7 +371,9 @@ public class ProcSerHelper {
 				if (!procedimentGda.isComu() && organGestorGda == null) {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.result.no", new Object[]{procedimentGda.getOrganGestor()}));
 					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.sync", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
-					return true; // Organ no sincronitzat
+					// Organ no sincronitzat
+					avisosProcedimentsOrgans.put(procedimentGda.getNom(), new String[] { "sense òrgan", procedimentGda.getOrganGestor() });
+					return;
 				}
 				procediment = procSerUpdateHelper.nouProcediment(procedimentGda, entitat, organGestorGda);
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.creat"));
@@ -385,13 +386,16 @@ public class ProcSerHelper {
 					if (!entitat.equals(procediment.getEntitat())) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.result.no", new Object[]{procediment.getEntitat().getNom()}));
 						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.revisar", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
-						return false;
+						return;
 					}
 
 					if (!procedimentGda.isComu() && organGestorGda == null) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.result.no", new Object[]{procedimentGda.getOrganGestor()}));
 						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.sync", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
-						return true; // Organ no sincronitzat
+						// Organ no sincronitzat
+						String organOriginal = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() + " - " + procediment.getOrganGestor().getNom() : "sense òrgan";
+						avisosProcedimentsOrgans.put(procedimentGda.getNom(), new String[] { organOriginal, procedimentGda.getOrganGestor() });
+						return;
 					}
 
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.result.si"));
@@ -424,7 +428,7 @@ public class ProcSerHelper {
 					}
 				} else {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.modificar.inactiu"));
-					return false;
+					return;
 				}
 			}
 			Long t2 = System.currentTimeMillis();
@@ -433,17 +437,17 @@ public class ProcSerHelper {
 		} catch (Exception ex) {
 			log.error("Error no esperat al actualitzar el procediment", ex);
 		}
-		return false;
 	}
 
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
-	public Boolean actualitzarServeiFromGda(
+	public void actualitzarServeiFromGda(
 			ProgresActualitzacioDto progres,
 			ProcSerDataDto serveiGda,
 			EntitatEntity entitat,
 			Map<String, OrganismeDto> organigramaEntitat,
 			boolean modificar,
-			List<OrganGestorEntity> organsGestorsModificats) {
+			List<OrganGestorEntity> organsGestorsModificats,
+			Map<String, String[]> avisosProcedimentsOrgans) {
 
 		Long t1 = System.currentTimeMillis();
 		OrganGestorEntity organGestorGda = null;
@@ -452,7 +456,7 @@ public class ProcSerHelper {
 			ServeiEntity servei = serveiRepository.findByCodiAndEntitat(serveiGda.getCodi(), entitat);
 
 			if (!serveiHasToBeUpdated(serveiGda, servei, organigramaEntitat, progres)) {
-				return false;
+				return;
 			}
 
 			// Organ gestor
@@ -473,7 +477,9 @@ public class ProcSerHelper {
 				if (!serveiGda.isComu() && organGestorGda == null) {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.organ.result.no", new Object[]{serveiGda.getOrganGestor()}));
 					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.organ.sync", new Object[]{serveiGda.getCodi(), servei.getEntitat().getNom()}));
-					return true; // Organ no sincronitzat
+					// Organ no sincronitzat
+					avisosProcedimentsOrgans.put(serveiGda.getNom(), new String[] { "sense òrgan", serveiGda.getOrganGestor() });
+					return;
 				}
 				procSerUpdateHelper.nouServei(serveiGda, entitat, organGestorGda);
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.creat"));
@@ -486,13 +492,16 @@ public class ProcSerHelper {
 					if (!entitat.equals(servei.getEntitat())) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.entitat.result.no", new Object[]{servei.getEntitat().getNom()}));
 						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.entitat.revisar", new Object[]{serveiGda.getCodi(), servei.getEntitat().getNom()}));
-						return false;
+						return;
 					}
 
 					if (!serveiGda.isComu() && organGestorGda == null) {
 						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.organ.result.no", new Object[]{serveiGda.getOrganGestor()}));
 						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.organ.sync", new Object[]{serveiGda.getCodi(), servei.getEntitat().getNom()}));
-						return true; // Organ no sincronitzat
+						// Organ no sincronitzat
+						String organOriginal = servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() + " - " + servei.getOrganGestor().getNom() : "sense òrgan";
+						avisosProcedimentsOrgans.put(serveiGda.getNom(), new String[] { organOriginal, serveiGda.getOrganGestor() });
+						return;
 					}
 
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.entitat.result.si"));
@@ -525,7 +534,7 @@ public class ProcSerHelper {
 					}
 				} else {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.modificar.inactiu"));
-					return false;
+					return;
 				}
 			}
 			Long t2 = System.currentTimeMillis();
@@ -534,7 +543,6 @@ public class ProcSerHelper {
 		} catch (Exception ex) {
 			log.error("Error no esperat al actualitzar el servei", ex);
 		}
-		return false;
 	}
 
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
@@ -561,40 +569,6 @@ public class ProcSerHelper {
 		}
 //		logger.debug(">>>> ..........................................................................");
 		progres.addSeparador();
-	}
-
-	private void actualitzaAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {
-		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, PROCEDIMENT_ORGAN_NO_SYNC);
-		if (avisosSinc != null && !avisosSinc.isEmpty()) {
-			avisRepository.delete(avisosSinc);
-		}
-		if (!avisosProcedimentsOrgans.isEmpty()) {
-			String missatgeAvis = "";
-			for(Map.Entry<String, String[]> avisProc: avisosProcedimentsOrgans.entrySet()) {
-				missatgeAvis += " - Procediment '" + avisProc.getKey() + "': actualment a l'òrgan " + avisProc.getValue()[0] + ", i hauria de pertànyer a l'òrgan " + avisProc.getValue()[1] + " </br>";
-			}
-			missatgeAvis += "Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments";
-			Date ara = new Date();
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(ara);
-			calendar.add(Calendar.YEAR, 1);
-			AvisEntity avis = AvisEntity.getBuilder(
-					PROCEDIMENT_ORGAN_NO_SYNC,
-					missatgeAvis,
-					ara,
-					calendar.getTime(),
-					AvisNivellEnumDto.ERROR,
-					true,
-					entitatId).build();
-			avisRepository.save(avis);
-		}
-	}
-
-	@Data
-	@Builder
-	public static class ResultatProcesActualitzacio {
-		List<OrganGestorEntity> organsGestorsModificats;
-		Integer organsGestorsNoSincronitzats = 0;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ProcSerHelper.class);

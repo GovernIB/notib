@@ -181,11 +181,9 @@ public class ClientRestv2Test extends ClientBaseTest {
 //	@Test
 	public void testConsultaJustificant() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
-		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("8vzkicPP5FQ=");
 
 		// When
-		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("8vzkicPP5Fg=");
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("2b3538f5-bf9a-4db1-8f9c-9e984320d31f");
 		if (resposta.isError()) {
 			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
 		} else {
@@ -195,6 +193,9 @@ public class ClientRestv2Test extends ClientBaseTest {
 		System.out.println(">>> Informació registre: " + resposta.toString());
 		assertFalse(resposta.isError());
 		assertNull(resposta.getErrorDescripcio());
+
+//		FileOutputStream outputStream = new FileOutputStream("/justificant.pdf");
+//		outputStream.write(new BASE64Decoder().decodeBuffer(new String(resposta.getJustificant().getContingut())));
 	}
 
 	@Test
@@ -818,7 +819,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 	public void consultaDadesRegistreTest() throws DatatypeConfigurationException, IOException, DecoderException {
 		// Given
 		DadesConsulta dadesConsulta = new DadesConsulta();
-		dadesConsulta.setReferencia("d9ef4a35-c91e-425d-95d5-da0644af7177");
+		dadesConsulta.setReferencia("03904df1-e899-45fb-bf76-58c6cb0777ec");
 		dadesConsulta.setAmbJustificant(true);
 
 		// When
@@ -828,6 +829,10 @@ public class ClientRestv2Test extends ClientBaseTest {
 		} else {
 			System.out.println(">>> Reposta Ok");
 		}
+
+//		Integer numRegistre = resposta.getNumRegistre();
+//		Date dataRegistre = resposta.getDataRegistre();
+//		String numRegistreFormatat = resposta.getNumRegistreFormatat();
 
 		System.out.println(">>> Informació registre: " + resposta.toString());
 		assertFalse(resposta.isError());

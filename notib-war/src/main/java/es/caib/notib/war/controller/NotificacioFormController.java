@@ -558,7 +558,7 @@ public class NotificacioFormController extends BaseUserController {
         // 2-Descartam els organs vigents i els transformam a Dto
         List<OrganGestorDto> organsGestorsProcediments = new ArrayList<>();
         if (!codisOrgansGestorsProcediments.isEmpty())
-            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.VIGENT);
+            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.V);
 
         // 3-Obtenim els òrgans amb permís de notificació
         List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(

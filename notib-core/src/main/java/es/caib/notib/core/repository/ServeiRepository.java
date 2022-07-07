@@ -214,5 +214,6 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 	List<ServeiEntity> findByNomAndEntitat(
             @Param("nomServei") String nomServei,
             @Param("entitatActual") EntitatEntity entitat);
-	
+
+    Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 }

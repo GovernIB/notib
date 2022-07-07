@@ -1,6 +1,5 @@
 package es.caib.notib.core.service;
 
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
@@ -91,17 +90,16 @@ public class OrganGestorServiceTest {
 
         Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(2L))).thenReturn(entitatEntity);
 
-        OrganGestorEntity organGestor = OrganGestorEntity.builder(
-                ORGAN_CODI,
-                "nom vell",
-                null,
-                entitatEntity,
-                "llibre",
-                "llibre nom",
-                "oficina",
-                "oficina nom",
-                OrganGestorEstatEnum.E,
-            false).build();
+        OrganGestorEntity organGestor = OrganGestorEntity.builder()
+                .codi(ORGAN_CODI)
+                .nom("nom vell")
+                .entitat(entitatEntity)
+                .llibre("llibre")
+                .llibreNom("llibre nom")
+                .oficina("oficina")
+                .oficinaNom("oficina nom")
+                .estat("E")
+                .sir(false).build();
         Mockito.when(organGestorRepository.findByCodi(Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
     }
 

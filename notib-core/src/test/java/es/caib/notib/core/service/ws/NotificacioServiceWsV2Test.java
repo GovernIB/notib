@@ -196,8 +196,7 @@ public class NotificacioServiceWsV2Test {
 		grupDto.setId(1L);
 		grups.add(grupDto);
 		
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, null,
-				entitatMock, null, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitatMock).build();
 		
 //		Map<String, OrganismeDto> organigramaEntitat = null;
 		

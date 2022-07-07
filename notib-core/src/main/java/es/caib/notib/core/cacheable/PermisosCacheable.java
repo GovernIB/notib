@@ -211,7 +211,7 @@ public class PermisosCacheable {
         // 1. Obtenim els òrgans gestors amb permisos
         List<OrganGestorEntity> organsDisponibles;
         if (!ExtendedPermission.READ.equals(permisos[0])){
-            organsDisponibles = organGestorRepository.findByEntitatAndEstat(entitat, OrganGestorEstatEnum.VIGENT);
+            organsDisponibles = organGestorRepository.findByEntitatAndEstat(entitat, OrganGestorEstatEnum.V);
         } else {
             organsDisponibles = organGestorRepository.findByEntitat(entitat);
         }
@@ -241,7 +241,7 @@ public class PermisosCacheable {
                     if (organsFills != null)
                         for(String organCodi: organsFills) {
                             OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
-                            if (ExtendedPermission.READ.equals(permisos[0]) || organ.getEstat() == OrganGestorEstatEnum.VIGENT) {
+                            if (ExtendedPermission.READ.equals(permisos[0]) || organ.getEstat() == OrganGestorEstatEnum.V) {
                                 organsGestorsAmbPermis.add(organ);
                             }
                         }

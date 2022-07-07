@@ -64,12 +64,12 @@
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<!-- Cache -->
-	<bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+	<bean id="eh_cache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="classpath:ehcache.xml" />
 	</bean>
 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
 		<property name="cacheManager">
-			<ref bean="ehcache"/>
+			<ref bean="eh_cache"/>
 		</property>
 	</bean>
 	<cache:annotation-driven cache-manager="cacheManager"/>

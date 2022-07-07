@@ -22,29 +22,30 @@ public class OrganGestorItemTest extends DatabaseItemTest<OrganGestorDto>{
 
     @Override
     public OrganGestorDto create(Object element, Long entitatId) throws Exception{
-        authenticationTest.autenticarUsuari("admin");
-        ((OrganGestorDto)element).setEntitatId(entitatId);
-        OrganGestorDto entitatCreada = organGestorService.create((OrganGestorDto)element);
-//        organGestorId = entitatCreada.getId();
-//        elementsCreats.add(entitatCreada);
-        if (((OrganGestorDto)element).getPermisos() != null) {
-            for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
-                organGestorService.permisUpdate(
-                        entitatId,
-                        entitatCreada.getId(),
-                        false,
-                        permis);
-            }
-        }
-        return entitatCreada;
+//        authenticationTest.autenticarUsuari("admin");
+//        ((OrganGestorDto)element).setEntitatId(entitatId);
+//        OrganGestorDto entitatCreada = organGestorService.create((OrganGestorDto)element);
+////        organGestorId = entitatCreada.getId();
+////        elementsCreats.add(entitatCreada);
+//        if (((OrganGestorDto)element).getPermisos() != null) {
+//            for (PermisDto permis: ((OrganGestorDto)element).getPermisos()) {
+//                organGestorService.permisUpdate(
+//                        entitatId,
+//                        entitatCreada.getId(),
+//                        false,
+//                        permis);
+//            }
+//        }
+//        return entitatCreada;
+        return null;
     }
 
     @Override
     public void delete(Long entitatId, OrganGestorDto object) {
-        authenticationTest.autenticarUsuari("admin");
-        organGestorService.delete(
-                entitatId,
-                object.getId());
+//        authenticationTest.autenticarUsuari("admin");
+//        organGestorService.delete(
+//                entitatId,
+//                object.getId());
     }
 
     public static OrganGestorDto getRandomInstance() {

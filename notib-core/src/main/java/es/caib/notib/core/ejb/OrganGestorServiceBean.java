@@ -33,17 +33,17 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@Autowired
 	OrganGestorService delegate;
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public OrganGestorDto create(OrganGestorDto dto) {
-		return delegate.create(dto);
-	}
-	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public OrganGestorDto delete(Long entitatId, Long organId) {
-		return delegate.delete(entitatId, organId);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public OrganGestorDto create(OrganGestorDto dto) {
+//		return delegate.create(dto);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public OrganGestorDto delete(Long entitatId, Long organId) {
+//		return delegate.delete(entitatId, organId);
+//	}
 	
 //	@Override
 //	@RolesAllowed({"NOT_ADMIN", "tothom"})

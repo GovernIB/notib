@@ -8,6 +8,7 @@ import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.ServeiService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -22,8 +23,9 @@ public class OrganGestorHelper {
 	private static final String ORGANS_ACCESSIBLES= "organs.accessiblesUsuari";
 	private static final String ORGAN_ACTUAL= "organs.actual";
 	private static final String REQUEST_PARAMETER_CANVI_ORGAN= "canviOrgan";
-	private static final String SESSION_ATTRIBUTE_ORGANS_NO_SYNC = "OrganGestorHelper.organsNoSincronitzats";
-	
+	private static final String SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC = "OrganGestorHelper.organsProcNoSincronitzats";
+	private static final String SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC = "OrganGestorHelper.organsServNoSincronitzats";
+
 	public static List<OrganGestorDto> getOrgansGestorsUsuariActual(
 			HttpServletRequest request) {
 		return getOrgansGestorsUsuariActual(request, null);
@@ -101,18 +103,33 @@ public class OrganGestorHelper {
 		return REQUEST_PARAMETER_CANVI_ORGAN;
 	}
 
-	public static void setOrgansNoSincronitzats(HttpServletRequest request, ProcedimentService procedimentService) {
+	public static void setOrgansProcedimentsNoSincronitzats(HttpServletRequest request, ProcedimentService procedimentService) {
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null && procedimentService != null)
 			request.getSession().setAttribute(
-					OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_NO_SYNC,
+					OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC,
 					procedimentService.getProcedimentsAmbOrganNoSincronitzat(entitatActual.getId()));
 	}
 
-	public static Integer getOrgansNoSincronitzats(HttpServletRequest request) {
-		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_NO_SYNC);
+	public static void setOrgansServeisNoSincronitzats(HttpServletRequest request, ServeiService serveiService) {
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		if (entitatActual != null && serveiService != null)
+			request.getSession().setAttribute(
+					OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC,
+					serveiService.getServeisAmbOrganNoSincronitzat(entitatActual.getId()));
+	}
+
+	public static Integer getOrgansProcNoSincronitzats(HttpServletRequest request) {
+		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC);
 		return organsNoSincronitzats != null ? organsNoSincronitzats : 0;
 	}
+
+	public static Integer getOrgansServNoSincronitzats(HttpServletRequest request) {
+		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC);
+		return organsNoSincronitzats != null ? organsNoSincronitzats : 0;
+	}
+
+
 
 //	private static final Logger LOGGER = LoggerFactory.getLogger(OrganGestorHelper.class);
 

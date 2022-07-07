@@ -22,12 +22,19 @@ import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.AvisRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
+import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PagadorCieRepository;
+import es.caib.notib.core.repository.PagadorPostalRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import org.apache.commons.collections.MultiHashMap;
@@ -64,19 +71,15 @@ import java.util.Set;
 public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@Resource
-	private ProcedimentRepository procedimentRepository;
-	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private ProcSerRepository procSerRepository;
 	@Resource
 	private ProcSerOrganRepository procSerOrganRepository;
 	@Resource
 	private NotificacioRepository notificacioRepository;
 	@Resource
 	private AvisRepository avisRepository;
-	@Resource
-	private NotificacioTableViewRepository notificacioTableViewRepository;
-	@Resource
-	private EnviamentTableRepository enviamentTableRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -92,8 +95,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private MetricsHelper metricsHelper;
 	@Resource
-	private MessageHelper messageHelper;
-	@Resource
 	private GrupRepository grupReposity;
 	@Resource
 	private PagadorPostalRepository pagadorPostalReposity;
@@ -102,7 +103,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private OrganGestorHelper organGestorHelper;
 	@Resource
-	private ProcSerHelper procSerHelper;
+	private ProcSerSyncHelper procSerSyncHelper;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
 	@Resource
@@ -123,77 +124,77 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Getter
 	private List<OrganGestorDto> organsList;
 
-	@Override
-	@Transactional
-	public OrganGestorDto create(OrganGestorDto dto) {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i
-			//		que l'Organ que crea es fill d'almenys un dels Organs que administra 
-			
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(dto.getEntitatId());
-			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() : OrganGestorEstatEnum.V;
-			Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-			OrganismeDto node = arbreUnitats.get(dto.getCodi());
-			String codiPare = node != null ? node.getPare() : null;
-			OrganGestorEntity.OrganGestorEntityBuilder organGestorBuilder = OrganGestorEntity.builder(
-					dto.getCodi(),
-					dto.getNom(),
-					codiPare,
-					entitat,
-					dto.getLlibre(),
-					dto.getLlibreNom(),
-					dto.getOficina() != null ? dto.getOficina().getCodi() : null,
-					dto.getOficina() != null ? dto.getOficina().getNom() : null,
-					estat,
-					dto.getSir());
-			if (dto.isEntregaCieActiva()) {
-				EntregaCieEntity entregaCie = new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId());
-				organGestorBuilder.entregaCie(entregaCieRepository.save(entregaCie));
-			}
-			return conversioTipusHelper.convertir(organGestorRepository.save(organGestorBuilder.build()), OrganGestorDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-	
-	@Override
-	@Transactional
-	public OrganGestorDto delete(
-			Long entitatId,
-			Long organId) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i
-			//		verificar que almenys un dels organs que administra es pare del que vol eliminar.
-			
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId);
-//					true,
-//					false,
-//					false);
-			
-			OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestor(
-					entitat, 
-					organId);
-
-			// Eliminar permisos de l'òrgan
-			permisosHelper.deleteAcl(
-					organId,
-					OrganGestorEntity.class);
-			// Eliminar organ
-			organGestorRepository.delete(organGestorEntity);
-
-			return conversioTipusHelper.convertir(
-					organGestorEntity, 
-					OrganGestorDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	@Override
+//	@Transactional
+//	public OrganGestorDto create(OrganGestorDto dto) {
+//
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//
+//			//TODO: Si es tothom comprovar que és administrador d'Organ i
+//			//		que l'Organ que crea es fill d'almenys un dels Organs que administra
+//
+//			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(dto.getEntitatId());
+//			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() : OrganGestorEstatEnum.V;
+//			Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+//			OrganismeDto node = arbreUnitats.get(dto.getCodi());
+//			String codiPare = node != null ? node.getPare() : null;
+//			OrganGestorEntity.OrganGestorEntityBuilder organGestorBuilder = OrganGestorEntity.builder(
+//					dto.getCodi(),
+//					dto.getNom(),
+//					codiPare,
+//					entitat,
+//					dto.getLlibre(),
+//					dto.getLlibreNom(),
+//					dto.getOficina() != null ? dto.getOficina().getCodi() : null,
+//					dto.getOficina() != null ? dto.getOficina().getNom() : null,
+//					estat,
+//					dto.getSir());
+//			if (dto.isEntregaCieActiva()) {
+//				EntregaCieEntity entregaCie = new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId());
+//				organGestorBuilder.entregaCie(entregaCieRepository.save(entregaCie));
+//			}
+//			return conversioTipusHelper.convertir(organGestorRepository.save(organGestorBuilder.build()), OrganGestorDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
+//
+//	@Override
+//	@Transactional
+//	public OrganGestorDto delete(
+//			Long entitatId,
+//			Long organId) {
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//
+//			//TODO: Si es tothom comprovar que és administrador d'Organ i
+//			//		verificar que almenys un dels organs que administra es pare del que vol eliminar.
+//
+//			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//					entitatId);
+////					true,
+////					false,
+////					false);
+//
+//			OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestor(
+//					entitat,
+//					organId);
+//
+//			// Eliminar permisos de l'òrgan
+//			permisosHelper.deleteAcl(
+//					organId,
+//					OrganGestorEntity.class);
+//			// Eliminar organ
+//			organGestorRepository.delete(organGestorEntity);
+//
+//			return conversioTipusHelper.convertir(
+//					organGestorEntity,
+//					OrganGestorDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional
@@ -241,33 +242,33 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			//Compravacions en ús
-			boolean organEnUs=false;
-			//1) Si té permisos
-			// #571 --> Si té permisos els esborram!
-//			organEnUs=permisosHelper.hasAnyPermis(organId,OrganGestorEntity.class);
-//			if (!organEnUs) {
-				//2) Revisam si té procediments assignats
-				List<ProcedimentEntity> procedimentsOrganGestor = procedimentRepository.findByOrganGestorId(organId);
-				organEnUs=procedimentsOrganGestor != null && !procedimentsOrganGestor.isEmpty();
-				if (!organEnUs) {
-					//3) revisar si té grups
-					List<GrupEntity> grupsByOrganGestor = grupReposity.findByOrganGestorId(organId);
-					organEnUs=grupsByOrganGestor != null && !grupsByOrganGestor.isEmpty();
-					
-					if (!organEnUs) {
-						//4) revisar si té pagadors cie
-						List<PagadorCieEntity> pagCiesByOrganGestor = pagadorCieReposity.findByOrganGestorId(organId);
-						organEnUs=pagCiesByOrganGestor != null && !pagCiesByOrganGestor.isEmpty();
-						if (!organEnUs) {
-							//5) revisar si té pagadors postals
-							List<PagadorPostalEntity> pagPostalByOrganGestor = pagadorPostalReposity.findByOrganGestorId(organId);
-							organEnUs=pagPostalByOrganGestor != null && !pagPostalByOrganGestor.isEmpty();
-						}
-					}
-				
-				}
-//			}
-			return organEnUs;
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
+			if (organGestor == null)
+				return true; // No en ús pq no existeix!!
+
+			if (OrganGestorEstatEnum.V.equals(organGestor.getEstat()))
+				return true;
+
+			if (notificacioRepository.countByOrganGestor(organGestor) > 0)
+				return true;
+
+			List<ProcSerEntity> procedimentsOrganGestor = procSerRepository.findByOrganGestorId(organId);
+			if (procedimentsOrganGestor != null && !procedimentsOrganGestor.isEmpty())
+				return true;
+
+			List<GrupEntity> grupsByOrganGestor = grupReposity.findByOrganGestorId(organId);
+			if (grupsByOrganGestor != null && !grupsByOrganGestor.isEmpty())
+				return true;
+
+			List<PagadorCieEntity> pagCiesByOrganGestor = pagadorCieReposity.findByOrganGestorId(organId);
+			if (pagCiesByOrganGestor != null && !pagCiesByOrganGestor.isEmpty())
+				return true;
+
+			List<PagadorPostalEntity> pagPostalByOrganGestor = pagadorPostalReposity.findByOrganGestorId(organId);
+			if (pagPostalByOrganGestor != null && !pagPostalByOrganGestor.isEmpty())
+				return true;
+
+			return false;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -551,7 +552,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		entitat.setDataActualitzacio(ara);
 
 		// Actualitzar procediments
-		procSerHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), "ca");
+		EntitatDto entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+		procSerSyncHelper.actualitzaProcediments(entitatDto);
+		procSerSyncHelper.actualitzaServeis(entitatDto);
 
 		// Actualitzar permisos
 		permisosHelper.actualitzarPermisosOrgansObsolets(organsDividits, organsFusionats, organsSubstituits);

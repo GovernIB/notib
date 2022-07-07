@@ -33,6 +33,7 @@ import static org.junit.Assert.assertThat;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@SuppressWarnings("unchecked")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NotificaWsTestIntegracioRest {
 

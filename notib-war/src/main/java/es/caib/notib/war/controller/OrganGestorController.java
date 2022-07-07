@@ -5,7 +5,6 @@ import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
-import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.PrediccioSincronitzacio;
@@ -25,14 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -68,7 +65,9 @@ public class OrganGestorController extends BaseUserController{
 				"es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
-		model.addAttribute("oficinesEntitat", organGestorService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(), true));
+		if (!entitat.isOficinaEntitat()) {
+			model.addAttribute("oficinesEntitat", organGestorService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(), true));
+		}
 		return "organGestorList";
 	}
 
@@ -271,26 +270,26 @@ public class OrganGestorController extends BaseUserController{
 	}
 
 	
-	@RequestMapping(value = "/{organGestorCodi}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable String organGestorCodi) {
-
-		String redirect = "redirect:../../procediment";
-		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			OrganGestorDto organ = organGestorService.findByCodi(entitat.getId(), organGestorCodi);
-			if (organ == null) {
-				return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.ko");
-			}
-			if (organGestorService.organGestorEnUs(organ.getId())) {
-				return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.us");
-			}
-			organGestorService.delete(entitat.getId(), organ.getId());
-			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.controller.esborrat.ok");
-		} catch (Exception e) {
-			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
-			return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.ko");
-		}
-	}
+//	@RequestMapping(value = "/{organGestorCodi}/delete", method = RequestMethod.GET)
+//	public String delete(HttpServletRequest request, @PathVariable String organGestorCodi) {
+//
+//		String redirect = "redirect:../../procediment";
+//		try {
+//			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+//			OrganGestorDto organ = organGestorService.findByCodi(entitat.getId(), organGestorCodi);
+//			if (organ == null) {
+//				return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.ko");
+//			}
+//			if (organGestorService.organGestorEnUs(organ.getId())) {
+//				return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.us");
+//			}
+//			organGestorService.delete(entitat.getId(), organ.getId());
+//			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.controller.esborrat.ok");
+//		} catch (Exception e) {
+//			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
+//			return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.ko");
+//		}
+//	}
 
 	@ResponseBody
 	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)

@@ -352,7 +352,6 @@ public class ClientBaseTest {
 			int numDestinataris,
 			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
 
-		List<NotificacioV2> notificacions = new ArrayList();
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 
 		Long iNotificacioId = System.currentTimeMillis();

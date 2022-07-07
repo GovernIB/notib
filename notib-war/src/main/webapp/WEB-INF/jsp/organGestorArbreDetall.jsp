@@ -202,11 +202,13 @@
             </div>
         </div>
         <div class="flex-space-around">
+<%--
             <div>
                 <a id="esborrar" class="btn btn-default"  href="" data-adjust-height="false" data-height="650px">
                     <span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/>
                 </a>
             </div>
+--%>
             <div>
                 <a id="procediments" class="btn btn-default"  href="" data-toggle="modal" data-adjust-height="false" data-height="650px">
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.procediment"/>

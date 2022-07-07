@@ -52,12 +52,12 @@
 		
 		var $estatRadioButton = $('input[type=radio][name=estat]');
 		$estatRadioButton.on('change', function() {
-			if ($(this).is(':checked')) {
-				$estatRadioButton.parent().removeClass('active');
-				$(this).parent().addClass('active');
-			} else {
-				$(this).parent().removeClass('active');
-			}
+			// if ($(this).is(':checked')) {
+			// 	$estatRadioButton.parent().removeClass('active');
+			// 	$(this).parent().addClass('active');
+			// } else {
+			// 	$(this).parent().removeClass('active');
+			// }
 			$('#btnFiltrar').click();
 		});
 	});
@@ -86,7 +86,12 @@
 								 optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
 			</div>
 			<div class="col-md-2 filtreEstat">
-				<not:inputRadio name="estat" botons="true" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" />
+<%--				<not:inputRadio name="estat" botons="true" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" />--%>
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn btn-default active"><input type="radio" name="estat" id="T" value="" autocomplete="off" checked></span> Tots</label>
+					<label class="btn btn-default"><input type="radio" name="estat" id="V" value="V" autocomplete="off"><span class="fa fa-fire"></span> Vigents</label>
+					<label class="btn btn-default"><input type="radio" name="estat" id="E" value="E" autocomplete="off"><span class="fa fa-snowflake-o"></span>  Obsolets</label>
+				</div>
 			</div>
 			<c:if test="${setOficina}">
 				<div class="col-md-3">
@@ -163,9 +168,9 @@
 				<th data-col-name="estat" data-template="#cellEstatTemplate">
 					<spring:message code="organgestor.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{if estat == 'VIGENT'}}
-							<spring:message code="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.VIGENT"/>
-						{{else estat == 'ALTRES'}}
+						{{if estat == 'V'}}
+							<spring:message code="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V"/>
+						{{else}}
 							<spring:message code="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.ALTRES"/>
 						{{/if}}
 					</script>
@@ -190,7 +195,7 @@
 <%--								<li><a href="organgestor/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/></a></li>--%>
 								<li><a href="procediment/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="650px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.procediment"/></a></li>
 								<li><a href="servei/organ/{{:codi}}" data-toggle="modal" data-adjust-height="false" data-height="650px"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/></a></li>
-								<li><a href="organgestor/{{:codi}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+<%--								<li><a href="organgestor/{{:codi}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>--%>
 							</ul>
 						</div>
 					</script>

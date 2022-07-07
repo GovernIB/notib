@@ -19,11 +19,11 @@ import java.util.List;
  */
 public interface OrganGestorService {
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public OrganGestorDto create(OrganGestorDto dto);
-	
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public OrganGestorDto delete(Long entitatId, Long organId);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public OrganGestorDto create(OrganGestorDto dto);
+//
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public OrganGestorDto delete(Long entitatId, Long organId);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public OrganGestorDto update(OrganGestorDto dto);

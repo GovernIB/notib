@@ -143,7 +143,7 @@ public class EmailNotificacioHelperTest {
 		DadesUsuari dadesUsuari = DadesUsuari.builder().email(EMAIL_DEST).build();
 		UsuariEntity usuari = UsuariEntity.hiddenBuilder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(false).build();
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").agrupar(false).createdBy(usuari).build();
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null,null, entidad, null, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
 
 		notificacioMock =  Mockito.mock(NotificacioEntity.class);
@@ -188,7 +188,7 @@ public class EmailNotificacioHelperTest {
 
 		// Given
 		EntitatEntity entidad = EntitatEntity.hiddenBuilder().nom("Govern de les Illes Balears").build(); // TODO: Afegir logos
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, "Direcció General de Modernització o Administració Digital",null, entidad, null, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).nom("Direcció General de Modernització o Administració Digital").build();
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").build();
 		PersonaEntity persona = PersonaEntity.builder().nom("Nom").llinatge1("Llinatge1").llinatge2("Llinatge2").email(EMAIL_DEST).build();
 
@@ -219,7 +219,7 @@ public class EmailNotificacioHelperTest {
 
 		// Given
 		EntitatEntity entidad = EntitatEntity.hiddenBuilder().nom("Govern de les Illes Balears").build(); // TODO: Afegir logos
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, "Direcció General de Modernització o Administració Digital",null, entidad, null, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).nom("Direcció General de Modernització o Administració Digital").build();
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").build();
 		PersonaEntity persona = PersonaEntity.builder().nom("Nom").llinatge1("Llinatge1").llinatge2("Llinatge2").email(EMAIL_DEST).build();
 		DocumentEntity document = DocumentEntity.getBuilderV2(null, null, "buit.pdf", null, false, null, null, null, null, null, null, null, null).build();

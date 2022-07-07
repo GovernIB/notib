@@ -59,7 +59,7 @@ public class EntityComprovarHelperIT extends BaseServiceTestV2 {
         OrganGestorDto organGestor = new OrganGestorDto();
         organGestor.setCodi("DIR3-1");
         organGestor.setNom("Procedimiento 1");
-        organGestor.setEstat(OrganGestorEstatEnum.VIGENT);
+        organGestor.setEstat(OrganGestorEstatEnum.V);
         organGestorCreator.addObject("organGestorProves", organGestor);
 
         database = createDatabase(EntitatItemTest.getRandomInstance(),

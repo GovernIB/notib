@@ -21,7 +21,7 @@
 		<constructor-arg>
 			<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
 				<property name="cacheManager">
-					<ref bean="ehcache"/>
+					<ref bean="eh_cache"/>
 				</property>
 				<property name="cacheName" value="aclCache" />
 			</bean>

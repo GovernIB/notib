@@ -64,6 +64,9 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     @Temporal(TemporalType.DATE)
     protected Date ultimaActualitzacio;
 
+    @Column(name = "organ_no_sinc", nullable = false)
+    private boolean organNoSincronitzat;
+
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "entitat")
     @ForeignKey(name = "not_entitat_fk")

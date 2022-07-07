@@ -261,7 +261,7 @@ public class ServeiPermisController extends BaseUserController{
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		List<OrganismeDto> organismes;
-		OrganismeDto organismeActual = new OrganismeDto();
+		OrganismeDto organismeActual = OrganismeDto.builder().build();
 		if (organGestorActual != null) {
 			organismes = organGestorService.findOrganismes(entitat, organGestorActual);
 			organismeActual.setCodi(organGestorActual.getCodi());

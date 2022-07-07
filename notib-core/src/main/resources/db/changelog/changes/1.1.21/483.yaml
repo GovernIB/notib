@@ -39,8 +39,11 @@ databaseChangeLog:
                   defaultValue: 'V'
               - column:
                   name: sir
-                  tyoe: boolean
+                  type: boolean
                   defaultValue: ${booleanFalse}
+              - column:
+                  name: tipus_transicio
+                  type: varchar(12 ${varcharUnit})
         - addColumn:
             tableName: not_procediment
             columns:
@@ -48,28 +51,28 @@ databaseChangeLog:
                   name: organ_no_sinc
                   type: boolean
                   valueBoolean: false
-              - addColumn:
-                  tableName: not_entitat
-                  columns:
-                    - column:
-                        name: data_sincronitzacio
-                        type: timestamp
-                    - column:
-                        name: data_actualitzacio
-                        type: timestamp
         - addColumn:
-          tableName: not_avis
-          columns:
-            - column:
-                name: avis_admin
-                type: BOOLEAN
-                defaultValue: ${booleanFalse}
-            - addColumn:
-                tableName: not_avis
-                columns:
-                  - column:
-                      name: entitat_id
-                      type: BIGINT
+            tableName: not_entitat
+            columns:
+              - column:
+                  name: data_sincronitzacio
+                  type: timestamp
+              - column:
+                  name: data_actualitzacio
+                  type: timestamp
+        - addColumn:
+            tableName: not_avis
+            columns:
+              - column:
+                  name: avis_admin
+                  type: BOOLEAN
+                  defaultValue: ${booleanFalse}
+        - addColumn:
+            tableName: not_avis
+            columns:
+              - column:
+                  name: entitat_id
+                  type: BIGINT
         - createTable:
             tableName: not_og_sinc_rel
             columns:
@@ -100,7 +103,7 @@ databaseChangeLog:
             constraintName: not_uo_sinc_rel_mult_uk
             columnNames: antic_og, nou_og
         - insert:
-            tableName: pbl_config
+            tableName: not_config
             columns:
               - column:
                   name: key

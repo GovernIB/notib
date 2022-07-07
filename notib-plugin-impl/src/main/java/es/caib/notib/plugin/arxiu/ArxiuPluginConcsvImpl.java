@@ -187,6 +187,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String,Object> documentMetadadesUuid(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -217,6 +218,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String,Object> documentMetadadesCsv(String identificador) {
 		/*
 		 * Les URLs de consulta son les següents:
@@ -298,6 +300,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 		return webResource.get(InputStream.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static DocumentMetadades toDocumentMetadades(Map<String,Object> metadatas) throws ArxiuException {
 		DocumentMetadades metadades = new DocumentMetadades();
 

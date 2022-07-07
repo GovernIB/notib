@@ -465,4 +465,6 @@ public interface ServeiService {
 	ProcSerDto findByNom(
             Long entitatId,
             String nomServei) throws NotFoundException;
+
+	Integer getServeisAmbOrganNoSincronitzat(Long entitatId);
 }

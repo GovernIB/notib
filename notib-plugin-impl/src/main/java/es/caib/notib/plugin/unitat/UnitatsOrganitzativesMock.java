@@ -56,7 +56,7 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 
 	@Override
-	public List<NodeDir3> findAmbPare(String pareCodi, Timestamp dataActualitzacio, Timestamp dataSincronitzacio) throws SistemaExternException {
+	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		return null;
 	}
 

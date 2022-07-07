@@ -1,7 +1,6 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -66,16 +65,15 @@ public class ProcedimentHelperTest {
         ReflectionTestUtils.setField(entitatEntity, "apiKey", "APIKEY");
         ReflectionTestUtils.setField(entitatEntity, "dir3Codi", ENTITAT_CODI);
 
-        OrganGestorEntity organGestor = OrganGestorEntity.builder(
-                ORGAN_CODI,
-                "nom vell",
-                null,
-                entitatEntity,
-                "llibre",
-                "llibre nom",
-                "oficina",
-                "oficina nom",
-                OrganGestorEstatEnum.ALTRES)
+        OrganGestorEntity organGestor = OrganGestorEntity.builder()
+                .codi(ORGAN_CODI)
+                .nom("nom vell")
+                .entitat(entitatEntity)
+                .llibre("llibre")
+                .llibreNom("llibre nom")
+                .oficina("oficina")
+                .oficinaNom("oficina nom")
+                .estat("E")
                 .build();
         Mockito.when(organGestorRepository.findByCodi(Mockito.eq(ORGAN_CODI))).thenReturn(organGestor);
     }
@@ -112,15 +110,16 @@ public class ProcedimentHelperTest {
 
         // When
         ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
-        progres.setNumProcediments(1);
+        progres.setNumOperacions(1);
+        Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
         procedimentHelper.actualitzarProcedimentFromGda(
                 progres,
                 procedimentGda,
                 entitatEntity,
                 organigramaEntitat,
                 true,
-                new ArrayList<OrganGestorEntity>()
-        );
+                new ArrayList<OrganGestorEntity>(),
+                avisosProcedimentsOrgans);
 
         // Then
     }

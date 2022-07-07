@@ -417,4 +417,9 @@ public class ServeiServiceBean implements ServeiService {
 			String nomServei) throws NotFoundException {
 		return delegate.findByNom(entitatId, nomServei);
 	}
+
+    @Override
+    public Integer getServeisAmbOrganNoSincronitzat(Long entitatId) {
+        return delegate.getServeisAmbOrganNoSincronitzat(entitatId);
+    }
 }

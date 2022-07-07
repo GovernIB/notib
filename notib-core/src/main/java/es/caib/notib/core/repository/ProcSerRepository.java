@@ -209,6 +209,8 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("grups") List<String> grups
 	);
 
+    List<ProcSerEntity> findByOrganGestorId(Long organId);
+
 //	public List<ProcedimentEntity> findByOrganGestorCodiIn(List<String> organsFills);
 //
 //	@Query(

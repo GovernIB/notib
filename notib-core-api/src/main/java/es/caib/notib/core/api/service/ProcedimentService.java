@@ -20,7 +20,7 @@ public interface ProcedimentService {
     public enum TipusPermis { PROCEDIMENT, PROCEDIMENT_ORGAN }
 	/**
 	 * Crea un nou procediment.
-	 * 
+	 *
 	 * @param procediment
 	 *            Informació del procediment a crear.
 	 * @return El procediment creat.
@@ -252,7 +252,7 @@ public interface ProcedimentService {
 	 *            Id de l'entitat.
 	 * @param isAdministrador
 	 * 			  True si l'usuari acutal està com administrador           
-	 * @param id
+	 * @param procedimentId
 	 *            Atribut id del permis.
 	 * @return El llistat de permisos.
 	 * @throws NotFoundException
@@ -372,7 +372,7 @@ public interface ProcedimentService {
 	/**
 	 * buida els procediments en cache per entitat
 	 * 
-	 * @param entitatId
+	 * @param entitat
 	 *            Id de l'entitat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")

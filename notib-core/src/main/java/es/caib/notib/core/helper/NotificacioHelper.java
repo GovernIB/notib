@@ -17,6 +17,7 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NoDocumentException;
 import es.caib.notib.core.api.exception.NoMetadadesException;
+import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.repository.DocumentRepository;
@@ -298,7 +299,8 @@ public class NotificacioHelper {
 		// Recuperar òrgan gestor notificació
 		log.trace("Processam organ gestor");
 		if (organGestor == null && notificacio.getOrganGestorCodi() != null ) {
-			organGestor = organGestorHelper.createOrganGestorFromNotificacio(notificacio, entitat);
+//			organGestor = organGestorHelper.createOrganGestorFromNotificacio(notificacio, entitat);
+			throw new NotFoundException(notificacio.getOrganGestorCodi(), OrganGestorEntity.class);
 		}
 
 		// Recupera grup notificació a partir del codi

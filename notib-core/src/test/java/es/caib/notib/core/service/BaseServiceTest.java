@@ -14,13 +14,24 @@ import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.config.ConfigEntity;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import es.caib.notib.plugin.SistemaExternException;
@@ -98,10 +109,21 @@ public class BaseServiceTest {
 	protected NotificacioService notificacioService;
 	
 	@Autowired
-	private  UsuariRepository usuariRepository;
-	
+	private UsuariRepository usuariRepository;
 	@Autowired
-	private  NotificacioRepository notificacioRepository;
+	private NotificacioRepository notificacioRepository;
+	@Autowired
+	private EntitatRepository entitatRepository;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private EntregaCieRepository entregaCieRepository;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
 	
 	@Autowired
 	private  PluginHelper pluginHelper;
@@ -197,7 +219,7 @@ public class BaseServiceTest {
 				} else if(element instanceof OrganGestorDto) {
 					autenticarUsuari("admin");
 					((OrganGestorDto)element).setEntitatId(entitatId);
-					OrganGestorDto entitatCreada = organGestorService.create((OrganGestorDto)element);
+					OrganGestorDto entitatCreada = organGestorCreate((OrganGestorDto)element);
 					organGestorId = entitatCreada.getId();
 					elementsCreats.add(entitatCreada);
 					if (((OrganGestorDto)element).getPermisos() != null) {
@@ -289,21 +311,17 @@ public class BaseServiceTest {
 					Long entitadId = ((EntitatDto)element).getId();
 					List<OrganGestorDto> organsGestors = organGestorService.findByEntitat(entitadId);
 					for(OrganGestorDto organGestorDto: organsGestors) {
-						organGestorService.delete(entitatId, organGestorDto.getId());
+						organGestorDelete(entitatId, organGestorDto.getId());
 					}
 					autenticarUsuari("super");
 					entitatService.delete(entitadId);
 					entitatId = null;
 				} else if(element instanceof AplicacioDto) {
 					autenticarUsuari("super");
-					usuariAplicacioService.delete(
-							((AplicacioDto)element).getId(), 
-							entitatId);
+					usuariAplicacioService.delete(((AplicacioDto)element).getId(), entitatId);
 				} else if(element instanceof OrganGestorDto) {
 					autenticarUsuari("admin");
-					organGestorService.delete(
-							entitatId,
-							((OrganGestorDto)element).getId());
+					organGestorDelete(entitatId, ((OrganGestorDto)element).getId());
 				} else if(element instanceof ProcSerDto) {
 					
 					autenticarUsuari("admin");
@@ -739,7 +757,44 @@ public class BaseServiceTest {
 		return getClass().getResourceAsStream(
 				"/es/caib/notib/core/notificacio_adjunt.pdf");
 	}
-	
+
+	private OrganGestorDto organGestorCreate(OrganGestorDto dto) {
+			EntitatEntity entitat = entitatRepository.getOne(dto.getEntitatId());
+			OrganGestorEstatEnum estat = dto.getEstat() != null ? dto.getEstat() : OrganGestorEstatEnum.V;
+			Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+			OrganismeDto node = arbreUnitats.get(dto.getCodi());
+			String codiPare = node != null ? node.getPare() : null;
+			OrganGestorEntity.OrganGestorEntityBuilder organGestorBuilder = OrganGestorEntity.builder()
+					.codi(dto.getCodi())
+					.nom(dto.getNom())
+					.codiPare(codiPare)
+					.entitat(entitat)
+					.llibre(dto.getLlibre())
+					.llibreNom(dto.getLlibreNom())
+					.oficina(dto.getOficina() != null ? dto.getOficina().getCodi() : null)
+					.oficinaNom(dto.getOficina() != null ? dto.getOficina().getNom() : null)
+					.estat(estat.name())
+					.sir(dto.getSir());
+			if (dto.isEntregaCieActiva()) {
+				EntregaCieEntity entregaCie = new EntregaCieEntity(dto.getCieId(), dto.getOperadorPostalId());
+				organGestorBuilder.entregaCie(entregaCieRepository.save(entregaCie));
+			}
+			return conversioTipusHelper.convertir(organGestorRepository.save(organGestorBuilder.build()), OrganGestorDto.class);
+	}
+
+		public OrganGestorDto organGestorDelete(Long entitatId, Long organId) {
+			EntitatEntity entitat = entitatRepository.getOne(entitatId);
+			OrganGestorEntity organGestorEntity = organGestorRepository.findByEntitatAndIds(entitat, Arrays.asList(new Long[]{organId})).get(0);
+
+			// Eliminar permisos de l'òrgan
+			permisosHelper.deleteAcl(organId, OrganGestorEntity.class);
+			// Eliminar organ
+			organGestorRepository.delete(organGestorEntity);
+
+			return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
+	}
+
+
 	// Contrucción PaginacioParamsDto
 	// ///////////////////////////////////////////////////////////////////////////////////////////////
 

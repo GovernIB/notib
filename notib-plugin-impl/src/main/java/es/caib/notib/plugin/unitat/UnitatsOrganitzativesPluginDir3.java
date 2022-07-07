@@ -132,7 +132,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 
 	@Override
-	public List<NodeDir3> findAmbPare(String pareCodi, Timestamp dataActualitzacio, Timestamp dataSincronitzacio) throws SistemaExternException {
+	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		try {
 			List<NodeDir3> unitats = new ArrayList<NodeDir3>();
 			List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
@@ -515,8 +515,8 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	@Override
 	public List<OficinaSIR> oficinesSIRUnitat(String unitat, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 
-		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
-		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
+		List<OficinaSIR> oficinesSIR = new ArrayList<>();
+		List<OficinaTF> oficinesWS = new ArrayList<>();
 		try {
 			getOficinesUnitatSuperior(unitat, oficinesWS, arbreUnitats);
 			for (OficinaTF oficinaTF : oficinesWS) {

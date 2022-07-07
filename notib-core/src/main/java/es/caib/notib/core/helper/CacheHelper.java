@@ -123,7 +123,7 @@ public class CacheHelper {
 		return pluginHelper.oficinesSIREntitat(codiDir3Entitat);
 	}
 	
-	@Cacheable(value = "organigramaOriginal", key="#entitatcodi")
+	@Cacheable(value = "organigramaOriginal", key="#entitatDir3Codi")
 	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
 		Map<String, OrganismeDto> organigrama = new HashMap<>();
 

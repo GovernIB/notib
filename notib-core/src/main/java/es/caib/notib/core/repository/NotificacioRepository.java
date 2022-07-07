@@ -268,4 +268,5 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 
 	@Query(	"select count(n.id) from NotificacioEntity n where n.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
+
 }
