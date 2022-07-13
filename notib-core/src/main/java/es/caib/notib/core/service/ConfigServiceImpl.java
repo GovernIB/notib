@@ -125,6 +125,9 @@ public class ConfigServiceImpl implements ConfigService {
         for (ConfigEntity config : configs) {
             for (EntitatEntity entitat : entitats) {
                 String key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
+                if (configRepository.findByKey(key) != null ) {
+                    continue;
+                }
                 nova = new ConfigEntity();
                 nova.crearConfigNova(key, entitat.getCodi(), config);
                 configRepository.save(nova);

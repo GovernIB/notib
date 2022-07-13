@@ -20,6 +20,8 @@ import java.util.List;
  */
 public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
 
+    ConfigEntity findByKey(String key);
+
     ConfigEntity findByKeyAndEntitatCodi(String key, String entitatCodi);
 
     List<ConfigEntity> findByEntitatCodiIsNull();

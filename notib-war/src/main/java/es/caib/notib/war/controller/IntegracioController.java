@@ -113,8 +113,8 @@ public class IntegracioController extends BaseUserController {
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
 		IntegracioFiltreCommand filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
-		List<IntegracioAccioDto> accions = codi != null ? monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre.asDto())
-				: new ArrayList<IntegracioAccioDto>();
+		List<IntegracioAccioDto> accions = codi != null ? monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre !=null ? filtre.asDto() : null)
+														: new ArrayList<IntegracioAccioDto>();
 		if (accions.size() < paginacio.getPaginaTamany()) {
 			return 	DatatablesHelper.getDatatableResponse(request, accions);
 		}

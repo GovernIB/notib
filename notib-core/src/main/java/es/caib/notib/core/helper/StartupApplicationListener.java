@@ -68,8 +68,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     }
 
     private void addCustomAuthentication() {
-        auth = SecurityContextHolder.getContext().getAuthentication();
 
+        auth = SecurityContextHolder.getContext().getAuthentication();
         Principal principal = new Principal() {
             public String getName() {
                 return "INIT";
@@ -79,10 +79,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
         rols.add(new SimpleGrantedAuthority("NOT_SUPER"));
         rols.add(new SimpleGrantedAuthority("NOT_ADMIN"));
         rols.add(new SimpleGrantedAuthority("tothom"));
-
-        Authentication authentication =  new UsernamePasswordAuthenticationToken(
-                principal, "N/A",
-                rols);
+        Authentication authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
