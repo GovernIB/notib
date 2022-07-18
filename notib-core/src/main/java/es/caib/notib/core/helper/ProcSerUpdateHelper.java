@@ -52,8 +52,8 @@ public class ProcSerUpdateHelper {
 		procediment = ProcedimentEntity.getBuilder(
 				procedimentGda.getCodi(),
 				procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null,
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				false,
 				procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
@@ -86,8 +86,8 @@ public class ProcSerUpdateHelper {
 		ServeiEntity servei = ServeiEntity.getBuilder(
 				serveiGda.getCodi(),
 				serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				false,
 				serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
