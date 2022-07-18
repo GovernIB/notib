@@ -108,7 +108,8 @@ public class ConfigServiceImpl implements ConfigService {
             return new ArrayList<>();
         }
         String [] split = key.split(ConfigDto.prefix);
-        if (split[1] == null) {
+
+        if (split == null || split.length != 2) {
             log.error("Entitat config key no trobada. Key: " + key);
             return new ArrayList<>();
         }
@@ -132,6 +133,17 @@ public class ConfigServiceImpl implements ConfigService {
                 nova.crearConfigNova(key, entitat.getCodi(), config);
                 configRepository.save(nova);
             }
+        }
+    }
+
+    @Override
+    public void actualitzarPropietatsJBossBdd() {
+
+        List<ConfigEntity> configs = configRepository.findJBossConfigurables();
+        for(ConfigEntity config : configs) {
+            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            config.setValue(property);
+            configRepository.save(config);
         }
     }
 

@@ -46,12 +46,6 @@ public class ConfigHelper {
     }
 
     @Transactional(readOnly = true)
-    public String getConfigKeyByEntitat(String property) {
-
-        return entitat == null || entitat.get() == null ? getConfig(property) : getConfigKeyByEntitat(entitat.get().getCodi(), property);
-    }
-
-    @Transactional(readOnly = true)
     public String getConfigKeyByEntitat(String entitatCodi, String property) {
 
         String key = crearEntitatKey(entitatCodi, property);
@@ -71,12 +65,28 @@ public class ConfigHelper {
     }
 
     @Transactional(readOnly = true)
-    public String getConfig(String key) throws NotDefinedConfigException {
-        ConfigEntity configEntity = configRepository.findOne(key);
+    public String getConfig(String keyGeneral)  {
+
+        String entitatCodi  = getEntitatActualCodi();
+        String value = null;
+        ConfigEntity configEntity = configRepository.findOne(keyGeneral);
         if (configEntity == null) {
-            throw new NotDefinedConfigException(key);
+            return getJBossProperty(keyGeneral);
         }
-        return getConfig(configEntity);
+        // Propietat trobada en db
+        if (configEntity.isConfigurable() && !Strings.isNullOrEmpty(entitatCodi)) {
+            // Propietat a nivell d'entitat
+            String keyEntitat = crearEntitatKey(entitatCodi, keyGeneral);
+            ConfigEntity configEntitatEntity = configRepository.findOne(keyEntitat);
+            if (configEntitatEntity != null) {
+                value = getConfig(configEntitatEntity);
+            }
+        }
+        if (value == null) {
+            // Propietat global
+            value = getConfig(configEntity);
+        }
+        return value;
     }
 
     @Transactional(readOnly = true)
@@ -102,16 +112,8 @@ public class ConfigHelper {
         }
     }
 
-    public boolean getAsBooleanByEntitat(String key) {
-        return Boolean.parseBoolean(getConfigKeyByEntitat(key));
-    }
-
     public boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(getConfig(key));
-    }
-
-    public int getAsIntByEntitat(String key) {
-        return new Integer(getConfigKeyByEntitat(key));
     }
 
     public int getAsInt(String key) {
@@ -119,7 +121,7 @@ public class ConfigHelper {
     }
 
     public long getAsLongByEntitat(String key) {
-        return new Long(getConfigKeyByEntitat(key));
+        return new Long(getConfig(key));
     }
 
     public long getAsLong(String key) {
@@ -306,11 +308,11 @@ public class ConfigHelper {
             throw new RuntimeException(msg);
         }
         String [] split = key.split(ConfigDto.prefix);
-        if (split == null || split.length != 2) {
+        if (split == null) {
             String msg = "Format no reconegut per la key: " + key;
             log.error(msg);
             throw new RuntimeException(msg);
         }
-        return (ConfigDto.prefix + "." + entitatCodi + split[1]);
+        return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + split[1]);
     }
 }

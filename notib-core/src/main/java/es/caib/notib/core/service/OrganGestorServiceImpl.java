@@ -1149,7 +1149,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 		}
 		organsGestors = new ArrayList<>(setOrgansGestors);
-		if (!configHelper.getAsBooleanByEntitat("es.caib.notib.notifica.dir3.entitat.permes")) {
+		if (!configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
 			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
 		}
 		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty()) {

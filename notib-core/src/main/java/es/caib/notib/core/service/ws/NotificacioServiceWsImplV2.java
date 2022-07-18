@@ -2443,7 +2443,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	
 	// Indica si usar valores por defecto cuando ni el documento ni documentV2 tienen metadades
 	private boolean getUtilizarValoresPorDefecto() {
-		return configHelper.getAsBooleanByEntitat("es.caib.notib.document.metadades.por.defecto");
+		return configHelper.getAsBoolean("es.caib.notib.document.metadades.por.defecto");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 

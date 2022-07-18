@@ -1,5 +1,7 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
 import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.entity.config.ConfigGroupEntity;
@@ -30,14 +32,58 @@ public class ConfigHelperTest {
 
     private final String MAX_INTENTS_CALLBACK = "10";
 
+    private final String entitatCodi = "TEST";
+    private final String configKey = ".propietat.de.test";
+    private final String valorGlobal = "valor_global";
+    private final String valorEntitat = "valor_entitat";
+    private EntitatDto entitatEntity;
+    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
+
     @Before
     public void setUp() throws Exception {
-        Mockito.when(configRepository.findOne(
-                Mockito.eq("PROPERTY_KEY"))
-        ).thenReturn(
-                new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE")
-        );
+        entitatEntity = new EntitatDto();
+        entitatEntity.setCodi(entitatCodi);
+        ConfigHelper.setEntitat(entitatEntity);
+        Mockito.when(configRepository.findOne(Mockito.eq("PROPERTY_KEY"))).thenReturn(new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE"));
+        Mockito.when(configRepository.findOne(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(new ConfigEntity(ConfigDto.prefix + configKey, "valor_global"));
+        Mockito.when(configRepository.findOne(Mockito.eq(ConfigDto.prefix + "." + entitatCodi + configKey))).thenReturn(new ConfigEntity(ConfigDto.prefix + "." + entitatCodi + configKey, "valor_entitat"));
     }
+
+    @Test
+    public void getPropertyGlobal() throws Exception {
+
+        String valorGlo = configHelper.getConfig(ConfigDto.prefix + configKey);
+        Assert.assertEquals(valorGlobal, valorGlo);
+    }
+
+    @Test
+    public void getPropertyEntitat() throws Exception {
+
+        ConfigEntity config = new ConfigEntity(ConfigDto.prefix + configKey, "valor_global");
+        config.setConfigurable(true);
+        Mockito.when(configRepository.findOne(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(config);
+        String valorEnt = configHelper.getConfig(ConfigDto.prefix + configKey);
+        Assert.assertEquals(valorEntitat, valorEnt);
+    }
+
+    @Test
+    public void crearEntitatKeyTest() throws Exception {
+
+        // When
+        String propertyValue = configHelper.crearEntitatKey(entitatCodi, ConfigDto.prefix + configKey);
+        String propertyValue2 = configHelper.crearEntitatKey(entitatCodi, configKey);
+
+        // Then
+        Assert.assertEquals(ConfigDto.prefix + "." +entitatCodi + configKey, propertyValue);
+        Assert.assertEquals(configKey, propertyValue2);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void crearEntitatKeyTest_throwException() throws Exception {
+        // When
+        configHelper.crearEntitatKey(entitatCodi, null);
+    }
+
 
     @Test
     public void whenGetConfig_ThenReturnConfigValue() throws Exception {
@@ -48,10 +94,11 @@ public class ConfigHelperTest {
         Assert.assertEquals("PROPERTY_VALUE", propertyValue);
     }
 
-    @Test(expected = NotDefinedConfigException.class)
+    @Test
     public void GivenNonExistingKey_whenGetConfig_ThenException() throws Exception {
         // When
         String propertyValue = configHelper.getConfig("PROPERTY_INEXISTENT");
+        Assert.assertNull(propertyValue);
     }
 
     @Test

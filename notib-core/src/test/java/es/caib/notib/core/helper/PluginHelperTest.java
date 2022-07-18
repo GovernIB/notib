@@ -94,11 +94,11 @@ public class PluginHelperTest {
 		properties.put("es.caib.notib.plugin.regweb.mock.justificant", "../notib-plugin-impl/src/main/resources/es/caib/notib/plugin/caib/registre/justificant.pdf");
 //		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.plugin.registre.segons.entre.peticions"))).thenReturn(secondsBetweenCalls);
 //        Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.plugin.registre.class"))).thenReturn("");
-		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 //		Mockito.when(configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.arxiu.class")).thenReturn("es.caib.notib.plugin.arxiu.ArxiuPluginConcsvImpl");
 //		Mockito.when(configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.registre.class")).thenReturn("es.caib.notib.plugin.registre.RegistrePluginMockImpl");
-		Mockito.when(configHelper.getAsIntByEntitat("es.caib.notib.plugin.registre.segons.entre.peticions")).thenReturn(30);
+		Mockito.when(configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions")).thenReturn(30);
 //		Mockito.when(configHelper.getAllEntityProperties(Mockito.anyString())).thenReturn(properties);
 		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entidad);
 
@@ -551,8 +551,8 @@ public class PluginHelperTest {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"1",
 				"",
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
 				false,
 				null, // organGestor

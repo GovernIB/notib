@@ -101,7 +101,7 @@ public abstract class EmailHelper<T> {
     }
 
     public String getEmailFooter() {
-        return configHelper.getConfigKeyByEntitat("es.caib.notib.email.footer");
+        return configHelper.getConfig("es.caib.notib.email.footer");
     }
 
     @AllArgsConstructor

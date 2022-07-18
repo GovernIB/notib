@@ -486,11 +486,11 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private String getPeuLogo() {
-		return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.peu.logo"));
+		return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.peu.logo"));
 	}
 
 	private String getCapsaleraLogoEntitat() {
-		return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.logo"));
+		return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.logo"));
 	}
 
 	private InputStream getCapsaleraDefaultLogoEntitat() {

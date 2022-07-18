@@ -1981,28 +1981,28 @@ public class PluginHelper {
 	// PROPIETATS PLUGIN
 
 	private String getPropertyPluginUnitats() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.unitats.class");
+		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");
 	}
 	private String getPropertyPluginDadesUsuari() {
 		return configHelper.getConfig("es.caib.notib.plugin.dades.usuari.class");
 	}
 	private String getPropertyPluginGestioDocumental() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.gesdoc.class");
+		return configHelper.getConfig("es.caib.notib.plugin.gesdoc.class");
 	}
 	private String getPropertyPluginRegistre() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.registre.class");
+		return configHelper.getConfig("es.caib.notib.plugin.registre.class");
 	}
 	private String getPropertyPluginArxiu() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.arxiu.class");
+		return configHelper.getConfig("es.caib.notib.plugin.arxiu.class");
 	}
 	private String getPropertyPluginGestorDocumentalAdministratu() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.gesconadm.class");
+		return configHelper.getConfig("es.caib.notib.plugin.gesconadm.class");
 	}
 	private String getPropertyPluginFirmaServidor() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.firmaservidor.class");
+		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
-		return configHelper.getAsIntByEntitat("es.caib.notib.plugin.registre.segons.entre.peticions");
+		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
 	}
 	public String getOrganGestorsFile() {
 		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
@@ -2095,7 +2095,7 @@ public class PluginHelper {
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
-		return configHelper.getAsBooleanByEntitat("es.caib.notib.documents.metadades.from.arxiu");
+		return configHelper.getAsBoolean("es.caib.notib.documents.metadades.from.arxiu");
 	}
 
 	private static boolean isDocumentEstranger(String nie) {

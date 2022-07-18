@@ -174,23 +174,23 @@ public abstract class JustificantHelper<T> {
         }
 
         private String getDireccio() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.direccio"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.direccio"));
         }
 
         private String getNifDireccio() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.nif"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.nif"));
         }
 
         private String getCodiDireccio() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.codi"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.codi"));
         }
 
         private String getEmailDireccio() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.email"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.email"));
         }
 
         private String getPeuTitol() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.peu.titol"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.peu.titol"));
         }
     }
 
@@ -266,11 +266,11 @@ public abstract class JustificantHelper<T> {
         }
 
         private String getPeuLogo() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.peu.logo"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.peu.logo"));
         }
 
         private String getCapsaleraLogo() {
-            return getNotBlankProperty(configHelper.getConfigKeyByEntitat("es.caib.notib.justificant.capsalera.logo"));
+            return getNotBlankProperty(configHelper.getConfig("es.caib.notib.justificant.capsalera.logo"));
         }
 
         private InputStream getCapsaleraDefaultLogo() {
