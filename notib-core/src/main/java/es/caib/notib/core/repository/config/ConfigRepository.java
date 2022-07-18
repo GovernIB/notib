@@ -29,6 +29,9 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
     @Query("FROM ConfigEntity c WHERE c.entitatCodi IS NULL AND c.configurable = true")
     List<ConfigEntity> findByEntitatCodiIsNullAndConfigurableIsTrue();
 
+    @Query("FROM ConfigEntity c WHERE c.configurable = true AND c.jbossProperty = true")
+    List<ConfigEntity> findJBossConfigurables();
+
     @Query("FROM ConfigEntity c WHERE (c.entitatCodi = :entitatCodi AND c.value IS NOT NULL) OR c.entitatCodi IS NULL")
     List<ConfigEntity> findConfigEntitaCodiAndGlobals(@Param("entitatCodi") String entitatCodi);
 

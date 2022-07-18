@@ -29,8 +29,6 @@ public class ConfigHelper {
     @Autowired
     private ConfigGroupRepository configGroupRepository;
 
-    public static final String prefix = "es.caib.notib";
-
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
 
     public static ThreadLocal<EntitatDto> getEntitat() {
@@ -303,9 +301,16 @@ public class ConfigHelper {
     public String crearEntitatKey(String entitatCodi, String key) {
 
         if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
-            return null;
+            String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
+            log.error(msg);
+            throw new RuntimeException(msg);
         }
-        String [] split = key.split(prefix);
-        return (prefix + "." + entitatCodi + split[1]);
+        String [] split = key.split(ConfigDto.prefix);
+        if (split == null || split.length != 2) {
+            String msg = "Format no reconegut per la key: " + key;
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+        return (ConfigDto.prefix + "." + entitatCodi + split[1]);
     }
 }

@@ -1761,6 +1761,9 @@ public class PluginHelper {
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		GestioDocumentalPlugin plugin = gestioDocumentalPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1785,6 +1788,10 @@ public class PluginHelper {
 	}
 
 	private RegistrePlugin getRegistrePlugin(String codiEntitat) {
+
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 
 		RegistrePlugin plugin = registrePlugin.get(codiEntitat);
 		if (plugin != null) {
@@ -1812,6 +1819,10 @@ public class PluginHelper {
 	private IArxiuPlugin getArxiuPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
 		IArxiuPlugin plugin = arxiuPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1838,6 +1849,13 @@ public class PluginHelper {
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		UnitatsOrganitzativesPlugin plugin = unitatsOrganitzativesPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1864,6 +1882,10 @@ public class PluginHelper {
 	private GestorContingutsAdministratiuPlugin getGestorDocumentalAdministratiuPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
 		GestorContingutsAdministratiuPlugin plugin = gestorDocumentalAdministratiuPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1890,6 +1912,10 @@ public class PluginHelper {
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
 		FirmaServidorPlugin plugin = firmaServidorPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
