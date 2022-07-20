@@ -55,8 +55,10 @@ CREATE TABLE NOT_ORGAN_GESTOR
     "LLIBRE_NOM"     varchar(255),
     "OFICINA"        varchar(255),
     "OFICINA_NOM"    varchar(255),
-    "ESTAT"          numeric(10, 0) DEFAULT 0 NOT NULL,
+    "ESTAT"          varchar(1) DEFAULT 'V',
     "ENTREGA_CIE_ID" numeric(19, 0) DEFAULT NULL,
+    "CODI_PARE"      varchar (32),
+    "SIR"            numeric(1, 0) DEFAULT 0,
     constraint NOT_ORGAN_GESTOR_UK unique (codi),
     constraint NOT_ORGAN_ENTITAT_FK foreign key (ENTITAT) references NOT_ENTITAT (id)
 );
@@ -112,94 +114,54 @@ INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('FLOAT');
 INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('CRON');
 INSERT INTO NOT_CONFIG_TYPE (CODE) VALUES ('CREDENTIALS');
 
-INSERT INTO NOT_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES
-    (0, 'GENERAL', 'Configuracions generals' );
-
-
+INSERT INTO NOT_CONFIG_GROUP (POSITION, CODE, DESCRIPTION) VALUES (0, 'GENERAL', 'Configuracions generals' );
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.metriques.generar', 'false');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasques.actives', 'false');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.registre.enviaments.periode', '300000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.registre.enviaments.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.notifica.enviaments.periode', '300000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.notifica.enviaments.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.periode', '300000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode', '300000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.actualitzacio.procediments.cron', '0 53 16 * * *');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.actualitzacio.serveis.cron', '0 58 16 * * *');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.refrescar.notificacions.expirades.cron', '0 0 0 * * ?');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.periode', '300000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.periode', '300000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.periode', '432000000');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.retard.inicial', '3000000');
-
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.plugin.unitats.dir3.protocol', 'REST');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.plugin.unitats.fitxer', '');
 
-INSERT INTO NOT_ENTITAT (id, codi, nom, tipus, dir3_codi, descripcio, activa, version, api_key,  tipus_doc_default,
-                         amb_entrega_deh, dir3_codi_reg, amb_entrega_cie, llibre_entitat, oficina_entitat) VALUES
-(1, 'ENTITAT_TESTS', 'ENTITAT_TESTS', 'GOVERN', 'EA0004518', 'Descripció', 1, 1, '', 1, 1, '', 0, 0, 0);
+INSERT INTO NOT_ENTITAT (id, codi, nom, tipus, dir3_codi, descripcio, activa, version, api_key,  tipus_doc_default, amb_entrega_deh, dir3_codi_reg, amb_entrega_cie, llibre_entitat, oficina_entitat) VALUES (1, 'ENTITAT_TESTS', 'ENTITAT_TESTS', 'GOVERN', 'EA0004518', 'Descripció', 1, 1, '', 1, 1, '', 0, 0, 0);
 
-INSERT INTO NOT_ORGAN_GESTOR (id, CODI, ENTITAT, NOM) VALUES
-(2, 'A00000000', '1', 'òrgan per defecte');
-
-INSERT INTO NOT_ORGAN_GESTOR (id, CODI, ENTITAT, NOM) VALUES
-(3, 'A04013511', '1', 'òrgan base de dades');
-
-INSERT INTO NOT_ACL_CLASS (ID, CLASS) VALUES
-(4, 'es.caib.notib.core.entity.EntitatEntity');
-
-INSERT INTO NOT_ACL_SID (ID, PRINCIPAL, SID) VALUES
-(5, 1, 'admin');
-
-INSERT INTO NOT_ACL_OBJECT_IDENTITY (ID, OBJECT_ID_CLASS, OBJECT_ID_IDENTITY,
-                                           PARENT_OBJECT, OWNER_SID, ENTRIES_INHERITING)  VALUES
-(6, 4, 1, NULL, 5, 1);
+INSERT INTO NOT_ACL_CLASS (ID, CLASS) VALUES (4, 'es.caib.notib.core.entity.EntitatEntity');
+INSERT INTO NOT_ACL_SID (ID, PRINCIPAL, SID) VALUES (5, 1, 'admin');
+INSERT INTO NOT_ACL_OBJECT_IDENTITY (ID, OBJECT_ID_CLASS, OBJECT_ID_IDENTITY, PARENT_OBJECT, OWNER_SID, ENTRIES_INHERITING)  VALUES (6, 4, 1, NULL, 5, 1);
 
 -- Permís usuari
-INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK,
-                                 GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES
-(7, 6, 0, 5, 32, 1, 0, 0);
-
+INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK, GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES (7, 6, 0, 5, 32, 1, 0, 0);
 -- Permís administrador entitat
-INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK,
-                           GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES
-(8, 6, 1, 5, 128, 1, 0, 0);
+INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK, GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES (8, 6, 1, 5, 128, 1, 0, 0);
 
+INSERT INTO NOT_ORGAN_GESTOR (id, CODI, ENTITAT, NOM) VALUES (2, 'A00000000', '1', 'òrgan per defecte');
+INSERT INTO NOT_ORGAN_GESTOR (id, CODI, ENTITAT, NOM) VALUES (3, 'A04013511', '1', 'òrgan base de dades');
+-- CREACIÓ D'UN ÒRGAN GESTOR SENSE CAP PERMÍS
+INSERT INTO NOT_ORGAN_GESTOR (id, CODI, ENTITAT, NOM) VALUES (86, 'A00000002', 1, 'òrgan sense permisos');
 
 -- -- -- -- -- --
 -- Permisos de l'òrgan gestor
 -- -- -- -- -- --
-INSERT INTO NOT_ACL_CLASS (ID, CLASS) VALUES
-(9, 'es.caib.notib.core.entity.OrganGestorEntity');
+INSERT INTO NOT_ACL_CLASS (ID, CLASS) VALUES (9, 'es.caib.notib.core.entity.OrganGestorEntity');
+INSERT INTO NOT_ACL_OBJECT_IDENTITY (ID, OBJECT_ID_CLASS, OBJECT_ID_IDENTITY, PARENT_OBJECT, OWNER_SID, ENTRIES_INHERITING)  VALUES (10, 9, 2, NULL, 5, 1);
 
-INSERT INTO NOT_ACL_OBJECT_IDENTITY (ID, OBJECT_ID_CLASS, OBJECT_ID_IDENTITY,
-                                     PARENT_OBJECT, OWNER_SID, ENTRIES_INHERITING)  VALUES
-(10, 9, 2, NULL, 5, 1);
-
-INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK,
-                           GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES
-(11, 10, 0, 5, 32, 1, 0, 0);
-
-INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK,
-                           GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES
-(12, 10, 1, 5, 64, 1, 0, 0);
+INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK, GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES (11, 10, 0, 5, 32, 1, 0, 0);
+INSERT INTO NOT_ACL_ENTRY (ID, ACL_OBJECT_IDENTITY, ACE_ORDER, SID, MASK, GRANTING, AUDIT_SUCCESS, AUDIT_FAILURE) VALUES (12, 10, 1, 5, 64, 1, 0, 0);
 
 
 
--- CREACIÓ D'UN ÒRGAN GESTOR SENSE CAP PERMÍS
-INSERT INTO NOT_ORGAN_GESTOR (id, CODI, ENTITAT, NOM) VALUES
-(86, 'A00000002', 1, 'òrgan sense permisos');
 

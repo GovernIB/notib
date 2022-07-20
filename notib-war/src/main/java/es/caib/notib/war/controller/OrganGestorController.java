@@ -266,7 +266,7 @@ public class OrganGestorController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:unitatOrganitzativa",
-				"unitat.controller.synchronize.ok");
+				"organgestor.controller.synchronize.ok");
 	}
 
 	

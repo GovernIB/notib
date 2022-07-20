@@ -59,8 +59,8 @@ public interface OrganGestorService {
 	 * @return Indica si la sincronització ha tengut èxit
 	 * @throws Exception
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	public Object[] syncDir3OrgansGestors(Long entitatId) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
@@ -219,4 +219,7 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	OrganGestorDto getOrganNou(String codiSia);
 
+
+	// For testing:
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper);
 }

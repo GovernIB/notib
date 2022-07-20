@@ -118,6 +118,7 @@ public class PaginacioHelper {
 			Class<T> targetType) {
 		return toPaginaDto(page, targetType, null);
 	}
+	@SuppressWarnings("unchecked")
 	public <S, T> PaginaDto<T> toPaginaDto(
 			Page<S> page,
 			Class<T> targetType,

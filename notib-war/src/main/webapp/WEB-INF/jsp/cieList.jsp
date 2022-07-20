@@ -32,7 +32,7 @@ pageContext.setAttribute(
 
 		var organsGestors = [];
 		let organData;
-		organsGestors.push({id:"", text:"", estat:"VIGENT"});
+		organsGestors.push({id:"", text:"", estat:"V"});
 		<c:forEach items="${organsGestors}" var="organGestor">
 			organData = {id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"}
 			<c:if test="${cieFiltreCommand.organismePagadorCodi == organGestor.codi}">

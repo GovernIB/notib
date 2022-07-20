@@ -2,13 +2,15 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.cacheable.OrganGestorCachable;
+import es.caib.notib.core.api.dto.organisme.TipusTransicioEnumDto;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.AvisEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.AvisRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -18,12 +20,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -43,12 +46,14 @@ public class OrganGestorHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private AvisRepository avisRepository;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private OrganGestorCachable organGestorCachable;
+	@Autowired
+	private ProcSerOrganRepository procSerOrganRepository;
+	@Autowired
+	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private PermisosCacheable permisosCacheable;
 	@Autowired
@@ -234,6 +239,116 @@ public class OrganGestorHelper {
 					true,
 					entitat.getId()).build();
 			avisRepository.save(avis);
+		}
+	}
+
+	@Transactional
+	public void sincronitzarOrgans(Long entitatId,
+								   List<NodeDir3> unitatsWs,
+								   List<OrganGestorEntity> obsoleteUnitats,
+								   List<OrganGestorEntity> organsDividits,
+								   List<OrganGestorEntity> organsFusionats,
+								   List<OrganGestorEntity> organsSubstituits) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+
+		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
+		for (NodeDir3 unitatWS: unitatsWs) {
+			sincronizarUnitat(unitatWS, entitat);
+		}
+
+		// Històrics
+		for (NodeDir3 unidadWS : unitatsWs) {
+			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unidadWS.getCodi());
+			sincronizarHistoricsUnitat(unitat, unidadWS, entitat);
+		}
+		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+		// Definint tipus de transició
+		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
+			if (obsoleteUnitat.getNous() == null || obsoleteUnitat.getNous().isEmpty()) {
+				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
+			} else if (obsoleteUnitat.getNous().size() > 1) {
+				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
+				organsDividits.add(obsoleteUnitat);
+			} else {
+				if (obsoleteUnitat.getNous().size() == 1) {
+					if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
+						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.FUSIO);
+						organsFusionats.add(obsoleteUnitat);
+					} else if (obsoleteUnitat.getNous().get(0).getAntics().size() == 1) {
+						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.SUBSTITUCIO);
+						organsSubstituits.add(obsoleteUnitat);
+					}
+				}
+			}
+		}
+
+		Date ara = new Date();
+		// Si és la primera sincronització
+		if (entitat.getDataSincronitzacio() == null) {
+			entitat.setDataSincronitzacio(ara);
+		}
+		entitat.setDataActualitzacio(ara);
+	}
+
+	private OrganGestorEntity sincronizarUnitat(NodeDir3 unitatWS, EntitatEntity entitat) {
+		OrganGestorEntity unitat = null;
+		if (unitatWS != null) {
+			// checks if unitat already exists in database
+			unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
+			// if not it creates a new one
+			if (unitat == null) {
+				// Venen les unitats ordenades, primer el pare i després els fills?
+				unitat = OrganGestorEntity.builder()
+						.codi(unitatWS.getCodi())
+						.entitat(entitat)
+						.nom(unitatWS.getDenominacio())
+						.codiPare(unitatWS.getSuperior())
+//						.pare(organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior()))
+						.estat(unitatWS.getEstat())
+						.build();
+				organGestorRepository.save(unitat);
+			} else {
+				unitat.update(
+						unitatWS.getDenominacio(),
+						unitatWS.getEstat(),
+						unitatWS.getSuperior());
+			}
+		}
+		return unitat;
+	}
+
+	private void sincronizarHistoricsUnitat(
+			OrganGestorEntity unitat,
+			NodeDir3 unidadWS,
+			EntitatEntity entitat) {
+
+		if (unidadWS.getHistoricosUO()!=null && !unidadWS.getHistoricosUO().isEmpty()) {
+			for (String historicoCodi : unidadWS.getHistoricosUO()) {
+				OrganGestorEntity nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
+				unitat.addNou(nova);
+				nova.addAntic(unitat);
+			}
+		}
+	}
+
+	@Transactional
+	public void deleteExtingitsNoUtilitzats(List<OrganGestorEntity> obsoleteUnitats) {
+		// Eliminar organs no vigents no utilitzats??
+		Iterator<OrganGestorEntity> it = obsoleteUnitats.iterator();
+		while (it.hasNext()) {
+			OrganGestorEntity organObsolet = it.next();
+			Integer nombreProcediments = procSerOrganRepository.countByOrganGestor(organObsolet);
+			if (nombreProcediments > 0)
+				continue;
+			Integer nombreExpedients = notificacioRepository.countByOrganGestor(organObsolet);
+			if (nombreExpedients > 0)
+				continue;
+			try {
+				permisosHelper.eliminarPermisosOrgan(organObsolet);
+				organGestorRepository.delete(organObsolet);
+			} catch (Exception ex) {
+				logger.error("No ha estat possible esborrar l'òrgan gestor.", ex);
+			}
 		}
 	}
 }

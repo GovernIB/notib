@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
-import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.OrganGestorService;
@@ -264,13 +263,17 @@ public class ProcSerHelper {
 	 *
 	 * @param procedimentGda Procediment obtingut desde GDA
 	 * @param procedimentEntity Procediment de la base de dades
-	 * @param organigramaEntitat Organigrama dels òrgans gestors de l'entitat
+	 * @param codiOrgansGda Organigrama dels òrgans gestors de l'entitat
 	 * @param progres Seguiment del progrés d'actualització
 	 *
 	 * @return Si el procediment s'ha d'actualitzar
 	 */
-	private boolean procedimentHasToBeUpdated(ProcSerDataDto procedimentGda, ProcedimentEntity procedimentEntity,
-											  Map<String, OrganismeDto> organigramaEntitat, ProgresActualitzacioDto progres) {
+	private boolean procedimentHasToBeUpdated(
+			ProcSerDataDto procedimentGda,
+			ProcedimentEntity procedimentEntity,
+//			Map<String, OrganismeDto> organigramaEntitat,
+			List<String> codiOrgansGda,
+			ProgresActualitzacioDto progres) {
 
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
@@ -290,7 +293,7 @@ public class ProcSerHelper {
 			}
 		}
 
-		if (!organigramaEntitat.containsKey(procedimentGda.getOrganGestor())) {
+		if (!codiOrgansGda.contains(procedimentGda.getOrganGestor())) {
 			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
@@ -301,7 +304,12 @@ public class ProcSerHelper {
 		return true;
 	}
 
-	private boolean serveiHasToBeUpdated(ProcSerDataDto serveiGda, ServeiEntity serveiEntity, Map<String, OrganismeDto> organigramaEntitat, ProgresActualitzacioDto progres) {
+	private boolean serveiHasToBeUpdated(
+			ProcSerDataDto serveiGda,
+			ServeiEntity serveiEntity,
+//			Map<String, OrganismeDto> organigramaEntitat,
+			List<String> codiOrgansGda,
+			ProgresActualitzacioDto progres) {
 
 		if (serveiGda.getCodi() == null || serveiGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat"));
@@ -321,7 +329,7 @@ public class ProcSerHelper {
 			}
 		}
 
-		if (!organigramaEntitat.containsKey(serveiGda.getOrganGestor())) {
+		if (!codiOrgansGda.contains(serveiGda.getOrganGestor())) {
 			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat.noOrganDinsOrganigrama", new Object[] {serveiGda.getOrganGestor()}));
@@ -338,7 +346,8 @@ public class ProcSerHelper {
 			ProgresActualitzacioDto progres,
 			ProcSerDataDto procedimentGda,
 			EntitatEntity entitat,
-			Map<String, OrganismeDto> organigramaEntitat,
+//			Map<String, OrganismeDto> organigramaEntitat,
+			List<String> codiOrgansGda,
 			boolean modificar,
 			List<OrganGestorEntity> organsGestorsModificats,
 			Map<String, String[]> avisosProcedimentsOrgans) {
@@ -349,7 +358,7 @@ public class ProcSerHelper {
 		try {
 			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
 
-			if (!procedimentHasToBeUpdated(procedimentGda, procediment, organigramaEntitat, progres)) {
+			if (!procedimentHasToBeUpdated(procedimentGda, procediment, codiOrgansGda, progres)) {
 				return;
 			}
 
@@ -372,6 +381,7 @@ public class ProcSerHelper {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.result.no", new Object[]{procedimentGda.getOrganGestor()}));
 					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.sync", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
 					// Organ no sincronitzat
+					procediment.setOrganNoSincronitzat(true);
 					avisosProcedimentsOrgans.put(procedimentGda.getNom(), new String[] { "sense òrgan", procedimentGda.getOrganGestor() });
 					return;
 				}
@@ -444,7 +454,8 @@ public class ProcSerHelper {
 			ProgresActualitzacioDto progres,
 			ProcSerDataDto serveiGda,
 			EntitatEntity entitat,
-			Map<String, OrganismeDto> organigramaEntitat,
+//			Map<String, OrganismeDto> organigramaEntitat,
+			List<String> codiOrgansGda,
 			boolean modificar,
 			List<OrganGestorEntity> organsGestorsModificats,
 			Map<String, String[]> avisosProcedimentsOrgans) {
@@ -455,7 +466,7 @@ public class ProcSerHelper {
 		try {
 			ServeiEntity servei = serveiRepository.findByCodiAndEntitat(serveiGda.getCodi(), entitat);
 
-			if (!serveiHasToBeUpdated(serveiGda, servei, organigramaEntitat, progres)) {
+			if (!serveiHasToBeUpdated(serveiGda, servei, codiOrgansGda, progres)) {
 				return;
 			}
 
@@ -478,6 +489,7 @@ public class ProcSerHelper {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.organ.result.no", new Object[]{serveiGda.getOrganGestor()}));
 					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.organ.sync", new Object[]{serveiGda.getCodi(), servei.getEntitat().getNom()}));
 					// Organ no sincronitzat
+					servei.setOrganNoSincronitzat(true);
 					avisosProcedimentsOrgans.put(serveiGda.getNom(), new String[] { "sense òrgan", serveiGda.getOrganGestor() });
 					return;
 				}

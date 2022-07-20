@@ -148,7 +148,7 @@
 				<th data-col-name="codi" data-template="#cellOrganGestorTemplate"><spring:message code="organgestor.list.columna.codi"/>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:codi}}
-						{{if estat != 'VIGENT'}}
+						{{if estat != 'V'}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='organgestor.list.columna.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
 				</th>
@@ -206,7 +206,7 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
-			<a id="procediment-boto-update"
+			<a id="organ-boto-update"
 					class="btn btn-default" href="organgestor/sync/dir3"
 					data-toggle="modal"
 					data-maximized="false">

@@ -23,7 +23,7 @@ public class AvisHelper {
 		List<AvisDto> avisos = (List<AvisDto>) request.getAttribute(REQUEST_PARAMETER_AVISOS);
 		boolean canviRol = request.getParameter(RolHelper.getRequestParameterCanviRol()) != null;
 		if ((avisos == null && !RequestSessionHelper.isError(request) && avisService != null) || canviRol) {
-			if (RolHelper.isUsuariActualAdministrador(request)) {
+			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
 				EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 				avisos = avisService.findActiveAdmin(entitatActual.getId());
 			}

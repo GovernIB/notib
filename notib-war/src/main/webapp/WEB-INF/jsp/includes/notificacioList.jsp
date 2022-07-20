@@ -122,7 +122,7 @@
     }
 
     var organsGestors = [];
-    organsGestors.push({id:"", text:"", estat:"VIGENT"});
+    organsGestors.push({id:"", text:"", estat:"V"});
     <c:forEach items="${organsGestorsPermisLectura}" var="organGestor">
     organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
     </c:forEach>
@@ -664,7 +664,7 @@
         <th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate" width="200px"><spring:message code="notificacio.form.camp.organEmisor"/>
             <script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organGestorDesc}}
-						{{if organEstat != 'VIGENT'}}
+						{{if organEstat != 'V'}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='notificacio.list.columna.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
         </th>

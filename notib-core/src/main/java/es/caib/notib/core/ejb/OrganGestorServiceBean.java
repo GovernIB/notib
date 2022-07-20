@@ -62,7 +62,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
+	@RolesAllowed({"NOT_ADMIN"})
+	public Object[] syncDir3OrgansGestors(Long entitatId) throws Exception {
 		return delegate.syncDir3OrgansGestors(entitatId);
 	}
 
@@ -232,6 +233,11 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto getOrganNou(String codiSia) {
 		return delegate.getOrganNou(codiSia);
+	}
+
+	@Override
+	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {
+		delegate.setServicesForSynctest(procSerSyncHelper, pluginHelper);
 	}
 
 	@Override

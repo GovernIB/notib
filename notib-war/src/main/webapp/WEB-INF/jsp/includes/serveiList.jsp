@@ -20,7 +20,7 @@ function isRolActualAdministradorEntitat() {
 }
 
 var organsGestors = [];
-organsGestors.push({id:"", text:"", estat:"VIGENT"});
+organsGestors.push({id:"", text:"", estat:"V"});
 <c:forEach items="${organsGestors}" var="organGestor">
 organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
 </c:forEach>
@@ -120,7 +120,7 @@ $(document).ready(function() {
 				<th data-col-name="organGestorDesc" data-template="#cellOrganGestorTemplate"><spring:message code="procediment.list.columna.organGestor"/>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organGestorDesc}}
-						{{if organGestorEstat != 'VIGENT'}}
+						{{if organGestorEstat != 'V'}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='procediment.list.columna.organGestor.obsolet'/>"></span>{{/if}}
 					</script>
 				</th>
@@ -190,7 +190,7 @@ $(document).ready(function() {
 		<c:if test="${isRolActualAdministradorEntitat}">
 			<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
 			<c:if test="${!isCodiDir3Entitat}">
-				<a id="procediment-boto-update"
+				<a id="servei-boto-update"
 					class="btn btn-default" href="${unitatCodiUrlPrefix}servei/update/auto"
 					data-toggle="modal"
 					data-maximized="false">

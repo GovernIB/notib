@@ -37,7 +37,7 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 		
 		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(request, procedimentService, organGestorService, aplicacioService);
 
-		if (RolHelper.isUsuariActualAdministrador(request) || RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+		if (RolHelper.isUsuariActualAdministradorEntitat(request) || RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 			OrganGestorHelper.setOrgansProcedimentsNoSincronitzats(request, procedimentService);
 			OrganGestorHelper.setOrgansServeisNoSincronitzats(request, serveiService);
 		}

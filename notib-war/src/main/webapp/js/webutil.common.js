@@ -716,7 +716,7 @@ function resetSessionTimeout(){
 function loadOrgans($selector, organsGestors, missatgeObsolets){
 	function formatState(organ) {
 		let msgObsolet = missatgeObsolets;
-		if (organ.estat == 'VIGENT' || organ.estat == null || organ.estat == '') {
+		if (organ.estat == 'V' || organ.estat == null || organ.estat == '') {
 			return organ.text;
 		}
 		return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");

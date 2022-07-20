@@ -6,7 +6,6 @@ import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -42,9 +41,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -339,7 +336,7 @@ public class NotificacioServiceWsV2Test {
 		grupDto.setId(1L);
 		grups.add(grupDto);
 
-		OrganGestorEntity organGestor = OrganGestorEntity.builder(null, null, null, entitatMock, null, null, null, null, null).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitatMock).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
 		DocumentV2 document2 = new DocumentV2();
 		document2.setUuid(UUID.randomUUID().toString());

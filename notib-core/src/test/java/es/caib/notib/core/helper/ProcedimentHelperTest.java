@@ -1,7 +1,6 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
-import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
@@ -23,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -105,8 +105,10 @@ public class ProcedimentHelperTest {
 //        Mockito.when(procedimentRepository.save(
 //                Mockito.<ProcedimentEntity>any()
 //        )).thenReturn(procedimentDB);
-        Map<String, OrganismeDto> organigramaEntitat = new HashMap<>();
-        organigramaEntitat.put(ORGAN_CODI, null);
+//        Map<String, OrganismeDto> organigramaEntitat = new HashMap<>();
+//        organigramaEntitat.put(ORGAN_CODI, null);
+        List<String> codiOrgansGda = new ArrayList<>();
+        codiOrgansGda.add(ORGAN_CODI);
 
         // When
         ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
@@ -116,7 +118,7 @@ public class ProcedimentHelperTest {
                 progres,
                 procedimentGda,
                 entitatEntity,
-                organigramaEntitat,
+                codiOrgansGda,
                 true,
                 new ArrayList<OrganGestorEntity>(),
                 avisosProcedimentsOrgans);

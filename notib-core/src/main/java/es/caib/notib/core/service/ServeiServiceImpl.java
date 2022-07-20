@@ -4,7 +4,6 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
@@ -40,6 +39,7 @@ import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.notib.core.repository.*;
 import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -401,9 +401,14 @@ public class ServeiServiceImpl implements ServeiService{
 			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosServeisOrgans = new HashMap<>();
-			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+//			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat, entitat.getDir3Codi(), null, null);
+			List<String> codiOrgansGda = new ArrayList<>();
+			for (NodeDir3 unitat: unitatsWs) {
+				codiOrgansGda.add(unitat.getCodi());
+			}
 			EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
-			serveiHelper.actualitzarServeiFromGda(progres, proc, entity, organigrama, true, organsModificats, avisosServeisOrgans);
+			serveiHelper.actualitzarServeiFromGda(progres, proc, entity, codiOrgansGda, true, organsModificats, avisosServeisOrgans);
 
 			if (avisosServeisOrgans.size() > 0) {
 				if (serveisAmbOrganNoSincronitzat.containsKey(entitat)) {

@@ -205,8 +205,8 @@ public class ClientBaseTest {
 			int numDestinataris,
 			boolean ambEnviamentPostal) throws DatatypeConfigurationException, IOException, DecoderException {
 		
-		List<Integer> repetits = new ArrayList();
-		List<NotificacioV2> notificacions = new ArrayList();
+		List<Integer> repetits = new ArrayList<>();
+		List<NotificacioV2> notificacions = new ArrayList<>();
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 
 		for(int i = 0; i < numeroDeNotificacions; i++){

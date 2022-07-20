@@ -326,7 +326,7 @@ function getCookie(cname) {
 					</script>
 					<script id="cellOrganGestorTemplate" type="text/x-jsrender">
 						{{:organCodi}}
-						{{if organEstat != 'VIGENT'}}
+						{{if organEstat != 'V'}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='enviament.list.organGestor.obsolet'/>"></span>{{/if}}
  					</script>
 				</th>

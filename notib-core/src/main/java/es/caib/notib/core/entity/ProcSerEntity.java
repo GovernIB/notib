@@ -6,6 +6,7 @@ import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.joda.time.DateTime;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -64,6 +65,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     @Temporal(TemporalType.DATE)
     protected Date ultimaActualitzacio;
 
+    @Setter
     @Column(name = "organ_no_sinc", nullable = false)
     private boolean organNoSincronitzat;
 

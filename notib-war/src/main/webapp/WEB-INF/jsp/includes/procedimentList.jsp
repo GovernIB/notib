@@ -28,7 +28,7 @@ function isRolActualAdministradorEntitat() {
 }
 
 var organsGestors = [];
-organsGestors.push({id:"", text:"", estat:"VIGENT"});
+organsGestors.push({id:"", text:"", estat:"V"});
 <c:forEach items="${organsGestors}" var="organGestor">
 organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
 </c:forEach>

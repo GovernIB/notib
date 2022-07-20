@@ -74,10 +74,10 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@JoinTable(name = "not_og_sinc_rel",
 			joinColumns = { @JoinColumn(name = "antic_og", referencedColumnName = "id", nullable = false) },
 			inverseJoinColumns = { @JoinColumn(name = "nou_og", referencedColumnName = "id", nullable = false) })
-	@ManyToMany
+	@ManyToMany(cascade = CascadeType.ALL)
 	private List<OrganGestorEntity> nous = new ArrayList<>();
 
-	@ManyToMany(mappedBy = "nous")
+	@ManyToMany(mappedBy = "nous", cascade = CascadeType.ALL)
 	private List<OrganGestorEntity> antics = new ArrayList<>();
 
 	@Setter
@@ -173,9 +173,15 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 //	}
 
 	public void addNou(OrganGestorEntity nou) {
+		if (nous == null) {
+			nous = new ArrayList<>();
+		}
 		nous.add(nou);
 	}
 	public void addAntic(OrganGestorEntity antic) {
+		if (antics == null) {
+			antics = new ArrayList<>();
+		}
 		antics.add(antic);
 	}
 

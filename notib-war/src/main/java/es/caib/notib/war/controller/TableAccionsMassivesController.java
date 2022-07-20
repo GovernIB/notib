@@ -16,13 +16,16 @@ import es.caib.notib.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -452,6 +455,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
     protected Set<Long> getIdsSeleccionats(HttpServletRequest request) {
 
+        @SuppressWarnings("unchecked")
         Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, sessionAttributeSeleccio);
         return seleccio != null ? new HashSet<>(seleccio) : new HashSet<Long>();
     }

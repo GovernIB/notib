@@ -51,6 +51,7 @@ public class NotificaWsTestIntegracioRest {
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 
+	@SuppressWarnings("deprecation")
 	private static NotificacioRestClient client;
 	
 	

@@ -8,7 +8,6 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
-import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.AvisEntity;
@@ -17,6 +16,7 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.AvisRepository;
 import es.caib.notib.core.service.ProcedimentServiceImpl;
 import es.caib.notib.core.service.ServeiServiceImpl;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,6 +90,7 @@ public class ProcSerSyncHelper {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
+			progres.setNumOperacions((totalElementsCons * 2) + 1);
 
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			List<OrganGestorEntity> organsGestorsModificats = processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
@@ -137,7 +138,7 @@ public class ProcSerSyncHelper {
 
 		int elementsUltimaPagina = totalElementsCons % 30 == 0 ? 30 : totalElementsCons % 30;
 		int pagines = totalElementsCons / 30 + (totalElementsCons % 30 == 0 ? 0 : 1);
-		progres.setNumOperacions(totalElementsCons + pagines);
+//		progres.setNumOperacions(totalElementsCons + pagines);
 
 		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [PROCEDIMENTS] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
@@ -161,11 +162,11 @@ public class ProcSerSyncHelper {
 				}
 			} while (reintents > 0 && reintents < 3);
 			// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
-			progres.incrementOperacionsRealitzades();
-			if (reintents > 0) {
-				int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
-				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
-			}
+			int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
+			progres.incrementOperacionsRealitzades(elementsPagina);
+//			if (reintents > 0) {
+//				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
+//			}
 			numPagina++;
 		} while (numPagina * 30 < totalElementsCons);
 
@@ -182,7 +183,16 @@ public class ProcSerSyncHelper {
 
 		long startTime = System.nanoTime();
 		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();
-		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+
+//		TODO: Organigrama de GDA no de BBDD
+//		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+		EntitatDto entitatDto = new EntitatDto();
+		entitatDto.setCodi(entitat.getCodi());
+		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), null, null);
+		List<String> codiOrgansGda = new ArrayList<>();
+		for (NodeDir3 unitat: unitatsWs) {
+			codiOrgansGda.add(unitat.getCodi());
+		}
 
 		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [PROCEDIMENTS] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
@@ -200,7 +210,7 @@ public class ProcSerSyncHelper {
 					progres,
 					procedimentGda,
 					entitat,
-					organigramaEntitat,
+					codiOrgansGda,
 					modificar,
 					organsGestorsModificats,
 					avisosProcedimentsOrgans);
@@ -425,7 +435,14 @@ public class ProcSerSyncHelper {
 
 		long startTime = System.nanoTime();
 		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();
-		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+//		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+		EntitatDto entitatDto = new EntitatDto();
+		entitatDto.setCodi(entitat.getCodi());
+		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), null, null);
+		List<String> codiOrgansGda = new ArrayList<>();
+		for (NodeDir3 unitat: unitatsWs) {
+			codiOrgansGda.add(unitat.getCodi());
+		}
 
 		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [SERVEIS] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
@@ -443,7 +460,7 @@ public class ProcSerSyncHelper {
 					progres,
 					serveiGda,
 					entitat,
-					organigramaEntitat,
+					codiOrgansGda,
 					modificar,
 					organsGestorsModificats,
 					avisosServeisOrgans);

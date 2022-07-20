@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ taglib tagdir="/WEB-INF/tags/notib" prefix="rip"%>
+<%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
@@ -19,7 +19,7 @@
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	<rip:modalHead />
+	<not:modalHead />
 </head>
 <body>
 
@@ -253,7 +253,7 @@
 	</div>
 
 	<c:set var="formAction">
-		<dis:modalUrl value="/unitatOrganitzativa/saveSynchronize" />
+		<not:modalUrl value="/organgestor/saveSynchronize" />
 	</c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 		<div id="modal-botons">

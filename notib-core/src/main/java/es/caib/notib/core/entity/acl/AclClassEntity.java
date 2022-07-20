@@ -1,5 +1,6 @@
 package es.caib.notib.core.entity.acl;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -13,6 +14,7 @@ import javax.persistence.Table;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@EqualsAndHashCode
 @Entity
 @Table(name = "not_acl_class")
 public class AclClassEntity extends AbstractPersistable<Long> {

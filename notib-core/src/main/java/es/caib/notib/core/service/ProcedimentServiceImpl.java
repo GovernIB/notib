@@ -5,7 +5,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
@@ -43,6 +42,7 @@ import es.caib.notib.core.repository.*;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -400,9 +400,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
+			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat, entitat.getDir3Codi(), null, null);
+			List<String> codiOrgansGda = new ArrayList<>();
+			for (NodeDir3 unitat: unitatsWs) {
+				codiOrgansGda.add(unitat.getCodi());
+			}
 			EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
-			procedimentHelper.actualitzarProcedimentFromGda(progres, proc, entity, organigrama, true, organsModificats, avisosProcedimentsOrgans);
+			procedimentHelper.actualitzarProcedimentFromGda(progres, proc, entity, codiOrgansGda, true, organsModificats, avisosProcedimentsOrgans);
 
 			if (avisosProcedimentsOrgans.size() > 0) {
 				if (procedimentsAmbOrganNoSincronitzat.containsKey(entitat)) {
@@ -435,248 +439,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			procSerSyncHelper.actualitzaProcediments(entitatDto);
-//			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_PROCEDIMENT, "Actualització de procediments", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
-//			info.setCodiEntitat(entitatDto.getCodi());
-//			ConfigHelper.setEntitat(entitatDto);
-//			logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
-//
-//			// Comprova si hi ha una altre instància del procés en execució
-//			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
-//			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-//				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
-//				return;	// Ja existeix un altre procés que està executant l'actualització.
-//			}
-//
-//			// inicialitza el seguiment del prgrés d'actualització
-//			progres = new ProgresActualitzacioDto();
-//			progresActualitzacio.put(entitatDto.getDir3Codi(), progres);
-//			Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-//
-//			try {
-//
-//				Long ti = System.currentTimeMillis();
-//				progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
-//
-//				EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
-//				int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
-//
-//				List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
-//				List<OrganGestorEntity> organsGestorsModificats = processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-//				eliminarOrgansObsoletsNoUtilitzats(organsGestorsModificats, progres);
-//
-//				Long tf = System.currentTimeMillis();
-//				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.fi.resultat", new Object[] {procedimentsGda.size(), totalElementsCons}));
-//				progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
-//				for (ActualitzacioInfo inf: progres.getInfo()) {
-//					if (inf.getText() != null)
-//						info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
-//				}
-//				progres.setProgres(100);
-//				progres.setFinished(true);
-//
-//				procedimentsAmbOrganNoSincronitzat.put(entitat.getId(), avisosProcedimentsOrgans.size());
-//				actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
-//
-//				integracioHelper.addAccioOk(info);
-//			} catch (Exception e) {
-//				StringWriter sw = new StringWriter();
-//				PrintWriter pw = new PrintWriter(sw);
-//				e.printStackTrace(pw);
-//				progresActualitzacio.get(entitatDto.getDir3Codi()).setError(true);
-//				progresActualitzacio.get(entitatDto.getDir3Codi()).setErrorMsg(sw.toString());
-//				progresActualitzacio.get(entitatDto.getDir3Codi()).setProgres(100);
-//				progresActualitzacio.get(entitatDto.getDir3Codi()).setFinished(true);
-//
-//				for (ActualitzacioInfo inf: progres.getInfo()) {
-//					if (inf.getText() != null)
-//						info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
-//				}
-//				integracioHelper.addAccioError(info, "Error actualitzant procediments: ", e);
-//				throw e;
-//			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
-//	private List<ProcSerDto> obtenirProcediments(EntitatDto entitatDto, ProgresActualitzacioDto progres, int totalElementsCons) {
-//		List<ProcSerDto> procedimentsGda = new ArrayList<>();
-//		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
-//		long startTime = System.nanoTime();
-//
-//		// Loes operacions a tenir en compte per al percentatge contarà els procediments a processar, més les pàgines a obtenir
-//
-//		int elementsUltimaPagina = totalElementsCons % 30 == 0 ? 30 : totalElementsCons % 30;
-//		int pagines = totalElementsCons / 30 + (totalElementsCons % 30 == 0 ? 0 : 1);
-//		progres.setNumOperacions(totalElementsCons + pagines);
-//
-//		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
-//		logger.info(" [PROCEDIMENTS] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
-//		startTime = System.nanoTime();
-//		Long t1 = System.currentTimeMillis();
-//
-//		// Recuperam tots els procediments del Rolsac
-//		int numPagina = 1;
-//		do {
-//			int reintents = 0;
-//			do {
-//				try {
-//					procedimentsGda.addAll(getProcedimentsGdaByEntitat(entitatDto.getDir3Codi(), numPagina));
-//					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.result", new Object[] {procedimentsGda.size()}));
-//					progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(System.currentTimeMillis() - t1)}));
-//					// Si obté la pàgina posam reintents a 0, de manera que la condició sigui fals, i finalitzi del do-while
-//					reintents = 0;
-//				} catch (Exception e) {
-//					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
-//					reintents++;
-//				}
-//			} while (reintents > 0 && reintents < 3);
-//			// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
-//			progres.incrementOperacionsRealitzades();
-//			if (reintents > 0) {
-//				int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
-//				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
-//			}
-//			numPagina++;
-//		} while (numPagina * 30 < totalElementsCons);
-//
-////				// Actualitzem el número d'operacions
-////				progres.setNumOperacions(procedimentsGda.size() + pagines);
-//
-//		elapsedTime = (System.nanoTime() - startTime) / 10e6;
-//		logger.info(" [TIMER-PRO] Obtenció de procediments: " + elapsedTime + " ms");
-//
-//		return procedimentsGda;
-//	}
-//
-//	private List<OrganGestorEntity> processarProcediments(EntitatEntity entitat, List<ProcSerDto> procedimentsGda, ProgresActualitzacioDto progres, Map<String, String[]> avisosProcedimentsOrgans) {
-//
-//		long startTime = System.nanoTime();
-//		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();
-//		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
-//
-//		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
-//		logger.info(" [PROCEDIMENTS] Obtenir organigrama de l'entitat: " + elapsedTime + " ms");
-//
-//		startTime = System.nanoTime();
-//		// Processam els procediments obtinguts
-//		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediments", new Object[] {procedimentsGda.size()}));
-//
-//		boolean modificar = isActualitzacioProcedimentsModificarProperty();
-//
-//		int i = 1;
-//		for (ProcSerDto procedimentGda: procedimentsGda) {
-//			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment", new Object[] {i, procedimentGda.getNom()}));
-//			procedimentHelper.actualitzarProcedimentFromGda(
-//					progres,
-//					procedimentGda,
-//					entitat,
-//					organigramaEntitat,
-//					modificar,
-//					organsGestorsModificats,
-//					avisosProcedimentsOrgans);
-//			progres.addSeparador();
-//			progres.incrementOperacionsRealitzades();
-//			i++;
-//		}
-//
-//		elapsedTime = (System.nanoTime() - startTime) / 10e6;
-//		logger.info(" [TIMER-PRO] Recorregut procediments i actualització: " + elapsedTime + " ms");
-//		return organsGestorsModificats;
-//	}
-//
-//	private void eliminarOrgansObsoletsNoUtilitzats(List<OrganGestorEntity> organsGestorsModificats, ProgresActualitzacioDto progres) {
-//		boolean eliminarOrgans = isActualitzacioProcedimentsEliminarOrgansProperty();
-//		if (eliminarOrgans) {
-//			long startTime = System.nanoTime();
-//			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs"));
-//			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.check"));
-//			if (organsGestorsModificats.isEmpty()) {
-//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.result.no"));
-//			} else {
-//				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.result.si", new Object[] {organsGestorsModificats.size()}));
-//			}
-//
-//			for (OrganGestorEntity organGestorAntic: organsGestorsModificats) {
-//				procedimentHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
-//			}
-//			double elapsedTime = (System.nanoTime() - startTime) / 10e6;
-//			logger.info(" [TIMER-PRO] Eliminar organs: " + elapsedTime + " ms");
-//		} else {
-//			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.organs.inactiu"));
-//		}
-//	}
-//
-//	private void actualitzaAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {
-//		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, PROCEDIMENT_ORGAN_NO_SYNC);
-//		if (avisosSinc != null && !avisosSinc.isEmpty()) {
-//			avisRepository.delete(avisosSinc);
-//		}
-//		addAvisosSyncProcediments(avisosProcedimentsOrgans, entitatId);
-//	}
-//
-//	public void addAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {
-//		if (!avisosProcedimentsOrgans.isEmpty()) {
-//			String missatgeAvis = "";
-//			for(Map.Entry<String, String[]> avisProc: avisosProcedimentsOrgans.entrySet()) {
-//				missatgeAvis += " - Procediment '" + avisProc.getKey() + "': actualment a l'òrgan " + avisProc.getValue()[0] + ", i hauria de pertànyer a l'òrgan " + avisProc.getValue()[1] + " </br>";
-//			}
-//			missatgeAvis += "Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments";
-//			Date ara = new Date();
-//			Calendar calendar = Calendar.getInstance();
-//			calendar.setTime(ara);
-//			calendar.add(Calendar.YEAR, 1);
-//			AvisEntity avis = AvisEntity.getBuilder(
-//					PROCEDIMENT_ORGAN_NO_SYNC,
-//					missatgeAvis,
-//					ara,
-//					calendar.getTime(),
-//					AvisNivellEnumDto.ERROR,
-//					true,
-//					entitatId).build();
-//			avisRepository.save(avis);
-//		}
-//	}
-//
-//	private int getTotalProcediments(String codiDir3) {
-//		logger.debug(">>>> >> Obtenir total procediments Rolsac...");
-//		Long t1 = System.currentTimeMillis();
-//		int totalElements = pluginHelper.getTotalProcediments(codiDir3);
-//		Long t2 = System.currentTimeMillis();
-//		logger.debug(">>>> >> resultat"  + totalElements + " procediments (" + (t2 - t1) + "ms)");
-//		return totalElements;
-//	}
-//
-//	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
-//
-//		ProgresActualitzacioDto progres = progresActualitzacio.get(codiDir3);
-//		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
-//		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
-//		Long t1 = System.currentTimeMillis();
-//		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
-//		Long t2 = System.currentTimeMillis();
-//		logger.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
-//		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
-//		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
-//		return procedimentsEntitat;
-//	}
-//
-//	private boolean isActualitzacioProcedimentsModificarProperty() {
-//		try {
-//			return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
-//		} catch (Exception e) {
-//			return true;
-//		}
-//	}
-//
-//	private boolean isActualitzacioProcedimentsEliminarOrgansProperty() {
-//		try {
-//			return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
-//		} catch (Exception e) {
-//			return false;
-//		}
-//	}
 
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String dir3Codi) {

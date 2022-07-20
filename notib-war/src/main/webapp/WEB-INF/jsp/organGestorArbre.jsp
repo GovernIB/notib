@@ -95,6 +95,10 @@
                 });
             });
         </script>
+        <style>
+            #detall .container-custom {width: 100%;}
+            #detall .container-foot {display: none;}
+        </style>
     </head>
     <body>
         <c:set var="formActionFiltre"><not:modalUrl value="/organgestorArbre"/></c:set>
@@ -149,11 +153,21 @@
                            fullesAtributPare="codi"  fullesIcona="fa fa-inbox fa-lg" changedCallback="changedCallback" isArbreSeleccionable="${true}"
                            isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"/>
             </div>
-            <div id="detall" class="col-md-7">
+            <div class="col-md-7">
+                <div style="padding-bottom: 10px; text-align: right">
+                    <a id="organ-boto-update"
+                            class="btn btn-default" href="organgestor/sync/dir3"
+                            data-toggle="modal"
+                            data-maximized="false">
+                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
+                    </a>
+                </div>
+                <div id="detall">
 
-            </div>
-            <div class="col-md-7 datatable-dades-carregant" style="display: none; text-align: center; margin-top: 100px;">
-                <span class="fa fa-circle-o-notch fa-spin fa-3x"></span>
+                </div>
+                <div class="datatable-dades-carregant" style="display: none; text-align: center; margin-top: 100px;">
+                    <span class="fa fa-circle-o-notch fa-spin fa-3x"></span>
+                </div>
             </div>
         </div>
     </body>
