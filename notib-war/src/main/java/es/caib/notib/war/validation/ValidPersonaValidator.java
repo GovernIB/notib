@@ -101,6 +101,16 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 							.addNode("llinatge1")
 							.addConstraintViolation();
 				}
+				String llinatge1 = persona.getLlinatge1();
+				String llinatge2 = persona.getLlinatge2();
+				int llinatge1Size = llinatge1.length();
+				int llinatge2Size = llinatge2 != null ? llinatge2.length() : 0;
+				if ((llinatge1Size + llinatge2Size) < MIN_SIZE_LLINATGES) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale))
+							.addNode("llinatge1").addConstraintViolation();
+				}
 //				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
 //					valid = false;
 //					context.buildConstraintViolationWithTemplate(
