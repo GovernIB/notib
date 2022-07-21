@@ -100,7 +100,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 		logger.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-
+		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getDir3Codi() : null);
 		notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 		if (!NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			logger.error(" [NOT] la notificació no té l'estat REGISTRADA.");
@@ -190,7 +190,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 												new AccioParam("Identificador de l'enviament", String.valueOf(enviament.getId())));
 
 		logger.info(" [EST] Inici actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-
+		info.setCodiEntitat(enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null ?  enviament.getNotificacio().getEntitat().getDir3Codi() : null);
 		long startTime;
 		double elapsedTime;
 		try {

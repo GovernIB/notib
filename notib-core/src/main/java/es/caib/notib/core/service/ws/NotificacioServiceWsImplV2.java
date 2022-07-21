@@ -169,6 +169,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			
 			// Obtenir dades bàsiques per a la notificació
 			String emisorDir3Codi = notificacio.getEmisorDir3Codi();
+			info.setCodiEntitat(emisorDir3Codi);
 			logger.debug(">> [ALTA] emisorDir3Codi: " + emisorDir3Codi);
 			
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
@@ -489,6 +490,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
+				info.setCodiEntitat(permisConsulta.getCodiDir3Entitat());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
 				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
 
@@ -553,6 +555,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 //			Long notificacioId;
 			RespostaConsultaEstatNotificacioV2 resposta = new RespostaConsultaEstatNotificacioV2();
 			resposta.setIdentificador(identificador);
+			info.setCodiEntitat(resposta.getEmisorDir3());
 	
 			try {
 				NotificacioEntity notificacio = null;
@@ -702,6 +705,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 			logger.debug("Consultant estat enviament amb referencia: " + referencia);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
+			info.setCodiEntitat(enviament.getNotificacio().getEntitat().getDir3Codi());
 			try {
 				if (enviament == null) {
 					resposta.setError(true);
@@ -710,6 +714,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					integracioHelper.addAplicacioAccioParam(info, null);
 					integracioHelper.addAccioError(info, "No existeix cap enviament amb l'identificador especificat");
 					return resposta;
+				}
+				if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
+					info.setCodiEntitat(enviament.getNotificacio().getEntitat().getDir3Codi());
 				}
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				//Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
@@ -881,7 +888,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					"Consulta de les dades de registre", 
 					IntegracioAccioTipusEnumDto.RECEPCIO, 
 					new AccioParam("Dades de la consulta", json));
-			
+
 			RespostaConsultaDadesRegistreV2 resposta = new RespostaConsultaDadesRegistreV2();
 			String numeroRegistreFormatat = null;
 			String codiDir3Entitat = null;
@@ -920,7 +927,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = notificacio.getRegistreNumeroFormatat();
 				codiDir3Entitat = notificacio.getEmisorDir3Codi();
-
+				info.setCodiEntitat(notificacio.getEmisorDir3Codi());
 				if (numeroRegistreFormatat == null) {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
@@ -970,6 +977,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = enviament.getRegistreNumeroFormatat();
 				codiDir3Entitat = enviament.getNotificacio().getEmisorDir3Codi();
+				info.setCodiEntitat(codiDir3Entitat);
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				if (numeroRegistreFormatat == null) {
 					resposta.setError(true);
@@ -1060,6 +1068,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
 						ex);
 			}
+			info.setCodiEntitat(notificacio.getEntitat().getDir3Codi());
 			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() < 100) {
@@ -1130,6 +1139,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
 			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
+			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getDir3Codi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 			resposta.setErrorData(new Date());

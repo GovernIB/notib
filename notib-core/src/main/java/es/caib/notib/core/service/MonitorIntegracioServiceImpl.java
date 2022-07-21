@@ -64,7 +64,13 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
-			return integracioHelper.findAccions(codi, filtre);
+			List<IntegracioAccioDto> accions = integracioHelper.findAccions(codi, filtre);
+			int index = 0;
+			for (IntegracioAccioDto accio : accions) {
+				accio.setIndex(Long.valueOf(index));
+				index++;
+			}
+			return accions;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

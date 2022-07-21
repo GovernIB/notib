@@ -87,6 +87,7 @@ public class CallbackHelper {
 				new AccioParam("Callback", aplicacio.getCallbackUrl())
 		);
 		info.setAplicacio(aplicacio != null ? aplicacio.getUsuariCodi() : "Sense aplicació");
+		info.setCodiEntitat(notificacio.getEntitat() != null ? notificacio.getEntitat().getDir3Codi() : null);
 		int intents = event.getCallbackIntents() + 1;
 		log.info(String.format("[Callback] Intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]",
 				intents, event.getId(), notificacio.getId()));
