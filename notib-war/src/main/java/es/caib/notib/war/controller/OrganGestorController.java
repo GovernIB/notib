@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.PrediccioSincronitzacio;
@@ -12,6 +13,8 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.core.service.ProcedimentServiceImpl;
+import es.caib.notib.core.service.ServeiServiceImpl;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -166,21 +169,6 @@ public class OrganGestorController extends BaseUserController{
 		}
 	}
 	
-//	@RequestMapping(value = "/{organGestorCodi}/update", method = RequestMethod.GET)
-//	public String updateNom(HttpServletRequest request, @PathVariable String organGestorCodi) {
-//
-//		String redirect = "redirect:../../organgestor";
-//		redirect += request.getHeader("Referer").contains("Arbre") ? "Arbre" : "";
-//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//		try {
-//			organGestorService.updateOne(entitat.getId(), organGestorCodi);
-//			return getAjaxControllerReturnValueSuccess(request, redirect, "organgestor.controller.update.nom.ok");
-//		} catch (Exception e) {
-//			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
-//			return getAjaxControllerReturnValueError(request, redirect, "organgestor.controller.update.nom.error");
-//		}
-//	}
-//
 //	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
 //	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
 //
@@ -189,14 +177,46 @@ public class OrganGestorController extends BaseUserController{
 //		return "organGestorActualitzacioForm";
 //	}
 
-//	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
-//	@ResponseBody
-//	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
-//
-//		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//		return organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
-//	}
-//
+	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ProgresActualitzacioDto progresActualitzacio = organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
+
+
+		if (progresActualitzacio == null) {
+//			logger.error("No s'ha trobat el progres actualització d'organs gestors per a l'entitat {}", entitat.getDir3Codi());
+			return new ProgresActualitzacioDto();
+		}
+
+		if (progresActualitzacio.getFase() == 2) {
+			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
+			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
+				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 18 / 100));
+				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
+				progresAcumulat.getInfo().addAll(progresProc.getInfo());
+//				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
+				return progresAcumulat;
+			}
+		}
+		if (progresActualitzacio.getFase() == 3) {
+			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
+			if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
+				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+				progresAcumulat.setProgres(45 + (progresSer.getProgres() * 18 / 100));
+				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
+				progresAcumulat.getInfo().addAll(progresSer.getInfo());
+//				logger.info("Progres actualització organs gestors fase 3: {}", progresAcumulat.getProgres());
+				return progresAcumulat;
+			}
+		}
+
+//		logger.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
+		return progresActualitzacio;
+	}
+
 //	@RequestMapping(value = "/update", method = RequestMethod.POST)
 //	public String updateNoms(HttpServletRequest request, Model model) {
 //
@@ -237,6 +257,8 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
+
+			model.addAttribute("isUpdatingOrgans", organGestorService.isUpdatingOrgans(entitat));
 
 		} catch (Exception e) {
 			logger.error("Error al obtenir la predicció de la sincronitzacio", e);

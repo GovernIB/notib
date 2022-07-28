@@ -94,7 +94,7 @@ public class ProcSerSyncHelper {
 
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			List<OrganGestorEntity> organsGestorsModificats = processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
+//			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
@@ -348,7 +348,7 @@ public class ProcSerSyncHelper {
 
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
 			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
-			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
+//			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
@@ -417,11 +417,11 @@ public class ProcSerSyncHelper {
 				}
 			} while (reintents > 0 && reintents < 3);
 			// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
-			progres.incrementOperacionsRealitzades();
-			if (reintents > 0) {
-				int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
-				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
-			}
+			int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
+			progres.incrementOperacionsRealitzades(elementsPagina);
+//			if (reintents > 0) {
+//				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
+//			}
 			numPagina++;
 		} while (numPagina * 30 < totalElementsCons);
 

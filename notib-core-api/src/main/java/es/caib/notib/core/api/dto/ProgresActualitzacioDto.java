@@ -21,6 +21,7 @@ public class ProgresActualitzacioDto {
 		ERROR
 	}
 
+	int fase = 0;
 	Integer progres = 0;
 	Integer numOperacions;
 	Integer numOperacionsRealitzades = 0;

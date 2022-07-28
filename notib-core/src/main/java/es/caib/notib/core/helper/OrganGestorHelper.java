@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.TipusTransicioEnumDto;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.AvisEntity;
@@ -22,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,6 +60,8 @@ public class OrganGestorHelper {
 	private PermisosCacheable permisosCacheable;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Resource
+	private MessageHelper messageHelper;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
@@ -248,22 +252,35 @@ public class OrganGestorHelper {
 								   List<OrganGestorEntity> obsoleteUnitats,
 								   List<OrganGestorEntity> organsDividits,
 								   List<OrganGestorEntity> organsFusionats,
-								   List<OrganGestorEntity> organsSubstituits) {
+								   List<OrganGestorEntity> organsSubstituits,
+								   ProgresActualitzacioDto progres) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 
+		int nombreUnitatsTotal = unitatsWs.size();
+		int nombreUnitatsProcessades = 0;
 		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
 		for (NodeDir3 unitatWS: unitatsWs) {
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.unitat", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
 			sincronizarUnitat(unitatWS, entitat);
+			progres.setProgres(2 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 		}
+		progres.setProgres(12);
 
 		// Històrics
-		for (NodeDir3 unidadWS : unitatsWs) {
-			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unidadWS.getCodi());
-			sincronizarHistoricsUnitat(unitat, unidadWS, entitat);
+		nombreUnitatsProcessades = 0;
+		for (NodeDir3 unitatWS : unitatsWs) {
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.historic", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
+			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
+			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
+			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 		}
+		progres.setProgres(22);
 		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
 		// Definint tipus de transició
+		nombreUnitatsProcessades = 0;
+		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.definir.transicio", new Object[] {obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom()}));
 			if (obsoleteUnitat.getNous() == null || obsoleteUnitat.getNous().isEmpty()) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
 			} else if (obsoleteUnitat.getNous().size() > 1) {
@@ -280,7 +297,9 @@ public class OrganGestorHelper {
 					}
 				}
 			}
+			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
+		progres.setProgres(27);
 
 		Date ara = new Date();
 		// Si és la primera sincronització
@@ -332,11 +351,19 @@ public class OrganGestorHelper {
 	}
 
 	@Transactional
-	public void deleteExtingitsNoUtilitzats(List<OrganGestorEntity> obsoleteUnitats) {
+	public void deleteExtingitsNoUtilitzats(List<OrganGestorEntity> obsoleteUnitats, ProgresActualitzacioDto progres) {
 		// Eliminar organs no vigents no utilitzats??
+		int nombreUnitatsTotal = obsoleteUnitats.size();
+		int nombreUnitatsProcessades = 0;
+
 		Iterator<OrganGestorEntity> it = obsoleteUnitats.iterator();
 		while (it.hasNext()) {
+
 			OrganGestorEntity organObsolet = it.next();
+
+			progres.setProgres(81 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.check", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
+
 			Integer nombreProcediments = procSerOrganRepository.countByOrganGestor(organObsolet);
 			if (nombreProcediments > 0)
 				continue;
@@ -346,8 +373,10 @@ public class OrganGestorHelper {
 			try {
 				permisosHelper.eliminarPermisosOrgan(organObsolet);
 				organGestorRepository.delete(organObsolet);
+				progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.borrat", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
 			} catch (Exception ex) {
 				logger.error("No ha estat possible esborrar l'òrgan gestor.", ex);
+				progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.error", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
 			}
 		}
 	}

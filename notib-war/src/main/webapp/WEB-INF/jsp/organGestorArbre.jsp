@@ -158,6 +158,7 @@
                     <a id="organ-boto-update"
                             class="btn btn-default" href="organgestor/sync/dir3"
                             data-toggle="modal"
+                            data-refresh-pagina="true"
                             data-maximized="false">
                             <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
                     </a>

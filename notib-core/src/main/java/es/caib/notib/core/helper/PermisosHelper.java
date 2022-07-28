@@ -5,6 +5,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.acl.AclClassEntity;
@@ -68,6 +69,8 @@ public class PermisosHelper {
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
 	@Autowired
 	private AclCache aclCache;
+	@Resource
+	private MessageHelper messageHelper;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -847,14 +850,21 @@ public class PermisosHelper {
 			List<NodeDir3> unitatsWs,
 			List<OrganGestorEntity> organsDividits,
 			List<OrganGestorEntity> organsFusionats,
-			List<OrganGestorEntity> organsSubstituits) {
+			List<OrganGestorEntity> organsSubstituits,
+			ProgresActualitzacioDto progres) {
 
 		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.notib.core.entity.OrganGestorEntity");
 
 		List<String> organsFusionatsProcessats = new ArrayList<>();
 
+		int nombreUnitatsTotal = unitatsWs.size();
+		int nombreUnitatsProcessades = 0;
+
 		// Actualitzam permisos en l'ordre en que ens arriben del Dir3
 		for(NodeDir3 unitat: unitatsWs) {
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.permisos.unitat", new Object[] {unitat.getCodi()}));
+			progres.setProgres(63 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
 
 			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
@@ -880,25 +890,6 @@ public class PermisosHelper {
 				duplicaPermisos(classname, organOrigen, organDesti);
 				continue;
 			}
-
-//			for (OrganGestorEntity organDividit : organsDividits) {
-//				for (OrganGestorEntity nou : organDividit.getNous()) {
-//					duplicaPermisos(classname, organDividit, nou);
-//				}
-//			}
-
-//			Set<OrganGestorEntity> organsFusio = new HashSet<>();
-//			for (OrganGestorEntity organFusionat : organsFusionats) {
-//				organsFusio.add(organFusionat.getNous().get(0));
-//			}
-//			for (OrganGestorEntity organFusio : organsFusio) {
-//				duplicaPermisos(classname, organFusio);
-//			}
-
-//			for (OrganGestorEntity organSubstituit : organsSubstituits) {
-//				OrganGestorEntity organNou = organSubstituit.getNous().get(0);
-//				duplicaPermisos(classname, organSubstituit, organNou);
-//			}
 		}
 	}
 

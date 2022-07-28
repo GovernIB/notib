@@ -923,12 +923,14 @@ public class PluginHelper {
 				integracioHelper.addAccioOk(info);
 				return unitatsOrganitzatives;
 			} else {
-				String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
+				String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
 				integracioHelper.addAccioError(info, errorMissatge);
 				throw new SistemaExternException(
 						IntegracioHelper.INTCODI_UNITATS,
 						errorMissatge);
 			}
+		} catch (SistemaExternException sex) {
+			throw sex;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
