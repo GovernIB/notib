@@ -132,9 +132,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
-
 
 	@Transactional
 	@Override
@@ -171,8 +172,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 			info.setCodiEntitat(emisorDir3Codi);
 			logger.debug(">> [ALTA] emisorDir3Codi: " + emisorDir3Codi);
-			
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
+			if (entitat != null) {
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+			}
 			logger.debug(">> [ALTA] entitat: " + (entitat == null ? "null": (entitat.getCodi() + " - " + entitat.getNom())));
 			
 			String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -490,6 +493,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
 				info.setCodiEntitat(permisConsulta.getCodiDir3Entitat());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
 				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
@@ -586,6 +590,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					return resposta;
 				}
 
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				switch (notificacio.getEstat()) {
 				case PENDENT:
@@ -718,6 +723,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 					info.setCodiEntitat(enviament.getNotificacio().getEntitat().getDir3Codi());
 				}
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(enviament.getNotificacio().getEntitat(), EntitatDto.class));
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				//Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
 				// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
@@ -923,6 +929,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = notificacio.getRegistreNumeroFormatat();
@@ -1068,6 +1075,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
 						ex);
 			}
+			ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
 			info.setCodiEntitat(notificacio.getEntitat().getDir3Codi());
 			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
