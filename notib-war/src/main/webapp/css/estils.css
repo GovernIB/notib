@@ -333,11 +333,6 @@ table.dataTable tr.datatable-dades-carregant div {
 	width:100% !important;
 }
 
-.entitat-no-configurada {
-	background: pink;
-	outline: 3px solid pink;
-}
-
 .padding-bottom-4 {
 	padding-bottom: 4px;
 }

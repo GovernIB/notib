@@ -115,10 +115,10 @@ public class EmailNotificacioHelperTest {
 	@Before
 	public void setUp() {
 		Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.email.remitent"))).thenReturn("email_test@limit.es");
-		Mockito.when(configHelper.getConfigKeyByEntitat(Mockito.eq("es.caib.notib.email.footer"))).thenReturn(" Notib - Govern de les Illes Balears");
+		Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.email.footer"))).thenReturn(" Notib - Govern de les Illes Balears");
 		Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.app.base.url"))).thenReturn("http://localhost:8080/notib");
-		Mockito.when(configHelper.getConfigKeyByEntitat(Mockito.eq("es.caib.notib.justificant.capsalera.logo"))).thenReturn(null);
-		Mockito.when(configHelper.getConfigKeyByEntitat(Mockito.eq("es.caib.notib.justificant.peu.logo"))).thenReturn(null);
+		Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.justificant.capsalera.logo"))).thenReturn(null);
+		Mockito.when(configHelper.getConfig(Mockito.eq("es.caib.notib.justificant.peu.logo"))).thenReturn(null);
 
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.titol"))).thenReturn("Notificació notib");
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.titol"))).thenReturn("Canvi estat a la notificació: ");

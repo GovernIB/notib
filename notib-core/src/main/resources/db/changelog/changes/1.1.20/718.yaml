@@ -6,5 +6,5 @@ databaseChangeLog:
         - sql:
             sql: "
             INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (8, 'SCHEDULLED', 'SCHEDULLED_SERVEIS', 'Tasca periòdica d''actualització dels serveis' );
-            INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.actualitzacio.serveis.actiu', 'true', 'Indica si la tasca periòdica està activa (true/false)', 'SCHEDULLED_SERVEIS', 0, 0, 'BOOL', 1);
-            INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.actualitzacio.serveis.cron', '0 0 0 * * ?', 'Especificar l''expressió ''cron'' indicant la freqüencia en que s''han d''actualitzar els serveis', 'SCHEDULLED_SERVEIS', 1, 0, 'CRON', 1);"
+            INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.actualitzacio.serveis.actiu', 'true', 'Indica si la tasca periòdica està activa (true/false)', 'SCHEDULLED_SERVEIS', 0, 0, 'BOOL', 0);
+            INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.actualitzacio.serveis.cron', '0 0 0 * * ?', 'Especificar l''expressió ''cron'' indicant la freqüencia en que s''han d''actualitzar els serveis', 'SCHEDULLED_SERVEIS', 1, 0, 'CRON', 0);"

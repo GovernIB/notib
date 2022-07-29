@@ -49,7 +49,6 @@
 		$('#missatges-integracions').on('click', '.integracio-details', function () {
 			let index = $(this).data('index');
 			let details = data[index];
-			console.log(details);
 			$('#integracio-data').html(formate_date(details.data, 'datetime'));
 			$('#integracio-descripcio').html(details.descripcio);
 			$('#integracio-tipus').html(details.tipus);

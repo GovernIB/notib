@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(	name = "NOT_CONFIG")
 @NoArgsConstructor

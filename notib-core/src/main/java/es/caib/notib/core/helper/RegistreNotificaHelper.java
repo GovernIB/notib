@@ -272,7 +272,7 @@ public class RegistreNotificaHelper {
 	}
 
 	private boolean isSirActivat() {
-		return configHelper.getAsBooleanByEntitat("es.caib.notib.emprar.sir");
+		return configHelper.getAsBoolean("es.caib.notib.emprar.sir");
 	}
 
 	/**

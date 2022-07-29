@@ -272,14 +272,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyGetByEntitat(String property, String defaultValue) {
 
-		String value = configHelper.getConfigKeyByEntitat(property);
+		String value = configHelper.getConfig(property);
 		return Strings.isNullOrEmpty(value) ? defaultValue : value;
 	}
 
 	@Override
 	public String propertyGetByEntitat(String property) {
 
-		return configHelper.getConfigKeyByEntitat(property);
+		return configHelper.getConfig(property);
 	}
 
 	@Override

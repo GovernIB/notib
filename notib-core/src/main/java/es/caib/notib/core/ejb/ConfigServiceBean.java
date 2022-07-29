@@ -57,6 +57,12 @@ public class ConfigServiceBean implements ConfigService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void actualitzarPropietatsJBossBdd() {
+		delegate.actualitzarPropietatsJBossBdd();
+	}
+
+	@Override
 	public String getPropertyValue(String key) {
 		return delegate.getPropertyValue(key);
 	}

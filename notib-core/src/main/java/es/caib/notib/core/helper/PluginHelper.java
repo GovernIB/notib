@@ -1783,8 +1783,8 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			return dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(Properties.class)
-					.newInstance(configHelper.getAllEntityProperties(null));
+			dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(null));
+			return dadesUsuariPlugin;
 		} catch (Exception ex) {
 			logger.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_USUARIS, "Error al crear la instància del plugin de dades d'usuari", ex);
@@ -1803,6 +1803,9 @@ public class PluginHelper {
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		GestioDocumentalPlugin plugin = gestioDocumentalPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1827,6 +1830,10 @@ public class PluginHelper {
 	}
 
 	private RegistrePlugin getRegistrePlugin(String codiEntitat) {
+
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 
 		RegistrePlugin plugin = registrePlugin.get(codiEntitat);
 		if (plugin != null) {
@@ -1854,6 +1861,10 @@ public class PluginHelper {
 	private IArxiuPlugin getArxiuPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
 		IArxiuPlugin plugin = arxiuPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1880,6 +1891,13 @@ public class PluginHelper {
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		UnitatsOrganitzativesPlugin plugin = unitatsOrganitzativesPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1906,6 +1924,10 @@ public class PluginHelper {
 	private GestorContingutsAdministratiuPlugin getGestorDocumentalAdministratiuPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
 		GestorContingutsAdministratiuPlugin plugin = gestorDocumentalAdministratiuPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1932,6 +1954,10 @@ public class PluginHelper {
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
 
 		String codiEntitat = getCodiEntitatActual();
+		if (Strings.isNullOrEmpty(codiEntitat)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+
 		FirmaServidorPlugin plugin = firmaServidorPlugin.get(codiEntitat);
 		if (plugin != null) {
 			return plugin;
@@ -1997,28 +2023,28 @@ public class PluginHelper {
 	// PROPIETATS PLUGIN
 
 	private String getPropertyPluginUnitats() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.unitats.class");
+		return configHelper.getConfig("es.caib.notib.plugin.unitats.class");
 	}
 	private String getPropertyPluginDadesUsuari() {
 		return configHelper.getConfig("es.caib.notib.plugin.dades.usuari.class");
 	}
 	private String getPropertyPluginGestioDocumental() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.gesdoc.class");
+		return configHelper.getConfig("es.caib.notib.plugin.gesdoc.class");
 	}
 	private String getPropertyPluginRegistre() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.registre.class");
+		return configHelper.getConfig("es.caib.notib.plugin.registre.class");
 	}
 	private String getPropertyPluginArxiu() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.arxiu.class");
+		return configHelper.getConfig("es.caib.notib.plugin.arxiu.class");
 	}
 	private String getPropertyPluginGestorDocumentalAdministratu() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.gesconadm.class");
+		return configHelper.getConfig("es.caib.notib.plugin.gesconadm.class");
 	}
 	private String getPropertyPluginFirmaServidor() {
-		return configHelper.getConfigKeyByEntitat("es.caib.notib.plugin.firmaservidor.class");
+		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
-		return configHelper.getAsIntByEntitat("es.caib.notib.plugin.registre.segons.entre.peticions");
+		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
 	}
 	public String getOrganGestorsFile() {
 		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
@@ -2111,7 +2137,7 @@ public class PluginHelper {
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
-		return configHelper.getAsBooleanByEntitat("es.caib.notib.documents.metadades.from.arxiu");
+		return configHelper.getAsBoolean("es.caib.notib.documents.metadades.from.arxiu");
 	}
 
 	private static boolean isDocumentEstranger(String nie) {

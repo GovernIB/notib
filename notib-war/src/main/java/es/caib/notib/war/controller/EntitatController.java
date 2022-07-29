@@ -135,7 +135,6 @@ public class EntitatController extends BaseController {
 
 	private void fillFormsModel(ConfigGroupDto cGroup, Model model, String entiatCodi){
 
-		String key = null;
 		List<ConfigDto> confs = new ArrayList<>();
 		for (ConfigDto config: cGroup.getConfigs()) {
 			if (Strings.isNullOrEmpty(config.getEntitatCodi()) || !config.getEntitatCodi().equals(entiatCodi)) {

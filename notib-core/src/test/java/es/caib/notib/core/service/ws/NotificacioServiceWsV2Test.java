@@ -149,13 +149,11 @@ public class NotificacioServiceWsV2Test {
 	
 	@Before
 	public void setUp() {
-
-//		MockitoAnnotations.initMocks(this);
-		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getAsIntByEntitat(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
 //		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
-		Mockito.when(configHelper.getAsBooleanByEntitat(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
+		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
 		Mockito.when(auth.getName()).thenReturn("mockedName");
 		Mockito.when(messageHelper.getMessage("error.validacio.nom.titular.longitud.max")).thenReturn("error.validacio.nom.titular.longitud.max");
 		Mockito.when(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max")).thenReturn("error.validacio.llinatge1.titular.longitud.max");
@@ -198,8 +196,8 @@ public class NotificacioServiceWsV2Test {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
 				false,
 				null, // organGestor

@@ -863,14 +863,15 @@
 				});
 			}
 
-			var organ = $(this).val();
+			let organ = $(this).val();
 			if (organ == undefined || organ == "") {
 				organ = "-";
 			}
-			if (num_organs > 0) {
+
+			// if (num_organs > 0) {
 				loadProcediments(organ);
 				loadServeis(organ, '${notificacioCommand.tipusProcSer}' == 'PROCEDIMENT' );
-			}
+			// }
 
 		});
 		$('#procedimentId').on('change', function() {
@@ -1206,6 +1207,7 @@
 	}
 
 	function loadServeis(organ, carregaInicial) {
+		console.log("loadServeis");
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value="/notificacio/organ/"/>" + organ + "/serveis",

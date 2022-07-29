@@ -30,8 +30,6 @@ public class ConfigHelper {
     @Autowired
     private ConfigGroupRepository configGroupRepository;
 
-    public static final String prefix = "es.caib.notib";
-
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
 
     public static ThreadLocal<EntitatDto> getEntitat() {
@@ -46,12 +44,6 @@ public class ConfigHelper {
     public String getEntitatActualCodi() {
 
         return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
-    }
-
-    @Transactional(readOnly = true)
-    public String getConfigKeyByEntitat(String property) {
-
-        return entitat == null || entitat.get() == null ? getConfig(property) : getConfigKeyByEntitat(entitat.get().getCodi(), property);
     }
 
     @Transactional(readOnly = true)
@@ -74,12 +66,28 @@ public class ConfigHelper {
     }
 
     @Transactional(readOnly = true)
-    public String getConfig(String key) throws NotDefinedConfigException {
-        ConfigEntity configEntity = configRepository.findOne(key);
+    public String getConfig(String keyGeneral)  {
+
+        String entitatCodi  = getEntitatActualCodi();
+        String value = null;
+        ConfigEntity configEntity = configRepository.findOne(keyGeneral);
         if (configEntity == null) {
-            throw new NotDefinedConfigException(key);
+            return getJBossProperty(keyGeneral);
         }
-        return getConfig(configEntity);
+        // Propietat trobada en db
+        if (configEntity.isConfigurable() && !Strings.isNullOrEmpty(entitatCodi)) {
+            // Propietat a nivell d'entitat
+            String keyEntitat = crearEntitatKey(entitatCodi, keyGeneral);
+            ConfigEntity configEntitatEntity = configRepository.findOne(keyEntitat);
+            if (configEntitatEntity != null) {
+                value = getConfig(configEntitatEntity);
+            }
+        }
+        if (value == null) {
+            // Propietat global
+            value = getConfig(configEntity);
+        }
+        return value;
     }
 
     @Transactional(readOnly = true)
@@ -105,23 +113,8 @@ public class ConfigHelper {
         }
     }
 
-    public boolean getAsBooleanByEntitat(String key) {
-        return Boolean.parseBoolean(getConfigKeyByEntitat(key));
-    }
-
     public boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(getConfig(key));
-    }
-
-    public int getAsIntByEntitat(String key) {
-        return new Integer(getConfigKeyByEntitat(key));
-    }
-    public int getAsIntByEntitat(String key, Integer defaultValue) {
-        String propertyValue = getConfigKeyByEntitat(key);
-        if (StringUtils.isEmpty(propertyValue)) {
-            return defaultValue;
-        }
-        return new Integer(getConfigKeyByEntitat(key));
     }
 
     public int getAsInt(String key) {
@@ -129,7 +122,7 @@ public class ConfigHelper {
     }
 
     public long getAsLongByEntitat(String key) {
-        return new Long(getConfigKeyByEntitat(key));
+        return new Long(getConfig(key));
     }
 
     public long getAsLong(String key) {
@@ -311,9 +304,16 @@ public class ConfigHelper {
     public String crearEntitatKey(String entitatCodi, String key) {
 
         if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
-            return null;
+            String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
+            log.error(msg);
+            throw new RuntimeException(msg);
         }
-        String [] split = key.split(prefix);
-        return (prefix + "." + entitatCodi + split[1]);
+        String [] split = key.split(ConfigDto.prefix);
+        if (split == null) {
+            String msg = "Format no reconegut per la key: " + key;
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+        return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + split[1]);
     }
 }

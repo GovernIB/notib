@@ -49,24 +49,26 @@
 		$("#canviarVistaOrganGestor").click(function(){
 			window.location.replace("/notib/organgestorArbre");
 		});
-		
-		var $estatRadioButton = $('input[type=radio][name=estat]');
-		$estatRadioButton.on('change', function() {
-			// if ($(this).is(':checked')) {
-			// 	$estatRadioButton.parent().removeClass('active');
-			// 	$(this).parent().addClass('active');
-			// } else {
-			// 	$(this).parent().removeClass('active');
-			// }
+
+		$("#obsolet").on("click", x => {
+			$("#vigent").removeClass("active");
+			if ($(x).hasClass("active")) {
+				$(x).removeClass("active");
+			}
 			$('#btnFiltrar').click();
 		});
+
+		$("#vigent").on("click", x => {
+			$("#obsolet").removeClass("active");
+			if ($(x).hasClass("active")) {
+				$(x).removeClass("active");
+			}
+			$('#btnFiltrar').click();
+		});
+
+		$("#estat").on("change", () => $('#btnFiltrar').click());
 	});
 	</script>
-	<style type="text/css">
-		.filtreEstat > label {
-			width: 47%;
-		}
-</style>
 </head>
 <body>
 	<div id="botoVistes" class="row">
@@ -85,13 +87,10 @@
 				<not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
 								 optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
 			</div>
-			<div class="col-md-2 filtreEstat">
+			<div class="col-md-2">
 <%--				<not:inputRadio name="estat" botons="true" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" />--%>
-				<div class="btn-group" data-toggle="buttons">
-					<label class="btn btn-default active"><input type="radio" name="estat" id="T" value="" autocomplete="off" checked></span> Tots</label>
-					<label class="btn btn-default"><input type="radio" name="estat" id="V" value="V" autocomplete="off"><span class="fa fa-fire"></span> Vigents</label>
-					<label class="btn btn-default"><input type="radio" name="estat" id="E" value="E" autocomplete="off"><span class="fa fa-snowflake-o"></span>  Obsolets</label>
-				</div>
+				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+								 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
 			</div>
 			<c:if test="${setOficina}">
 				<div class="col-md-3">
