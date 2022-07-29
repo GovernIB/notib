@@ -87,12 +87,20 @@ public class NifHelper {
         int sumaTotal;
 
         for (int i = 1; i < str.length(); i += 2) {
-            int aux = Integer.parseInt("" + str.charAt(i));
-            sumaPar += aux;
+            try {
+                int aux = Integer.parseInt("" + str.charAt(i));
+                sumaPar += aux;
+            } catch (Exception ex) {
+                return "";
+            }
         }
 
         for (int i = 0; i < str.length(); i += 2) {
-            sumaImpar += posicioSenar("" + str.charAt(i));
+            try {
+                sumaImpar += posicioSenar("" + str.charAt(i));
+            } catch (Exception Ex) {
+                return "";
+            }
         }
 
         sumaTotal = sumaPar + sumaImpar;
