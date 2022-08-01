@@ -7,6 +7,7 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.test.data.ConfigTest;
@@ -50,6 +51,10 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
     EntitatDto entitatCreate;
     ProcSerDto procedimentCreate;
     OrganGestorDto organGestorCreate;
+
+    @Autowired
+    private ConfigHelper configHelper;
+
 
     @Before
     public void setUp() throws SistemaExternException, IOException, DecoderException, RegistrePluginException {
@@ -105,6 +110,10 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         permisosProcediment.add(permisNotificacio);
 
         procedimentCreate.setPermisos(permisosProcediment);
+
+        EntitatDto entitat = new EntitatDto();
+        entitat.setCodi("test");
+        ConfigHelper.setEntitat(entitat);
 
         System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
     }

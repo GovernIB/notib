@@ -128,4 +128,4 @@ databaseChangeLog:
                   value: TEXT
         - sql:
             dbms: oracle
-            sql: grant select, update, insert, delete on not_og_sinc_rel to www_ripea;
+            sql: grant select, update, insert, delete on not_og_sinc_rel to www_notib;

@@ -327,7 +327,7 @@ public class NotificacioServiceWsV2Test {
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", "nom", null, "dir3Codi", "dir3CodiReg", "apiKey", false, null, null, "colorFons", "colorLletra", null, "oficina", "nomOficinaVirtual", false, "llibre", "llibreNom", false).build();
 		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		ProcedimentEntity procediment = ProcedimentEntity.getBuilder("", "", configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.retard"), configHelper.getAsIntByEntitat("es.caib.notib.procediment.alta.auto.caducitat"), entitatMock, false, null, /* organGestor*/ null, null, null, null, false, false).build();
+		ProcedimentEntity procediment = ProcedimentEntity.getBuilder("", "", configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"), configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"), entitatMock, false, null, /* organGestor*/ null, null, null, null, false, false).build();
 
 		List<GrupDto> grups = new ArrayList<GrupDto>();
 		GrupDto grupDto = new GrupDto();
