@@ -120,7 +120,11 @@ public class OrganGestorSyncHelperIT {
     @Test
     public void whenOrganGestorSync() throws Exception {
         authenticationTest.autenticarUsuari("admin");
-        List<OrganGestorEntity>[] result = (List<OrganGestorEntity>[])organGestorService.syncDir3OrgansGestors(1L);
+        EntitatDto entitatDto = new EntitatDto();
+        entitatDto.setCodi("ENTITAT_TESTS");
+        entitatDto.setDir3Codi("EA0004518");
+        entitatDto.setId(1L);
+        List<OrganGestorEntity>[] result = (List<OrganGestorEntity>[])organGestorService.syncDir3OrgansGestors(entitatDto);
         Assert.assertNotNull(result);
         Assert.assertEquals(4, result.length);
 

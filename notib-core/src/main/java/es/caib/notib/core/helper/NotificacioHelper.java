@@ -24,6 +24,7 @@ import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
@@ -66,6 +67,9 @@ public class NotificacioHelper {
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
+
 	@Autowired
 	private RegistreNotificaHelper registreNotificaHelper;
 	@Autowired
@@ -299,7 +303,9 @@ public class NotificacioHelper {
 		// Recuperar òrgan gestor notificació
 		log.trace("Processam organ gestor");
 		if (organGestor == null && notificacio.getOrganGestorCodi() != null ) {
-//			organGestor = organGestorHelper.createOrganGestorFromNotificacio(notificacio, entitat);
+			organGestor = organGestorRepository.findByCodi(notificacio.getOrganGestorCodi());
+		}
+		if (organGestor == null) {
 			throw new NotFoundException(notificacio.getOrganGestorCodi(), OrganGestorEntity.class);
 		}
 

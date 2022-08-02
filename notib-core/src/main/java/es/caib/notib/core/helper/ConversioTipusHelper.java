@@ -395,10 +395,8 @@ public class ConversioTipusHelper {
 	
 	public class EntitatEntitytoMapper extends CustomMapper<EntitatEntity, EntitatDto> {
 		@Override
-		public void mapAtoB(
-				EntitatEntity entitatEntity, 
-				EntitatDto entitatDto, 
-				MappingContext context) {
+		public void mapAtoB(EntitatEntity entitatEntity, EntitatDto entitatDto, MappingContext context) {
+
 			if (entitatEntity.getTipusDocDefault() != null) {
 				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
 				tipusDocumentDto.setEntitat(entitatEntity.getId());

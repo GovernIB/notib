@@ -493,9 +493,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 
 	@Override
-	public Object[] syncDir3OrgansGestors(Long entitatId) throws Exception {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-		EntitatDto entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
 
 		if (entitat.getDir3Codi() == null || entitat.getDir3Codi().isEmpty()) {
 			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
@@ -543,7 +542,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		ti = tf;
 		progres.setFase(1);
 		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar"));
-		organGestorHelper.sincronitzarOrgans(entitatId, unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+		organGestorHelper.sincronitzarOrgans(entitat.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
 //		progres.incrementOperacionsRealitzades();	// 27%
 		progres.setProgres(27);
 		tf = System.currentTimeMillis();
@@ -619,7 +618,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@SuppressWarnings({"deprecation", "unchecked"})
 	@Override
+	@Transactional(readOnly = true)
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 
 		boolean isFirstSincronization = entitat.getDataSincronitzacio() == null;

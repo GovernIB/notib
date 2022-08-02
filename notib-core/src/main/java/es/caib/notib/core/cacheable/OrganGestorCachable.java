@@ -63,7 +63,7 @@ public class OrganGestorCachable {
         }
 
         List<String> pares = new ArrayList<>();
-        while(!currentNode.getCodi().equals(currentNode.getPare())) {
+        while(currentNode != null && !currentNode.getCodi().equals(currentNode.getPare())) {
             pares.add(currentNode.getCodi());
             currentNode = organigramaEntitat.get(currentNode.getPare());
         }

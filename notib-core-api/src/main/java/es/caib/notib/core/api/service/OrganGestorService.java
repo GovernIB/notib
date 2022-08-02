@@ -55,12 +55,12 @@ public interface OrganGestorService {
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
 	 *
-	 * @param entitatId Identificador de l'entitat actual
+	 * @param entitat Dto de l'entitat actual
 	 * @return Indica si la sincronització ha tengut èxit
 	 * @throws Exception
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN')")
-	public Object[] syncDir3OrgansGestors(Long entitatId) throws Exception;
+	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception;
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;

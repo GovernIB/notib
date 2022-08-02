@@ -740,7 +740,7 @@ public class PluginHelper {
 			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalProcediments(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al obtenir el número total d'elemetns";
+			String errorDescripcio = "Error al obtenir el número total d'elements";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
@@ -809,7 +809,7 @@ public class PluginHelper {
 			totalElements = getGestorDocumentalAdministratiuPlugin().getTotalServeis(codiDir3);
 			integracioHelper.addAccioOk(info);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al obtenir el número total d'elemetns";
+			String errorDescripcio = "Error al obtenir el número total d'elements";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
@@ -899,11 +899,8 @@ public class PluginHelper {
 		return organigrama;
 	}
 
-	public List<NodeDir3> unitatsOrganitzativesFindByPare(
-			EntitatDto entitat,
-			String pareCodi,
-			Date dataActualitzacio,
-			Date dataSincronitzacio) {
+	public List<NodeDir3> unitatsOrganitzativesFindByPare(EntitatDto entitat, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
+
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_UNITATS,
 				"Consulta llista d'unitats donat un pare",
@@ -914,30 +911,20 @@ public class PluginHelper {
 		try {
 			configHelper.setEntitat(entitat);
 			info.setCodiEntitat(entitat.getCodi());
-			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(
-					pareCodi,
-					dataActualitzacio,
-					dataSincronitzacio);
-
+			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			if (unitatsOrganitzatives != null && !unitatsOrganitzatives.isEmpty()) {
 				integracioHelper.addAccioOk(info);
 				return unitatsOrganitzatives;
-			} else {
-				String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
-				integracioHelper.addAccioError(info, errorMissatge);
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_UNITATS,
-						errorMissatge);
 			}
+			String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
+			integracioHelper.addAccioError(info, errorMissatge);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 		} catch (SistemaExternException sex) {
 			throw sex;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_UNITATS,
-					errorDescripcio,
-					ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
 	}
 

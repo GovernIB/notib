@@ -234,22 +234,16 @@ public class OrganGestorController extends BaseUserController{
 //		}
 //	}
 
-
-
 	@RequestMapping(value = "/sync/dir3", method = RequestMethod.GET)
 	public String syncDir3(HttpServletRequest request, Model model) {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		String redirect = "redirect:../../organgestor";
 		if (entitat.getDir3Codi() == null || entitat.getDir3Codi().isEmpty()) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../organgestor",
-					"L'entitat actual no té cap codi DIR3 associat");
+			return getAjaxControllerReturnValueError(request, redirect, "L'entitat actual no té cap codi DIR3 associat");
 		}
 		try {
-
 			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
-
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
 			model.addAttribute("splitMap", prediccio.getSplitMap());
 			model.addAttribute("mergeMap", prediccio.getMergeMap());
@@ -257,15 +251,10 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
-
 			model.addAttribute("isUpdatingOrgans", organGestorService.isUpdatingOrgans(entitat));
-
 		} catch (Exception e) {
 			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
-			return getModalControllerReturnValueErrorMessageText(
-					request,
-					"redirect:../../organgestor",
-					e.getMessage());
+			return getModalControllerReturnValueErrorMessageText(request, redirect, e.getMessage());
 		}
 
 		return "synchronizationPrediction";
@@ -276,19 +265,13 @@ public class OrganGestorController extends BaseUserController{
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			organGestorService.syncDir3OrgansGestors(entitatActual.getId());
+			organGestorService.syncDir3OrgansGestors(entitatActual);
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar", e);
-			return getModalControllerReturnValueErrorMessageText(
-					request,
-					"redirect:../../organgestor",
-					e.getMessage());
+			return getModalControllerReturnValueErrorMessageText(request, "redirect:../../organgestor", e.getMessage());
 		}
 
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:unitatOrganitzativa",
-				"organgestor.controller.synchronize.ok");
+		return getModalControllerReturnValueSuccess(request, "redirect:unitatOrganitzativa", "organgestor.controller.synchronize.ok");
 	}
 
 	

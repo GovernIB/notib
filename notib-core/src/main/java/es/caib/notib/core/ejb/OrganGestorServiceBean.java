@@ -63,8 +63,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public Object[] syncDir3OrgansGestors(Long entitatId) throws Exception {
-		return delegate.syncDir3OrgansGestors(entitatId);
+	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception {
+		return delegate.syncDir3OrgansGestors(entitat);
 	}
 
 	@Override
