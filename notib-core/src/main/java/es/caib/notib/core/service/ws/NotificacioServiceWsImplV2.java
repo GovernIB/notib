@@ -5,6 +5,7 @@ package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -142,7 +143,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	public RespostaAlta alta(NotificacioV2 notificacio) throws NotificacioServiceWsException {
 
 		RespostaAltaV2 resposta = altaV2(notificacio);
-
 		return RespostaAlta.builder()
 				.identificador(resposta.getIdentificador())
 				.estat(resposta.getEstat())
@@ -154,8 +154,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	@Transactional
 	@Override
-	public RespostaAltaV2 altaV2(
-			NotificacioV2 notificacio) throws NotificacioServiceWsException {
+	public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
@@ -182,15 +182,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] usuariCodi: " + usuariCodi);
 			
 			AplicacioEntity aplicacio = null;
-			if (entitat != null && usuariCodi != null)
+			if (entitat != null && usuariCodi != null) {
 				aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
+			}
 			logger.debug(">> [ALTA] aplicacio: " + (aplicacio == null ? "null" : aplicacio.getUsuariCodi()));
 			
-			resposta = validarNotificacio(
-					notificacio,
-					emisorDir3Codi,
-					entitat,
-					aplicacio);
+			resposta = validarNotificacio(notificacio, emisorDir3Codi, entitat, aplicacio);
 			logger.debug(">> [ALTA] validacio: [error=" + resposta.isError() + ", estat=" + resposta.getEstat() + ", descripcio=" + resposta.getErrorDescripcio() + "]");
 			
 			if (resposta.isError()) {
@@ -205,9 +202,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				// Obtenir dades depenents de procediment (Procediment NO obligatori per a comunicacions a administracions)
 				if (notificacio.getProcedimentCodi() != null) {
-					procediment = procSerRepository.findByCodiAndEntitat(
-							notificacio.getProcedimentCodi(), 
-							entitat);
+					procediment = procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat);
 
 					if (procediment != null) {
 
@@ -238,14 +233,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						// La caducitat únicament és necessària per a notificacions. Per tant tindrà procedimetns
 						if (notificacio.getCaducitat() == null) {
 							if (notificacio.getCaducitatDiesNaturals() != null) {
-								notificacio.setCaducitat(CaducitatHelper.sumarDiesNaturals(
-										new Date(),
-										notificacio.getCaducitatDiesNaturals()));
+								notificacio.setCaducitat(CaducitatHelper.sumarDiesNaturals(new Date(), notificacio.getCaducitatDiesNaturals()));
 							} else {
-								notificacio.setCaducitat(
-										CaducitatHelper.sumarDiesLaborals(
-												new Date(),
-												procediment.getCaducitat()));
+								notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(new Date(), procediment.getCaducitat()));
 							}
 						}
 						
@@ -1724,6 +1714,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.enviaments.no.null"));
 		}
+		List<String> nifs = new ArrayList<>();
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
@@ -1760,6 +1751,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			// - Nif
 			if(enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
+			}
+			if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+				if (nifs.contains(enviament.getTitular().getNif())) {
+					return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
+				} else {
+					nifs.add(enviament.getTitular().getNif());
+				}
 			}
 			if (!FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 				if (NifHelper.isvalid(enviament.getTitular().getNif())) {

@@ -247,6 +247,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			// ENVIAMENTS
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
+				List<String> nifs = new ArrayList<>();
 				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
 
 //					if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
@@ -300,6 +301,16 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 												MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.sense.nif.email", null, locale))
 										.addNode("enviaments[" + envCount + "].titular.email")
 										.addConstraintViolation();
+							}
+						}
+
+						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+							if (nifs.contains(enviament.getTitular().getNif())) {
+								valid = false;
+								String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit");
+								context.buildConstraintViolationWithTemplate(msg).addNode("enviaments[" + envCount + "].titular.nif").addConstraintViolation();
+							} else {
+								nifs.add(enviament.getTitular().getNif());
 							}
 						}
 					}
