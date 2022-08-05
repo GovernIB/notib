@@ -305,12 +305,13 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 
 						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
-							if (nifs.contains(enviament.getTitular().getNif())) {
+							String nif = enviament.getTitular().getNif().toLowerCase();
+							if (nifs.contains(nif)) {
 								valid = false;
 								String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit");
 								context.buildConstraintViolationWithTemplate(msg).addNode("enviaments[" + envCount + "].titular.nif").addConstraintViolation();
 							} else {
-								nifs.add(enviament.getTitular().getNif());
+								nifs.add(nif);
 							}
 						}
 					}
@@ -336,12 +337,25 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
 						for (PersonaCommand destinatari: enviament.getDestinataris()) {
-							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
+							if (!Strings.isNullOrEmpty(destinatari.getEmail()) && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
 								.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].email")
 								.addConstraintViolation();
+							}
+							String nif = destinatari.getNif();
+							if (!Strings.isNullOrEmpty(nif)) {
+								nif = nif.toLowerCase();
+								if (nifs.contains(nif)) {
+									valid = false;
+									context.buildConstraintViolationWithTemplate(
+													MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit", null, locale))
+											.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].nif")
+											.addConstraintViolation();
+								} else {
+									nifs.add(nif);
+								}
 							}
 							destCount++;
 						}

@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -1753,10 +1754,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
 			}
 			if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
-				if (nifs.contains(enviament.getTitular().getNif())) {
+				String nif = enviament.getTitular().getNif().toLowerCase();
+				if (nifs.contains(nif)) {
 					return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
 				} else {
-					nifs.add(enviament.getTitular().getNif());
+					nifs.add(nif);
 				}
 			}
 			if (!FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
@@ -1895,6 +1897,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					// - Nif
 					if(destinatari.getNif() != null && destinatari.getNif().length() > 9) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.longitud.max"));
+					}
+					if (!Strings.isNullOrEmpty(destinatari.getNif())) {
+						String nif = destinatari.getNif().toLowerCase();
+						if (nifs.contains(nif)) {
+							return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
+						} else {
+							nifs.add(nif);
+						}
 					}
 					if (!FISICA_SENSE_NIF.equals(destinatari.getInteressatTipus()) && destinatari.getNif() != null && !destinatari.getNif().isEmpty()) {
 						if (NifHelper.isvalid(destinatari.getNif())) {
