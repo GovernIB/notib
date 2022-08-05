@@ -244,8 +244,8 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				descripcionRespuesta.value = "OK";
 
 
-				//if datado + certificació
-				if (tipoEntrega.equals(BigInteger.valueOf(2L))) {
+				//if (datado + certificació) or (certificació)
+				if (tipoEntrega.equals(BigInteger.valueOf(2L)) || tipoEntrega.equals(BigInteger.valueOf(3L))) {
 					logger.debug("Guardant certificació de l'enviament [tipoEntrega=" + tipoEntrega + ", id=" + enviament.getId() + "]");
 					certificacionOrganismo(
 							acusePDF,
