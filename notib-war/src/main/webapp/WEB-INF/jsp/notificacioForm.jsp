@@ -1420,7 +1420,7 @@
 						required="true" 
 						optionItems="${organsGestors}" 
 						optionValueAttribute="codi" 
-						optionTextAttribute="organGestorDesc"
+						optionTextAttribute="valor"
 						labelSize="2" 
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"

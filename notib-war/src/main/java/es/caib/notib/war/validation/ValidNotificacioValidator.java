@@ -247,6 +247,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			// ENVIAMENTS
 			if (notificacio.getEnviaments() != null) {
 				int envCount = 0;
+				List<String> nifs = new ArrayList<>();
 				for (EnviamentCommand enviament: notificacio.getEnviaments()) {
 
 //					if (TipusEnviamentEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus()) && InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
@@ -302,6 +303,17 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 										.addConstraintViolation();
 							}
 						}
+
+						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+							String nif = enviament.getTitular().getNif().toLowerCase();
+							if (nifs.contains(nif)) {
+								valid = false;
+								String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit");
+								context.buildConstraintViolationWithTemplate(msg).addNode("enviaments[" + envCount + "].titular.nif").addConstraintViolation();
+							} else {
+								nifs.add(nif);
+							}
+						}
 					}
 
 					if (enviament.getEntregaDeh() != null && enviament.getEntregaDeh().isActiva()) {
@@ -325,12 +337,25 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					if (enviament.getDestinataris() != null) {
 						int destCount = 0;
 						for (PersonaCommand destinatari: enviament.getDestinataris()) {
-							if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty() && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
+							if (!Strings.isNullOrEmpty(destinatari.getEmail()) && !EmailValidHelper.isEmailValid(destinatari.getEmail())) {
 								valid = false;
 								context.buildConstraintViolationWithTemplate(
 										MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
 								.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].email")
 								.addConstraintViolation();
+							}
+							String nif = destinatari.getNif();
+							if (!Strings.isNullOrEmpty(nif)) {
+								nif = nif.toLowerCase();
+								if (nifs.contains(nif)) {
+									valid = false;
+									context.buildConstraintViolationWithTemplate(
+													MessageHelper.getInstance().getMessage("notificacio.form.valid.nif.repetit", null, locale))
+											.addNode("enviaments["+envCount+"].destinataris[" + destCount +"].nif")
+											.addConstraintViolation();
+								} else {
+									nifs.add(nif);
+								}
 							}
 							destCount++;
 						}

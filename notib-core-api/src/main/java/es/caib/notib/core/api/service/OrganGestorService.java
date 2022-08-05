@@ -219,6 +219,9 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	OrganGestorDto getOrganNou(String codiSia);
 
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis);
+
 
 	// For testing:
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper);

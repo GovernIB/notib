@@ -548,6 +548,7 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("referer", referer);
     }
 
+
     private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
 
         // 1-recuperam els òrgans dels procediments disponibles (amb permís)
@@ -670,6 +671,9 @@ public class NotificacioFormController extends BaseUserController {
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
         List<OrganGestorDto> organsGestors;
+
+        List<OrganGestorDto> organsGestors  = null;
+        List<CodiValorDto> codisValor = new ArrayList<>();
         if (RolEnumDto.NOT_ADMIN.equals(rol)) {
             organsGestors = organGestorService.findByEntitat(entitatActual.getId());
         } else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
@@ -677,11 +681,9 @@ public class NotificacioFormController extends BaseUserController {
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
-        	if (tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR)) {
-        		organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, PermisEnum.COMUNIACIO_SIR);
-        	} else {
-	            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, PermisEnum.NOTIFICACIO);
-        	}
+            PermisEnum tipus = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
+//            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
+            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), tipus);
         }
 
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
@@ -692,7 +694,13 @@ public class NotificacioFormController extends BaseUserController {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
         }
 
-        model.addAttribute("organsGestors", organsGestors);
+        if (organsGestors != null) {
+            for (OrganGestorDto o : organsGestors) {
+                codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
+            }
+        }
+
+        model.addAttribute("organsGestors", codisValor);
         model.addAttribute("procediments", procedimentsDisponibles);
         model.addAttribute("serveis", serveisDisponibles);
         model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGetByEntitat("es.caib.notib.titular.incapacitat", "true"));

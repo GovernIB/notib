@@ -5,6 +5,7 @@ package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -47,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -141,7 +143,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	public RespostaAlta alta(NotificacioV2 notificacio) throws NotificacioServiceWsException {
 
 		RespostaAltaV2 resposta = altaV2(notificacio);
-
 		return RespostaAlta.builder()
 				.identificador(resposta.getIdentificador())
 				.estat(resposta.getEstat())
@@ -232,14 +233,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						// La caducitat únicament és necessària per a notificacions. Per tant tindrà procedimetns
 						if (notificacio.getCaducitat() == null) {
 							if (notificacio.getCaducitatDiesNaturals() != null) {
-								notificacio.setCaducitat(CaducitatHelper.sumarDiesNaturals(
-										new Date(),
-										notificacio.getCaducitatDiesNaturals()));
+								notificacio.setCaducitat(CaducitatHelper.sumarDiesNaturals(new Date(), notificacio.getCaducitatDiesNaturals()));
 							} else {
-								notificacio.setCaducitat(
-										CaducitatHelper.sumarDiesLaborals(
-												new Date(),
-												procediment.getCaducitat()));
+								notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(new Date(), procediment.getCaducitat()));
 							}
 						}
 						
@@ -1718,6 +1714,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.enviaments.no.null"));
 		}
+		List<String> nifs = new ArrayList<>();
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
@@ -1754,6 +1751,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			// - Nif
 			if(enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
+			}
+			if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+				String nif = enviament.getTitular().getNif().toLowerCase();
+				if (nifs.contains(nif)) {
+					return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
+				} else {
+					nifs.add(nif);
+				}
 			}
 			if (!FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 				if (NifHelper.isvalid(enviament.getTitular().getNif())) {
@@ -1891,6 +1896,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					// - Nif
 					if(destinatari.getNif() != null && destinatari.getNif().length() > 9) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.longitud.max"));
+					}
+					if (!Strings.isNullOrEmpty(destinatari.getNif())) {
+						String nif = destinatari.getNif().toLowerCase();
+						if (nifs.contains(nif)) {
+							return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
+						} else {
+							nifs.add(nif);
+						}
 					}
 					if (!FISICA_SENSE_NIF.equals(destinatari.getInteressatTipus()) && destinatari.getNif() != null && !destinatari.getNif().isEmpty()) {
 						if (NifHelper.isvalid(destinatari.getNif())) {

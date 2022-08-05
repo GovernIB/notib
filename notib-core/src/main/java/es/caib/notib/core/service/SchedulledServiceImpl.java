@@ -199,6 +199,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 					logger.info("[PRO] Realitzant actualització de procediments per a " + entitats.size() + " entitats");
 					for (EntitatDto entitat: entitats) {
 						logger.info(">>> Actualitzant procedimetns de la entitat: " + entitat.getNom());
+						ConfigHelper.setEntitat(entitat);
 						procedimentService.actualitzaProcediments(entitat);
 					}
 				} else {
