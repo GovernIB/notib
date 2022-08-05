@@ -670,8 +670,6 @@ public class NotificacioFormController extends BaseUserController {
         List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
-        List<OrganGestorDto> organsGestors;
-
         List<OrganGestorDto> organsGestors  = null;
         List<CodiValorDto> codisValor = new ArrayList<>();
         if (RolEnumDto.NOT_ADMIN.equals(rol)) {
