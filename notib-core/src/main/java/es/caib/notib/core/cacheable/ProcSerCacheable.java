@@ -12,6 +12,7 @@ import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +20,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -87,6 +89,9 @@ public class ProcSerCacheable {
             }
         });
 
+        for (ProcSerEntity procSer: procs) {
+            Hibernate.initialize(procSer.getOrganGestor().getEntregaCie());
+        }
         return procs;
     }
 
@@ -192,6 +197,9 @@ public class ProcSerCacheable {
                 ProcSerOrganEntity.class,
                 permisos,
                 auth);
+        for (ProcSerOrganEntity procSerOrgan: procedimentOrgansAmbPermis) {
+            Hibernate.initialize(procSerOrgan.getOrganGestor().getEntregaCie());
+        }
         return procedimentOrgansAmbPermis;
     }
 
