@@ -13,8 +13,8 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
-import es.caib.notib.core.service.ProcedimentServiceImpl;
-import es.caib.notib.core.service.ServeiServiceImpl;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -49,6 +49,10 @@ public class OrganGestorController extends BaseUserController{
 	
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private ProcedimentService procedimentService;
+	@Autowired
+	private ServeiService serveiService;
 	@Autowired
 	private EntitatService entitatService;
 	@Autowired
@@ -191,7 +195,8 @@ public class OrganGestorController extends BaseUserController{
 		}
 
 		if (progresActualitzacio.getFase() == 2) {
-			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
+//			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
+			ProgresActualitzacioDto progresProc = procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
 			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
 				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
 				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 18 / 100));
@@ -202,7 +207,8 @@ public class OrganGestorController extends BaseUserController{
 			}
 		}
 		if (progresActualitzacio.getFase() == 3) {
-			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
+//			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
+			ProgresActualitzacioDto progresSer = serveiService.getProgresActualitzacio(entitat.getDir3Codi());
 			if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
 				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
 				progresAcumulat.setProgres(45 + (progresSer.getProgres() * 18 / 100));
