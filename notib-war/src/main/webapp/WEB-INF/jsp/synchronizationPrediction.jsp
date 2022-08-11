@@ -29,6 +29,7 @@
 		var content="<spring:message code="organgestor.actualitzacio.cancelarActu"/>";
 		var acceptar="<spring:message code="organgestor.actualitzacio.acceptar"/>";
 		var cancelar="<spring:message code="organgestor.actualitzacio.cancelar"/>";
+		var tancar="<spring:message code="comu.boto.tancar"/>";
 		<c:if test="${not isUpdatingOrgans}">
 		var isUpdating = false;
 		$(document).ready(function() {
@@ -39,6 +40,7 @@
 				$('.prediccio').fadeOut();
 				$('#autobtn', parent.document).prop('disabled', true);
 				$('#cancelbtn', parent.document).toggle(true);
+				$('#cancelbtn', parent.document).html(cancelar);
 				$.post($(this).attr('action'));
 				isUpdating = true;
 				$('.close', parent.document).on('click', dismissFunction);
@@ -91,6 +93,7 @@
 							$('#bar').html('100%');
 							$('.close', parent.document).prop('disabled', false);
 							$('.loading').hide();
+							$('#cancelbtn', parent.document).html(tancar);
 						} else {
 							if (data.progres > 0) {
 								$('.loading').hide();

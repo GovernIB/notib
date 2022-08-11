@@ -24,8 +24,6 @@ import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
-import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.core.repository.AvisRepository;
 import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.repository.GrupRepository;
@@ -505,7 +503,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		// Comprova si hi ha una altre instància del procés en execució
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-			logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+			logger.debug("[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització");
 			return null;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 
@@ -520,100 +518,105 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		Long ti = System.currentTimeMillis();
 
-		// 1. Obtenir canvis a l'organigrama
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
-		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-				entitatDto,
-				entitat.getDir3Codi(),
-				entitat.getDataActualitzacio(),
-				entitat.getDataSincronitzacio());
-//		progres.incrementOperacionsRealitzades();	// 2%
-		progres.setProgres(2);
-		Long tf = System.currentTimeMillis();
-
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi.resultat", new Object[] {unitatsWs.size()}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi"));
-
 		List<OrganGestorEntity> obsoleteUnitats = new ArrayList<>();
 		List<OrganGestorEntity> organsDividits = new ArrayList<>();
 		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
 		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
 
-		// 2. Sincronitzar òrgans
-		ti = tf;
-		progres.setFase(1);
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar"));
-		organGestorHelper.sincronitzarOrgans(entitat.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
-//		progres.incrementOperacionsRealitzades();	// 27%
-		progres.setProgres(27);
-		tf = System.currentTimeMillis();
+		try {
+			// 1. Obtenir canvis a l'organigrama
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
+			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+					entitatDto,
+					entitat.getDir3Codi(),
+					entitat.getDataActualitzacio(),
+					entitat.getDataSincronitzacio());
+			//		progres.incrementOperacionsRealitzades();	// 2%
+			progres.setProgres(2);
+			Long tf = System.currentTimeMillis();
 
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi.resultat", new Object[]{unitatsWs.size()}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi"));
 
-		// 3. Actualitzar procediments
-		ti = tf;
-		progres.setFase(2);
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.procediments"));
-		procSerSyncHelper.actualitzaProcediments(entitatDto);
-		ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
-		if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
-			progres.getInfo().addAll(ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi()).getInfo());
+			// 2. Sincronitzar òrgans
+			ti = tf;
+			progres.setFase(1);
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar"));
+			organGestorHelper.sincronitzarOrgans(entitat.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+			//		progres.incrementOperacionsRealitzades();	// 27%
+			progres.setProgres(27);
+			tf = System.currentTimeMillis();
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
+
+			// 3. Actualitzar procediments
+			ti = tf;
+			progres.setFase(2);
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.procediments"));
+			procSerSyncHelper.actualitzaProcediments(entitatDto);
+			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
+			if (progresProc != null && progresProc.getInfo() != null && !progresProc.getInfo().isEmpty()) {
+				progres.getInfo().addAll(ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi()).getInfo());
+			}
+			//		progres.incrementOperacionsRealitzades();	// 45%
+			progres.setProgres(45);
+			tf = System.currentTimeMillis();
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.procediments.fi"));
+
+			// 4. Actualitzar serveis
+			ti = tf;
+			progres.setFase(3);
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.serveis"));
+			procSerSyncHelper.actualitzaServeis(entitatDto);
+			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
+			if (progresSer != null && progresSer.getInfo() != null && !progresSer.getInfo().isEmpty()) {
+				progres.getInfo().addAll(ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi()).getInfo());
+			}
+			progres.setFase(4);
+			//		progres.incrementOperacionsRealitzades();	// 63%
+			progres.setProgres(63);
+			tf = System.currentTimeMillis();
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.serveis.fi"));
+
+			// 5. Actualitzar permisos
+			ti = tf;
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos"));
+			permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
+			//		progres.incrementOperacionsRealitzades();	// 81%
+			progres.setProgres(81);
+			tf = System.currentTimeMillis();
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos.fi"));
+
+			// 6. Eliminar òrgans no utilitzats
+			ti = tf;
+			progres.setFase(5);
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar"));
+			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
+			//		progres.incrementOperacionsRealitzades();	// 99%
+			progres.setProgres(99);
+			tf = System.currentTimeMillis();
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar.fi"));
+
+			cacheHelper.evictFindOrgansGestorWithPermis();
+
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
+		} catch (Exception ex) {
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.ERROR, messageHelper.getMessage("organgestor.actualitzacio.error") + ex.getMessage());
+			throw ex;
+		} finally {
+			progres.setProgres(100);
+			progres.setFinished(true);
 		}
-//		progres.incrementOperacionsRealitzades();	// 45%
-		progres.setProgres(45);
-		tf = System.currentTimeMillis();
-
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.procediments.fi"));
-
-		// 4. Actualitzar serveis
-		ti = tf;
-		progres.setFase(3);
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.serveis"));
-		procSerSyncHelper.actualitzaServeis(entitatDto);
-		ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
-		if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
-			progres.getInfo().addAll(ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi()).getInfo());
-		}
-		progres.setFase(4);
-//		progres.incrementOperacionsRealitzades();	// 63%
-		progres.setProgres(63);
-		tf = System.currentTimeMillis();
-
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.serveis.fi"));
-
-		// 5. Actualitzar permisos
-		ti = tf;
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos"));
-		permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
-//		progres.incrementOperacionsRealitzades();	// 81%
-		progres.setProgres(81);
-		tf = System.currentTimeMillis();
-
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos.fi"));
-
-		// 6. Eliminar òrgans no utilitzats
-		ti = tf;
-		progres.setFase(5);
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar"));
-		organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
-//		progres.incrementOperacionsRealitzades();	// 99%
-		progres.setProgres(99);
-		tf = System.currentTimeMillis();
-
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar.fi"));
-
-		cacheHelper.evictFindOrgansGestorWithPermis();
-
-		progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
-
-		progres.setProgres(100);
-		progres.setFinished(true);
 
 		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};
 	}
