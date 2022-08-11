@@ -458,10 +458,15 @@ public class EntitatServiceImpl implements EntitatService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null) {
-				return permisosCacheable.getPermisosEntitatsUsuariActual(auth);
-			}
 			Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
+			if (auth != null) {
+				try {
+					hasPermisos = permisosCacheable.getPermisosEntitatsUsuariActual(auth);
+					return hasPermisos;
+				} catch (Exception ex) {
+					logger.error("Error obtenint els permisos de l'usuari " + auth.getName(), ex);
+				}
+			}
 			hasPermisos.put(RolEnumDto.tothom, false);
 			hasPermisos.put(RolEnumDto.NOT_ADMIN, false);
 			hasPermisos.put(RolEnumDto.NOT_APL, false);
