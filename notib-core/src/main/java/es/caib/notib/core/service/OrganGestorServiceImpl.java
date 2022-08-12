@@ -13,13 +13,25 @@ import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
-import es.caib.notib.plugin.unitat.CodiValor;
+import es.caib.notib.core.repository.EntregaCieRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PagadorCieRepository;
+import es.caib.notib.core.repository.PagadorPostalRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -35,7 +47,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.xml.bind.ValidationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació del servei de gestió de òrgans gestors.
@@ -1099,13 +1118,17 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entity, permisos);
 		List<ProcSerOrganEntity> procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entity, permisos);
+		List<OrganGestorEntity> organsAmbPermisComu = organGestorHelper.findOrgansGestorsWithPermis(auth, entity, new Permission[]{ExtendedPermission.COMUNS});
 
-		List<OrganGestorEntity> organs = new ArrayList<>();
+		List<OrganGestorEntity> organs = new ArrayList<>(organsAmbPermisComu);
 		List<String> codis = new ArrayList<>();
+		for (OrganGestorEntity organ: organsAmbPermisComu) {
+			codis.add(organ.getCodi());
+		}
 		for (ProcSerEntity p : procediments) {
 			if (!organs.contains(p.getOrganGestor())) {
 				organs.add(p.getOrganGestor());
-				codis.add(p.getCodi());
+				codis.add(p.getOrganGestor().getCodi());
 			}
 		}
 		for (ProcSerOrganEntity p : procedimentsOrgans) {
@@ -1115,13 +1138,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 		}
 
-		Collections.sort(organs, new Comparator<OrganGestorEntity>() {
-			@Override
-			public int compare(OrganGestorEntity p1, OrganGestorEntity p2) {
-				return p1.getCodi().compareTo(p2.getCodi());
-			}
-		});
-
+		// Afegim els òrgans fills
 		CodiValorDto foo;
 		Set<CodiValorDto> resposta = new HashSet<>();
 		List<String> codiFills;
@@ -1145,7 +1162,17 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 		}
 
-		return new ArrayList<>(resposta);
+		List<CodiValorDto> organsAmbPermis = new ArrayList<>(resposta);
+		if (!organsAmbPermis.isEmpty()) {
+			Collections.sort(organsAmbPermis, new Comparator<CodiValorDto>() {
+				@Override
+				public int compare(CodiValorDto p1, CodiValorDto p2) {
+					return p1.getCodi().compareTo(p2.getCodi());
+				}
+			});
+		}
+
+		return organsAmbPermis;
 	/*
 		2.- Obtenir òrgans amb permís
 		3.- Obtenir procediments comuns (procedimentOrgan)

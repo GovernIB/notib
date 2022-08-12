@@ -93,6 +93,26 @@ public class OrganGestorHelper {
 		return codis;
 	}
 
+	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
+															   EntitatEntity entitat,
+															   Permission[] permisos) {
+		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
+				entitat,
+				auth,
+				permisos);
+
+		if (organs.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		Set<String> codisOrgansAmbDescendents = new HashSet<>();
+		for (OrganGestorEntity organGestorEntity : organs) {
+			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
+		}
+		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
+
+	}
+
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
 		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
