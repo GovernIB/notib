@@ -285,16 +285,20 @@ public class PluginHelper {
 		return resposta;
 	}
 	
-	public List<TipusAssumpte> llistarTipusAssumpte(String entitatCodi) throws SistemaExternException {
+	public List<TipusAssumpte> llistarTipusAssumpte(String codiDir3Entitat) throws SistemaExternException {
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir llista de tipus d'assumpte", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatCodi));
-		info.setCodiEntitat(entitatCodi);
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat));
 		try {
-			List<TipusAssumpte> tipusAssumptes = getRegistrePlugin(entitatCodi).llistarTipusAssumpte(entitatCodi);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<TipusAssumpte> tipusAssumptes = getRegistrePlugin(entitat.getCodi()).llistarTipusAssumpte(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 			return tipusAssumptes;
 		} catch (Exception ex) {
@@ -304,17 +308,21 @@ public class PluginHelper {
 		}
 	}
 
-	public List<CodiAssumpte> llistarCodisAssumpte(String entitatcodi, String tipusAssumpte) throws SistemaExternException {
+	public List<CodiAssumpte> llistarCodisAssumpte(String codiDir3Entitat, String tipusAssumpte) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir la llista de codis d'assumpte", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipus d'assumpte", tipusAssumpte));
-		info.setCodiEntitat(entitatcodi);
 		try {
-			List<CodiAssumpte> assumptes = getRegistrePlugin(entitatcodi).llistarCodisAssumpte(entitatcodi, tipusAssumpte);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<CodiAssumpte> assumptes = getRegistrePlugin(entitat.getCodi()).llistarCodisAssumpte(codiDir3Entitat, tipusAssumpte);
 			integracioHelper.addAccioOk(info);
 			return assumptes;
 		} catch (Exception ex) {
@@ -324,18 +332,22 @@ public class PluginHelper {
 		}
 	}
 	
-	public OficinaDto llistarOficinaVirtual(String entitatcodi, String nomOficinaVirtual, TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
+	public OficinaDto llistarOficinaVirtual(String codiDir3Entitat, String nomOficinaVirtual, TipusRegistreRegweb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir la oficina virtual", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
-		info.setCodiEntitat(entitatcodi);
 		OficinaDto oficinaDto = new OficinaDto();
 		try {
-			Oficina oficina = getRegistrePlugin(entitatcodi).llistarOficinaVirtual(entitatcodi, nomOficinaVirtual, autoritzacio.getValor());
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			Oficina oficina = getRegistrePlugin(entitat.getCodi()).llistarOficinaVirtual(codiDir3Entitat, nomOficinaVirtual, autoritzacio.getValor());
 			if (oficina != null) {
 				oficinaDto.setCodi(oficina.getCodi());
 				oficinaDto.setNom(oficina.getNom());
@@ -349,18 +361,22 @@ public class PluginHelper {
 		return oficinaDto;
 	}
 	
-	public List<OficinaDto> llistarOficines(String entitatcodi, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
+	public List<OficinaDto> llistarOficines(String codiDir3Entitat, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE,
 				"Obtenir la llista de oficines",
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Tipud de registre", autoritzacio.name()));
-		info.setCodiEntitat(entitatcodi);
 		List<OficinaDto> oficinesDto = new ArrayList<>();
 		try {
-			List<Oficina> oficines = getRegistrePlugin(entitatcodi).llistarOficines(entitatcodi, autoritzacio.getValor());
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<Oficina> oficines = getRegistrePlugin(entitat.getCodi()).llistarOficines(codiDir3Entitat, autoritzacio.getValor());
 			if (oficines != null) {
 				for (Oficina oficina : oficines) {
 					OficinaDto oficinaDto = new OficinaDto();
@@ -395,13 +411,17 @@ public class PluginHelper {
 		}
 	}
 	
-	public List<OficinaDto> oficinesSIREntitat(String entitatCodi) throws SistemaExternException {
+	public List<OficinaDto> oficinesSIREntitat(String codiDir3Entitat) throws SistemaExternException {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
-												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", entitatCodi));
-		info.setCodiEntitat(entitatCodi);
+												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", codiDir3Entitat));
 		try {
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(entitatCodi);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(codiDir3Entitat);
 			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
@@ -412,18 +432,22 @@ public class PluginHelper {
 		}
 	}
 	
-	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, TipusRegistreRegweb3Enum tipusRegistre) throws SistemaExternException{
+	public List<LlibreOficina> llistarLlibresOficines(String codiDir3Entitat, String usuariCodi, TipusRegistreRegweb3Enum tipusRegistre) throws SistemaExternException{
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir la llista de llibre amb oficina", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatCodi),
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Codi de l'usuari", usuariCodi),
 				new AccioParam("Tipud de registre", tipusRegistre.name()));
-		info.setCodiEntitat(entitatCodi);
 		try {
-			List<LlibreOficina> llibresOficines = getRegistrePlugin(entitatCodi).llistarLlibresOficines(entitatCodi, usuariCodi, tipusRegistre.getValor());
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<LlibreOficina> llibresOficines = getRegistrePlugin(entitat.getCodi()).llistarLlibresOficines(codiDir3Entitat, usuariCodi, tipusRegistre.getValor());
 			integracioHelper.addAccioOk(info);
 			return llibresOficines;
 		} catch (Exception ex) {
@@ -433,22 +457,22 @@ public class PluginHelper {
 		}
 	}
 	
-	public LlibreDto llistarLlibreOrganisme(String entitatCodiDir3, String organismeCodi) throws SistemaExternException{
+	public LlibreDto llistarLlibreOrganisme(String codiDir3Entitat, String organismeCodi) throws SistemaExternException{
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir la llista de llibres per organisme", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatCodiDir3),
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Codi de l'organisme", organismeCodi));
 		LlibreDto llibreDto = new LlibreDto();
 		try {
-			EntitatEntity entitat = entitatRepository.findByDir3Codi(entitatCodiDir3);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
 			if (entitat == null) {
-				throw new Exception("Entitat amb codiDir3 " + entitatCodiDir3+ "no trobada");
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
 			}
 			info.setCodiEntitat(entitat.getCodi());
-			Llibre llibre = getRegistrePlugin(entitat.getCodi()).llistarLlibreOrganisme(entitatCodiDir3, organismeCodi);
+			Llibre llibre = getRegistrePlugin(entitat.getCodi()).llistarLlibreOrganisme(codiDir3Entitat, organismeCodi);
 			if (llibre != null) {
 				llibreDto.setCodi(llibre.getCodi());
 				llibreDto.setNomCurt(llibre.getNomCurt());
@@ -464,18 +488,22 @@ public class PluginHelper {
 		return llibreDto;
 	}
 	
-	public List<LlibreDto> llistarLlibres(String entitatcodi, String oficina, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
+	public List<LlibreDto> llistarLlibres(String codiDir3Entitat, String oficina, AutoritzacioRegiWeb3Enum autoritzacio) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir la llista de llibres d'una oficina", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi),
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat),
 				new AccioParam("Oficina", oficina));
-		info.setCodiEntitat(entitatcodi);
 		List<LlibreDto> llibresDto = new ArrayList<>();
 		try {
-			List<Llibre> llibres = getRegistrePlugin(entitatcodi).llistarLlibres(entitatcodi, oficina, autoritzacio.getValor());
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<Llibre> llibres = getRegistrePlugin(entitat.getCodi()).llistarLlibres(codiDir3Entitat, oficina, autoritzacio.getValor());
 			if (llibres != null) {
 				for (Llibre llibre : llibres) {
 					LlibreDto llibreDto = new LlibreDto();
@@ -495,16 +523,20 @@ public class PluginHelper {
 		return llibresDto;
 	}
 	
-	public List<Organisme> llistarOrganismes(String entitatcodi) throws SistemaExternException {
+	public List<Organisme> llistarOrganismes(String codiDir3Entitat) throws SistemaExternException {
 		
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_REGISTRE, 
 				"Obtenir llista d'organismes", 
 				IntegracioAccioTipusEnumDto.ENVIAMENT, 
-				new AccioParam("Codi Dir3 de l'entitat", entitatcodi));
-		info.setCodiEntitat(entitatcodi);
+				new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat));
 		try {
-			List<Organisme> organismes = getRegistrePlugin(entitatcodi).llistarOrganismes(entitatcodi);
+			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			if (entitat == null) {
+				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
+			}
+			info.setCodiEntitat(entitat.getCodi());
+			List<Organisme> organismes = getRegistrePlugin(entitat.getCodi()).llistarOrganismes(codiDir3Entitat);
 			integracioHelper.addAccioOk(info);
 			return organismes;
 		} catch (Exception ex) {
