@@ -1139,16 +1139,16 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 
 		// Afegim els òrgans fills
-		CodiValorDto foo;
+		CodiValorDto organCodiValor;
 		Set<CodiValorDto> resposta = new HashSet<>();
 		List<String> codiFills;
 		OrganGestorEntity organFill;
 		boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
 		for(OrganGestorEntity organ: organs) {
 
-			foo = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
+			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
-				resposta.add(foo);
+				resposta.add(organCodiValor);
 			}
 			//buscar fills
 			codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entity.getDir3Codi(), organ.getCodi());
@@ -1157,8 +1157,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					continue;
 				}
 				organFill = organGestorRepository.findByCodi(fill);
-				foo = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
-				resposta.add(foo);
+				if (organFill != null) {
+					organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
+					resposta.add(organCodiValor);
+				}
 			}
 		}
 
