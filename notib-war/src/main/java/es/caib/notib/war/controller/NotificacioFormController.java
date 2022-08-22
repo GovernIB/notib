@@ -688,14 +688,14 @@ public class NotificacioFormController extends BaseUserController {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
 
-        if (organsGestors == null || organsGestors.isEmpty()) {
-            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
-        }
-
         if (organsGestors != null) {
             for (OrganGestorDto o : organsGestors) {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
             }
+        }
+
+        if (codisValor == null || codisValor.isEmpty()) {
+            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
         }
 
         model.addAttribute("organsGestors", codisValor);

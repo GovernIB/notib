@@ -1359,7 +1359,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 					new AccioParam("Callback", aplicacio.getCallbackUrl())
 			);
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
-				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getDir3Codi());
+				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			}
 			integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 			integracioHelper.addAccioOk(info);

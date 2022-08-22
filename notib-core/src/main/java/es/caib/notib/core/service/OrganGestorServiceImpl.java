@@ -20,6 +20,12 @@ import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.GrupEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
@@ -32,6 +38,15 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PagadorCieRepository;
+import es.caib.notib.core.repository.PagadorPostalRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import org.apache.commons.collections.MultiHashMap;
@@ -1567,13 +1582,17 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entity, permisos);
 		List<ProcSerOrganEntity> procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entity, permisos);
+		List<OrganGestorEntity> organsAmbPermisComu = organGestorHelper.findOrgansGestorsWithPermis(auth, entity, new Permission[]{ExtendedPermission.COMUNS});
 
-		List<OrganGestorEntity> organs = new ArrayList<>();
+		List<OrganGestorEntity> organs = new ArrayList<>(organsAmbPermisComu);
 		List<String> codis = new ArrayList<>();
+		for (OrganGestorEntity organ: organsAmbPermisComu) {
+			codis.add(organ.getCodi());
+		}
 		for (ProcSerEntity p : procediments) {
 			if (!organs.contains(p.getOrganGestor())) {
 				organs.add(p.getOrganGestor());
-				codis.add(p.getCodi());
+				codis.add(p.getOrganGestor().getCodi());
 			}
 		}
 		for (ProcSerOrganEntity p : procedimentsOrgans) {
@@ -1583,23 +1602,17 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 		}
 
-		Collections.sort(organs, new Comparator<OrganGestorEntity>() {
-			@Override
-			public int compare(OrganGestorEntity p1, OrganGestorEntity p2) {
-				return p1.getCodi().compareTo(p2.getCodi());
-			}
-		});
-
-		CodiValorDto foo;
+		// Afegim els òrgans fills
+		CodiValorDto organCodiValor;
 		Set<CodiValorDto> resposta = new HashSet<>();
 		List<String> codiFills;
 		OrganGestorEntity organFill;
 		boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
 		for(OrganGestorEntity organ: organs) {
 
-			foo = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
+			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
-				resposta.add(foo);
+				resposta.add(organCodiValor);
 			}
 			//buscar fills
 			codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entity.getDir3Codi(), organ.getCodi());
@@ -1608,12 +1621,24 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 					continue;
 				}
 				organFill = organGestorRepository.findByCodi(fill);
-				foo = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
-				resposta.add(foo);
+				if (organFill != null) {
+					organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
+					resposta.add(organCodiValor);
+				}
 			}
 		}
 
-		return new ArrayList<>(resposta);
+		List<CodiValorDto> organsAmbPermis = new ArrayList<>(resposta);
+		if (!organsAmbPermis.isEmpty()) {
+			Collections.sort(organsAmbPermis, new Comparator<CodiValorDto>() {
+				@Override
+				public int compare(CodiValorDto p1, CodiValorDto p2) {
+					return p1.getCodi().compareTo(p2.getCodi());
+				}
+			});
+		}
+
+		return organsAmbPermis;
 	/*
 		2.- Obtenir òrgans amb permís
 		3.- Obtenir procediments comuns (procedimentOrgan)
