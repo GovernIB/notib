@@ -42,13 +42,14 @@ public class OrganGestorCommand {
 	private Long operadorPostalId;
 	private Long cieId;
 
+	private String estatTraduccio;
+
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {
+
 		if (dto == null) {
 			return null;
 		}
-		OrganGestorCommand command = ConversioTipusHelper.convertir(
-				dto,
-				OrganGestorCommand.class);
+		OrganGestorCommand command = ConversioTipusHelper.convertir(dto, OrganGestorCommand.class);
 		if (dto.getOficina() != null) {
 			command.setOficina(dto.getOficina().getCodi());
 			command.setOficinaNom(dto.getOficina().getNom());
@@ -56,12 +57,11 @@ public class OrganGestorCommand {
 		return command;
 	}
 	public static OrganGestorDto asDto(OrganGestorCommand command) {
+
 		if (command == null) {
 			return null;
 		}
-		OrganGestorDto organGestorDto = ConversioTipusHelper.convertir(
-				command,
-				OrganGestorDto.class);
+		OrganGestorDto organGestorDto = ConversioTipusHelper.convertir(command, OrganGestorDto.class);
 		OficinaDto oficina = new OficinaDto();
 		oficina.setCodi(command.getOficina());
 		oficina.setNom(command.getOficinaNom());
