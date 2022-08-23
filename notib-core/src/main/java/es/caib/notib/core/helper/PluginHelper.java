@@ -944,13 +944,13 @@ public class PluginHelper {
 			configHelper.setEntitat(entitat);
 			info.setCodiEntitat(entitat.getCodi());
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
-			if (unitatsOrganitzatives != null && !unitatsOrganitzatives.isEmpty()) {
-				integracioHelper.addAccioOk(info);
-				return unitatsOrganitzatives;
+			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
+				String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
+				integracioHelper.addAccioError(info, errorMissatge);
+				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
-			String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
-			integracioHelper.addAccioError(info, errorMissatge);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
+			integracioHelper.addAccioOk(info);
+			return unitatsOrganitzatives;
 		} catch (SistemaExternException sex) {
 			throw sex;
 		} catch (Exception ex) {

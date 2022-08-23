@@ -43,13 +43,16 @@ public class OrganGestorDto extends AuditoriaDto implements Serializable {
 	private Long operadorPostalId;
 	private Long cieId;
 
+	private String estatTraduccio;
+
 	public void setOrganGestorEstatEnum(OrganGestorEstatEnum estat) {
 		this.estat = estat;
 		actiu = estat != null && OrganGestorEstatEnum.V.equals(estat);
 	}
 
 	public String getNomCodi() {
-		return nom + " (" + codi + ")";
+		return nom + " (" + codi + ")" + (estat != null && !OrganGestorEstatEnum.V.equals(estat) ?
+				" <span class=\"fa fa-warning text-danger\" title=\" " + estatTraduccio + " \"></span>" : "");
 	}
 
 	public String getCodiNom() {
