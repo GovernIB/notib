@@ -1,3 +1,4 @@
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib tagdir="/WEB-INF/tags/notib" prefix="not"%>
@@ -11,6 +12,10 @@
 <%@ attribute name="fullesAtributNom"%>
 <%@ attribute name="fullesAtributPare"%>
 <%@ attribute name="fullesIcona"%>
+<%@ attribute name="fullesIconaDreta"%>
+<%@ attribute name="fullesAtributDreta"%>
+<%@ attribute name="fullesCondicioDreta"%>
+<%@ attribute name="fullesMissatgeDreta"%>
 <%@ attribute name="fullesAtributCssClassCondition"%>
 <%@ attribute name="fullesAtributInfoText"%>
 <%@ attribute name="isOcultarCounts" type="java.lang.Boolean"%>
@@ -20,7 +25,14 @@
 			<small <c:if test="${fill.retornatFiltre}">style="font-weight:bold;"</c:if>>${fill.dades[atributNom]}<c:if test="${not isOcultarCounts and fill.mostrarCount}"> <span class="badge">${fill.count}</span></c:if></small>
 			<not:arbreFills pare="${fill}" fills="${fill.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"  fulles="${fulles}"
 							fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}"
-							isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}"/>
+							isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}"
+							fullesAtributDreta="${fullesAtributDreta}" fullesMissatgeDreta="${fullesMissatgeDreta}"
+							fullesIconaDreta="${fullesIconaDreta}" fullesCondicioDreta="${fullesCondicioDreta}"/>
+
+			<c:if test="${fullesCondicioDreta != fill.dades[fullesAtributDreta]}">
+				<span> </span><span class="${fullesIconaDreta}" title="<spring:message code="${fullesMissatgeDreta}${fill.dades[fullesAtributDreta]}"/>"></span>
+			</c:if>
+
 		</li>
 	</c:forEach>
 	<c:forEach var="fulla" items="${fulles}">
@@ -40,6 +52,7 @@
 					</c:otherwise>
 				</c:choose>
 				<c:if test="${!empty fullesAtributInfoText && fulla[fullesAtributInfo]}">${fullesAtributInfoText}</c:if>
+
 			</li>
 		</c:if>
 	</c:forEach>

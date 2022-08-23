@@ -17,6 +17,7 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.EnumHelper;
+import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -164,6 +165,7 @@ public class OrganGestorArbreController extends BaseUserController {
             if (o == null) {
                 throw new NotFoundException(codiSia, OrganGestorEntity.class);
             }
+            o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
             omplirModel(model, entitat, o);
         } catch (Exception ex) {
             String msg = getMessage(request, "organgestor.detall.error", new Object[] {

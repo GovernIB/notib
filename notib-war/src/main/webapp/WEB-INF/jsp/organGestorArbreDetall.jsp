@@ -169,7 +169,7 @@
             <not:inputText name="codi" readonly="true" textKey="organgestor.list.columna.codi" required="true"/>
             <not:inputText name="nom" readonly="true" textKey="organgestor.list.columna.nom" required="true"/>
 
-            <not:inputText name="estat" readonly="true" textKey="organgestor.list.columna.estat" required="true"/>
+            <not:inputText name="estatTraduccio" readonly="true" textKey="organgestor.list.columna.estat" required="true"/>
 
             <c:if test="${setLlibre and !isModificacio}">
                 <br/>

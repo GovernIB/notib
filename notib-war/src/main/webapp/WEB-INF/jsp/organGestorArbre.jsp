@@ -158,7 +158,9 @@
 
                 <not:arbre id="arbreOrgans" atributId="codi" atributNom="nomCodi" arbre="${arbreOrgans}" fullesAtributId="id" fullesAtributNom="nomCodi"
                            fullesAtributPare="codi"  fullesIcona="fa fa-inbox fa-lg" changedCallback="changedCallback" isArbreSeleccionable="${true}"
-                           isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"/>
+                           isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"
+                           fullesAtributDreta="estat" fullesMissatgeDreta="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."
+                           fullesIconaDreta="fa fa-warning text-danger" fullesCondicioDreta="V"/>
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">

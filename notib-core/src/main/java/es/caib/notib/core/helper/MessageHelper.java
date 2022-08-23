@@ -77,8 +77,18 @@ public class MessageHelper implements MessageSourceAware {
 		return getMessage(key, null, null);
 	}
 
+//	public void setMessageSource(MessageSource messageSource) {
+//		this.messageSource = messageSource;
+//	}
+
 	public void setMessageSource(MessageSource messageSource) {
-		this.messageSource = messageSource;
+		INSTANCE.messageSource = messageSource;
+	}
+
+	public static MessageHelper INSTANCE = new MessageHelper();
+
+	public static MessageHelper getInstance() {
+		return INSTANCE;
 	}
 
 }
