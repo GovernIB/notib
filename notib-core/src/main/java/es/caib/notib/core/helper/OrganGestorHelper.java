@@ -348,34 +348,34 @@ public class OrganGestorHelper {
 			return unitat;
 		}
 
-		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(entitat.getDir3Codi(), unitatWS.getCodi());
-		Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
-		List<OficinaDto> oficines = pluginHelper.oficinesSIRUnitat(entitat.getDir3Codi(), arbreUnitats);
+
 		// checks if unitat already exists in database
 		unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
 		// if not it creates a new one
 		if (unitat != null) {
 			unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
-			updateLlibreAndOficina(unitat, llibre, oficines);
+			updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 			return unitat;
 		}
 		// Venen les unitats ordenades, primer el pare i després els fills?
 		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(unitatWS.getDenominacio()).codiPare(unitatWS.getSuperior())
 				.estat(unitatWS.getEstat()).build();
-		updateLlibreAndOficina(unitat, llibre, oficines);
+		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
 		organGestorRepository.save(unitat);
 		return unitat;
 
 	}
 
-	private void updateLlibreAndOficina(OrganGestorEntity organ, LlibreDto llibre, List<OficinaDto> oficines) {
+	private void updateLlibreAndOficina(OrganGestorEntity organ, String entitatDir3Codi) {
 
+		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(entitatDir3Codi, organ.getCodi());
+		List<OficinaDto> oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
 		if (llibre != null) {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
 		if (oficines != null && !oficines.isEmpty()) {
 			OficinaDto o = oficines.get(0);
-			organ.updateOficina(o.getCodi(), o.getCodi());
+			organ.updateOficina(o.getCodi(), o.getNom());
 		}
 	}
 

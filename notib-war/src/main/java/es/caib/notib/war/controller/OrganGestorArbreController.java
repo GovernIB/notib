@@ -13,7 +13,6 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
-import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.EnumHelper;
@@ -163,7 +162,7 @@ public class OrganGestorArbreController extends BaseUserController {
             OrganGestorDto o = organService.findByCodi(entitat.getId(), codiSia);
             //o = o == null ? organService.getOrganNou(codiSia) : o;
             if (o == null) {
-                throw new NotFoundException(codiSia, OrganGestorEntity.class);
+                throw new NotFoundException(codiSia, OrganGestorDto.class);
             }
             o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
             omplirModel(model, entitat, o);
