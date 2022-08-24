@@ -713,10 +713,10 @@ public class NotificacioFormController extends BaseUserController {
             interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
         } else if (TipusEnviamentEnumDto.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA, };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         } else {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF,  InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         }
         model.addAttribute("interessatTipus", EnumHelper.getOrderedOptionsForEnum(InteressatTipusEnumDto.class,"es.caib.notib.core.api.dto.interessatTipusEnumDto.", interessatsTipus));
