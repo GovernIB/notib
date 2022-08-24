@@ -189,14 +189,14 @@ $(document).ready(function() {
 	<p style="text-align:right">
 		<c:if test="${isRolActualAdministradorEntitat}">
 			<a id="procediment-boto-cache" class="btn btn-warning" href="${unitatCodiUrlPrefix}procediment/cache/refrescar"><span class="fa fa-trash"></span>&nbsp;<spring:message code="procediment.list.boto.cache"/></a>
-			<c:if test="${!isCodiDir3Entitat}">
-				<a id="servei-boto-update"
+<%--			<c:if test="${!isCodiDir3Entitat}">--%>
+				<a id="procediment-boto-update"
 					class="btn btn-default" href="${unitatCodiUrlPrefix}servei/update/auto"
 					data-toggle="modal"
 					data-maximized="false">
 					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="servei.list.boto.servei.auto"/>
 				</a>
-			</c:if>
+<%--			</c:if>--%>
 		</c:if>
 		<a id="procediment-boto-nou" class="btn btn-default" href="${unitatCodiUrlPrefix}servei/new" data-toggle="modal" data-maximized="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="servei.list.boto.nou.procediment"/></a>
 	</p>
