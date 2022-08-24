@@ -1364,9 +1364,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				organismes = organigramaHelper.getOrganismesFillsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar els organismes de l'entitat: " + entitat.getDir3Codi() + " i òrgan gestor: " + organGestor.getCodi();
-				logger.error(
-						errorMessage, 
-						e.getMessage());
+				logger.error(errorMessage, e.getMessage());
 			}
 			return organismes;
 		} finally {
@@ -1376,27 +1374,18 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public LlibreDto getLlibreOrganisme(
-			Long entitatId,
-			String organGestorDir3Codi) {
+	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
 			LlibreDto llibre = new LlibreDto();
 			try {
 				//Recupera el llibre de l'òrgan gestor especificat (organisme)
-				llibre = cacheHelper.getLlibreOrganGestor(
-						entitat.getDir3Codi(),
-						organGestorDir3Codi);
+				llibre = cacheHelper.getLlibreOrganGestor(entitat.getDir3Codi(), organGestorDir3Codi);
 	 		} catch (Exception e) {
 	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'òrgan gestor: " + organGestorDir3Codi;
-				logger.error(
-						errorMessage, 
-						e.getMessage());
+				logger.error(errorMessage, e.getMessage());
 			}
 			return llibre;
 		} finally {
