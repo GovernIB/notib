@@ -1718,8 +1718,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
-				comunicacioAmbAdministracio = InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
-				comunicacioSenseAdministracio = !InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
+				comunicacioAmbAdministracio = comunicacioAmbAdministracio || InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
+				comunicacioSenseAdministracio = comunicacioSenseAdministracio || !InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
 			}
 			boolean senseNif = true;
 			
@@ -2084,7 +2084,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return setRespostaError(messageHelper.getMessage("error.validacio.provincia.no.null.entrega.nacional"));
 					}
 					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
-						return setRespostaError("error.validacio.poblacio.codi.no.null.entrega.nacional.normalitzat");
+						return setRespostaError(messageHelper.getMessage("error.validacio.poblacio.codi.no.null.entrega.nacional.normalitzat"));
 					}
 				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
