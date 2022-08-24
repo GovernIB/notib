@@ -12,6 +12,10 @@
 <%@ attribute name="fullesAtributNom"%>
 <%@ attribute name="fullesAtributPare"%>
 <%@ attribute name="fullesIcona"%>
+<%@ attribute name="fullesIconaDreta"%>
+<%@ attribute name="fullesAtributDreta"%>
+<%@ attribute name="fullesCondicioDreta"%>
+<%@ attribute name="fullesMissatgeDreta"%>
 <%@ attribute name="isArbreSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isFullesSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isOcultarCounts" type="java.lang.Boolean"%>
@@ -30,7 +34,9 @@
 				<small>${arbre.arrel.dades[atributNom]}<c:if test="${not isOcultarCounts and arbre.arrel.mostrarCount}"> <span class="badge">${arbre.arrel.count}</span></c:if></small>
 				<not:arbreFills pare="${arbre.arrel}" fills="${arbre.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}" fulles="${fulles}"
 								fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}"
-								isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}" fullesAtributInfoText="${fullesAtributInfoText}"/>
+								isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}" fullesAtributInfoText="${fullesAtributInfoText}"
+								fullesAtributDreta="${fullesAtributDreta}" fullesMissatgeDreta="${fullesMissatgeDreta}"
+								fullesIconaDreta="${fullesIconaDreta}" fullesCondicioDreta="${fullesCondicioDreta}"/>
 			</li>
 		</ul>
 	</c:if>

@@ -2,7 +2,10 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.organisme.TipusTransicioEnumDto;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.AvisEntity;
@@ -12,6 +15,7 @@ import es.caib.notib.core.repository.AvisRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.plugin.registre.Llibre;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -30,6 +34,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,6 +49,8 @@ public class OrganGestorHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private OrganigramaHelper organigramaHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
@@ -109,6 +116,26 @@ public class OrganGestorHelper {
 			codis.add(organGestorDto.getCodi());
 		}
 		return codis;
+	}
+
+	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
+															   EntitatEntity entitat,
+															   Permission[] permisos) {
+		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
+				entitat,
+				auth,
+				permisos);
+
+		if (organs.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		Set<String> codisOrgansAmbDescendents = new HashSet<>();
+		for (OrganGestorEntity organGestorEntity : organs) {
+			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
+		}
+		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
+
 	}
 
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
@@ -315,30 +342,41 @@ public class OrganGestorHelper {
 	}
 
 	private OrganGestorEntity sincronizarUnitat(NodeDir3 unitatWS, EntitatEntity entitat) {
+
 		OrganGestorEntity unitat = null;
-		if (unitatWS != null) {
-			// checks if unitat already exists in database
-			unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
-			// if not it creates a new one
-			if (unitat == null) {
-				// Venen les unitats ordenades, primer el pare i després els fills?
-				unitat = OrganGestorEntity.builder()
-						.codi(unitatWS.getCodi())
-						.entitat(entitat)
-						.nom(unitatWS.getDenominacio())
-						.codiPare(unitatWS.getSuperior())
-//						.pare(organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior()))
-						.estat(unitatWS.getEstat())
-						.build();
-				organGestorRepository.save(unitat);
-			} else {
-				unitat.update(
-						unitatWS.getDenominacio(),
-						unitatWS.getEstat(),
-						unitatWS.getSuperior());
-			}
+		if (unitatWS == null) {
+			return unitat;
 		}
+
+		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(entitat.getDir3Codi(), unitatWS.getCodi());
+		Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
+		List<OficinaDto> oficines = pluginHelper.oficinesSIRUnitat(entitat.getDir3Codi(), arbreUnitats);
+		// checks if unitat already exists in database
+		unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
+		// if not it creates a new one
+		if (unitat != null) {
+			unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
+			updateLlibreAndOficina(unitat, llibre, oficines);
+			return unitat;
+		}
+		// Venen les unitats ordenades, primer el pare i després els fills?
+		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(unitatWS.getDenominacio()).codiPare(unitatWS.getSuperior())
+				.estat(unitatWS.getEstat()).build();
+		updateLlibreAndOficina(unitat, llibre, oficines);
+		organGestorRepository.save(unitat);
 		return unitat;
+
+	}
+
+	private void updateLlibreAndOficina(OrganGestorEntity organ, LlibreDto llibre, List<OficinaDto> oficines) {
+
+		if (llibre != null) {
+			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
+		}
+		if (oficines != null && !oficines.isEmpty()) {
+			OficinaDto o = oficines.get(0);
+			organ.updateOficina(o.getCodi(), o.getCodi());
+		}
 	}
 
 	private void sincronizarHistoricsUnitat(

@@ -110,16 +110,22 @@
                 <div class="col-md-3">
                     <not:inputText name="nom" inline="true" placeholderKey="organgestor.list.columna.nom"/>
                 </div>
+
+                <div class="col-md-2">
+                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
+                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
+                </div>
+
+                <div class="col-md-2">
+                    <not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+                                     placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
+                </div>
                 <c:if test="${setOficina}">
                     <div class="col-md-3">
                         <not:inputSelect name="oficina" textKey="organgestor.list.columna.oficina" required="true" optionItems="${oficinesEntitat}" optionValueAttribute="codi"
                                          optionTextAttribute="nom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.oficina.select"/>
                     </div>
                 </c:if>
-                <div class="col-md-3">
-                    <not:inputSelect name="codiPare" textKey="organgestor.list.columna.organ.arrel" required="true" optionItems="${organsEntitat}" optionValueAttribute="codi"
-                                     optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
-                </div>
 
             </div>
             <div class="row">
@@ -129,6 +135,7 @@
                     </button>
                     <not:inputHidden name="entregaCie"/>
                 </div>
+
                 <div class="col-md-2 pull-right">
                     <div class="pull-right">
                         <button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -151,7 +158,9 @@
 
                 <not:arbre id="arbreOrgans" atributId="codi" atributNom="nomCodi" arbre="${arbreOrgans}" fullesAtributId="id" fullesAtributNom="nomCodi"
                            fullesAtributPare="codi"  fullesIcona="fa fa-inbox fa-lg" changedCallback="changedCallback" isArbreSeleccionable="${true}"
-                           isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"/>
+                           isFullesSeleccionable="${true}" isOcultarCounts="${true}" fullesAtributCssClassCondition="actiu"
+                           fullesAtributDreta="estat" fullesMissatgeDreta="es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."
+                           fullesIconaDreta="fa fa-warning text-danger" fullesCondicioDreta="V"/>
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">

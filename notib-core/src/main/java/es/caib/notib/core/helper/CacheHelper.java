@@ -125,8 +125,8 @@ public class CacheHelper {
 	
 	@Cacheable(value = "organigramaOriginal", key="#entitatDir3Codi")
 	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
-		Map<String, OrganismeDto> organigrama = new HashMap<>();
 
+		Map<String, OrganismeDto> organigrama = new HashMap<>();
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
 		if (organs == null || organs.isEmpty()) {
 			return organigrama;
@@ -141,7 +141,8 @@ public class CacheHelper {
 	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
 		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
 		for (OrganGestorEntity organ: organs) {
-			if (OrganGestorEstatEnum.V.equals(organ.getEstat()) || OrganGestorEstatEnum.T.equals(organ.getEstat())) {    // Unitats Vigents o Transitòries
+//			if (OrganGestorEstatEnum.V.equals(organ.getEstat()) || OrganGestorEstatEnum.T.equals(organ.getEstat())) {    // Unitats Vigents o Transitòries
+
 				if (organsMap.containsKey(organ.getCodiPare())) {
 					List<OrganGestorEntity> fills = organsMap.get(organ.getCodiPare());
 					fills.add(organ);
@@ -150,7 +151,7 @@ public class CacheHelper {
 					fills.add(organ);
 					organsMap.put(organ.getCodiPare(), fills);
 				}
-			}
+//			}
 		}
 		return organsMap;
 	}

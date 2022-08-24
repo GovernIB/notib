@@ -688,14 +688,14 @@ public class NotificacioFormController extends BaseUserController {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
 
-        if (organsGestors == null || organsGestors.isEmpty()) {
-            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
-        }
-
         if (organsGestors != null) {
             for (OrganGestorDto o : organsGestors) {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
             }
+        }
+
+        if (codisValor == null || codisValor.isEmpty()) {
+            MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
         }
 
         model.addAttribute("organsGestors", codisValor);
@@ -713,10 +713,10 @@ public class NotificacioFormController extends BaseUserController {
             interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
         } else if (TipusEnviamentEnumDto.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA, };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         } else {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF,  InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         }
         model.addAttribute("interessatTipus", EnumHelper.getOrderedOptionsForEnum(InteressatTipusEnumDto.class,"es.caib.notib.core.api.dto.interessatTipusEnumDto.", interessatsTipus));

@@ -17,6 +17,7 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.NotificacioHelper.NotificacioData;
 import es.caib.notib.core.repository.DocumentRepository;
 import es.caib.notib.core.repository.GrupRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.test.data.ConfigTest;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
@@ -57,6 +58,8 @@ public class NotificacioHelperTest {
 	private GrupRepository grupRepository;
 	@Mock
 	private DocumentRepository documentRepository;
+	@Mock
+	private OrganGestorRepository organGestorRepository;
 	@Mock
 	private GrupEntity grupNotificacio;
 	@Mock
@@ -174,7 +177,8 @@ public class NotificacioHelperTest {
 		Mockito.when(grupRepository.findOne(Mockito.anyLong())).thenReturn(grupNotificacio);
 		Mockito.when(documentRepository.findOne(Mockito.anyLong())).thenReturn(documentEntity);
 		Mockito.when(documentRepository.save(Mockito.any(DocumentEntity.class))).thenReturn(documentEntity2, documentEntity3);
-		
+		Mockito.when(organGestorRepository.findByCodi(Mockito.any(String.class))).thenReturn(organGestor);
+
 		//base64
 		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn(documentGesdocId);
 		

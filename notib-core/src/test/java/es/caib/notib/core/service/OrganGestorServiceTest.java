@@ -24,6 +24,7 @@ import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.test.data.ConfigTest;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,6 +32,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
+@Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class OrganGestorServiceTest {
     @Mock

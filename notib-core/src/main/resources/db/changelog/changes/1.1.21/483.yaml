@@ -51,6 +51,7 @@ databaseChangeLog:
                   name: organ_no_sinc
                   type: boolean
                   valueBoolean: false
+                  defaultValue: 0
         - addColumn:
             tableName: not_entitat
             columns:
