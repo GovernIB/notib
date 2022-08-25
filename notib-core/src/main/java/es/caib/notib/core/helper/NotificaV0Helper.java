@@ -1,6 +1,7 @@
 
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -245,7 +246,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, "", false);
 
 			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-			NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(datatDarrer.getResultado());
+			EnviamentEstat estat = getEstatNotifica(datatDarrer.getResultado());
 			log.info("Actualitzant informació enviament amb Datat...");
 			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 				CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();

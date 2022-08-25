@@ -34,7 +34,7 @@ public class RespostaConsultaEstatEnviamentV2 extends RespostaBase {
     private String identificador;
     private String referencia;
     private String notificaIndentificador;
-    private EnviamentEstatEnum estat;
+    private EnviamentEstat estat;
     private Date estatData;
     private String estatDescripcio;
     private boolean enviamentSir;

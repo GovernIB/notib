@@ -44,7 +44,6 @@ import java.util.Date;
 //import es.caib.notib.core.api.dto.NotificaDomiciliTipusEnumDto;
 //import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 //import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-//import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 //import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 //import es.caib.notib.core.api.dto.PermisDto;
 //import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
@@ -1746,8 +1745,8 @@ public class NotificaWsTestIntegracio {
 			enviament.getTitular().setNif("00000000T");
 			enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
 			enviament.setNotificacio(notificacio);
-			enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
-//			enviament.setSeuEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+			enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
+//			enviament.setSeuEstat(EnviamentEstat.NOTIB_PENDENT);
 			enviament.getTitular().setNom("titularNom" + i);
 			enviament.getTitular().setLlinatge1("titLlinatge1_" + i);
 			enviament.getTitular().setLlinatge2("titLlinatge2_" + i);
@@ -2064,10 +2063,10 @@ public class NotificaWsTestIntegracio {
 		public void setNotificaReferencia(String notificaReferencia) {
 			this.notificaReferencia = notificaReferencia;
 		}
-		public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
+		public void setNotificaEstat(EnviamentEstat notificaEstat) {
 			this.notificaEstat = notificaEstat;
 		}
-//		public void setSeuEstat(NotificacioEnviamentEstatEnumDto seuEstat) {
+//		public void setSeuEstat(EnviamentEstat seuEstat) {
 //			this.seuEstat = seuEstat;
 //		}
 		public void setNotificacio(NotificacioEntity notificacio) {

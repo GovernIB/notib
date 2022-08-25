@@ -5,6 +5,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -545,7 +546,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getEstat().isNull(),
 							filtreNetejat.getEstat().getField(),
 							!filtreNetejat.getEstat().isNull() ?
-									NotificacioEnviamentEstatEnumDto.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
@@ -591,7 +592,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getEstat().isNull(),
 							filtreNetejat.getEstat().getField(),
 							!filtreNetejat.getEstat().isNull() ?
-									NotificacioEnviamentEstatEnumDto.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
@@ -633,7 +634,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getEstat().isNull(),
 							filtreNetejat.getEstat().getField(),
 							!filtreNetejat.getEstat().isNull() ?
-									NotificacioEnviamentEstatEnumDto.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
@@ -750,7 +751,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 						filtre.getConcepte() == null ? "" : filtre.getConcepte(),
 						filtre.getEstat() == null,
 						filtre.getEstat(),
-						filtre.getEstat() == null ? null : NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()),
+						filtre.getEstat() == null ? null : EnviamentEstat.valueOf(filtre.getEstat().toString()),
 						filtre.getUsuari() == null || filtre.getUsuari().trim().isEmpty(),
 						filtre.getUsuari() == null ? "" : filtre.getUsuari(),
 						paginacioHelper.toSpringDataPageable(paginacioParams));

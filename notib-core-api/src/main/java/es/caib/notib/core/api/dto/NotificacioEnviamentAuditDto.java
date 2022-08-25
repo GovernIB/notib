@@ -1,5 +1,6 @@
 package es.caib.notib.core.api.dto;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import lombok.Data;
@@ -34,7 +35,7 @@ public class NotificacioEnviamentAuditDto {
     private Date notificaDataCaducitat;
     private String notificaEmisorDir3;
     private String notificaArrelDir3;
-    private NotificacioEnviamentEstatEnumDto notificaEstat;
+    private EnviamentEstat notificaEstat;
     private Date notificaEstatData;
     private boolean notificaEstatFinal;
     private String notificaDatatOrigen;

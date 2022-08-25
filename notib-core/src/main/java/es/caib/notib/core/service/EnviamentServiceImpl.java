@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
@@ -288,7 +289,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtre.getCsvUuid(),
 						(filtre.getEstat() == null),
 						(estat),
-						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+						filtre.getEstat() != null ? EnviamentEstat.valueOf(filtre.getEstat().toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -432,7 +433,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.csvUuid.getField(),
 						filtreFields.estat.isNull(),
 						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? NotificacioEnviamentEstatEnumDto.valueOf(filtreFields.estat.getField().toString()) : null,
+						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
 						entitatEntity,
 						filtreFields.dataEnviamentInici.isNull(),
 						filtreFields.dataEnviamentInici.getField(),
@@ -502,7 +503,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.csvUuid.getField(),
 						filtreFields.estat.isNull(),
 						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? NotificacioEnviamentEstatEnumDto.valueOf(filtreFields.estat.getField().toString()) : null,
+						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
 						entitatEntity,
 						filtreFields.dataEnviamentInici.isNull(),
 						filtreFields.dataEnviamentInici.getField(),
@@ -565,7 +566,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.csvUuid.getField(),
 						filtreFields.estat.isNull(),
 						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? NotificacioEnviamentEstatEnumDto.valueOf(filtreFields.estat.getField().toString()) : null,
+						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
 						entitatEntity,
 						filtreFields.dataEnviamentInici.isNull(),
 						filtreFields.dataEnviamentInici.getField(),
@@ -1265,7 +1266,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				return enviament.isEnviamentProcessat() ? Estat.PROCESSADA :
 						enviament.isEnviamentFinalitzat() ? Estat.FINALITZADA :
 						enviament.isEnviamentEnviat() ? Estat.ENVIADA :
-						NotificacioEnviamentEstatEnumDto.REGISTRADA.equals(enviament.getNotificaEstat()) ? Estat.REGISTRADA : Estat.PENDENT;
+								EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat()) ? Estat.REGISTRADA : Estat.PENDENT;
 		}
 	}
 	

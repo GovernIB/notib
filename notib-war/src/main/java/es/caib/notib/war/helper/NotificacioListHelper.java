@@ -3,6 +3,7 @@
  */
 package es.caib.notib.war.helper;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -66,8 +67,8 @@ public class NotificacioListHelper {
 				"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("tipusUsuari", EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
 				"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-				"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class,
+				"es.caib.notib.client.domini.EnviamentEstat."));
 		model.addAttribute("notificacioComunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
 				"es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
 		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,

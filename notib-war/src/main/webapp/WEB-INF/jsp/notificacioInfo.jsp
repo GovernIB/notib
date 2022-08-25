@@ -323,7 +323,7 @@ $(document).ready(function() {
 								<c:if test="${notificacio.estat == 'FINALITZADA' or notificacio.estat == 'PROCESSADA'}">
 									(<c:forEach items="${notificacio.enviaments}" var="enviament" varStatus="status">
 										<c:if test="${not empty enviament.notificaEstat}">
-											<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+											<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
 											${!status.last ? ', ' : ''}
 										</c:if>
 									</c:forEach>)
@@ -598,7 +598,7 @@ $(document).ready(function() {
 											<th><spring:message code="notificacio.list.enviament.list.estat"/></th>
 											<td>
 												<c:if test="${not empty enviament.notificaEstat}">
-													<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
+													<spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/>
 													<c:if test="${enviament.perEmail and enviament.notificaEstat == 'FINALITZADA'}">
 														(<c:choose><c:when test="${notificacio.enviamentTipus == 'NOTIFICACIO'}"><spring:message code="notificacio.list.enviament.list.finalitzat.avis.email"/></c:when><c:otherwise><spring:message code="notificacio.list.enviament.list.finalitzat.email"/></c:otherwise></c:choose>)
 													</c:if>
@@ -620,9 +620,6 @@ $(document).ready(function() {
 										</tr>
 						    			<tr>
 							    			<th><spring:message code="enviament.info.seccio.notifica.registre"/></th>
-							    			<%--<td>
-							    			<spring:message code="es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.${enviament.notificaEstat}"/>
-							    			</td>--%>
 							    			<c:choose>
 							    				<c:when test="${not empty enviament.registreNumeroFormatat}">
 													<td>

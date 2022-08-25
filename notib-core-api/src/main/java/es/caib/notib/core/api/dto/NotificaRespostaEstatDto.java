@@ -5,6 +5,7 @@ package es.caib.notib.core.api.dto;
 
 import java.util.Date;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -15,7 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 
-	private NotificacioEnviamentEstatEnumDto estat;
+	private EnviamentEstat estat;
 	private Date estatData;
 	private String estatDescripcio;
 	private String datatOrigen;
@@ -35,10 +36,10 @@ public class NotificaRespostaEstatDto extends NotificaRespostaDto {
 	private NotificaCertificacioArxiuTipusEnumDto certificacioArxiuTipus;
 	private String certificacioNumSeguiment;
 
-	public NotificacioEnviamentEstatEnumDto getEstat() {
+	public EnviamentEstat getEstat() {
 		return estat;
 	}
-	public void setEstat(NotificacioEnviamentEstatEnumDto estat) {
+	public void setEstat(EnviamentEstat estat) {
 		this.estat = estat;
 	}
 	public Date getEstatData() {

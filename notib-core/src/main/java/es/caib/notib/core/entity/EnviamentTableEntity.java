@@ -1,7 +1,7 @@
 package es.caib.notib.core.entity;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
@@ -157,7 +157,7 @@ public class EnviamentTableEntity extends NotibAuditable<Long> {
 	protected String notificaCertificacioNumSeguiment;
 
 	@Column(name = "NOTIFICA_ESTAT", length = 50)
-	protected NotificacioEnviamentEstatEnumDto notificaEstat;
+	protected EnviamentEstat notificaEstat;
 
 	@Column(name = "NOTIFICA_REF", length = 36)
 	protected String notificaReferencia;

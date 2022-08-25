@@ -403,7 +403,7 @@ public class ClientRestTest extends ClientBaseTest {
 			assertFalse(info.isError());
 
 			assertNotNull(referencia.getReferencia());
-			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+			if (SYNC_MODE && info.getEstat() == EnviamentEstat.LLEGIDA) {
 				assertNotNull(info.getCertificacio());
 				assertNotNull(info.getReceptorNif());
 			}
@@ -492,7 +492,7 @@ public class ClientRestTest extends ClientBaseTest {
 			assertFalse(info.isError());
 
 			assertNotNull(referencia.getReferencia());
-			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+			if (SYNC_MODE && info.getEstat() == EnviamentEstat.LLEGIDA) {
 				assertNotNull(info.getCertificacio());
 				assertNotNull(info.getReceptorNif());
 			}
@@ -548,7 +548,7 @@ public class ClientRestTest extends ClientBaseTest {
 			assertFalse(info.isError());
 
 			assertNotNull(referencia.getReferencia());
-			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+			if (SYNC_MODE && info.getEstat() == EnviamentEstat.LLEGIDA) {
 				assertNotNull(info.getCertificacio());
 				assertNotNull(info.getReceptorNif());
 			}
@@ -610,7 +610,7 @@ public class ClientRestTest extends ClientBaseTest {
 			assertFalse(info.isError());
 
 			assertNotNull(referencia.getReferencia());
-			if (SYNC_MODE && info.getEstat() == EnviamentEstatEnum.LLEGIDA) {
+			if (SYNC_MODE && info.getEstat() == EnviamentEstat.LLEGIDA) {
 				assertNotNull(info.getCertificacio());
 				assertNotNull(info.getReceptorNif());
 			}

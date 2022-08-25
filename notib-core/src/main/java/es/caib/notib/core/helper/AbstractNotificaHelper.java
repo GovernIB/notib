@@ -3,8 +3,8 @@
  */
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -66,7 +66,7 @@ public abstract class AbstractNotificaHelper {
 	}
 
 	public NotificacioEnviamentEntity enviamentUpdateDatat(
-			NotificacioEnviamentEstatEnumDto notificaEstat,
+			EnviamentEstat notificaEstat,
 			Date notificaEstatData,
 			String notificaEstatDescripcio,
 			String notificaDatatOrigen,
@@ -75,18 +75,18 @@ public abstract class AbstractNotificaHelper {
 			String notificaDatatNumSeguiment,
 			String notificaDatatErrorDescripcio,
 			NotificacioEnviamentEntity enviament) throws Exception {
-		boolean estatFinal = 
-				NotificacioEnviamentEstatEnumDto.ABSENT.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.EXPIRADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.EXTRAVIADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.MORT.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.LLEGIDA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.NOTIFICADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.REBUTJADA.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.DESCONEGUT.equals(notificaEstat) ||
-				NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO.equals(notificaEstat);
+		boolean estatFinal =
+				EnviamentEstat.ABSENT.equals(notificaEstat) ||
+						EnviamentEstat.ADRESA_INCORRECTA.equals(notificaEstat) ||
+						EnviamentEstat.ERROR_ENTREGA.equals(notificaEstat) ||
+						EnviamentEstat.EXPIRADA.equals(notificaEstat) ||
+						EnviamentEstat.EXTRAVIADA.equals(notificaEstat) ||
+						EnviamentEstat.MORT.equals(notificaEstat) ||
+						EnviamentEstat.LLEGIDA.equals(notificaEstat) ||
+						EnviamentEstat.NOTIFICADA.equals(notificaEstat) ||
+						EnviamentEstat.REBUTJADA.equals(notificaEstat) ||
+						EnviamentEstat.DESCONEGUT.equals(notificaEstat) ||
+						EnviamentEstat.SENSE_INFORMACIO.equals(notificaEstat);
 		enviament.updateNotificaDatat(
 				notificaEstat,
 				notificaEstatData,
@@ -166,29 +166,29 @@ public abstract class AbstractNotificaHelper {
 			"envio_programado",
 			"sin_informacion",
 			"anulada"};
-	private static final NotificacioEnviamentEstatEnumDto[] estatsNotib = new NotificacioEnviamentEstatEnumDto[] {
-			NotificacioEnviamentEstatEnumDto.ABSENT,
-			NotificacioEnviamentEstatEnumDto.DESCONEGUT,
-			NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA,
-			NotificacioEnviamentEstatEnumDto.ENVIADA_DEH,
-			NotificacioEnviamentEstatEnumDto.ENVIADA_CI,
-			NotificacioEnviamentEstatEnumDto.ENTREGADA_OP,
-			NotificacioEnviamentEstatEnumDto.LLEGIDA,
-			NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA,
-			NotificacioEnviamentEstatEnumDto.EXTRAVIADA,
-			NotificacioEnviamentEstatEnumDto.MORT,
-			NotificacioEnviamentEstatEnumDto.NOTIFICADA,
-			NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT,
-			NotificacioEnviamentEstatEnumDto.PENDENT_CIE,
-			NotificacioEnviamentEstatEnumDto.PENDENT_DEH,
-			NotificacioEnviamentEstatEnumDto.PENDENT_SEU,
-			NotificacioEnviamentEstatEnumDto.REBUTJADA,
-			NotificacioEnviamentEstatEnumDto.EXPIRADA,
-			NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT,
-			NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO,
-			NotificacioEnviamentEstatEnumDto.ANULADA};
+	private static final EnviamentEstat[] estatsNotib = new EnviamentEstat[] {
+			EnviamentEstat.ABSENT,
+			EnviamentEstat.DESCONEGUT,
+			EnviamentEstat.ADRESA_INCORRECTA,
+			EnviamentEstat.ENVIADA_DEH,
+			EnviamentEstat.ENVIADA_CI,
+			EnviamentEstat.ENTREGADA_OP,
+			EnviamentEstat.LLEGIDA,
+			EnviamentEstat.ERROR_ENTREGA,
+			EnviamentEstat.EXTRAVIADA,
+			EnviamentEstat.MORT,
+			EnviamentEstat.NOTIFICADA,
+			EnviamentEstat.PENDENT_ENVIAMENT,
+			EnviamentEstat.PENDENT_CIE,
+			EnviamentEstat.PENDENT_DEH,
+			EnviamentEstat.PENDENT_SEU,
+			EnviamentEstat.REBUTJADA,
+			EnviamentEstat.EXPIRADA,
+			EnviamentEstat.ENVIAMENT_PROGRAMAT,
+			EnviamentEstat.SENSE_INFORMACIO,
+			EnviamentEstat.ANULADA};
 
-	protected NotificacioEnviamentEstatEnumDto getEstatNotifica(String estatCodi) {
+	protected EnviamentEstat getEstatNotifica(String estatCodi) {
 		for (int i = 0; i < estatsNotifica.length; i++) {
 			if (estatCodi.equalsIgnoreCase(estatsNotifica[i])) {
 				return estatsNotib[i];

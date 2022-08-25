@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -60,7 +60,7 @@ public class NotificaHelper {
 	}
 
 	public void enviamentUpdateDatat(
-			NotificacioEnviamentEstatEnumDto notificaEstat,
+			EnviamentEstat notificaEstat,
 			Date notificaEstatData,
 			String notificaEstatDescripcio,
 			String notificaDatatOrigen,

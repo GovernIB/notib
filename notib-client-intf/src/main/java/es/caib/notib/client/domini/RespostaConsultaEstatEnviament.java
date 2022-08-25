@@ -28,7 +28,7 @@ import java.util.Date;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RespostaConsultaEstatEnviament extends RespostaBase {
 
-    private EnviamentEstatEnum estat;
+    private EnviamentEstat estat;
     private Date estatData;
     private String estatDescripcio;
     private String estatOrigen;

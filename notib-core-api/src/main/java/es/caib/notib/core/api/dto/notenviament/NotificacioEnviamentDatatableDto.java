@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.api.dto.notenviament;
 
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -27,7 +27,7 @@ public class NotificacioEnviamentDatatableDto {
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;
 
-	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private EnviamentEstat notificaEstat;
 	private Date notificaEstatData;
 
 	private NotificacioEstatEnumDto notificacioEstat;

@@ -25,7 +25,7 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Datat {
 
-    private EnviamentEstatEnum estat;
+    private EnviamentEstat estat;
     private Date data;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String origen;

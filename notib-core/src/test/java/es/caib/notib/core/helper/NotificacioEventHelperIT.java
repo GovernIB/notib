@@ -367,7 +367,7 @@ public class NotificacioEventHelperIT extends BaseServiceTestV2 {
 //                        assertEquals(events.size(), 4);
 //
 //                        for (NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-//                            enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+//                            enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
 //                        }
 //                    }
 //                },

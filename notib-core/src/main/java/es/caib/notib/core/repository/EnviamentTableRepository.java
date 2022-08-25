@@ -1,7 +1,7 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EnviamentTableEntity;
@@ -106,7 +106,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
+			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -213,7 +213,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
+			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
@@ -312,7 +312,7 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("csv") String csv,
 			@Param("isEstatNull") boolean isEstatNull,
 			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
+			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esDataEnviamentIniciNull") boolean esDataEnviamentIniciNull,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,

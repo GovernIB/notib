@@ -1,9 +1,9 @@
 package es.caib.notib.core.entity.auditoria;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
@@ -87,7 +87,7 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	private String notificaArrelDir3;
 	// estat i datat
 	@Column(name = "notifica_estat", nullable = false)
-	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private EnviamentEstat notificaEstat;
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date notificaEstatData;

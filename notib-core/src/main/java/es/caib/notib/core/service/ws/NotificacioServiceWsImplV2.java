@@ -719,7 +719,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
 				// serà necessari consultar l'estat de la notificació a Notifica
 				if (!notificaHelper.isAdviserActiu() && !enviament.isNotificaEstatFinal()
-					&& !enviament.getNotificaEstat().equals(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT)) {
+					&& !enviament.getNotificaEstat().equals(EnviamentEstat.NOTIB_PENDENT)) {
 					logger.debug("Consultat estat de l'enviament amb referencia " + referencia + " a Notifica.");
 					enviament = notificaHelper.enviamentRefrescarEstat(enviament.getId());
 				}
@@ -2280,55 +2280,55 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				.build();
 	}
 	
-	private EnviamentEstatEnum toEnviamentEstat(NotificacioEnviamentEstatEnumDto estat) {
+	private EnviamentEstat toEnviamentEstat(EnviamentEstat estat) {
 		if (estat == null) return null;
 		switch (estat) {
 		case ABSENT:
-			return EnviamentEstatEnum.ABSENT;
+			return EnviamentEstat.ABSENT;
 		case ADRESA_INCORRECTA:
-			return EnviamentEstatEnum.ADRESA_INCORRECTA;
+			return EnviamentEstat.ADRESA_INCORRECTA;
 		case DESCONEGUT:
-			return EnviamentEstatEnum.DESCONEGUT;
+			return EnviamentEstat.DESCONEGUT;
 		case ENTREGADA_OP:
-			return EnviamentEstatEnum.ENTREGADA_OP;
+			return EnviamentEstat.ENTREGADA_OP;
 		case ENVIADA_CI:
-			return EnviamentEstatEnum.ENVIADA_CI;
+			return EnviamentEstat.ENVIADA_CI;
 		case ENVIADA_DEH:
-			return EnviamentEstatEnum.ENVIADA_DEH;
+			return EnviamentEstat.ENVIADA_DEH;
 		case ENVIAMENT_PROGRAMAT:
-			return EnviamentEstatEnum.ENVIAMENT_PROGRAMAT;
+			return EnviamentEstat.ENVIAMENT_PROGRAMAT;
 		case ERROR_ENTREGA:
-			return EnviamentEstatEnum.ERROR_ENTREGA;
+			return EnviamentEstat.ERROR_ENTREGA;
 		case EXPIRADA:
-			return EnviamentEstatEnum.EXPIRADA;
+			return EnviamentEstat.EXPIRADA;
 		case EXTRAVIADA:
-			return EnviamentEstatEnum.EXTRAVIADA;
+			return EnviamentEstat.EXTRAVIADA;
 		case LLEGIDA:
-			return EnviamentEstatEnum.LLEGIDA;
+			return EnviamentEstat.LLEGIDA;
 		case MORT:
-			return EnviamentEstatEnum.MORT;
+			return EnviamentEstat.MORT;
 		case NOTIB_ENVIADA:
-			return EnviamentEstatEnum.NOTIB_ENVIADA;
+			return EnviamentEstat.NOTIB_ENVIADA;
 		case NOTIB_PENDENT:
-			return EnviamentEstatEnum.NOTIB_PENDENT;
+			return EnviamentEstat.NOTIB_PENDENT;
 		case NOTIFICADA:
-			return EnviamentEstatEnum.NOTIFICADA;
+			return EnviamentEstat.NOTIFICADA;
 		case PENDENT_CIE:
-			return EnviamentEstatEnum.PENDENT_CIE;
+			return EnviamentEstat.PENDENT_CIE;
 		case PENDENT_DEH:
-			return EnviamentEstatEnum.PENDENT_DEH;
+			return EnviamentEstat.PENDENT_DEH;
 		case PENDENT_ENVIAMENT:
-			return EnviamentEstatEnum.PENDENT_ENVIAMENT;
+			return EnviamentEstat.PENDENT_ENVIAMENT;
 		case PENDENT_SEU:
-			return EnviamentEstatEnum.PENDENT_SEU;
+			return EnviamentEstat.PENDENT_SEU;
 		case REBUTJADA:
-			return EnviamentEstatEnum.REBUTJADA;
+			return EnviamentEstat.REBUTJADA;
 		case SENSE_INFORMACIO:
-			return EnviamentEstatEnum.SENSE_INFORMACIO;
+			return EnviamentEstat.SENSE_INFORMACIO;
 		case ENVIAT_SIR:
-			return EnviamentEstatEnum.ENVIAT_SIR;
+			return EnviamentEstat.ENVIAT_SIR;
 		case ANULADA:
-			return EnviamentEstatEnum.ANULADA;
+			return EnviamentEstat.ANULADA;
 		default:
 			return null;
 		}

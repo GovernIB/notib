@@ -3,7 +3,7 @@
  */
 package es.caib.notib.core.repository;
 
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -178,7 +178,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull, 
 			@Param("estat") NotificacioEstatEnumDto estat, 
-			@Param("notificaEstat") NotificacioEnviamentEstatEnumDto notificaEstat,
+			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isUsuariNull") boolean isUsuariNull, 
 			@Param("usuariCodi") String usuariCodi, 
 			Pageable springDataPageable);

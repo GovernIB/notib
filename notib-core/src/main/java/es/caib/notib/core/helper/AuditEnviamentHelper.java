@@ -1,7 +1,7 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.Enviament;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
@@ -163,7 +163,7 @@ public class AuditEnviamentHelper {
 		
 		//Comunicació + administració (SIR)
 		if (totsAdministracio) {
-			enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.ENVIAT_SIR);
+			enviament.setNotificaEstat(EnviamentEstat.ENVIAT_SIR);
 		}
 		
 		event.setEnviament(enviament);

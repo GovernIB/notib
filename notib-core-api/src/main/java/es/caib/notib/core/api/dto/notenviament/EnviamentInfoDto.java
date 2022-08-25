@@ -1,5 +1,6 @@
 package es.caib.notib.core.api.dto.notenviament;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import lombok.Getter;
@@ -41,7 +42,7 @@ public class EnviamentInfoDto extends NotificacioEnviamentDatatableDto{
 	private Date notificaErrorData;
 	private String notificaErrorDescripcio;
 
-	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private EnviamentEstat notificaEstat;
 
 	private String notificaCertificacioArxiuNom;
 	private Date notificaCertificacioData;
