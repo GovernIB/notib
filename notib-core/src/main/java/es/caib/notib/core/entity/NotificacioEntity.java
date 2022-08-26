@@ -1,9 +1,9 @@
 package es.caib.notib.core.entity;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -342,7 +342,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		List<NotificacioEnviamentEntity> enviamentsPerEmail = new ArrayList<>();
 		if (enviaments != null && !enviaments.isEmpty()) {
 			for(NotificacioEnviamentEntity enviament: enviaments) {
-				if (enviament.isPerEmail() && enviament.getNotificaEstat() != NotificacioEnviamentEstatEnumDto.FINALITZADA) {
+				if (enviament.isPerEmail() && enviament.getNotificaEstat() != EnviamentEstat.FINALITZADA) {
 					enviamentsPerEmail.add(enviament);
 				}
 			}
@@ -354,8 +354,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		List<NotificacioEnviamentEntity> enviamentsNoEnviats = new ArrayList<>();
 		if (enviaments != null && !enviaments.isEmpty()) {
 			for(NotificacioEnviamentEntity enviament: enviaments) {
-				if (enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT ||
-						enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.REGISTRADA) {
+				if (enviament.getNotificaEstat() == EnviamentEstat.NOTIB_PENDENT ||
+						enviament.getNotificaEstat() == EnviamentEstat.REGISTRADA) {
 					enviamentsNoEnviats.add(enviament);
 				}
 			}
@@ -374,8 +374,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public boolean hasEnviamentsEnviats() {
 		if (enviaments != null && !enviaments.isEmpty()) {
 			for(NotificacioEnviamentEntity enviament: enviaments) {
-				if (enviament.getNotificaEstat() != NotificacioEnviamentEstatEnumDto.REGISTRADA &&
-						enviament.getNotificaEstat() != NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT) {
+				if (enviament.getNotificaEstat() != EnviamentEstat.REGISTRADA &&
+						enviament.getNotificaEstat() != EnviamentEstat.NOTIB_PENDENT) {
 					return true;
 				}
 			}
@@ -386,8 +386,8 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	public boolean hasEnviamentsNoEnviats() {
 		if (enviaments != null && !enviaments.isEmpty()) {
 			for(NotificacioEnviamentEntity enviament: enviaments) {
-				if (enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.REGISTRADA ||
-						enviament.getNotificaEstat() == NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT) {
+				if (enviament.getNotificaEstat() == EnviamentEstat.REGISTRADA ||
+						enviament.getNotificaEstat() == EnviamentEstat.NOTIB_PENDENT) {
 					return true;
 				}
 			}

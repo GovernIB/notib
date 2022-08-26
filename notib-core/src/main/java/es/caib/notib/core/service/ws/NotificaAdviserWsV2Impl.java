@@ -4,12 +4,12 @@
 package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
@@ -222,7 +222,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 					receptorNombre = receptor.getNombreReceptor();
 					receptorNif = receptor.getNifReceptor();
 				}
-				NotificacioEnviamentEstatEnumDto notificaEstat = getNotificaEstat(estado);
+				EnviamentEstat notificaEstat = getNotificaEstat(estado);
 
 				//Update enviament
 				notificaHelper.enviamentUpdateDatat(
@@ -312,48 +312,48 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		return enviament;
 	}
 
-	private NotificacioEnviamentEstatEnumDto getNotificaEstat(String estado) {
-		NotificacioEnviamentEstatEnumDto notificaEstat = null;
+	private EnviamentEstat getNotificaEstat(String estado) {
+		EnviamentEstat notificaEstat = null;
 		if ("pendiente_envio".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT;
+			notificaEstat = EnviamentEstat.PENDENT_ENVIAMENT;
 		} else if ("enviado_ci".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_CI;
+			notificaEstat = EnviamentEstat.ENVIADA_CI;
 		} else if ("notificada".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIFICADA;
+			notificaEstat = EnviamentEstat.NOTIFICADA;
 		} else if ("extraviada".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.EXTRAVIADA;
+			notificaEstat = EnviamentEstat.EXTRAVIADA;
 		} else if ("rehusada".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.REBUTJADA;
+			notificaEstat = EnviamentEstat.REBUTJADA;
 		} else if ("desconocido".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.DESCONEGUT;
+			notificaEstat = EnviamentEstat.DESCONEGUT;
 		} else if ("fallecido".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.MORT;
+			notificaEstat = EnviamentEstat.MORT;
 		} else if ("ausente".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ABSENT;
+			notificaEstat = EnviamentEstat.ABSENT;
 		} else if ("direccion_incorrecta".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA;
+			notificaEstat = EnviamentEstat.ADRESA_INCORRECTA;
 		} else if ("sin_informacion".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO;
+			notificaEstat = EnviamentEstat.SENSE_INFORMACIO;
 		} else if ("error".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ERROR_ENTREGA;
+			notificaEstat = EnviamentEstat.ERROR_ENTREGA;
 		} else if ("pendiente_sede".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_SEU;
+			notificaEstat = EnviamentEstat.PENDENT_SEU;
 		} else if ("enviado_deh".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIADA_DEH;
+			notificaEstat = EnviamentEstat.ENVIADA_DEH;
 		} else if ("leida".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.LLEGIDA;
+			notificaEstat = EnviamentEstat.LLEGIDA;
 		} else if ("envio_programado".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ENVIAMENT_PROGRAMAT;
+			notificaEstat = EnviamentEstat.ENVIAMENT_PROGRAMAT;
 		} else if ("pendiente_cie".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_CIE;
+			notificaEstat = EnviamentEstat.PENDENT_CIE;
 		} else if ("pendiente_deh".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.PENDENT_DEH;
+			notificaEstat = EnviamentEstat.PENDENT_DEH;
 		} else if ("entregado_op".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ENTREGADA_OP;
+			notificaEstat = EnviamentEstat.ENTREGADA_OP;
 		} else if ("expirada".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.EXPIRADA;
+			notificaEstat = EnviamentEstat.EXPIRADA;
 		} else if ("anulada".equals(estado)) {
-			notificaEstat = NotificacioEnviamentEstatEnumDto.ANULADA;
+			notificaEstat = EnviamentEstat.ANULADA;
 		}
 		return notificaEstat;
 	}

@@ -1,4 +1,5 @@
 package es.caib.notib.core.api.dto;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -67,7 +68,7 @@ public class NotificacioEnviamentDtoV2 extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private String notificaCertificacioArxiuNom;
 	private Date notificaCertificacioData;
-	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private EnviamentEstat notificaEstat;
 	private Date notificaEstatData;
 	private String notificaDatatErrorDescripcio;
 	private String notificaDatatOrigen;

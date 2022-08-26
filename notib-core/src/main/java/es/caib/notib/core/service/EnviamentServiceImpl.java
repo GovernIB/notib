@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.consulta.DocumentConsultaV2;
 import es.caib.notib.client.domini.consulta.GenericInfo;
@@ -286,7 +287,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtre.getCsvUuid(),
 						(filtre.getEstat() == null),
 						(estat),
-						filtre.getEstat() != null ? NotificacioEnviamentEstatEnumDto.valueOf(filtre.getEstat().toString()) : null,
+						filtre.getEstat() != null ? EnviamentEstat.valueOf(filtre.getEstat().toString()) : null,
 						entitatEntity,
 						(dataEnviamentInici == null),
 						dataEnviamentInici,
@@ -430,7 +431,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.csvUuid.getField(),
 						filtreFields.estat.isNull(),
 						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? NotificacioEnviamentEstatEnumDto.valueOf(filtreFields.estat.getField().toString()) : null,
+						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
 						entitatEntity,
 						filtreFields.dataEnviamentInici.isNull(),
 						filtreFields.dataEnviamentInici.getField(),
@@ -500,7 +501,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.csvUuid.getField(),
 						filtreFields.estat.isNull(),
 						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? NotificacioEnviamentEstatEnumDto.valueOf(filtreFields.estat.getField().toString()) : null,
+						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
 						entitatEntity,
 						filtreFields.dataEnviamentInici.isNull(),
 						filtreFields.dataEnviamentInici.getField(),
@@ -563,7 +564,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.csvUuid.getField(),
 						filtreFields.estat.isNull(),
 						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? NotificacioEnviamentEstatEnumDto.valueOf(filtreFields.estat.getField().toString()) : null,
+						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
 						entitatEntity,
 						filtreFields.dataEnviamentInici.isNull(),
 						filtreFields.dataEnviamentInici.getField(),
@@ -1167,7 +1168,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				consulta.getVisibleCarpeta(),
 				getPageable(consulta.getPagina(), consulta.getMida()));
 
-		return PaginaEnviaments.builder().numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(new Locale(consulta.getIdioma().name())).build();
+		return PaginaEnviaments.builder().messageHelper(messageHelper).numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(new Locale(consulta.getIdioma().name())).build();
 	}
 
 	private Pageable getPageable(Integer pagina, Integer mida) {
@@ -1285,7 +1286,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				return enviament.isEnviamentProcessat() ? Estat.PROCESSADA :
 						enviament.isEnviamentFinalitzat() ? Estat.FINALITZADA :
 						enviament.isEnviamentEnviat() ? Estat.ENVIADA :
-						NotificacioEnviamentEstatEnumDto.REGISTRADA.equals(enviament.getNotificaEstat()) ? Estat.REGISTRADA : Estat.PENDENT;
+								EnviamentEstat.REGISTRADA.equals(enviament.getNotificaEstat()) ? Estat.REGISTRADA : Estat.PENDENT;
 		}
 	}
 	
@@ -1392,6 +1393,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		private Integer numEnviaments;
 		private List<NotificacioEnviamentEntity> enviaments;
 		private Locale locale;
+		private MessageHelper messageHelper;
 
 		public Integer getNumeroEnviamentsRetornats() {
 			return enviaments != null ? enviaments.size() : 0;
@@ -1541,15 +1543,15 @@ public class EnviamentServiceImpl implements EnviamentService {
 				case ENVIADA_AMB_ERRORS:
 				case FINALITZADA_AMB_ERRORS:
 				default:
-					return GenericInfo.builder().codi("ERROR").nom(getNom("ERROR")).descripcio(MessageHelper.getInstance().getMessage("enviament.estat.ERROR", null, locale)).build();
+					return GenericInfo.builder().codi("ERROR").nom(getNom("ERROR")).descripcio(messageHelper.getMessage("enviament.estat.ERROR", null, locale)).build();
 			}
 		}
 
 		private String getNom(String codi) {
-			return MessageHelper.getInstance().getMessage("enviament.estat." + codi + ".nom", null, locale);
+			return messageHelper.getMessage("enviament.estat." + codi + ".nom", null, locale);
 		}
 		private String getDesc(String codi) {
-			return MessageHelper.getInstance().getMessage("enviament.estat." + codi + ".desc", null, locale);
+			return messageHelper.getMessage("enviament.estat." + codi + ".desc", null, locale);
 		}
 
 		private Date getEstatDate(NotificacioEnviamentEntity enviament) {
@@ -1577,7 +1579,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 			}
 			PersonaConsultaV2 persona= PersonaConsultaV2.builder()
-					.tipus(GenericInfo.builder().codi(tipus.name()).nom(MessageHelper.getInstance().getMessage("interessatTipusEnumDto." + tipus.name())).build())
+					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("interessatTipusEnumDto." + tipus.name())).build())
 					.nom(nom)
 					.llinatge1(personaEntity.getLlinatge1())
 					.llinatge2(personaEntity.getLlinatge2())

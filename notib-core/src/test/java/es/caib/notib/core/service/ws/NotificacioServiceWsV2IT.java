@@ -374,7 +374,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		destinataris.add(destinatari);
 		enviament.setDestinataris(destinataris);
 		enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
-//		enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+//		enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
 		return enviament;
 	}
 

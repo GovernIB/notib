@@ -1,5 +1,6 @@
 package es.caib.notib.core.service;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.core.api.dto.notificacio.*;
@@ -272,7 +273,7 @@ public class NotificacioMassivaServiceTest {
 				Mockito.nullable(String.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(NotificacioEstatEnumDto.class),
-				Mockito.nullable(NotificacioEnviamentEstatEnumDto.class),
+				Mockito.nullable(EnviamentEstat.class),
 				Mockito.anyBoolean(),
 				Mockito.nullable(Date.class),
 				Mockito.anyBoolean(),

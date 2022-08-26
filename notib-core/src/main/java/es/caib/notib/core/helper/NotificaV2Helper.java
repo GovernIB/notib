@@ -1,11 +1,11 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -224,7 +224,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 			logger.info(" [EST] Actualitzant informació enviament amb Datat...");
 			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-			NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(darrerDatat.getResultado());
+			EnviamentEstat estat = getEstatNotifica(darrerDatat.getResultado());
 			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 				actualitzaDatatEnviament(resultadoInfoEnvio, enviament, darrerDatat);
 			}
@@ -341,7 +341,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 										  NotificacioEnviamentEntity enviament,
 										  Datado darrerDatat) throws Exception {
 		Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
-		NotificacioEnviamentEstatEnumDto estat = getEstatNotifica(darrerDatat.getResultado());
+		EnviamentEstat estat = getEstatNotifica(darrerDatat.getResultado());
 		CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
 		CodigoDIR organismoEmisorRaiz = resultadoInfoEnvio.getCodigoOrganismoEmisorRaiz();
 		enviament.updateNotificaInformacio(

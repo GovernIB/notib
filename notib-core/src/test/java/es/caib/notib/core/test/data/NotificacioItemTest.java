@@ -1,10 +1,10 @@
 package es.caib.notib.core.test.data;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.DocumentDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.PersonaDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentDatabaseDto;
@@ -147,7 +147,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         destinataris.add(destinatari);
         enviament.setDestinataris(destinataris);
         enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
-        enviament.setNotificaEstat(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT);
+        enviament.setNotificaEstat(EnviamentEstat.NOTIB_PENDENT);
         return enviament;
     }
 

@@ -3,7 +3,7 @@ package es.caib.notib.core.helper;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -168,7 +168,7 @@ public class NotificaV2HelperTest {
                 .serveiTipus(ServeiTipusEnumDto.NORMAL)
                 .notificacio(notificacioMock)
                 .notificaDataCreacio(new Date())
-                .notificaEstat(NotificacioEnviamentEstatEnumDto.EXPIRADA)
+                .notificaEstat(EnviamentEstat.EXPIRADA)
                 .notificaIdentificador("identificador")
                 .build();
         ReflectionTestUtils.setField(enviamentMock, "id", 2L);

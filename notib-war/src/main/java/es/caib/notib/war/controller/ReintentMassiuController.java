@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -62,8 +63,8 @@ public class ReintentMassiuController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
-				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
+						"es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
 	}
 	
@@ -78,8 +79,8 @@ public class ReintentMassiuController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
 						"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto."));
 		model.addAttribute("notificacioEnviamentEstats",
-				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
+						"es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
 	}
 	

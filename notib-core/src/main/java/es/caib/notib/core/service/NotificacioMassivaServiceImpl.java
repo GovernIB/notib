@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
@@ -317,7 +318,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtreNetejat.getEstat().isNull(),
                 filtreNetejat.getEstat().getField(),
                 !filtreNetejat.getEstat().isNull() ?
-                        NotificacioEnviamentEstatEnumDto.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+                        EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
                 filtreNetejat.getDataInici().isNull(),
                 filtreNetejat.getDataInici().getField(),
                 filtreNetejat.getDataFi().isNull(),

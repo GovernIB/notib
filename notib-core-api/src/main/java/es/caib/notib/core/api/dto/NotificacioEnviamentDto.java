@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.dto;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.cie.EntregaPostalDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
 import lombok.Getter;
@@ -36,7 +37,7 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	private String notificaErrorDescripcio;
 	private String notificaCertificacioArxiuNom;
 	private Date notificaCertificacioData;
-	private NotificacioEnviamentEstatEnumDto notificaEstat;
+	private EnviamentEstat notificaEstat;
 	private Date notificaEstatData;
 	private String notificaDatatErrorDescripcio;
 	private String notificaDatatOrigen;
@@ -81,13 +82,13 @@ public class NotificacioEnviamentDto extends AuditoriaDto {
 	}
 
 	public boolean isEnviamentEnviat() {
-		return !NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT.equals(notificaEstat) && !NotificacioEnviamentEstatEnumDto.REGISTRADA.equals(notificaEstat);
+		return !EnviamentEstat.NOTIB_PENDENT.equals(notificaEstat) && !EnviamentEstat.REGISTRADA.equals(notificaEstat);
 	}
 	public boolean isEnviamentFinalitzat() {
-		return notificaEstatFinal || NotificacioEnviamentEstatEnumDto.FINALITZADA.equals(notificaEstat);
+		return notificaEstatFinal || EnviamentEstat.FINALITZADA.equals(notificaEstat);
 	}
 	public boolean isEnviamentProcessat() {
-		return NotificacioEnviamentEstatEnumDto.PROCESSADA.equals(notificaEstat);
+		return EnviamentEstat.PROCESSADA.equals(notificaEstat);
 	}
 
 	@Override

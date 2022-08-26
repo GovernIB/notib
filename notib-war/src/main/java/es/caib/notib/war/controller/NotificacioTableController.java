@@ -187,7 +187,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Map<String, Integer>  registres = new HashMap<>();
             for (NotificacioEnviamentDatatableDto env : enviaments) {
                 if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
-                    notificaEstat += getMessage(request, "es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto." + env.getNotificaEstat()) + ", ";
+                    notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";
                 }
                 if (env.getRegistreEstat() != null) {
                     if (registres.containsKey(env.getRegistreEstat().name())) {

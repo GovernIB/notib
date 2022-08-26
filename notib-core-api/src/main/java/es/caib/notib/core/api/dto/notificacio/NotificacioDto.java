@@ -47,7 +47,7 @@ public class NotificacioDto extends AuditoriaDto {
 	private boolean documentNormalitzat;
 	private boolean documentGenerarCsv;
 	private NotificacioEstatEnumDto estat;
-//	private NotificacioEnviamentEstatEnumDto notificaEstat;
+//	private EnviamentEstat notificaEstat;
 	private Date estatDate;
 	private Date notificaErrorData;
 	private NotificacioErrorTipusEnumDto notificaErrorTipus;
