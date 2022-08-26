@@ -9,11 +9,25 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EnviamentService;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.JustificantService;
+import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
-import es.caib.notib.war.helper.*;
+import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.EntitatHelper;
+import es.caib.notib.war.helper.EnumHelper;
+import es.caib.notib.war.helper.MessageHelper;
+import es.caib.notib.war.helper.MissatgesHelper;
+import es.caib.notib.war.helper.NotificacioListHelper;
+import es.caib.notib.war.helper.RequestSessionHelper;
+import es.caib.notib.war.helper.RolHelper;
+import es.caib.notib.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
@@ -22,7 +36,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +50,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -167,7 +194,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\">" :
                     NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
             String nomEstat = " " + getMessage(request, "es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "";
-            String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + item.getNotificaErrorDescripcio() + " \"></span>" : "";
+            String error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>" : "";
             error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
                     " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
             estat = "<span>" + estat + nomEstat + error + "</span>";
