@@ -186,6 +186,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             String registreEstat = "";
             Map<String, Integer>  registres = new HashMap<>();
             for (NotificacioEnviamentDatatableDto env : enviaments) {
+                item.updateEstatTipusCount(env.getNotificaEstat());
                 if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
                     notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";
                 }
@@ -208,6 +209,28 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             notificaEstat = notificaEstat.length() > 0 ? "(" + notificaEstat.substring(0, notificaEstat.length()-2) +")" : "";
             estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
                     + "</div></div>" + data + notificaEstat;
+            if (item.getNTramitacio() > 0 ){
+                estat += "<div>Tramitacio: " + item.getNTramitacio() + "</div>";
+            }
+            if (item.getNCompareixenca() > 0 ){
+                estat += "<div>Compareixenca: " + item.getNCompareixenca() + "</div>";
+            }
+            if (item.getNLlegida() > 0 ){
+                estat += "<div>Llegida: " + item.getNLlegida() + "</div>";
+            }
+            if (item.getNRebutjada() > 0 ){
+                estat += "<div>Rebutjada: " + item.getNRebutjada() + "</div>";
+            }
+            if (item.getNExpirada() > 0 ){
+                estat += "<div>Expirada: " + item.getNExpirada() + "</div>";
+            }
+            if (item.getNAnulada() > 0 ){
+                estat += "<div>Anulada: " + item.getNAnulada() + "</div>";
+            }
+            if (item.getNError() > 0 ){
+                estat += "<div>Error: " + item.getNError() + "</div>";
+            }
+
             item.setEstatString(estat);
         }
     }

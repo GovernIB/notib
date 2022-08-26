@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.dto.notificacio;
 
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
@@ -60,6 +61,14 @@ public class NotificacioTableItemDto {
 	private Date envCerData;
 	private String referencia;
 
+	private int nTramitacio;
+	private int nCompareixenca;
+	private int nLlegida;
+	private int nRebutjada;
+	private int nExpirada;
+	private int nAnulada;
+	private int nError;
+
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
 	}
@@ -99,6 +108,44 @@ public class NotificacioTableItemDto {
 		if (createdByCodi != null && !createdByCodi.isEmpty())
 			nomComplet += "(" + createdByCodi + ")";
 		return nomComplet;
+	}
+
+	public void updateEstatTipusCount(EnviamentEstat estat) {
+
+		switch (estat) {
+
+			case NOTIB_PENDENT:
+			case REGISTRADA:
+			case NOTIB_ENVIADA:
+			case ENVIAMENT_PROGRAMAT:
+				nTramitacio++;
+				break;
+			case ENVIADA:
+			case ENVIADA_CI:
+			case ENVIADA_DEH:
+			case PENDENT:
+			case ENTREGADA_OP:
+			case PENDENT_ENVIAMENT:
+			case PENDENT_SEU:
+			case PENDENT_CIE:
+			case PENDENT_DEH:
+				nCompareixenca++;
+				break;
+			case LLEGIDA:
+				nLlegida++;
+				break;
+			case REBUTJADA:
+				nRebutjada++;
+				break;
+			case EXPIRADA:
+				nExpirada++;
+				break;
+			case ANULADA:
+				nAnulada++;
+				break;
+			default:
+				nError++;
+		}
 	}
 
 	@Override

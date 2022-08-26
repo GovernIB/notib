@@ -256,8 +256,11 @@
                 } else {
                     destinataris = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
                 }
+                console.log(data[i].notificaEstat);
                 contingutTbody += '<td>' + destinataris + '</td>';
-                contingutTbody += '<td>';
+                if (data[i].estatColor) {
+                    contingutTbody += '<td style="box-shadow: inset 3px 0px 0px ' + data[i].estatColor + ';"> <span class="' + data[i].estatIcona + '"></span><span>  </span>';
+                }
                 contingutTbody += (data[i].notificaEstat) ? notificacioEnviamentEstats[data[i].notificaEstat] : '';
                 if (data[i].notificaEstat == "FINALITZADA" && data[i].perEmail) {
                     if (rowData.enviamentTipus == "NOTIFICACIO") {

@@ -28,6 +28,8 @@ public class NotificacioEnviamentDatatableDto {
 	private List<PersonaDto> destinataris;
 
 	private EnviamentEstat notificaEstat;
+	private String estatColor;
+	private String estatIcona;
 	private Date notificaEstatData;
 
 	private NotificacioEstatEnumDto notificacioEstat;
