@@ -1,10 +1,10 @@
 package es.caib.notib.core.entity;
 
 import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificaCertificacioTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
 import es.caib.notib.core.audit.NotibAuditable;
@@ -119,7 +119,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	
 	/* Notifica estat i datat */
 	@Column(name = "notifica_estat", nullable = false)
-	protected NotificacioEnviamentEstatEnumDto notificaEstat;
+	protected EnviamentEstat notificaEstat;
 	
 	@Column(name = "notifica_estat_data")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -270,7 +270,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void setTitular(PersonaEntity titular) {
 		this.titular = titular;
 	}
-	public void setNotificaEstat(NotificacioEnviamentEstatEnumDto notificaEstat) {
+	public void setNotificaEstat(EnviamentEstat notificaEstat) {
 		this.notificaEstat = notificaEstat;
 	}
 	public void setNotificacio(NotificacioEntity notificacio) {
@@ -312,7 +312,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	public void updateNotificaEnviada(String notificaIdentificador) {
 		this.notificaIdentificador = notificaIdentificador;
 		this.notificaEstatData = new Date();
-		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_ENVIADA;
+		this.notificaEstat = EnviamentEstat.NOTIB_ENVIADA;
 		this.notificaError = false;
 		this.notificacioErrorEvent = null;
 		this.notificaIntentData = new Date();
@@ -321,7 +321,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	public void updateNotificaEnviadaEmail() {
 		this.notificaEstatData = new Date();
-		this.notificaEstat = NotificacioEnviamentEstatEnumDto.FINALITZADA;
+		this.notificaEstat = EnviamentEstat.FINALITZADA;
 		this.notificaEstatFinal = true;
 		this.notificaError = false;
 		this.notificacioErrorEvent = null;
@@ -351,7 +351,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 	}
 	
 	public void updateNotificaDatat(
-			NotificacioEnviamentEstatEnumDto notificaEstat,
+			EnviamentEstat notificaEstat,
 			Date notificaEstatData,
 			boolean notificaEstatFinal,
 			String notificaEstatDescripcio,
@@ -479,7 +479,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			NotificacioEntity notificacioGuardada,
 			PersonaEntity titular) {
 		this.serveiTipus = tipusServei;
-		this.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+		this.notificaEstat = EnviamentEstat.NOTIB_PENDENT;
 		this.notificaIntentNum = 0;
 		this.notificacio = notificacioGuardada;
 		if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
@@ -537,7 +537,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 				String referencia) {
 			built = new NotificacioEnviamentEntity();
 			built.serveiTipus = tipusServei;
-			built.notificaEstat = NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT;
+			built.notificaEstat = EnviamentEstat.NOTIB_PENDENT;
 			built.notificaIntentNum = 0;
 			built.notificacio = notificacioGuardada;
 			if (enviament.isEntregaPostalActiva() && enviament.getEntregaPostal() != null) {
@@ -607,16 +607,16 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 
 	public boolean isPendentRefrescarEstatNotifica(){
 		if (!notificaEstatFinal)
-			return !Arrays.asList(NotificacioEnviamentEstatEnumDto.NOTIB_PENDENT,
-					NotificacioEnviamentEstatEnumDto.REGISTRADA,
-					NotificacioEnviamentEstatEnumDto.FINALITZADA,
-					NotificacioEnviamentEstatEnumDto.PROCESSADA).contains(notificaEstat);
+			return !Arrays.asList(EnviamentEstat.NOTIB_PENDENT,
+					EnviamentEstat.REGISTRADA,
+					EnviamentEstat.FINALITZADA,
+					EnviamentEstat.PROCESSADA).contains(notificaEstat);
 		else {
-			return notificaEstat.equals(NotificacioEnviamentEstatEnumDto.EXPIRADA) && notificaCertificacioData == null;
+			return notificaEstat.equals(EnviamentEstat.EXPIRADA) && notificaCertificacioData == null;
 		}
 	}
 	public boolean isPendentRefrescarEstatRegistre(){
-		return !notificaEstatFinal && notificaEstat.equals(NotificacioEnviamentEstatEnumDto.ENVIAT_SIR)
+		return !notificaEstatFinal && notificaEstat.equals(EnviamentEstat.ENVIAT_SIR)
 					&& !Arrays.asList(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT,
 							NotificacioRegistreEstatEnumDto.REBUTJAT).contains(registreEstat);
 	}
