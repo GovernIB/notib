@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.api.service;
 
+import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
@@ -198,13 +199,9 @@ public interface EnviamentService {
 	
 	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
 	Resposta findEnviaments(ApiConsulta consulta);
-//	Resposta findEnviamentsByNif(String dniTitular,
-//			NotificaEnviamentTipusEnumDto tipus,
-//			Boolean estatFinal,
-//			String basePath,
-//			Integer pagina,
-//			Integer mida);
 
+	@PreAuthorize("hasRole('NOT_CARPETA') or hasRole('NOT_SUPER')")
+	RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta);
 	/**
 	 * Actualitza l'estat de l'enviament indicat i reinicia el comptador de reintents.
 	 *
@@ -231,4 +228,5 @@ public interface EnviamentService {
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	void enviarCallback(Long enviamentId) throws Exception;
+
 }

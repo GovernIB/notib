@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.ejb;
 
+import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
@@ -168,7 +169,13 @@ public class EnviamentServiceBean implements EnviamentService {
 		return delegate.findEnviaments(consulta);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_CARPETA", "NOT_SUPER"})
+    public RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta) {
+        return delegate.findEnviamentsV2(consulta);
+    }
+
+    @Override
 	public void actualitzarEstat(Long enviamentId) {
 		delegate.actualitzarEstat(enviamentId);
 	}

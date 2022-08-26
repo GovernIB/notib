@@ -7,19 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import es.caib.notib.client.domini.AppInfo;
-import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.PermisConsulta;
-import es.caib.notib.client.domini.RespostaAltaV2;
-import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
-import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
-import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
-import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-;
+;import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Client REST v2 per al servei de notificacions de NOTIB.
@@ -29,7 +23,9 @@ import org.slf4j.LoggerFactory;
 public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	private static final String NOTIFICACIOV2_SERVICE_PATH = "/api/services/notificacioV22";
+	private static final String CONSULTAV2_SERVICE_PATH = "/api/consulta/v2";
 
+	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	/**
 	 * Constructor per a crear un client per a connectar-se amb la API REST v2 de NOTIB.
 	 * <p>El client creat amb aquest constructor utilitzarà autenticació tipus form (per defecte en entorn CAIB),
@@ -137,6 +133,8 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 			throw new RuntimeException(ex);
 		}
 	}
+
+	// NOTIFICACIÓ
 
 	/**
 	 * Mètode per a donar d'alta una Notificació/Comunicació a Notib
@@ -253,6 +251,84 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 	 */
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
 		return donarPermisConsulta(permisConsulta, NOTIFICACIOV2_SERVICE_PATH);
+	}
+
+
+	// CONSULTA
+
+	public RespostaConsultaV2 comunicacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular;
+			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
+			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public RespostaConsultaV2 notificacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular;
+			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
+			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public RespostaConsultaV2 comunicacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/pendents";
+			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
+			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public RespostaConsultaV2 notificacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/pendents";
+			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
+			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public RespostaConsultaV2 comunicacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/llegides";
+			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
+			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	public RespostaConsultaV2 notificacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+		try {
+			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/llegides";
+			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
+			return getMapper().readValue(json, RespostaConsultaV2.class);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
+		Client jerseyClient = generarClient(urlAmbMetode);
+		String json = jerseyClient.
+				resource(urlAmbMetode).
+				queryParam("dataInicial", dataInicial != null ? sdf.format(dataInicial) : "").
+				queryParam("dataFinal", dataInicial != null ? sdf.format(dataFinal) : "").
+				queryParam("visibleCarpeta", visibleCarpeta != null ? (visibleCarpeta ? "si" : "no") : "").
+				queryParam("lang", lang != null ? lang.name() : "").
+				queryParam("pagina", pagina != null ? pagina.toString() : "").
+				queryParam("mida", mida != null ? mida.toString() : "").
+				type("application/json").
+				get(String.class);
+		return json;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioRestClientV2.class);

@@ -1,5 +1,6 @@
 package es.caib.notib.core.api.dto;
 
+import es.caib.notib.client.domini.IdiomaEnumDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,8 @@ public class ApiConsulta {
     private Integer mida;
     private Date dataInicial;
     private Date dataFinal;
+    private IdiomaEnumDto idioma;
+    private Boolean visibleCarpeta;
 
     public void setDniTitular(String dniTitular) {
         this.dniTitular = dniTitular != null ? dniTitular.toUpperCase() : null;
