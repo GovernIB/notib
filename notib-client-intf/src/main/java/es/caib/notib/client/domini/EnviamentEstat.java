@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 
 /**
- * Enumerat que indica l'estat d'una notificació per a un destinatari.
+ * Enumerat que indica l'estat d'una enviament per a un destinatari.
  *
  * @author Limit Tecnologies <limit@limit.es>
  *
@@ -29,36 +29,36 @@ import java.io.Serializable;
 @Getter
 public enum EnviamentEstat implements Serializable {
 
-    NOTIB_PENDENT("#777", "fa fa-clock-o"),
-    NOTIB_ENVIADA("#777", "fa fa-clock-o"),
-    ABSENT("#d9534f", "fa-exclamation-circle"),
-    ADRESA_INCORRECTA("#d9534f", "fa fa-exclamation-circle"),
-    DESCONEGUT("#d9534f", "fa fa-exclamation-circle"),
-    ENVIADA_CI("#e67e22", "fa fa-envelope-o"),
-    ENVIADA_DEH("#e67e22", "fa fa-envelope-o"),
-    ENVIAMENT_PROGRAMAT("#777", "fa-clock-o"),
-    ENTREGADA_OP("#e67e22", "fa fa-envelope-o"),
-    ERROR_ENTREGA("#d9534f", "fa fa-exclamation-circle"),
-    EXPIRADA("#F1D629", "fa fa-asterisk"),
-    EXTRAVIADA("#d9534f", "fa fa-exclamation-circle"),
-    MORT("#d9534f", "fa fa-exclamation-circle"),
-    LLEGIDA("#5cb85c", "fa fa-check-circle"),
-    NOTIFICADA("#5cb85c", "fa fa-check-circle"),
-    PENDENT("#e67e22", "fa fa-envelope-o"),
-    PENDENT_ENVIAMENT("#e67e22", "fa fa-envelope-o"),
-    PENDENT_SEU("#e67e22", "fa fa-envelope-o"),
-    PENDENT_CIE("#e67e22", "fa fa-envelope-o"),
-    PENDENT_DEH("#e67e22", "fa fa-envelope-o"),
-    REBUTJADA("#6F5647", "fa fa-times"),
-    SENSE_INFORMACIO("#d9534f", "fa fa-exclamation-circle"),
-    FINALITZADA("", "fa fa-send-o"),
-    ENVIADA("#e67e22", "fa fa-envelope-o"),
-    REGISTRADA("#777", "fa fa-envelope-o"),
-    PROCESSADA("", "fa fa-send-o"),
-    ANULADA("#337ab7", "fa fa-window-close-o"),
-    ENVIAT_SIR("#e67e22", "fa fa-envelope-o"),
-    ENVIADA_AMB_ERRORS("", "fa fa-send-o"),
-    FINALITZADA_AMB_ERRORS("", "fa fa-send-o");
+    NOTIB_PENDENT(EnviamentEstatGrup.TRAMITACIO.getColor(), EnviamentEstatGrup.TRAMITACIO.getIcona()),
+    NOTIB_ENVIADA(EnviamentEstatGrup.TRAMITACIO.getColor(), EnviamentEstatGrup.TRAMITACIO.getIcona()),
+    ABSENT(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    ADRESA_INCORRECTA(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    DESCONEGUT(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    ENVIADA_CI(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    ENVIADA_DEH(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    ENVIAMENT_PROGRAMAT(EnviamentEstatGrup.TRAMITACIO.getColor(), EnviamentEstatGrup.TRAMITACIO.getIcona()),
+    ENTREGADA_OP(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    ERROR_ENTREGA(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    EXPIRADA(EnviamentEstatGrup.EXPIRADA.getColor(), EnviamentEstatGrup.EXPIRADA.getIcona()),
+    EXTRAVIADA(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    MORT(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    LLEGIDA(EnviamentEstatGrup.LLEGIDA.getColor(), EnviamentEstatGrup.LLEGIDA.getIcona()),
+    NOTIFICADA(EnviamentEstatGrup.LLEGIDA.getColor(), EnviamentEstatGrup.LLEGIDA.getIcona()),
+    PENDENT(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    PENDENT_ENVIAMENT(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    PENDENT_SEU(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    PENDENT_CIE(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    PENDENT_DEH(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    REBUTJADA(EnviamentEstatGrup.REBUTJADA.getColor(), EnviamentEstatGrup.REBUTJADA.getIcona()),
+    SENSE_INFORMACIO(EnviamentEstatGrup.ERROR.getColor(), EnviamentEstatGrup.ERROR.getIcona()),
+    FINALITZADA(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona()),
+    ENVIADA(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    REGISTRADA(EnviamentEstatGrup.TRAMITACIO.getColor(), EnviamentEstatGrup.TRAMITACIO.getIcona()),
+    PROCESSADA(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona()),
+    ANULADA(EnviamentEstatGrup.ANULADA.getColor(), EnviamentEstatGrup.ANULADA.getIcona()),
+    ENVIAT_SIR(EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor(), EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getIcona()),
+    ENVIADA_AMB_ERRORS(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona()),
+    FINALITZADA_AMB_ERRORS(EnviamentEstatGrup.ESTAT_FICTICI.getColor(), EnviamentEstatGrup.ESTAT_FICTICI.getIcona());
 
     private String color;
     private String icona;

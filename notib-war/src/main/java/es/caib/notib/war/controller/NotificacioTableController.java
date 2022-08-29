@@ -1,5 +1,7 @@
 package es.caib.notib.war.controller;
 
+import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.EnviamentEstatGrup;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
@@ -209,26 +211,52 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             notificaEstat = notificaEstat.length() > 0 ? "(" + notificaEstat.substring(0, notificaEstat.length()-2) +")" : "";
             estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
                     + "</div></div>" + data + notificaEstat;
+            String padding = "; padding-left: 5px;";
+            String boxShadow = "box-shadow: inset 3px 0px 0px ";
             if (item.getNTramitacio() > 0 ){
-                estat += "<div>Tramitacio: " + item.getNTramitacio() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.TRAMITACIO.getColor() + padding + "\">" +
+                        item.getNTramitacio() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.TRAMITACIO)
+                        + "</div>";
             }
             if (item.getNCompareixenca() > 0 ){
-                estat += "<div>Compareixenca: " + item.getNCompareixenca() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor() + padding + "\">" +
+                        item.getNCompareixenca() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.PENDENT_COMPAREIXENCA)
+                        + "</div>";
             }
             if (item.getNLlegida() > 0 ){
-                estat += "<div>Llegida: " + item.getNLlegida() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.LLEGIDA.getColor() + padding + "\">" +
+                        item.getNLlegida() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.LLEGIDA)
+                        + "</div>";
             }
             if (item.getNRebutjada() > 0 ){
-                estat += "<div>Rebutjada: " + item.getNRebutjada() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.REBUTJADA.getColor() + padding + "\">" +
+                        item.getNRebutjada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.REBUTJADA)
+                        + "</div>";;
             }
             if (item.getNExpirada() > 0 ){
-                estat += "<div>Expirada: " + item.getNExpirada() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.EXPIRADA.getColor() + padding + "\">" +
+                        item.getNExpirada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.EXPIRADA)
+                        + "</div>";
             }
             if (item.getNAnulada() > 0 ){
-                estat += "<div>Anulada: " + item.getNAnulada() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ANULADA.getColor() + padding + "\">" +
+                        item.getNAnulada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.ANULADA)
+                        + "</div>";
             }
             if (item.getNError() > 0 ){
-                estat += "<div>Error: " + item.getNError() + "</div>";
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ERROR.getColor() + padding + "\">" +
+                        item.getNError() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.ERROR)
+                        + "</div>";
+            }
+            if (item.getNFinalitzada() > 0 ){
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ESTAT_FICTICI.getColor() + padding + "\">" +
+                        item.getNFinalitzada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.FINALITZADA)
+                        + "</div>";
+            }
+            if (item.getNProcessada() > 0 ){
+                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ESTAT_FICTICI.getColor() + padding + "\">" +
+                        item.getNProcessada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.PROCESSADA)
+                        + "</div>";
             }
 
             item.setEstatString(estat);

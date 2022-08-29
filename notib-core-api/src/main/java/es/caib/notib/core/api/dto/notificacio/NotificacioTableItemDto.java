@@ -68,6 +68,8 @@ public class NotificacioTableItemDto {
 	private int nExpirada;
 	private int nAnulada;
 	private int nError;
+	private int nFinalitzada;
+	private int nProcessada;
 
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
@@ -142,6 +144,12 @@ public class NotificacioTableItemDto {
 				break;
 			case ANULADA:
 				nAnulada++;
+				break;
+			case FINALITZADA:
+				nFinalitzada++;
+				break;
+			case PROCESSADA:
+				nProcessada++;
 				break;
 			default:
 				nError++;
