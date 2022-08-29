@@ -50,9 +50,9 @@ public class ClientRestv2Test extends ClientBaseTest {
 	@Before
 	public void setUp() throws Exception {
 
-		String keystorePath = ClientRestv2Test.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
-		System.setProperty("javax.net.ssl.trustStore", keystorePath);
-		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
+//		String keystorePath = ClientRestv2Test.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
+//		System.setProperty("javax.net.ssl.trustStore", keystorePath);
+//		System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
 
 		client = NotificacioRestClientFactory.getRestClientV2(
 				URL,

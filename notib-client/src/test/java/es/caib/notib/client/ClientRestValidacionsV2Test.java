@@ -107,6 +107,8 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 	public void test1022() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("E03143601");
 		notificacio.setProcedimentCodi(null);
 		notificacio.setOrganGestor(null);
 		enviaNotificacioError(notificacio, "1022");
@@ -114,8 +116,8 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 	@Test
 	public void test1023() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setProcedimentCodi("875082");
-		notificacio.setOrganGestor(null);
+		notificacio.setProcedimentCodi("888956");
+		notificacio.setOrganGestor("AAAAAAA");
 		enviaNotificacioError(notificacio, "1023");
 	}
 	
@@ -213,7 +215,7 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 		enviaNotificacioError(notificacio, "1064");
 	}
 	
-	// @Test
+	@Test
 	// A veces da timeout en DEV. Se usa un archivo de pruebas de 11 MB, justo por encima del máximo.
 	public void test1065() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
@@ -995,6 +997,7 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 	public void test1310() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 2, false);
 		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.getEnviaments().get(1).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
 		notificacio.getEnviaments().get(1).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 		notificacio.getEnviaments().get(1).getTitular().setDir3Codi(ORGAN_SIR_CODI);
 		enviaNotificacioError(notificacio, "1310");
@@ -1003,6 +1006,7 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 	@Test
 	public void test1320() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEmisorDir3Codi("A04035959");
 		notificacio.setProcedimentCodi("PRUEBA");
 		notificacio.setGrupCodi("XXXX");
 		enviaNotificacioError(notificacio, "1320");
@@ -1011,16 +1015,18 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 	@Test
 	public void test1321() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEmisorDir3Codi("A04035959");
 		notificacio.setProcedimentCodi("PRUEBA2");
-		notificacio.setGrupCodi("serveiconcret");
+		notificacio.setGrupCodi("G1");
 		enviaNotificacioError(notificacio, "1321");
 	}
 	
 	@Test
 	public void test1322() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		notificacio.setEmisorDir3Codi("A04035959");
 		notificacio.setProcedimentCodi("PRUEBA");
-		notificacio.setGrupCodi("serveiconcret");
+		notificacio.setGrupCodi("G2");
 		enviaNotificacioError(notificacio, "1322");
 	}
 	

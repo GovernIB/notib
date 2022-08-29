@@ -47,7 +47,8 @@ public class ClientBaseTest {
 	protected static final String ENTITAT_DIR3CODI = "A04003003";
 	protected static final String ORGAN_CODI = "A04013529";
 	protected static final String ORGAN_CODI_CIE = "A04013529";
-	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105";
+	protected static final String IDENTIFICADOR_PROCEDIMENT = "874105"; // DEV
+//	protected static final String IDENTIFICADOR_PROCEDIMENT = "207982"; // LOCAL
 	protected static final String IDENTIFICADOR_PROCEDIMENT_CIE = "874106"; // DEV
 
 
@@ -59,7 +60,7 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-			notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setOrganGestor(ambEnviamentPostal ? ORGAN_CODI_CIE : ORGAN_CODI);
