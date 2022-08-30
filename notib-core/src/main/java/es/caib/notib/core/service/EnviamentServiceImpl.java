@@ -4,6 +4,11 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.consulta.DocumentConsultaV2;
+import es.caib.notib.client.domini.consulta.GenericInfo;
+import es.caib.notib.client.domini.consulta.PersonaConsultaV2;
+import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
+import es.caib.notib.client.domini.consulta.TransmissioV2;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
@@ -12,7 +17,6 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.rest.consulta.Document;
 import es.caib.notib.core.api.rest.consulta.Estat;
 import es.caib.notib.core.api.rest.consulta.Persona;
 import es.caib.notib.core.api.rest.consulta.PersonaTipus;
@@ -29,6 +33,7 @@ import es.caib.notib.core.entity.EnviamentTableEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
@@ -67,15 +72,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 /**
  * Implementació del servei de gestió de enviaments.
  * 
@@ -1122,6 +1120,28 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	public Resposta findEnviaments(ApiConsulta consulta) {
 
+		consulta.setVisibleCarpeta(null);
+		PaginaEnviaments paginaEnviaments = findEnviamentsByConsulta(consulta);
+		Resposta resposta = new Resposta();
+		resposta.setNumeroElementsTotals(paginaEnviaments.getNumEnviaments());
+		resposta.setNumeroElementsRetornats(paginaEnviaments.getNumeroEnviamentsRetornats());
+		List<NotificacioEnviamentDto> dtos = conversioTipusHelper.convertirList(paginaEnviaments.getEnviaments(), NotificacioEnviamentDto.class);
+		resposta.setResultat(dtosToTransmissions(dtos, consulta.getBasePath()));
+		return resposta;
+	}
+
+	@Override
+	public RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta) {
+		PaginaEnviaments paginaEnviaments = findEnviamentsByConsulta(consulta);
+		RespostaConsultaV2 resposta = RespostaConsultaV2.builder()
+				.numeroElementsTotals(paginaEnviaments.getNumEnviaments())
+				.numeroElementsRetornats(paginaEnviaments.getNumeroEnviamentsRetornats())
+				.resultat(paginaEnviaments.getTransmissionsV2(consulta.getBasePath(), consulta.getIdioma().name().toLowerCase()))
+				.build();
+		return resposta;
+	}
+
+	private PaginaEnviaments findEnviamentsByConsulta(ApiConsulta consulta) {
 		Date dataInicial = consulta.getDataInicial() != null ? FiltreHelper.toIniciDia(consulta.getDataInicial()) : null;
 		Date dataFinal = consulta.getDataFinal() != null ? FiltreHelper.toFiDia(consulta.getDataFinal()) : null;
 		Integer numEnviaments = notificacioEnviamentRepository.countEnviaments(
@@ -1132,8 +1152,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataFinal,
 				consulta.getTipus(),
 				consulta.getEstatFinal() == null,
-				consulta.getEstatFinal());
-		Page<NotificacioEnviamentEntity> comunicacions = notificacioEnviamentRepository.findEnviaments(
+				consulta.getEstatFinal(),
+				consulta.getVisibleCarpeta() == null,
+				consulta.getVisibleCarpeta());
+		Page<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findEnviaments(
 				consulta.getDniTitular(),
 				dataInicial == null,
 				dataInicial,
@@ -1142,15 +1164,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 				consulta.getTipus(),
 				consulta.getEstatFinal() == null,
 				consulta.getEstatFinal(),
+				consulta.getVisibleCarpeta() == null,
+				consulta.getVisibleCarpeta(),
 				getPageable(consulta.getPagina(), consulta.getMida()));
-		Resposta resposta = new Resposta();
-		resposta.setNumeroElementsTotals(numEnviaments);
-		resposta.setNumeroElementsRetornats(comunicacions.getContent() != null ? comunicacions.getContent().size() : 0);
-		List<NotificacioEnviamentDto> dtos = conversioTipusHelper.convertirList(comunicacions.getContent(), NotificacioEnviamentDto.class);
-		resposta.setResultat(dtosToTransmissions(dtos, consulta.getBasePath()));
-		return resposta;
+
+		return PaginaEnviaments.builder().messageHelper(messageHelper).numEnviaments(numEnviaments).enviaments(enviaments.getContent()).locale(new Locale(consulta.getIdioma().name())).build();
 	}
-	
+
 	private Pageable getPageable(Integer pagina, Integer mida) {
 		Pageable pageable = new PageRequest(0, 999999999);
 		if (pagina != null && mida != null) {
@@ -1199,7 +1219,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		transmissio.setDataEstat(data);
 		if (not.getDocument() != null) {
-			Document document = Document.builder()
+			es.caib.notib.core.api.rest.consulta.Document document = es.caib.notib.core.api.rest.consulta.Document.builder()
 					.nom(not.getDocument().getArxiuNom())
 					.mediaType(not.getDocument().getMediaType())
 					.mida(not.getDocument().getMida())
@@ -1368,6 +1388,208 @@ public class EnviamentServiceImpl implements EnviamentService {
 		}
 	}
 
+	@Builder @Getter
+	private static class PaginaEnviaments {
+		private Integer numEnviaments;
+		private List<NotificacioEnviamentEntity> enviaments;
+		private Locale locale;
+		private MessageHelper messageHelper;
+
+		public Integer getNumeroEnviamentsRetornats() {
+			return enviaments != null ? enviaments.size() : 0;
+		}
+
+		public List<TransmissioV2> getTransmissionsV2(String basePath, String lang) {
+			List<TransmissioV2> transmissions = new ArrayList<>();
+			if (enviaments != null) {
+				for (NotificacioEnviamentEntity enviament: enviaments) {
+					transmissions.add(toTransmissio(enviament, basePath, new Locale(lang)));
+				}
+			}
+			return transmissions;
+		}
+
+		private TransmissioV2 toTransmissio(NotificacioEnviamentEntity enviament, String basePath, Locale locale) {
+
+			NotificacioEntity not = enviament.getNotificacio();
+			// Organ
+			GenericInfo organGestor = GenericInfo.builder().codi(not.getOrganGestor().getCodi()).nom(not.getOrganGestor().getNom()).build();
+			// Procediment
+			GenericInfo procediment = null;
+			if (not.getProcediment() != null)
+				procediment = GenericInfo.builder().codi(not.getProcediment().getCodi()).nom(not.getProcediment().getNom()).build();
+			// Estat
+			GenericInfo estat = getEstat(enviament);
+			Date dataEstat = getEstatDate(enviament);
+			// Document
+			DocumentConsultaV2 document = null;
+			if (not.getDocument() != null) {
+				document = DocumentConsultaV2.builder()
+						.nom(not.getDocument().getArxiuNom())
+						.mediaType(not.getDocument().getMediaType())
+						.mida(not.getDocument().getMida())
+						.url(basePath + "/document/" + not.getId()).build();
+			}
+			// Titular
+			PersonaConsultaV2 titular = toPersona(enviament.getTitular());
+			// Destinataris
+			List<PersonaConsultaV2> destinataris = new ArrayList<>();
+			if (enviament.getDestinataris() != null && !enviament.getDestinataris().isEmpty()) {
+				for (PersonaEntity destinatari: enviament.getDestinataris()) {
+					destinataris.add(toPersona(destinatari));
+				}
+			}
+			// Justificant de registre
+			String justificantUrl = null;
+			if (NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) &&
+					(enviament.getRegistreEstat() != null &&
+							(NotificacioRegistreEstatEnumDto.DISTRIBUIT.equals(enviament.getRegistreEstat()) ||
+									NotificacioRegistreEstatEnumDto.OFICI_EXTERN.equals(enviament.getRegistreEstat()) ||
+									NotificacioRegistreEstatEnumDto.OFICI_SIR.equals(enviament.getRegistreEstat()) ) ||
+							(enviament.getRegistreData() != null && enviament.getRegistreNumeroFormatat() != null && !enviament.getRegistreNumeroFormatat().isEmpty()))) {
+				justificantUrl = basePath + "/justificant/" + enviament.getId();
+			}
+			// Certificació
+			String certificacioUrl = null;
+			if (enviament.getNotificaCertificacioData() != null) {
+				certificacioUrl = basePath + "/certificacio/" + enviament.getId();
+			}
+			// Errors
+			Date errorData = null;
+			String errorDescripcio = null;
+			if (enviament.isNotificaError()) {
+				NotificacioEventEntity event = enviament.getNotificacioErrorEvent();
+				if (event != null) {
+					errorData = event.getData();
+					errorDescripcio = event.getErrorDescripcio();
+				}
+			}
+
+			TransmissioV2 transmissio = TransmissioV2.builder()
+					.id(enviament.getId())
+					.emisor(not.getEntitat().getCodi())
+					.organGestor(organGestor)
+					.procediment(procediment)
+					.numExpedient(not.getNumExpedient())
+					.concepte(not.getConcepte())
+					.descripcio(not.getDescripcio())
+					.dataEnviament(not.getEnviamentDataProgramada() != null ? not.getEnviamentDataProgramada() : not.getNotificaEnviamentData())
+					.estat(estat)
+					.dataEstat(dataEstat)
+					.document(document)
+					.titular(titular)
+					.destinataris(destinataris)
+					.error(enviament.isNotificaError())
+					.errorData(errorData)
+					.errorDescripcio(errorDescripcio)
+					.justificant(justificantUrl)
+					.certificacio(certificacioUrl)
+					.build();
+
+			return transmissio;
+		}
+
+		// Recuperar l'estat a partir de l'enviament, i no de la notificació.
+		//  A més, no s'han d'eliminar els estat enviada_amb_errors i finalitzada_amb_errors.
+		private GenericInfo getEstat(NotificacioEnviamentEntity enviament) {
+			switch (enviament.getNotificaEstat()) {
+				case NOTIB_PENDENT:
+				case REGISTRADA:
+				case NOTIB_ENVIADA:
+				case ENVIAMENT_PROGRAMAT:
+					return GenericInfo.builder().codi("EN TRAMITACIO").nom(getNom("EN_TRAMITACIO")).descripcio(getDesc("EN_TRAMITACIO")).build();
+				case ABSENT:
+					return GenericInfo.builder().codi("ABSENT").nom(getNom("ABSENT")).descripcio(getDesc("ABSENT")).build();
+				case ADRESA_INCORRECTA:
+					return GenericInfo.builder().codi("ADREÇA INCORRECTA").nom(getNom("ADRESA_INCORRECTA")).descripcio(getDesc("ADRESA_INCORRECTA")).build();
+				case DESCONEGUT:
+					return GenericInfo.builder().codi("DESCONEGUT").nom(getNom("DESCONEGUT")).descripcio(getDesc("DESCONEGUT")).build();
+				case ENVIADA:
+				case ENVIADA_CI:
+				case ENVIADA_DEH:
+				case ENTREGADA_OP:
+				case PENDENT:
+				case PENDENT_ENVIAMENT:
+				case PENDENT_SEU:
+				case PENDENT_CIE:
+				case PENDENT_DEH:
+					return GenericInfo.builder().codi("PENDENT COMPAREIXENÇA").nom(getNom("PENDENT")).descripcio(getDesc("PENDENT")).build();
+				case ERROR_ENTREGA:
+					return GenericInfo.builder().codi("ERROR").nom(getNom("ERROR")).descripcio(getDesc("ERROR")).build();
+				case EXPIRADA:
+					return GenericInfo.builder().codi("EXPIRADA").nom(getNom("EXPIRADA")).descripcio(getDesc("EXPIRADA")).build();
+				case EXTRAVIADA:
+					return GenericInfo.builder().codi("EXTRAVIADA").nom(getNom("EXTRAVIADA")).descripcio(getDesc("EXTRAVIADA")).build();
+				case MORT:
+					return GenericInfo.builder().codi("DIFUNT").nom(getNom("DIFUNT")).descripcio(getDesc("DIFUNT")).build();
+				case LLEGIDA:
+					return GenericInfo.builder().codi("LLEGIDA").nom(getNom("LLEGIDA")).descripcio(getDesc("LLEGIDA")).build();
+				case NOTIFICADA:
+					return GenericInfo.builder().codi("ACCEPTADA").nom(getNom("ACCEPTADA")).descripcio(getDesc("ACCEPTADA")).build();
+				case REBUTJADA:
+					return GenericInfo.builder().codi("REBUTJADA").nom(getNom("REBUTJADA")).descripcio(getDesc("REBUTJADA")).build();
+				case SENSE_INFORMACIO:
+					return GenericInfo.builder().codi("SENSE INFORMACIO").nom(getNom("SENSE_INFORMACIO")).descripcio(getDesc("SENSE_INFORMACIO")).build();
+				case ANULADA:
+					return GenericInfo.builder().codi("ANULADA").nom(getNom("ANULADA")).descripcio(getDesc("ANULADA")).build();
+				case ENVIAT_SIR:
+					return GenericInfo.builder().codi("ENVIAT SIR").nom(getNom("ENVIADA_SIR")).descripcio(getDesc("ENVIADA_SIR")).build();
+
+				case FINALITZADA:
+					if (enviament.isPerEmail()) {
+						return GenericInfo.builder().codi("ENVIAT EMAIL").nom(getNom("ENVIADA_EMAIL")).descripcio(getDesc("ENVIADA_EMAIL")).build();
+					}
+				case PROCESSADA:
+				case ENVIADA_AMB_ERRORS:
+				case FINALITZADA_AMB_ERRORS:
+				default:
+					return GenericInfo.builder().codi("ERROR").nom(getNom("ERROR")).descripcio(messageHelper.getMessage("enviament.estat.ERROR", null, locale)).build();
+			}
+		}
+
+		private String getNom(String codi) {
+			return messageHelper.getMessage("enviament.estat." + codi + ".nom", null, locale);
+		}
+		private String getDesc(String codi) {
+			return messageHelper.getMessage("enviament.estat." + codi + ".desc", null, locale);
+		}
+
+		private Date getEstatDate(NotificacioEnviamentEntity enviament) {
+
+			if (enviament.getNotificaEstatData() != null)
+				return enviament.getNotificaEstatData();
+
+			NotificacioEntity not = enviament.getNotificacio();
+			if (not.getEstatDate() != null)
+				return not.getEstatDate();
+			if (NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat())) {
+				return not.getRegistreData();
+			} else if (NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(not.getEstat())) {
+				return not.getNotificaEnviamentData();
+			}
+			return not.getCreatedDate().toDate();
+		}
+
+		private PersonaConsultaV2 toPersona(PersonaEntity personaEntity) {
+			InteressatTipusEnumDto tipus = personaEntity.getInteressatTipus();
+			String nom = personaEntity.getNom();
+			if (!InteressatTipusEnumDto.FISICA.equals(tipus)) {
+				if (personaEntity.getRaoSocial() != null && !personaEntity.getRaoSocial().isEmpty()) {
+					nom = personaEntity.getRaoSocial();
+				}
+			}
+			PersonaConsultaV2 persona= PersonaConsultaV2.builder()
+					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("interessatTipusEnumDto." + tipus.name())).build())
+					.nom(nom)
+					.llinatge1(personaEntity.getLlinatge1())
+					.llinatge2(personaEntity.getLlinatge2())
+					.nif(personaEntity.getNif())
+					.email(personaEntity.getEmail())
+					.build();
+			return persona;
+		}
+
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
 
