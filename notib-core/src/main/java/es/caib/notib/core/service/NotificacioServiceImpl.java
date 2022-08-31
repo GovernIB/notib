@@ -970,14 +970,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEventEntity event = notificacioEventRepository.findUltimEventRegistreByNotificacioId(notificacioId);
-			if (event == null)
-				return null;
-			return conversioTipusHelper.convertir(
-					event, 
-					NotificacioEventDto.class);
+			return event != null ? conversioTipusHelper.convertir(event, NotificacioEventDto.class) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -985,26 +982,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEventDto> eventFindAmbEnviament(
-			Long entitatId, 
-			Long notificacioId,
-			Long enviamentId) {
+	public List<NotificacioEventDto> eventFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels events associats a un destinatari (" +
-					"notificacioId=" + notificacioId + ", " + 
-					"enviamentId=" + enviamentId + ")");
+			logger.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-			entityComprovarHelper.comprovarPermisos(
-					enviament.getNotificacio().getId(),
-					true,
-					true,
-					true);
-			return conversioTipusHelper.convertirList(
-					notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(
-							notificacioId,
-							enviamentId),
-					NotificacioEventDto.class);
+			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
+			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(notificacioId, enviamentId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1012,25 +997,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
-			Long entitatId,
-			Long notificacioId,
-			Long enviamentId) {
+	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels events associats a un destinatari (" +
-					"notificacioId=" + notificacioId + ", " +
-					"enviamentId=" + enviamentId + ")");
+			logger.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
-			entityComprovarHelper.comprovarPermisos(
-					enviament.getNotificacio().getId(),
-					true,
-					true,
-					true);
-			return conversioTipusHelper.convertirList(
-					notificacioEnviamentAuditRepository.findByEnviamentIdOrderByCreatedDateAsc(
-							enviamentId),
-					NotificacioEnviamentAuditDto.class);
+			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
+			return conversioTipusHelper.convertirList(notificacioEnviamentAuditRepository.findByEnviamentIdOrderByCreatedDateAsc(enviamentId), NotificacioEnviamentAuditDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1038,14 +1012,14 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ArxiuDto getDocumentArxiu(
-			Long notificacioId) {
+	public ArxiuDto getDocumentArxiu(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			String nomDocumetnDefault = "document";
+			String nomDocumentDefault = "document";
 			NotificacioEntity entity = notificacioRepository.findById(notificacioId);
 			DocumentEntity document = entity.getDocument();
-			return documentHelper.documentToArxiuDto(nomDocumetnDefault, document);
+			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1053,9 +1027,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ArxiuDto getDocumentArxiu(
-			Long notificacioId,
-			Long documentId) {
+	public ArxiuDto getDocumentArxiu(Long notificacioId, Long documentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			String nomDocumentDefault = "document";
@@ -1075,15 +1048,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 		try {
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			pluginHelper.gestioDocumentalGet(
-					enviament.getNotificaCertificacioArxiuId(),
-					PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-					output);
-			return new ArxiuDto(
-					calcularNomArxiuCertificacio(enviament),
-					enviament.getNotificaCertificacioMime(),
-					output.toByteArray(),
-					output.size());
+			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
+			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1092,6 +1058,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public boolean enviar(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
@@ -1105,6 +1072,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	@Override
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			return notificacioHelper.registrarNotificar(notificacioId);
@@ -1116,6 +1084,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	@Transactional
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
@@ -1132,18 +1101,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	
 	@Transactional
 	@Override
-	public String marcarComProcessada(
-			Long notificacioId,
-			String motiu,
-			boolean isAdministrador) throws Exception {
+	public String marcarComProcessada(Long notificacioId, String motiu, boolean isAdministrador) throws Exception {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (" +
-					"notificacioId=" + notificacioId + ")");		
+			logger.debug("Refrescant l'estat de la notificació a PROCESSAT (notificacioId=" + notificacioId + ")");
 			String resposta = null;
-			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(
-					null,
-					notificacioId);
+			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
@@ -1666,8 +1630,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				calcularNomArxiuCertificacio(enviament));
 	}
 
-	private String calcularNomArxiuCertificacio(
-			NotificacioEnviamentEntity enviament) {
+	private String calcularNomArxiuCertificacio(NotificacioEnviamentEntity enviament) {
 		return "certificacio_" + enviament.getNotificaIdentificador() + ".pdf";
 	}
 

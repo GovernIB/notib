@@ -257,25 +257,25 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
 			"   and (:esVisibleCarpetaNull = false and (:visibleCarpeta = false " +
-			"		or (ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_SEU " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_CIE " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_DEH " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA_CI " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA_DEH " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENTREGADA_OP " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REBUTJADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.LLEGIDA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIFICADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.EXPIRADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ABSENT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.DESCONEGUT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.MORT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.EXTRAVIADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO)))")
+			"		or (ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_ENVIAMENT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_SEU " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_CIE " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_DEH " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA_CI " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA_DEH " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENTREGADA_OP " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.REBUTJADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.LLEGIDA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIFICADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ABSENT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ADRESA_INCORRECTA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.DESCONEGUT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.MORT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXTRAVIADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO)))")
 	Integer countEnviaments(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
@@ -303,25 +303,25 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
 			"   and (:esVisibleCarpetaNull = false and (:visibleCarpeta = false " +
-			"		or (ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_ENVIAMENT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_SEU " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_CIE " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.PENDENT_DEH " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA_CI " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENVIADA_DEH " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ENTREGADA_OP " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REBUTJADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.LLEGIDA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.NOTIFICADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.EXPIRADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ABSENT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.ADRESA_INCORRECTA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.DESCONEGUT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.MORT " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.EXTRAVIADA " +
-			"		or ne.notificaEstat = es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.SENSE_INFORMACIO)))")
+			"		or (ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_ENVIAMENT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_SEU " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_CIE " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_DEH " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA_CI " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIADA_DEH " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENTREGADA_OP " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.REBUTJADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.LLEGIDA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIFICADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ABSENT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ADRESA_INCORRECTA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.DESCONEGUT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.MORT " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXTRAVIADA " +
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO)))")
 	Page<NotificacioEnviamentEntity> findEnviaments(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
