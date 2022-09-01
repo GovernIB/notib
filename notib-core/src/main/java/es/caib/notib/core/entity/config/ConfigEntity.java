@@ -1,8 +1,11 @@
 package es.caib.notib.core.entity.config;
 
 import es.caib.notib.core.entity.EntitatEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,7 +18,10 @@ import java.util.List;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(	name = "NOT_CONFIG")
 @NoArgsConstructor
@@ -45,6 +51,9 @@ public class ConfigEntity {
 
     @Column(name = "entitat_codi", length = 64)
     private String entitatCodi;
+
+    @Column(name = "CONFIGURABLE")
+    private boolean configurable;
 
     @Column(name = "POSITION")
     private int position;
@@ -78,11 +87,12 @@ public class ConfigEntity {
     public void crearConfigNova(String key, String entitatCodi, ConfigEntity entitat) {
 
         this.key = key;
+        this.entitatCodi = entitatCodi;
         this.value = null;
         this.description = entitat.getDescription();
         this.jbossProperty = entitat.isJbossProperty();
         this.groupCode = entitat.getGroupCode();
         this.type = entitat.getType();
-        this.entitatCodi = entitatCodi;
+        this.configurable = entitat.isConfigurable();
     }
 }

@@ -181,4 +181,9 @@ public class EntitatServiceBean implements EntitatService {
 	public boolean existeixPermis(Long entitatId, String principal) throws Exception {
 		return delegate.existeixPermis(entitatId, principal);
 	}
+
+	@Override
+	public void setConfigEntitat(EntitatDto entitatDto) {
+		delegate.setConfigEntitat(entitatDto);
+	}
 }

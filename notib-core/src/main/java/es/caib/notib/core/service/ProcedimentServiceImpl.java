@@ -417,7 +417,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 					"Actualització de procediments", 
 					IntegracioAccioTipusEnumDto.PROCESSAR, 
 					new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
-
+			info.setCodiEntitat(entitatDto.getCodi());
 			logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 			// Comprova si hi ha una altre instància del procés en execució
 			ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
@@ -574,7 +574,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 	
-	private int getTotalProcediments(String codiDir3) {		
+	private int getTotalProcediments(String codiDir3) {
 		logger.debug(">>>> >> Obtenir total procediments Rolsac...");
 		Long t1 = System.currentTimeMillis();
 		int totalElements = pluginHelper.getTotalProcediments(codiDir3);
@@ -583,24 +583,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		return totalElements;
 	}
 	
-	private List<ProcSerDto> getProcedimentsGdaByEntitat(
-			String codiDir3,
-			int numPagina) {
+	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
+
 		ProgresActualitzacioDto progres = progresActualitzacio.get(codiDir3);
-		
 		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		Long t1 = System.currentTimeMillis();
-		
-		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(
-				codiDir3,
-				numPagina);
-		
+		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
 		Long t2 = System.currentTimeMillis();
 		logger.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
-		
 		return procedimentsEntitat;
 	}
 	
@@ -756,6 +749,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
+	@Transactional
 	public List<ProcSerDto> findByOrganGestorIDescendentsAndComu(Long entitatId, OrganGestorDto organGestor) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
@@ -1220,6 +1214,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		List<ProcedimentEntity> procediments;
@@ -1235,6 +1230,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public boolean hasProcedimentsComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1283,21 +1279,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
-	private List<ProcedimentEntity> recuperarProcedimentAmbPermis(
-			EntitatEntity entitat,
-			PermisEnum permis,
-			String organFiltre) {
+	private List<ProcedimentEntity> recuperarProcedimentAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(
-				auth.getName(),
-				entitat,
-				permisos);
-		List<ProcSerOrganEntity> procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(
-				auth,
-				entitat,
-				permisos);
+		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
+		List<ProcSerOrganEntity> procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
 		List<ProcSerEntity> procSerAmbPermis;
 		if (organFiltre != null) {
 			List<ProcSerOrganEntity> procedimentsOrgansAmbPermis = new ArrayList<>();
@@ -1305,36 +1292,34 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 				List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
 				for (ProcSerOrganEntity procedimentOrgan: procedimentsOrgans) {
-					if (organsFills.contains(procedimentOrgan.getOrganGestor().getCodi()))
+					if (organsFills.contains(procedimentOrgan.getOrganGestor().getCodi())) {
 						procedimentsOrgansAmbPermis.add(procedimentOrgan);
+					}
 				}
 			}
-
 			procSerAmbPermis = addProcedimentsOrgan(procediments, procedimentsOrgansAmbPermis, organFiltre);
-
 			boolean hasComunsPermission = hasPermisProcedimentsComuns(entitat.getDir3Codi(), organFiltre);
 			if (hasComunsPermission && (PermisEnum.NOTIFICACIO.equals(permis) || PermisEnum.COMUNIACIO_SIR.equals(permis))) {
 				List<ProcedimentEntity> procedimentsComuns = procedimentRepository.findByEntitatAndComuTrue(entitat);
 				for (ProcedimentEntity procediment: procedimentsComuns) {
-					if (!procSerAmbPermis.contains(procediment))
+					if (!procSerAmbPermis.contains(procediment)) {
 						procSerAmbPermis.add(procediment);
+					}
 				}
 			}
-
-		} else {
-
-			Set<ProcSerEntity> setProcediments = new HashSet<>();
-			if (procediments != null)
-				setProcediments = new HashSet<>(procediments);
-
-			if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
-				for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgans) {
-					setProcediments.add(procedimentOrgan.getProcSer());
-				}
-			}
-			procSerAmbPermis = new ArrayList<>(setProcediments);
+			return filtraProcediments(procSerAmbPermis);
 		}
 
+		Set<ProcSerEntity> setProcediments = new HashSet<>();
+		if (procediments != null) {
+			setProcediments = new HashSet<>(procediments);
+		}
+		if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
+			for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgans) {
+				setProcediments.add(procedimentOrgan.getProcSer());
+			}
+		}
+		procSerAmbPermis = new ArrayList<>(setProcediments);
 		return filtraProcediments(procSerAmbPermis);
 	}
 

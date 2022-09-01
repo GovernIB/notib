@@ -5,5 +5,6 @@ public enum PermisEnum {
 	PROCESSAR,
 	NOTIFICACIO, // Notificacions i comunicacions NO SIR
 	GESTIO,
-	COMUNIACIO_SIR // Comunicacions SIR
+	COMUNIACIO_SIR, // Comunicacions SIR
+	COMUNS // Procediments i serveis comuns
 }

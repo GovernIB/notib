@@ -1,8 +1,8 @@
 package es.caib.notib.plugin.registre;
 
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
-import es.caib.notib.plugin.PropertiesHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Scanner;
 
 
 /**
@@ -21,7 +27,13 @@ import java.util.*;
  */
 
 public class RegistrePluginMockImpl implements RegistrePlugin{
-	
+
+	private final Properties properties;
+
+	public RegistrePluginMockImpl(Properties properties) {
+		this.properties = properties;
+	}
+
 	@Override
 	public RespostaConsultaRegistre salidaAsientoRegistral(
 			String codiDir3Entitat, 
@@ -39,7 +51,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 //			e.printStackTrace();
 //		}
 //		System.out.println(">>> FIIIIIIII  DETALL REGISTRE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		if (arb.getResumen().startsWith("Error") || arb.getInteresados().get(0).getInteresado().getApellido1().equals("error")) {
+		DatosInteresadoWsDto interesado = arb.getInteresados().get(0).getInteresado();
+		if (arb.getResumen().startsWith("Error") || interesado.getApellido1() != null && interesado.getApellido1().equals("error")) {
 			resposta.setErrorCodi("3");
 			resposta.setErrorDescripcio("Error de registre MOCK (" + System.currentTimeMillis() + ")");
 			return resposta;
@@ -354,7 +367,8 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		
 //		ClassLoader classLoader = getClass().getClassLoader();
 //		File file = new File(classLoader.getResource("es/caib/notib/plugin/caib/registre/justificant.pdf").getFile());
-		File file = new File(getJustificantPath());
+		String justificantPath = getJustificantPath();
+		File file = new File(justificantPath);
 		
 		try {
 		
@@ -367,12 +381,12 @@ public class RegistrePluginMockImpl implements RegistrePlugin{
 		return fileContent;
 	}
 	
-	public static String getSequenciaPath() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.mock.sequencia");
+	public String getSequenciaPath() {
+		return properties.getProperty("es.caib.notib.plugin.regweb.mock.sequencia");
 	}
 	
-	public static String getJustificantPath() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.regweb.mock.justificant");
+	public String getJustificantPath() {
+		return properties.getProperty("es.caib.notib.plugin.regweb.mock.justificant");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginMockImpl.class);

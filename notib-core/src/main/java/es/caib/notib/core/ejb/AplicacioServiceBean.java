@@ -4,19 +4,16 @@
 package es.caib.notib.core.ejb;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
 
@@ -32,7 +29,13 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Autowired
 	AplicacioService delegate;
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		delegate.actualitzarEntiatThreadLocal(entitat);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void processarAutenticacioUsuari() {
@@ -70,18 +73,6 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioDto> integracioFindAll() {
-		return delegate.integracioFindAll();
-	}
-
-	@Override
-	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
-		return delegate.integracioFindDarreresAccionsByCodi(codi, paginacio);
-	}
-
-	@Override
 	public void excepcioSave(Throwable exception) {
 		delegate.excepcioSave(exception);
 	}
@@ -105,6 +96,12 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public String propertyGetByEntitat(String property) {
+		return delegate.propertyGetByEntitat(property);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property) {
 		return delegate.propertyGet(property);
 	}
@@ -113,6 +110,12 @@ public class AplicacioServiceBean implements AplicacioService {
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property, String defaultValue) {
 		return delegate.propertyGet(property, defaultValue);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public String propertyGetByEntitat(String property, String defaultValue) {
+		return delegate.propertyGetByEntitat(property, defaultValue);
 	}
 
 	@Override

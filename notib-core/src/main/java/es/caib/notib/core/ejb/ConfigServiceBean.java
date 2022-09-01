@@ -49,4 +49,21 @@ public class ConfigServiceBean implements ConfigService {
 	public List<ConfigDto> findEntitatsConfigByKey(String key) {
 		return delegate.findEntitatsConfigByKey(key);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void crearPropietatsConfigPerEntitats() {
+		delegate.crearPropietatsConfigPerEntitats();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void actualitzarPropietatsJBossBdd() {
+		delegate.actualitzarPropietatsJBossBdd();
+	}
+
+	@Override
+	public String getPropertyValue(String key) {
+		return delegate.getPropertyValue(key);
+	}
 }

@@ -616,10 +616,8 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("referer", referer);
     }
 
-    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(
-            EntitatDto entitatActual,
-            List<CodiValorOrganGestorComuDto> procedimentsDisponibles,
-            PermisEnum permis) {
+
+    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
 
         // 1-recuperam els òrgans dels procediments disponibles (amb permís)
         List<String> codisOrgansGestorsProcediments = new ArrayList<>();
@@ -749,6 +747,7 @@ public class NotificacioFormController extends BaseUserController {
                                       Model model,
                                       UsuariDto usuariActual,
                                       TipusEnviamentEnumDto tipusEnviament) {
+
         RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
         String organFiltreProcediments = null;
         if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
@@ -770,7 +769,8 @@ public class NotificacioFormController extends BaseUserController {
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
 
-        List<OrganGestorDto> organsGestors;
+        List<OrganGestorDto> organsGestors  = null;
+        List<CodiValorDto> codisValor = new ArrayList<>();
         if (RolEnumDto.NOT_ADMIN.equals(rol)) {
             organsGestors = organGestorService.findByEntitat(entitatActual.getId());
 
@@ -779,35 +779,32 @@ public class NotificacioFormController extends BaseUserController {
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
-        	if (tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR)) {
-        		organsGestors = recuperarOrgansPerProcedimentAmbPermis(
-    	                entitatActual,
-                        procSerDisponibles,
-                        PermisEnum.COMUNIACIO_SIR);
-        	} else {
-	            organsGestors = recuperarOrgansPerProcedimentAmbPermis(
-		                entitatActual,
-	                    procSerDisponibles,
-	                    PermisEnum.NOTIFICACIO);
-        	}
+            PermisEnum tipus = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
+//            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
+            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), tipus);
         }
-
 
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
 
-        if (organsGestors == null || organsGestors.isEmpty()) {
+        if (organsGestors != null) {
+            for (OrganGestorDto o : organsGestors) {
+                codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
+            }
+        }
+
+        if (codisValor == null || codisValor.isEmpty()) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
         }
 
-        model.addAttribute("organsGestors", organsGestors);
+        model.addAttribute("organsGestors", codisValor);
         model.addAttribute("procediments", procedimentsDisponibles);
         model.addAttribute("serveis", serveisDisponibles);
 
 
-        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGet("es.caib.notib.titular.incapacitat", "true"));
-        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGet("es.caib.notib.destinatari.multiple", "false"));
+        model.addAttribute("isTitularAmbIncapacitat", aplicacioService.propertyGetByEntitat("es.caib.notib.titular.incapacitat", "true"));
+        model.addAttribute("isMultiplesDestinataris", aplicacioService.propertyGetByEntitat("es.caib.notib.destinatari.multiple", "false"));
         model.addAttribute("ambEntregaDeh", entitatActual.isAmbEntregaDeh());
 
         model.addAttribute("comunicacioTipus",
@@ -829,10 +826,10 @@ public class NotificacioFormController extends BaseUserController {
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
 
         } else if (TipusEnviamentEnumDto.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA, };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         } else {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
             interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
         }
 
@@ -890,12 +887,8 @@ public class NotificacioFormController extends BaseUserController {
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(
-                Date.class,
-                new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
-        binder.registerCustomEditor(
-                Boolean.class,
-                new CustomBooleanEditor("SI", "NO", false));
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+        binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor("SI", "NO", false));
     }
 
     @Data

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementació del plugin de registre per a la interficie de
@@ -32,6 +33,10 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
 	
 	private static final String OFICINA_VIRTUAL_DEFAULT = "Oficina Virtual";
+
+	public RegistrePluginRegweb3Impl(Properties properties) {
+		super(properties);
+	}
 
 
 	@Override

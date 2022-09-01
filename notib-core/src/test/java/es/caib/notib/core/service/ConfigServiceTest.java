@@ -50,7 +50,7 @@ public class ConfigServiceTest {
                 conversioTipusHelper.convertir(Mockito.any(ConfigEntity.class), Mockito.eq(ConfigDto.class))
         ).thenCallRealMethod();
 
-        ConfigEntity configEntity = new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE");
+        ConfigEntity configEntity = ConfigEntity.builder().key("PROPERTY_KEY").value("PROPERTY_VALUE").configurable(true).build();
         Mockito.when(
                 configRepository.findOne(Mockito.eq("PROPERTY_KEY"))
         ).thenReturn(configEntity);
@@ -62,7 +62,7 @@ public class ConfigServiceTest {
         ConfigDto configEdited = configService.updateProperty(configDto);
 
         // Then
-        Mockito.verify(pluginHelper).reloadProperties(Mockito.nullable(String.class));
+//        Mockito.verify(pluginHelper).reloadProperties(Mockito.nullable(String.class));
         Mockito.verify(configRepository).findOne(Mockito.eq("PROPERTY_KEY"));
 
         Assert.assertEquals("NEW_VALUE", configEdited.getValue());

@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.entity.ProcesosInicialsEntity;
 import es.caib.notib.core.repository.ProcessosInicialsRepository;
@@ -28,6 +29,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private NotificacioService notificacioService;
 
     @Autowired
+    private ConfigService configService;
+
+    @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
 
     public static int counter = 0;
@@ -48,12 +52,16 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                     case ACTUALITZAR_REFERENCIES:
                         notificacioService.actualitzarReferencies();
                         break;
+                    case PROPIETATS_CONFIG_ENTITATS:
+                        configService.crearPropietatsConfigPerEntitats();
+                        break;
                     default:
                         log.error("Procés inicial no definit");
                         break;
                 }
                 processosInicialsRepository.updateInit(proces.getId(), false);
             }
+            configService.actualitzarPropietatsJBossBdd();
         } catch (Exception ex) {
             log.error("Errror executant els processos inicials", ex);
         }
@@ -61,8 +69,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     }
 
     private void addCustomAuthentication() {
-        auth = SecurityContextHolder.getContext().getAuthentication();
 
+        auth = SecurityContextHolder.getContext().getAuthentication();
         Principal principal = new Principal() {
             public String getName() {
                 return "INIT";
@@ -72,10 +80,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
         rols.add(new SimpleGrantedAuthority("NOT_SUPER"));
         rols.add(new SimpleGrantedAuthority("NOT_ADMIN"));
         rols.add(new SimpleGrantedAuthority("tothom"));
-
-        Authentication authentication =  new UsernamePasswordAuthenticationToken(
-                principal, "N/A",
-                rols);
+        Authentication authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

@@ -5,6 +5,7 @@ package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -36,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sun.misc.BASE64Encoder;
 
 import javax.jws.WebService;
-import javax.mail.internet.InternetAddress;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,16 +132,16 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	private static final String COMUNICACIOAMBADMINISTRACIO = "comunicacioAmbAdministracio";
-
 
 	@Transactional
 	@Override
 	public RespostaAlta alta(NotificacioV2 notificacio) throws NotificacioServiceWsException {
 
 		RespostaAltaV2 resposta = altaV2(notificacio);
-
 		return RespostaAlta.builder()
 				.identificador(resposta.getIdentificador())
 				.estat(resposta.getEstat())
@@ -153,8 +153,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 	@Transactional
 	@Override
-	public RespostaAltaV2 altaV2(
-			NotificacioV2 notificacio) throws NotificacioServiceWsException {
+	public RespostaAltaV2 altaV2(NotificacioV2 notificacio) throws NotificacioServiceWsException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("[ALTA] Alta de notificació: " + notificacio.toString());
@@ -169,24 +169,25 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			
 			// Obtenir dades bàsiques per a la notificació
 			String emisorDir3Codi = notificacio.getEmisorDir3Codi();
+//			info.setCodiEntitat(emisorDir3Codi);
 			logger.debug(">> [ALTA] emisorDir3Codi: " + emisorDir3Codi);
-			
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
+			if (entitat != null) {
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				info.setCodiEntitat(entitat.getCodi());
+			}
 			logger.debug(">> [ALTA] entitat: " + (entitat == null ? "null": (entitat.getCodi() + " - " + entitat.getNom())));
 			
 			String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 			logger.debug(">> [ALTA] usuariCodi: " + usuariCodi);
 			
 			AplicacioEntity aplicacio = null;
-			if (entitat != null && usuariCodi != null)
+			if (entitat != null && usuariCodi != null) {
 				aplicacio = aplicacioRepository.findByEntitatIdAndUsuariCodi(entitat.getId(), usuariCodi);
+			}
 			logger.debug(">> [ALTA] aplicacio: " + (aplicacio == null ? "null" : aplicacio.getUsuariCodi()));
 			
-			resposta = validarNotificacio(
-					notificacio,
-					emisorDir3Codi,
-					entitat,
-					aplicacio);
+			resposta = validarNotificacio(notificacio, emisorDir3Codi, entitat, aplicacio);
 			logger.debug(">> [ALTA] validacio: [error=" + resposta.isError() + ", estat=" + resposta.getEstat() + ", descripcio=" + resposta.getErrorDescripcio() + "]");
 			
 			if (resposta.isError()) {
@@ -201,9 +202,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				// Obtenir dades depenents de procediment (Procediment NO obligatori per a comunicacions a administracions)
 				if (notificacio.getProcedimentCodi() != null) {
-					procediment = procSerRepository.findByCodiAndEntitat(
-							notificacio.getProcedimentCodi(), 
-							entitat);
+					procediment = procSerRepository.findByCodiAndEntitat(notificacio.getProcedimentCodi(), entitat);
 
 					if (procediment != null) {
 
@@ -234,14 +233,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						// La caducitat únicament és necessària per a notificacions. Per tant tindrà procedimetns
 						if (notificacio.getCaducitat() == null) {
 							if (notificacio.getCaducitatDiesNaturals() != null) {
-								notificacio.setCaducitat(CaducitatHelper.sumarDiesNaturals(
-										new Date(),
-										notificacio.getCaducitatDiesNaturals()));
+								notificacio.setCaducitat(CaducitatHelper.sumarDiesNaturals(new Date(), notificacio.getCaducitatDiesNaturals()));
 							} else {
-								notificacio.setCaducitat(
-										CaducitatHelper.sumarDiesLaborals(
-												new Date(),
-												procediment.getCaducitat()));
+								notificacio.setCaducitat(CaducitatHelper.sumarDiesLaborals(new Date(), procediment.getCaducitat()));
 							}
 						}
 						
@@ -489,6 +483,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				info.setCodiEntitat(entitat.getCodi());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
 				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
 
@@ -553,7 +549,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 //			Long notificacioId;
 			RespostaConsultaEstatNotificacioV2 resposta = new RespostaConsultaEstatNotificacioV2();
 			resposta.setIdentificador(identificador);
-	
+
 			try {
 				NotificacioEntity notificacio = null;
 
@@ -583,6 +579,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					return resposta;
 				}
 
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
+				info.setCodiEntitat(notificacio.getEntitat().getCodi());
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				switch (notificacio.getEstat()) {
 				case PENDENT:
@@ -702,6 +700,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 			logger.debug("Consultant estat enviament amb referencia: " + referencia);
 			RespostaConsultaEstatEnviamentV2 resposta = RespostaConsultaEstatEnviamentV2.builder().referencia(referencia).build();
+			info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			try {
 				if (enviament == null) {
 					resposta.setError(true);
@@ -711,6 +710,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					integracioHelper.addAccioError(info, "No existeix cap enviament amb l'identificador especificat");
 					return resposta;
 				}
+				if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
+					info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
+				}
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(enviament.getNotificacio().getEntitat(), EntitatDto.class));
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				//Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
 				// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
@@ -881,7 +884,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					"Consulta de les dades de registre", 
 					IntegracioAccioTipusEnumDto.RECEPCIO, 
 					new AccioParam("Dades de la consulta", json));
-			
+
 			RespostaConsultaDadesRegistreV2 resposta = new RespostaConsultaDadesRegistreV2();
 			String numeroRegistreFormatat = null;
 			String codiDir3Entitat = null;
@@ -916,11 +919,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
+				info.setCodiEntitat(notificacio.getEntitat().getCodi());
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = notificacio.getRegistreNumeroFormatat();
 				codiDir3Entitat = notificacio.getEmisorDir3Codi();
-
 				if (numeroRegistreFormatat == null) {
 					resposta.setError(true);
 					resposta.setErrorData(new Date());
@@ -970,6 +974,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				//Dades registre i consutla justificant
 				numeroRegistreFormatat = enviament.getRegistreNumeroFormatat();
 				codiDir3Entitat = enviament.getNotificacio().getEmisorDir3Codi();
+				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				if (numeroRegistreFormatat == null) {
 					resposta.setError(true);
@@ -1060,6 +1065,8 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
 						ex);
 			}
+			ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
+			info.setCodiEntitat(notificacio.getEntitat().getCodi());
 			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
 			if (progres != null && progres.getProgres() != null &&  progres.getProgres() < 100) {
@@ -1130,6 +1137,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		NotificacioEventEntity errorEvent = notificacioHelper.getNotificaErrorEvent(notificacioGuardada);
 		if (errorEvent != null) {
 			logger.debug(">> [ALTA] Event d'error de Notifica!: " + errorEvent.getDescripcio() + " - " + errorEvent.getErrorDescripcio());
+			info.setCodiEntitat(errorEvent.getNotificacio().getEntitat().getCodi());
 			resposta.setError(true);
 			resposta.setErrorDescripcio(errorEvent.getErrorDescripcio());
 			resposta.setErrorData(new Date());
@@ -1706,11 +1714,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.enviaments.no.null"));
 		}
+		List<String> nifs = new ArrayList<>();
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
-				comunicacioAmbAdministracio = InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
-				comunicacioSenseAdministracio = !InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
+				comunicacioAmbAdministracio = comunicacioAmbAdministracio || InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
+				comunicacioSenseAdministracio = comunicacioSenseAdministracio || !InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
 			}
 			boolean senseNif = true;
 			
@@ -1742,6 +1751,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			// - Nif
 			if(enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
+			}
+			if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+				String nif = enviament.getTitular().getNif().toLowerCase();
+				if (nifs.contains(nif)) {
+					return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
+				} else {
+					nifs.add(nif);
+				}
 			}
 			if (!FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 				if (NifHelper.isvalid(enviament.getTitular().getNif())) {
@@ -1879,6 +1896,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					// - Nif
 					if(destinatari.getNif() != null && destinatari.getNif().length() > 9) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.longitud.max"));
+					}
+					if (!Strings.isNullOrEmpty(destinatari.getNif())) {
+						String nif = destinatari.getNif().toLowerCase();
+						if (nifs.contains(nif)) {
+							return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
+						} else {
+							nifs.add(nif);
+						}
 					}
 					if (!FISICA_SENSE_NIF.equals(destinatari.getInteressatTipus()) && destinatari.getNif() != null && !destinatari.getNif().isEmpty()) {
 						if (NifHelper.isvalid(destinatari.getNif())) {
@@ -2059,7 +2084,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						return setRespostaError(messageHelper.getMessage("error.validacio.provincia.no.null.entrega.nacional"));
 					}
 					if (enviament.getEntregaPostal().getPoblacio() == null || enviament.getEntregaPostal().getPoblacio().isEmpty()) {
-						return setRespostaError("error.validacio.poblacio.codi.no.null.entrega.nacional.normalitzat");
+						return setRespostaError(messageHelper.getMessage("error.validacio.poblacio.codi.no.null.entrega.nacional.normalitzat"));
 					}
 				}
 				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {

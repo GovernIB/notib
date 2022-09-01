@@ -30,6 +30,7 @@
 					this.value = '';
 				} else if (type == 'checkbox' || type == 'radio') {
 					this.checked = false;
+					$(this).parent().removeClass('active');
 				} else if (tag == 'select') {
 					this.selectedIndex = 0;
 				}
@@ -48,6 +49,24 @@
 		$("#canviarVistaOrganGestor").click(function(){
 			window.location.replace("/notib/organgestorArbre");
 		});
+
+		$("#obsolet").on("click", x => {
+			$("#vigent").removeClass("active");
+			if ($(x).hasClass("active")) {
+				$(x).removeClass("active");
+			}
+			$('#btnFiltrar').click();
+		});
+
+		$("#vigent").on("click", x => {
+			$("#obsolet").removeClass("active");
+			if ($(x).hasClass("active")) {
+				$(x).removeClass("active");
+			}
+			$('#btnFiltrar').click();
+		});
+		
+		$("#estat").on("change", () => $('#btnFiltrar').click());
 	});
 	</script>
 </head>
@@ -69,7 +88,9 @@
 								 optionTextAttribute="codiNom" labelSize="0" inline="true" emptyOption="true" optionMinimumResultsForSearch="2" placeholderKey="organgestor.form.camp.organ.arrel.select"/>
 			</div>
 			<div class="col-md-2">
-				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="true" placeholderKey="organgestor.list.columna.estat" inline="true"/>
+<%--				<not:inputRadio name="estat" botons="true" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" />--%>
+				<not:inputSelect name="estat" optionItems="${organGestorEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+								 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
 			</div>
 			<c:if test="${setOficina}">
 				<div class="col-md-3">
@@ -101,7 +122,7 @@
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+					<button id="btnFiltrar" type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
 		</div>
@@ -132,7 +153,7 @@
 				</th>
 				<th data-col-name="nom"><spring:message code="organgestor.list.columna.nom"/></th>
 				<th data-col-name="codiPare"><spring:message code="organgestor.list.columna.codi.pare"/></th>
-				<th data-col-name="nomPare"><spring:message code="organgestor.list.columna.nom.pare"/></th>
+				<th data-col-name="nomPare" data-orderable="false"><spring:message code="organgestor.list.columna.nom.pare"/></th>
 				<c:if test="${setLlibre}">
 					<th data-col-name="llibreCodiNom"><spring:message code="procediment.list.columna.llibre"/></th>
 				</c:if>

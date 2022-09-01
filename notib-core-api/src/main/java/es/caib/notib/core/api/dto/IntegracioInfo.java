@@ -13,6 +13,7 @@ import java.util.List;
 public class IntegracioInfo {
 
 	String codi;
+	String codiEntitat;
 	String descripcio;
 	String aplicacio;
 	IntegracioAccioTipusEnumDto tipus;

@@ -184,6 +184,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				return enviament;
 			}
 
+			if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
+				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
+			}
 			if (enviament.isNotificaEstatFinal()) {
 				if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
 					logger.warn(

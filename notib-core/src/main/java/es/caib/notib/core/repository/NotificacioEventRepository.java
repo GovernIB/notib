@@ -20,19 +20,15 @@ import java.util.List;
  */
 public interface NotificacioEventRepository extends JpaRepository<NotificacioEventEntity, Long> {
 
-	List<NotificacioEventEntity> findByNotificacioIdOrderByDataAsc(
-			Long notificacioId);
+	List<NotificacioEventEntity> findByNotificacioIdAndErrorIsTrue(Long notificacioId);
 
-	List<NotificacioEventEntity> findByNotificacioIdOrEnviamentIdOrderByDataAsc(
-			Long notificacioId,
-			Long enviamentId);
+	List<NotificacioEventEntity> findByNotificacioIdOrderByDataAsc(Long notificacioId);
+
+	List<NotificacioEventEntity> findByNotificacioIdOrEnviamentIdOrderByDataAsc(Long notificacioId,	Long enviamentId);
 	
-	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(
-			Long enviamentId);
+	List<NotificacioEventEntity> findByEnviamentIdOrderByIdAsc(Long enviamentId);
 
-	long countByEnviamentIdAndCallbackEstat(
-			Long enviamentId,
-			CallbackEstatEnumDto callbackEstat);
+	long countByEnviamentIdAndCallbackEstat(Long enviamentId, CallbackEstatEnumDto callbackEstat);
 
 	@Modifying
 	@Query( " delete from " +
@@ -68,22 +64,15 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 
 	void deleteByEnviament(NotificacioEnviamentEntity enviament);
 
-	void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio,
-									 NotificacioEventTipusEnumDto tipus,
-									 boolean error);
+	void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
+
 	void deleteByNotificacio(NotificacioEntity notificacio);
-	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(
-			NotificacioEntity notificacio,
-			NotificacioEventTipusEnumDto tipus,
-			boolean error);
-	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(
-			NotificacioEntity notificacio,
-			NotificacioEventTipusEnumDto tipus,
-			boolean error);
-	List<NotificacioEventEntity> findByEnviamentAndTipusAndErrorOrderByDataDescIdDesc(
-			NotificacioEnviamentEntity enviament,
-			NotificacioEventTipusEnumDto tipus,
-			boolean error);
+
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
+
+	List<NotificacioEventEntity> findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(NotificacioEntity notificacio, NotificacioEventTipusEnumDto tipus, boolean error);
+
+	List<NotificacioEventEntity> findByEnviamentAndTipusAndErrorOrderByDataDescIdDesc(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto tipus, boolean error);
 
 	List<NotificacioEventEntity> findByNotificacio(NotificacioEntity notificacio);
 
@@ -115,7 +104,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			   "		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.CALLBACK_CLIENT" +
 		       "	   )" +
 		       " order by ne.callbackData asc nulls first, data asc")
-	NotificacioEventEntity findUltimEventByNotificacioId(@Param("notificacioId")Long notificacioId);
+	NotificacioEventEntity findUltimEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 	
 	@Query("select ne " + 
 			   "  from NotificacioEventEntity ne " +
@@ -127,7 +116,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			   "		  and e.tipus = es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE" +
 		       "	   )" +
 		       " order by ne.callbackData asc nulls first, data asc")
-	NotificacioEventEntity findUltimEventRegistreByNotificacioId(@Param("notificacioId")Long notificacioId);
+	NotificacioEventEntity findUltimEventRegistreByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	@Query( "select ne " +
 			"from " +
@@ -140,7 +129,7 @@ public interface NotificacioEventRepository extends JpaRepository<NotificacioEve
 			"		where " +
 			"			n.id = :notificacioId and e.errorTipus is not null " +
 			"	   ) ")
-	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId")Long notificacioId);
+	NotificacioEventEntity findLastErrorEventByNotificacioId(@Param("notificacioId") Long notificacioId);
 
 	@Query("select ne " +
 			"  from NotificacioEventEntity ne " +

@@ -4,5 +4,6 @@ import java.io.Serializable;
 
 public enum ProcessosInicialsEnum implements Serializable {
 
-    ACTUALITZAR_REFERENCIES;
+    ACTUALITZAR_REFERENCIES,
+    PROPIETATS_CONFIG_ENTITATS;
 }

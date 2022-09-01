@@ -4,12 +4,14 @@ import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.service.ConfigService;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.entity.config.ConfigGroupEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -37,31 +39,28 @@ public class ConfigServiceImpl implements ConfigService {
     @Autowired
     private ConfigRepository configRepository;
     @Autowired
+    private EntitatRepository entitatRepository;
+    @Autowired
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private PluginHelper pluginHelper;
     @Autowired
     private CacheHelper cacheHelper;
+    @Autowired
+    private ConfigHelper configHelper;
 
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
 
-           /*
-
-            INSERT INTO NOT_CONFIG ("KEY", VALUE, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, ENTITAT_CODI)
-            SELECT "KEY", null, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, 'CAIB'
-            FROM NOT_CONFIG nc
-            WHERE nc."KEY" = 'es.caib.notib.emprar.sir'
-
-            */
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
-        configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
-        pluginHelper.reloadProperties(configEntity.getGroupCode());
-        if (property.getKey().endsWith(".class")){
-            pluginHelper.resetPlugins();
+        if (!configEntity.isConfigurable()) {
+            log.error("ATENCIÓ S'ESTÀ INTENTANT GUARDAR UNA PROPIETAT QUE NO ÉS CONFIGURABLE");
+            return null;
         }
+        configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
+        pluginHelper.resetPlugins(configEntity.getGroupCode());
         cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
@@ -93,13 +92,10 @@ public class ConfigServiceImpl implements ConfigService {
             ConfigEntity configEntity = configRepository.findOne(key);
             if (configEntity != null) {
                 configEntity.update(value);
-                pluginHelper.reloadProperties(configEntity.getGroupCode());
-                if (configEntity.getKey().endsWith(".class")){
-                    pluginHelper.resetPlugins();
-                }
                 editedProperties.add(configEntity.getKey());
             }
         }
+        pluginHelper.resetAllPlugins();
         return editedProperties;
     }
 
@@ -108,10 +104,52 @@ public class ConfigServiceImpl implements ConfigService {
     public List<ConfigDto>  findEntitatsConfigByKey(String key) {
 
         if (Strings.isNullOrEmpty(key) || !key.contains(ConfigDto.prefix)) {
+            log.error("Entitat config key buida o no conté el prefix. Key: " + key);
             return new ArrayList<>();
         }
         String [] split = key.split(ConfigDto.prefix);
-        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNull(split[1]), ConfigDto.class);
+
+        if (split == null || split.length != 2) {
+            log.error("Entitat config key no trobada. Key: " + key);
+            return new ArrayList<>();
+        }
+        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(split[1]), ConfigDto.class);
+    }
+
+    @Override
+    @Transactional
+    public void crearPropietatsConfigPerEntitats() {
+
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
+        List<EntitatEntity> entitats = entitatRepository.findAll();
+        ConfigEntity nova;
+        for (ConfigEntity config : configs) {
+            for (EntitatEntity entitat : entitats) {
+                String key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
+                if (configRepository.findByKey(key) != null ) {
+                    continue;
+                }
+                nova = new ConfigEntity();
+                nova.crearConfigNova(key, entitat.getCodi(), config);
+                configRepository.save(nova);
+            }
+        }
+    }
+
+    @Override
+    public void actualitzarPropietatsJBossBdd() {
+
+        List<ConfigEntity> configs = configRepository.findJBossConfigurables();
+        for(ConfigEntity config : configs) {
+            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            config.setValue(property);
+            configRepository.save(config);
+        }
+    }
+
+    @Override
+    public String getPropertyValue(String key) {
+        return configHelper.getConfig(key);
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {

@@ -310,7 +310,26 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
-
+        
+        // 11. Actualització dels serveis a partir de la informació de Rolsac
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        schedulledService.actualitzarServeis();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_SERVEIS_CRON));
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
     }
 
     private long calcularDelay() {

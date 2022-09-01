@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -245,6 +246,10 @@ public class DocumentEntity  extends NotibAuditable<Long> {
 		public DocumentEntity build() {
 			return built;
 		}
+	}
+
+	public void updateId(Long id) {
+		setId(id);
 	}
 
 	public String getArxiuNom() {

@@ -9,7 +9,9 @@ import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
-import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.MonitorIntegracioService;
+import es.caib.notib.war.command.IntegracioFiltreCommand;
+import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador per a la consulta d'accions de les integracions.
@@ -39,10 +42,11 @@ import java.util.List;
 public class IntegracioController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
+	private static final String INTEGRACIO_FILTRE = "integracio_filtre";
 
 	@Autowired
-	private AplicacioService aplicacioService;
-
+	private MonitorIntegracioService monitorIntegracioService;
+	
 	enum IntegracioEnumDto {
 		USUARIS,
 		REGISTRE,
@@ -61,24 +65,41 @@ public class IntegracioController extends BaseUserController {
 		return getAmbCodi(request, "USUARIS", model);
 	}
 
+	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
+	public String post(HttpServletRequest request, @PathVariable @NonNull String codi, IntegracioFiltreCommand command, Model model) {
+
+		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
+		return getAmbCodi(request, codi, model);
+	}
+
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
-		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
+		List<IntegracioDto> integracions = monitorIntegracioService.integracioFindAll();
+		
+		// Consulta el número d'errors per codi d'integracio
+		Map<String, Integer> errors = monitorIntegracioService.countErrors();
+				
 		for (IntegracioDto integracio: integracions) {
 			for (IntegracioEnumDto integracioEnum: IntegracioEnumDto.values()) {
 				if (integracio.getCodi().equals(integracioEnum.name())) {
 					integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class,"integracio.list.pipella." + integracio.getCodi()).getText());
 				}
 			}
+			if (errors.containsKey(integracio.getCodi())) {
+				integracio.setNumErrors(errors.get(integracio.getCodi()).intValue());
+			}
 		}
-		model.addAttribute("integracions", integracions);
+		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		model.addAttribute("integracioFiltreCommand", command);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, codi);
+		model.addAttribute("integracions", integracions);
+		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
 		try {
 			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(aplicacioService.integracioFindDarreresAccionsByCodi(codi, paginacio)));
+			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto())));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -91,7 +112,9 @@ public class IntegracioController extends BaseUserController {
 
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
-		List<IntegracioAccioDto> accions = codi != null ? aplicacioService.integracioFindDarreresAccionsByCodi(codi, paginacio) : new ArrayList<IntegracioAccioDto>();
+		IntegracioFiltreCommand filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		List<IntegracioAccioDto> accions = codi != null ? monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre !=null ? filtre.asDto() : null)
+														: new ArrayList<IntegracioAccioDto>();
 		if (accions.size() < paginacio.getPaginaTamany()) {
 			return 	DatatablesHelper.getDatatableResponse(request, accions);
 		}
@@ -114,7 +137,8 @@ public class IntegracioController extends BaseUserController {
 	public String detall(HttpServletRequest request, @PathVariable String codi, @PathVariable int index, Model model) {
 
 		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi, paginacio);
+		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		List<IntegracioAccioDto> accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto());
 		if (index < accions.size()) {
 			model.addAttribute("integracio", accions.get(index));
 		}

@@ -24,6 +24,7 @@ ConfigDto {
     private List<EntitatConfig> entitatsConfig;
     private String entitatCodi;
     private String entitatValue;
+    private boolean configurable;
 
     private String typeCode;
     private List<String> validValues;
@@ -53,6 +54,6 @@ ConfigDto {
             return null;
         }
         String [] split = key.split(prefix);
-        return (prefix + "." + entitatCodi + split[1]).toLowerCase();
+        return (prefix + "." + entitatCodi + split[1]);
     }
 }

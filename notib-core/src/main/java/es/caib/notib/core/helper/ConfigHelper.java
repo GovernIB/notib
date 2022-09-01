@@ -1,6 +1,7 @@
 package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.exception.NotDefinedConfigException;
 import es.caib.notib.core.entity.config.ConfigEntity;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Component
+@Slf4j
 public class ConfigHelper {
 
     @Autowired
@@ -27,13 +29,64 @@ public class ConfigHelper {
     @Autowired
     private ConfigGroupRepository configGroupRepository;
 
+    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
+
+    public static ThreadLocal<EntitatDto> getEntitat() {
+        return entitat;
+    }
+
+    public static void setEntitat(EntitatDto entitat) {
+        ConfigHelper.entitat.set(entitat);
+    }
+
     @Transactional(readOnly = true)
-    public String getConfig(String key) throws NotDefinedConfigException {
+    public String getEntitatActualCodi() {
+
+        return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
+    }
+
+    @Transactional(readOnly = true)
+    public String getConfigKeyByEntitat(String entitatCodi, String property) {
+
+        String key = crearEntitatKey(entitatCodi, property);
         ConfigEntity configEntity = configRepository.findOne(key);
-        if (configEntity == null) {
-            throw new NotDefinedConfigException(key);
+        if (configEntity != null && (configEntity.isJbossProperty() && configEntity.getValue() == null || configEntity.getValue() != null)) {
+            String config = getConfig(configEntity);
+            if (!Strings.isNullOrEmpty(config)) {
+                return config;
+            }
         }
-        return getConfig(configEntity);
+        configEntity = configRepository.findOne(property);
+        if (configEntity != null) {
+            return getConfig(configEntity);
+        }
+        log.error("No s'ha trobat la propietat -> key global: " + property + " key entitat: " + key);
+        throw new NotDefinedConfigException(property);
+    }
+
+    @Transactional(readOnly = true)
+    public String getConfig(String keyGeneral)  {
+
+        String entitatCodi  = getEntitatActualCodi();
+        String value = null;
+        ConfigEntity configEntity = configRepository.findOne(keyGeneral);
+        if (configEntity == null) {
+            return getJBossProperty(keyGeneral);
+        }
+        // Propietat trobada en db
+        if (configEntity.isConfigurable() && !Strings.isNullOrEmpty(entitatCodi)) {
+            // Propietat a nivell d'entitat
+            String keyEntitat = crearEntitatKey(entitatCodi, keyGeneral);
+            ConfigEntity configEntitatEntity = configRepository.findOne(keyEntitat);
+            if (configEntitatEntity != null) {
+                value = getConfig(configEntitatEntity);
+            }
+        }
+        if (value == null) {
+            // Propietat global
+            value = getConfig(configEntity);
+        }
+        return value;
     }
 
     @Transactional(readOnly = true)
@@ -62,9 +115,15 @@ public class ConfigHelper {
     public boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(getConfig(key));
     }
+
     public int getAsInt(String key) {
         return new Integer(getConfig(key));
     }
+
+    public long getAsLongByEntitat(String key) {
+        return new Long(getConfig(key));
+    }
+
     public long getAsLong(String key) {
         return new Long(getConfig(key));
     }
@@ -77,6 +136,20 @@ public class ConfigHelper {
     }
     public String getJBossProperty(String key, String defaultValue) {
         return JBossPropertiesHelper.getProperties().getProperty(key, defaultValue);
+    }
+
+    @Transactional(readOnly = true)
+    public Properties getAllEntityProperties(String entitatCodi) {
+        Properties properties = new Properties();
+//        List<ConfigEntity> configs = !Strings.isNullOrEmpty(entitatCodi) ? configRepository.findConfigEntitaCodiAndGlobals(entitatCodi) : configRepository.findByEntitatCodiIsNull();
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        for (ConfigEntity config: configs) {
+             String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
+            if (value != null) {
+                properties.put(config.getKey(), value);
+            }
+        }
+        return properties;
     }
 
     private String getConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
@@ -100,32 +173,32 @@ public class ConfigHelper {
             return getProperties(null);
         }
         public static JBossPropertiesHelper getProperties(String path) {
+
             String propertiesPath = path;
             if (propertiesPath == null) {
                 propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
             }
-            if (instance == null) {
-                instance = new JBossPropertiesHelper();
-                if (propertiesPath != null) {
-                    instance.llegirSystem = false;
-                    log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
-                    try {
-                        if (propertiesPath.startsWith("classpath:")) {
-                            instance.load(
-                                    JBossPropertiesHelper.class.getClassLoader().getResourceAsStream(
-                                            propertiesPath.substring("classpath:".length())));
-                        } else if (propertiesPath.startsWith("file://")) {
-                            FileInputStream fis = new FileInputStream(
-                                    propertiesPath.substring("file://".length()));
-                            instance.load(fis);
-                        } else {
-                            FileInputStream fis = new FileInputStream(propertiesPath);
-                            instance.load(fis);
-                        }
-                    } catch (Exception ex) {
-                        log.error("No s'han pogut llegir els properties", ex);
-                    }
+            if (instance != null) {
+                return instance;
+            }
+            instance = new JBossPropertiesHelper();
+            if (propertiesPath == null) {
+                return instance;
+            }
+            instance.llegirSystem = false;
+            log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
+            try {
+                if (propertiesPath.startsWith("classpath:")) {
+                    instance.load(JBossPropertiesHelper.class.getClassLoader().getResourceAsStream(propertiesPath.substring("classpath:".length())));
+                } else if (propertiesPath.startsWith("file://")) {
+                    FileInputStream fis = new FileInputStream(propertiesPath.substring("file://".length()));
+                    instance.load(fis);
+                } else {
+                    FileInputStream fis = new FileInputStream(propertiesPath);
+                    instance.load(fis);
                 }
+            } catch (Exception ex) {
+                log.error("No s'han pogut llegir els properties", ex);
             }
             return instance;
         }
@@ -208,7 +281,7 @@ public class ConfigHelper {
 
     public void crearConfigsEntitat(String codiEntitat) {
 
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
         ConfigDto dto = new ConfigDto();
         dto.setEntitatCodi(codiEntitat);
         ConfigEntity nova;
@@ -225,5 +298,21 @@ public class ConfigHelper {
 
     public void deleteConfigEntitat(String codiEntitat) {
         configRepository.deleteByEntitatCodi(codiEntitat);
+    }
+
+    public String crearEntitatKey(String entitatCodi, String key) {
+
+        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+            String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+        String [] split = key.split(ConfigDto.prefix);
+        if (split == null) {
+            String msg = "Format no reconegut per la key: " + key;
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+        return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + split[1]);
     }
 }

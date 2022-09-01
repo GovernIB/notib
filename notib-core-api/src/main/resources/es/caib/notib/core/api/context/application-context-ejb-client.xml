@@ -104,4 +104,8 @@
 			id="ConfigService"
 			jndi-name="notib/ConfigServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.ConfigService"/>
+	<jee:local-slsb
+			id="MonitorIntegracioService"
+			jndi-name="notib/MonitorIntegracioServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.MonitorIntegracioService"/>
 </beans>

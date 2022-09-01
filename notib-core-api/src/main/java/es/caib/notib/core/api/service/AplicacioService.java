@@ -3,10 +3,8 @@
  */
 package es.caib.notib.core.api.service;
 
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +19,8 @@ import java.util.List;
 public interface AplicacioService {
 
 
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	void actualitzarEntiatThreadLocal(EntitatDto entitat);
 	/**
 	 * Processa l'autenticació d'un usuari.
 	 * 
@@ -72,26 +72,6 @@ public interface AplicacioService {
 	public List<UsuariDto> findUsuariAmbText(String text);
 
 	/**
-	 * Obté les integracions disponibles.
-	 * 
-	 * @return La llista d'integracions.
-	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
-	public List<IntegracioDto> integracioFindAll();
-
-	/**
-	 * Obté la llista de les darreres accions realitzades a una integració.
-	 * 
-	 * @param codi
-	 *             Codi de la integració.
-	 * @return La llista amb les darreres accions.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat la integració amb el codi especificat.
-	 */
-	@PreAuthorize("hasRole('NOT_SUPER')")
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) throws NotFoundException;
-
-	/**
 	 * Emmagatzema una excepció llençada per un servei.
 	 * 
 	 * @param exception
@@ -126,6 +106,15 @@ public interface AplicacioService {
 	public List<String> permisosFindRolsDistinctAll();
 
 	/**
+	 * Retorna el valor d'un paràmetre de configuració per la entitat especificada
+	 *
+	 * @param property El codi del paràmetre
+	 * @return el valor del paràmetre
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	 String propertyGetByEntitat(String property);
+
+	/**
 	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
 	 * 
 	 * @param property
@@ -145,7 +134,17 @@ public interface AplicacioService {
 	 * @return el valor del paràmetre
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	public String propertyGet(String property, String defaultValue);
+	String propertyGet(String property, String defaultValue);
+
+	/**
+	 * Retorna el valor d'un paràmetre de configuració de l'aplicació.
+	 *
+	 * @param property El codi del paràmetre
+	 * @param defaultValue El valor per defecte en cas que el paràmetre no s'hagi definit
+	 * @return el valor del paràmetre
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	String propertyGetByEntitat(String property, String defaultValue);
 
 	/**
 	 * Modifica la configuració de l'usuari actual

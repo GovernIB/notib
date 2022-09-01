@@ -66,10 +66,17 @@ public class NotificacioMassivaServiceBean implements NotificacioMassivaService 
 	public FitxerDto getResumFile(Long entitatId, Long notificacioMassivaId) {
 		return delegate.getResumFile(entitatId, notificacioMassivaId);
 	}
+
 	@Override
-	public FitxerDto getErrorsFile(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getErrorsFile(entitatId, notificacioMassivaId);
+	public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) {
+		return delegate.getErrorsValidacioFile(entitatId, notificacioMassivaId);
 	}
+
+	@Override
+	public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) {
+		return delegate.getErrorsExecucioFile(entitatId, notificacioMassivaId);
+	}
+
 	@Override
 	@RolesAllowed({"tothom"})
 	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {

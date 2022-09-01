@@ -672,6 +672,7 @@ public class EntityComprovarHelper {
 		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
 		case GESTIO: return ExtendedPermission.ADMINISTRATION;
 		case COMUNIACIO_SIR: return ExtendedPermission.COMUNICACIO_SIR;
+		case COMUNS: return ExtendedPermission.COMUNS;
 		default: return null;
 		}
 	}
@@ -683,6 +684,7 @@ public class EntityComprovarHelper {
 			case "NOTIFICACIO": return ExtendedPermission.NOTIFICACIO;
 			case "GESTIO": return ExtendedPermission.ADMINISTRATION;
 			case "COMUNICACIO_SIR": return ExtendedPermission.COMUNICACIO_SIR;
+			case "COMUNS": return ExtendedPermission.COMUNS;
 			default: return null;
 		}
 	}

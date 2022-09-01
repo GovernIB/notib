@@ -25,7 +25,9 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 
 	public static final int MAX_SIZE_NOM = 30;
 	public static final int MAX_SIZE_RAO_SOCIAL = 80;
-
+	private static final int MIN_SIZE_LLINATGES = 2;
+	private static final int MIN_SIZE_NOM_RAO = 2;
+	
 	@Autowired
 	private AplicacioService aplicacioService;
 
@@ -55,12 +57,25 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 			switch (persona.getInteressatTipus()) {
 			case FISICA:
 				valid = validarNom(persona, context);
-				if (Strings.isNullOrEmpty(persona.getLlinatge1())) {
+				String llinatge1Interessat = persona.getLlinatge1();
+				String llinatge2Interessat = persona.getLlinatge2();
+				
+				if (Strings.isNullOrEmpty(llinatge1Interessat)) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
 							MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale))
 					.addNode("llinatge1")
 					.addConstraintViolation();
+				}
+				if (!Strings.isNullOrEmpty(llinatge1Interessat)) {
+					int llinatge1InteressatSize = llinatge1Interessat.length();
+					int llinatge2InteressatSize = llinatge2Interessat != null ? llinatge2Interessat.length() : 0; 
+					if ((llinatge1InteressatSize + llinatge2InteressatSize) < MIN_SIZE_LLINATGES) {
+						valid = false;
+						context.buildConstraintViolationWithTemplate(
+								MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale))
+								.addNode("llinatge1").addConstraintViolation();
+					}
 				}
 				if (Strings.isNullOrEmpty(persona.getNif())) {
 					valid = false;
@@ -85,6 +100,16 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 									MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatge1", null, locale))
 							.addNode("llinatge1")
 							.addConstraintViolation();
+				}
+				String llinatge1 = persona.getLlinatge1();
+				String llinatge2 = persona.getLlinatge2();
+				int llinatge1Size = llinatge1.length();
+				int llinatge2Size = llinatge2 != null ? llinatge2.length() : 0;
+				if ((llinatge1Size + llinatge2Size) < MIN_SIZE_LLINATGES) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(
+									MessageHelper.getInstance().getMessage("notificacio.form.valid.fisica.llinatges.size", new Object[] {MIN_SIZE_LLINATGES}, locale))
+							.addNode("llinatge1").addConstraintViolation();
 				}
 //				if (persona.getNif() != null && !persona.getNif().isEmpty() && !NifHelper.isValidNifNie(persona.getNif())) {
 //					valid = false;
@@ -146,30 +171,42 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		String msgKey = "";
 		boolean ok = true;
 		Object [] vars = null;
-		if (Strings.isNullOrEmpty(persona.getRaoSocialInput()) && isJuridica) {
+		String raoSocialInteressat = persona.getRaoSocialInput();
+		String nomInteressat = persona.getNomInput();
+		if (Strings.isNullOrEmpty(raoSocialInteressat) && isJuridica) {
 			ok = false;
 			msgKey = "notificacio.form.valid.juridica.rao";
 		}
-		if (Strings.isNullOrEmpty(persona.getNomInput()) && !isJuridica) {
+		if (Strings.isNullOrEmpty(nomInteressat) && !isJuridica) {
 			ok = false;
 			msgKey = "notificacio.form.valid.fisica.nom";
 		}
-		if (isJuridica && persona.getRaoSocialInput().length() > MAX_SIZE_RAO_SOCIAL) {
+		if (isJuridica && raoSocialInteressat.length() > MAX_SIZE_RAO_SOCIAL) {
 			ok = false;
 			msgKey = "notificacio.form.valid.administracio.nom.max.length";
 			vars = new Object[] {MAX_SIZE_RAO_SOCIAL};
 		}
-		if (!isJuridica && persona.getNomInput().length() > MAX_SIZE_NOM) {
+		if (isJuridica && !raoSocialInteressat.isEmpty() && raoSocialInteressat.length() < MIN_SIZE_NOM_RAO) {
+			ok = false;
+			msgKey = "notificacio.form.valid.juridica.rao.min.length";
+			vars = new Object[] {MIN_SIZE_NOM_RAO};
+		}
+		if (!isJuridica && nomInteressat.length() > MAX_SIZE_NOM) {
 			ok = false;
 			msgKey = "notificacio.form.valid.fisica.nom.max.length";
 			vars = new Object[] {MAX_SIZE_NOM};
+		}
+		if (!isJuridica && !nomInteressat.isEmpty() && nomInteressat.length() < MIN_SIZE_NOM_RAO) {
+			ok = false;
+			msgKey = "notificacio.form.valid.fisica.nom.min.length";
+			vars = new Object[] {MIN_SIZE_NOM_RAO};
 		}
 		if (!ok) {
 			String node = isJuridica ? "raoSocialInput" : "nomInput";
 			String msg = MessageHelper.getInstance().getMessage(msgKey, vars, locale);
 			context.buildConstraintViolationWithTemplate(msg).addNode(node).addConstraintViolation();
 		}
-		return true;
+		return ok;
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ValidPersonaValidator.class);

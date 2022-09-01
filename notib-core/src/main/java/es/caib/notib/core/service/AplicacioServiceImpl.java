@@ -7,15 +7,14 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.IntegracioAccioDto;
-import es.caib.notib.core.api.dto.IntegracioDto;
-import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -46,7 +45,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private AclSidRepository aclSidRepository;
-
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -56,8 +54,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	private IntegracioHelper integracioHelper;
-	@Autowired
 	private ExcepcioLogHelper excepcioLogHelper;
 	@Autowired
 	private MetricsHelper metricsHelper;
@@ -65,6 +61,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+
+	@Override
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		configHelper.setEntitat(entitat);
+	}
 
 	@Transactional
 	@Override
@@ -97,6 +98,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 					usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 				}
 			}
+
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 
@@ -220,32 +222,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public List<IntegracioDto> integracioFindAll() {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Consultant les integracions");
-			return integracioHelper.findAll();
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio) {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
-			String filtre = paginacio.getFiltre();
-			return "CALLBACK".equals(codi)  && !Strings.isNullOrEmpty(filtre)? integracioHelper.findAccions(codi, filtre)
-					:  integracioHelper.findAccionsByIntegracioCodi(codi);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
 	public void excepcioSave(Throwable exception) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
@@ -291,6 +267,19 @@ public class AplicacioServiceImpl implements AplicacioService {
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	public String propertyGetByEntitat(String property, String defaultValue) {
+
+		String value = configHelper.getConfig(property);
+		return Strings.isNullOrEmpty(value) ? defaultValue : value;
+	}
+
+	@Override
+	public String propertyGetByEntitat(String property) {
+
+		return configHelper.getConfig(property);
 	}
 
 	@Override

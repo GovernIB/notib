@@ -257,7 +257,8 @@
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/resum"/>" data-toggle="modal" data-height="700px" data-processar="true"><span class="fa fa-info-circle"></span>&nbsp; <spring:message code="notificacio.massiva.list.accio.resum"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/resum/download"/>"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="notificacio.massiva.list.accio.resum.download"/></a></li>
-								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/errors/download"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.errors.download"/></a></li>
+								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/errors/validacio/download"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.errors.validacio.download"/></a></li>
+								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/errors/execucio/download"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.errors.execucio.download"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/posposar"/>"><span class="fa fa-clock-o"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.posposar"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/reactivar"/>"><span class="fa fa-bolt"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.reactivar"/></a></li>
 								<li><a href="<c:url value="/notificacio/massiva/{{:id}}/remeses"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="notificacio.massiva.list.accio.remeses"/></a></li>

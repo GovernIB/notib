@@ -48,5 +48,14 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	List<ConfigDto> findEntitatsConfigByKey(String key);
 
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void crearPropietatsConfigPerEntitats();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void actualitzarPropietatsJBossBdd();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	String getPropertyValue(String key);
+
 }
 

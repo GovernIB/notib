@@ -16,7 +16,6 @@ import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
 import es.caib.notib.plugin.SistemaExternException;
-import es.caib.notib.plugin.PropertiesHelper;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.
@@ -43,7 +47,13 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
 	private static final String WS_UNITATS = "ws/Dir3CaibObtenerUnidades";
 	private static final String WS_OFICINA = "ws/Dir3CaibObtenerOficinas";
-	
+
+	private final Properties properties;
+
+	public UnitatsOrganitzativesPluginDir3(Properties properties) {
+		this.properties = properties;
+	}
+
 	@Override
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException {
 		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
@@ -567,22 +577,19 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 	
 	private String getServiceUrl() {
-		String dir3Url = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.unitats.dir3.url");
+		String dir3Url = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
 		if (!dir3Url.endsWith("/"))
 			dir3Url = dir3Url + "/";
 		return dir3Url;
 	}
 	
 	private String getUsernameServiceUrl() {
-		String dir3Username = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.unitats.dir3.username");
+		String dir3Username = properties.getProperty("es.caib.notib.plugin.unitats.dir3.username");
 		return dir3Username;
 	}
 	
 	private String getPasswordServiceUrl() {
-		String dir3Password = PropertiesHelper.getProperties().getProperty(
-				"es.caib.notib.plugin.unitats.dir3.password");
+		String dir3Password = properties.getProperty("es.caib.notib.plugin.unitats.dir3.password");
 		return dir3Password;
 	}
 	

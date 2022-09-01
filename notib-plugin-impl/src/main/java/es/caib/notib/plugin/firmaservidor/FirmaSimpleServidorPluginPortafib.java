@@ -3,7 +3,6 @@
  */
 package es.caib.notib.plugin.firmaservidor;
 
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementació del plugin de signatura emprant el portafirmes
@@ -31,6 +31,12 @@ import java.util.List;
 	public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
 
 	private static final String PROPERTIES_BASE = "es.caib.notib.plugin.firmaservidor.portafib.";
+
+	private final Properties properties;
+
+	public FirmaSimpleServidorPluginPortafib(Properties properties) {
+		this.properties = properties;
+	}
 
 	@Override
 	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
@@ -163,31 +169,31 @@ import java.util.List;
 
 
 	private String getPropertyEndpoint() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "endpoint");
+		return properties.getProperty(PROPERTIES_BASE + "endpoint");
 	}
 
 	private String getPropertyUsername() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "auth.username");
+		return properties.getProperty(PROPERTIES_BASE + "auth.username");
 	}
 
 	private String getPropertyPassword() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "auth.password");
+		return properties.getProperty(PROPERTIES_BASE + "auth.password");
 	}
 
 	private String getPropertyPerfil() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "perfil");
+		return properties.getProperty(PROPERTIES_BASE + "perfil");
 	}
 
 	private String getPropertyLocation() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
+		return properties.getProperty(PROPERTIES_BASE + "location", "Palma");
 	}
 
 	private String getPropertySignerEmail() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "signerEmail", "suport@caib.es");
+		return properties.getProperty(PROPERTIES_BASE + "signerEmail", "suport@caib.es");
 	}
 
 	private String getPropertyUsuariFirma() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username");
+		return properties.getProperty(PROPERTIES_BASE + "username");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);

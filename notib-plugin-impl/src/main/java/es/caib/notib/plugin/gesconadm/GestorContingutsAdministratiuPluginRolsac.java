@@ -2,11 +2,14 @@ package es.caib.notib.plugin.gesconadm;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.*;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandler;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.representation.Form;
-import es.caib.notib.plugin.PropertiesHelper;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,12 +28,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
 	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private String baseUrl;
+
+	private final Properties properties;
+
+	public GestorContingutsAdministratiuPluginRolsac(Properties properties) {
+		this.properties = properties;
+	}
 
 	@Override
 	public GesconAdm getProcSerByCodiSia(String codiSia, boolean isServei) throws SistemaExternException {
@@ -428,61 +438,47 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		return jerseyClient;
 	}
 
-	private void autenticarClient(
-			Client jerseyClient,
-			String urlAmbMetode) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+	private void autenticarClient(Client jerseyClient, String urlAmbMetode) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+
 		String username = getUsernameServiceUrl();
 		String password = getPasswordServiceUrl();
-		
-		if (!isServiceBasicAuthentication()) {
-			logger.debug(
-					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
-			jerseyClient.resource(urlAmbMetode).get(String.class);
-			Form form = new Form();
-			form.putSingle("j_username", username);
-			form.putSingle("j_password", password);
-			jerseyClient.
-				resource(baseUrl + "j_security_check").
-				type("application/x-www-form-urlencoded").
-				post(form);
-		} else {
-			logger.debug(
-					"Autenticant REST amb autenticació de tipus HTTP basic (" +
-					"urlAmbMetode=" + urlAmbMetode + ", " +
-					"username=" + username +
-					"password=********)");
+		if (isServiceBasicAuthentication()) {
+			logger.debug("Autenticant REST amb autenticació de tipus HTTP basic (" + "urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
 			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
+			return;
 		}
+		logger.debug("Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
+					"urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
+		jerseyClient.resource(urlAmbMetode).get(String.class);
+		Form form = new Form();
+		form.putSingle("j_username", username);
+		form.putSingle("j_password", password);
+		jerseyClient.resource(baseUrl + "j_security_check").type("application/x-www-form-urlencoded").post(form);
 	}
 	
 	private String getBaseUrl() {
-		if (baseUrl == null || baseUrl.isEmpty()) {
-			baseUrl = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.base.url");
-			if (baseUrl != null && !baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
-				baseUrl = baseUrl + "/";
-			}
+
+		if (baseUrl != null && !baseUrl.isEmpty()) {
+			return baseUrl;
+		}
+		baseUrl = properties.getProperty("es.caib.notib.plugin.gesconadm.base.url");
+		if (baseUrl != null && !baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
+			baseUrl = baseUrl + "/";
 		}
 		return baseUrl;
 	}
 	
 	private String getUsernameServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.username");
+		return properties.getProperty("es.caib.notib.plugin.gesconadm.username");
 	}
 
 	private String getPasswordServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.password");
+		return properties.getProperty("es.caib.notib.plugin.gesconadm.password");
 	}
 	
 	private boolean isServiceBasicAuthentication() {
-		String isBasicAuth = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
-		if (isBasicAuth == null || isBasicAuth.isEmpty()) {
-			return true;
-		} else {
-			return new Boolean(isBasicAuth).booleanValue();
-		}
+		String isBasicAuth = properties.getProperty("es.caib.notib.plugin.gesconadm.basic.authentication");
+		return isBasicAuth == null || isBasicAuth.isEmpty() ? true : new Boolean(isBasicAuth).booleanValue();
 	}
 
 	@Getter @Setter

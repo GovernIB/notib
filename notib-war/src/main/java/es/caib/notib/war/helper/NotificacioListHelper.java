@@ -59,40 +59,26 @@ public class NotificacioListHelper {
 		return notificacioFiltreCommand;
 	}
 
-	public void fillModel(EntitatDto entitatActual,
-						  OrganGestorDto organGestorActual,
-						  HttpServletRequest request, Model model) {
-		ompleProcediments(entitatActual, organGestorActual, request, model);
+	public void fillModel(EntitatDto entitatActual, OrganGestorDto organGestorActual, HttpServletRequest request, Model model) {
 
-		model.addAttribute("notificacioEstats",
-				EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-						"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto."));
-		model.addAttribute("tipusUsuari",
-				EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-						"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
-		model.addAttribute("notificacioEnviamentEstats",
-				EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
-						"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
-		model.addAttribute("notificacioComunicacioTipus",
-				EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-						"es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
-		model.addAttribute("notificacioEnviamentTipus",
-				EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
-						"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
-		model.addAttribute("mostrarColumnaEntitat",
-				aplicacioService.propertyGet("es.caib.notib.columna.entitat"));
-		model.addAttribute("mostrarColumnaNumExpedient",
-				aplicacioService.propertyGet("es.caib.notib.columna.num.expedient"));
+		ompleProcediments(entitatActual, organGestorActual, request, model);
+		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
+				"es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto."));
+		model.addAttribute("tipusUsuari", EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
+				"es.caib.notib.core.api.dto.TipusUsuariEnumDto."));
+		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(NotificacioEnviamentEstatEnumDto.class,
+				"es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto."));
+		model.addAttribute("notificacioComunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
+				"es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
+		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
+				"es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto."));
+		model.addAttribute("mostrarColumnaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.entitat"));
+		model.addAttribute("mostrarColumnaNumExpedient", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.num.expedient"));
 	}
 
-	public void ompleProcediments(
-			EntitatDto entitatActual,
-			OrganGestorDto organGestorActual,
-			HttpServletRequest request,
-			Model model) {
+	public void ompleProcediments(EntitatDto entitatActual, OrganGestorDto organGestorActual, HttpServletRequest request, Model model) {
 
 		List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
-
 		Long entitatId = entitatActual.getId();
 		String usuari = SecurityContextHolder.getContext().getAuthentication().getName();
 		RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
@@ -106,12 +92,7 @@ public class NotificacioListHelper {
 //		organsGestorsDisponibles.remove(organEntitat);
 
 		try {
-			organsDisponibles = organGestorService.getOrgansGestorsDisponiblesConsulta(
-					entitatId,
-					usuari,
-					rol,
-					organ
-			);
+			organsDisponibles = organGestorService.getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
 		}catch (Exception e) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, NoPermisosException.class))
 				MissatgesHelper.warning(request, messageSource.getMessage(

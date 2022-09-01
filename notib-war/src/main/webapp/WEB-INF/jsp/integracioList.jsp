@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <html>
 <head>
@@ -48,7 +49,6 @@
 		$('#missatges-integracions').on('click', '.integracio-details', function () {
 			let index = $(this).data('index');
 			let details = data[index];
-			console.log(details);
 			$('#integracio-data').html(formate_date(details.data, 'datetime'));
 			$('#integracio-descripcio').html(details.descripcio);
 			$('#integracio-tipus').html(details.tipus);
@@ -95,22 +95,42 @@
 
 		$(".pestanya").click(() => {
 			let codi = "${codiActual}";
-			console.log(codi);
 			if (codi === "CALLBACK") {
-				console.log("show");
-				console.log($("#missatges-integracions_filter"));
 				$("#missatges-integracions_filter").show();
 			} else {
-				console.log("hide");
 				$("#missatges-integracions_filter").hide();
 			}
 		});
 	});
 </script>
+
+<form:form id="filtre" action="" method="post" cssClass="well" commandName="integracioFiltreCommand">
+	<div class="row">
+		<div class="col-md-2">
+			<not:inputText name="entitatCodi" inline="true" placeholderKey="integracio.filtre.codi.entitat"/>
+		</div>
+		<c:if test="${'CALLBACK' == codiActual}">
+			<div class="col-md-2">
+				<not:inputText name="aplicacio" inline="true" placeholderKey="integracio.filtre.codi.aplicacio"/>
+			</div>
+		</c:if>
+		<div class="col-md-2 pull-right">
+			<div class="pull-right">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+			</div>
+		</div>
+	</div>
+</form:form>
+
 	<ul class="nav nav-tabs" role="tablist">
 		<c:forEach var="integracio" items="${integracions}">
 			<li<c:if test="${integracio.codi == codiActual}"> class="active pestanya"</c:if>>
-				<a href="<c:url value="/integracio/${integracio.codi}"/>"><spring:message code="${integracio.nom}"/></a>
+				<a href="<c:url value="/integracio/${integracio.codi}"/>"><spring:message code="${integracio.nom}"/>
+					<c:if test="${integracio.numErrors > 0}">
+						<span class="badge small" style="background-color: #d9534f;">${integracio.numErrors}</span>
+					</c:if>	
+				</a>
 			</li>
 		</c:forEach>
 	</ul>
@@ -118,7 +138,7 @@
 <script id="botonsTemplate" type="text/x-jsrender">
 
 	</script>
-	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
+	<table id="missatges-integracions" data-toggle="datatable" data-filter="#filtre" data-url="<c:url value="/integracio/datatable"/>"
 			<c:if test="${codiActual == 'CALLBACK'}">
 			   data-search-enabled="true"
 			   data-info-type="search"
@@ -135,6 +155,7 @@
 					<th data-col-name="aplicacio" data-orderable="false"><spring:message code="integracio.list.columna.aplicacio"/></th>
 				</c:if>
 				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
+				<th data-col-name="codiEntitat" data-orderable="false"><spring:message code="integracio.list.columna.entitat"/></th>
 				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
 					<spring:message code="integracio.list.columna.temps.resposta"/>
 					<script id="cellTempsTemplate" type="text/x-jsrender">{{:tempsResposta}} ms</script>

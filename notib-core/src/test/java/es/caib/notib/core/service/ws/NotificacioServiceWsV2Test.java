@@ -424,7 +424,7 @@ public class NotificacioServiceWsV2Test {
 			entregaDeh.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 			enviament.setEntregaDeh(entregaDeh);
 			enviament.setServeiTipus(NotificaServeiTipusEnumDto.URGENT);
-			notificacio.setEnviaments(new ArrayList<Enviament>());
+		//	notificacio.setEnviaments(new ArrayList<Enviament>());
 			notificacio.getEnviaments().add(enviament);
 		}
 		return notificacio;

@@ -86,7 +86,9 @@ CREATE TABLE NOT_CONFIG
     JBOSS_PROPERTY       numeric(1, 0)    DEFAULT 0 NOT NULL,
     TYPE_CODE            varchar(128)     DEFAULT 'TEXT',
     LASTMODIFIEDBY_CODI  varchar(64),
-    LASTMODIFIEDDATE     TIMESTAMP(6)
+    LASTMODIFIEDDATE     TIMESTAMP(6),
+    ENTITAT_CODI         varchar(64),
+    CONFIGURABLE         numeric(1, 0)    DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE NOT_CONFIG_GROUP
@@ -131,6 +133,7 @@ INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actua
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.enviament.actualitzacio.estat.registre.retard.inicial', '3000000');
 
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.actualitzacio.procediments.cron', '0 53 16 * * *');
+INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.actualitzacio.serveis.cron', '0 58 16 * * *');
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.refrescar.notificacions.expirades.cron', '0 0 0 * * ?');
 
 INSERT INTO NOT_CONFIG (KEY, VALUE) VALUES ('es.caib.notib.tasca.callback.pendents.periode', '300000');

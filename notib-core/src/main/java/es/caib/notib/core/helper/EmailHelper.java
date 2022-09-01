@@ -1,6 +1,8 @@
 package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.UsuariRepository;

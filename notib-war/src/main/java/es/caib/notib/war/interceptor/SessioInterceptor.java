@@ -26,15 +26,9 @@ public class SessioInterceptor extends HandlerInterceptorAdapter {
 	EntitatService entitatService;
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		SessioHelper.processarAutenticacio(
-				request, 
-				response,
-				aplicacioService,
-				entitatService);
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+		SessioHelper.processarAutenticacio(request, response, aplicacioService, entitatService);
 		return true;
 	}
 

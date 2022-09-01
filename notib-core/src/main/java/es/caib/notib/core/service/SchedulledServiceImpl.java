@@ -8,11 +8,17 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
+import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.helper.*;
-import es.caib.notib.plugin.PropertiesHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.CreacioSemaforDto;
+import es.caib.notib.core.helper.EnviamentHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +36,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,7 +60,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private EnviamentHelper enviamentHelper;
-
+	@Autowired
+	private ServeiService serveiService;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
@@ -184,6 +190,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 					logger.info("[PRO] Realitzant actualització de procediments per a " + entitats.size() + " entitats");
 					for (EntitatDto entitat: entitats) {
 						logger.info(">>> Actualitzant procedimetns de la entitat: " + entitat.getNom());
+						ConfigHelper.setEntitat(entitat);
 						procedimentService.actualitzaProcediments(entitat);
 					}
 				} else {
@@ -252,7 +259,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
+	
+	//8. Esborra documents temporals
+	//////////////////////////////////////////////////////////////////
 	@Override
 	public void eliminarDocumentsTemporals() {
 
@@ -271,7 +280,35 @@ public class SchedulledServiceImpl implements SchedulledService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
+	
+	// 9. Actualització dels serveis a partir de la informació de Rolsac
+	/////////////////////////////////////////////////////////////////////////
+	@Override
+	public void actualitzarServeis() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.info("[SER] Actualitzant serveis...");
+			if (!isActualitzacioServeisActiuProperty()) {
+				logger.info("[SER] L'actualització de serveis està deshabilitada");
+				return;
+			}
+			addAdminAuthentication();
+			logger.info("[SER] Cercant entitats per a actualitzar els serveis");
+			List<EntitatDto> entitats = entitatService.findAll();
+			if (entitats == null || entitats.isEmpty()) {
+				logger.info("[SER] No hi ha entitats per actualitzar");
+				return;
+			}
+			logger.info("[SER] Realitzant actualització de serveis per a " + entitats.size() + " entitats");
+			for (EntitatDto entitat: entitats) {
+				logger.info(">>> Actualitzant serveis de la entitat: " + entitat.getNom());
+				serveiService.actualitzaServeis(entitat);
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}	
+	}
+	
 	private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
@@ -279,7 +316,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 		Path path = Paths.get(dir);
 		DirectoryStream<Path> files = Files.newDirectoryStream(path);
-		long now = new Date().getTime();
 		for (Path file : files) {
 			if (Files.isDirectory(file)) {
 				esborrarTemporals(file.toString());
@@ -294,7 +330,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 
 	private String getBaseDir(String agrupacio) {
-		String baseDir = PropertiesHelper.getProperties().getProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		// TODO: Això es global o per entitat???!!!
+		String baseDir = configHelper.getConfig("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		if (baseDir == null) {
 			return null;
 		}
@@ -352,7 +389,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private boolean isEnviamentActualitzacioCertificacioActiva() {
 		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.certificacio.finalitzades.actiu");
 	}
-	
+	private boolean isActualitzacioServeisActiuProperty() {
+		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
+	}
 	private boolean isSemaforInUse() {
 		boolean inUse = true;
 		synchronized(CreacioSemaforDto.getCreacioSemafor()) {

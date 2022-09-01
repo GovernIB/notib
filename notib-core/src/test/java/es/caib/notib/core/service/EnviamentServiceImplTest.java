@@ -60,7 +60,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
         entitatCreate.setNom("Limit Tecnologies");
         entitatCreate.setDescripcio("Descripció de Limit Tecnologies");
         entitatCreate.setTipus(EntitatTipusEnumDto.GOVERN);
-        entitatCreate.setDir3Codi(ENTITAT_DGTIC_DIR3CODI);
+        entitatCreate.setDir3Codi("CAIB");
         entitatCreate.setApiKey(ENTITAT_DGTIC_KEY);
         entitatCreate.setAmbEntregaDeh(true);
 //        entitatCreate.setAmbEntregaCie(true);

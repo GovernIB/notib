@@ -3,19 +3,25 @@
  */
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.config.ConfigDto;
+import es.caib.notib.core.api.dto.config.ConfigGroupDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.ConfigService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.war.command.ConfigCommand;
 import es.caib.notib.war.command.EntitatCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.RolHelper;
+import org.hibernate.util.ConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +62,8 @@ public class EntitatController extends BaseController {
 	private PagadorCieService cieService;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private ConfigService configService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get( HttpServletRequest request, Model model) {
@@ -107,6 +115,41 @@ public class EntitatController extends BaseController {
 		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
+	}
+
+	@RequestMapping(value = "/{entitatId}/configurar", method = RequestMethod.GET)
+	public String configEntitat(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
+
+		List<ConfigGroupDto> configGroups = configService.findAll();
+		model.addAttribute("config_groups", configGroups);
+		EntitatDto entitat = entitatService.findById(entitatId);
+		model.addAttribute("entitatNom", entitat.getNom());
+		if (entitat == null || Strings.isNullOrEmpty(entitat.getCodi())) {
+			return "configEntitat";
+		}
+		for (ConfigGroupDto cGroup: configGroups) {
+			fillFormsModel(cGroup, model, entitat.getCodi());
+		}
+		return "configEntitat";
+	}
+
+	private void fillFormsModel(ConfigGroupDto cGroup, Model model, String entiatCodi){
+
+		List<ConfigDto> confs = new ArrayList<>();
+		for (ConfigDto config: cGroup.getConfigs()) {
+			if (Strings.isNullOrEmpty(config.getEntitatCodi()) || !config.getEntitatCodi().equals(entiatCodi)) {
+				continue;
+			}
+			model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+			confs.add(config);
+		}
+		cGroup.setConfigs(confs);
+		if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()){
+			return;
+		}
+		for (ConfigGroupDto child : cGroup.getInnerConfigs()){
+			fillFormsModel(child, model, entiatCodi);
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.POST)

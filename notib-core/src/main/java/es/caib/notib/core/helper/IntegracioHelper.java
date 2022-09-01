@@ -1,8 +1,8 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.entity.AplicacioEntity;
-import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
@@ -48,11 +48,11 @@ public class IntegracioHelper {
 	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 	
-	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<String, LinkedList<IntegracioAccioDto>>();
-	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
+	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<>();
+	private Map<String, Integer> maxAccionsIntegracio = new HashMap<>();
 
 	public List<IntegracioDto> findAll() {
-		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
+		List<IntegracioDto> integracions = new ArrayList<>();
 		integracions.add(novaIntegracio(INTCODI_USUARIS));
 		integracions.add(novaIntegracio(INTCODI_REGISTRE));
 		integracions.add(novaIntegracio(INTCODI_NOTIFICA));
@@ -66,14 +66,26 @@ public class IntegracioHelper {
 		return integracions;
 	}
 
-	public List<IntegracioAccioDto> findAccions(String integracioCodi, String filtre) {
+	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
+
 		return getLlistaAccions(integracioCodi, filtre);
 	}
-
-	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi) {
-		return getLlistaAccions(integracioCodi);
+	
+	public Map<String, Integer> countErrorsGroupByCodi() {
+		Map<String ,Integer> errorsGroupByCodi = new HashMap<String, Integer>();
+		errorsGroupByCodi.put(INTCODI_USUARIS,countErrors(INTCODI_USUARIS));
+		errorsGroupByCodi.put(INTCODI_REGISTRE,countErrors(INTCODI_REGISTRE));
+		errorsGroupByCodi.put(INTCODI_NOTIFICA,countErrors(INTCODI_NOTIFICA));
+		errorsGroupByCodi.put(INTCODI_ARXIU,countErrors(INTCODI_ARXIU));
+		errorsGroupByCodi.put(INTCODI_CLIENT,countErrors(INTCODI_CLIENT));
+		errorsGroupByCodi.put(INTCODI_GESDOC,countErrors(INTCODI_GESDOC));
+		errorsGroupByCodi.put(INTCODI_UNITATS,countErrors(INTCODI_UNITATS));
+		errorsGroupByCodi.put(INTCODI_GESCONADM,countErrors(INTCODI_GESCONADM));
+		errorsGroupByCodi.put(INTCODI_PROCEDIMENT,countErrors(INTCODI_PROCEDIMENT));
+		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_FIRMASERV));
+		return errorsGroupByCodi;
 	}
-
+	
 	public void addAccioOk(IntegracioInfo info) {
 		addAccioOk(info, true);
 	}
@@ -86,6 +98,7 @@ public class IntegracioHelper {
 		accio.setAplicacio(info.getAplicacio());
 		accio.setParametres(info.getParams());
 		accio.setTipus(info.getTipus());
+		accio.setCodiEntitat(info.getCodiEntitat());
 		accio.setTempsResposta(info.getTempsResposta());
 		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
 		addAccio(info.getCodi(), accio, obtenirUsuari);
@@ -114,6 +127,7 @@ public class IntegracioHelper {
 		accio.setAplicacio(info.getAplicacio());
 		accio.setParametres(info.getParams());
 		accio.setTipus(info.getTipus());
+		accio.setCodiEntitat(info.getCodiEntitat());
 		accio.setTempsResposta(info.getTempsResposta());
 		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
 		accio.setErrorDescripcio(errorDescripcio);
@@ -130,34 +144,34 @@ public class IntegracioHelper {
 				throwable);
 	}
 
-	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, String ... filtres) {
+	private Integer countErrors(String codi) {
+		Integer accionsAmbError = 0;
+		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(codi);
+		if (accions != null) {
+			for (IntegracioAccioDto integracioAccioDto : accions) {
+				if (integracioAccioDto.getEstat().equals(IntegracioAccioEstatEnumDto.ERROR))
+					accionsAmbError++;
+			}
+		}
+		return accionsAmbError;
+	}
+	
+	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, IntegracioFiltreDto filtre) {
+
 		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 		if (accions == null) {
 			accions = new LinkedList<>();
 			accionsIntegracio.put(integracioCodi, accions);
 			return accions;
 		}
-		int index = 0;
-		List<IntegracioAccioDto>  indexBorrar = new ArrayList<>();
 		LinkedList<IntegracioAccioDto> accionsBones = new LinkedList<>();
 		for (IntegracioAccioDto accio: accions) {
-			boolean esborrada = false;
-			if ("CALLBACK".equals(integracioCodi) && filtres != null) {
-				for (int foo = 0; foo < filtres.length; foo++) {
-					String filtre = filtres[foo] != null ? filtres[foo] : "";
-					if (accio.getAplicacio() != null && !accio.getAplicacio().toLowerCase().contains(filtre.toLowerCase())) {
-						esborrada = true;
-						indexBorrar.add(accio);
-						continue;
-					}
-					accionsBones.add(accio);
-				}
+			if (filtre != null && !filtre.filtresOK(accio, integracioCodi)) {
+				continue;
 			}
-			if (!esborrada) {
-				accio.setIndex(new Long(index++));
-			}
+			accionsBones.add(accio);
 		}
-		return accionsBones.size() > 0 || filtres.length > 0 ? accionsBones : accions;
+		return accionsBones;
 	}
 	private int getMaxAccions(String integracioCodi) {
 		Integer max = maxAccionsIntegracio.get(integracioCodi);
@@ -169,8 +183,14 @@ public class IntegracioHelper {
 	}
 
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio, boolean obtenirUsuari) {
+
 		afegirParametreUsuari(accio, obtenirUsuari);
-		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi);
+		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
+		if (accions == null) {
+			accions = new LinkedList<>();
+			accions.add(accio);
+			return;
+		}
 		int max = getMaxAccions(integracioCodi);
 		while (accions.size() >= max) {
 			accions.remove(accions.size() - 1);

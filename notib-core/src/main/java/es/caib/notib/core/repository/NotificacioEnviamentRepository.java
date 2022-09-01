@@ -261,7 +261,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 		    "   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
-			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular))" +
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular)))" +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
 	Integer countEnviaments(
@@ -285,7 +285,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 		    "    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
 		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 			"   and ne.notificaEstat <> es.caib.notib.core.api.dto.NotificacioEnviamentEstatEnumDto.REGISTRADA " +
-			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = :dniTitular) or (upper(d.nif) = :dniTitular)) " +
+			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular))) " +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal)")
 	Page<NotificacioEnviamentEntity> findEnviaments(

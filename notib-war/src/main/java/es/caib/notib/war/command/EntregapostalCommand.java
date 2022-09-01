@@ -26,7 +26,7 @@ public class EntregapostalCommand {
 	private String numeroCasa;
 	@Size(max=3)
 	private String numeroQualificador;
-	@Size(max=5)
+	@Size(max=20)
 	private String puntKm;
 	@Size(max=10)
 	private String apartatCorreus;

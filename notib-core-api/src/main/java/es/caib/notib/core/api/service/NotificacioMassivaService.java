@@ -160,7 +160,19 @@ public interface NotificacioMassivaService {
 	 *
 	 * @return L'objecte amb la informació del fitxer consultat
 	 */
-	FitxerDto getErrorsFile(Long entitatId, Long notificacioMassivaId);
+	FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId);
+
+
+	/**
+	 * Consulta el document CSV amb els errors que han tingut lloc durant el procés
+	 * d'execució la notificacio massiva indicada per paràmetre.
+	 *
+	 * @param entitatId Entitat actual
+	 * @param notificacioMassivaId Identificador de la notificació massiva
+	 *
+	 * @return L'objecte amb la informació del fitxer consultat
+	 */
+	FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId);
 
 	/**
 	 * Obté un fitxer CSV d'exemple amb el format que ha de tenir per a carregar dades massives.
