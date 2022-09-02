@@ -238,12 +238,13 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 }
                 List<String> errors = notificacioValidatorHelper.validarNotificacioMassiu(notificacio, entitat, documentsProcessatsMassiu);
                 try {
-                    ProcSerEntity procediment = procSerRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat);
-                    if (procediment == null) {
+                    ProcSerEntity procediment = !Strings.isNullOrEmpty(notificacio.getProcediment().getCodi()) ?
+                                                procSerRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat) : null;
+                    if (procediment == null && !NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus())) {
                         errors.add(messageHelper.getMessage("error.validacio.procser.amb.codi.no.trobat"));
-                    } else if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
+                    } else if (procediment != null && ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
                         errors.add(messageHelper.getMessage("error.validacio.alta.notificacio.amb.servei.nomes.comunicacions"));
-                    } else {
+                    } else if (procediment != null){
                         notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
                 } catch (Exception e) {
