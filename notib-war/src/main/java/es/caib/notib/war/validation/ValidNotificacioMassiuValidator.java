@@ -28,24 +28,20 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(NotificacioMassivaCommand notificacioMassivaCommand, ConstraintValidatorContext context) {
-		boolean valid = true;
 
+		boolean valid = true;
 		String messageError = checkCSVFile(notificacioMassivaCommand);
 		if (messageError != null && !messageError.isEmpty()) {
 			valid = false;
 			notificacioMassivaCommand.setFicheroCsv(null);
-			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(messageError))
-					.addNode("ficheroCsv")
-					.addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(messageError)).addNode("ficheroCsv").addConstraintViolation();
 		}
 
 		messageError = checkZIPFile(notificacioMassivaCommand);
 		if (messageError != null && !messageError.isEmpty()) {
 			valid = false;
 			notificacioMassivaCommand.setFicheroZip(null);
-			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(messageError))
-					.addNode("ficheroZip")
-					.addConstraintViolation();
+			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage(messageError)).addNode("ficheroZip").addConstraintViolation();
 		}
 		return valid;
 	}
@@ -57,6 +53,7 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 	 * @return String with the error message key
 	 */
 	private String checkCSVFile(NotificacioMassivaCommand notificacioMassivaCommand) {
+
 		if (notificacioMassivaCommand.getFitxerCSVGestdocId() != null && !notificacioMassivaCommand.getFitxerCSVGestdocId().isEmpty()) {
 			return null;
 		}
@@ -89,25 +86,27 @@ public class ValidNotificacioMassiuValidator  implements ConstraintValidator<Val
 	 * @return String with the error message key
 	 */
 	private String checkZIPFile(NotificacioMassivaCommand notificacioMassivaCommand) {
+
 		if (notificacioMassivaCommand.getFitxerZIPGestdocId() != null && !notificacioMassivaCommand.getFitxerZIPGestdocId().isEmpty()) {
 			return null;
 		}
 
 		MultipartFile fitxerZIP = notificacioMassivaCommand.getFicheroZip();
-		if (fitxerZIP != null && fitxerZIP.getSize() != 0) {
-			String extensio = FilenameUtils.getExtension(fitxerZIP.getOriginalFilename());
-			if (!extensionsZipDisponibles.contains(extensio)) {
-				log.info("Error validacio ZIP enviament massiu. Extensió fitxer incorrecte: " + extensio);
-				return "notificacio.form.valid.document.format";
-			}
+		if (fitxerZIP == null || fitxerZIP.getSize() == 0) {
+			return null;
+		}
+		String extensio = FilenameUtils.getExtension(fitxerZIP.getOriginalFilename());
+		if (!extensionsZipDisponibles.contains(extensio)) {
+			log.info("Error validacio ZIP enviament massiu. Extensió fitxer incorrecte: " + extensio);
+			return "notificacio.form.valid.document.format";
+		}
 //			if (!formatsZipDisponibles.contains(fitxerZIP.getContentType())) {
 //				log.info("Error validacio CSV enviament massiu. Format fitxer incorrecte: " + fitxerZIP.getContentType());
 //				return "notificacio.form.valid.document.format";
 //			}
-			Long fileSize = fitxerZIP.getSize();
-			if (fileSize > zipFileMaxSize) {
-				return "notificacio.form.valid.document.size";
-			}
+		Long fileSize = fitxerZIP.getSize();
+		if (fileSize > zipFileMaxSize) {
+			return "notificacio.form.valid.document.size";
 		}
 		return null;
 	}

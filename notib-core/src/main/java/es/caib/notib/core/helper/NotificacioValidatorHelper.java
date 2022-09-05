@@ -237,7 +237,8 @@ public class NotificacioValidatorHelper {
 				// Destinataris.
 				// De momento se trata cada línea como 1 notificación con 1 envío y 1 titular
 
-				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO && senseNif) {
+				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO
+						&& !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 					errors.add(messageHelper.getMessage("error.validacio.nif.informat.interessats"));
 				}
 

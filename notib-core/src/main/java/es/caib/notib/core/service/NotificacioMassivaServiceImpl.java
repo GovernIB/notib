@@ -817,6 +817,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.cifnif.missatge");
             titular.setNif(linia[9]);
 
+            // Email
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.missatge");
+            titular.setEmail(linia[10]);
+
             // Interessat tipus
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.interessat.tipus.missatge");
             // TODO:  Igual lo hemos planteado mal. Si es un nif, podria ser el Nif de la administración.
@@ -824,11 +829,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             //Si es persona física o jurídica no tiene sentido
             //Entonces podriamos utilizar este campo para saber si es una administración
             setInteressatTipus(notificacio, titular);
-
-            // Email
-            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.columna");
-            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.missatge");
-            titular.setEmail(linia[10]);
 
             // Codi Dir3
             columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.columna");
@@ -1073,27 +1073,29 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     private void setInteressatTipus(NotificacioDatabaseDto notificacio, PersonaDto titular) {
-        if (titular.getNif() != null && !titular.getNif().isEmpty()) {
-            if (NifHelper.isValidCif(titular.getNif())) {
-                titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
-            } else if (NifHelper.isValidNifNie(titular.getNif())) {
-                titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-            } else {
-//                try {
-                    List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
-                    if (lista != null && lista.size() > 0) {
-                        titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-                    } else {
-                        notificacio.getErrors().add(
-                                messageHelper.getMessage("error.nifcif.no.valid.a")
-                                + titular.getNif() +
-                                messageHelper.getMessage("error.nifcif.no.valid.b"));
-                    }
-//                } catch (Exception e) {
-//                    notificacio.getErrors().add("");
-//                }
-            }
+
+        if (Strings.isNullOrEmpty(titular.getNif()) && !Strings.isNullOrEmpty(titular.getEmail())) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA_SENSE_NIF);
+            return;
         }
+        if (Strings.isNullOrEmpty(titular.getNif()) && Strings.isNullOrEmpty(titular.getEmail())) {
+            notificacio.getErrors().add(messageHelper.getMessage("error.persona.sense.nif.no.email"));
+            return;
+        }
+        if (NifHelper.isValidCif(titular.getNif())) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+            return;
+        }
+        if (NifHelper.isValidNifNie(titular.getNif())) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+            return;
+        }
+        List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
+        if (lista != null && lista.size() > 0) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+            return;
+        }
+        notificacio.getErrors().add(messageHelper.getMessage("error.nifcif.no.valid.a") + titular.getNif() + messageHelper.getMessage("error.nifcif.no.valid.b"));
     }
 
     public boolean isNumeric(String strNum) {
