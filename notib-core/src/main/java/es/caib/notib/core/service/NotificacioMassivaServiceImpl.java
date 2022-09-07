@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.DocumentTipusEnumDto;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
@@ -788,11 +789,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             enviament.setNotificaReferencia(referencia); //si no se envía, Notific@ genera una
             enviament.setEntregaDehActiva(false); // De momento dejamos false
 
-            // Entrega postal
-            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
-            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
-            setEntregaPostal(linia, entitat, enviament);
-
             // Servei tipus
             columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.missatge");
@@ -829,7 +825,22 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             //Si es persona física o jurídica no tiene sentido
             //Entonces podriamos utilizar este campo para saber si es una administración
             setInteressatTipus(notificacio, titular);
-            enviament.setPerEmail(InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()));
+            boolean senseNif = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus());
+            enviament.setPerEmail(senseNif);
+
+            if (senseNif) {
+                log.error("FISICA SENSE NIF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1111 +****************");
+                DocumentTipusEnumDto tipus = Strings.isNullOrEmpty(linia[12]) ? DocumentTipusEnumDto.ALTRE :
+                        DocumentTipusEnumDto.PASSAPORT.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.PASSAPORT :
+                        DocumentTipusEnumDto.ESTRANGER.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.ESTRANGER : DocumentTipusEnumDto.ALTRE;
+                titular.setDocumentTipus(tipus);
+            } else {
+
+                // Entrega postal
+                columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
+                missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
+                setEntregaPostal(linia, entitat, enviament);
+            }
             // Codi Dir3
             columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.missatge");

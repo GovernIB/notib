@@ -136,17 +136,20 @@ public class NotificacioValidatorHelper {
 					if (enviament.getTitular().getInteressatTipus() == null) {
 						errors.add(messageHelper.getMessage("error.validacio.interessat.tipus.titular.enviament.no.null"));
 					}
-					if (enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
-						if (NifHelper.isvalid(enviament.getTitular().getNif())) {
+					if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
+							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+
+						String nif = enviament.getTitular().getNif();
+						if (NifHelper.isvalid(nif)) {
 							senseNif = false;
 							switch (enviament.getTitular().getInteressatTipus()) {
 								case FISICA:
-									if (!NifHelper.isValidNifNie(enviament.getTitular().getNif())) {
+									if (!NifHelper.isValidNifNie(nif)) {
 										errors.add(messageHelper.getMessage("error.validacio.nif.titular.tipus.document.no.valid.persona.fisica"));
 									}
 									break;
 								case JURIDICA:
-									if (!NifHelper.isValidCif(enviament.getTitular().getNif())) {
+									if (!NifHelper.isValidCif(nif)) {
 										errors.add(messageHelper.getMessage("error.validacio.nif.titular.tipus.document.invalid.persona.juridica"));
 									}
 									break;
