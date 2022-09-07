@@ -37,6 +37,7 @@ public class Enviament {
     private boolean entregaDehActiva;
     private EntregaDeh entregaDeh;
     private NotificaServeiTipusEnumDto serveiTipus;
+    private boolean perEmail;
 
     public List<Persona> getDestinataris() {
         if (destinataris == null) {

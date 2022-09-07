@@ -222,6 +222,33 @@ public class NotificacioHelper {
 	}
 
 	public NotificacioEntity saveNotificacio(NotificacioHelper.NotificacioData data) {
+//		NotificacioEntity not = NotificacioEntity.builder().entitat(data.getEntitat())
+//				.emisorDir3Codi(data.getNotificacio().getEmisorDir3Codi())
+//				.organGestor(data.getOrganGestor())
+//				.comunicacioTipus(pluginHelper.getNotibTipusComunicacioDefecte())
+//				.enviamentTipus(data.getNotificacio().getEnviamentTipus())
+//				.concepte(data.getNotificacio().getConcepte())
+//				.descripcio(data.getNotificacio().getDescripcio())
+//				.enviamentDataProgramada(data.getNotificacio().getEnviamentDataProgramada())
+//				.retard(data.getNotificacio().getRetard())
+//				.caducitat(data.getNotificacio().getCaducitat())
+//				.usuariCodi(data.getNotificacio().getUsuariCodi())
+//				.procedimentCodiNotib(data.getProcSer() != null ? data.getProcSer().getCodi() : null)
+//				.procediment(data.getProcSer())
+//				.grupCodi(data.getGrupNotificacio() != null ? data.getGrupNotificacio().getCodi() : null)
+//				.numExpedient(data.getNotificacio().getNumExpedient())
+//				.tipusUsuari(TipusUsuariEnumDto.INTERFICIE_WEB)
+//				.procedimentOrgan(data.getProcedimentOrgan())
+//				.idioma(data.getNotificacio().getIdioma())
+//				.referencia(UUID.randomUUID().toString())
+//				.document(data.getDocumentEntity())
+//				.document2(data.getDocument2Entity())
+//				.document3(data.getDocument3Entity())
+//				.document4(data.getDocument4Entity())
+//				.document5(data.getDocument5Entity())
+//				.notificacioMassivaEntity(data.getNotificacioMassivaEntity())
+//				.build();
+//		return 	auditNotificacioHelper.desaNotificacio(not);
 		return 	auditNotificacioHelper.desaNotificacio(NotificacioEntity.
 				getBuilderV2(
 						data.getEntitat(),

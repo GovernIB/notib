@@ -829,7 +829,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             //Si es persona física o jurídica no tiene sentido
             //Entonces podriamos utilizar este campo para saber si es una administración
             setInteressatTipus(notificacio, titular);
-
+            enviament.setPerEmail(InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()));
             // Codi Dir3
             columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.missatge");
@@ -837,6 +837,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
             // Incapacitat
             titular.setIncapacitat(false);
+
             enviament.setTitular(titular);
             enviaments.add(enviament);
             notificacio.setEnviaments(enviaments);
