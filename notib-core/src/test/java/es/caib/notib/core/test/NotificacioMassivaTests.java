@@ -8,29 +8,31 @@ import java.io.InputStream;
 
 public class NotificacioMassivaTests {
 
-
     public static TestMassiusFiles getTest1Files() {
 
-        return TestMassiusFiles.builder()
-                .csvContent(getFileContent("/es/caib/notib/core/massiu/test1.csv"))
-                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip"))
-                .build();
+        return TestMassiusFiles.builder().csvContent(getFileContent("/es/caib/notib/core/massiu/test1.csv"))
+                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip")).build();
     }
     public static TestMassiusFiles getTest2Files() {
 
-        return TestMassiusFiles.builder()
-                .csvContent(getFileContent("/es/caib/notib/core/massiu/test2.csv"))
-                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip"))
-                .build();
+        return TestMassiusFiles.builder().csvContent(getFileContent("/es/caib/notib/core/massiu/test2.csv"))
+                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip")).build();
     }
+
     public static TestMassiusFiles getTest3Files() {
 
-        return TestMassiusFiles.builder()
-                .csvContent(getFileContent("/es/caib/notib/core/massiu/test3.csv"))
-                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip"))
-                .build();
+        return TestMassiusFiles.builder().csvContent(getFileContent("/es/caib/notib/core/massiu/test3.csv"))
+                .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip")).build();
     }
+
+    public static TestMassiusFiles getTestInteressatSenseNif() {
+
+        return TestMassiusFiles.builder().csvContent(getFileContent("/es/caib/notib/core/massiu/test_interessat_sense_nif.csv"))
+                .zipContent(getFileContent("/es/caib/notib/core/massiu/test_interessat_sense_nif.zip")).build();
+    }
+
     private static byte[] getFileContent(String filename) {
+
         InputStream is =  NotificacioMassivaTests.class.getResourceAsStream(filename);
         byte[] targetArray = new byte[0];
         try {
