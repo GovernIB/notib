@@ -92,88 +92,48 @@ public class AplicacioController extends BaseController {
 	}
 
 	@RequestMapping(value = "/{aplicacioId}", method = RequestMethod.GET)
-	public String update(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long entitatId,
-			@PathVariable Long aplicacioId) {
-		AplicacioDto dto = null;
-		if (aplicacioId != null) {
-			dto = usuariAplicacioService.findByEntitatAndId(entitatId, aplicacioId);
-		}
-		if (dto != null) {
-			model.addAttribute(AplicacioCommand.asCommand(dto));
-		} else {
-			model.addAttribute(new AplicacioCommand());
-		}
-		model.addAttribute(
-				"entitat", 
-				entitatService.findById(entitatId));
+	public String update(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable Long aplicacioId) {
+
+		AplicacioDto dto = aplicacioId != null ? usuariAplicacioService.findByEntitatAndId(entitatId, aplicacioId) : null;
+		model.addAttribute(dto != null ? AplicacioCommand.asCommand(dto) : new AplicacioCommand());
+		model.addAttribute("entitat", entitatService.findById(entitatId));
 		return "aplicacioForm";
 	}
 
 	@RequestMapping(value = "newOrModify", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long entitatId,
-			@Valid AplicacioCommand command,
-			BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			model.addAttribute(
-					"entitat", 
-					entitatService.findById(entitatId));
+	public String save(HttpServletRequest request, Model model, @PathVariable Long entitatId, @Valid AplicacioCommand command, BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {model.addAttribute("entitat", entitatService.findById(entitatId));
 			return "aplicacioForm";
 		}
+		String url = "redirect:aplicacio";
+		String msg = command.getId() == null ? "aplicacio.controller.creada.ok" : "aplicacio.controller.modificada.ok";
 		if (command.getId() == null) {
-			usuariAplicacioService.create(
-					AplicacioCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:aplicacio",
-					"aplicacio.controller.creada.ok");
-		} else {
-			usuariAplicacioService.update(
-					AplicacioCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:aplicacio",
-					"aplicacio.controller.modificada.ok");
+			usuariAplicacioService.create(AplicacioCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(request, url, msg);
 		}
+		usuariAplicacioService.update(AplicacioCommand.asDto(command));
+		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 
 	@RequestMapping(value = "/{aplicacioId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			Model model,
-			@PathVariable Long entitatId,
-			@PathVariable Long aplicacioId) {
+	public String delete(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable Long aplicacioId) {
+
 		usuariAplicacioService.delete(aplicacioId, entitatId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:aplicacio",
-				"aplicacio.controller.esborrada.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:aplicacio", "aplicacio.controller.esborrada.ok");
 	}
 	
 	@RequestMapping(value = "/{aplicacioId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long aplicacioId) {
+	public String enable(HttpServletRequest request, @PathVariable Long aplicacioId) {
+
 		usuariAplicacioService.updateActiva(aplicacioId, true);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"aplicacio.controller.activada.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "aplicacio.controller.activada.ok");
 	}
 	@RequestMapping(value = "/{aplicacioId}/disable", method = RequestMethod.GET)
-	public String disable(
-			HttpServletRequest request,
-			@PathVariable Long aplicacioId) {
+	public String disable(HttpServletRequest request, @PathVariable Long aplicacioId) {
+
 		usuariAplicacioService.updateActiva(aplicacioId, false);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../entitat",
-				"aplicacio.controller.desactivada.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "aplicacio.controller.desactivada.ok");
 	}
 
 	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {

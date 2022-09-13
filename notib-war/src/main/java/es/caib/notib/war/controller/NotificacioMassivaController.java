@@ -3,6 +3,7 @@ package es.caib.notib.war.controller;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
@@ -95,8 +96,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
         NotificacioMassivaFiltreCommand filtre = getFiltreCommand(request);
         model.addAttribute("notificacioMassivaFiltreCommand", filtre);
-        model.addAttribute("notificacioMassivaEstats", EnumHelper.getOptionsForEnum(NotificacioMassivaEstatDto.class,
-                                                "es.caib.notib.core.api.dto.notificacio.NotificacioMassivaEstatDto."));
+        String prefix = "es.caib.notib.core.api.dto.notificacio.NotificacioMassivaEstatDto.";
+        model.addAttribute("notificacioMassivaEstats", EnumHelper.getOptionsForEnum(NotificacioMassivaEstatDto.class, prefix));
         return "notificacioMassivaList";
     }
 
@@ -115,12 +116,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         NotificacioMassivaFiltreDto filtre = getFiltreCommand(request).asDto();
         PaginaDto<NotificacioMassivaTableItemDto> notificacions = new PaginaDto<>();
         try {
-
-            notificacions = notificacioMassivaService.findAmbFiltrePaginat(
-                    entitatActual != null ? entitatActual.getId() : null,
-                    filtre,
-                    RolEnumDto.valueOf(RolHelper.getRolActual(request)),
-                    DatatablesHelper.getPaginacioDtoFromRequest(request));
+            RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+            PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+            notificacions = notificacioMassivaService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null, filtre, rol, params);
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
@@ -185,27 +183,29 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/posposar", method = RequestMethod.GET)
     public String posposar(HttpServletRequest request, @PathVariable Long id) {
 
+        String url = "redirect:..";
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         try {
             notificacioMassivaService.posposar(entitatActual.getId(), id);
+            return getModalControllerReturnValueSuccess(request, url,"notificacio.massiva.controller.posposar.ok");
         } catch (Exception e) {
             log.error("Hi ha hagut un error posposant la notificació massiva", e);
-            return getModalControllerReturnValueError(request, "redirect:..", "notificacio.massiva.controller.posposar.ko", new Object[]{e.getMessage()});
+            return getModalControllerReturnValueError(request, url, "notificacio.massiva.controller.posposar.ko", new Object[]{e.getMessage()});
         }
-        return getModalControllerReturnValueSuccess(request,"redirect:..","notificacio.massiva.controller.posposar.ok");
     }
 
     @RequestMapping(value = "/{id}/reactivar", method = RequestMethod.GET)
     public String reactivar(HttpServletRequest request, @PathVariable Long id) {
 
+        String url = "redirect:..";
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         try {
             notificacioMassivaService.reactivar(entitatActual.getId(), id);
+            return getModalControllerReturnValueSuccess(request, url, "notificacio.massiva.controller.reactivar.ok");
         } catch (Exception e) {
             log.error("Hi ha hagut un error reactivant la notificació massiva", e);
-            return getModalControllerReturnValueError(request,"redirect:..", "notificacio.massiva.controller.reactivar.ko", new Object[]{e.getMessage()});
+            return getModalControllerReturnValueError(request, url, "notificacio.massiva.controller.reactivar.ko", new Object[]{e.getMessage()});
         }
-        return getModalControllerReturnValueSuccess(request, "redirect:..", "notificacio.massiva.controller.reactivar.ok");
     }
 
     @RequestMapping(value = "/{id}/cancelar", method = RequestMethod.GET)
@@ -387,7 +387,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
         NotificacioFiltreDto filtre = notificacioListHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
         assert entitatActual != null;
-        return notificacioService.findIdsAmbFiltre(entitatActual.getId(),
-                RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi, usuariActual.getCodi(), filtre);
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, usuariActual.getCodi(), filtre);
     }
 }

@@ -43,6 +43,7 @@ public class UsuariController extends BaseController {
 
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
+
 		// Només per Jboss
 		// Es itera sobre totes les cookies
 		for(Cookie c : request.getCookies()) {

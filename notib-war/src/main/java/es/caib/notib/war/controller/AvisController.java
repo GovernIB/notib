@@ -36,20 +36,16 @@ public class AvisController extends BaseUserController {
 	@Autowired
 	private AvisService avisService;
 
-	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get() {
 		return "avisList";
 	}
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
-		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
-				request,
-				avisService.findPaginat(
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));
-		return dtr;
+	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	public DatatablesResponse datatable(HttpServletRequest request) {
+
+		return DatatablesHelper.getDatatableResponse(request, avisService.findPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
 	}
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
@@ -59,81 +55,61 @@ public class AvisController extends BaseUserController {
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(
-	    				new SimpleDateFormat("dd/MM/yyyy"),
-	    				true));
+
+	    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 	}
 	
 	@RequestMapping(value = "/{avisId}", method = RequestMethod.GET)
-	public String get(
-			@PathVariable Long avisId,
-			Model model) {
+	public String get(@PathVariable Long avisId, Model model) {
+
 		AvisDto avis = null;
-		if (avisId != null)
+		if (avisId != null) {
 			avis = avisService.findById(avisId);
+		}
 		if (avis != null) {
 			model.addAttribute(AvisCommand.asCommand(avis));
-		} else {
-			AvisCommand avisCommand = new AvisCommand();
-			avisCommand.setDataInici(new Date());
-			model.addAttribute(avisCommand);
+			return "avisForm";
 		}
+		AvisCommand avisCommand = new AvisCommand();
+		avisCommand.setDataInici(new Date());
+		model.addAttribute(avisCommand);
 		return "avisForm";
 	}
+
 	@RequestMapping(method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid AvisCommand command,
-			BindingResult bindingResult) {
+	public String save(HttpServletRequest request, @Valid AvisCommand command, BindingResult bindingResult) {
+
 		if (bindingResult.hasErrors()) {
 			return "avisForm";
 		}
+		String url = "redirect:avis";
+		String msg = command.getId() != null ? "avis.controller.modificat.ok" : "avis.controller.creat.ok";
 		if (command.getId() != null) {
 			avisService.update(AvisCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:avis",
-					"avis.controller.modificat.ok");
-		} else {
-			avisService.create(AvisCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:avis",
-					"avis.controller.creat.ok");
+			return getModalControllerReturnValueSuccess(request, url, msg);
 		}
+		avisService.create(AvisCommand.asDto(command));
+		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 
 	@RequestMapping(value = "/{avisId}/enable", method = RequestMethod.GET)
-	public String enable(
-			HttpServletRequest request,
-			@PathVariable Long avisId) {
+	public String enable(HttpServletRequest request, @PathVariable Long avisId) {
+
 		avisService.updateActiva(avisId, true);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../avis",
-				"avis.controller.activat.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.activat.ok");
 	}
+
 	@RequestMapping(value = "/{avisId}/disable", method = RequestMethod.GET)
-	public String disable(
-			HttpServletRequest request,
-			@PathVariable Long avisId) {
+	public String disable(HttpServletRequest request, @PathVariable Long avisId) {
+
 		avisService.updateActiva(avisId, false);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../avis",
-				"avis.controller.desactivat.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.desactivat.ok");
 	}
 
 	@RequestMapping(value = "/{avisId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long avisId) {
+	public String delete(HttpServletRequest request, @PathVariable Long avisId) {
+
 		avisService.delete(avisId);
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../avis",
-				"avis.controller.esborrat.ok");
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../avis", "avis.controller.esborrat.ok");
 	}
 }

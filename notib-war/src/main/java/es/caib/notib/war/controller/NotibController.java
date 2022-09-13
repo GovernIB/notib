@@ -33,41 +33,41 @@ public class NotibController {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-	
-	
+
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			return "redirect:integracio";
-		} else if (RolHelper.isUsuariActualAplicacio(request)) {
-			return "redirect:api/rest";
-		} else if (RolHelper.isUsuariActualUsuari(request)) {
-			return "redirect:notificacio";
-		} else {
-			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-			if (entitat == null)
-				throw new SecurityException("No te cap entitat assignada");
-			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-				return "redirect:notificacio";
-			} else if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
-				return "redirect:notificacio";
-			} else {
-				return "index";
-			}
 		}
+		if (RolHelper.isUsuariActualAplicacio(request)) {
+			return "redirect:api/rest";
+		}
+		if (RolHelper.isUsuariActualUsuari(request)) {
+			return "redirect:notificacio";
+		}
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		if (entitat == null)
+			throw new SecurityException("No te cap entitat assignada");
+		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+			return "redirect:notificacio";
+		}
+		if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
+			return "redirect:notificacio";
+		}
+		return "index";
 	}
 
 	@RequestMapping(value = ModalHelper.ACCIO_MODAL_TANCAR, method = RequestMethod.GET)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void modalTancar() {
 	}
+
 	@RequestMapping(value = AjaxHelper.ACCIO_AJAX_OK, method = RequestMethod.GET)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void ajaxOk() {
 	}
+
 	@RequestMapping(value = "/missatges", method = RequestMethod.GET)
 	public String get() {
 		return "util/missatges";
@@ -80,19 +80,13 @@ public class NotibController {
 	}
 
 	@RequestMapping(value = "/error")
-	public String error(
-			HttpServletRequest request,
-			Model model) {
-		model.addAttribute(
-				"errorObject",
-				new ErrorObject(request));
+	public String error(HttpServletRequest request, Model model) {
+		model.addAttribute("errorObject", new ErrorObject(request));
 		return "util/error";
 	}
 
 	@RequestMapping(value = "/api")
-	public String api(
-			HttpServletRequest request,
-			Model model) {
+	public String api(HttpServletRequest request, Model model) {
 		return "redirect:/api/rest";
 	}
 
@@ -102,18 +96,19 @@ public class NotibController {
 		String exceptionMessage;
 		String requestUri;
 		String message;
+
 		public ErrorObject(HttpServletRequest request) {
+
 			statusCode = (Integer)request.getAttribute("javax.servlet.error.status_code");
 			throwable = (Throwable)request.getAttribute("javax.servlet.error.exception");
 			exceptionMessage = getExceptionMessage(throwable, statusCode);
 			requestUri = (String)request.getAttribute("javax.servlet.error.request_uri");
-			if (requestUri == null) 
+			if (requestUri == null) {
 				requestUri = "Desconeguda";
-			message = 
-					"Retornat codi d'error " + statusCode + " "
-					+ "per al recurs " + requestUri + " "
-					+ "amb el missatge: " + exceptionMessage;
+			}
+			message = "Retornat codi d'error " + statusCode + " per al recurs " + requestUri + " amb el missatge: " + exceptionMessage;
 		}
+
 		public Integer getStatusCode() {
 			return statusCode;
 		}
@@ -139,17 +134,13 @@ public class NotibController {
 			return ExceptionUtils.getFullStackTrace(throwable);
 		}
 		private String getExceptionMessage(Throwable throwable, Integer statusCode) {
-			if (throwable != null) {
-				Throwable rootCause = ExceptionUtils.getRootCause(throwable);
-				if (rootCause != null)
-					return rootCause.getMessage();
-				else
-					return throwable.getMessage();
-			} else {
+
+			if (throwable == null) {
 				HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
 				return httpStatus.getReasonPhrase();
 			}
+			Throwable rootCause = ExceptionUtils.getRootCause(throwable);
+			return rootCause != null ? rootCause.getMessage() : throwable.getMessage();
 		}
 	}
-
 }

@@ -20,15 +20,13 @@ public class MetricController {
 	
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
-	public String metrics(
-			HttpServletRequest request) {
+	public String metrics(HttpServletRequest request) {
 		return aplicacioService.getMetrics();
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public String metricsView(
-			HttpServletRequest request,
-			Model model) {
+	public String metricsView(HttpServletRequest request, Model model) {
+
 		model.addAttribute("metriques", aplicacioService.getMetrics());
 		return "util/metrics";
 	}

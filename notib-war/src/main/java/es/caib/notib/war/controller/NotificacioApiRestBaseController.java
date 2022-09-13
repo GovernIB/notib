@@ -27,6 +27,7 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 	protected NotificacioServiceWsV2 notificacioServiceWsV2;
 
 	protected String getErrorDescripcio(Exception e) {
+
 		String errorDescripcio;
 		if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
 			errorDescripcio = "L'usuari " + aplicacioService.getUsuariActual().getCodi() + " no té els permisos necessaris: " + e.getMessage();
@@ -40,6 +41,7 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 	}
 
 	protected String extractIdentificador(HttpServletRequest request) {
+
 		String url = request.getRequestURL().toString();
 		String[] urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
 		String referencia = urlArr.length > 1 ? urlArr[1].substring(1) : "";
@@ -47,34 +49,25 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 	}
 
 	public RespostaConsultaJustificantEnviament consultaJustificant(HttpServletRequest request) {
-		String referencia = extractIdentificador(request);
+
 		try {
-			if (referencia.isEmpty()) {
-				return RespostaConsultaJustificantEnviament.builder()
-						.error(true)
-						.errorDescripcio("No s'ha informat cap referència de l'enviament")
-						.errorData(new Date())
-						.build();
+			String referencia = extractIdentificador(request);
+			if (!referencia.isEmpty()) {
+				return notificacioServiceWsV2.consultaJustificantEnviament(referencia);
 			}
-			return notificacioServiceWsV2.consultaJustificantEnviament(referencia);
+			String msg = "No s'ha informat cap referència de l'enviament";
+			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
 		} catch (Exception e) {
-			return RespostaConsultaJustificantEnviament.builder()
-					.error(true)
-					.errorDescripcio(getErrorDescripcio(e))
-					.errorData(new Date())
-					.build();
+			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
 		}
 	}
 
 	public String donarPermisConsulta(PermisConsulta permisConsulta) {
-		String resposta = null;
+
 		try {
-			if (notificacioServiceWsV2.donarPermisConsulta(permisConsulta)) {
-				resposta = "OK";
-			}
+			return notificacioServiceWsV2.donarPermisConsulta(permisConsulta) ? "OK" : null;
 		} catch (Exception e) {
-			resposta = getErrorDescripcio(e);
+			return getErrorDescripcio(e);
 		}
-		return resposta;
 	}
 }

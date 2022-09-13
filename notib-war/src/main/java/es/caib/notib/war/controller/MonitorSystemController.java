@@ -26,9 +26,7 @@ import java.util.*;
 public class MonitorSystemController extends BaseController {
 	
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		return "monitor";
 	}
 

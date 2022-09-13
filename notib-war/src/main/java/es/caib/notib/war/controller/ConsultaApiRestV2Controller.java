@@ -71,18 +71,9 @@ public class ConsultaApiRestV2Controller {
 		
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO)
-				.estatFinal(null)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : IdiomaEnumDto.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
+		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null).basePath(basePath)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 	
@@ -112,18 +103,9 @@ public class ConsultaApiRestV2Controller {
 
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
-				.estatFinal(null)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : IdiomaEnumDto.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
+		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null).basePath(basePath)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -154,18 +136,9 @@ public class ConsultaApiRestV2Controller {
 
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO)
-				.estatFinal(false)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : IdiomaEnumDto.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
+		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false).basePath(basePath)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -196,18 +169,9 @@ public class ConsultaApiRestV2Controller {
 
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
-				.estatFinal(false)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : IdiomaEnumDto.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
+		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false).basePath(basePath)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -237,18 +201,9 @@ public class ConsultaApiRestV2Controller {
 
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO)
-				.estatFinal(true)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : IdiomaEnumDto.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
+		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true).basePath(basePath)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -278,18 +233,9 @@ public class ConsultaApiRestV2Controller {
 
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder()
-				.dniTitular(dniTitular)
-				.tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO)
-				.estatFinal(true)
-				.basePath(basePath)
-				.pagina(pagina)
-				.mida(mida)
-				.dataInicial(dataInicial)
-				.dataFinal(dataFinal)
-				.idioma(lang != null ? lang : IdiomaEnumDto.CA)
-				.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true)
-				.build();
+		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true).basePath(basePath)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
 
@@ -309,22 +255,17 @@ public class ConsultaApiRestV2Controller {
 			log.debug("No s'ha trobat el document per a la notificació amb identificador " + notificacioId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			if (arxiu.getContentType() == null) {
-				if (arxiu.getNom() != null) {
-					if (arxiu.getNom().endsWith(".pdf")) {
-						arxiu.setContentType("application/pdf");
-					} else if (arxiu.getNom().endsWith(".pdf")) {
-						arxiu.setContentType("application/zip");
-					}
-				}
+			if (arxiu.getContentType() == null && arxiu.getNom() != null) {
+				String type = arxiu.getNom().endsWith(".pdf") ? "application/pdf" : (arxiu.getNom().endsWith(".pdf") ? "application/zip" : null);
+				arxiu.setContentType(type);
 			}
 			String contingutDocumentBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			document = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutDocumentBasse64).build();
-			return new ResponseEntity<Arxiu>(document, status);
+			return new ResponseEntity<>(document, status);
 		}
 		document = Arxiu.builder().error(true).missatgeError("No s'ha trobat el document.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<Arxiu>(document, status);
+		return new ResponseEntity<>(document, status);
 	}
 
 	@RequestMapping(value="/certificacio/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -349,7 +290,7 @@ public class ConsultaApiRestV2Controller {
 		}
 		certificacio = Arxiu.builder().error(true).missatgeError("No s'ha trobat la certificació.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<Arxiu>(certificacio, status);
+		return new ResponseEntity<>(certificacio, status);
 	}
 
 	@RequestMapping(value="/justificant/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -22,8 +22,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +40,7 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  *
  */
+@Slf4j
 @Controller
 @RequestMapping("/organgestor")
 public class OrganGestorController extends BaseUserController{
@@ -68,8 +68,8 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 		model.addAttribute("organsEntitat", organService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
-		model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class,
-				"es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
+		String prefix = "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.";
+		model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, prefix));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 		if (!entitat.isOficinaEntitat()) {
@@ -168,7 +168,7 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("cieList", cieList);
 			return "organGestorForm";
 		} catch (Exception e) {
-			logger.error(String.format("Excepció intentant actualitzar l'òrgan gestor (Id=%d):", organGestorId), e);
+			log.error(String.format("Excepció intentant actualitzar l'òrgan gestor (Id=%d):", organGestorId), e);
 			return getAjaxControllerReturnValueError(request, "redirect:../../organgestor", "organgestor.controller.update.nom.error");
 		}
 	}
@@ -187,13 +187,10 @@ public class OrganGestorController extends BaseUserController{
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		ProgresActualitzacioDto progresActualitzacio = organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
-
-
 		if (progresActualitzacio == null) {
-//			logger.error("No s'ha trobat el progres actualització d'organs gestors per a l'entitat {}", entitat.getDir3Codi());
+//			log.error("No s'ha trobat el progres actualització d'organs gestors per a l'entitat {}", entitat.getDir3Codi());
 			return new ProgresActualitzacioDto();
 		}
-
 		if (progresActualitzacio.getFase() == 2) {
 //			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
 			ProgresActualitzacioDto progresProc = procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
@@ -202,24 +199,24 @@ public class OrganGestorController extends BaseUserController{
 				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 18 / 100));
 				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 				progresAcumulat.getInfo().addAll(progresProc.getInfo());
-//				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
+//				log.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
 				return progresAcumulat;
 			}
 		}
-		if (progresActualitzacio.getFase() == 3) {
-//			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
-			ProgresActualitzacioDto progresSer = serveiService.getProgresActualitzacio(entitat.getDir3Codi());
-			if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
-				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
-				progresAcumulat.setProgres(45 + (progresSer.getProgres() * 18 / 100));
-				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
-				progresAcumulat.getInfo().addAll(progresSer.getInfo());
-//				logger.info("Progres actualització organs gestors fase 3: {}", progresAcumulat.getProgres());
-				return progresAcumulat;
-			}
+		if (progresActualitzacio.getFase() != 3) {
+			return progresActualitzacio;
 		}
-
-//		logger.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
+//		ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
+		ProgresActualitzacioDto progresSer = serveiService.getProgresActualitzacio(entitat.getDir3Codi());
+		if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
+			ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+			progresAcumulat.setProgres(45 + (progresSer.getProgres() * 18 / 100));
+			progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
+			progresAcumulat.getInfo().addAll(progresSer.getInfo());
+//			log.info("Progres actualització organs gestors fase 3: {}", progresAcumulat.getProgres());
+			return progresAcumulat;
+		}
+//		log.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
 		return progresActualitzacio;
 	}
 
@@ -234,7 +231,7 @@ public class OrganGestorController extends BaseUserController{
 //			organGestorService.updateAll(entitat.getId(), organGestorActual != null ? organGestorActual.getCodi() : null);
 //			return getAjaxControllerReturnValueSuccess(request, url, msg);
 //		} catch (Exception e) {
-//			logger.error("Excepció intentant actualitzar tots els òrgans gestors", e);
+//			log.error("Excepció intentant actualitzar tots els òrgans gestors", e);
 //			msg = "organgestor.controller.update.nom.tots.error";
 //			return getAjaxControllerReturnValueError(request, url, msg);
 //		}
@@ -258,12 +255,11 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
 			model.addAttribute("isUpdatingOrgans", organGestorService.isUpdatingOrgans(entitat));
+			return "synchronizationPrediction";
 		} catch (Exception e) {
-			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
+			log.error("Error al obtenir la predicció de la sincronitzacio", e);
 			return getModalControllerReturnValueErrorMessageText(request, redirect, e.getMessage());
 		}
-
-		return "synchronizationPrediction";
 	}
 
 	@RequestMapping(value = "/saveSynchronize", method = RequestMethod.POST)
@@ -272,12 +268,11 @@ public class OrganGestorController extends BaseUserController{
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			organGestorService.syncDir3OrgansGestors(entitatActual);
+			return getModalControllerReturnValueSuccess(request, "redirect:unitatOrganitzativa", "organgestor.controller.synchronize.ok");
 		} catch (Exception e) {
-			logger.error("Error al syncronitzar", e);
+			log.error("Error al syncronitzar", e);
 			return getModalControllerReturnValueErrorMessageText(request, "redirect:../../organgestor", e.getMessage());
 		}
-
-		return getModalControllerReturnValueSuccess(request, "redirect:unitatOrganitzativa", "organgestor.controller.synchronize.ok");
 	}
 
 	
@@ -297,7 +292,7 @@ public class OrganGestorController extends BaseUserController{
 //			organGestorService.delete(entitat.getId(), organ.getId());
 //			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.controller.esborrat.ok");
 //		} catch (Exception e) {
-//			logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
+//			log.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
 //			return getAjaxControllerReturnValueError(request, redirect,"organgestor.controller.esborrat.ko");
 //		}
 //	}
@@ -329,7 +324,4 @@ public class OrganGestorController extends BaseUserController{
 		RequestSessionHelper.actualitzarObjecteSessio(request, ORGANS_FILTRE, organGestorFiltreCommand);
 		return organGestorFiltreCommand;
 	}
-	
-	@SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.getLogger(OrganGestorController.class);
 }

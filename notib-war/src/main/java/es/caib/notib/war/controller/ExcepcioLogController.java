@@ -29,32 +29,20 @@ public class ExcepcioLogController extends BaseUserController {
 	@Autowired
 	private AplicacioService aplicacioService;
 
-
-
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		return "excepcioList";
 	}
 
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
-		DatatablesResponse dtr = DatatablesHelper.getDatatableResponse(
-				request,
-				aplicacioService.excepcioFindAll());
-		return dtr;
+	public DatatablesResponse datatable(HttpServletRequest request) {
+		return DatatablesHelper.getDatatableResponse(request, aplicacioService.excepcioFindAll());
 	}
 
 	@RequestMapping(value = "/{index}", method = RequestMethod.GET)
-	public String detall(
-			HttpServletRequest request,
-			@PathVariable Long index,
-			Model model) {
+	public String detall(HttpServletRequest request, @PathVariable Long index, Model model) {
 		model.addAttribute("excepcio", aplicacioService.excepcioFindOne(index));
 		return "excepcioDetall";
 	}
-
 }

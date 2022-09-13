@@ -100,7 +100,6 @@ public class OrganGestorArbreController extends BaseUserController {
     public String guardarOrgan(HttpServletRequest request, @Valid OrganGestorCommand command, BindingResult bindingResult, Model model) {
 
         EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-
         OrganGestorDto organ = OrganGestorCommand.asDto(command);
         String msg = "";
         if (bindingResult.hasErrors()) {
@@ -108,7 +107,6 @@ public class OrganGestorArbreController extends BaseUserController {
             msg = "organgestor.arbre.error.guardar";
             return getAjaxControllerReturnValueError(request,"redirect:./", msg);
         }
-
         organ.setLlibreNom(command.getLlibre() != null ? organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()).getNomLlarg() : null);
         if (command.getOficina() != null) {
             List<OficinaDto> oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),true);
@@ -120,14 +118,14 @@ public class OrganGestorArbreController extends BaseUserController {
             }
             organ.setOficinaNom(oficinaNom);
         }
-
         if (command.getId() != null) {
             msg = "organgestor.controller.update.nom.ok";
             organService.update(organ);
-        } else {
+        }
+//        else {
 //            msg = "organgestor.controller.creat.ok";
 //            organService.create(organ);
-        }
+//        }
         return getAjaxControllerReturnValueSuccess(request, "redirect:./", msg);
     }
 
@@ -214,6 +212,4 @@ public class OrganGestorArbreController extends BaseUserController {
             }
         }
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(OrganGestorArbreController.class);
 }

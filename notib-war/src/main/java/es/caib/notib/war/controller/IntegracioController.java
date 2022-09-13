@@ -99,7 +99,8 @@ public class IntegracioController extends BaseUserController {
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
 		try {
 			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto())));
+			List<IntegracioAccioDto> i = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto());
+			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(i));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}

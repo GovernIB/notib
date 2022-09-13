@@ -110,6 +110,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
+
         initForm(request, model, TipusEnviamentEnumDto.NOTIFICACIO);
         RequestSessionHelper.esborrarObjecteSessio(request, ENVIAMENT_TIPUS);
         return "notificacioForm";
@@ -117,6 +118,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @RequestMapping(value = "/new/comunicacio")
     public String altaComunicacio(HttpServletRequest request, Model model) {
+
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO);
         RequestSessionHelper.esborrarObjecteSessio(request, ENVIAMENT_TIPUS);
         return "notificacioForm";
@@ -124,6 +126,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @RequestMapping(value = "/new/comunicacioSIR")
     public String altaComunicacioSIR(HttpServletRequest request, Model model) {
+
         initForm(request, model, TipusEnviamentEnumDto.COMUNICACIO_SIR);
         RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_TIPUS, TipusEnviamentEnumDto.COMUNICACIO_SIR);
         return "notificacioForm";
@@ -158,7 +161,6 @@ public class NotificacioFormController extends BaseUserController {
         }
         notificacioCommand.setEnviamentTipus(tipusEnviament);
         emplenarModelNotificacio(request, model, notificacioCommand);
-
     }
 
     @RequestMapping(value = "/procediments", method = RequestMethod.GET)
@@ -167,18 +169,15 @@ public class NotificacioFormController extends BaseUserController {
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         model.addAttribute("entitat", entitatActual);
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
-//		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
 
         Set<ProcSerSimpleDto> procedimentsDisponibles = new HashSet<ProcSerSimpleDto>();
         List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 
         if (RolHelper.isUsuariActualUsuari(request)) {
-//			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
         	List<ProcSerSimpleDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
         	List<ProcSerSimpleDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
         	procedimentsDisponibles.addAll(procedimentsDisponiblesPerNotificacio);
         	procedimentsDisponibles.addAll(procedimentsDisponiblesPerComunicacioSir);
-        	
             model.addAttribute("procediments", procedimentsDisponibles);
             List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
             for (ProcSerSimpleDto pro : procedimentsDisponibles) {
@@ -187,32 +186,32 @@ public class NotificacioFormController extends BaseUserController {
             organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
             model.addAttribute("organsGestors", organsGestorsDisponibles);
         }
-
         return "notificacioProcedimentsForm";
     }
 
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
+
     	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
-                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), enviamentTipus);
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, enviamentTipus);
     }
 
     @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeisOrgan(HttpServletRequest request, @PathVariable String organId) {
+
     	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
-                                                            RolEnumDto.valueOf(RolHelper.getRolActual(request)), enviamentTipus);
+        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, enviamentTipus);
     }
 
     @RequestMapping(value = "/cercaUnitats", method = RequestMethod.GET)
     @ResponseBody
-    public List<OrganGestorDto> getAdministracions(
-            HttpServletRequest request,
+    public List<OrganGestorDto> getAdministracions(HttpServletRequest request,
             @RequestParam(value = "codi", required = false) String codi,
             @RequestParam(value = "denominacio", required = false) String denominacio,
             @RequestParam(value = "nivellAdministracio", required = false) Long nivellAdministracio,
@@ -220,6 +219,7 @@ public class NotificacioFormController extends BaseUserController {
             @RequestParam(value = "provincia", required = false) Long provincia,
             @RequestParam(value = "municipi", required = false) String municipi,
             Model model) {
+
         return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
 
     }
@@ -250,7 +250,6 @@ public class NotificacioFormController extends BaseUserController {
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         ProcSerDto procedimentActual = null;
-
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
         }
@@ -265,7 +264,6 @@ public class NotificacioFormController extends BaseUserController {
             emplenarModelNotificacio(request, model, notificacioCommand);
             return "notificacioForm";
         }
-
         if (RolHelper.isUsuariActualAdministrador(request)) {
             model.addAttribute("entitat", entitatService.findAll());
         }
@@ -279,6 +277,8 @@ public class NotificacioFormController extends BaseUserController {
             } else {
                 notificacioService.create(entitatActual.getId(), notificacioCommand.asDatabaseDto());
             }
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
+            return "redirect:../notificacio";
         } catch (Exception ex) {
             ex.printStackTrace();
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
@@ -288,66 +288,60 @@ public class NotificacioFormController extends BaseUserController {
             model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
-        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Formulari processat satisfactoriament. ");
-        return "redirect:../notificacio";
     }
 
-    
     private void updateDocuments(NotificacioCommand notificacioCommand) throws IOException {
 
         for (int i = 0; i < 5; i++) {
 
-            if (notificacioCommand.getTipusDocument()[i] != null) {
-                String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
-                switch (notificacioCommand.getTipusDocument()[i]) {
-                    case ARXIU:
-                        if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
-                            String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
-                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                            notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
-                            notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
-                        } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
-                            byte[] result;
-                            if (notificacioCommand.getId() != null) {
-                                result = gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId);
-                            } else {
-                                result = gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
-                            }
-
-                            String contingutBase64 = Base64.encodeBase64String(result);
-                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                    case CSV:
-                        if (notificacioCommand.getDocumentArxiuCsv()[i] != null
-                                && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                    case UUID:
-                        if (notificacioCommand.getDocumentArxiuUuid()[i] != null
-                                && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                    case URL:
-                        if (notificacioCommand.getDocumentArxiuUrl()[i] != null
-                                && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                }
-            } else {
+            if (notificacioCommand.getTipusDocument()[i] == null) {
                 notificacioCommand.getDocuments()[i] = null;
+                continue;
+            }
+            String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
+            switch (notificacioCommand.getTipusDocument()[i]) {
+                case ARXIU:
+                    if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
+                        String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
+                        notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                        notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
+                        notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+                    } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
+                        byte[] result;
+                        if (notificacioCommand.getId() != null) {
+                            result = gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId);
+                        } else {
+                            result = gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
+                        }
+
+                        String contingutBase64 = Base64.encodeBase64String(result);
+                        notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
+                case CSV:
+                    if (notificacioCommand.getDocumentArxiuCsv()[i] != null && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
+                case UUID:
+                    if (notificacioCommand.getDocumentArxiuUuid()[i] != null && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
+                case URL:
+                    if (notificacioCommand.getDocumentArxiuUrl()[i] != null && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
             }
         }
     }
@@ -384,24 +378,19 @@ public class NotificacioFormController extends BaseUserController {
 
 	@RequestMapping(value = "/nivellsAdministracions", method = RequestMethod.GET)
 	@ResponseBody
-	private List<CodiValorDto> getNivellsAdministracions(
-		HttpServletRequest request, Model model) {
+	private List<CodiValorDto> getNivellsAdministracions(HttpServletRequest request, Model model) {
 		return notificacioService.llistarNivellsAdministracions();
 	}
 
-
 	@RequestMapping(value = "/comunitatsAutonomes", method = RequestMethod.GET)
 	@ResponseBody
-	private List<CodiValorDto> getComunitatsAutonomess(
-		HttpServletRequest request, Model model) {
+	private List<CodiValorDto> getComunitatsAutonomess(HttpServletRequest request, Model model) {
 		return notificacioService.llistarComunitatsAutonomes();
 	}
 
 	@RequestMapping(value = "/provincies/{codiCA}", method = RequestMethod.GET)
 	@ResponseBody
-	private List<ProvinciesDto> getProvinciesPerCA(
-		HttpServletRequest request, Model model,
-		@PathVariable String codiCA) {
+	private List<ProvinciesDto> getProvinciesPerCA(HttpServletRequest request, Model model, @PathVariable String codiCA) {
 		return notificacioService.llistarProvincies(codiCA);
 	}
 
@@ -430,12 +419,9 @@ public class NotificacioFormController extends BaseUserController {
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
-        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
-        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
-                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-            } else {
-        		procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-            }
+        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ?
+                    procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR)
+                    :  procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
             dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
         }
         return dadesProcediment;
@@ -483,12 +469,12 @@ public class NotificacioFormController extends BaseUserController {
 
         Boolean teMetadades = Boolean.FALSE;
         if (!validacio && doc == null) {
-            return RespostaConsultaArxiuDto.builder().validacioIdCsv(false).documentExistent(false)
-                    .metadadesExistents(teMetadades).origen(null).validesa(null).tipoDocumental(null).modoFirma(null).build();
+            return RespostaConsultaArxiuDto.builder().validacioIdCsv(false).documentExistent(false).metadadesExistents(teMetadades).origen(null).validesa(null)
+                    .tipoDocumental(null).modoFirma(null).build();
         }
         if (doc == null) {
-            return RespostaConsultaArxiuDto.builder().validacioIdCsv(true).documentExistent(false)
-                    .metadadesExistents(teMetadades).origen(null).validesa(null).tipoDocumental(null).modoFirma(null).build();
+            return RespostaConsultaArxiuDto.builder().validacioIdCsv(true).documentExistent(false).metadadesExistents(teMetadades).origen(null).validesa(null)
+                    .tipoDocumental(null).modoFirma(null).build();
         }
         teMetadades = doc.getOrigen() != null || doc.getValidesa() != null || doc.getTipoDocumental() != null || doc.getModoFirma() != null;
         if (teMetadades) {
@@ -663,10 +649,8 @@ public class NotificacioFormController extends BaseUserController {
         if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
             organFiltreProcediments = getOrganGestorActual(request).getCodi();
         }
-        List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organFiltreProcediments,
-                                                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
-        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(entitatActual.getId(), organFiltreProcediments,
-                                                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
+        List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organFiltreProcediments, rol, tipusEnviament);
+        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(entitatActual.getId(), organFiltreProcediments, rol, tipusEnviament);
         List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
@@ -680,7 +664,6 @@ public class NotificacioFormController extends BaseUserController {
 
         } else { // Rol usuari o altres
             PermisEnum tipus = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
-//            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
             codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), tipus);
         }
 
@@ -746,6 +729,7 @@ public class NotificacioFormController extends BaseUserController {
 
     @Data
     public class DadesProcediment {
+
         private String caducitat;
         private Integer caducitatDiesNaturals;
         private Integer retard;
@@ -757,7 +741,6 @@ public class NotificacioFormController extends BaseUserController {
         private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
         private boolean comu;
         private boolean entregaCieActiva;
-
         private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
         public void setCaducitat(Date data) {

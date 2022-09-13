@@ -21,6 +21,7 @@ import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.RolHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.util.ConfigHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/entitat")
 public class EntitatController extends BaseController {
@@ -86,11 +88,13 @@ public class EntitatController extends BaseController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNew(HttpServletRequest request, Model model) {
+
 		if (!RolHelper.isUsuariActualAdministrador(request)) {
 			return "entitatList";
 		}
 		return get(request, null, model);
 	}
+
 	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
@@ -178,7 +182,6 @@ public class EntitatController extends BaseController {
 		}
 		entitatService.create(command.asDto());
 		return getModalControllerReturnValueSuccess(request, redirect, msg);
-
 	}
 
 	public List<CodiValorDescDto> getTipusDocSelected(HttpServletRequest request, String[] tipusDocName) {
@@ -203,11 +206,13 @@ public class EntitatController extends BaseController {
 
 	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long entitatId) {
+
 		entitatService.updateActiva(entitatId, true);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "entitat.controller.activada.ok");
 	}
 	@RequestMapping(value = "/{entitatId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long entitatId) {
+
 		entitatService.updateActiva(entitatId, false);
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "entitat.controller.desactivada.ok");
 	}
@@ -242,7 +247,7 @@ public class EntitatController extends BaseController {
 		try {
 			writeFileToResponse("Logo_cap.png", entitatService.getCapLogo(), response);
 		} catch (Exception ex) {
-			logger.debug("Error al obtenir el logo de la capçalera", ex);
+			log.debug("Error al obtenir el logo de la capçalera", ex);
 		}
 		return null;
 	}
@@ -261,7 +266,7 @@ public class EntitatController extends BaseController {
 		try {
 			writeFileToResponse("Logo_peu.png", entitatService.getPeuLogo(), response);
 		} catch (Exception ex) {
-			logger.debug("Error al obtenir el logo del peu", ex);
+			log.debug("Error al obtenir el logo del peu", ex);
 		}
 		return null;
 	}
@@ -277,8 +282,8 @@ public class EntitatController extends BaseController {
 		}
 		tipusDoc = new CodiValorDescDto[tipusDocuments.size()];
 		for (int i = 0; i < tipusDocuments.size(); i++) {
-			tipusDoc[i] = new CodiValorDescDto(String.valueOf(i),tipusDocuments.get(i).getTipusDocEnum().name(),
-					MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request)));
+			String msg = MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request));
+			tipusDoc[i] = new CodiValorDescDto(String.valueOf(i),tipusDocuments.get(i).getTipusDocEnum().name(), msg);
 		}
 		return tipusDoc;
 	}
@@ -308,7 +313,4 @@ public class EntitatController extends BaseController {
 	public Map<String, OrganismeDto> getOrganigrama(@PathVariable String entitatCodi, HttpServletRequest request,HttpServletResponse response) throws IOException {
 		return entitatService.findOrganigramaByEntitat(entitatCodi);
 	}
-
-
-	private static final Logger logger = LoggerFactory.getLogger(EntitatController.class);
 }

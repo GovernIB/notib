@@ -207,22 +207,17 @@ public class ConsultaApiRestV1Controller {
 			log.debug("No s'ha trobat el document per a la notificació amb identificador " + notificacioId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			if (arxiu.getContentType() == null) {
-				if (arxiu.getNom() != null) {
-					if (arxiu.getNom().endsWith(".pdf")) {
-						arxiu.setContentType("application/pdf");
-					} else if (arxiu.getNom().endsWith(".pdf")) {
-						arxiu.setContentType("application/zip");
-					}
-				}
+			if (arxiu.getContentType() == null && arxiu.getNom() != null) {
+				String type = arxiu.getNom().endsWith(".pdf") ? "application/pdf" : (arxiu.getNom().endsWith(".pdf") ? "application/zip" :null);
+				arxiu.setContentType(type);
 			}
 			String contingutDocumentBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			document = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutDocumentBasse64).build();
-			return new ResponseEntity<Arxiu>(document, status);
+			return new ResponseEntity<>(document, status);
 		}
 		document = Arxiu.builder().error(true).missatgeError("No s'ha trobat el document.").build();
 		status = HttpStatus.BAD_REQUEST;
-		return new ResponseEntity<Arxiu>(document, status);
+		return new ResponseEntity<>(document, status);
 	}
 
 	@RequestMapping(value="/certificacio/{enviamentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -243,7 +238,7 @@ public class ConsultaApiRestV1Controller {
 		if (arxiu != null && arxiu.getContingut() != null) {
 			String contingutCertificacioBasse64 = Base64.encodeBase64String(arxiu.getContingut());
 			certificacio = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutCertificacioBasse64).build();
-			return new ResponseEntity<Arxiu>(certificacio, status);
+			return new ResponseEntity<>(certificacio, status);
 		}
 		certificacio = Arxiu.builder().error(true).missatgeError("No s'ha trobat la certificació.").build();
 		status = HttpStatus.BAD_REQUEST;

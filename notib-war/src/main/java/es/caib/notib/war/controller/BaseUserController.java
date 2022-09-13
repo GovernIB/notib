@@ -20,12 +20,11 @@ import es.caib.notib.war.helper.RolHelper;
  */
 public class BaseUserController extends BaseController {
 
-	public EntitatDto getEntitatActualComprovantPermisos( 
-			HttpServletRequest request) {
+	public EntitatDto getEntitatActualComprovantPermisos(HttpServletRequest request) {
+
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 //		boolean administradorEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 		boolean administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
@@ -41,6 +40,7 @@ public class BaseUserController extends BaseController {
 	}
 	
 	public OrganGestorDto getOrganGestorActual(HttpServletRequest request) {
+
 		OrganGestorDto organGestor = null;
 		boolean administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (administradorOrgan) {
@@ -51,8 +51,6 @@ public class BaseUserController extends BaseController {
 	
 	public Long getOrganGestorActualId(HttpServletRequest request) {
 		OrganGestorDto organGestor = getOrganGestorActual(request); 
-		if (organGestor!=null) return organGestor.getId();
-		else return null;
+		return organGestor!=null ? organGestor.getId() : null;
 	}
-
 }

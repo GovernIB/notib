@@ -56,9 +56,9 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
-
 		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
@@ -89,31 +89,15 @@ public class EnviamentController extends TableAccionsMassivesController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(
-			HttpServletRequest request,
-			@Valid NotificacioEnviamentFiltreCommand filtreCommand,
-			BindingResult bindingResult,
-			Model model,
-			@RequestParam(value = "accio", required = false) String accio) {
+	public String post(HttpServletRequest request, @Valid NotificacioEnviamentFiltreCommand filtreCommand, BindingResult bindingResult, Model model,
+					   @RequestParam(value = "accio", required = false) String accio) {
 
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				ENVIAMENTS_FILTRE,
-				filtreCommand);
-
-		Long enviamentId = (Long)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				ENVIAMENT_ID);
+		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
+		Long enviamentId = (Long)RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_ID);
 		if (enviamentId == null || !enviamentId.equals(filtreCommand.getId())) {
-			RequestSessionHelper.esborrarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_SELECCIO);
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					ENVIAMENT_ID,
-					filtreCommand.getId());
+			RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+			RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENT_ID, filtreCommand.getId());
 		}
-
 		return "redirect:enviament";
 	}
 
@@ -136,15 +120,10 @@ public class EnviamentController extends TableAccionsMassivesController {
 				organGestorCodi = organGestorActual.getCodi();
 			}
 
-			enviaments = enviamentService.enviamentFindByEntityAndFiltre(
-					entitatActual.getId(),
-					RolEnumDto.valueOf(RolHelper.getRolActual(request)),
-					organGestorCodi,
-					usuariActual.getCodi(),
-					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
+			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi,
+							usuariActual.getCodi(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
 
-		}catch(SecurityException e) {
+		} catch (SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
 		}
 		return DatatablesHelper.getDatatableResponse(request, enviaments,"id", SESSION_ATTRIBUTE_SELECCIO);
@@ -181,8 +160,5 @@ public class EnviamentController extends TableAccionsMassivesController {
 		filtreCommand = new NotificacioEnviamentFiltreCommand();
 		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
 		return filtreCommand;
-
-		/*Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
-		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));*/
 	}
 }

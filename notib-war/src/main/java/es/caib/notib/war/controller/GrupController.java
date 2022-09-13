@@ -41,11 +41,9 @@ public class GrupController extends BaseUserController{
 	@Autowired
 	GrupService grupService;
 	
-	
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
+
 		model.addAttribute(new GrupFiltreCommand());
 		GrupFiltreCommand grupFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("grupFiltreCommand", grupFiltreCommand);
@@ -54,147 +52,86 @@ public class GrupController extends BaseUserController{
 	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable( 
-			HttpServletRequest request ) {
+	public DatatablesResponse datatable(HttpServletRequest request) {
+
 		GrupFiltreCommand grupFiltreCommand = getFiltreCommand(request);
 		PaginaDto<GrupDto> grup = null;
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		if (organGestorActual != null) {
-			grupFiltreCommand.setOrganGestorId(organGestorActual.getId());
-		} else {
-			grupFiltreCommand.setOrganGestorId(null);
-		}
-		
-		grup = grupService.findAmbFiltrePaginat(
-							entitat.getId(),
-							GrupFiltreCommand.asDto(grupFiltreCommand),
-							DatatablesHelper.getPaginacioDtoFromRequest(request));
-		
-		return DatatablesHelper.getDatatableResponse(
-				request, 
-				grup, 
-				"id");
+		grupFiltreCommand.setOrganGestorId(organGestorActual != null ? organGestorActual.getId() : null);
+		grup = grupService.findAmbFiltrePaginat(entitat.getId(), GrupFiltreCommand.asDto(grupFiltreCommand), DatatablesHelper.getPaginacioDtoFromRequest(request));
+		return DatatablesHelper.getDatatableResponse(request, grup, "id");
 	}
 	
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
-	public String newGet(
-			HttpServletRequest request,
-			Model model) {
-		String vista = formGet(request, null, model);
-		return vista;
+	public String newGet(HttpServletRequest request, Model model) {
+		return formGet(request, null, model);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(	
-			HttpServletRequest request,
-			GrupFiltreCommand command,
-			Model model) {
+	public String post(HttpServletRequest request, GrupFiltreCommand command, Model model) {
 		
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request, 
-				GRUP_FILTRE, 
-				command);
-		
+		RequestSessionHelper.actualitzarObjecteSessio(request, GRUP_FILTRE, command);
 		return "grupAdminList";
 	}
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid GrupCommand grupCommand,
-			BindingResult bindingResult,
-			Model model) {
+	public String save(HttpServletRequest request, @Valid GrupCommand grupCommand, BindingResult bindingResult, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			return "grupAdminForm";
 		}
-
-		// if it is modified
+		String url = "redirect:grupAdminList";
+		String msg = grupCommand.getId() != null ? "grup.controller.modificat.ok" : "grup.controller.creat.ok";
 		if (grupCommand.getId() != null) {
-			grupService.update(
-					GrupCommand.asDto(grupCommand));
-			
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:grupAdminList",
-					"grup.controller.modificat.ok");
-		//if it is new	
-		} else {
-			GrupDto dto = GrupCommand.asDto(grupCommand);
-			OrganGestorDto organGestorActual = getOrganGestorActual(request);
-			if (organGestorActual != null)
-				dto.setOrganGestorId(organGestorActual.getId());
-			
-			grupService.create(
-					entitatActual.getId(),
-					dto);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:grupAdminList",
-					"grup.controller.creat.ok");
+			grupService.update(GrupCommand.asDto(grupCommand));
+			return getModalControllerReturnValueSuccess(request, url, msg);
 		}
+		GrupDto dto = GrupCommand.asDto(grupCommand);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		dto.setOrganGestorId(organGestorActual != null ? organGestorActual.getId() : null);
+		grupService.create(entitatActual.getId(), dto);
+		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
 	
 	@RequestMapping(value = "/{grupId}", method = RequestMethod.GET)
-	public String formGet(
-			HttpServletRequest request,
-			@PathVariable Long grupId,
-			Model model) {
+	public String formGet(HttpServletRequest request, @PathVariable Long grupId, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		GrupCommand grupCommand = null;
 		GrupDto grup = null;
-		
 		if (grupId != null) {
-			grup = grupService.findById(
-					entitatActual.getId(),
-					grupId);
-			
+			grup = grupService.findById(entitatActual.getId(), grupId);
 			model.addAttribute(grup);
 		}
-		
-		if (grup != null)
-			grupCommand = GrupCommand.asCommand(grup);
-		else
-			grupCommand = new GrupCommand();
-		
+		grupCommand = grup != null ? GrupCommand.asCommand(grup) : new GrupCommand();
 		model.addAttribute(grupCommand);
 		return "grupAdminForm";
 	}
 	
 	@RequestMapping(value = "/{grupId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long grupId) {
+	public String delete(HttpServletRequest request, @PathVariable Long grupId) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+		boolean existeix = grupService.existProcedimentGrupByGrupId(entitatActual.getId(), grupId);
+		String url = "redirect:../../grup";
+		String msg = existeix ? "grup.controller.esborrat.ko.enus" : "grup.controller.esborrat.ok";
 		// Comprova que el grup no s'utilitzi
-		if (grupService.existProcedimentGrupByGrupId(entitatActual.getId(), grupId)) {
-			return getAjaxControllerReturnValueError(
-					request, 
-					"redirect:../../grup", 
-					"grup.controller.esborrat.ko.enus");
-		};
+		if (existeix) {
+			return getAjaxControllerReturnValueError(request, url, msg);
+		}
 		grupService.delete(grupId);
-		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../grup",
-				"grup.controller.esborrat.ok");
+		return getAjaxControllerReturnValueSuccess(request, url, msg);
 	}
 	
-	private GrupFiltreCommand getFiltreCommand(
-			HttpServletRequest request) {
-		GrupFiltreCommand grupFiltreCommand = (GrupFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				GRUP_FILTRE);
-		if (grupFiltreCommand == null) {
-			grupFiltreCommand = new GrupFiltreCommand();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					GRUP_FILTRE,
-					grupFiltreCommand);
+	private GrupFiltreCommand getFiltreCommand(HttpServletRequest request) {
+
+		GrupFiltreCommand grupFiltreCommand = (GrupFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, GRUP_FILTRE);
+		if (grupFiltreCommand != null) {
+			return grupFiltreCommand;
 		}
+		grupFiltreCommand = new GrupFiltreCommand();
+		RequestSessionHelper.actualitzarObjecteSessio(request, GRUP_FILTRE, grupFiltreCommand);
 		return grupFiltreCommand;
 	}
-	
 }

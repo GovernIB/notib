@@ -25,6 +25,7 @@ public class ApiController extends BaseUserController {
     @RequestMapping(value = "/scheduling/restart", method = RequestMethod.GET)
     @ResponseBody
     public String schedulingRestart(HttpServletRequest request) {
+
         schedulledService.restartSchedulledTasks();
         return "OK";
     }

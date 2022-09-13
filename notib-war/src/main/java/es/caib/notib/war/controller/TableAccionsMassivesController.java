@@ -306,34 +306,20 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
 
 
     @RequestMapping(value = "/reactivar/sir", method = RequestMethod.GET)
-    public String reactivarSir(
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    public String reactivarSir(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         Set<Long> seleccio = getIdsEnviamentsSeleccionats(request);
         if (seleccio == null || seleccio.isEmpty()) {
-            MissatgesHelper.error(
-                    request,
-                    getMessage(
-                            request,
-                            "enviament.controller.reactivar.seleccio.buida"));
+            MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.seleccio.buida"));
             return "redirect:" + request.getHeader("Referer");
         }
-
 
         log.info("Reactivam SIR dels enviaments: " + StringUtils.join(seleccio, ", "));
         try {
             enviamentService.reactivaSir(seleccio);
-            MissatgesHelper.info(
-                    request,
-                    getMessage(
-                            request,
-                            "enviament.controller.reactivar.sir.OK"));
+            MissatgesHelper.info(request, getMessage(request, "enviament.controller.reactivar.sir.OK"));
         } catch (Exception e) {
-            MissatgesHelper.error(
-                    request,
-                    getMessage(
-                            request,
-                            "enviament.controller.reactivar.sir.KO"));
+            MissatgesHelper.error(request, getMessage(request, "enviament.controller.reactivar.sir.KO"));
         }
 
         return "redirect:" + request.getHeader("Referer");
@@ -427,6 +413,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
     }
 
     private void mostraErrorReintentarNotificacio(HttpServletRequest request, Long notificacioId, NotificacioDtoV2 notificacio, Exception e) {
+
         String errorMessage = "";
         if (e.getMessage() != null && !e.getMessage().isEmpty()) {
             errorMessage = e.getMessage();
@@ -440,8 +427,7 @@ public abstract class TableAccionsMassivesController extends BaseUserController 
             errorMessage += e.getStackTrace()[2] + "<br/>...";
         }
         MissatgesHelper.error(request, getMessage(request,"enviament.controller.reintent.notificacio.pendents.error",
-                        new String[]{notificacioId.toString(), notificacio.getCreatedDateAmbFormat(), notificacio.getConcepte(), errorMessage})
-        );
+                        new String[]{notificacioId.toString(), notificacio.getCreatedDateAmbFormat(), notificacio.getConcepte(), errorMessage}));
     }
 
     protected boolean requestIsRemesesEnviamentMassiu(HttpServletRequest request) {

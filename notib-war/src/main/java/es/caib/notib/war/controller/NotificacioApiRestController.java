@@ -46,9 +46,9 @@ public class NotificacioApiRestController extends BaseController {
 	@RequestMapping(value = {"/rest/appinfo"}, method = RequestMethod.GET)
 	@ResponseBody
 	public AppInfo getAppInfo(HttpServletRequest request) throws IOException {
+
 		AppInfo appInfo = new AppInfo();
 		appInfo.setNom("Notib");
-
 		Manifest manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
 		Attributes manifestAtributs = manifest.getMainAttributes();
 		Map<String, Object>manifestAtributsMap = new HashMap<String, Object>();
@@ -69,5 +69,4 @@ public class NotificacioApiRestController extends BaseController {
 	public void enviarContingutPost(@RequestBody NotificacioCanviClient notificacioCanvi) {
 		log.info("Notificacio canvi " + notificacioCanvi.toString());
 	}
-
 }

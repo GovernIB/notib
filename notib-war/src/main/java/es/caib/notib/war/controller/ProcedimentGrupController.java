@@ -2,6 +2,7 @@ package es.caib.notib.war.controller;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.service.EntitatService;
@@ -34,7 +35,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/procediment")
 public class ProcedimentGrupController extends BaseUserController{
-
 	
 	@Autowired
 	EntitatService entitatService;
@@ -42,172 +42,84 @@ public class ProcedimentGrupController extends BaseUserController{
 	ProcedimentService procedimentService;
 	@Autowired
 	GrupService grupService;
-	
-	
+
 	@RequestMapping(value = "/{procedimentId}/grup", method = RequestMethod.GET)
-	public String permis(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId,
-			Model model) {
+	public String permis(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute(
-				"procediment",
-				procedimentService.findById(
-						entitatActual.getId(),
-						isAdministrador(request),
-						procedimentId));
+		model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
 		return "procedimentAdminGrup";
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/grup/new", method = RequestMethod.GET)
-	public String getNew(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId,
-			Model model) {
+	public String getNew(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 		return get(request, procedimentId, null, model);
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/grup/{grupId}", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId,
-			@PathVariable Long grupId,
-			Model model) {
+	public String get(HttpServletRequest request, @PathVariable Long procedimentId, @PathVariable Long grupId, Model model) {
 		
 		ProcedimentGrupCommand procedimentGrupCommand;
-		
-		ProcSerGrupDto procedimentGrup = emplenarModelGrups(
-				request, 
-				procedimentId,
-				grupId,
-				model);
-		
-		
-		if (procedimentGrup != null) 
-			procedimentGrupCommand = ProcedimentGrupCommand.asCommand(procedimentGrup);
-		else
-			procedimentGrupCommand = new ProcedimentGrupCommand();
-		
+		ProcSerGrupDto procedimentGrup = emplenarModelGrups(request, procedimentId, grupId, model);
+		procedimentGrupCommand = procedimentGrup != null ? ProcedimentGrupCommand.asCommand(procedimentGrup) : new ProcedimentGrupCommand();
 		model.addAttribute(procedimentGrupCommand);
-		
 		return "procedimentAdminGrupForm";
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/grup/{grupId}/delete", method = RequestMethod.GET)
 	@ResponseBody
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId,
-			@PathVariable Long grupId,
-			Model model) {
+	public String delete(HttpServletRequest request, @PathVariable Long procedimentId, @PathVariable Long grupId, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		procedimentService.grupDelete(
-				entitatActual.getId(),
-				grupId);
-		
-		MissatgesHelper.success(
-				request, 
-				getMessage(
-						request, 
-						"procediment.controller.grup.esborrat.ok"));
+		procedimentService.grupDelete(entitatActual.getId(), grupId);
+		MissatgesHelper.success(request, getMessage(request, "procediment.controller.grup.esborrat.ok"));
 		return "ok";
 	}
 	
-	private ProcSerGrupDto emplenarModelGrups(
-			HttpServletRequest request,
-			Long procedimentId,
-			Long grupId,
-			Model model) {
+	private ProcSerGrupDto emplenarModelGrups(HttpServletRequest request, Long procedimentId, Long grupId, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ProcSerGrupDto procedimentGrups = null;
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		List<GrupDto> grups;
-		if (organGestorActual == null) {
-			grups = grupService.findByEntitat(entitatActual.getId());
-		} else {
-			grups = grupService.findByEntitatAndOrganGestor(
-					entitatActual,
-					organGestorActual);
+		List<GrupDto> grups = organGestorActual == null ? grupService.findByEntitat(entitatActual.getId())
+								: grupService.findByEntitatAndOrganGestor(entitatActual, organGestorActual);
+		model.addAttribute("grups", grups);
+		model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
+		if (grupId == null) {
+			return procedimentGrups;
 		}
-		model.addAttribute(
-				"grups", 
-				grups);
-
-		model.addAttribute(
-				"procediment",
-				procedimentService.findById(
-						entitatActual.getId(),
-						isAdministrador(request),
-						procedimentId));
-		
-		
-		if (grupId != null) {
-			procedimentGrups = grupService.findProcedimentGrupById(
-					entitatActual.getId(),
-					grupId);
-
-			model.addAttribute(procedimentGrups);
-		}
-		
+		procedimentGrups = grupService.findProcedimentGrupById(entitatActual.getId(), grupId);
+		model.addAttribute(procedimentGrups);
 		return procedimentGrups;
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/grup", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId,
-			@Valid ProcedimentGrupCommand command,
-			BindingResult bindingResult,
-			Model model) {
+	public String save(HttpServletRequest request, @PathVariable Long procedimentId, @Valid ProcedimentGrupCommand command, BindingResult bindingResult, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminGrupForm";
 		}
-		
+		String url = "redirect:../../procediment/" + procedimentId + "/grup";
+		String msg = command.getId() != null ? "procediment.controller.grup.modificat.ok" : "procediment.controller.grup.create.ok";
 		if (command.getId() != null) {
-			procedimentService.grupUpdate(
-					entitatActual.getId(),
-					procedimentId,
-					ProcedimentGrupCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../procediment/" + procedimentId + "/grup",
-					"procediment.controller.grup.modificat.ok");
-		} else {
-			procedimentService.grupCreate(
-					entitatActual.getId(),
-					procedimentId,
-					ProcedimentGrupCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../procediment/" + procedimentId + "/grup",
-					"procediment.controller.grup.create.ok");
+			procedimentService.grupUpdate(entitatActual.getId(), procedimentId, ProcedimentGrupCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(request, url, msg);
 		}
-		
-		
+		procedimentService.grupCreate(entitatActual.getId(), procedimentId, ProcedimentGrupCommand.asDto(command));
+		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
-	
-	
+
 	@RequestMapping(value = "/{procedimentId}/grup/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request, 
-			@PathVariable Long procedimentId, 
-			Model model) {
+	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		return DatatablesHelper.getDatatableResponse(request,
-				grupService.findByProcSer(
-						entitatActual.getId(), 
-						procedimentId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
-						"id");
+		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		return DatatablesHelper.getDatatableResponse(request, grupService.findByProcSer(entitatActual.getId(), procedimentId, params), "id");
 	}
 	
-	private boolean isAdministrador(
-			HttpServletRequest request) {
+	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);
 	}
-	
 }
