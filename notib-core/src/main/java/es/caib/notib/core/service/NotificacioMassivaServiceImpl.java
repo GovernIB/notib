@@ -109,7 +109,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private NotificacioValidatorHelper notificacioValidatorHelper;
     @Autowired
     private NotificacioMassivaHelper notificacioMassivaHelper;
-
     @Autowired
     private ProcSerRepository procSerRepository;
     @Autowired
@@ -137,6 +136,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     @Override
     public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
+
         entityComprovarHelper.comprovarEntitat(entitatId);
         NotificacioMassivaEntity notificacioMassiva = notificacioMassivaRepository.findOne(id);
         return conversioTipusHelper.convertir(notificacioMassiva, NotificacioMassivaDataDto.class);
@@ -181,11 +181,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             } else {
                 builder.errores(linea[18]);
             }
-
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
             }
-
             if (notificacioMassiva.getNotificacions() != null && !notificacioMassiva.getNotificacions().isEmpty()) {
                 NotificacioEntity not = notificacioMassiva.getNotificacions().get(foo);
                 String error = "";
@@ -262,7 +260,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         errors.add(messageHelper.getMessage("error.metadades.document"));
                     }
                 }
-
                 if (errors.size() > 0) {
                     log.debug("[NOT-MASSIVA] Alta errònea de la notificació de la nova notificacio massiva");
                     writeCsvLinia(listWriterErrors, linia, errors);
@@ -388,6 +385,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     @Transactional
     @Override
     public void posposar(Long entitatId, Long notificacioMassivaId) {
+
         entityComprovarHelper.comprovarEntitat(entitatId);
         notificacioMassivaHelper.posposarNotificacions(notificacioMassivaId);
     }
@@ -395,6 +393,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     @Transactional
     @Override
     public void reactivar(Long entitatId, Long notificacioMassivaId) {
+
         entityComprovarHelper.comprovarEntitat(entitatId);
         notificacioMassivaHelper.reactivarNotificacions(notificacioMassivaId);
     }
@@ -430,7 +429,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 NotificacioEntity not = notificacions.get(foo);
                 String[] linia = linies.get(foo);
                 String[] liniaCsv = liniesCsv.get(foo);
-
                 String txt = NotificacioEstatEnumDto.PENDENT.equals(not.getEstat()) ? messageHelper.getMessage("notificacio.massiva.cancelada") : "";
                 List<String> msg = Collections.singletonList(txt);
                 if (!ok.equals(linia[linia.length-1]) || !Strings.isNullOrEmpty(txt)) {
@@ -450,15 +448,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 return;
             }
             notificacioMassivaRepository.save(massiva);
-
             listWriterErrors.flush();
             byte[] content = writerListErrors.toString().getBytes();
             pluginHelper.gestioDocumentalUpdate(massiva.getErrorsGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_ERRORS, content);
-
             listWriterInforme.flush();
             content = writerListInforme.toString().getBytes();
             pluginHelper.gestioDocumentalUpdate(massiva.getResumGesdocId(), PluginHelper.GESDOC_AGRUPACIO_MASSIUS_INFORMES, content);
-
         } catch (Exception ex) {
             log.error("Error cancelant la notificacio massiva " + notificacioMassivaId);
             throw ex;
@@ -509,6 +504,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     @Override
     public FitxerDto getCSVFile(Long entitatId, Long notificacioMassivaId) {
+
         entityComprovarHelper.comprovarEntitat(entitatId);
         NotificacioMassivaEntity notificacioMassiva = notificacioMassivaRepository.findOne(notificacioMassivaId);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -568,15 +564,13 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     @Transactional
     @Override
-    public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException{
+    public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
+
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
-            InputStream input;
-            if (registreNotificaHelper.isSendDocumentsActive()) {
-                input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva_metadades.csv");
-            } else {
-                input = this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva.csv");
-            }
+            InputStream input = registreNotificaHelper.isSendDocumentsActive() ?
+                        this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva_metadades.csv")
+                        : this.getClass().getClassLoader().getResourceAsStream("es/caib/notib/core/plantillas/modelo_datos_carga_masiva.csv");
             assert input != null;
             return IOUtils.toByteArray(input);
         } finally {
@@ -585,6 +579,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     private void checkCSVContent(List<String[]> linies, List<String> csvHeader) {
+
         if (linies == null || csvHeader == null) {
             throw new InvalidCSVFileException("S'ha produït un error processant el fitxer CSV indicat: sense contingut");
         }
@@ -620,7 +615,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         if(auth.getName() == null) {
             throw new AccessDeniedException("No s'ha pogut consultar el llistat de notificacions massives");
         }
-        Page<NotificacioMassivaEntity> pageNotificacionsMassives = notificacioMassivaRepository.findUserRolePage(
+        return notificacioMassivaRepository.findUserRolePage(
                 entitat,
                 auth.getName(),
                 filtre.getDataInici() == null,
@@ -630,17 +625,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtre.getEstatProces() == null,
                 filtre.getEstatProces(),
 //                filtre.getEstatProces() == null ? "" : filtre.getEstatProces().name(),
-                paginacioHelper.toSpringDataPageable(paginacioParams)
-        );
-        return pageNotificacionsMassives;
+                paginacioHelper.toSpringDataPageable(paginacioParams));
     }
 
-    private Page<NotificacioMassivaEntity> findAmbFiltrePaginatByAdminEntitat(
-            EntitatEntity entitat,
-            NotificacioMassivaFiltreDto filtre,
-            PaginacioParamsDto paginacioParams){
+    private Page<NotificacioMassivaEntity> findAmbFiltrePaginatByAdminEntitat(EntitatEntity entitat, NotificacioMassivaFiltreDto filtre, PaginacioParamsDto paginacioParams){
 
-        Page<NotificacioMassivaEntity> pageNotificacionsMassives = notificacioMassivaRepository.findEntitatAdminRolePage(
+        return notificacioMassivaRepository.findEntitatAdminRolePage(
                 entitat,
                 filtre.getDataInici() == null,
                 filtre.getDataInici(),
@@ -651,9 +641,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 //                filtre.getEstatProces() == null ? "" : filtre.getEstatProces().name(),
                 filtre.getCreatedByCodi() == null || filtre.getCreatedByCodi().isEmpty(),
                 filtre.getCreatedByCodi(),
-                paginacioHelper.toSpringDataPageable(paginacioParams)
-        );
-        return pageNotificacionsMassives;
+                paginacioHelper.toSpringDataPageable(paginacioParams));
     }
 
     private boolean enviarCorreuElectronic(NotificacioMassivaEntity notMassiva, @NonNull byte[] fileResumContent, @NonNull byte[] fileErrorsContent) throws Exception {
@@ -685,13 +673,17 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     private String getKeyDocument(NotificacioDatabaseDto notificacio) {
+
         if (notificacio.getDocument() == null) {
             return null;
-        } else if (notificacio.getDocument().getContingutBase64() != null && !notificacio.getDocument().getContingutBase64().isEmpty()) {//arxiu
+        }
+        if (notificacio.getDocument().getContingutBase64() != null && !notificacio.getDocument().getContingutBase64().isEmpty()) {//arxiu
             return notificacio.getDocument().getArxiuNom();
-        } else if (notificacio.getDocument().getUuid() != null) {
+        }
+        if (notificacio.getDocument().getUuid() != null) {
             return notificacio.getDocument().getUuid();
-        } else if (notificacio.getDocument().getCsv() != null) {
+        }
+        if (notificacio.getDocument().getCsv() != null) {
             return notificacio.getDocument().getCsv();
         }
         return null;
@@ -835,7 +827,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                         DocumentTipusEnumDto.ESTRANGER.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.ESTRANGER : DocumentTipusEnumDto.ALTRE;
                 titular.setDocumentTipus(tipus);
             } else {
-
                 // Entrega postal
                 columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
                 missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
@@ -852,50 +843,49 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             enviament.setTitular(titular);
             enviaments.add(enviament);
             notificacio.setEnviaments(enviaments);
+            return notificacio;
         } catch (Exception e) {
             throw new NotificacioMassivaException(fila, columna, "Error " + missatge, e);
         }
-
-        return notificacio;
     }
 
     private void setTipusEnviament(NotificacioDatabaseDto notificacio, String strTipusEnviament) {
 
-        if (strTipusEnviament != null && !strTipusEnviament.isEmpty()) {
-            if ("C".equalsIgnoreCase(strTipusEnviament) ||
-                    "COMUNICACIO".equalsIgnoreCase(strTipusEnviament) ||
-                    "COMUNICACION".equalsIgnoreCase(strTipusEnviament) ||
-                    "COMUNICACIÓ".equalsIgnoreCase(strTipusEnviament) ||
-                    "COMUNICACIÓN".equalsIgnoreCase(strTipusEnviament)) {
-                notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-            } else if ("N".equalsIgnoreCase(strTipusEnviament) ||
-                    "NOTIFICACIO".equalsIgnoreCase(strTipusEnviament) ||
-                    "NOTIFICACION".equalsIgnoreCase(strTipusEnviament) ||
-                    "NOTIFICACIÓ".equalsIgnoreCase(strTipusEnviament) ||
-                    "NOTIFICACIÓN".equalsIgnoreCase(strTipusEnviament)) {
-                notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
-            } else {
-                notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
-                notificacio.getErrors().add(messageHelper.getMessage("error.tipus.enviament.no.valid.a") + strTipusEnviament + messageHelper.getMessage("error.tipus.enviament.no.valid.b"));
-            }
+        if (strTipusEnviament == null || strTipusEnviament.isEmpty()) {
+            return;
         }
+        if ("C".equalsIgnoreCase(strTipusEnviament) || "COMUNICACIO".equalsIgnoreCase(strTipusEnviament) || "COMUNICACION".equalsIgnoreCase(strTipusEnviament) ||
+                "COMUNICACIÓ".equalsIgnoreCase(strTipusEnviament) || "COMUNICACIÓN".equalsIgnoreCase(strTipusEnviament)) {
+            notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+            return;
+        }
+        if ("N".equalsIgnoreCase(strTipusEnviament) || "NOTIFICACIO".equalsIgnoreCase(strTipusEnviament) || "NOTIFICACION".equalsIgnoreCase(strTipusEnviament) ||
+                "NOTIFICACIÓ".equalsIgnoreCase(strTipusEnviament) || "NOTIFICACIÓN".equalsIgnoreCase(strTipusEnviament)) {
+            notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO);
+            return;
+        }
+        notificacio.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
+        notificacio.getErrors().add(messageHelper.getMessage("error.tipus.enviament.no.valid.a") + strTipusEnviament + messageHelper.getMessage("error.tipus.enviament.no.valid.b"));
     }
 
     private void setRetard(NotificacioDatabaseDto notificacio, String strRetard) {
+
         if (isEnter(strRetard)) {
             notificacio.setRetard(Integer.valueOf(strRetard));
-        } else if (strRetard != null) {
+            return;
+        }
+        if (strRetard != null) {
             notificacio.getErrors().add(messageHelper.getMessage("error.retard.no.valid.a") + strRetard + messageHelper.getMessage("error.retard.no.valid.b"));
         }
     }
 
     private void setDataProgramada(NotificacioDatabaseDto notificacio, String strData) {
+
+        if (strData == null || strData.isEmpty()) {
+            return;
+        }
         try {
-            if (strData != null && !strData.isEmpty()) {
-                notificacio.setEnviamentDataProgramada(new SimpleDateFormat("dd/MM/yyyy").parse(strData));
-            } else {
-                notificacio.setEnviamentDataProgramada(null);
-            }
+            notificacio.setEnviamentDataProgramada(strData != null && !strData.isEmpty() ? new SimpleDateFormat("dd/MM/yyyy").parse(strData) : null);
         } catch (ParseException e) {
             notificacio.setEnviamentDataProgramada(null);
             notificacio.getErrors().add(messageHelper.getMessage("error.format.data.programada.a") + strData + messageHelper.getMessage("error.format.data.programada.b"));
@@ -947,8 +937,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         String[] docSplit = arxiuNom.split("\\.");
 //        String[] docSplit = linia[4].split("\\.");
         if (docSplit.length > 1 && Arrays.asList("JPG", "JPEG", "ODT", "ODP", "ODS", "ODG", "DOCX", "XLSX", "PPTX",
-                "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP")
-                .contains(docSplit[1].toUpperCase())) {
+                "PDF", "PNG", "RTF", "SVG", "TIFF", "TXT", "XML", "XSIG", "CSIG", "HTML", "CSV", "ZIP").contains(docSplit[1].toUpperCase())) {
+
             notificacio.setDocument(null);
             notificacio.getErrors().add(messageHelper.getMessage("error.document.no.trobat.dins.zip"));
             return llegirMetadades;
@@ -981,78 +971,85 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     private void setOrigen(NotificacioDatabaseDto notificacio, String strOrigen) {
+
         // Origen
-        if (strOrigen != null && !strOrigen.isEmpty()) {
-            if ("CIUTADA".equalsIgnoreCase(strOrigen) || "CIUDADANO".equalsIgnoreCase(strOrigen)) {
-                notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
-            } else if ("ADMINISTRACIO".equalsIgnoreCase(strOrigen) || "ADMINISTRACION".equalsIgnoreCase(strOrigen)) {
-                notificacio.getDocument().setOrigen(OrigenEnum.ADMINISTRACIO);
-            } else {
-                notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
-                notificacio.getErrors().add(
-                        messageHelper.getMessage("error.valor.origen.no.valid.a")
-                        + strOrigen +
-                        messageHelper.getMessage("error.valor.origen.no.valid.b"));
-            }
+        if (strOrigen == null || strOrigen.isEmpty()) {
+            return;
         }
+        if ("CIUTADA".equalsIgnoreCase(strOrigen) || "CIUDADANO".equalsIgnoreCase(strOrigen)) {
+            notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
+            return;
+        }
+        if ("ADMINISTRACIO".equalsIgnoreCase(strOrigen) || "ADMINISTRACION".equalsIgnoreCase(strOrigen)) {
+            notificacio.getDocument().setOrigen(OrigenEnum.ADMINISTRACIO);
+            return;
+        }
+        notificacio.getDocument().setOrigen(OrigenEnum.CIUTADA);
+        String msg = messageHelper.getMessage("error.valor.origen.no.valid.a") + strOrigen + messageHelper.getMessage("error.valor.origen.no.valid.b");
+        notificacio.getErrors().add(msg);
     }
 
     private void setValidesa(NotificacioDatabaseDto notificacio, String strValidesa) {
+
         // Validesa
-        if (strValidesa != null && !strValidesa.isEmpty()) {
-            if ("ORIGINAL".equalsIgnoreCase(strValidesa)) {
-                notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
-            } else if ("COPIA".equalsIgnoreCase(strValidesa)) {
-                notificacio.getDocument().setValidesa(ValidesaEnum.COPIA);
-            } else if ("COPIA AUTENTICA".equalsIgnoreCase(strValidesa)) {
-                notificacio.getDocument().setValidesa(ValidesaEnum.COPIA_AUTENTICA);
-            } else {
-                notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
-                notificacio.getErrors().add(
-                        messageHelper.getMessage("error.valor.validesa.no.valid.a")
-                        + strValidesa +
-                        messageHelper.getMessage("error.valor.validesa.no.valid.b"));
-            }
+        if (strValidesa == null || strValidesa.isEmpty()) {
+            return;
         }
+        if ("ORIGINAL".equalsIgnoreCase(strValidesa)) {
+            notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
+            return;
+        }
+        if ("COPIA".equalsIgnoreCase(strValidesa)) {
+            notificacio.getDocument().setValidesa(ValidesaEnum.COPIA);
+            return;
+        }
+        if ("COPIA AUTENTICA".equalsIgnoreCase(strValidesa)) {
+            notificacio.getDocument().setValidesa(ValidesaEnum.COPIA_AUTENTICA);
+            return;
+        }
+        notificacio.getDocument().setValidesa(ValidesaEnum.ORIGINAL);
+        String msg = messageHelper.getMessage("error.valor.validesa.no.valid.a") + strValidesa + messageHelper.getMessage("error.valor.validesa.no.valid.b");
+        notificacio.getErrors().add(msg);
     }
 
     private void setTipusDocumental(NotificacioDatabaseDto notificacio, String strTipus) {
+
         // Tipo documental
-        if (strTipus != null && !strTipus.isEmpty()) {
-            TipusDocumentalEnum tipo = TipusDocumentalEnum.ALTRES;
-            try {
-                tipo = TipusDocumentalEnum.valueOf(strTipus.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                notificacio.getErrors().add(
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.a")
-                        + strTipus +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.b") +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.a") +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.b") +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.c") +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.d") +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.e") +
-                        messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.f"));
-            }
-            notificacio.getDocument().setTipoDocumental(tipo);
+        if (strTipus == null || strTipus.isEmpty()) {
+            return;
         }
+        TipusDocumentalEnum tipo = TipusDocumentalEnum.ALTRES;
+        try {
+            tipo = TipusDocumentalEnum.valueOf(strTipus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            notificacio.getErrors().add(messageHelper.getMessage("error.valor.tipus.documental.no.valid.a")
+                    + strTipus + messageHelper.getMessage("error.valor.tipus.documental.no.valid.b") +
+                    messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.a") +
+                    messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.b") +
+                    messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.c") +
+                    messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.d") +
+                    messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.e") +
+                    messageHelper.getMessage("error.valor.tipus.documental.no.valid.valors.f"));
+        }
+        notificacio.getDocument().setTipoDocumental(tipo);
     }
 
     private void setModeFirma(NotificacioDatabaseDto notificacio, String strMode) {
+
         // PDF firmat
-        if (strMode != null && !strMode.isEmpty()) {
-            if ("SI".equalsIgnoreCase(strMode) || "TRUE".equalsIgnoreCase(strMode)) {
-                notificacio.getDocument().setModoFirma(true);
-            } else if ("NO".equalsIgnoreCase(strMode) || "FALSE".equalsIgnoreCase(strMode)) {
-                notificacio.getDocument().setModoFirma(false);
-            } else {
-                notificacio.getErrors().add(
-                        messageHelper.getMessage("error.valor.validesa.no.valid.a")
-                        + strMode +
-                        messageHelper.getMessage("error.valor.validesa.no.valid.b"));
-            }
-//                    Boolean.valueOf(linia[21]) : Boolean.FALSE);
+        if (strMode == null || strMode.isEmpty()) {
+            return;
         }
+        if ("SI".equalsIgnoreCase(strMode) || "TRUE".equalsIgnoreCase(strMode)) {
+            notificacio.getDocument().setModoFirma(true);
+            return;
+        }
+        if ("NO".equalsIgnoreCase(strMode) || "FALSE".equalsIgnoreCase(strMode)) {
+            notificacio.getDocument().setModoFirma(false);
+            return;
+        }
+        String msg = messageHelper.getMessage("error.valor.validesa.no.valid.a") + strMode + messageHelper.getMessage("error.valor.validesa.no.valid.b");
+        notificacio.getErrors().add(msg);
     }
 
     private void setEntregaPostal(String[] linia, EntitatEntity entitat, NotEnviamentDatabaseDto enviament) {
@@ -1072,16 +1069,20 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
 
     private void setServeiTipus(NotificacioDatabaseDto notificacio, NotEnviamentDatabaseDto enviament, String strServeiTipus) {
 
-        if (strServeiTipus != null && !strServeiTipus.isEmpty()) {
-            if ("NORMAL".equalsIgnoreCase(strServeiTipus)) {
-                enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
-            } else if ("URGENT".equalsIgnoreCase(strServeiTipus) || "URGENTE".equalsIgnoreCase(strServeiTipus)) {
-                enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
-            } else {
-                enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
-                notificacio.getErrors().add(messageHelper.getMessage("error.tipus.servei.no.valid.a") + strServeiTipus + messageHelper.getMessage("error.tipus.servei.no.valid.b"));
-            }
+        if (strServeiTipus == null || strServeiTipus.isEmpty()) {
+            return;
         }
+        if ("NORMAL".equalsIgnoreCase(strServeiTipus)) {
+            enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
+            return;
+        }
+        if ("URGENT".equalsIgnoreCase(strServeiTipus) || "URGENTE".equalsIgnoreCase(strServeiTipus)) {
+            enviament.setServeiTipus(ServeiTipusEnumDto.URGENT);
+            return;
+        }
+        enviament.setServeiTipus(ServeiTipusEnumDto.NORMAL);
+        notificacio.getErrors().add(messageHelper.getMessage("error.tipus.servei.no.valid.a") + strServeiTipus + messageHelper.getMessage("error.tipus.servei.no.valid.b"));
+
     }
 
     private void setInteressatTipus(NotificacioDatabaseDto notificacio, PersonaDto titular) {
@@ -1111,6 +1112,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     public boolean isNumeric(String strNum) {
+
         if (strNum == null) {
             return false;
         }
@@ -1123,15 +1125,16 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     public boolean isEnter(String strNum) {
+
         if (strNum == null) {
             return false;
         }
         try {
             int i = Integer.parseInt(strNum);
+            return true;
         } catch (NumberFormatException nfe) {
             return false;
         }
-        return true;
     }
 
     private ICsvListWriter initCsvWritter(Writer writer) {

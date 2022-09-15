@@ -52,8 +52,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -140,7 +138,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta els destinataris d'una notificació (notificacioId=" + notificacioId + ")");
+			log.debug("Consulta els destinataris d'una notificació (notificacioId=" + notificacioId + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,true,true);
 			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId);
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByNotificacio(notificacio);
@@ -153,10 +151,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional(readOnly = true)
 	public Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds) {
+
 		if (notificacionsIds == null || notificacionsIds.isEmpty()) {
 			return Collections.emptySet();
 		}
-
 		// Oracle no permet fer consultes de més de 1000 elements en un .. in (..)
 		List<Long> idsEnviaments = new ArrayList<>();
 		for (List<Long> idsNotificacionsParcials : Lists.partition(new ArrayList<>(notificacionsIds), 999)){
@@ -168,49 +166,28 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException  {
+	public List<Long> findIdsAmbFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException  {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant els ids d'expedient segons el filtre ("
-					+ "entitatId=" + entitatId + ", "
-					+ "filtre=" + filtre + ")");
-			entityComprovarHelper.comprovarPermisos(
-					entitatId,
-					false,
-					false,
-					false);
-			return findIdsAmbFiltrePaginat(
-					entitatId,
-					filtre);
+			log.debug("Consultant els ids d'expedient segons el filtre (entitatId=" + entitatId + ", filtre=" + filtre + ")");
+			entityComprovarHelper.comprovarPermisos(entitatId, false, false, false);
+			return findIdsAmbFiltrePaginat(entitatId, filtre);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 	
-	private List<Long> findIdsAmbFiltrePaginat(
-			Long entitatId,
-			NotificacioEnviamentFiltreDto filtre) throws ParseException {
+	private List<Long> findIdsAmbFiltrePaginat(Long entitatId, NotificacioEnviamentFiltreDto filtre) throws ParseException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta els enviaments de les notificacións que te una entitat");
-			Date dataEnviamentInici = null,
-				 dataEnviamentFi = null,
-				 dataProgramadaDisposicioInici = null,
-				 dataProgramadaDisposicioFi = null,
-				 dataRegistreInici = null,
-				 dataRegistreFi = null,
-				 dataCaducitatInici = null,
-				 dataCaducitatFi = null;
+			log.debug("Consulta els enviaments de les notificacións que te una entitat");
+			Date dataEnviamentInici = null, dataEnviamentFi = null, dataProgramadaDisposicioInici = null, dataProgramadaDisposicioFi = null, dataRegistreInici = null,
+					dataRegistreFi = null, dataCaducitatInici = null, dataCaducitatFi = null;
 			
 			EntitatEntity entitatEntity = entitatRepository.findOne(entitatId);
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
-			
+			entityComprovarHelper.comprovarPermisos(null, true, true, true);
 			if (filtre.getDataEnviamentInici() != null && filtre.getDataEnviamentInici() != "") {
 				dataEnviamentInici = new SimpleDateFormat("dd/MM/yyyy").parse(filtre.getDataEnviamentInici());
 				dataEnviamentInici = FiltreHelper.toIniciDia(dataEnviamentInici);
@@ -244,27 +221,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 				dataCaducitatFi = FiltreHelper.toIniciDia(dataCaducitatFi);
 			}
 			//Filtres camps procediment
-			Integer estat = null;
-			Integer tipusEnviament = null;
-			if(filtre.getEstat()!=null){
-				estat = filtre.getEstat().getNumVal();
-			}else{
-				estat = 0;
-			}
-			if(filtre.getEnviamentTipus()!=null){
-				tipusEnviament = NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus());
-			}else{
-				tipusEnviament = 0;
-			}
-			List<NotificacioEnviamentEntity> enviament = null;
-			
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
-				
-				enviament = notificacioEnviamentRepository.findByNotificacio(
+			Integer estat = filtre.getEstat()!=null ? filtre.getEstat().getNumVal() : 0;
+			Integer tipusEnviament = filtre.getEnviamentTipus()!=null ? NotificacioTipusEnviamentEnumDto.getNumVal(filtre.getEnviamentTipus()) : 0;
+			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+
+			List<NotificacioEnviamentEntity> enviament = notificacioEnviamentRepository.findByNotificacio(
 						filtre.getCodiProcediment() == null || filtre.getCodiProcediment().isEmpty(),
 						filtre.getCodiProcediment() == null ? "" : filtre.getCodiProcediment(),
 						filtre.getGrup() == null || filtre.getGrup().isEmpty(),
@@ -316,7 +277,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						(dataRegistreFi == null),
 						dataRegistreFi);
 				
-			List<Long> enviamentIds = new ArrayList<Long>();
+			List<Long> enviamentIds = new ArrayList<>();
 			for(NotificacioEnviamentEntity nee: enviament) {
 				enviamentIds.add(nee.getId());
 //				nee.setNotificacio(notificacioRepository.findById(nee.getNotificacioId()));
@@ -330,9 +291,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional(readOnly = true)
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
+			log.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
 			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
@@ -344,23 +306,19 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional
 	@Override
-	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws ParseException {
+	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi,
+																			  NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacioParams) throws ParseException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta els enviaments de les notificacións que te una entitat");
+			log.debug("Consulta els enviaments de les notificacións que te una entitat");
 			boolean isUsuari = RolEnumDto.tothom.equals(rol);
 			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
 			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
 			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat, false);
 			Page<EnviamentTableEntity> pageEnviaments = null;
-			logger.info("Consulta de taula d'enviaments ...");
+			log.info("Consulta de taula d'enviaments ...");
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("enviamentDataProgramada", new String[] {"enviamentDataProgramada"});
 			mapeigPropietatsOrdenacio.put("notificaIdentificador", new String[] {"notificaIdentificador"});
@@ -385,24 +343,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 			NotificacioEnviamentFiltre filtreFields = getFiltre(entitatId, filtre);
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
-				List<String> codisProcedimentsDisponibles = new ArrayList<>();
-				List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
-				List<String> codisProcedimentsOrgans = new ArrayList<>();
-
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
-
 				// Procediments accessibles per qualsevol òrgan gestor
-				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
-
+				List<String> codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
-
+				List<String> codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
-				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(
-						auth,
-						entitatEntity,
-						permisos);
+				List<String> codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatEntity, permisos);
 
 				boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 				boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
@@ -601,7 +549,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.referenciaNotificacio.isNull(),
 						filtreFields.referenciaNotificacio.getField(),
 						pageable);
-				logger.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
+				log.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
 				pageEnviaments = new PageImpl<>(new ArrayList<EnviamentTableEntity>());
@@ -613,24 +561,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 						tableItem.setLlibre(entitatEntity.getLlibre());
 				}
 			}
-
 			return paginaDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
-
 	public NotificacioEnviamentFiltre getFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtreDto) throws ParseException {
 
-		Date dataEnviamentInici = null,
-				dataEnviamentFi = null,
-				dataProgramadaDisposicioInici = null,
-				dataProgramadaDisposicioFi = null,
-				dataRegistreInici = null,
-				dataRegistreFi = null,
-				dataCaducitatInici = null,
-				dataCaducitatFi = null;
+		Date dataEnviamentInici = null, dataEnviamentFi = null, dataProgramadaDisposicioInici = null, dataProgramadaDisposicioFi = null, dataRegistreInici = null,
+				dataRegistreFi = null, dataCaducitatInici = null, dataCaducitatFi = null;
 
 		if (filtreDto.getDataEnviamentInici() != null && filtreDto.getDataEnviamentInici() != "") {
 			dataEnviamentInici = FiltreHelper.toIniciDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtreDto.getDataEnviamentInici()));
@@ -656,7 +596,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		if (filtreDto.getDataCaducitatFi() != null && filtreDto.getDataCaducitatFi() != "") {
 			dataCaducitatFi = FiltreHelper.toFiDia(new SimpleDateFormat("dd/MM/yyyy").parse(filtreDto.getDataCaducitatFi()));
 		}
-
 		NotificacioEstatEnumDto estat = filtreDto.getEstat();
 		Boolean hasZeronotificaEnviamentIntent = null;
 		boolean isEstatNull = estat == null;
@@ -670,7 +609,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		} else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
 			hasZeronotificaEnviamentIntent = false;
 		}
-
 		//Filtres camps procediment
 		NotificaEnviamentTipusEnumDto tipusEnviament = null;
 		if(filtreDto.getEnviamentTipus()!=null) {
@@ -680,7 +618,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 				tipusEnviament = NotificaEnviamentTipusEnumDto.COMUNICACIO;
 			}
 		}
-
 		return NotificacioEnviamentFiltre.builder()
 				.entitatId(new FiltreField<>(entitatId))
 				.dataEnviamentInici(new FiltreField<>(dataEnviamentInici))
@@ -756,8 +693,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 //		private String uuid;
 		private StringField creadaPer;
 
-		private boolean nomesSenseErrors = false;
-		private boolean nomesAmbErrors = false;
+		private boolean nomesSenseErrors;
+		private boolean nomesAmbErrors;
 		private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
 		private StringField referenciaNotificacio;
 
@@ -777,27 +714,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto exportacio(
-			Long entitatId,
-			Collection<Long> enviamentIds,
-			String format) throws IOException, ParseException {
+	public FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, ParseException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Exportant informació dels enviaments (" +
-					"entitatId=" + entitatId + ", " +
-					"enviamentsIds=" + enviamentIds + ", " +
-					"format=" + format + ")");
-
+			log.debug("Exportant informació dels enviaments (entitatId=" + entitatId + ", enviamentsIds=" + enviamentIds + ", format=" + format + ")");
 			EntitatEntity entitatEntity = entitatRepository.findOne(entitatId);
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
-
-
+			entityComprovarHelper.comprovarPermisos(null, true, true, true);
 			List<NotificacioEnviamentEntity> enviaments = notificacioEnviamentRepository.findByIdIn(enviamentIds);
-
 			//Genera les columnes
 			int numColumnes = 24;
 			String[] columnes = new String[numColumnes];
@@ -840,7 +764,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 					csvUuid = enviament.getNotificacio().getDocument().getUuid();
 				}
 
-
 				fila[0] = enviament.getCreatedDate().toDate() != null ? sdf.format(enviament.getCreatedDate().toDate()) : "";
 				fila[1] = enviament.getNotificacio().getEnviamentDataProgramada() != null ? sdf.format(enviament.getNotificacio().getEnviamentDataProgramada()) : "";
 				fila[2] = enviament.getNotificaIdentificador();
@@ -873,17 +796,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 				
 			FitxerDto fitxer = new FitxerDto();
-			if ("ODS".equalsIgnoreCase(format)) {
-				Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
-				TableModel model = new DefaultTableModel(filesArray, columnes);
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				SpreadSheet.createEmpty(model).getPackage().save(baos);
-				fitxer.setNom("exportacio.ods");
-				fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
-				fitxer.setContingut(baos.toByteArray());
-			} else {
+			if (!"ODS".equalsIgnoreCase(format)) {
 				throw new ValidationException("Format de fitxer no suportat: " + format);
 			}
+			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
+			TableModel model = new DefaultTableModel(filesArray, columnes);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			SpreadSheet.createEmpty(model).getPackage().save(baos);
+			fitxer.setNom("exportacio.ods");
+			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
+			fitxer.setContingut(baos.toByteArray());
 			return fitxer;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -891,18 +813,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public void columnesCreate(
-			UsuariDto usuari,
-			Long entitatId, 
-			ColumnesDto columnes) {
+	public void columnesCreate(UsuariDto usuari, Long entitatId, ColumnesDto columnes) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
 			UsuariEntity usuariEntity = usuariRepository.findByCodi(usuari.getCodi());
-			
 			if (columnes == null) {
 				columnes = new ColumnesDto();
-				
 				columnes.setDataEnviament(true);
 				columnes.setCodiNotibEnviament(true);
 				columnes.setProCodi(true);
@@ -977,7 +895,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 					columnes.isCsvUuid(), 
 					columnes.isEstat(),
 					columnes.isReferenciaNotificacio());
-	
 			columnesRepository.saveAndFlush(columnesEntity);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1001,20 +918,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<NotificacioEventDto> eventFindAmbNotificacio(
-			Long notificacioId) {
+	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels events de la notificació (" +
+			log.debug("Consulta dels events de la notificació (" +
 					"notificacioId=" + notificacioId + ")");
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
-			return conversioTipusHelper.convertirList(
-					notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId),
-					NotificacioEventDto.class);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true);
+			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId), NotificacioEventDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1023,18 +934,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional
 	public boolean reintentarCallback(Long eventId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.info("Notificant canvi al client...");
+			log.info("Notificant canvi al client...");
 			// Recupera l'event
 			NotificacioEventEntity event = notificacioEventRepository.findOne(eventId);
 			try {
 				NotificacioEntity notificacio = callbackHelper.notifica(event);
 				return (notificacio != null && !notificacio.isErrorLastCallback());
-			}catch (Exception e) {
-				logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", event.getId()), e);
+			} catch (Exception e) {
+				log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", event.getId()), e);
 				e.printStackTrace();
-
 				// Marcam a l'event que ha causat un error no controlat  i el treiem de la cola
 				callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
 				return false;
@@ -1047,6 +958,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional
 	public void reactivaConsultes(Set<Long> enviaments) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
@@ -1060,6 +972,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Override
 	@Transactional
 	public void reactivaSir(Set<Long> enviaments) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			for (Long enviamentId: enviaments) {
@@ -1099,6 +1012,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	@Transactional
 	@Override
 	public NotificacioEnviamentDtoV2 getOne(Long enviamentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			return conversioTipusHelper.convertir(notificacioEnviamentRepository.findOne(enviamentId), NotificacioEnviamentDtoV2.class);
@@ -1132,16 +1046,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Override
 	public RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta) {
+
 		PaginaEnviaments paginaEnviaments = findEnviamentsByConsulta(consulta);
-		RespostaConsultaV2 resposta = RespostaConsultaV2.builder()
-				.numeroElementsTotals(paginaEnviaments.getNumEnviaments())
-				.numeroElementsRetornats(paginaEnviaments.getNumeroEnviamentsRetornats())
-				.resultat(paginaEnviaments.getTransmissionsV2(consulta.getBasePath(), consulta.getIdioma().name().toLowerCase()))
-				.build();
+		List<TransmissioV2> transmissions = paginaEnviaments.getTransmissionsV2(consulta.getBasePath(), consulta.getIdioma().name().toLowerCase());
+		RespostaConsultaV2 resposta = RespostaConsultaV2.builder().numeroElementsTotals(paginaEnviaments.getNumEnviaments())
+										.numeroElementsRetornats(paginaEnviaments.getNumeroEnviamentsRetornats()).resultat(transmissions).build();
 		return resposta;
 	}
 
 	private PaginaEnviaments findEnviamentsByConsulta(ApiConsulta consulta) {
+
 		Date dataInicial = consulta.getDataInicial() != null ? FiltreHelper.toIniciDia(consulta.getDataInicial()) : null;
 		Date dataFinal = consulta.getDataFinal() != null ? FiltreHelper.toFiDia(consulta.getDataFinal()) : null;
 		Integer numEnviaments = notificacioEnviamentRepository.countEnviaments(
@@ -1172,6 +1086,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	private Pageable getPageable(Integer pagina, Integer mida) {
+
 		Pageable pageable = new PageRequest(0, 999999999);
 		if (pagina != null && mida != null) {
 			pageable = new PageRequest(pagina, mida);
@@ -1179,13 +1094,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 		return pageable;
 	}
 	
-	
 	private List<Transmissio> dtosToTransmissions(List<NotificacioEnviamentDto> enviaments, String basePath) {
+
 		List<Transmissio> transmissions = new ArrayList<Transmissio>();
-		if (enviaments != null) {
-			for (NotificacioEnviamentDto enviament: enviaments) {
-				transmissions.add(toTransmissio(enviament, basePath));
-			}
+		if (enviaments == null) {
+			return transmissions;
+		}
+		for (NotificacioEnviamentDto enviament: enviaments) {
+			transmissions.add(toTransmissio(enviament, basePath));
 		}
 		return transmissions;
 	}
@@ -1204,12 +1120,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		transmissio.setConcepte(not.getConcepte());
 		transmissio.setDescripcio(not.getDescripcio());
 		Date dataProgramada = not.getEnviamentDataProgramada();
-		if (dataProgramada == null) {
-			transmissio.setDataEnviament(not.getNotificaEnviamentData());
-		} else {
-			transmissio.setDataEnviament(dataProgramada);
-		}
-
+		transmissio.setDataEnviament(dataProgramada == null ? not.getNotificaEnviamentData() : dataProgramada);
 		transmissio.setEstat(getEstat(enviament));
 		Date data = not.getEstatDate() != null ? not.getEstatDate() :
 				(NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat()) ? not.getRegistreData()
@@ -1219,11 +1130,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		transmissio.setDataEstat(data);
 		if (not.getDocument() != null) {
-			es.caib.notib.core.api.rest.consulta.Document document = es.caib.notib.core.api.rest.consulta.Document.builder()
-					.nom(not.getDocument().getArxiuNom())
-					.mediaType(not.getDocument().getMediaType())
-					.mida(not.getDocument().getMida())
-					.url(basePath + "/document/" + not.getId()).build();
+			es.caib.notib.core.api.rest.consulta.Document document = es.caib.notib.core.api.rest.consulta.Document.builder().nom(not.getDocument().getArxiuNom())
+																	.mediaType(not.getDocument().getMediaType()).mida(not.getDocument().getMida())
+																	.url(basePath + "/document/" + not.getId()).build();
 			transmissio.setDocument(document);
 		}
 		transmissio.setTitular(toPersona(enviament.getTitular()));
@@ -1236,7 +1145,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 		transmissio.setDestinataris(destinataris);
 		transmissio.setSubestat(SubEstat.valueOf(enviament.getNotificaEstat().name()));
 		transmissio.setDataSubestat(enviament.getNotificaEstatData() != null ? enviament.getNotificaEstatData() : data);
-
 		transmissio.setError(enviament.isNotificaError());
 		transmissio.setErrorData(enviament.getNotificaErrorData());
 		transmissio.setErrorDescripcio(enviament.getNotificaErrorDescripcio());
@@ -1250,20 +1158,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 				(enviament.getRegistreData() != null && enviament.getRegistreNumeroFormatat() != null && !enviament.getRegistreNumeroFormatat().isEmpty()))) {
 			transmissio.setJustificant(basePath + "/justificant/" + enviament.getId());
 		}
-		
 		// Certificació
 		if (enviament.getNotificaCertificacioData() != null) {
 			transmissio.setCertificacio(basePath + "/certificacio/" + enviament.getId());
 		}
-
 		return transmissio;
 	}
 
 	// Recuperar l'estat a partir de l'enviament, i no de la notificació.
 	//  A més, no s'han d'eliminar els estat enviada_amb_errors i finalitzada_amb_errors.
 	private Estat getEstat(NotificacioEnviamentDto enviament) {
-		NotificacioDto notificacio = enviament.getNotificacio();
 
+		NotificacioDto notificacio = enviament.getNotificacio();
 		switch (notificacio.getEstat()) {
 			case PENDENT:
 				return Estat.PENDENT;
@@ -1291,16 +1197,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 	
 	private Persona toPersona(PersonaDto dto) {
+
 		Persona persona= new Persona();
 		persona.setNom(dto.getNom());
 		if (dto.getInteressatTipus() != null) {
 			persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
 			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus())) {
-				if (dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
-					persona.setNom(dto.getRaoSocial());
-				} else {
-					persona.setNom(dto.getNom());
-				}
+				persona.setNom(dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty() ? dto.getRaoSocial() : dto.getNom());
 			}
 		}
 		persona.setLlinatge1(dto.getLlinatge1());
@@ -1334,12 +1237,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
 		if (enviament.getNotificacio().isTipusUsuariAplicacio() && numEventsCallbackPendent == 0) {
-			logger.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
+			log.info(String.format("[callback] Reactivam callback de l'enviment [id=%d]", enviamentId));
 			notificacioEventHelper.addCallbackActivarEvent(enviament);
 			return;
 		}
-		logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
-					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+		String msg = "[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)";
+		log.info(String.format(msg, enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
 	}
 
 	@Transactional
@@ -1349,11 +1252,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		long numEventsCallbackPendent = notificacioEventRepository.countByEnviamentIdAndCallbackEstat(enviamentId, CallbackEstatEnumDto.PENDENT);
 		if (!enviament.getNotificacio().isTipusUsuariAplicacio() || numEventsCallbackPendent == 0) {
-			logger.info(String.format("[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)",
-					enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
+			String msg = "[callback] No es pot reactivar el callback de l'enviment [id=%d] (Tipus usuari = %s, callbacks pendents = %d)";
+			log.info(String.format(msg, enviamentId, enviament.getNotificacio().getTipusUsuari().toString(), numEventsCallbackPendent));
 			return;
 		}
-		logger.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", enviamentId));
+		log.info(String.format("[callback] Enviar callback de l'enviment [id=%d]", enviamentId));
 		UsuariEntity usuari = enviament.getCreatedBy();
 		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuari.getCodi(), enviament.getNotificacio().getEntitat().getId());
 		callbackHelper.notificaCanvi(enviament, aplicacio.getCallbackUrl());
@@ -1363,7 +1266,6 @@ public class EnviamentServiceImpl implements EnviamentService {
 			log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
 			auditNotificacioHelper.updateNotificacioProcessada(not, "Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
 		}
-
 		int maxPendents = configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
 		Pageable page = new PageRequest(0, maxPendents);
 		List<NotificacioEventEntity> events = notificacioEventRepository.findEventsAmbCallbackPendent();
@@ -1390,21 +1292,22 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 	@Builder @Getter
 	private static class PaginaEnviaments {
+
 		private Integer numEnviaments;
 		private List<NotificacioEnviamentEntity> enviaments;
 		private Locale locale;
 		private MessageHelper messageHelper;
-
 		public Integer getNumeroEnviamentsRetornats() {
 			return enviaments != null ? enviaments.size() : 0;
 		}
 
 		public List<TransmissioV2> getTransmissionsV2(String basePath, String lang) {
 			List<TransmissioV2> transmissions = new ArrayList<>();
-			if (enviaments != null) {
-				for (NotificacioEnviamentEntity enviament: enviaments) {
-					transmissions.add(toTransmissio(enviament, basePath, new Locale(lang)));
-				}
+			if (enviaments == null) {
+				return transmissions;
+			}
+			for (NotificacioEnviamentEntity enviament: enviaments) {
+				transmissions.add(toTransmissio(enviament, basePath, new Locale(lang)));
 			}
 			return transmissions;
 		}
@@ -1416,19 +1319,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 			GenericInfo organGestor = GenericInfo.builder().codi(not.getOrganGestor().getCodi()).nom(not.getOrganGestor().getNom()).build();
 			// Procediment
 			GenericInfo procediment = null;
-			if (not.getProcediment() != null)
+			if (not.getProcediment() != null) {
 				procediment = GenericInfo.builder().codi(not.getProcediment().getCodi()).nom(not.getProcediment().getNom()).build();
+			}
 			// Estat
 			GenericInfo estat = getEstat(enviament);
 			Date dataEstat = getEstatDate(enviament);
 			// Document
 			DocumentConsultaV2 document = null;
 			if (not.getDocument() != null) {
-				document = DocumentConsultaV2.builder()
-						.nom(not.getDocument().getArxiuNom())
-						.mediaType(not.getDocument().getMediaType())
-						.mida(not.getDocument().getMida())
-						.url(basePath + "/document/" + not.getId()).build();
+				document = DocumentConsultaV2.builder().nom(not.getDocument().getArxiuNom()).mediaType(not.getDocument().getMediaType()).mida(not.getDocument()
+							.getMida()).url(basePath + "/document/" + not.getId()).build();
 			}
 			// Titular
 			PersonaConsultaV2 titular = toPersona(enviament.getTitular());
@@ -1464,34 +1365,18 @@ public class EnviamentServiceImpl implements EnviamentService {
 					errorDescripcio = event.getErrorDescripcio();
 				}
 			}
-
-			TransmissioV2 transmissio = TransmissioV2.builder()
-					.id(enviament.getId())
-					.emisor(not.getEntitat().getCodi())
-					.organGestor(organGestor)
-					.procediment(procediment)
-					.numExpedient(not.getNumExpedient())
-					.concepte(not.getConcepte())
-					.descripcio(not.getDescripcio())
-					.dataEnviament(not.getEnviamentDataProgramada() != null ? not.getEnviamentDataProgramada() : not.getNotificaEnviamentData())
-					.estat(estat)
-					.dataEstat(dataEstat)
-					.document(document)
-					.titular(titular)
-					.destinataris(destinataris)
-					.error(enviament.isNotificaError())
-					.errorData(errorData)
-					.errorDescripcio(errorDescripcio)
-					.justificant(justificantUrl)
-					.certificacio(certificacioUrl)
-					.build();
-
+			TransmissioV2 transmissio = TransmissioV2.builder().id(enviament.getId()).emisor(not.getEntitat().getCodi()).organGestor(organGestor).
+										procediment(procediment).numExpedient(not.getNumExpedient()).concepte(not.getConcepte()).descripcio(not.getDescripcio())
+										.dataEnviament(not.getEnviamentDataProgramada() != null ? not.getEnviamentDataProgramada() : not.getNotificaEnviamentData())
+										.estat(estat).dataEstat(dataEstat).document(document).titular(titular).destinataris(destinataris).error(enviament.isNotificaError())
+										.errorData(errorData).errorDescripcio(errorDescripcio).justificant(justificantUrl).certificacio(certificacioUrl).build();
 			return transmissio;
 		}
 
 		// Recuperar l'estat a partir de l'enviament, i no de la notificació.
 		//  A més, no s'han d'eliminar els estat enviada_amb_errors i finalitzada_amb_errors.
 		private GenericInfo getEstat(NotificacioEnviamentEntity enviament) {
+
 			switch (enviament.getNotificaEstat()) {
 				case NOTIB_PENDENT:
 				case REGISTRADA:
@@ -1556,21 +1441,24 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		private Date getEstatDate(NotificacioEnviamentEntity enviament) {
 
-			if (enviament.getNotificaEstatData() != null)
+			if (enviament.getNotificaEstatData() != null) {
 				return enviament.getNotificaEstatData();
-
+			}
 			NotificacioEntity not = enviament.getNotificacio();
-			if (not.getEstatDate() != null)
+			if (not.getEstatDate() != null) {
 				return not.getEstatDate();
+			}
 			if (NotificacioEstatEnumDto.REGISTRADA.equals(not.getEstat())) {
 				return not.getRegistreData();
-			} else if (NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(not.getEstat())) {
+			}
+			if (NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(not.getEstat())) {
 				return not.getNotificaEnviamentData();
 			}
 			return not.getCreatedDate().toDate();
 		}
 
 		private PersonaConsultaV2 toPersona(PersonaEntity personaEntity) {
+
 			InteressatTipusEnumDto tipus = personaEntity.getInteressatTipus();
 			String nom = personaEntity.getNom();
 			if (!InteressatTipusEnumDto.FISICA.equals(tipus)) {
@@ -1578,19 +1466,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 					nom = personaEntity.getRaoSocial();
 				}
 			}
-			PersonaConsultaV2 persona= PersonaConsultaV2.builder()
-					.tipus(GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("interessatTipusEnumDto." + tipus.name())).build())
-					.nom(nom)
-					.llinatge1(personaEntity.getLlinatge1())
-					.llinatge2(personaEntity.getLlinatge2())
-					.nif(personaEntity.getNif())
-					.email(personaEntity.getEmail())
-					.build();
-			return persona;
+			GenericInfo t = GenericInfo.builder().codi(tipus.name()).nom(messageHelper.getMessage("interessatTipusEnumDto." + tipus.name())).build();
+			return PersonaConsultaV2.builder().tipus(t).nom(nom).llinatge1(personaEntity.getLlinatge1()).llinatge2(personaEntity.getLlinatge2())
+										.nif(personaEntity.getNif()).email(personaEntity.getEmail()).build();
 		}
-
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(EnviamentServiceImpl.class);
-
 }

@@ -27,19 +27,14 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 
 	@Override
 	@Transactional(rollbackFor=Exception.class)
-	public String guardarArxiuTemporal(String contigut) {
-		String documentGesdocId = null;
+	public String guardarArxiuTemporal(String contingut) {
+
 		try {
-			if(contigut != null) {
-				documentGesdocId = pluginHelper.gestioDocumentalCreate(
-						PluginHelper.GESDOC_AGRUPACIO_TEMPORALS,
-						Base64.decodeBase64(contigut));
-			}
+			return contingut != null ? pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_TEMPORALS, Base64.decodeBase64(contingut)) : null;
 		} catch (Exception ex) {
-			log.error(
-					"Error al guardar l'arxiu temporal " + ex);
-		} 
-		return documentGesdocId;
+			log.error("Error al guardar l'arxiu temporal " + ex);
+			return null;
+		}
 	}
 	
 	@Override
@@ -55,19 +50,17 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 	}
 
 	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
 		try {
-			if(arxiuGestdocId != null) {
-				pluginHelper.gestioDocumentalGet(
-						arxiuGestdocId,
-						agrupacio,
-						output);
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			if (arxiuGestdocId != null) {
+				return output.toByteArray();
 			}
+			pluginHelper.gestioDocumentalGet(arxiuGestdocId, agrupacio, output);
+			return output.toByteArray();
 		} catch (Exception ex) {
 			log.error("Error al recuperar l'arxiu de l'agrupació: " + agrupacio);
 			throw ex;
 		}
-		return output.toByteArray();
 	}
-
 }

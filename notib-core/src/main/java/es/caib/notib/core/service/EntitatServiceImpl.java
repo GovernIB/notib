@@ -25,8 +25,7 @@ import es.caib.notib.core.repository.EntitatTipusDocRepository;
 import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.security.ExtendedPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.acls.model.Permission;
@@ -51,6 +50,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class EntitatServiceImpl implements EntitatService {
 
@@ -93,7 +93,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Creant una nova entitat (entitat=" + entitat + ")");
+			log.debug("Creant una nova entitat (entitat=" + entitat + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
 
 			EntitatEntity.EntitatEntityBuilder entitatBuilder = EntitatEntity.getBuilder(entitat.getCodi(), entitat.getNom(), entitat.getTipus(), entitat.getDir3Codi(),
@@ -112,7 +112,6 @@ public class EntitatServiceImpl implements EntitatService {
 					entitatTipusDocRepository.save(tipusDocEntity);
 				}
 			}
-
 			configHelper.crearConfigsEntitat(entitat.getCodi());
 			return conversioTipusHelper.convertir(entitatSaved, EntitatDto.class);
 		} finally {
@@ -127,7 +126,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
+			log.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
 			entityComprovarHelper.comprovarEntitat(entitat.getId(),true,true,false,false);
 			byte[] logoCapActual = null;
 			byte[] logoPeuActual = null;
@@ -189,7 +188,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant propietat activa d'una entitat existent (id=" + id + ", activa=" + activa + ")");
+			log.debug("Actualitzant propietat activa d'una entitat existent (id=" + id + ", activa=" + activa + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
 			EntitatEntity entitat = entitatRepository.findOne(id);
 			entitat.updateActiva(activa);
@@ -207,7 +206,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Esborrant entitat (id=" + id +  ")");
+			log.debug("Esborrant entitat (id=" + id +  ")");
 			entityComprovarHelper.comprovarPermisos(null, true,false,false );
 			EntitatEntity entitat = entitatRepository.findOne(id);
 			List<NotificacioEntity> notificacions = notificacioRepository.findByEntitatId(entitat.getId());
@@ -235,11 +234,8 @@ public class EntitatServiceImpl implements EntitatService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<TipusDocumentDto> tipusDocumentsDto = new ArrayList<TipusDocumentDto>();
-			
 			EntitatEntity entitat = entitatRepository.findOne(entitatId);
-			
 			List<EntitatTipusDocEntity> tipusDocsEntity = entitatTipusDocRepository.findByEntitat(entitat);
-			
 			for (EntitatTipusDocEntity entitatTipusDocEntity : tipusDocsEntity) {
 				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
 				tipusDocumentDto.setTipusDocEnum(entitatTipusDocEntity.getTipusDocEnum());
@@ -253,6 +249,7 @@ public class EntitatServiceImpl implements EntitatService {
 	
 	@Override
 	public TipusDocumentEnumDto findTipusDocumentDefaultByEntitat(Long entitatId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entitatRepository.findOne(entitatId);
@@ -268,7 +265,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'entitat (id=" + entitatId + ")");
+			log.debug("Consulta de l'entitat (id=" + entitatId + ")");
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
@@ -282,9 +279,11 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
+			log.debug("Consulta de l'entitat amb codi (codi=" + codi + ")");
 			EntitatEntity entitat = entitatRepository.findByCodi(codi);
-			if (entitat == null) return null;
+			if (entitat == null)  {
+				return null;
+			}
 			entityComprovarHelper.comprovarPermisos(null,true,true,true);
 			return conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		} finally {
@@ -298,7 +297,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
+			log.debug("Consulta de l'entitat amb codi DIR3 (dir3codi=" + dir3codi + ")");
 			EntitatDto dto = conversioTipusHelper.convertir(entitatRepository.findByDir3Codi(dir3codi), EntitatDto.class);
 			return dto;
 		} finally {
@@ -312,7 +311,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de totes les entitats");
+			log.debug("Consulta de totes les entitats");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
 			return conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
 		} finally {
@@ -323,9 +322,10 @@ public class EntitatServiceImpl implements EntitatService {
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<EntitatDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
+		
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
+			log.debug("Consulta de totes les entitats paginades (paginacioParams=" + paginacioParams + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,false,false);
 			PaginaDto<EntitatDto> resposta = paginacioHelper.toPaginaDto(entitatRepository.findByFiltre(paginacioParams.getFiltre(),
 								paginacioHelper.toSpringDataPageable(paginacioParams)), EntitatDto.class);
@@ -349,7 +349,7 @@ public class EntitatServiceImpl implements EntitatService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			logger.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
+			log.debug("Consulta les entitats accessibles per l'usuari actual (usuari=" + auth.getName() + ")");
 			return permisosCacheable.findEntitatsAccessiblesUsuari(auth.getName(), rolActual);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -362,7 +362,7 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
+			log.debug("Consulta dels permisos de l'entitat (entitatId=" + entitatId + ")");
 			entityComprovarHelper.comprovarPermisos(null,true,true,true);
 			List<PermisDto> permisos = permisosHelper.findPermisos(entitatId, EntitatEntity.class);
 			permisosHelper.ordenarPermisos(paginacioParams, permisos);
@@ -379,20 +379,10 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Modificació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permis=" + permis + ")");
-			
-			if (TipusEnumDto.ROL.equals(permis.getTipus())) {
-				if (permis.getPrincipal().equalsIgnoreCase("tothom")) {
-					permis.setPrincipal(permis.getPrincipal().toLowerCase());					
-				} else {
-					permis.setPrincipal(permis.getPrincipal().toUpperCase());
-				}
-			} else {
-				if (TipusEnumDto.USUARI.equals(permis.getTipus())) {
-					permis.setPrincipal(permis.getPrincipal().toLowerCase());
-				}
-			}
-			
+			log.debug("Modificació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permis=" + permis + ")");
+			permis.setPrincipal(TipusEnumDto.ROL.equals(permis.getTipus()) ? 
+					(permis.getPrincipal().equalsIgnoreCase("tothom") ? permis.getPrincipal().toLowerCase() : permis.getPrincipal().toUpperCase())	
+					: (TipusEnumDto.USUARI.equals(permis.getTipus()) ? permis.getPrincipal().toLowerCase() : permis.getPrincipal()));
 			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
 			permisosHelper.updatePermis(entitatId, EntitatEntity.class, permis);
 		} finally {
@@ -407,15 +397,14 @@ public class EntitatServiceImpl implements EntitatService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Eliminació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permisId=" + permisId + ")");
+			log.debug("Eliminació com a superusuari del permis de l'entitat (entitatId=" + entitatId + ", permisId=" + permisId + ")");
 			entityComprovarHelper.comprovarEntitat(entitatId,true,true,false,false);
 			permisosHelper.deletePermis(entitatId, EntitatEntity.class, permisId);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
-
+	
 	@Override
 	public boolean hasPermisUsuariEntitat() {
 
@@ -464,7 +453,7 @@ public class EntitatServiceImpl implements EntitatService {
 					hasPermisos = permisosCacheable.getPermisosEntitatsUsuariActual(auth);
 					return hasPermisos;
 				} catch (Exception ex) {
-					logger.error("Error obtenint els permisos de l'usuari " + auth.getName(), ex);
+					log.error("Error obtenint els permisos de l'usuari " + auth.getName(), ex);
 				}
 			}
 			hasPermisos.put(RolEnumDto.tothom, false);
@@ -472,7 +461,6 @@ public class EntitatServiceImpl implements EntitatService {
 			hasPermisos.put(RolEnumDto.NOT_APL, false);
 			hasPermisos.put(RolEnumDto.NOT_ADMIN_ORGAN, false);
 			return hasPermisos;
-
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -483,13 +471,13 @@ public class EntitatServiceImpl implements EntitatService {
 	public List<OficinaDto> findOficinesEntitat(String dir3codi) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<OficinaDto> oficines = new ArrayList<OficinaDto>();
+			List<OficinaDto> oficines = new ArrayList<>();
 			try {
 				//Recupera les oficines d'una entitat
 				oficines = cacheHelper.llistarOficinesEntitat(dir3codi);
 			} catch (Exception e) {
 				String errorMessage = "No s'han pogut recuperar les oficines de l'entitat amb codi: " + dir3codi;
-				logger.error(errorMessage, e.getMessage());
+				log.error(errorMessage, e.getMessage());
 			}
 			return oficines;	
 		} finally {
@@ -536,7 +524,7 @@ public class EntitatServiceImpl implements EntitatService {
 				llibre = cacheHelper.getLlibreOrganGestor(dir3Codi, dir3Codi);
 	 		} catch (Exception e) {
 	 			String errorMessage = "No s'ha pogut recuperar el llibre de l'entitat amb codi Dir3: " + dir3Codi;
-				logger.error(errorMessage, e.getMessage());
+				log.error(errorMessage, e.getMessage());
 			}
 			return llibre;
 		} finally {
@@ -577,7 +565,4 @@ public class EntitatServiceImpl implements EntitatService {
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		ConfigHelper.setEntitat(entitatDto);
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
 }

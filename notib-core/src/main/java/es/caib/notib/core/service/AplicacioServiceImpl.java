@@ -76,9 +76,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
 			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+			DadesUsuari dadesUsuari;
 			if (usuari == null) {
 				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 				if (dadesUsuari == null) {
 					throw new NotFoundException(auth.getName(), DadesUsuari.class);
@@ -88,7 +89,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 			} else {
 				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-				DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 				if (dadesUsuari == null) {
 					throw new NotFoundException(auth.getName(), DadesUsuari.class);
 				}
@@ -98,7 +99,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 					usuari.update(dadesUsuari.getNom(), dadesUsuari.getLlinatges(), dadesUsuari.getEmail());
 				}
 			}
-
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
 
@@ -278,7 +278,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public String propertyGetByEntitat(String property) {
-
 		return configHelper.getConfig(property);
 	}
 

@@ -135,11 +135,9 @@ public class AuditServiceImpl implements AuditService {
 			isAuditar = false;
 		}
 		if (isAuditar) {
-			if (tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte)) {
-				audit = ProcedimentAudit.getBuilder((ProcedimentEntity)objecteAuditar, tipusOperacio, joinPoint).build();
-			} else {
-				audit = ProcedimentAudit.getBuilder((ProcSerDto)objecteAuditar, tipusOperacio, joinPoint).build();
-			}
+			audit = tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte) ?
+					ProcedimentAudit.getBuilder((ProcedimentEntity)objecteAuditar, tipusOperacio, joinPoint).build()
+					: ProcedimentAudit.getBuilder((ProcSerDto)objecteAuditar, tipusOperacio, joinPoint).build();
 			procedimentAuditRepository.saveAndFlush(audit);
 		}
 	}
@@ -156,11 +154,9 @@ public class AuditServiceImpl implements AuditService {
 			isAuditar = false;
 		}
 		if (isAuditar) {
-			if (tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte)) {
-				audit = ProcedimentAudit.getBuilder((ProcSerEntity)objecteAuditar, tipusOperacio, joinPoint).build();
-			} else {
-				audit = ProcedimentAudit.getBuilder((ProcSerDto)objecteAuditar, tipusOperacio, joinPoint).build();
-			}
+			audit = tipusObjecte == null || TipusObjecte.ENTITAT.equals(tipusObjecte) ?
+					ProcedimentAudit.getBuilder((ProcSerEntity)objecteAuditar, tipusOperacio, joinPoint).build()
+					: ProcedimentAudit.getBuilder((ProcSerDto)objecteAuditar, tipusOperacio, joinPoint).build();
 			procedimentAuditRepository.saveAndFlush(audit);
 		}
 	}
@@ -224,5 +220,4 @@ public class AuditServiceImpl implements AuditService {
 			}
 		}
 	}
-
 }

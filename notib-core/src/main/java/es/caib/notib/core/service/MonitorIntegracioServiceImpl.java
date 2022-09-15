@@ -9,8 +9,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import es.caib.notib.core.api.dto.IntegracioFiltreDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,17 +31,12 @@ import es.caib.notib.core.helper.PaginacioHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
 	@Resource
 	private IntegracioHelper integracioHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private PaginacioHelper paginacioHelper;
-	@Resource
-	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
 	
@@ -51,7 +45,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant les integracions");
+			log.debug("Consultant les integracions");
 			return integracioHelper.findAll();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -63,7 +57,7 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
+			log.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
 			List<IntegracioAccioDto> accions = integracioHelper.findAccions(codi, filtre);
 			int index = 0;
 			for (IntegracioAccioDto accio : accions) {
@@ -86,7 +80,4 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(MonitorIntegracioServiceImpl.class);
-
 }

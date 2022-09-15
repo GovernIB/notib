@@ -81,6 +81,7 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional
     public List<String> syncFromJBossProperties() {
+
         log.info("Sincronitzant les propietats amb JBoss");
         Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
         List<String> editedProperties = new ArrayList<>();
@@ -108,7 +109,6 @@ public class ConfigServiceImpl implements ConfigService {
             return new ArrayList<>();
         }
         String [] split = key.split(ConfigDto.prefix);
-
         if (split == null || split.length != 2) {
             log.error("Entitat config key no trobada. Key: " + key);
             return new ArrayList<>();

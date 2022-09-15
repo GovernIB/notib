@@ -17,9 +17,9 @@ import es.caib.notib.core.repository.GrupProcSerRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class GrupServiceImpl implements GrupService{
 
@@ -61,35 +62,16 @@ public class GrupServiceImpl implements GrupService{
 	@Audita(entityType = TipusEntitat.GRUP, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
-	public GrupDto create(
-			Long entitatId,
-			GrupDto grup) {
+	public GrupDto create(Long entitatId, GrupDto grup) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Creant un nou gurp ("
-					+ "grup=" + grup + ")");
-			
+			log.debug("Creant un nou gurp (grup=" + grup + ")");
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat 
-			
-			OrganGestorEntity organGestor = null;
-			if (grup.getOrganGestorId() != null) {
-				organGestor = entityComprovarHelper.comprovarOrganGestor(
-						entitat, 
-						grup.getOrganGestorId());
-			}
-			
-			GrupEntity grupEntity = grupReposity.save(
-					GrupEntity.getBuilder(
-							grup.getCodi(),
-							grup.getNom(),
-							entitat,
-							organGestor).build());
-			
-			return conversioTipusHelper.convertir(
-					grupEntity, 
-					GrupDto.class);
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
+			OrganGestorEntity organGestor = grup.getOrganGestorId() != null ? entityComprovarHelper.comprovarOrganGestor(entitat, grup.getOrganGestorId()) : null ;
+			GrupEntity grupEntity = grupReposity.save(GrupEntity.getBuilder(grup.getCodi(), grup.getNom(), entitat, organGestor).build());
+			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -99,22 +81,15 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	@Transactional
 	public GrupDto update(GrupDto grup) throws NotFoundException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant grup ("
-					+ "grup=" + grup + ")");
-			
+			log.debug("Actualitzant grup (grup=" + grup + ")");
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al grup i que es administrador de l'organ indicat
-			
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(grup.getId());
-			grupEntity.update(
-							grup.getCodi(),
-							grup.getNom());
-			
+			grupEntity.update(grup.getCodi(), grup.getNom());
 			grupReposity.save(grupEntity);
-			return conversioTipusHelper.convertir(
-					grupEntity, 
-					GrupDto.class);
+			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -124,15 +99,13 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	@Transactional
 	public GrupDto delete(Long id) throws NotFoundException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar 
+			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(id);
 			grupReposity.delete(grupEntity);
-			return conversioTipusHelper.convertir(
-					grupEntity, 
-					GrupDto.class);
+			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -140,17 +113,13 @@ public class GrupServiceImpl implements GrupService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public GrupDto findById(
-			Long entitatId,
-			Long id) {
+	public GrupDto findById(Long entitatId, Long id) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId);
-			
 			GrupEntity grupEntity = entityComprovarHelper.comprovarGrup(id);
-			return conversioTipusHelper.convertir(
-					grupEntity, 
-					GrupDto.class);
+			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -158,20 +127,13 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public GrupDto findByCodi(
-			String grupCodi,
-			Long entitatId) {
+	public GrupDto findByCodi(String grupCodi, Long entitatId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = null;
-			
-			if(entitatId != null)
-				entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			
+			EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId) : null;
 			GrupEntity grupEntity = grupReposity.findByCodiAndEntitat(grupCodi, entitat);
-			return conversioTipusHelper.convertir(
-					grupEntity, 
-					GrupDto.class);
+			return conversioTipusHelper.convertir(grupEntity, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -181,25 +143,23 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<GrupDto> findByProcedimentAndUsuariGrups(Long procedimentId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<GrupDto> grups = new ArrayList<GrupDto>();
+			List<GrupDto> grups = new ArrayList<>();
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			ProcSerEntity procediment = procSerRepository.findOne(procedimentId);
 			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procediment);
-			
 			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
 				DadesUsuari usuariGrup = cacheHelper.findUsuariAmbCodi(auth.getName());
-				if (usuariGrup != null) {
-					List<String> rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
-					if (rols.contains(grupProcediment.getGrup().getCodi())) {
-						grups.add(conversioTipusHelper.convertir(
-								grupReposity.findOne(grupProcediment.getGrup().getId()), 
-								GrupDto.class));
-					}
-				}			
+				if (usuariGrup == null) {
+					continue;
+				}
+				List<String> rols = cacheHelper.findRolsUsuariAmbCodi(usuariGrup.getCodi());
+				if (rols.contains(grupProcediment.getGrup().getCodi())) {
+					grups.add(conversioTipusHelper.convertir(grupReposity.findOne(grupProcediment.getGrup().getId()), GrupDto.class));
+				}
 			}
-			
 			return grups;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -209,18 +169,15 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<GrupDto> findGrupsByProcSer(Long procSerId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			List<GrupDto> grups = new ArrayList<GrupDto>();
 			ProcSerEntity procSer = procSerRepository.findOne(procSerId);
 			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procSer);
-			
 			for (GrupProcSerEntity grupProcediment : grupsProcediment) {
-				grups.add(conversioTipusHelper.convertir(
-					grupReposity.findOne(grupProcediment.getGrup().getId()), 
-					GrupDto.class));	
+				grups.add(conversioTipusHelper.convertir(grupReposity.findOne(grupProcediment.getGrup().getId()), GrupDto.class));
 			}
-			
 			return grups;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -229,27 +186,16 @@ public class GrupServiceImpl implements GrupService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<ProcSerGrupDto> findByProcSer(
-			Long entitatId, 
-			Long procedimentId,
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<ProcSerGrupDto> findByProcSer(Long entitatId, Long procedimentId, PaginacioParamsDto paginacioParams) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			if (entitatId != null)
-				entityComprovarHelper.comprovarEntitat(
-						entitatId, 
-						false,
-						false, 
-						false);
-
+			if (entitatId != null) {
+				entityComprovarHelper.comprovarEntitat(entitatId, false, false, false);
+			}
 			ProcSerEntity procSer = procSerRepository.findOne(procedimentId);
-			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(
-					procSer,
-					paginacioHelper.toSpringDataPageable(paginacioParams)); 
-			
-			return paginacioHelper.toPaginaDto(
-					grupsProcediment, 
-					ProcSerGrupDto.class);
+			List<GrupProcSerEntity> grupsProcediment = grupProcSerRepository.findByProcSer(procSer, paginacioHelper.toSpringDataPageable(paginacioParams));
+			return paginacioHelper.toPaginaDto(grupsProcediment, ProcSerGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -257,17 +203,13 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public ProcSerGrupDto findProcedimentGrupById(
-			Long entitatId, 
-			Long procedimentGrupId) {
+	public ProcSerGrupDto findProcedimentGrupById(Long entitatId, Long procedimentGrupId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId);
 			GrupProcSerEntity procedimentGrup = grupProcSerRepository.findOne(procedimentGrupId);
-			
-			return conversioTipusHelper.convertir(
-					procedimentGrup, 
-					ProcSerGrupDto.class);
+			return conversioTipusHelper.convertir(procedimentGrup, ProcSerGrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -275,9 +217,8 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public Boolean existProcedimentGrupByGrupId(
-			Long entitatId, 
-			Long grupId) {
+	public Boolean existProcedimentGrupByGrupId(Long entitatId, Long grupId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			GrupEntity grup = entityComprovarHelper.comprovarGrup(grupId);
@@ -290,19 +231,16 @@ public class GrupServiceImpl implements GrupService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
 	
 	@Override
 	@Transactional
-	public List<GrupDto> deleteGrupsProcediment(
-			List<GrupDto> grups) throws NotFoundException {
+	public List<GrupDto> deleteGrupsProcediment(List<GrupDto> grups) throws NotFoundException {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que es administrador de l'organ del grup que vol eliminar
 			List<GrupEntity> grupsEntity = entityComprovarHelper.comprovarGrups(grups);
-			
 			grupReposity.delete(grupsEntity);
-			
 			return grups;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -312,13 +250,11 @@ public class GrupServiceImpl implements GrupService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<GrupDto> findByEntitat(Long entitatId) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			
-			return conversioTipusHelper.convertirList(
-					grupReposity.findByEntitat(entitat),
-					GrupDto.class);
+			return conversioTipusHelper.convertirList(grupReposity.findByEntitat(entitat), GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -326,72 +262,37 @@ public class GrupServiceImpl implements GrupService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<GrupDto> findByEntitatAndOrganGestor(
-			EntitatDto entitat, 
-			OrganGestorDto organGestor) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-					entitat.getDir3Codi(), 
-					organGestor.getCodi());
-			
-			return conversioTipusHelper.convertirList(
-					grupReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills),
-					GrupDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+	public List<GrupDto> findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
 
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+			return conversioTipusHelper.convertirList(grupReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills), GrupDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<GrupDto> findAmbFiltrePaginat(
-			Long entitatId, 
-			GrupFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<GrupDto> findAmbFiltrePaginat(Long entitatId, GrupFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true );
-			
+			entityComprovarHelper.comprovarPermisos(null, true, true, true );
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Page<GrupEntity> grup = null;
-	
 			List<String> organsFills = null;
-			if (filtre.getOrganGestorId() != null) {
-				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
-						entitat, 
-						filtre.getOrganGestorId());
-				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitat.getDir3Codi(), 
-						organGestor.getCodi());	
-				
-				grup = grupReposity.findByCodiNotNullFiltrePaginatWithOrgan(
-						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-						filtre.getCodi(),
-						organsFills,
-						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams));
-				
-			}else{
-				grup = grupReposity.findByCodiNotNullFiltrePaginat(
-						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-						filtre.getCodi(),
-						entitat,
-						paginacioHelper.toSpringDataPageable(paginacioParams));
+			boolean isNullFiltreCodi = filtre.getCodi() == null || filtre.getCodi().isEmpty();
+			Pageable params =  paginacioHelper.toSpringDataPageable(paginacioParams);
+			if (filtre.getOrganGestorId() == null) {
+				grup = grupReposity.findByCodiNotNullFiltrePaginat(isNullFiltreCodi, filtre.getCodi(), entitat, params);
+				return paginacioHelper.toPaginaDto(grup, GrupDto.class);
 			}
-			
-			
-			
-			
-			
-			return paginacioHelper.toPaginaDto(
-					grup,
-					GrupDto.class);
+			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, filtre.getOrganGestorId());
+			organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+			grup = grupReposity.findByCodiNotNullFiltrePaginatWithOrgan(isNullFiltreCodi, filtre.getCodi(), organsFills, entitat, params);
+			return paginacioHelper.toPaginaDto(grup, GrupDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -408,7 +309,4 @@ public class GrupServiceImpl implements GrupService{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
-
 }

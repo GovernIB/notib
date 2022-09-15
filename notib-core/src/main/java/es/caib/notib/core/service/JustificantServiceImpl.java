@@ -34,6 +34,7 @@ import java.util.Map;
 @Slf4j
 @Service
 public class JustificantServiceImpl implements JustificantService {
+
     @Autowired
     private JustificantEnviamentHelper justificantEnviamentHelper;
     @Autowired
@@ -57,24 +58,22 @@ public class JustificantServiceImpl implements JustificantService {
 
     @Transactional
     @Override
-    public FitxerDto generarJustificantEnviament(Long notificacioId,
-                                                 String sequence) throws JustificantException {
+    public FitxerDto generarJustificantEnviament(Long notificacioId, String sequence) throws JustificantException {
+
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
 
             NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
-
-            if (enviamentsPendents != null && !enviamentsPendents.isEmpty())
+            if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {
                 throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
-
+            }
             if (isABackgroundProcessNotEnded(sequence)) {
                 log.error("Ja existeix un altre procés iniciat");
                 getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
                 return null;
-            } else {
-                return generarJustificantEnviament(notificacio, sequence);
             }
+            return generarJustificantEnviament(notificacio, sequence);
         } finally {
             metricsHelper.fiMetrica(timer);
         }
@@ -82,31 +81,22 @@ public class JustificantServiceImpl implements JustificantService {
 
     @Transactional
     @Override
-    public FitxerDto generarJustificantEnviament(Long notificacioId,
-            Long entitatId,
-            String sequence) throws JustificantException {
+    public FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException {
+
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
-
             NotificacioEntity notificacio = notificacioRepository.findOne(notificacioId);
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
-
-            if (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat()))
+            if (enviamentsPendents != null && !enviamentsPendents.isEmpty() && !NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
                 throw new ValidationException("No es pot generar el justificant d'una notificació amb enviaments pendents.");
-
-            entityComprovarHelper.comprovarEntitat(
-                    entitatId,
-                    false,
-                    true,
-                    true,
-                    false);
+            }
+            entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
             if (isABackgroundProcessRunning(sequence)) {
                 log.error("Ja existeix un altre procés iniciat");
                 getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
                 return null;
-            } else {
-                return generarJustificantEnviament(notificacio, sequence);
             }
+            return generarJustificantEnviament(notificacio, sequence);
         } finally {
             metricsHelper.fiMetrica(timer);
         }
@@ -114,9 +104,8 @@ public class JustificantServiceImpl implements JustificantService {
 
     @Transactional
     @Override
-    public FitxerDto generarJustificantComunicacioSIR(Long enviamentId,
-                                                      Long entitatId,
-                                                      String sequence) throws JustificantException {
+    public FitxerDto generarJustificantComunicacioSIR(Long enviamentId, Long entitatId, String sequence) throws JustificantException {
+
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
             NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
@@ -126,19 +115,13 @@ public class JustificantServiceImpl implements JustificantService {
             if (!enviament.isRegistreEstatFinal()){
                 throw new ValidationException("No es pot generar un justificant de un enviament que no està en un estat final");
             }
-            entityComprovarHelper.comprovarEntitat(
-                    entitatId,
-                    false,
-                    true,
-                    true,
-                    false);
+            entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
             if (isABackgroundProcessRunning(sequence)) {
                 log.error("Ja existeix un altre procés iniciat");
                 getProgress(sequence).addInfo(ProgresDescarregaDto.TipusInfo.ERROR, messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant"));
                 return null;
-            } else {
-                return generarJustificantComunicacioSIR(enviament, sequence);
             }
+            return generarJustificantComunicacioSIR(enviament, sequence);
         } finally {
             metricsHelper.fiMetrica(timer);
         }
@@ -146,6 +129,7 @@ public class JustificantServiceImpl implements JustificantService {
 
     @Override
     public ProgresDescarregaDto consultaProgresGeneracioJustificant(String sequence) {
+
         Timer.Context timer = metricsHelper.iniciMetrica();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -160,43 +144,36 @@ public class JustificantServiceImpl implements JustificantService {
     }
 
     private ProgresDescarregaDto getProgress(String sequence) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        ProgresDescarregaDto progres;
-        if (isABackgroundProcessRunning(sequence)){
-            progres = progresDescarrega.get(auth.getName() + "_" + sequence);
 
-        } else {
-            progres = new ProgresDescarregaDto();
-            progresDescarrega.put(auth.getName() + "_" + sequence, progres);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (isABackgroundProcessRunning(sequence)){
+            return progresDescarrega.get(auth.getName() + "_" + sequence);
         }
+        ProgresDescarregaDto progres = new ProgresDescarregaDto();
+        progresDescarrega.put(auth.getName() + "_" + sequence, progres);
         return progres;
     }
 
     private boolean isABackgroundProcessRunning(String sequence){
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
         return progres != null && progres.getProgres() != 0;
     }
     private boolean isABackgroundProcessNotEnded(String sequence){
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         ProgresDescarregaDto progres = progresDescarrega.get(auth.getName() + "_" + sequence);
         return progres != null && progres.getProgres() < 100;
     }
-    private FitxerDto generarJustificantEnviament(
-            NotificacioEntity notificacio,
-            String sequence) throws JustificantException {
+    private FitxerDto generarJustificantEnviament(NotificacioEntity notificacio, String sequence) throws JustificantException {
 
         //## Únic procés per usuari per evitar sobrecàrrega
         ProgresDescarregaDto progres = getProgress(sequence);
-
         //## GENERAR JUSTIFICANT
         log.debug("Recuperant el justificant de la notificacio (notificacioId=" + notificacio.getId() + ")");
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
-        byte[] contingut = justificantEnviamentHelper.generarJustificant(
-                conversioTipusHelper.convertir(
-                        notificacio,
-                        NotificacioDtoV2.class),
-                progres);
+        byte[] contingut = justificantEnviamentHelper.generarJustificant(conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class), progres);
         FitxerDto justificantOriginal = new FitxerDto();
         justificantOriginal.setNom("justificant_notificació_" + notificacio.getId() + ".pdf");
         justificantOriginal.setContentType("application/pdf");
@@ -207,12 +184,7 @@ public class JustificantServiceImpl implements JustificantService {
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.aplicant.firma"));
         byte[] contingutFirmat = null;
         try {
-            contingutFirmat = pluginHelper.firmaServidorFirmar(
-                    notificacio,
-                    justificantOriginal,
-                    TipusFirma.PADES,
-                    "justificant enviament Notib",
-                    "ca");
+            contingutFirmat = pluginHelper.firmaServidorFirmar(notificacio, justificantOriginal, TipusFirma.PADES, "justificant enviament Notib", "ca");
             progres.setProgres(100);
         } catch (Exception ex) {
             progres.setProgres(100);
@@ -232,13 +204,11 @@ public class JustificantServiceImpl implements JustificantService {
         notificacio.setJustificantCreat(true);
         return justificantFirmat;
     }
-    private FitxerDto generarJustificantComunicacioSIR(
-            NotificacioEnviamentEntity enviament,
-            String sequence) throws JustificantException {
+
+    private FitxerDto generarJustificantComunicacioSIR(NotificacioEnviamentEntity enviament, String sequence) throws JustificantException {
 
         //## Únic procés per usuari per evitar sobrecàrrega
         ProgresDescarregaDto progres = getProgress(sequence);
-
         //## GENERAR JUSTIFICANT
         log.debug("Recuperant el justificant de la notificacio (enviamentId=" + enviament.getId() + ")");
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant"));
@@ -253,12 +223,7 @@ public class JustificantServiceImpl implements JustificantService {
         progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.aplicant.firma"));
         byte[] contingutFirmat = null;
         try {
-            contingutFirmat = pluginHelper.firmaServidorFirmar(
-                    enviament.getNotificacio(),
-                    justificantOriginal,
-                    TipusFirma.PADES,
-                    "justificant enviament Notib",
-                    "ca");
+            contingutFirmat = pluginHelper.firmaServidorFirmar(enviament.getNotificacio(), justificantOriginal, TipusFirma.PADES, "justificant enviament Notib", "ca");
             progres.setProgres(100);
         } catch (Exception ex) {
             progres.setProgres(100);

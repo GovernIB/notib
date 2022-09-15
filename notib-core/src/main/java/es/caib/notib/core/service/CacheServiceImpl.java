@@ -11,6 +11,7 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.PaginacioHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class CacheServiceImpl implements CacheService {
 
@@ -39,9 +41,10 @@ public class CacheServiceImpl implements CacheService {
 	
 	@Override
 	public PaginaDto<CacheDto> getAllCaches() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Recuperant el llistat de les caches disponibles");
+			log.debug("Recuperant el llistat de les caches disponibles");
 			List<CacheDto> caches = new ArrayList<CacheDto>();	
 			Collection<String> cachesValues = cacheHelper.getAllCaches();
 			for (String cacheValue : cachesValues) {
@@ -61,15 +64,13 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public void removeCache(String value) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Esborrant la cache (value=" + value + ")");
+			log.debug("Esborrant la cache (value=" + value + ")");
 			cacheHelper.clearCache(value);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
-
 }
