@@ -14,6 +14,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -75,6 +76,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -170,7 +173,10 @@ public class SchedulledServiceImpl implements SchedulledService {
 				if (pendents != null && !pendents.isEmpty()) {
 					logger.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments");
 					for (NotificacioEnviamentEntity pendent: (List<NotificacioEnviamentEntity>)pendents) {
-						logger.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]" + ", i actualitzant les dades a Notib.");
+//						logger.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]" + ", i actualitzant les dades a Notib.");
+//						if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
+//							ConfigHelper.setEntitat(conversioTipusHelper.convertir(pendent.getNotificacio().getEntitat(), EntitatDto.class));
+//						}
 						notificacioService.enviamentRefrescarEstatRegistre(pendent.getId());
 					}
 				} else {
