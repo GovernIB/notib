@@ -14,38 +14,22 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PersonaHelper {
+
     @Autowired
     private PersonaRepository personaRepository;
 
     public PersonaEntity create(Persona persona, boolean incapacitat) {
 
-        PersonaEntity p = PersonaEntity.getBuilderV2(
-                persona.getInteressatTipus(),
-                persona.getEmail(),
-                persona.getLlinatge1(),
-                persona.getLlinatge2(),
-                persona.getNif(),
-                persona.getNom(),
-                persona.getTelefon(),
-                persona.getRaoSocial(),
-                persona.getDir3Codi()).incapacitat(incapacitat).build();
+        PersonaEntity p = PersonaEntity.getBuilderV2(persona.getInteressatTipus(), persona.getEmail(), persona.getLlinatge1(), persona.getLlinatge2(), persona.getNif(),
+                            persona.getNom(), persona.getTelefon(), persona.getRaoSocial(), persona.getDir3Codi()).incapacitat(incapacitat).build();
         p.setDocumentTipus(persona.getDocumentTipus());
         return personaRepository.saveAndFlush(p);
     }
 
     public PersonaEntity update(Persona persona, boolean incapacitat) {
         PersonaEntity personaEntity = personaRepository.findOne(persona.getId());
-        personaEntity.update(
-                persona.getInteressatTipus(),
-                persona.getEmail(),
-                persona.getLlinatge1(),
-                persona.getLlinatge2(),
-                persona.getNif(),
-                persona.getNom(),
-                persona.getTelefon(),
-                persona.getRaoSocial(),
-                persona.getDir3Codi(),
-                incapacitat);
+        personaEntity.update(persona.getInteressatTipus(), persona.getEmail(), persona.getLlinatge1(), persona.getLlinatge2(), persona.getNif(), persona.getNom(),
+                persona.getTelefon(), persona.getRaoSocial(), persona.getDir3Codi(), incapacitat);
         return personaEntity;
     }
 }

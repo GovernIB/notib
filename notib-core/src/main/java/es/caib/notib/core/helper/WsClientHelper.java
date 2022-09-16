@@ -39,46 +39,24 @@ import org.slf4j.LoggerFactory;
  */
 public class WsClientHelper<T> {
 
-	public T generarClientWs(
-			URL wsdlResourceUrl,
-			String endpoint,
-			QName qname,
-			String username,
-			String password,
-			String soapAction,
-			boolean logMissatgesActiu,
-			boolean disableCxfChunking,
-			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String username, String password, String soapAction, boolean logMissatgesActiu,
+							boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
+							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+
 		URL url = wsdlResourceUrl;
 		if (url == null) {
-			if (!endpoint.endsWith("?wsdl")) {
-				url = new URL(endpoint + "?wsdl");
-			} else {
-				url = new URL(endpoint);
-			}
+			url = !endpoint.endsWith("?wsdl") ? new URL(endpoint + "?wsdl") : new URL(endpoint);
 		}
 		Service service = Service.create(url, qname);
 		T servicePort = service.getPort(clazz);
 		BindingProvider bindingProvider = (BindingProvider)servicePort;
 		// Configura l'adreça del servei
-		String endpointAddress;
-		if (!endpoint.endsWith("?wsdl")) {
-			endpointAddress = endpoint;
-		} else {
-			endpointAddress = endpoint.substring(0, endpoint.length() - "?wsdl".length());
-		}
-		bindingProvider.getRequestContext().put(
-				BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-				endpointAddress);
+		String endpointAddress = !endpoint.endsWith("?wsdl") ? endpoint : endpoint.substring(0, endpoint.length() - "?wsdl".length());
+		bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 		// Configura l'autenticació si és necessària
 		if (username != null && !username.isEmpty()) {
-			bindingProvider.getRequestContext().put(
-					BindingProvider.USERNAME_PROPERTY,
-					username);
-			bindingProvider.getRequestContext().put(
-					BindingProvider.PASSWORD_PROPERTY,
-					password);
+			bindingProvider.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, username);
+			bindingProvider.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, password);
 		}
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
@@ -92,17 +70,14 @@ public class WsClientHelper<T> {
 		}
 		// Configura handlers addicionals
 		for (int i = 0; i < handlers.length; i++) {
-			if (handlers[i] != null)
+			if (handlers[i] != null) {
 				handlerChain.add(handlers[i]);
+			}
 		}
 		bindingProvider.getBinding().setHandlerChain(handlerChain);
 		if (soapAction != null) {
-			bindingProvider.getRequestContext().put(
-					BindingProvider.SOAPACTION_USE_PROPERTY,
-					true);
-			bindingProvider.getRequestContext().put(
-					BindingProvider.SOAPACTION_URI_PROPERTY,
-					soapAction);
+			bindingProvider.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
+			bindingProvider.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
 		}
 		if (disableCxfChunking) {
 			try {
@@ -120,85 +95,24 @@ public class WsClientHelper<T> {
 		return servicePort;
 	}
 
-	public T generarClientWs(
-			URL wsdlResourceUrl,
-			String endpoint,
-			QName qname,
-			String userName,
-			String password,
-			boolean disableCxfChunking,
-			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(
-				wsdlResourceUrl,
-				endpoint,
-				qname,
-				userName,
-				password,
-				null,
-				false,
-				disableCxfChunking,
-				clazz,
-				handlers);
+	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
+							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, false, disableCxfChunking, clazz, handlers);
 	}
 
-	public T generarClientWs(
-			URL wsdlResourceUrl,
-			String endpoint,
-			QName qname,
-			String userName,
-			String password,
-			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(
-				wsdlResourceUrl,
-				endpoint,
-				qname,
-				userName,
-				password,
-				null,
-				false,
-				false,
-				clazz,
-				handlers);
+	public T generarClientWs(URL wsdlResourceUrl, String endpoint, QName qname, String userName, String password, Class<T> clazz, Handler<?>... handlers)
+							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+		return this.generarClientWs(wsdlResourceUrl, endpoint, qname, userName, password, null, false, false, clazz, handlers);
 	}
 
-	public T generarClientWs(
-			String endpoint,
-			QName qname,
-			String userName,
-			String password,
-			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(
-				null,
-				endpoint,
-				qname,
-				userName,
-				password,
-				null,
-				false,
-				false,
-				clazz,
-				handlers);
+	public T generarClientWs(String endpoint, QName qname, String userName, String password, Class<T> clazz, Handler<?>... handlers)
+							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+		return this.generarClientWs(null, endpoint, qname, userName, password, null, false, false, clazz, handlers);
 	}
 
-	public T generarClientWs(
-			String endpoint,
-			QName qname,
-			Class<T> clazz,
-			Handler<?>... handlers) throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
-		return this.generarClientWs(
-				null,
-				endpoint,
-				qname,
-				null,
-				null,
-				null,
-				false,
-				false,
-				clazz,
-				handlers);
+	public T generarClientWs(String endpoint, QName qname, Class<T> clazz, Handler<?>... handlers)
+							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
+		return this.generarClientWs(null, endpoint, qname, null, null, null, false, false, clazz, handlers);
 	}
 
 	public static class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
@@ -223,10 +137,7 @@ public class WsClientHelper<T> {
 		private void logXml(SOAPMessageContext messageContext) {
 			StringBuilder sb = new StringBuilder();
 			Boolean outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-			if (outboundProperty.booleanValue())
-				sb.append("Missarge sortint: ");
-			else
-				sb.append("Missarge entrant: ");
+			sb.append(outboundProperty.booleanValue() ? "Missarge sortint: " : "Missarge entrant: ");
 			/*@SuppressWarnings("unchecked")
 			Map<String, List<String>> requestHeaders = (Map<String, List<String>>)context.get(MessageContext.HTTP_REQUEST_HEADERS);
 			if (requestHeaders == null) {
@@ -245,5 +156,4 @@ public class WsClientHelper<T> {
 			LOGGER.debug(sb.toString());
 		}
 	}
-
 }

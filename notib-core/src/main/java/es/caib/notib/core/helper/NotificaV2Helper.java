@@ -90,7 +90,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 
-
 	@UpdateNotificacioTable
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
@@ -178,6 +177,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
+
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
 	}
@@ -195,42 +195,33 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		double elapsedTime;
 		try {
 			Date dataUltimDatat = enviament.getNotificaDataCreacio();
-
 			enviament.updateNotificaDataRefrescEstat();
 			enviament.updateNotificaNovaConsulta(pluginHelper.getConsultaReintentsPeriodeProperty());
-
 			if (enviament.getNotificaIdentificador() == null) {
 				logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 				String errorDescripcio = "L'enviament no té identificador de Notifica";
 				integracioHelper.addAccioError(info, errorDescripcio);
 				throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 			}
-
 			startTime = System.nanoTime();
 			ResultadoInfoEnvioV2 resultadoInfoEnvio = getNotificaResultadoInfoEnvio(enviament, info);
 			elapsedTime = (System.nanoTime() - startTime) / 10e6;
 			logger.info(" [TIMER-EST] Refrescar estat enviament (infoEnvioV2)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
-
 			Datado darrerDatat = getDarrerDatat(resultadoInfoEnvio, enviament, info);
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				logger.info(" [EST] Actualitzant certificació de l'enviament [Id: " + enviament.getId() + "] ...");
 				actualitzaCertificacio(resultadoInfoEnvio, enviament, darrerDatat);
-
 			} else {
 				logger.info(" [EST] Notifica no té cap certificació de l'enviament [Id: " + enviament.getId() + "] ...");
-
 			}
 			notificacioEventHelper.addNotificaConsultaInfoEvent(enviament.getNotificacio(), enviament, "", false);
-
 			logger.info(" [EST] Actualitzant informació enviament amb Datat...");
 			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
 			EnviamentEstat estat = getEstatNotifica(darrerDatat.getResultado());
 			if (!dataDatat.equals(dataUltimDatat) || !estat.equals(enviament.getNotificaEstat())) {
 				actualitzaDatatEnviament(resultadoInfoEnvio, enviament, darrerDatat);
 			}
-
 			logger.info(" [EST] Enviament actualitzat");
-
 			enviament.refreshNotificaConsulta();
 			integracioHelper.addAccioOk(info);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
@@ -248,7 +239,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV2 (notificacioId=" + enviament.getNotificacio().getId() + ", "
 								+ "notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
 			logger.error(errorPrefix, ex);
-
 		}
 		return enviament;
 	}
@@ -275,7 +265,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			integracioHelper.addAccioError(info, errorDescripcio);
 			throw new ValidationException(enviament, NotificacioEnviamentEntity.class, errorDescripcio);
 		}
-
 		Datado datatDarrer = null;
 		for (Datado datado: resultadoInfoEnvio.getDatados().getDatado()) {
 			Date datatData = toDate(datado.getFecha());
@@ -296,9 +285,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return datatDarrer;
 	}
 
-	private void actualitzaCertificacio(ResultadoInfoEnvioV2 resultadoInfoEnvio,
-										NotificacioEnviamentEntity enviament,
-										Datado darrerDatat) throws DatatypeConfigurationException {
+	private void actualitzaCertificacio(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws DatatypeConfigurationException {
+
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 		Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
 		Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
@@ -308,38 +296,21 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 		byte[] decodificat = certificacio.getContenidoCertificacion();
 		if (enviament.getNotificaCertificacioArxiuId() != null) {
-			pluginHelper.gestioDocumentalDelete(
-					enviament.getNotificaCertificacioArxiuId(),
-					PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
+			pluginHelper.gestioDocumentalDelete(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS);
 		}
-		String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-				PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS,
-				decodificat);
-
+		String gestioDocumentalId = pluginHelper.gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, decodificat);
 		logger.info(" [EST] Actualitzant certificació enviament...");
-		enviament.updateNotificaCertificacio(
-				dataCertificacio,
-				gestioDocumentalId,
-				certificacio.getHash(),
-				certificacio.getOrigen(),
-				certificacio.getMetadatos(),
-				certificacio.getCsv(),
-				certificacio.getMime(),
-				Integer.parseInt(certificacio.getSize()),
-				null,
-				null,
-				null);
+		enviament.updateNotificaCertificacio(dataCertificacio, gestioDocumentalId, certificacio.getHash(), certificacio.getOrigen(), certificacio.getMetadatos(),
+												certificacio.getCsv(), certificacio.getMime(), Integer.parseInt(certificacio.getSize()), null,
+												null, null);
 
 		logger.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
 		//Crea un nou event
-		notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-				NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-				darrerDatat.getResultado());
+		notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament, NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO, darrerDatat.getResultado());
 	}
 
-	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio,
-										  NotificacioEnviamentEntity enviament,
-										  Datado darrerDatat) throws Exception {
+	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio, NotificacioEnviamentEntity enviament, Datado darrerDatat) throws Exception {
+
 		Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
 		EnviamentEstat estat = getEstatNotifica(darrerDatat.getResultado());
 		CodigoDIR organismoEmisor = resultadoInfoEnvio.getCodigoOrganismoEmisor();
@@ -354,27 +325,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getCodigo() : null,
 				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getDescripcionCodigoDIR() : null,
 				(organismoEmisorRaiz != null) ? organismoEmisorRaiz.getNifDIR() : null);
-		if (estat != null)
+		if (estat != null) {
 			logger.info(" [EST] Nou estat: " + estat.name());
-
+		}
 		//Crea un nou event
 		logger.info(" [EST] Creant nou event per Datat...");
-		notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-				NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-				darrerDatat.getResultado());
+		notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament, NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT, darrerDatat.getResultado());
 		logger.info(" [EST] L'event s'ha guardat correctament...");
-
 		logger.info(" [EST] Actualitzant Datat enviament...");
-		enviamentUpdateDatat(
-				estat,
-				toDate(darrerDatat.getFecha()),
-				null,
-				darrerDatat.getOrigen(),
-				darrerDatat.getNifReceptor(),
-				darrerDatat.getNombreReceptor(),
-				null,
-				null,
-				enviament);
+		enviamentUpdateDatat(estat, toDate(darrerDatat.getFecha()), null, darrerDatat.getOrigen(), darrerDatat.getNifReceptor(),
+								darrerDatat.getNombreReceptor(), null, null, enviament);
 		logger.info(" [EST] Fi actualització Datat");
 	}
 
@@ -717,12 +677,10 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 	
 	private void updateEventWithEnviament(NotificacioEntity notificacio, String errorDescripcio, NotificacioErrorTipusEnumDto notificacioErrorTipus, boolean notificaError) {
-
 		notificacioEventHelper.addErrorEvent(notificacio, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
 	}
 	
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
-
 		return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/core/wsdl/NotificaWsV21.wsdl"), getNotificaUrlProperty(),
 				new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),
@@ -730,6 +688,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	private static class ApiKeySOAPHandlerV2 implements SOAPHandler<SOAPMessageContext> {
+
 		private final String apiKey;
 		public ApiKeySOAPHandlerV2(String apiKey) {
 			this.apiKey = apiKey;
@@ -787,5 +746,4 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return configHelper.getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificaV2Helper.class);
-
 }

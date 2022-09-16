@@ -72,209 +72,103 @@ public class PermisosHelper {
 	@Resource
 	private MessageHelper messageHelper;
 
-	public void assignarPermisUsuari(
-			String userName,
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission permission) {
-		assignarPermisos(
-				new PrincipalSid(userName),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission},
-				false);
-	}
-	public void assignarPermisRol(
-			String roleName,
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission permission) {
-		assignarPermisos(
-				new GrantedAuthoritySid(getMapeigRol(roleName)),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission},
-				false);
+	public void assignarPermisUsuari(String userName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+		assignarPermisos(new PrincipalSid(userName), objectClass, objectIdentifier, new Permission[] {permission}, false);
 	}
 
-	public void revocarPermisUsuari(
-			String userName,
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission permission) {
-		revocarPermisos(
-				new PrincipalSid(userName),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission});
-	}
-	public void revocarPermisRol(
-			String roleName,
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission permission) {
-		revocarPermisos(
-				new GrantedAuthoritySid(getMapeigRol(roleName)),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission});
+	public void assignarPermisRol(String roleName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+		assignarPermisos(new GrantedAuthoritySid(getMapeigRol(roleName)), objectClass, objectIdentifier, new Permission[] {permission}, false);
 	}
 
-	public void mourePermisUsuari(
-			String sourceUserName,
-			String targetUserName,
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission permission) {
-		assignarPermisos(
-				new PrincipalSid(targetUserName),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission},
-				false);
-		revocarPermisos(
-				new PrincipalSid(sourceUserName),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission});
-	}
-	public void mourePermisRol(
-			String sourceRoleName,
-			String targetRoleName,
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission permission) {
-		assignarPermisos(
-				new GrantedAuthoritySid(getMapeigRol(targetRoleName)),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission},
-				false);
-		revocarPermisos(
-				new GrantedAuthoritySid(getMapeigRol(sourceRoleName)),
-				objectClass,
-				objectIdentifier,
-				new Permission[] {permission});
+	public void revocarPermisUsuari(String userName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+		revocarPermisos(new PrincipalSid(userName), objectClass, objectIdentifier, new Permission[] {permission});
 	}
 
-	public void filterGrantedAny(
-			Collection<? extends AbstractPersistable<Long>> objects,
-			Class<?> clazz,
-			Permission[] permissions) {
+	public void revocarPermisRol(String roleName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+		revocarPermisos(new GrantedAuthoritySid(getMapeigRol(roleName)), objectClass, objectIdentifier, new Permission[] {permission});
+	}
+
+	public void mourePermisUsuari(String sourceUserName, String targetUserName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+		assignarPermisos(new PrincipalSid(targetUserName), objectClass, objectIdentifier, new Permission[] {permission}, false);
+		revocarPermisos(new PrincipalSid(sourceUserName), objectClass, objectIdentifier, new Permission[] {permission});
+	}
+
+	public void mourePermisRol(String sourceRoleName, String targetRoleName, Long objectIdentifier, Class<?> objectClass, Permission permission) {
+		assignarPermisos(new GrantedAuthoritySid(getMapeigRol(targetRoleName)), objectClass, objectIdentifier, new Permission[] {permission}, false);
+		revocarPermisos(new GrantedAuthoritySid(getMapeigRol(sourceRoleName)), objectClass, objectIdentifier, new Permission[] {permission});
+	}
+
+	public void filterGrantedAny(Collection<? extends AbstractPersistable<Long>> objects, Class<?> clazz, Permission[] permissions) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAny(
-				objects,
-				new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
-					@Override
-					public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
-						return entitat.getId();
-					}
-				},
-				clazz,
-				permissions,
-				auth);
+		ObjectIdentifierExtractor<AbstractPersistable<Long>> o = new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
+			@Override public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {return entitat.getId();
+		}};
+		filterGrantedAny(objects, o, clazz, permissions, auth);
 	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void filterGrantedAny(
-			Collection<?> objects,
-			ObjectIdentifierExtractor objectIdentifierExtractor,
-			Class<?> clazz,
-			Permission[] permissions,
-			Authentication auth) {
-		Iterator<?> it = objects.iterator();
-		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(
-					it.next());
-			if (!isGrantedAny(
-					objectIdentifier,
-					clazz,
-					permissions,
-					auth))
-				it.remove();
-		}
-	}
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean isGrantedAny(
-			Collection<?> objects,
-			ObjectIdentifierExtractor objectIdentifierExtractor,
-			Class<?> clazz,
-			Permission[] permissions,
-			Authentication auth) {
+	public void filterGrantedAny(Collection<?> objects, ObjectIdentifierExtractor objectIdentifierExtractor, Class<?> clazz, Permission[] permissions, Authentication auth) {
+
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
 			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
-			if (isGrantedAny(
-					objectIdentifier,
-					clazz,
-					permissions,
-					auth))
+			if (!isGrantedAny(objectIdentifier, clazz, permissions, auth)) {
+				it.remove();
+			}
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public boolean isGrantedAny(Collection<?> objects, ObjectIdentifierExtractor objectIdentifierExtractor, Class<?> clazz, Permission[] permissions, Authentication auth) {
+
+		Iterator<?> it = objects.iterator();
+		while (it.hasNext()) {
+			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (isGrantedAny(objectIdentifier, clazz, permissions, auth)) {
 				return true;
+			}
 		}
 		return false;
 	}
-	public boolean isGrantedAny(
-			Long objectIdentifier,
-			Class<?> clazz,
-			Permission[] permissions,
-			Authentication auth) {
-		boolean[] granted = verificarPermisos(
-				objectIdentifier,
-				clazz,
-				permissions,
-				auth);
+	public boolean isGrantedAny(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
+
+		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
 		for (int i = 0; i < granted.length; i++) {
-			if (granted[i])
+			if (granted[i]) {
 				return true;
+			}
 		}
 		return false;
 	}
 
-	public void filterGrantedAll(
-			Collection<? extends AbstractPersistable<Long>> objects,
-			Class<?> clazz,
-			Permission[] permissions) {
+	public void filterGrantedAll(Collection<? extends AbstractPersistable<Long>> objects, Class<?> clazz, Permission[] permissions) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAll(
-				objects,
-				new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
-					@Override
-					public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
-						return entitat.getId();
-					}
-				},
-				clazz,
-				permissions,
-				auth);
+		ObjectIdentifierExtractor<AbstractPersistable<Long>> o = new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
+			@Override
+			public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
+				return entitat.getId();
+			}
+		};
+		filterGrantedAll(objects, o, clazz, permissions, auth);
 	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void filterGrantedAll(
-			Collection<?> objects,
-			ObjectIdentifierExtractor objectIdentifierExtractor,
-			Class<?> clazz,
-			Permission[] permissions,
-			Authentication auth) {
+	public void filterGrantedAll(Collection<?> objects, ObjectIdentifierExtractor objectIdentifierExtractor, Class<?> clazz, Permission[] permissions, Authentication auth) {
+
 		Iterator<?> it = objects.iterator();
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(
-					it.next());
-			if (!isGrantedAll(
-					objectIdentifier,
-					clazz,
-					permissions,
-					auth))
+			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (!isGrantedAll(objectIdentifier, clazz, permissions, auth)) {
 				it.remove();
+			}
 		}
 	}
-	public boolean isGrantedAll(
-			Long objectIdentifier,
-			Class<?> clazz,
-			Permission[] permissions,
-			Authentication auth) {
-		boolean[] granted = verificarPermisos(
-				objectIdentifier,
-				clazz,
-				permissions,
-				auth);
+
+	public boolean isGrantedAll(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
+
+		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
 		boolean result = true;
 		for (int i = 0; i < granted.length; i++) {
 			if (!granted[i]) {
@@ -284,7 +178,9 @@ public class PermisosHelper {
 		}
 		return result;
 	}
+
 	private List<AclSidEntity> getSids(Authentication auth) {
+
 		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
 		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
@@ -323,6 +219,7 @@ public class PermisosHelper {
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
 	public boolean isGrantedAny(Authentication auth, Class<?> clazz, Permission[] permissions) {
+
 		List<AclSidEntity> sids = getSids(auth);
 		if (sids.isEmpty()) {
 			return false;
@@ -344,6 +241,7 @@ public class PermisosHelper {
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission[] permissions) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<AclSidEntity> sids = getSids(auth);
 		if (sids.isEmpty()) {
@@ -384,95 +282,75 @@ public class PermisosHelper {
 //		return repository.findObjectsWithPermissions(clazz.getName(), sids, permission.getMask());
 //	}
 
-	public List<PermisDto> findPermisos(
-			Long objectIdentifier,
-			Class<?> objectClass) {
-		Acl acl = null;
+	public List<PermisDto> findPermisos(Long objectIdentifier, Class<?> objectClass) {
+
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			acl = aclService.readAclById(oid);
+			Acl acl = aclService.readAclById(oid);
+			return findPermisosPerAcl(acl);
 		} catch (NotFoundException nfex) {
-			return new ArrayList<PermisDto>();
+			return new ArrayList<>();
 		}
-		return findPermisosPerAcl(acl);
 	}
 	
-	public PermisDto findPermis(
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Long permisId) {
-		Acl acl = null;
+	public PermisDto findPermis(Long objectIdentifier, Class<?> objectClass, Long permisId) {
+
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			acl = aclService.readAclById(oid);
+			Acl acl = aclService.readAclById(oid);
+			return findPermisAclById(acl, permisId);
 		} catch (NotFoundException nfex) {
 			return new PermisDto();
 		}
-		return findPermisAclById(acl, permisId);
 	}
 	
-	public boolean hasAnyPermis(
-			Long objectIdentifier,
-			Class<?> objectClass) {
-		Acl acl = null;
+	public boolean hasAnyPermis(Long objectIdentifier, Class<?> objectClass) {
+
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			acl = aclService.readAclById(oid);
+			Acl acl = aclService.readAclById(oid);
+			return (acl.getEntries() != null && !acl.getEntries().isEmpty());
 		} catch (NotFoundException nfex) {
 			return false;
 		}
-		return (acl.getEntries() != null && !acl.getEntries().isEmpty());
-		
 	}
-	public boolean hasPermission(
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Permission[] permissions) {
+
+	public boolean hasPermission(Long objectIdentifier, Class<?> objectClass, Permission[] permissions) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<Sid> sids = new ArrayList<Sid>();
 		sids.add(new PrincipalSid(auth.getName()));
-		for (GrantedAuthority ga: auth.getAuthorities())
+		for (GrantedAuthority ga: auth.getAuthorities()) {
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
-
-		ObjectIdentity oid = new ObjectIdentityImpl(
-				objectClass,
-				objectIdentifier);
+		}
+		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 		try {
 			Acl acl = aclService.readAclById(oid);
 			List<Permission> ps = Arrays.asList(permissions);
-
-			return acl.isGranted(
-					ps,
-					sids,
-					false);
+			return acl.isGranted(ps, sids, false);
 		} catch (NotFoundException nfex) {
 			return false;
 		}
 	}
 	
-	public Map<Long, List<PermisDto>> findPermisos(
-			List<Long> objectIdentifiers,
-			Class<?> objectClass) {
+	public Map<Long, List<PermisDto>> findPermisos(List<Long> objectIdentifiers, Class<?> objectClass) {
+
 		try {
 			Map<Long, List<PermisDto>> resposta = new HashMap<Long, List<PermisDto>>();
 			List<ObjectIdentity> oids = new ArrayList<ObjectIdentity>();
 			for (Long objectIdentifier: objectIdentifiers) {
-				ObjectIdentity oid = new ObjectIdentityImpl(
-						objectClass,
-						objectIdentifier);
+				ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 				oids.add(oid);
 			}
 			if (!oids.isEmpty()) {
 				Map<ObjectIdentity, Acl> acls = lookupStrategy.readAclsById(oids, null);
 				for (ObjectIdentity oid: acls.keySet()) {
-					resposta.put(
-							(Long)oid.getIdentifier(),
-							findPermisosPerAcl(acls.get(oid)));
+					resposta.put((Long)oid.getIdentifier(), findPermisosPerAcl(acls.get(oid)));
 				}
 			}
 			return resposta;
 		} catch (NotFoundException nfex) {
-			return new HashMap<Long, List<PermisDto>>();
+			return new HashMap<>();
 		}
 	}
 	public void updatePermis(Long objectIdentifier, Class<?> objectClass, PermisDto permis) {
@@ -483,37 +361,28 @@ public class PermisosHelper {
 			assignarPermisos(new GrantedAuthoritySid(getMapeigRol(permis.getPrincipal())), objectClass, objectIdentifier, getPermissionsFromPermis(permis),true);
 		}
 	}
-	public void deletePermis(
-			Long objectIdentifier,
-			Class<?> objectClass,
-			Long permisId) {
+	public void deletePermis(Long objectIdentifier, Class<?> objectClass, Long permisId) {
+
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			MutableAcl acl = (MutableAcl)aclService.readAclById(oid);
 			Sid sid = null;
 			for (AccessControlEntry ace: acl.getEntries()) {
 				if (permisId.equals(ace.getId())) {
-					sid = ace.getSid(); 
-					assignarPermisos(
-							ace.getSid(),
-							objectClass,
-							objectIdentifier,
-							new Permission[] {},
-							true);
+					sid = ace.getSid();
+					assignarPermisos(ace.getSid(), objectClass, objectIdentifier, new Permission[] {}, true);
 					break;
 				}
 			}
 			// asseguram que s'eliminin de BBDD!!
-			if (sid != null)
-				aclService.deleteEntries( 
-						oid, 
-						sid);
+			if (sid != null) {
+				aclService.deleteEntries(oid, sid);
+			}
 		} catch (NotFoundException nfex) {
 		}
 	}
-	public void deleteAcl(
-			Long objectIdentifier,
-			Class<?> objectClass) {
+	public void deleteAcl(Long objectIdentifier, Class<?> objectClass) {
+
 		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			aclService.deleteAcl(oid, true);
@@ -524,84 +393,21 @@ public class PermisosHelper {
 
 
 	private List<PermisDto> findPermisosPerAcl(Acl acl) {
-		List<PermisDto> resposta = new ArrayList<PermisDto>();
-		if (acl != null) {
-			Map<String, PermisDto> permisosUsuari = new HashMap<String, PermisDto>();
-			Map<String, PermisDto> permisosRol = new HashMap<String, PermisDto>();
-			for (AccessControlEntry ace: acl.getEntries()) {
-				PermisDto permis = null;
-				if (ace.getSid() instanceof PrincipalSid) {
-					String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
-					permis = permisosUsuari.get(principal);
-					if (permis == null) {
-						permis = new PermisDto();
-						permis.setId((Long)ace.getId());
-						permis.setPrincipal(principal);
-						DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
-						if(usuari != null) {
-							permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
-						}else {
-							permis.setNomSencerAmbCodi(principal);
-						}
-						
-						permis.setTipus(TipusEnumDto.USUARI);
-						permisosUsuari.put(principal, permis);
-					}
-				} else if (ace.getSid() instanceof GrantedAuthoritySid) {
-					String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
-					permis = permisosRol.get(grantedAuthority);
-					if (permis == null) {
-						permis = new PermisDto();
-						permis.setId((Long)ace.getId());
-						permis.setPrincipal(grantedAuthority);
-						permis.setNomSencerAmbCodi(grantedAuthority);
-						permis.setTipus(TipusEnumDto.ROL);
-						permisosRol.put(grantedAuthority, permis);
-					}
-				}
-				if (permis != null) {
-					if (ExtendedPermission.READ.equals(ace.getPermission()))
-						permis.setRead(true);
-					if (ExtendedPermission.WRITE.equals(ace.getPermission()))
-						permis.setWrite(true);
-					if (ExtendedPermission.CREATE.equals(ace.getPermission()))
-						permis.setCreate(true);
-					if (ExtendedPermission.DELETE.equals(ace.getPermission()))
-						permis.setDelete(true);
-					if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission()))
-						permis.setAdministration(true);
-					if (ExtendedPermission.USUARI.equals(ace.getPermission()))
-						permis.setUsuari(true);
-					if (ExtendedPermission.ADMINISTRADOR.equals(ace.getPermission()))
-						permis.setAdministrador(true);
-					if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission()))
-						permis.setAdministradorEntitat(true);
-					if (ExtendedPermission.APLICACIO.equals(ace.getPermission()))
-						permis.setAplicacio(true);
-					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
-						permis.setProcessar(true);
-					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
-						permis.setComuns(true);
-					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
-						permis.setNotificacio(true);
-					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
-						permis.setComunicacioSir(true);
-				}
-			}
-			resposta.addAll(permisosUsuari.values());
-			resposta.addAll(permisosRol.values());
+
+		if (acl == null) {
+			return new ArrayList<>();
 		}
-		return resposta;
-	}
-	
-	private PermisDto findPermisAclById(Acl acl, Long permisId) {
-		PermisDto permis = null;
-		if (acl != null && permisId != null) {
-			for (AccessControlEntry ace: acl.getEntries()) {
-				if (ace.getSid() instanceof PrincipalSid && permisId.equals((Long)ace.getId())) {
-					String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
+		List<PermisDto> resposta = new ArrayList<PermisDto>();
+		Map<String, PermisDto> permisosUsuari = new HashMap<String, PermisDto>();
+		Map<String, PermisDto> permisosRol = new HashMap<String, PermisDto>();
+		for (AccessControlEntry ace: acl.getEntries()) {
+			PermisDto permis = null;
+			if (ace.getSid() instanceof PrincipalSid) {
+				String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
+				permis = permisosUsuari.get(principal);
+				if (permis == null) {
 					permis = new PermisDto();
-					permis.setId(permisId);
+					permis.setId((Long)ace.getId());
 					permis.setPrincipal(principal);
 					DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
 					if(usuari != null) {
@@ -609,43 +415,138 @@ public class PermisosHelper {
 					}else {
 						permis.setNomSencerAmbCodi(principal);
 					}
-						permis.setTipus(TipusEnumDto.USUARI);
-				} else if (ace.getSid() instanceof GrantedAuthoritySid && permisId.equals((Long)ace.getId())) {
-					String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
+
+					permis.setTipus(TipusEnumDto.USUARI);
+					permisosUsuari.put(principal, permis);
+				}
+			} else if (ace.getSid() instanceof GrantedAuthoritySid) {
+				String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
+				permis = permisosRol.get(grantedAuthority);
+				if (permis == null) {
 					permis = new PermisDto();
 					permis.setId((Long)ace.getId());
 					permis.setPrincipal(grantedAuthority);
 					permis.setNomSencerAmbCodi(grantedAuthority);
 					permis.setTipus(TipusEnumDto.ROL);
+					permisosRol.put(grantedAuthority, permis);
 				}
-				if (permis != null) {
-					if (ExtendedPermission.READ.equals(ace.getPermission()))
-						permis.setRead(true);
-					if (ExtendedPermission.WRITE.equals(ace.getPermission()))
-						permis.setWrite(true);
-					if (ExtendedPermission.CREATE.equals(ace.getPermission()))
-						permis.setCreate(true);
-					if (ExtendedPermission.DELETE.equals(ace.getPermission()))
-						permis.setDelete(true);
-					if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission()))
-						permis.setAdministration(true);
-					if (ExtendedPermission.USUARI.equals(ace.getPermission()))
-						permis.setUsuari(true);
-					if (ExtendedPermission.ADMINISTRADOR.equals(ace.getPermission()))
-						permis.setAdministrador(true);
-					if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission()))
-						permis.setAdministradorEntitat(true);
-					if (ExtendedPermission.APLICACIO.equals(ace.getPermission()))
-						permis.setAplicacio(true);
-					if (ExtendedPermission.PROCESSAR.equals(ace.getPermission()))
-						permis.setProcessar(true);
-					if (ExtendedPermission.COMUNS.equals(ace.getPermission()))
-						permis.setComuns(true);
-					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
-						permis.setNotificacio(true);
-					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
-						permis.setComunicacioSir(true);
+			}
+			if (permis == null) {
+				continue;
+			}
+			if (ExtendedPermission.READ.equals(ace.getPermission())) {
+				permis.setRead(true);
+			}
+			if (ExtendedPermission.WRITE.equals(ace.getPermission())) {
+				permis.setWrite(true);
+			}
+			if (ExtendedPermission.CREATE.equals(ace.getPermission())) {
+				permis.setCreate(true);
+			}
+			if (ExtendedPermission.DELETE.equals(ace.getPermission())) {
+				permis.setDelete(true);
+			}
+			if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission())) {
+				permis.setAdministration(true);
+			}
+			if (ExtendedPermission.USUARI.equals(ace.getPermission())) {
+				permis.setUsuari(true);
+			}
+			if (ExtendedPermission.ADMINISTRADOR.equals(ace.getPermission())) {
+				permis.setAdministrador(true);
+			}
+			if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission())) {
+				permis.setAdministradorEntitat(true);
+			}
+			if (ExtendedPermission.APLICACIO.equals(ace.getPermission())) {
+				permis.setAplicacio(true);
+			}
+			if (ExtendedPermission.PROCESSAR.equals(ace.getPermission())) {
+				permis.setProcessar(true);
+			}
+			if (ExtendedPermission.COMUNS.equals(ace.getPermission())) {
+				permis.setComuns(true);
+			}
+			if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission())) {
+				permis.setNotificacio(true);
+			}
+			if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission())) {
+				permis.setComunicacioSir(true);
+			}
+		}
+		resposta.addAll(permisosUsuari.values());
+		resposta.addAll(permisosRol.values());
+		return resposta;
+	}
+	
+	private PermisDto findPermisAclById(Acl acl, Long permisId) {
+
+		if (acl == null || permisId == null) {
+			return null;
+		}
+		PermisDto permis = null;
+		for (AccessControlEntry ace: acl.getEntries()) {
+			if (ace.getSid() instanceof PrincipalSid && permisId.equals((Long)ace.getId())) {
+				String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
+				permis = new PermisDto();
+				permis.setId(permisId);
+				permis.setPrincipal(principal);
+				DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+				if(usuari != null) {
+					permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
+				}else {
+					permis.setNomSencerAmbCodi(principal);
 				}
+					permis.setTipus(TipusEnumDto.USUARI);
+			} else if (ace.getSid() instanceof GrantedAuthoritySid && permisId.equals((Long)ace.getId())) {
+				String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
+				permis = new PermisDto();
+				permis.setId((Long)ace.getId());
+				permis.setPrincipal(grantedAuthority);
+				permis.setNomSencerAmbCodi(grantedAuthority);
+				permis.setTipus(TipusEnumDto.ROL);
+			}
+			if (permis == null) {
+				continue;
+			}
+			if (ExtendedPermission.READ.equals(ace.getPermission())) {
+				permis.setRead(true);
+			}
+			if (ExtendedPermission.WRITE.equals(ace.getPermission())) {
+				permis.setWrite(true);
+			}
+			if (ExtendedPermission.CREATE.equals(ace.getPermission())) {
+				permis.setCreate(true);
+			}
+			if (ExtendedPermission.DELETE.equals(ace.getPermission())) {
+				permis.setDelete(true);
+			}
+			if (ExtendedPermission.ADMINISTRATION.equals(ace.getPermission())) {
+				permis.setAdministration(true);
+			}
+			if (ExtendedPermission.USUARI.equals(ace.getPermission())) {
+				permis.setUsuari(true);
+			}
+			if (ExtendedPermission.ADMINISTRADOR.equals(ace.getPermission())) {
+				permis.setAdministrador(true);
+			}
+			if (ExtendedPermission.ADMINISTRADORENTITAT.equals(ace.getPermission())) {
+				permis.setAdministradorEntitat(true);
+			}
+			if (ExtendedPermission.APLICACIO.equals(ace.getPermission())) {
+				permis.setAplicacio(true);
+			}
+			if (ExtendedPermission.PROCESSAR.equals(ace.getPermission())) {
+				permis.setProcessar(true);
+			}
+			if (ExtendedPermission.COMUNS.equals(ace.getPermission())) {
+				permis.setComuns(true);
+			}
+			if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission())) {
+				permis.setNotificacio(true);
+			}
+			if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission())) {
+				permis.setComunicacioSir(true);
 			}
 		}
 		return permis;
@@ -654,7 +555,7 @@ public class PermisosHelper {
 	private void assignarPermisos(Sid sid, Class<?> objectClass, Serializable objectIdentifier, Permission[] permissions, boolean netejarAbans) {
 
 		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-		MutableAcl acl = null;
+		MutableAcl acl;
 		try {
 			acl = (MutableAcl)aclService.readAclById(oid);
 		} catch (NotFoundException nfex) {
@@ -677,11 +578,8 @@ public class PermisosHelper {
 		aclService.updateAcl(acl);
 	}
 
-	private void revocarPermisos(
-			Sid sid,
-			Class<?> objectClass,
-			Serializable objectIdentifier,
-			Permission[] permissions) throws NotFoundException {
+	private void revocarPermisos(Sid sid, Class<?> objectClass, Serializable objectIdentifier, Permission[] permissions) throws NotFoundException {
+
 		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 		try {
 			MutableAcl acl = (MutableAcl)aclService.readAclById(oid);
@@ -690,45 +588,41 @@ public class PermisosHelper {
 			for (AccessControlEntry ace: acl.getEntries()) {
 				if (ace.getSid().equals(sid)) {
 					for (Permission p: permissions) {
-						if (p.equals(ace.getPermission()))
+						if (p.equals(ace.getPermission())) {
 							indexosPerEsborrar.add(aceIndex);
+						}
 					}
 				}
 				aceIndex++;
 			}
-			for (Integer index: indexosPerEsborrar)
+			for (Integer index: indexosPerEsborrar) {
 				acl.deleteAce(index);
+			}
 			aclService.updateAcl(acl);
 		} catch (NotFoundException nfex) {
 			// Si no troba l'ACL no fa res
 		}
 	}
 
-	private boolean[] verificarPermisos(
-			Long objectIdentifier,
-			Class<?> clazz,
-			Permission[] permissions,
-			Authentication auth) {
+	private boolean[] verificarPermisos(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
+
 		List<Sid> sids = new ArrayList<Sid>();
 		sids.add(new PrincipalSid(auth.getName()));
-		for (GrantedAuthority ga: auth.getAuthorities())
+		for (GrantedAuthority ga: auth.getAuthorities()) {
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
+		}
 		boolean[] granted = new boolean[permissions.length];
-		for (int i = 0; i < permissions.length; i++)
+		for (int i = 0; i < permissions.length; i++) {
 			granted[i] = false;
+		}
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(
-					clazz,
-					objectIdentifier);
+			ObjectIdentity oid = new ObjectIdentityImpl(clazz, objectIdentifier);
 			Acl acl = aclService.readAclById(oid);
 			List<Permission> ps = new ArrayList<Permission>();
 			for (int i = 0; i < permissions.length; i++) {
 				try {
 					ps.add(permissions[i]);
-					granted[i] = acl.isGranted(
-							ps,
-							sids,
-							false);
+					granted[i] = acl.isGranted(ps, sids, false);
 					ps.clear();
 				} catch (NotFoundException ex) {}
 			}
@@ -737,6 +631,7 @@ public class PermisosHelper {
 	}
 
 	private Permission[] getPermissionsFromPermis(PermisDto permis) {
+
 		List<Permission> permissions = new ArrayList<Permission>();
 //		if (permis.isRead())
 //			permissions.add(ExtendedPermission.READ);
@@ -748,43 +643,47 @@ public class PermisosHelper {
 //			permissions.add(ExtendedPermission.DELETE);
 //		if (permis.isAdministration())
 //			permissions.add(ExtendedPermission.ADMINISTRATION);
-		if (permis.isUsuari())
+		if (permis.isUsuari()) {
 			permissions.add(ExtendedPermission.USUARI);
-		if (permis.isAdministrador())
+		}
+		if (permis.isAdministrador()) {
 			permissions.add(ExtendedPermission.ADMINISTRADOR);
-		if (permis.isAdministradorEntitat())
+		}
+		if (permis.isAdministradorEntitat()) {
 			permissions.add(ExtendedPermission.ADMINISTRADORENTITAT);
-		if (permis.isAplicacio())
+		}
+		if (permis.isAplicacio()) {
 			permissions.add(ExtendedPermission.APLICACIO);
-		if (permis.isRead())
+		}
+		if (permis.isRead()) {
 			permissions.add(ExtendedPermission.READ);
-		if (permis.isAdministration())
+		}
+		if (permis.isAdministration()) {
 			permissions.add(ExtendedPermission.ADMINISTRATION);
-		if (permis.isProcessar())
+		}
+		if (permis.isProcessar()) {
 			permissions.add(ExtendedPermission.PROCESSAR);
-		if (permis.isComuns())
+		}
+		if (permis.isComuns()) {
 			permissions.add(ExtendedPermission.COMUNS);
-		if (permis.isNotificacio())
+		}
+		if (permis.isNotificacio()) {
 			permissions.add(ExtendedPermission.NOTIFICACIO);
-		if (permis.isComunicacioSir())
+		}
+		if (permis.isComunicacioSir()) {
 			permissions.add(ExtendedPermission.COMUNICACIO_SIR);
-
+		}
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
 
 	private String getMapeigRol(String rol) {
-		String propertyMapeig = 
-				(String) ConfigHelper.JBossPropertiesHelper.getProperties().get(
-						"es.caib.notib.mapeig.rol." + rol);
-		if (propertyMapeig != null)
-			return propertyMapeig;
-		else
-			return rol;
+
+		String propertyMapeig = (String) ConfigHelper.JBossPropertiesHelper.getProperties().get("es.caib.notib.mapeig.rol." + rol);
+		return propertyMapeig != null ? propertyMapeig : rol;
 	}
 
-	public void revocarPermisosEntity(
-			Long objectIdentifier,
-			Class<?> clazz) {
+	public void revocarPermisosEntity(Long objectIdentifier, Class<?> clazz) {
+
 		List<PermisDto> permisosActuals = findPermisos(objectIdentifier, clazz);
 		for (PermisDto permisDto : permisosActuals) {
 			permisDto.revocaPermisos();
@@ -846,26 +745,17 @@ public class PermisosHelper {
 	}
 
 	@Transactional
-	public void actualitzarPermisosOrgansObsolets(
-			List<NodeDir3> unitatsWs,
-			List<OrganGestorEntity> organsDividits,
-			List<OrganGestorEntity> organsFusionats,
-			List<OrganGestorEntity> organsSubstituits,
-			ProgresActualitzacioDto progres) {
+	public void actualitzarPermisosOrgansObsolets(List<NodeDir3> unitatsWs, List<OrganGestorEntity> organsDividits, List<OrganGestorEntity> organsFusionats,
+												  List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
 		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.notib.core.entity.OrganGestorEntity");
-
 		List<String> organsFusionatsProcessats = new ArrayList<>();
-
 		int nombreUnitatsTotal = unitatsWs.size();
 		int nombreUnitatsProcessades = 0;
-
 		// Actualitzam permisos en l'ordre en que ens arriben del Dir3
 		for(NodeDir3 unitat: unitatsWs) {
-
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.permisos.unitat", new Object[] {unitat.getCodi()}));
 			progres.setProgres(63 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
-
 			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
 				for (OrganGestorEntity organDesti : organOrigen.getNous()) {
@@ -873,7 +763,6 @@ public class PermisosHelper {
 				}
 				continue;
 			}
-
 			organOrigen = getOrgan(organsFusionats, unitat.getCodi());
 			if (organOrigen != null && !organsFusionatsProcessats.contains(organOrigen.getCodi())) {
 				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
@@ -883,7 +772,6 @@ public class PermisosHelper {
 				duplicaPermisos(classname, organsOrigen, organDesti);
 				continue;
 			}
-
 			organOrigen = getOrgan(organsSubstituits, unitat.getCodi());
 			if (organOrigen != null) {
 				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
@@ -894,9 +782,11 @@ public class PermisosHelper {
 	}
 
 	private OrganGestorEntity getOrgan(List<OrganGestorEntity> llista, String codi) {
+
 		for (OrganGestorEntity organ: llista) {
-			if (organ.getCodi().equals(codi))
+			if (organ.getCodi().equals(codi)) {
 				return organ;
+			}
 		}
 		return null;
 	}
@@ -931,15 +821,18 @@ public class PermisosHelper {
 	}
 
 	private void duplicaPermisos(AclClassEntity classname, List<OrganGestorEntity> organsOrigen, OrganGestorEntity organDesti) {
+
 		Set<AclEntryEntity> permisosDesti = new HashSet<>();
 		Set<AclEntryEntity> permisosOrigen = new HashSet<>();
 		AclSidEntity ownerSid = null;
 		for (OrganGestorEntity organOrigen: organsOrigen) {
 			AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organOrigen.getId());
-			if (objectIdentityAntic == null)
+			if (objectIdentityAntic == null) {
 				continue;
-			if (ownerSid == null)
+			}
+			if (ownerSid == null) {
 				ownerSid = objectIdentityAntic.getOwnerSid();
+			}
 			permisosOrigen.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
 		}
 		duplicaEntradesPermisos(classname, organDesti, ownerSid, permisosOrigen, permisosDesti);
@@ -947,24 +840,15 @@ public class PermisosHelper {
 	}
 
 	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Set<AclEntryEntity> permisosOrigen, Set<AclEntryEntity> permisosDesti) {
+
 		AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		if (objectIdentityNou == null) {
-			objectIdentityNou = AclObjectIdentityEntity.builder()
-					.classname(classname)
-					.objectId(organNou.getId())
-					.ownerSid(ownerSid)
-					.build();
+			objectIdentityNou = AclObjectIdentityEntity.builder().classname(classname).objectId(organNou.getId()).ownerSid(ownerSid).build();
 			aclObjectIdentityRepository.save(objectIdentityNou);
 		}
 		for (AclEntryEntity permisAntic : permisosOrigen) {
-			AclEntryEntity aclEntry = AclEntryEntity.builder()
-					.aclObjectIdentity(objectIdentityNou)
-					.sid(permisAntic.getSid())
-					.order(permisosDesti.size())
-					.mask(permisAntic.getMask())
-					.granting(permisAntic.getGranting())
-					.build();
-			permisosDesti.add(aclEntry);
+			permisosDesti.add(AclEntryEntity.builder().aclObjectIdentity(objectIdentityNou).sid(permisAntic.getSid()).order(permisosDesti.size())
+										.mask(permisAntic.getMask()).granting(permisAntic.getGranting()).build());
 		}
 	}
 

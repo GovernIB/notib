@@ -30,10 +30,9 @@ public class OrganigramaHelper {
 	private OrganGestorCachable organGestorCachable;
 	
 	public List<OrganismeDto> getOrganismesFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
+
 		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
-		
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		
 		List<OrganismeDto> organismes= new ArrayList<OrganismeDto>();
 		organismes.addAll(getOrgansGestorsFills(organigramaEntitat, codiDir3));
 		return organismes;
@@ -48,8 +47,8 @@ public class OrganigramaHelper {
 	}
 
 	public List<String> getCodisOrgansGestorsFillsExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-		List<String> unitatsEntitat = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(codiDir3Entitat, codiDir3Organ);
 
+		List<String> unitatsEntitat = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(codiDir3Entitat, codiDir3Organ);
 		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
 		unitatsEntitat.retainAll(unitatsExistents);
 		return unitatsEntitat;
@@ -58,9 +57,8 @@ public class OrganigramaHelper {
 //		return getCodisOrgansGestorsFillsExistentsByOrgan(codiDir3Entitat, null);
 //	}
 
-	private List<OrganismeDto> getOrgansGestorsFills(
-			Map<String, OrganismeDto> organigrama,
-			String codiDir3) {
+	private List<OrganismeDto> getOrgansGestorsFills(Map<String, OrganismeDto> organigrama, String codiDir3) {
+
 		List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
 		OrganismeDto organisme = organigrama.get(codiDir3);
 		organismes.add(organisme);
@@ -73,13 +71,11 @@ public class OrganigramaHelper {
 	}
 
 	public List<String> getCodisOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
+
 		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
-		
 		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		
 		List<String> unitatsEntitat = new ArrayList<String>();
 		unitatsEntitat.addAll(getCodisOrgansGestorsPare(organigramaEntitat, codiDir3, codiDir3Entitat));
-		
 		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
 		unitatsEntitat.retainAll(unitatsExistents);
 		return unitatsEntitat;
@@ -93,19 +89,15 @@ public class OrganigramaHelper {
 	 * 		   Inclou el OrganGestorEntity del codi indicat per paràmetre
 	 */
 	public List<OrganGestorEntity> getOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
+
 		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
-		if (!unitatsEntitat.isEmpty())
-			return organGestorRepository.findByCodiIn(unitatsEntitat);
-		else
-			return new ArrayList<>();
+		return !unitatsEntitat.isEmpty() ? organGestorRepository.findByCodiIn(unitatsEntitat) : new ArrayList<OrganGestorEntity>();
 	}
 
 	public List<ProcSerOrganEntity> getProcSerOrgansGestorsParesExistentsByOrgan(Long procedimentId, String codiDir3Entitat, String codiDir3Organ) {
+
 		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
-		if (!unitatsEntitat.isEmpty())
-			return procSerOrganRepository.findByProcSerIdAndOrganGestorCodiIn(procedimentId, unitatsEntitat);
-		else
-			return new ArrayList<>();
+		return !unitatsEntitat.isEmpty() ? procSerOrganRepository.findByProcSerIdAndOrganGestorCodiIn(procedimentId, unitatsEntitat) : new ArrayList<ProcSerOrganEntity>();
 	}
 
 	/**
@@ -119,21 +111,17 @@ public class OrganigramaHelper {
 	 * @return Conjunt dels codis dels òrganismes fills del òrgan indicat.
 	 * 		   Inclou el codi de l'òrgan indicat per paràmetre
 	 */
-	private List<String> getCodisOrgansGestorsPare(
-			Map<String, OrganismeDto> organigrama,
-			String codiDir3,
-			String codiDir3Entitat) {
+	private List<String> getCodisOrgansGestorsPare(Map<String, OrganismeDto> organigrama, String codiDir3, String codiDir3Entitat) {
+
 		List<String> unitats = new ArrayList<String>();
 		unitats.add(codiDir3);
-		if (!codiDir3.equals(codiDir3Entitat)) {
-			OrganismeDto organisme = organigrama.get(codiDir3);
-			if (organisme != null && organisme.getPare() != null && !organisme.getPare().equals(codiDir3Entitat)) {
-				unitats.addAll(getCodisOrgansGestorsPare(organigrama, organisme.getPare(), codiDir3Entitat));
-			}
+		if (codiDir3.equals(codiDir3Entitat)) {
+			return unitats;
+		}
+		OrganismeDto organisme = organigrama.get(codiDir3);
+		if (organisme != null && organisme.getPare() != null && !organisme.getPare().equals(codiDir3Entitat)) {
+			unitats.addAll(getCodisOrgansGestorsPare(organigrama, organisme.getPare(), codiDir3Entitat));
 		}
 		return unitats;
 	}
-	
-//	private static final Logger logger = LoggerFactory.getLogger(OrganigramaHelper.class);
-
 }

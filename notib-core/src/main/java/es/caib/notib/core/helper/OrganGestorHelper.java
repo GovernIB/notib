@@ -73,44 +73,31 @@ public class OrganGestorHelper {
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
 	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
-	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
-			String usuariCodi,
-			Authentication auth,
-			EntitatEntity entitat,
-			Permission[] permisos) {
+	public List<OrganGestorEntity> getOrgansGestorsWithPermis(String usuariCodi, Authentication auth, EntitatEntity entitat, Permission[] permisos) {
 
 		// 1. Obtenim els òrgans gestors amb permisos
-		List<OrganGestorEntity> organsDisponibles = findOrganismesEntitatAmbPermis(entitat,
-				permisos);
-
-		if (organsDisponibles != null && !organsDisponibles.isEmpty()) {
-			Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
-
-			// 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-			for (OrganGestorEntity organGestorEntity : organsDisponibles) {
-				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitat.getDir3Codi(),
-						organGestorEntity.getCodi());
-				if (organsFills != null)
-					for(String organCodi: organsFills) {
-						organsGestorsAmbPermis.add(organGestorRepository.findByCodi(organCodi));
-					}
-
-			}
-
-			organsDisponibles = new ArrayList<>(organsGestorsAmbPermis);
+		List<OrganGestorEntity> organsDisponibles = findOrganismesEntitatAmbPermis(entitat, permisos);
+		if (organsDisponibles == null || organsDisponibles.isEmpty()) {
+			return organsDisponibles;
 		}
-
+		Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
+		// 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
+		for (OrganGestorEntity organGestorEntity : organsDisponibles) {
+			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi());
+			if (organsFills == null) {
+				continue;
+			}
+			for(String organCodi: organsFills) {
+				organsGestorsAmbPermis.add(organGestorRepository.findByCodi(organCodi));
+			}
+		}
+		organsDisponibles = new ArrayList<>(organsGestorsAmbPermis);
 		return organsDisponibles;
 	}
 
-	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth,
-														EntitatEntity entitat,
-														Permission[] permisos) {
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
-				entitat,
-				auth,
-				permisos);
+	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
+
+		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
 		List<String> codis = new ArrayList<>();
 		for (OrganGestorEntity organGestorDto : organs) {
 			codis.add(organGestorDto.getCodi());
@@ -118,32 +105,24 @@ public class OrganGestorHelper {
 		return codis;
 	}
 
-	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
-															   EntitatEntity entitat,
-															   Permission[] permisos) {
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
-				entitat,
-				auth,
-				permisos);
+	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
 
+		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
 		if (organs.isEmpty()) {
 			return new ArrayList<>();
 		}
-
 		Set<String> codisOrgansAmbDescendents = new HashSet<>();
 		for (OrganGestorEntity organGestorEntity : organs) {
 			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
 		}
 		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
-
 	}
 
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
-		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(
-				OrganGestorEntity.class,
-				permisos);
+
+		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
 		if (objectsIds.isEmpty()) {
-			return new ArrayList<OrganGestorEntity>();
+			return new ArrayList<>();
 		}
 		return organGestorRepository.findByEntitatAndIds(entitat, objectsIds);
 	}
@@ -244,16 +223,14 @@ public class OrganGestorHelper {
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
+
 		Date ara = new Date();
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(ara);
 		calendar.add(Calendar.YEAR, 1);
 
-		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-				conversioTipusHelper.convertir(entitat, EntitatDto.class),
-				entitat.getDir3Codi(),
-				entitat.getDataActualitzacio(),
-				entitat.getDataSincronitzacio());
+		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(conversioTipusHelper.convertir(entitat, EntitatDto.class),
+										entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 
 		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
 		if (avisosSinc != null && !avisosSinc.isEmpty()) {
@@ -261,28 +238,17 @@ public class OrganGestorHelper {
 		}
 
 		if (unitatsWs != null && !unitatsWs.isEmpty()) {
-			AvisEntity avis = AvisEntity.getBuilder(
-					ORGAN_NO_SYNC,
-					"Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.",
-					ara,
-					calendar.getTime(),
-					AvisNivellEnumDto.ERROR,
-					true,
-					entitat.getId()).build();
+			String msg = "Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.";
+			AvisEntity avis = AvisEntity.getBuilder(ORGAN_NO_SYNC, msg, ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitat.getId()).build();
 			avisRepository.save(avis);
 		}
 	}
 
 	@Transactional
-	public void sincronitzarOrgans(Long entitatId,
-								   List<NodeDir3> unitatsWs,
-								   List<OrganGestorEntity> obsoleteUnitats,
-								   List<OrganGestorEntity> organsDividits,
-								   List<OrganGestorEntity> organsFusionats,
-								   List<OrganGestorEntity> organsSubstituits,
-								   ProgresActualitzacioDto progres) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+	public void sincronitzarOrgans(Long entitatId, List<NodeDir3> unitatsWs, List<OrganGestorEntity> obsoleteUnitats, List<OrganGestorEntity> organsDividits,
+								   List<OrganGestorEntity> organsFusionats, List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 		int nombreUnitatsTotal = unitatsWs.size();
 		int nombreUnitatsProcessades = 0;
 		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
@@ -332,7 +298,6 @@ public class OrganGestorHelper {
 			avisRepository.delete(avisosSinc);
 		}
 		progres.setProgres(27);
-
 		Date ara = new Date();
 		// Si és la primera sincronització
 		if (entitat.getDataSincronitzacio() == null) {
@@ -347,8 +312,6 @@ public class OrganGestorHelper {
 		if (unitatWS == null) {
 			return unitat;
 		}
-
-
 		// checks if unitat already exists in database
 		unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
 		// if not it creates a new one
@@ -379,40 +342,38 @@ public class OrganGestorHelper {
 		}
 	}
 
-	private void sincronizarHistoricsUnitat(
-			OrganGestorEntity unitat,
-			NodeDir3 unidadWS,
-			EntitatEntity entitat) {
+	private void sincronizarHistoricsUnitat(OrganGestorEntity unitat, NodeDir3 unidadWS, EntitatEntity entitat) {
 
-		if (unidadWS.getHistoricosUO()!=null && !unidadWS.getHistoricosUO().isEmpty()) {
-			for (String historicoCodi : unidadWS.getHistoricosUO()) {
-				OrganGestorEntity nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
-				unitat.addNou(nova);
-				nova.addAntic(unitat);
-			}
+		if (unidadWS.getHistoricosUO() == null || unidadWS.getHistoricosUO().isEmpty()) {
+			return;
+		}
+		for (String historicoCodi : unidadWS.getHistoricosUO()) {
+			OrganGestorEntity nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
+			unitat.addNou(nova);
+			nova.addAntic(unitat);
 		}
 	}
 
 	@Transactional
 	public void deleteExtingitsNoUtilitzats(List<OrganGestorEntity> obsoleteUnitats, ProgresActualitzacioDto progres) {
+
 		// Eliminar organs no vigents no utilitzats??
 		int nombreUnitatsTotal = obsoleteUnitats.size();
 		int nombreUnitatsProcessades = 0;
 
 		Iterator<OrganGestorEntity> it = obsoleteUnitats.iterator();
 		while (it.hasNext()) {
-
 			OrganGestorEntity organObsolet = it.next();
-
 			progres.setProgres(81 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.check", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
-
 			Integer nombreProcediments = procSerOrganRepository.countByOrganGestor(organObsolet);
-			if (nombreProcediments > 0)
+			if (nombreProcediments > 0) {
 				continue;
+			}
 			Integer nombreExpedients = notificacioRepository.countByOrganGestor(organObsolet);
-			if (nombreExpedients > 0)
+			if (nombreExpedients > 0) {
 				continue;
+			}
 			try {
 				permisosHelper.eliminarPermisosOrgan(organObsolet);
 				organGestorRepository.delete(organObsolet);
