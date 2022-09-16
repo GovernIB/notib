@@ -39,9 +39,7 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId,
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
+	public List<Long> findIdsAmbFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException;
 
 	/**
 	 * Consulta dels enviaments d'una entitat realitzats d'una notificació.
@@ -56,13 +54,8 @@ public interface EnviamentService {
 	 * @throws ParseException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio) throws ParseException;
+	PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi,
+																	   NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException;
 	
 	/**
 	 * Consulta dels enviaments d'una notificació.
@@ -127,10 +120,7 @@ public interface EnviamentService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	FitxerDto exportacio(
-			Long entitatId,
-			Collection<Long> enviamentIds,
-			String format) throws IOException, NotFoundException, ParseException;
+	FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException;
 	
 	/**
 	 * Crea les columnes s'han de mostrar
@@ -140,10 +130,7 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void columnesCreate(
-			UsuariDto usuaris,
-			Long entitatId,
-			ColumnesDto columnes);
+	public void columnesCreate(UsuariDto usuaris, Long entitatId, ColumnesDto columnes);
 	
 	/**
 	 * Actualitza les columnes s'han de mostrar
@@ -153,18 +140,14 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void columnesUpdate(
-			Long entitatId,
-			ColumnesDto columnes);
+	public void columnesUpdate(Long entitatId, ColumnesDto columnes);
 	
 	/**
 	 * Obté les columnes visibles per un usuari i entitat
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public ColumnesDto getColumnesUsuari(
-			Long entitatId,
-			UsuariDto usuari);
+	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuari);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	NotificacioEnviamentDtoV2 getOne(Long enviamentId);

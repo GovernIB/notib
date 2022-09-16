@@ -30,9 +30,7 @@ public interface OperadorPostalService {
 	 * @return	El pagador postal creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	OperadorPostalDto create(
-			Long entitatId,
-			OperadorPostalDataDto postal);
+	OperadorPostalDto create(Long entitatId, OperadorPostalDataDto postal);
 
 	/**
 	 * Actualitza la informació d'un pagador postal.
@@ -79,10 +77,7 @@ public interface OperadorPostalService {
 	 * @return La pàgina amb els pagadors postals.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			OperadorPostalFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Llistat amb tots els pagadors postals.

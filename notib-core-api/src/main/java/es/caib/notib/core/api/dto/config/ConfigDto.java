@@ -14,9 +14,8 @@ import java.util.Map;
 @Builder
 //@NoArgsConstructor
 @AllArgsConstructor
-public class
+public class ConfigDto {
 
-ConfigDto {
     private String key;
     private String value;
     private String description;

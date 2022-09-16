@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Getter @Setter
 public class OperadorPostalTableItemDto implements Serializable {
+
     private Long id;
     private String nom;
     private String organismePagador;

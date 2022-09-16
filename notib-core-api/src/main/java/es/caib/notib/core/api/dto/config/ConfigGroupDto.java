@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class ConfigGroupDto {
+
     private String key;
     private String description;
     private List<ConfigDto> configs;

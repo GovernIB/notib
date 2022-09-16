@@ -30,9 +30,7 @@ public interface PagadorCieService {
 	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	CieDto create(
-			Long entitatId,
-			CieDataDto cie);
+	CieDto create(Long entitatId, CieDataDto cie);
 
 	/**
 	 * Actualitza la informació d'un pagador cie.
@@ -80,10 +78,7 @@ public interface PagadorCieService {
 	 * @return La pàgina amb els pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
-	PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			CieFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	PaginaDto<CieTableItemDto> findAmbFiltrePaginat(Long entitatId, CieFiltreDto filtre, PaginacioParamsDto paginacioParams);
 	
 	/**
 	 * Llistat amb tots els pagadors cie.

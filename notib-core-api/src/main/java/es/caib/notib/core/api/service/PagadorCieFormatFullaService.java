@@ -25,9 +25,7 @@ public interface PagadorCieFormatFullaService {
 	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public CieFormatFullaDto create(
-			Long pagadorCieId,
-			CieFormatFullaDto formatSobre);
+	public CieFormatFullaDto create(Long pagadorCieId, CieFormatFullaDto formatSobre);
 
 	/**
 	 * Actualitza la informació d'un format de fulla d'un pagador cie.
@@ -50,8 +48,7 @@ public interface PagadorCieFormatFullaService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')  or hasRole('tothom')")
-	public CieFormatFullaDto delete(
-			Long id) throws NotFoundException;
+	public CieFormatFullaDto delete(Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un format de fulla d'un pagador cie.
@@ -88,9 +85,7 @@ public interface PagadorCieFormatFullaService {
 	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public PaginaDto<CieFormatFullaDto> findAllPaginat(
-			Long pagadorCieId,
-			PaginacioParamsDto paginacioParams);
+	public PaginaDto<CieFormatFullaDto> findAllPaginat(Long pagadorCieId, PaginacioParamsDto paginacioParams);
 
 	
 }

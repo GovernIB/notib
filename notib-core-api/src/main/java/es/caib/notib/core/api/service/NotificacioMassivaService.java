@@ -50,9 +50,7 @@ public interface NotificacioMassivaService {
 	 *
 	 * @return La pàgina amb les notificacions de la notificació massiva
 	 */
-	PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId,
-														 NotificacioFiltreDto filtre,
-														 PaginacioParamsDto paginacioParams);
+	PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Dona d'alta una notificació massiva
@@ -63,10 +61,7 @@ public interface NotificacioMassivaService {
 	 * @throws RegistreNotificaException
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	NotificacioMassivaDataDto create(
-			Long entitatId,
-			String usuariCodi,
-			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException;
+	NotificacioMassivaDataDto create(Long entitatId, String usuariCodi, NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException;
 
 	/**
 	 * Esborra una notificació massiva
@@ -75,9 +70,7 @@ public interface NotificacioMassivaService {
 	 * @param notificacioMassivaId Identificador de la notificació massiva a esborrar
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
-	void delete(
-			Long entitatId,
-			Long notificacioMassivaId);
+	void delete(Long entitatId, Long notificacioMassivaId);
 
 	/**
 	 * Consulta les notificacions massives que s'han donat d'alta al sistema de manera paginada.
@@ -93,11 +86,7 @@ public interface NotificacioMassivaService {
 	 * @return La página consultada.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			NotificacioMassivaFiltreDto filtre,
-			RolEnumDto rol,
-			PaginacioParamsDto paginacioParams);
+	PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(Long entitatId, NotificacioMassivaFiltreDto filtre, RolEnumDto rol, PaginacioParamsDto paginacioParams);
 
 	/**
 	 * Baixa la prioritat de la notificació massiva indicada.

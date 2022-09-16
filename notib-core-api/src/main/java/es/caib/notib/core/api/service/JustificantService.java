@@ -29,8 +29,7 @@ public interface JustificantService {
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
      */
     @PreAuthorize("hasRole('tothom')")
-    FitxerDto generarJustificantEnviament(Long notificacioId,
-                                          String sequence) throws JustificantException;
+    FitxerDto generarJustificantEnviament(Long notificacioId, String sequence) throws JustificantException;
 
     /**
      * Executa el procés per a generar el justificant d'enviament d'una notificació
@@ -51,9 +50,7 @@ public interface JustificantService {
      *      S'aixeca aquesta excepció quan hi ha un error durant la generació del document del justificant
      */
     @PreAuthorize("hasRole('tothom')")
-    FitxerDto generarJustificantEnviament(Long notificacioId,
-                                          Long entitatId,
-                                          String sequence) throws JustificantException;
+    FitxerDto generarJustificantEnviament(Long notificacioId, Long entitatId, String sequence) throws JustificantException;
 
     /**
      * Executa el procés per a generar el justificant de recepció de comunicació SIR.

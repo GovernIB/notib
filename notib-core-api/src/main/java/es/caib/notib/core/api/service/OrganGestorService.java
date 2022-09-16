@@ -85,14 +85,10 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findAll();
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public OrganGestorDto findById(
-			Long entitatId,
-			Long id);
+	public OrganGestorDto findById(Long entitatId, Long id);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public OrganGestorDto findByCodi(
-			Long entitatId,
-			String codi);
+	public OrganGestorDto findByCodi(Long entitatId, String codi);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	public List<OrganGestorDto> findByEntitat(Long entitatId);
@@ -107,38 +103,22 @@ public interface OrganGestorService {
 	List<OrganGestorDto> findByCodisAndEstat(List<String> codisOrgans, OrganGestorEstatEnum estat);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<OrganGestorDto> findDescencentsByCodi(
-			Long entitatId,
-			String organCodi);
+	public List<OrganGestorDto> findDescencentsByCodi(Long entitatId, String organCodi);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(
-			Long entitatId,
-			String organCodiDir3,
-			OrganGestorFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+	public PaginaDto<OrganGestorDto> findAmbFiltrePaginat(Long entitatId, String organCodiDir3, OrganGestorFiltreDto filtre, PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	List<PermisDto> permisFind(Long entitatId, Long id) throws  NotFoundException;
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<PermisDto> permisFind(
-			Long entitatId,
-			Long id,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+	public List<PermisDto> permisFind(Long entitatId, Long id, PaginacioParamsDto paginacioParams) throws NotFoundException;
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void permisUpdate(
-			Long entitatId,
-			Long id,
-			boolean isAdminOrgan,
-			PermisDto permis) throws NotFoundException, ValidationException;
+	public void permisUpdate(Long entitatId, Long id, boolean isAdminOrgan, PermisDto permis) throws NotFoundException, ValidationException;
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public void permisDelete(
-			Long entitatId,
-			Long id,
-			Long permisId) throws NotFoundException;
+	public void permisDelete(Long entitatId, Long id, Long permisId) throws NotFoundException;
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
 	public List<OrganGestorDto> findAccessiblesByUsuariActual();
@@ -160,9 +140,7 @@ public interface OrganGestorService {
 	 * @return La llista dels codis d'assumpte.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public LlibreDto getLlibreOrganisme(
-			Long entitatId,
-			String organGestorDir3Codi);
+	public LlibreDto getLlibreOrganisme(Long entitatId, String organGestorDir3Codi);
 	
 	/**
 	 * Recupera les oficines SIR d'un òrgan gestor / entitat (anomenat organisme dins Regweb)
@@ -176,10 +154,7 @@ public interface OrganGestorService {
 	 * @return La llista de les oficines
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<OficinaDto> getOficinesSIR(
-			Long entitatId,
-			String dir3codi,
-			boolean isFiltre);
+	public List<OficinaDto> getOficinesSIR(Long entitatId, String dir3codi, boolean isFiltre);
 
 	/**
 	 * Recupera els òrgans sobre els que l'usuari actual té el permís
@@ -192,17 +167,10 @@ public interface OrganGestorService {
 	 * @return Llistat dels òrgans gestors sobre els que l'usuari té el permís
 	 */
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	List<OrganGestorDto> findOrgansGestorsWithPermis(
-			Long entitatId, 
-			String usuariCodi,
-			PermisEnum permis);
+	List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
-    		Long entitatId,
-			String usuari,
-			RolEnumDto rol,
-			String organ);
+    public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(Long entitatId, String usuari, RolEnumDto rol, String organ);
 
 	/**
 	 *  Obte el llistat d'organs en format d'arbre

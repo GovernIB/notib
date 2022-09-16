@@ -20,8 +20,7 @@ public interface UsuariAplicacioService {
 	/**
 	 * Registra una nova aplicació.
 	 * 
-	 * @param aplicacio
-	 *            Informació de l'aplicació a crear.
+	 * @param aplicacio Informació de l'aplicació a crear.
 	 *            
 	 * @return L'aplicació creada.
 	 */
@@ -32,13 +31,11 @@ public interface UsuariAplicacioService {
 	 * Actualitza la informació de l'aplicació que tengui el mateix
 	 * id que l'especificat per paràmetre.
 	 * 
-	 * @param aplicacio
-	 *            Informació de l'aplicació a modificar.
+	 * @param aplicacio Informació de l'aplicació a modificar.
 	 *            
 	 * @return L'aplicació modificada.
 	 * 
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public AplicacioDto update(AplicacioDto aplicacio) throws NotFoundException;
@@ -46,15 +43,12 @@ public interface UsuariAplicacioService {
 	/**
 	 * Esborra l'aplicació amb el mateix id que l'especificat.
 	 * 
-	 * @param id
-	 *            Atribut id de l'aplicació a esborrar.
-	 * @param entitatId
-	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 * @param id Atribut id de l'aplicació a esborrar.
+	 * @param entitatId Atribut id de la entitat a la que pertany l'apliació
 	 *             
 	 * @return L'aplicació esborrada.
 	 * 
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
 	public AplicacioDto delete(
@@ -64,8 +58,7 @@ public interface UsuariAplicacioService {
 	/**
 	 * Consulta una aplicació a partir d'un l'identificador.
 	 * 
-	 * @param aplicacioId
-	 *            Identificador de l'aplicació a consultar
+	 * @param aplicacioId Identificador de l'aplicació a consultar
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
@@ -75,10 +68,8 @@ public interface UsuariAplicacioService {
 	/**
 	 * Consulta una aplicació a partir d'un l'identificador.
 	 * 
-	 * @param aplicacioId
-	 *            Identificador de l'aplicació a consultar
-	 * @param entitatId
-	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 * @param aplicacioId Identificador de l'aplicació a consultar
+	 * @param entitatId Atribut id de la entitat a la que pertany l'apliació
 	 *            
 	 * @return L'aplicació amb l'identificador assenyalat.
 	 */
@@ -87,10 +78,6 @@ public interface UsuariAplicacioService {
 	
 	/**
 	 * Consulta una aplicació a partir del codi.
-	 * 
-	 * @param aplicacioCodi
-	 *            Codi de l'aplicació a consultar
-	 *            
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL')")
@@ -99,10 +86,8 @@ public interface UsuariAplicacioService {
 	/**
 	 * Consulta una aplicació a partir del codi.
 	 * 
-	 * @param aplicacioCodi
-	 *            Codi de l'aplicació a consultar
-	 * @param entitatId
-	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 * @param usuariCodi Codi de l'usuari a consultar
+	 * @param entitatId Atribut id de la entitat a la que pertany l'apliació
 	 *            
 	 * @return L'aplicació amb el codi assenyalat.
 	 */
@@ -112,10 +97,8 @@ public interface UsuariAplicacioService {
 	/**
 	 * Consulta una aplicació a partir d'un text
 	 * 
-	 * @param text
-	 *            Text a cercar
-	 * @param entitatId
-	 * 			  Atribut id de la entitat a la que pertany l'apliació
+	 * @param text Text a cercar
+	 * @param entitatId Atribut id de la entitat a la que pertany l'apliació
 	 *            
 	 * @return L'aplicació que coincideix  amb el text introduït.
 	 */
@@ -125,8 +108,7 @@ public interface UsuariAplicacioService {
 	/**
 	 * Llistat amb totes les aplicacions paginades.
 	 * 
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
@@ -136,8 +118,7 @@ public interface UsuariAplicacioService {
 	/**
 	 * Llistat amb totes les aplicacions paginades.
 	 * 
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 *            
 	 * @return La pàgina d'aplicacions.
 	 */
@@ -147,13 +128,10 @@ public interface UsuariAplicacioService {
 	/**
 	 * Marca l'aplicació amb l'id especificat com a activa/inactiva.
 	 * 
-	 * @param id
-	 *            Atribut id de l'aplicació a modificar.
-	 * @param activa
-	 *            true si es vol activar o false en cas contrari.
+	 * @param id Atribut id de l'aplicació a modificar.
+	 * @param activa true si es vol activar o false en cas contrari.
 	 * @return L'aplicació modificada.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public AplicacioDto updateActiva(Long id, boolean activa);

@@ -8,10 +8,7 @@ public interface RegistreService {
 
 	
 	/**
-	 * Registra una sortida.
-	 * 
-	 * @param procediment
-	 *            Informació del procediment a crear.
+	 * Registra una sortida..
 	 * @return El procediment creat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")

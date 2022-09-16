@@ -25,9 +25,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public CieFormatSobreDto create(
-			Long pagadorCieId,
-			CieFormatSobreDto formatSobre);
+	public CieFormatSobreDto create(Long pagadorCieId, CieFormatSobreDto formatSobre);
 
 	/**
 	 * Actualitza la informació d'un format de sobre d'un pagador cie.
@@ -50,8 +48,7 @@ public interface PagadorCieFormatSobreService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public CieFormatSobreDto delete(
-			Long id) throws NotFoundException;
+	public CieFormatSobreDto delete(Long id) throws NotFoundException;
 
 	/**
 	 * Consulta un format de sobre d'un pagador cie.
@@ -88,9 +85,7 @@ public interface PagadorCieFormatSobreService {
 	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public PaginaDto<CieFormatSobreDto> findAllPaginat(
-			Long pagadorCieId,
-			PaginacioParamsDto paginacioParams);
+	public PaginaDto<CieFormatSobreDto> findAllPaginat(Long pagadorCieId, PaginacioParamsDto paginacioParams);
 
 	
 }

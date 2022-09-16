@@ -19,6 +19,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class EnviamentDto extends AuditoriaDto {
+
 	private ServeiTipusEnumDto serveiTipus;
 	private PersonaDto titular;
 	private List<PersonaDto> destinataris;

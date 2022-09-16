@@ -55,9 +55,7 @@ public interface EntitatService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public EntitatDto updateActiva(
-			Long id,
-			boolean activa) throws NotFoundException;
+	public EntitatDto updateActiva(Long id, boolean activa) throws NotFoundException;
 
 	/**
 	 * Esborra l'entitat amb el mateix id que l'especificat.
@@ -69,8 +67,7 @@ public interface EntitatService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public EntitatDto delete(
-			Long id) throws NotFoundException;
+	public EntitatDto delete(Long id) throws NotFoundException;
 
 	/**
 	 * Consulta una entitat donat el seu id.
@@ -218,9 +215,7 @@ public interface EntitatService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	public void permisDelete(
-			Long entitatId,
-			Long permisId) throws NotFoundException;
+	public void permisDelete(Long entitatId, Long permisId) throws NotFoundException;
 	
 	/**
 	 * Recupera les oficines d'una entitat a partir del codi DIR3
@@ -230,8 +225,7 @@ public interface EntitatService {
 	 * @return La llista de les oficines
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
-	public List<OficinaDto> findOficinesEntitat(
-			String dir3codi);
+	public List<OficinaDto> findOficinesEntitat(String dir3codi);
 	
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom')")
 	byte[] getCapLogo() throws NoSuchFileException, IOException;
