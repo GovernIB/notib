@@ -59,41 +59,21 @@ public class NotificaHelper {
 		return getNotificaHelper().isAdviserActiu();
 	}
 
-	public void enviamentUpdateDatat(
-			EnviamentEstat notificaEstat,
-			Date notificaEstatData,
-			String notificaEstatDescripcio,
-			String notificaDatatOrigen,
-			String notificaDatatReceptorNif,
-			String notificaDatatReceptorNom,
-			String notificaDatatNumSeguiment,
-			String notificaDatatErrorDescripcio,
-			NotificacioEnviamentEntity enviament) throws Exception {
-		getNotificaHelper().enviamentUpdateDatat(
-				notificaEstat,
-				notificaEstatData,
-				notificaEstatDescripcio,
-				notificaDatatOrigen,
-				notificaDatatReceptorNif,
-				notificaDatatReceptorNom,
-				notificaDatatNumSeguiment,
-				notificaDatatErrorDescripcio,
-				enviament);
+	public void enviamentUpdateDatat(EnviamentEstat notificaEstat, Date notificaEstatData, String notificaEstatDescripcio, String notificaDatatOrigen,
+									 String notificaDatatReceptorNif, String notificaDatatReceptorNom, String notificaDatatNumSeguiment,
+									 String notificaDatatErrorDescripcio, NotificacioEnviamentEntity enviament) throws Exception {
+
+		getNotificaHelper().enviamentUpdateDatat(notificaEstat, notificaEstatData, notificaEstatDescripcio, notificaDatatOrigen, notificaDatatReceptorNif,
+													notificaDatatReceptorNom, notificaDatatNumSeguiment, notificaDatatErrorDescripcio, enviament);
 	}
 
 	private AbstractNotificaHelper getNotificaHelper() {
+
 		String versio = getNotificaVersioProperty();
-		if ("0".equals(versio)) {
-			return notificaV0Helper;
-		} else if ("2".equals(versio)) {
-			return notificaV2Helper;
-		} else {
-			return notificaV2Helper;
-		}
+		return "0".equals(versio) ? notificaV0Helper : "2".equals(versio) ? notificaV2Helper : notificaV2Helper;
 	}
 
 	private String getNotificaVersioProperty() {
 		return configHelper.getConfig("es.caib.notib.notifica.versio");
 	}
-
 }

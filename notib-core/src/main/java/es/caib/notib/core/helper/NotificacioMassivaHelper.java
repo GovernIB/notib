@@ -17,11 +17,13 @@ import java.util.List;
 @Slf4j
 @Component
 public class NotificacioMassivaHelper {
+
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 
 	@Transactional
 	public void posposarNotificacions(Long notificacioMassivaId) {
+
 		List<NotificacioEntity> notificacions = notificacioRepository.findByNotificacioMassivaEntityId(notificacioMassivaId);
 		for (NotificacioEntity notificacio: notificacions) {
 			// postposam el temps 8 hores
@@ -36,6 +38,7 @@ public class NotificacioMassivaHelper {
 	 */
 	@Transactional
 	public void reactivarNotificacions(Long notificacioMassivaId) {
+
 		List<NotificacioEntity> notificacions = notificacioRepository.findByNotificacioMassivaEntityId(notificacioMassivaId);
 		for (NotificacioEntity notificacio: notificacions) {
 			notificacio.restablirPrioritat();

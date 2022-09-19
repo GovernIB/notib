@@ -29,6 +29,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class NotificacioValidatorHelper {
+
 	@Resource
 	private CacheHelper cacheHelper;
 	@Autowired
@@ -47,7 +48,6 @@ public class NotificacioValidatorHelper {
 		boolean comunicacioSenseAdministracio = false;
 		String emisorDir3Codi = notificacio.getEmisorDir3Codi(); //entitat.getDir3Codi() entidad actual
 		Map<String, OrganismeDto> organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
-
 		// Emisor
 		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
 			errors.add(messageHelper.getMessage("error.validacio.emisordir3codi.no.null"));
@@ -57,10 +57,8 @@ public class NotificacioValidatorHelper {
 
 		// Entitat
 		if (entitat == null) {
-			errors.add(
-					messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a")
-					+ emisorDir3Codi +
-					messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
+			errors.add(messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.a") + emisorDir3Codi
+						+ messageHelper.getMessage("error.validacio.entitat.no.configurada.amb.codidir3.b"));
 		} else if (!entitat.isActiva()) {
 			errors.add(messageHelper.getMessage("error.validacio.entitat.desactivada.per.enviament.notificacions"));
 		}
@@ -74,9 +72,8 @@ public class NotificacioValidatorHelper {
 			}
 			List<Character> caractersNoValids = validFormat(notificacio.getConcepte());
 			if (!caractersNoValids.isEmpty()) {
-				errors.add(messageHelper.getMessage("error.validacio.concepte.format.invalid.a") +
-						StringUtils.join(caractersNoValids, ',')
-						+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
+				errors.add(messageHelper.getMessage("error.validacio.concepte.format.invalid.a") + StringUtils.join(caractersNoValids, ',')
+							+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
 			}
 		}
 
@@ -358,12 +355,11 @@ public class NotificacioValidatorHelper {
 		return errors;
 	}
 
-
 	private ArrayList<Character> validFormat(String value) {
+
 		String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
 		ArrayList<Character> charsNoValids = new ArrayList<Character>();
 		char[] chars = value.replace("\n", "").replace("\r", "").toCharArray();
-
 		boolean esCaracterValid = true;
 		for (int i = 0; i < chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(chars[i]) < 0);
@@ -374,8 +370,8 @@ public class NotificacioValidatorHelper {
 		return charsNoValids;
 	}
 
-
 	private boolean isEmailValid(String email) {
+
 		boolean valid = true;
 		try {
 			InternetAddress emailAddr = new InternetAddress(email);
@@ -387,12 +383,12 @@ public class NotificacioValidatorHelper {
 	}
 
 	private boolean isFormatValid(String docBase64) {
+
 		boolean valid = true;
 		String[] formatsValids = {"JVBERi0","UEsDBBQAAAAIA"}; //PDF / ZIP
-
-		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1])))
+		if (!(docBase64.startsWith(formatsValids[0]) || docBase64.startsWith(formatsValids[1]))) {
 			valid = false;
-
+		}
 		return valid;
 	}
 

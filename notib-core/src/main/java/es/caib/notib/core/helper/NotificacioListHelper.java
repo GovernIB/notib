@@ -50,6 +50,7 @@ public class NotificacioListHelper {
     private NotificacioRepository notificacioRepository;
 
     public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
+
         Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
         mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
         mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organCodi"});
@@ -58,42 +59,38 @@ public class NotificacioListHelper {
         mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
-    public PaginaDto<NotificacioTableItemDto> complementaNotificacions(
-            EntitatEntity entitatEntity,
-            String usuariCodi,
-            Page<NotificacioTableEntity> notificacions) {
+
+    public PaginaDto<NotificacioTableItemDto> complementaNotificacions(EntitatEntity entitatEntity, String usuariCodi, Page<NotificacioTableEntity> notificacions) {
 
         if (notificacions == null) {
             return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
         }
 
         List<String> codisProcedimentsProcessables = new ArrayList<String>();
-        List<ProcSerSimpleDto> procedimentsProcessables = procedimentService.findProcedimentServeisWithPermis(entitatEntity.getId(),
-                usuariCodi, PermisEnum.PROCESSAR);
-        if (procedimentsProcessables != null)
+        List<ProcSerSimpleDto> procedimentsProcessables = procedimentService.findProcedimentServeisWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        if (procedimentsProcessables != null) {
             for (ProcSerSimpleDto procediment : procedimentsProcessables) {
                 codisProcedimentsProcessables.add(procediment.getCodi());
             }
+        }
         List<ProcSerOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
         if (procedimentOrgansProcessables != null) {
             for (ProcSerOrganDto procedimentOrgan : procedimentOrgansProcessables) {
                 codisProcedimentsProcessables.add(procedimentOrgan.getProcSer().getCodi());
             }
         }
-
         List<String> codisOrgansProcessables = new ArrayList<String>();
         List<OrganGestorDto> organsProcessables = organGestorService.findOrgansGestorsWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
-        if (organsProcessables != null)
+        if (organsProcessables != null) {
             for (OrganGestorDto organ : organsProcessables) {
-            	codisOrgansProcessables.add(organ.getCodi());
+                codisOrgansProcessables.add(organ.getCodi());
             }
-        
+        }
         for (NotificacioTableEntity notificacio : notificacions) {
             boolean permisProcessar = false;
             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
                 permisProcessar = codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi());
             }
-
             // Si no te permís de processar per procediment, mirar si té permís de processar per òrgan gestor
             if (!permisProcessar && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
                 permisProcessar = codisOrgansProcessables.contains(notificacio.getOrganCodi());
@@ -134,32 +131,22 @@ public class NotificacioListHelper {
             hasZeronotificaEnviamentIntent = false;
 //					nomesAmbErrors = true;
         }
-        return NotificacioFiltre.builder()
-                .entitatId(new FiltreField<>(filtreDto.getEntitatId()))
-                .comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
-                .enviamentTipus(new FiltreField<>(filtreDto.getEnviamentTipus()))
-                .estat(new FiltreField<>(estat, isEstatNull))
-                .concepte(new StringField(filtreDto.getConcepte()))
-                .dataInici(new FiltreField<>(FiltreHelper.toIniciDia(filtreDto.getDataInici())))
-                .dataFi(new FiltreField<>(FiltreHelper.toFiDia(filtreDto.getDataFi())))
-                .titular(new StringField(filtreDto.getTitular()))
-                .organGestor(new FiltreField<>(organGestor))
-                .procediment(new FiltreField<>(procediment))
-                .tipusUsuari(new FiltreField<>(filtreDto.getTipusUsuari()))
-                .numExpedient(new StringField(filtreDto.getNumExpedient()))
-                .creadaPer(new StringField(filtreDto.getCreadaPer()))
-                .identificador(new StringField(filtreDto.getIdentificador()))
-                .nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
-                .nomesSenseErrors(new FiltreField<>(nomesSenseErrors))
-                .hasZeronotificaEnviamentIntent(new FiltreField<>(hasZeronotificaEnviamentIntent))
-                .referencia(new StringField(filtreDto.getReferencia()))
-                .build();
+        return NotificacioFiltre.builder().entitatId(new FiltreField<>(filtreDto.getEntitatId())).comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
+                .enviamentTipus(new FiltreField<>(filtreDto.getEnviamentTipus())).estat(new FiltreField<>(estat, isEstatNull))
+                .concepte(new StringField(filtreDto.getConcepte())).dataInici(new FiltreField<>(FiltreHelper.toIniciDia(filtreDto.getDataInici())))
+                .dataFi(new FiltreField<>(FiltreHelper.toFiDia(filtreDto.getDataFi()))).titular(new StringField(filtreDto.getTitular()))
+                .organGestor(new FiltreField<>(organGestor)).procediment(new FiltreField<>(procediment)).tipusUsuari(new FiltreField<>(filtreDto.getTipusUsuari()))
+                .numExpedient(new StringField(filtreDto.getNumExpedient())).creadaPer(new StringField(filtreDto.getCreadaPer()))
+                .identificador(new StringField(filtreDto.getIdentificador())).nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
+                .nomesSenseErrors(new FiltreField<>(nomesSenseErrors)).hasZeronotificaEnviamentIntent(new FiltreField<>(hasZeronotificaEnviamentIntent))
+                .referencia(new StringField(filtreDto.getReferencia())).build();
     }
 
     @Builder
     @Getter
     @Setter
     public static class NotificacioFiltre implements Serializable {
+
         private FiltreField<Long> entitatId;
         private FiltreField<NotificacioComunicacioTipusEnumDto> comunicacioTipus;
         private FiltreField<NotificaEnviamentTipusEnumDto> enviamentTipus;

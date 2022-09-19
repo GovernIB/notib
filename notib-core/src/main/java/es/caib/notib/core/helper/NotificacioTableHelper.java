@@ -36,27 +36,15 @@ public class NotificacioTableHelper {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
-        log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
 
+        log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
-            NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
-                    .notificacio(notificacio)
-                    .entitat(notificacio.getEntitat())
-                    .procedimentCodiNotib(notificacio.getProcedimentCodiNotib())
-                    .procedimentOrgan(notificacio.getProcedimentOrgan())
-                    .usuariCodi(notificacio.getUsuariCodi())
-                    .grupCodi(notificacio.getGrupCodi())
-                    //				.notificaErrorEvent(notificacio.getNotificaErrorEvent())
-                    .tipusUsuari(notificacio.getTipusUsuari())
-                    .notificaErrorData(null)
-                    .notificaErrorDescripcio(null)
-                    .enviamentTipus(notificacio.getEnviamentTipus())
-                    .numExpedient(notificacio.getNumExpedient())
-                    .concepte(notificacio.getConcepte())
-                    .estat(notificacio.getEstat())
-                    .estatDate(notificacio.getEstatDate())
-                    .estatProcessatDate(notificacio.getEstatProcessatDate())
-                    .entitatNom(notificacio.getEntitat().getNom())
+            NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder().notificacio(notificacio).entitat(notificacio.getEntitat())
+                    .procedimentCodiNotib(notificacio.getProcedimentCodiNotib()).procedimentOrgan(notificacio.getProcedimentOrgan())
+                    .usuariCodi(notificacio.getUsuariCodi()).grupCodi(notificacio.getGrupCodi()).tipusUsuari(notificacio.getTipusUsuari())
+                    .notificaErrorData(null).notificaErrorDescripcio(null).enviamentTipus(notificacio.getEnviamentTipus()).numExpedient(notificacio.getNumExpedient())
+                    .concepte(notificacio.getConcepte()).estat(notificacio.getEstat()).estatDate(notificacio.getEstatDate())
+                    .estatProcessatDate(notificacio.getEstatProcessatDate()).entitatNom(notificacio.getEntitat().getNom())
                     .procedimentCodi(notificacio.getProcediment() != null ? notificacio.getProcediment().getCodi() : null)
                     .procedimentNom(notificacio.getProcediment() != null ? notificacio.getProcediment().getNom() : null)
                     .procedimentIsComu(notificacio.getProcediment() != null && notificacio.getProcediment().isComu())
@@ -65,12 +53,8 @@ public class NotificacioTableHelper {
                     .organCodi(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getCodi() : null)
                     .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
                     .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
-                    .isErrorLastEvent(false)
-                    .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
-                    .enviadaDate(getEnviadaDate(notificacio))
-                    .referencia(notificacio.getReferencia())
-                    .build();
-
+                    .isErrorLastEvent(false).notificacioMassiva(notificacio.getNotificacioMassivaEntity()).enviadaDate(getEnviadaDate(notificacio))
+                    .referencia(notificacio.getReferencia()).build();
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
             log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);
@@ -79,6 +63,7 @@ public class NotificacioTableHelper {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEntity notificacio){
+
         log.info(String.format("[NOTIF-TABLE] Actualitzam el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
             NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findOne(notificacio.getId());
@@ -86,11 +71,9 @@ public class NotificacioTableHelper {
                 this.crearRegistre(notificacio);
                 return;
             }
-
             // Si pertany a una notificació massiva necessitam l'estat actual i error
             NotificacioEstatEnumDto estatActual = tableViewItem.getEstat();
             boolean hasErrorActual = tableViewItem.getNotificaErrorData() != null;
-
             tableViewItem.setEntitat(notificacio.getEntitat());
             tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
             tableViewItem.setProcedimentOrgan(notificacio.getProcedimentOrgan());
@@ -98,18 +81,14 @@ public class NotificacioTableHelper {
             tableViewItem.setGrupCodi(notificacio.getGrupCodi());
             tableViewItem.setTipusUsuari(notificacio.getTipusUsuari());
             tableViewItem.setNotificacioMassiva(notificacio.getNotificacioMassivaEntity());
-
             if (ignoreNotificaError(notificacio)) {
                 tableViewItem.setNotificaErrorData(null);
                 tableViewItem.setNotificaErrorDescripcio(null);
-
             } else {
-
                 NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
                 tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
                 if (tableViewItem.getNotificaErrorDescripcio() == null) {
                     // TODO MISSATGE MULTIDIOMA
-//                String desc = notificacio.hasEnviamentsPerEmail() ? messageHelper.getMessage("error.notificacio.enviaments")
                     String desc = notificacio.hasEnviamentsPerEmail() ?
                             "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
                             : (lastEvent != null ? lastEvent.getErrorDescripcio() : null);
@@ -135,12 +114,9 @@ public class NotificacioTableHelper {
             tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
             tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
-
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
-
             if (notificacio.getNotificacioMassivaEntity() != null) {
-                updateMassiva(notificacio.getNotificacioMassivaEntity(), estatActual, hasErrorActual,
-                            tableViewItem.getEstat(),tableViewItem.getNotificaErrorData() != null);
+                updateMassiva(notificacio.getNotificacioMassivaEntity(), estatActual, hasErrorActual, tableViewItem.getEstat(),tableViewItem.getNotificaErrorData() != null);
                 notificacioMassivaRepository.saveAndFlush(notificacio.getNotificacioMassivaEntity());
             }
         } catch (Exception ex) {
@@ -148,20 +124,14 @@ public class NotificacioTableHelper {
         }
     }
 
-    public void updateMassiva(
-            NotificacioMassivaEntity notificacioMassiva,
-            NotificacioEstatEnumDto originalEstat,
-            boolean originalHasError,
-            NotificacioEstatEnumDto destiEstat,
-            boolean destiHasError) {
+    public void updateMassiva(NotificacioMassivaEntity notificacioMassiva, NotificacioEstatEnumDto originalEstat, boolean originalHasError,
+                              NotificacioEstatEnumDto destiEstat, boolean destiHasError) {
 
         log.info("[PROCES MASSIU] updateMassiva");
-
         // Canvi d'estat
         if (!destiEstat.equals(originalEstat)) {
             // Estat inicial --> Estat processat
             if (isEstatInicial(originalEstat) && !isEstatInicial(destiEstat)) {
-
                 if (originalHasError) {
                     // Passar de processada amb error a processada
                     if (!destiHasError) {
@@ -171,7 +141,6 @@ public class NotificacioTableHelper {
                     // Actualitzam com a processada
                     notificacioMassiva.updateToProcessada();
                 }
-
                 // Estat processat --> Estat processat
             } else if (!isEstatInicial(originalEstat)) {
                 // Passar de processada amb error a processada
@@ -188,7 +157,6 @@ public class NotificacioTableHelper {
                     notificacioMassiva.updateToError();
                 }
             }
-
             // No canvia l'estat
         } else if (!originalHasError && destiHasError) {
             // Actialitzar com a processada amb error
@@ -202,8 +170,7 @@ public class NotificacioTableHelper {
     }
 
     private boolean isEstatInicial(NotificacioEstatEnumDto estat) {
-        return NotificacioEstatEnumDto.PENDENT.equals(estat) ||
-                NotificacioEstatEnumDto.ENVIANT.equals(estat);
+        return NotificacioEstatEnumDto.PENDENT.equals(estat) || NotificacioEstatEnumDto.ENVIANT.equals(estat);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -223,16 +190,13 @@ public class NotificacioTableHelper {
                 return null;
             }
             NotificacioEnviamentEntity env = notificacio.getEnviaments().iterator().next();
-
             if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
-                && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
-                    || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
+                && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
                 return env.getRegistreData();
             }
 
             if (!env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
-                    && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
-                        || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
+                    && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
                         || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
                 return notificacio.getNotificaEnviamentNotificaData();
             }
@@ -243,16 +207,10 @@ public class NotificacioTableHelper {
     }
 
     private boolean isErrorLastEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
-        List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(
-                NotificacioEventTipusEnumDto.CALLBACK_CLIENT,
-                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-                NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE,
-                NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
-                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR,
-                NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR
-        );
+
+        List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(NotificacioEventTipusEnumDto.CALLBACK_CLIENT, NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+                NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
+                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR);
         return event != null && notificacio.isTipusUsuariAplicacio() && event.isError() && errorsTipus.contains(event.getTipus());
     }
 
@@ -267,6 +225,7 @@ public class NotificacioTableHelper {
      * @return boleà indicant si s'ha d'ignorar l'error de la notificació
      */
     private boolean ignoreNotificaError(NotificacioEntity notificacio) {
+
         boolean hasNotificaIntents = notificacio.getNotificaEnviamentIntent() != 0;
 //        boolean hasSirConsultaIntents = false;
         boolean hasRegistreIntents = notificacio.getRegistreEnviamentIntent() != 0;
