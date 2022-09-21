@@ -589,7 +589,17 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		logger.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
 		Long t1 = System.currentTimeMillis();
-		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
+		List<ProcSerDto> procedimentsEntitat = new ArrayList<>();
+		for (int i=0;i<3;i++) {
+			try {
+				procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
+				break;
+			} catch (Exception ex) {
+				if (i == 2) {
+					throw ex;
+				}
+			}
+		}
 		Long t2 = System.currentTimeMillis();
 		logger.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
