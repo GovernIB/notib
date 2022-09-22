@@ -584,24 +584,27 @@ public class ServeiServiceImpl implements ServeiService{
 		return totalElements;
 	}
 	
-	private List<ProcSerDto> getServeisGdaByEntitat(
-			String codiDir3,
-			int numPagina) {
+	private List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {
+
 		ProgresActualitzacioDto progres = progresActualitzacioServeis.get(codiDir3);
-		
 		logger.debug(">>>> >> Obtenir tots els serveis de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm"));
 		Long t1 = System.currentTimeMillis();
-		
-		List<ProcSerDto> serveisEntitat = pluginHelper.getServeisGdaByEntitat(
-				codiDir3,
-				numPagina);
-		
+		List<ProcSerDto> serveisEntitat = new ArrayList<>();
+		for (int i=0;i<3;i++) {
+			try {
+				serveisEntitat = pluginHelper.getServeisGdaByEntitat(codiDir3, numPagina);
+				break;
+			} catch (Exception ex) {
+				if (i == 2) {
+					throw ex;
+				}
+			}
+		}
 		Long t2 = System.currentTimeMillis();
 		logger.debug(">>>> >> obtinguts" + serveisEntitat.size() + " serveis (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm.result", new Object[] {serveisEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
-		
 		return serveisEntitat;
 	}
 	
