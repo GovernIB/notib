@@ -196,7 +196,8 @@ public class IntegracioHelper {
 			accions.remove(accions.size() - 1);
 		}
 		try {
-			accions.add(0, accio);
+//			accions.add(0, accio);
+			accions.addFirst(accio);
 		} catch (Exception ex) {
 			log.error("Error afegint la acció: " + ex);
 			try {
