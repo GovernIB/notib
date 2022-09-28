@@ -11,7 +11,7 @@
 	<!-- es.caib.notib.hibernate.dialect=org.hibernate.dialect.Oracle9iDialect -->
 	<!-- es.caib.notib.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect -->
 	<!-- es.caib.notib.hibernate.dialect=org.hibernate.dialect.MySQLInnoDBDialect -->
-	es.caib.notib.hibernate.dialect=es.caib.notib.core.dialect.NotibOracleDialect
+	es.caib.notib.hibernate.dialect=es.caib.notib.logic.dialect.NotibOracleDialect
 	es.caib.notib.hibernate.show_sql=false
 	es.caib.notib.hibernate.format_sql=false
 	es.caib.notib.hibernate.use_sql_comments=false
@@ -44,8 +44,8 @@
 	es.caib.notib.plugin.registre.usuari=$notib_regweb
 	es.caib.notib.plugin.registre.password=notib_regweb
 	
-	es.caib.notib.plugin.regweb.mock.sequencia=/home/bgalmes/Programs/notib/notib-plugin-impl/src/main/resources/es/caib/notib/plugin/caib/registre/registre.txt
-	es.caib.notib.plugin.regweb.mock.justificant=/home/bgalmes/Programs/notib/notib-plugin-impl/src/main/resources/es/caib/notib/plugin/caib/registre/justificant.pdf
+	es.caib.notib.plugin.regweb.mock.sequencia=/home/bgalmes/Programs/notib/notib-plugin/src/main/resources/es/caib/notib/plugin/caib/registre/registre.txt
+	es.caib.notib.plugin.regweb.mock.justificant=/home/bgalmes/Programs/notib/notib-plugin/src/main/resources/es/caib/notib/plugin/caib/registre/justificant.pdf
 	
 	<!-- # ### -->
 	<!-- # Plugin Arxiu -->

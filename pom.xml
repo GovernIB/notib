@@ -1,56 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>es.caib.notib</groupId>
-  <artifactId>notib</artifactId>
-  <version>1.1.22</version>
-  <packaging>pom</packaging>
+  	<modelVersion>4.0.0</modelVersion>
+  	<groupId>es.caib.notib</groupId>
+  	<artifactId>notib</artifactId>
+  	<version>2.0.0</version>
+  	<packaging>pom</packaging>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.7.3</version>
+		<relativePath />
+	</parent>
   <properties>
-		<revision>1.1.22</revision>
-		<version.date>2022.09.01 15:00h</version.date>
-		<github.global.server>github</github.global.server>
-		<spring.version>3.2.16.RELEASE</spring.version>
-		<spring-security.version>3.2.9.RELEASE</spring-security.version>
-		<spring-data-jpa.version>1.6.6.RELEASE</spring-data-jpa.version>
-		<hibernate.version>3.6.5.Final</hibernate.version>
-		<hibernate.validator.version>4.1.0.Final</hibernate.validator.version>
-		<ehcache.version>2.10.1</ehcache.version>
-		<orika.version>1.4.6</orika.version>
-		<jackson.version>2.6.3</jackson.version>
+	  <keycloak.version>11.0.1</keycloak.version>
+	  <orika.starter.version>2.3.3</orika.starter.version>
+	  <sitemesh.version>2.4.2</sitemesh.version>
+	  <openapi.version>1.5.8</openapi.version>
+	  <java.compiler.version>11</java.compiler.version>
+	  <maven.compiler.target>${java.compiler.version}</maven.compiler.target>
+	  <maven.compiler.source>${java.compiler.version}</maven.compiler.source>
+<!--		<revision>1.1.22</revision>-->
+<!--		<version.date>2022.09.01 15:00h</version.date>-->
+<!--		<github.global.server>github</github.global.server>-->
+		<spring-boot.version>2.7.3</spring-boot.version>
+<!--		<spring-security.version>3.2.9.RELEASE</spring-security.version>-->
+<!--		<spring-data-jpa.version>2.7.2</spring-data-jpa.version>-->
+<!--		<hibernate.version>3.6.5.Final</hibernate.version>-->
+<!--		<hibernate.validator.version>4.1.0.Final</hibernate.validator.version>-->
+<!--		<ehcache.version>2.10.1</ehcache.version>-->
+<!--		<orika.version>1.4.6</orika.version>-->
+<!--		<jackson.version>2.6.3</jackson.version>-->
 		<regweb.version>3.2.5</regweb.version>
-		<dir3caib.version>1.0.7</dir3caib.version>
-		<rolsac.version>1.8.0</rolsac.version>
-		<slf4j.version>1.6.6</slf4j.version>
-		<cxf.version>2.2.12</cxf.version>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<arxiu.api.version>2.0.17</arxiu.api.version>
-		<lombok.version>1.18.12</lombok.version>
-	  	<liquibase.version>4.4.3</liquibase.version>
-		<apache.poi.version>4.1.2</apache.poi.version>
+		<dir3caib.version>1.0.14</dir3caib.version>
+<!--		<rolsac.version>1.8.0</rolsac.version>-->
+<!--		<slf4j.version>1.6.6</slf4j.version>-->
+		<cxf.version>3.4.8</cxf.version>
+<!--		<maven.compiler.source>1.7</maven.compiler.source>-->
+<!--		<maven.compiler.target>1.7</maven.compiler.target>-->
+<!--		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+		<arxiu.api.version>2.0.23</arxiu.api.version>
+<!--		<lombok.version>1.18.12</lombok.version>-->
+<!--	  	<liquibase.version>4.4.3</liquibase.version>-->
+<!--		<apache.poi.version>4.1.2</apache.poi.version>-->
 		<xdocreport.version>2.0.2</xdocreport.version>
-		<itext.pdf.version>5.4.3</itext.pdf.version>
-	  	<docker.image.prefix>280421</docker.image.prefix>
-		<docker.image.name>notib</docker.image.name>
+		<itext.pdf.version>5.5.13.3</itext.pdf.version>
+<!--	  	<docker.image.prefix>280421</docker.image.prefix>-->
+<!--		<docker.image.name>notib</docker.image.name>-->
+	  <junit.jupiter.version>5.8.2</junit.jupiter.version>
 	</properties>
 	<modules>
-		<module>notib-client</module>
-		<module>notib-core</module>
-		<module>notib-core-api</module>
-		<module>notib-ear</module>
-		<module>notib-lib-common</module>
+		<module>notib-boot</module>
+		<module>notib-back</module>
+		<module>notib-service</module>
+		<module>notib-service-intf</module>
+		<module>notib-persistence</module>
+		<module>notib-api-interna</module>
+		<module>notib-plugin-intf</module>
 		<module>notib-plugin</module>
-		<module>notib-plugin-impl</module>
-		<module>notib-war</module>
+		<module>notib-ejb</module>
+
+		<module>notib-client</module>
 		<module>notib-client-intf</module>
+
+		<module>notib-ear</module>
+<!--		<module>notib-lib-common</module>-->
 	</modules>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.1</version>
+				<version>3.0.0-M2</version>
 				<configuration>
 					<altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
 				</configuration>

@@ -673,7 +673,7 @@ public class ClientBaseTest {
 //		notificacio.setConcepte("concepte_" + notificacioId);
 //		notificacio.setDocumentArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 //		notificacio.setDocumentArxiuId(documentGesdocId);
-//		notificacio.setDocumentHash(Base64.encodeBase64String(
+//		notificacio.setDocumentHash(Base64.getEncoder().encodeToString(
 //				Hex.decodeHex(
 //						DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
 //		notificacio.setDocumentNormalitzat(false);

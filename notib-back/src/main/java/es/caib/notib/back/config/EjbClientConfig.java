@@ -1,0 +1,128 @@
+/**
+ * 
+ */
+package es.caib.notib.back.config;
+
+import es.caib.notib.logic.intf.service.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
+
+/**
+ * Configuració d'accés als services de Spring mitjançant EJBs.
+ *
+ * @author Limit Tecnologies <limit@limit.es>
+ */
+@Profile("!boot")
+@Slf4j
+@Configuration
+public class EjbClientConfig {
+
+	private static final String EJB_JNDI_PREFIX = "java:app/notib-ejb/";
+	private static final String EJB_JNDI_SUFFIX = "";
+
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean aplicacioService() {
+		return getLocalEjbFactoyBean(AplicacioService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean auditService() {
+		return getLocalEjbFactoyBean(AuditService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean avisService() {
+		return getLocalEjbFactoyBean(AvisService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean cacheService() {
+		return getLocalEjbFactoyBean(CacheService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean callbackService() {
+		return getLocalEjbFactoyBean(CallbackService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean configService() {
+		return getLocalEjbFactoyBean(ConfigService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean entitatService() {
+		return getLocalEjbFactoyBean(EntitatService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean enviamentService() {
+		return getLocalEjbFactoyBean(EnviamentService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean gestioDocumentalService() {
+		return getLocalEjbFactoyBean(GestioDocumentalService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean grupService() {
+		return getLocalEjbFactoyBean(GrupService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean justificantService() {
+		return getLocalEjbFactoyBean(JustificantService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean notificacioMassivaService() {
+		return getLocalEjbFactoyBean(NotificacioMassivaService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean notificacioService() {
+		return getLocalEjbFactoyBean(NotificacioService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean operadorPostalService() {
+		return getLocalEjbFactoyBean(OperadorPostalService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean organGestorService() {
+		return getLocalEjbFactoyBean(OrganGestorService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean pagadorCieFormatFullaService() {
+		return getLocalEjbFactoyBean(PagadorCieFormatFullaService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean pagadorCieFormatSobreService() {
+		return getLocalEjbFactoyBean(PagadorCieFormatSobreService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean pagadorCieService() {
+		return getLocalEjbFactoyBean(PagadorCieService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean procedimentService() {
+		return getLocalEjbFactoyBean(ProcedimentService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean registreService() {
+		return getLocalEjbFactoyBean(RegistreService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean schedulledService() {
+		return getLocalEjbFactoyBean(SchedulledService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean serveiService() {
+		return getLocalEjbFactoyBean(ServeiService.class);
+	}
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean usuariAplicacioService() {
+		return getLocalEjbFactoyBean(UsuariAplicacioService.class);
+	}
+
+	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
+		String jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;
+		log.info("Creating EJB proxy for serviceClass with JNDI name " + jndiName);
+		LocalStatelessSessionProxyFactoryBean factory = new LocalStatelessSessionProxyFactoryBean();
+		factory.setBusinessInterface(serviceClass);
+		factory.setJndiName(jndiName);
+		return factory;
+	}
+
+}

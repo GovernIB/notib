@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://www.ehcache.org/v3"
+		xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
+		xsi:schemaLocation="
+            http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.10.xsd
+            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
+
+	<cache-template name="default">
+		<expiry>
+			<ttl unit="seconds">86400</ttl>
+		</expiry>
+		<listeners>
+			<listener>
+				<class>es.caib.notib.logic.config.CacheEventLogger</class>
+				<event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+				<event-ordering-mode>UNORDERED</event-ordering-mode>
+				<events-to-fire-on>CREATED</events-to-fire-on>
+				<events-to-fire-on>EXPIRED</events-to-fire-on>
+				<events-to-fire-on>EVICTED</events-to-fire-on>
+			</listener>
+		</listeners>
+		<resources>
+			<heap unit="entries">100</heap>
+			<offheap unit="MB">10</offheap>
+			<!--			<disk persistent="true" unit="MB">20</disk>-->
+		</resources>
+	</cache-template>
+
+	<cache alias="aclCache" uses-template="default"><key-type>java.io.Serializable</key-type><value-type>org.springframework.security.acls.model.MutableAcl</value-type><expiry><ttl unit="seconds">600</ttl></expiry></cache>
+	<cache alias="entitatsUsuari" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type><expiry><ttl unit="seconds">43200</ttl></expiry></cache>
+	<cache alias="usuariAmbCodi" uses-template="default"><key-type>java.lang.String</key-type><value-type>es.caib.notib.plugin.usuari.DadesUsuari</value-type></cache>
+	<cache alias="rolsAmbCodi" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="getPermisosEntitatsUsuariActual" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.HashMap</value-type><expiry><ttl unit="seconds">604800</ttl></expiry><resources><heap unit="entries">300</heap></resources></cache>
+	<cache alias="denominacioOrganisme" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.lang.String</value-type><expiry><ttl unit="seconds">604800</ttl></expiry><resources><heap unit="entries">300</heap></resources></cache>
+	<cache alias="findOficinesEntitat" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="findLlibresOficina" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="findLlibreOrganisme" uses-template="default"><key-type>java.lang.String</key-type><value-type>es.caib.notib.logic.intf.dto.LlibreDto</value-type></cache>
+	<cache alias="oficinesSIRUnitat" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="unitatPerCodi" uses-template="default"><key-type>java.lang.String</key-type><value-type>es.caib.notib.logic.intf.dto.organisme.OrganGestorDto</value-type></cache>
+	<cache alias="oficinesSIREntitat" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organigramaOriginal" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.HashMap</value-type><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+	<cache alias="llistarNivellsAdministracions" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="llistarComunitatsAutonomes" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="llistarProvincies" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="llistarLocalitats" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organigrama" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.HashMap</value-type><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+	<cache alias="codisOrgansFills" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organCodisAncestors" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organismes" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+	<cache alias="organsGestorsUsuari" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organsPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="procedimentEntitiesPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="procedimentEntitiesPermisMenu" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="procedimentEntitiessOrganPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organsEntitiesPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="findUsuarisAmbPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.HashSet</value-type></cache>
+	<cache alias="procsersPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="procsersPermisMenu" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="procedimentsOrganPermis" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.ArrayList</value-type></cache>
+	<cache alias="organigramaPlugin" uses-template="default"><key-type>java.lang.String</key-type><value-type>java.util.HashMap</value-type><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+</config>

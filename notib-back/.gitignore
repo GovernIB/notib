@@ -1,0 +1,12 @@
+/target/
+/.classpath
+/.project
+/.settings/
+/appserv_jboss
+/appserv_tomcat
+/.flattened-pom.xml
+/.attach_pid*
+/.tern-project
+/notib-back.iml
+/pom.xml.versionsBackup
+/src/main/webapp/META-INF/context.xml

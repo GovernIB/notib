@@ -1,0 +1,7 @@
+/target/
+/.classpath
+/.project
+/.settings/
+/.attach_pid*
+/notib-api-interna.iml
+/pom.xml.versionsBackup

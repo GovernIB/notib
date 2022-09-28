@@ -15,4 +15,4 @@ ALTER TABLE not_notificacio_env_table ADD procediment_tipus VARCHAR(32);
 update not_procediment set tipus = 'PROCEDIMENT';
 update not_notificacio_table set procediment_tipus = 'PROCEDIMENT' where procediment_codi is not null;
 update not_notificacio_env_table set procediment_tipus = 'PROCEDIMENT' where procediment_codi_notib is not null;
-update NOT_ACL_CLASS set CLASS = 'es.caib.notib.core.entity.ProcSerOrganEntity' WHERE CLASS = 'es.caib.notib.core.entity.ProcedimentOrganEntity';
+update NOT_ACL_CLASS set CLASS = 'es.caib.notib.logic.entity.ProcSerOrganEntity' WHERE CLASS = 'es.caib.notib.logic.entity.ProcedimentOrganEntity';

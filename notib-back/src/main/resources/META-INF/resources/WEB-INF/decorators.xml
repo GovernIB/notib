@@ -1,0 +1,22 @@
+<decorators defaultdir="/WEB-INF/jsp/decorators">
+	<excludes>
+		<pattern>/js*</pattern>
+		<pattern>/css*</pattern>
+		<pattern>/img*</pattern>
+		<pattern>/font*</pattern>
+		<pattern>/nodeco*</pattern>
+		<pattern>/ws*</pattern>
+		<pattern>/api/services*</pattern>
+		<pattern>/hola*</pattern>
+		<!--pattern>/notificacio/rest*</pattern>
+		<pattern>/test/rest*</pattern-->
+	</excludes>
+	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
+		<pattern>/api/apidoc</pattern>
+		<pattern>/api/rest</pattern>
+		<pattern>/error</pattern>
+	</decorator>
+	<decorator name="default" page="default.jsp">
+		<pattern>/*</pattern>
+	</decorator>
+</decorators>

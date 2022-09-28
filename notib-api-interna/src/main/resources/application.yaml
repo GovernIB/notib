@@ -1,0 +1,16 @@
+server:
+  servlet:
+    context-path: /notibapi/interna
+
+spring:
+  mvc:
+    view:
+      prefix: /WEB_INF/jsp/
+      suffix: .jsp
+
+springdoc:
+  packages-to-scan: es.caib.notib.api.interna.controller
+  api-docs.path: /api-docs
+  swagger-ui:
+    path: /rest
+    operationsSorter: method

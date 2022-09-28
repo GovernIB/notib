@@ -6,7 +6,7 @@
 	<!-- # Par� metres accés a base de dades -->
 	<!-- # ### -->
 	es.caib.notib.datasource.jndi=java:es.caib.notib.db
-	es.caib.notib.hibernate.dialect=es.caib.notib.core.dialect.NotibOracleDialect
+	es.caib.notib.hibernate.dialect=es.caib.notib.logic.dialect.NotibOracleDialect
 	es.caib.notib.hibernate.show_sql=false
 	es.caib.notib.hibernate.hbm2ddl.auto=none
 	

@@ -1,0 +1,179 @@
+
+package es.caib.notib.logic.wsdl.notificaV2.getcies;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
+
+/**
+ * <p>Java class for Cie complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="Cie">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;all>
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="centroImpresion" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="fechaVigencia" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="codigoUnidadRelacionada" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="nombreUnidadRelacionada" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="orden" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *       &lt;/all>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Cie", propOrder = {
+
+})
+public class Cie {
+
+    protected int id;
+    @XmlElement(required = true)
+    protected String centroImpresion;
+    @XmlElement(required = true)
+    protected String fechaVigencia;
+    @XmlElement(required = true)
+    protected String codigoUnidadRelacionada;
+    @XmlElement(required = true)
+    protected String nombreUnidadRelacionada;
+    protected int orden;
+
+    /**
+     * Gets the value of the id property.
+     * 
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Sets the value of the id property.
+     * 
+     */
+    public void setId(int value) {
+        this.id = value;
+    }
+
+    /**
+     * Gets the value of the centroImpresion property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCentroImpresion() {
+        return centroImpresion;
+    }
+
+    /**
+     * Sets the value of the centroImpresion property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCentroImpresion(String value) {
+        this.centroImpresion = value;
+    }
+
+    /**
+     * Gets the value of the fechaVigencia property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getFechaVigencia() {
+        return fechaVigencia;
+    }
+
+    /**
+     * Sets the value of the fechaVigencia property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setFechaVigencia(String value) {
+        this.fechaVigencia = value;
+    }
+
+    /**
+     * Gets the value of the codigoUnidadRelacionada property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCodigoUnidadRelacionada() {
+        return codigoUnidadRelacionada;
+    }
+
+    /**
+     * Sets the value of the codigoUnidadRelacionada property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCodigoUnidadRelacionada(String value) {
+        this.codigoUnidadRelacionada = value;
+    }
+
+    /**
+     * Gets the value of the nombreUnidadRelacionada property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getNombreUnidadRelacionada() {
+        return nombreUnidadRelacionada;
+    }
+
+    /**
+     * Sets the value of the nombreUnidadRelacionada property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setNombreUnidadRelacionada(String value) {
+        this.nombreUnidadRelacionada = value;
+    }
+
+    /**
+     * Gets the value of the orden property.
+     * 
+     */
+    public int getOrden() {
+        return orden;
+    }
+
+    /**
+     * Sets the value of the orden property.
+     * 
+     */
+    public void setOrden(int value) {
+        this.orden = value;
+    }
+
+}

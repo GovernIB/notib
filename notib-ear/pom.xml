@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>1.1.22</version>
+		<version>2.0.0</version>
 	</parent>
 	<artifactId>notib-ear</artifactId>
 	<packaging>ear</packaging>
@@ -16,46 +16,48 @@
 <!--	</properties>-->
 	<dependencies>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator-legacy</artifactId>
-			<version>4.0.2.GA</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 			<exclusions>
 				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
 				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-ejb</artifactId>
+			<version>${project.version}</version>
+			<type>ejb</type>
+			<exclusions>
 				<exclusion>
-					<artifactId>hibernate-core</artifactId>
-					<groupId>org.hibernate</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>
-						hibernate-commons-annotations
-					</artifactId>
-					<groupId>org.hibernate</groupId>
+					<groupId>org.liquibase</groupId>
+					<artifactId>liquibase-core</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-lib-common</artifactId>
+			<artifactId>notib-back</artifactId>
 			<version>${project.version}</version>
-			<type>pom</type>
+			<type>war</type>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-plugin-impl</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-core</artifactId>
-			<version>${project.version}</version>
-			<type>ejb</type>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>notib-war</artifactId>
+			<artifactId>notib-api-interna</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
@@ -63,10 +65,10 @@
 	
 	<profiles>
 		<profile>
-			<id>jboss</id>
+			<id>ejb_container</id>
 			<activation>
 				<file>
-					<missing>../notib-war/appserv_tomcat</missing>
+					<missing>../notib-back/appserv_tomcat</missing>
 				</file>
 				<activeByDefault>true</activeByDefault>
 			</activation>
@@ -89,7 +91,7 @@
 							<execution>
 								<phase>package</phase>
 								<configuration>
-									<tasks>
+									<target>
 <!-- 										<copy file="${basedir}/target/notib.ear" tofile="${jboss.directory}/notib.ear" /> -->
 										<echo> </echo>
 										<echo> </echo>
@@ -102,7 +104,7 @@
 										<echo>|                          | |                                                                               |</echo>                                                                            
 										<echo>|                          |_|                                                                               |</echo>   
 										<echo> </echo>                                                                         										
-									</tasks>
+									</target>
 								</configuration>
 								<goals>
 									<goal>run</goal>
@@ -114,10 +116,10 @@
 			</build>
 		</profile>
 		<profile>
-			<id>tomcat</id>
+			<id>servlet_container</id>
 			<activation>
 				<file>
-					<exists>../notib-war/appserv_tomcat</exists>
+					<exists>../notib-back/appserv_tomcat</exists>
 				</file>
 				<activeByDefault>false</activeByDefault>
 			</activation>
@@ -170,24 +172,44 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ear-plugin</artifactId>
-				<version>2.8</version>
+				<version>3.2.0</version>
 				<configuration>
 					<finalName>notib</finalName>
-					<version>5</version>
+					<generateApplicationXml>true</generateApplicationXml>
+					<defaultLibBundleDir>/lib</defaultLibBundleDir>
+					<includeLibInApplicationXml>false</includeLibInApplicationXml>
+<!--					<packagingExcludes>lib/es.caib.emiserv-emiserv-controller-*.jar</packagingExcludes>-->
+					<version>6</version>
+					<initializeInOrder>true</initializeInOrder>
+					<archive>
+						<manifestEntries>
+							<Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+							<Implementation-Vendor>Límit Tecnologies</Implementation-Vendor>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Implementation-SCM-Branch>${git.branch}</Implementation-SCM-Branch>
+							<Implementation-SCM-Revision>${git.commit.id}</Implementation-SCM-Revision>
+						</manifestEntries>
+					</archive>
 					<modules>
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>
-							<artifactId>notib-core</artifactId>
-							<bundleFileName>notib.jar</bundleFileName>
+							<artifactId>notib-ejb</artifactId>
+							<bundleFileName>notib-ejb.jar</bundleFileName>
 						</ejbModule>
 						<webModule>
 							<groupId>${project.groupId}</groupId>
-							<artifactId>notib-war</artifactId>
-							<contextRoot>/notib</contextRoot>
-							<bundleFileName>notib.war</bundleFileName>
+							<artifactId>notib-back</artifactId>
+							<contextRoot>/notibback</contextRoot>
+							<bundleFileName>notib-back.war</bundleFileName>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>notib-api-interna</artifactId>
+							<contextRoot>/notibapi/interna</contextRoot>
+							<bundleFileName>notib-api-interna.war</bundleFileName>
 						</webModule>
 					</modules>
-					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>
+<!--					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>-->
 				</configuration>
 			</plugin>
 			<plugin>

@@ -1,0 +1,24 @@
+server:
+  servlet:
+    context-path: /notibback
+  error:
+    path: /error
+
+spring:
+  mvc:
+    view:
+      prefix: /WEB_INF/jsp/
+      suffix: .jsp
+  freemarker:
+    enabled: false
+  messages:
+    basename: messages_notib
+  liquibase:
+    contexts: undefined
+
+springdoc:
+  packages-to-scan: es.caib.notib.api.interna.controller
+  api-docs.path: /api-docs
+  swagger-ui:
+    path: /rest
+    operationsSorter: method

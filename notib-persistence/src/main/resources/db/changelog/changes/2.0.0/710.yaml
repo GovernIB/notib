@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1664181156088-1
+      author: limit
+      changes:
+        - renameColumn:
+            tableName: not_columnes
+            oldColumnName: created_date
+            newColumnName: data_enviament

@@ -70,7 +70,7 @@ public class ClientBaseTest {
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 		
-		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		String arxiuB64 = Base64.getEncoder().encodeToString(arxiuBytes);
 		document.setContingutBase64(arxiuB64);
 //		document.setUuid("8f3e508c-d304-4502-bd45-2061b47d3eda");
 //		document.setUuid("fb341a96-2cbf-4ec8-b7dd-08a1817c4b32");
@@ -177,7 +177,7 @@ public class ClientBaseTest {
 				 
 				DocumentV2 document = new DocumentV2();
 				document.setArxiuNom("documentArxiuNom_["+i+"]" + notificacioId + "."+ formatFile);
-				String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+				String arxiuB64 = Base64.getEncoder().encodeToString(arxiuBytes);
 				document.setContingutBase64(arxiuB64);
 				document.setNormalitzat(false);
 				document.setModoFirma(false);
@@ -548,7 +548,7 @@ public class ClientBaseTest {
 		DocumentV2 document = new DocumentV2();
 		document.setArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 
-		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		String arxiuB64 = Base64.getEncoder().encodeToString(arxiuBytes);
 		document.setContingutBase64(arxiuB64);
 //		document.setUuid("8f3e508c-d304-4502-bd45-2061b47d3eda");
 //		document.setUuid("fb341a96-2cbf-4ec8-b7dd-08a1817c4b32");
@@ -666,7 +666,7 @@ public class ClientBaseTest {
 //		notificacio.setConcepte("concepte_" + notificacioId);
 //		notificacio.setDocumentArxiuNom("documentArxiuNom_" + notificacioId + ".pdf");
 //		notificacio.setDocumentArxiuId(documentGesdocId);
-//		notificacio.setDocumentHash(Base64.encodeBase64String(
+//		notificacio.setDocumentHash(Base64.getEncoder().encodeToString(
 //				Hex.decodeHex(
 //						DigestUtils.sha256Hex(arxiuBytes).toCharArray())));
 //		notificacio.setDocumentNormalitzat(false);

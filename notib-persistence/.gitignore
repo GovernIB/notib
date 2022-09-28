@@ -1,0 +1,7 @@
+/target/
+/.classpath
+/.project
+/.settings/
+/.attach_pid*
+/notib-persistence.iml
+/pom.xml.versionsBackup
