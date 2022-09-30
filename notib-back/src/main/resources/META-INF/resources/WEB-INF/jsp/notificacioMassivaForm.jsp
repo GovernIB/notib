@@ -107,7 +107,7 @@
 	</div>
 </div>
 	<c:set var="formAction"><not:modalUrl value="/notificacio/massiva/new"/></c:set>
-	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioMassivaCommand" enctype="multipart/form-data">
+	<form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" modelAttribute="notificacioMassivaCommand" enctype="multipart/form-data">
 		<input type="hidden" name="fitxerCSVGestdocId" value="${notificacioMassivaCommand.fitxerCSVGestdocId}">
 		<input type="hidden" name="fitxerCSVNom" value="${notificacioMassivaCommand.fitxerCSVNom}">
 		<not:inputFile name="ficheroCsv" textKey="notificacio.massiva.form.camp.arxiuCsv" labelSize="2" inputSize="10"

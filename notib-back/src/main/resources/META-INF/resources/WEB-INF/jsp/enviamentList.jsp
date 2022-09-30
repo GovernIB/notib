@@ -166,7 +166,7 @@ function getCookie(cname) {
 			<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: dimgray;margin-top: 10px;"></span>
 		</div>
 	</div>
-	<form:form id="enviamentFiltreForm" action="" method="post" cssClass="well hidden" commandName="enviamentFiltreCommand"></form:form>
+	<form:form id="enviamentFiltreForm" action="" method="post" cssClass="well hidden" modelAttribute="enviamentFiltreCommand"></form:form>
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">

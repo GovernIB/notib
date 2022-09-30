@@ -161,8 +161,8 @@
     </script>
 
     <c:set var="formAction"><not:modalUrl value="/organgestorArbre/guardar"/></c:set>
-    <form:form action="${formAction}" method="post" commandName="organGestorCommand" role="form">
-<%--    <form:form id="dadesOrgan" action="" method="post" commandName="organGestorCommand" role="form">--%>
+    <form:form action="${formAction}" method="post" modelAttribute="organGestorCommand" role="form">
+<%--    <form:form id="dadesOrgan" action="" method="post" modelAttribute="organGestorCommand" role="form">--%>
         <div class="flex-column">
             <not:inputHidden name="id"/>
             <not:inputHidden name="entitatId"/>

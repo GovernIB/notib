@@ -104,7 +104,7 @@
 	});
 </script>
 
-<form:form id="filtre" action="" method="post" cssClass="well" commandName="integracioFiltreCommand">
+<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="integracioFiltreCommand">
 	<div class="row">
 		<div class="col-md-2">
 			<not:inputText name="entitatCodi" inline="true" placeholderKey="integracio.filtre.codi.entitat"/>

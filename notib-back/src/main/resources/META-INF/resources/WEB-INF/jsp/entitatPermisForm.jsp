@@ -90,7 +90,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/entitat/${entitat.id}/permis"/></c:set>
-	<form:form id="permis-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+	<form:form id="permis-form" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="entitat.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto" />
 		<form:hidden path="tipus"/>

@@ -22,7 +22,7 @@
 </head>
 <body>
 	<c:set var="createAplication"><not:modalUrl value="/entitat/${entitat.id}/aplicacio/newOrModify"/></c:set>
-	<form:form action="${createAplication}"  method="post" cssClass="form-horizontal" commandName="aplicacioCommand" role="form">
+	<form:form action="${createAplication}"  method="post" cssClass="form-horizontal" modelAttribute="aplicacioCommand" role="form">
 		<form:hidden path="id"/>
 		<input type="hidden" name="entitatId" value="${entitat.id}"/>
 		<not:inputText name="usuariCodi" textKey="aplicacio.form.camp.codi" required="true" readonly="${!empty aplicacioCommand.id}"/>

@@ -100,7 +100,7 @@ pageContext.setAttribute(
 		var isRolActualAdministradorOrgan = ${isRolActualAdministradorOrgan};
 	</script>
 	<c:set var="formAction"><not:modalUrl value="/organgestor/${organGestor.id}/permis"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="permisCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="tipus" textKey="procediment.permis.form.camp.tipus" disabled="${not empty permisCommand.id}" optionEnum="TipusEnumDto"/>
 		<c:url value="/userajax/usuari" var="urlConsultaInicial"/>

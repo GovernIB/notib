@@ -210,7 +210,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/organgestor/new"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organGestorCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="organGestorCommand" role="form">
 		<form:hidden path="entitatId" value="${entitat.id}"/>
 		<div role="tabpanel" class="tab-pane active" id="dadesgeneralsForm">
 			<form:hidden path="id"/>

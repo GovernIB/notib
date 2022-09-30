@@ -17,7 +17,7 @@
 	<not:modalHead/>
 </head>
 <body>
-	<form:form action="" class="form-horizontal" commandName="marcarProcessatCommand">
+	<form:form action="" class="form-horizontal" modelAttribute="marcarProcessatCommand">
 		<not:inputTextarea required="true" name="motiu" textKey="notificacio.pendent.camp.marcar.processat.motiu"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-send"></span> <spring:message code="notificacio.pendent.camp.marcar.processat.boto"/></button>

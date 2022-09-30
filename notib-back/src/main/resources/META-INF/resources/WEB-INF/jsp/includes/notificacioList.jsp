@@ -488,7 +488,7 @@
         });
     }
 </script>
-<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="notificacioFiltreCommand">
+<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="notificacioFiltreCommand">
     <div class="row">
         <c:if test="${mostraEntitat}">
             <div class="col-md-3">

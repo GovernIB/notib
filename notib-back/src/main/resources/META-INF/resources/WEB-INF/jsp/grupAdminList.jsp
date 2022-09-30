@@ -28,7 +28,7 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="grupFiltreCommand">
+	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="grupFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<not:inputText name="codi" inline="true" placeholderKey="grup.list.columna.codi"/>

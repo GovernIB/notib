@@ -1384,7 +1384,7 @@
 		</div>
 	</div>
     <c:set var="formAction"><not:modalUrl value="/notificacio/newOrModify"/></c:set>
-    <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" commandName="notificacioCommand" enctype="multipart/form-data">
+    <form:form action="${formAction}" id="form" method="post" cssClass="form-horizontal" modelAttribute="notificacioCommand" enctype="multipart/form-data">
 		<form:hidden path="enviamentTipus" id="enviamentTipus"/>
 		<input type="hidden" name="id" value="${notificacioCommand.id}">
 		<div class="container-fluid">

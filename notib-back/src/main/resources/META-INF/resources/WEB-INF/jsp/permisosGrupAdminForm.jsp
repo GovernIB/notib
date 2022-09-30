@@ -22,7 +22,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/procediment/newOrModify"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procSerCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="procSerCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-3">

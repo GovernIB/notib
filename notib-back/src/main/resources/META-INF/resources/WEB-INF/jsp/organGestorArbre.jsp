@@ -102,7 +102,7 @@
     </head>
     <body>
         <c:set var="formActionFiltre"><not:modalUrl value="/organgestorArbre"/></c:set>
-        <form:form id="filtre" action="${formActionFiltre}" method="post" cssClass="well" commandName="organGestorFiltreCommand">
+        <form:form id="filtre" action="${formActionFiltre}" method="post" cssClass="well" modelAttribute="organGestorFiltreCommand">
             <div class="row">
                 <div class="col-md-2">
                     <not:inputText name="codi" inline="true" placeholderKey="organgestor.list.columna.codi"/>

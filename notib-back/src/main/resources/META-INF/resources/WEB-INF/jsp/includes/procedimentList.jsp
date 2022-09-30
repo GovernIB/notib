@@ -68,7 +68,7 @@ $(document).ready(function() {
 </script>
 
 <c:if test="${not simplifiedView}">
-<form:form id="filtre" action="" method="post" cssClass="well" commandName="procSerFiltreCommand">
+<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="procSerFiltreCommand">
 	<div class="row">
 		<div class="col-md-2">
 			<not:inputText name="codi" inline="true" placeholderKey="procediment.list.columna.codi"/>

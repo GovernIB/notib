@@ -26,7 +26,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/servei/${servei.id}/grup"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="serveiGrupCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="serveiGrupCommand">
 		<form:hidden path="id"/>
 		<not:inputSelect name="grupId" textKey="procediment.grup.columna.tipus.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nomIRol" required="true"/>
 		<div id="modal-botons" class="well">

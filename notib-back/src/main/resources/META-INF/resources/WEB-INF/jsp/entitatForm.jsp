@@ -270,7 +270,7 @@ function updateLlibre(dir3codi) {
         <li role="presentation"><a href="#configuracioForm" aria-controls="configuracioForm" role="tab" data-toggle="tab"><c:if test="${not empty errorTipusDoc}"> <span class="fa fa-warning text-danger"></span></c:if> <spring:message code="entitat.form.titol.configuracio"/></a></li>
     </ul>
 	<c:set var="formAction"><not:modalUrl value="/entitat"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="entitatCommand" role="form"  enctype="multipart/form-data">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="entitatCommand" role="form"  enctype="multipart/form-data">
 		<br>
 		<div class="tab-content">
 		<form:hidden path="id"/>

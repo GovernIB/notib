@@ -42,7 +42,7 @@ pageContext.setAttribute(
 	</script>
 </head>
 <body>
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="operadorPostalFiltreCommand">
+	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="operadorPostalFiltreCommand">
 		<div class="row">
 			<div class="col-md-3">
 				<not:inputSelect name="organismePagador" placeholderKey="operadorpostal.list.columna.organismePagador"

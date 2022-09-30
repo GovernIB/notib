@@ -43,7 +43,7 @@ pageContext.setAttribute(
 	</script>
 </head>
 <body>
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="cieFiltreCommand">
+	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="cieFiltreCommand">
 		<div class="row">
 			<div class="col-md-3">
 				<not:inputSelect name="organismePagadorCodi" placeholderKey="cie.list.columna.organismePagador"

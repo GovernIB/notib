@@ -22,7 +22,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/grup/newOrModify"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="grupCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="grupCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">

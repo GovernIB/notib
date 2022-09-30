@@ -185,7 +185,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		</div>
 	</script>
 
-	<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="notificacioErrorCallbackFiltreCommand" >
+	<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="notificacioErrorCallbackFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
 				<not:inputSelect name="procedimentId" optionItems="${procediments}" optionValueAttribute="id" optionTextAttribute="descripcio" placeholderKey="notificacio.list.filtre.camp.procediment" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>

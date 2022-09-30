@@ -26,7 +26,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/procediment/${procediment.id}/grup"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="procedimentGrupCommand">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="procedimentGrupCommand">
 		<form:hidden path="id"/>
 <%-- 		<not:inputSelect name="tipus" textKey="procediment.grup.form.camp.tipus" optionItems="${TipusGrupEnum}"  optionValueAttribute="value" optionTextKeyAttribute="text"/> --%>
 		<not:inputSelect name="grupId" textKey="procediment.grup.columna.tipus.grup" optionItems="${grups}" optionValueAttribute="id" optionTextAttribute="nomIRol" required="true"/>

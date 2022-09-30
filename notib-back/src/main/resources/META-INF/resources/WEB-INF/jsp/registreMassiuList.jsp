@@ -193,7 +193,7 @@ notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.te
 		</div>
 	</script>
 		
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioRegistreErrorFiltreCommand" >
+	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="notificacioRegistreErrorFiltreCommand" >
 		<div class="row">
 			<div class="col-md-4">
 				<not:inputSelect name="procedimentId" optionItems="${procediments}"

@@ -289,7 +289,7 @@
 		</div>
 
 		<c:set var="formAction"><not:modalUrl value="/procediment/update/auto"/></c:set>
-		<form:form id="formUpdateAuto" action="${formAction}" method="post" cssClass="form-horizontal" commandName="permisCommand">
+		<form:form id="formUpdateAuto" action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="permisCommand">
 			<div class="loading">
 				<div class="loading-gif">
 					<img src="<c:url value="/img/ajax-loader.gif"/>"/>

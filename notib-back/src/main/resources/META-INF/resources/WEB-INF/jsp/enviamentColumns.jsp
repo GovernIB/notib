@@ -47,7 +47,7 @@ input[type='checkbox']:checked{
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/enviament/visualitzar/save"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="columnesCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="columnesCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row col-xs-12">
 			<div class="row col-xs-6">

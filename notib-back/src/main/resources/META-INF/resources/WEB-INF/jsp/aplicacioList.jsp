@@ -35,7 +35,7 @@
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="<c:url value="/entitat/${entitat.id}/aplicacio/new"/>" data-toggle="modal" data-datatable-id="taulaAplicacions"><span class="fa fa-plus"></span>&nbsp;<spring:message code="aplicacio.list.boto.nova.aplicacio"/></a>
 	</div>
-	<form:form id="form-filtre" action="" method="post" cssClass="well" commandName="aplicacioFiltreCommand">
+	<form:form id="form-filtre" action="" method="post" cssClass="well" modelAttribute="aplicacioFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
 				<not:inputText name="codiUsuari" inline="true"  placeholderKey="aplicacio.list.filtre.camp.codi.usuari"/>

@@ -79,7 +79,7 @@
 </head>
 <body>
 <div id="msg-box"></div>
-	<form:form id="filtre" action="" method="post" cssClass="well" commandName="notificacioMassivaFiltreCommand">
+	<form:form id="filtre" action="" method="post" cssClass="well" modelAttribute="notificacioMassivaFiltreCommand">
 		<div class="row">
 			<div class="col-md-2">
 				<not:inputDate name="dataInici" placeholderKey="notificacio.list.filtre.camp.datainici" inline="true" required="false" />

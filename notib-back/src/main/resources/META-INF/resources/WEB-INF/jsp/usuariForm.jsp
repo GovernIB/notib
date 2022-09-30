@@ -34,7 +34,7 @@ $(document).ready(function() {
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/usuari/configuracio"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="usuariCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="usuariCommand" role="form">
 		<form:hidden path="codi"/>
 		<not:inputText name="nom" textKey="usuari.form.camp.nom" disabled="true"/>
 		<not:inputText name="nif" textKey="usuari.form.camp.nif" disabled="true"/>

@@ -33,7 +33,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/cie/${pagadorCie.id}/formats/fulla/newOrModify"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorCieFormatFullaCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="pagadorCieFormatFullaCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">

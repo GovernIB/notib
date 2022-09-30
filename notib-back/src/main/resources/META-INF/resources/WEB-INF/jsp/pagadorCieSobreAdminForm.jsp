@@ -32,7 +32,7 @@
 </head>
 <body>
 	<c:set var="formAction"><not:modalUrl value="/cie/${pagadorCie.id}/formats/sobre/newOrModify"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="pagadorCieFormatSobreCommand" role="form">
+	<form:form action="${formAction}" method="post" cssClass="form-horizontal" modelAttribute="pagadorCieFormatSobreCommand" role="form">
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
