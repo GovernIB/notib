@@ -13,14 +13,8 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @SpringBootApplication
 public class NotibServletApp extends NotibApp {
-
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(NotibServletApp.class);
-	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(NotibServletApp.class, args);

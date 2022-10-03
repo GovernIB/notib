@@ -47,7 +47,7 @@
 		$(".panel-heading").css({"display": "flex", "justify-content": "space-between"})
 		$(".panel-heading").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
 		$("#canviarVistaOrganGestor").click(function(){
-			window.location.replace("/notib/organgestorArbre");
+			window.location.replace('<c:url value="/organgestorArbre"/>');
 		});
 
 		$("#obsolet").on("click", x => {

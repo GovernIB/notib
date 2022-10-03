@@ -66,9 +66,9 @@ $(document).ready(function() {
 	$("#remesa-link").click(e => {
 		e.preventDefault();
 		$.ajax({
-			url: "/notib/notificacio/filtrades/${enviament.notificacio.referencia}",
+			url: '<c:url value="/notificacio/filtrades"/>' + '/${enviament.notificacio.referencia}',
 			// success: () => top.location = "/notib/",
-			success: () => window.open("/notib/", "_blank"),
+			success: () => window.open('<c:url value="/"/>', "_blank"),
 			error: err => console.error(err)
 		});
 	});

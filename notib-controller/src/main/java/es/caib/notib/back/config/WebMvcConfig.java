@@ -97,14 +97,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		return bean;
 	}
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/webjars/**")
-				.addResourceLocations("/webjars/", "/META-INF/resources/webjars/" , "classpath:/META-INF/resources/webjars/")
-				.resourceChain(false)
-				.addResolver(new WebJarsResourceResolver());
-		registry.setOrder(1);
-	}
+//	@Override
+//	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//		registry.addResourceHandler("/webjars/**")
+//				.addResourceLocations("/webjars/", "/META-INF/resources/webjars/" , "classpath:/META-INF/resources/webjars/")
+//				.resourceChain(false)
+//				.addResolver(new WebJarsResourceResolver());
+//		registry.setOrder(1);
+//	}
 
 //	@Override
 //	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

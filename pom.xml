@@ -15,7 +15,7 @@
 	  <keycloak.version>11.0.1</keycloak.version>
 	  <orika.starter.version>2.3.3</orika.starter.version>
 	  <sitemesh.version>2.4.2</sitemesh.version>
-	  <openapi.version>1.5.8</openapi.version>
+	  <openapi.version>1.6.11</openapi.version>
 	  <java.compiler.version>11</java.compiler.version>
 	  <maven.compiler.target>${java.compiler.version}</maven.compiler.target>
 	  <maven.compiler.source>${java.compiler.version}</maven.compiler.source>
@@ -44,7 +44,7 @@
 <!--		<apache.poi.version>4.1.2</apache.poi.version>-->
 		<xdocreport.version>2.0.2</xdocreport.version>
 		<itext.pdf.version>5.5.13.3</itext.pdf.version>
-<!--	  	<docker.image.prefix>280421</docker.image.prefix>-->
+	  	<docker.image.prefix>280421</docker.image.prefix>
 <!--		<docker.image.name>notib</docker.image.name>-->
 	  <junit.jupiter.version>5.8.2</junit.jupiter.version>
 	</properties>
@@ -63,7 +63,8 @@
 		<module>notib-client-intf</module>
 
 		<module>notib-ear</module>
-<!--		<module>notib-lib-common</module>-->
+		<module>notib-controller</module>
+		<!--		<module>notib-lib-common</module>-->
 	</modules>
 	<build>
 		<plugins>

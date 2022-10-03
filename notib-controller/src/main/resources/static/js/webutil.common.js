@@ -1,6 +1,6 @@
 
 function webutilContextPath() {
-	return '/notib';
+	return '/notibback';
 }
 function webutilModalTancarPath() {
 	return webutilContextPath() + '/modal/tancar';

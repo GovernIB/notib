@@ -166,7 +166,7 @@ function sortTable(n) {
 						<td style="display:none;" scope="row" name="comu" >${procediment.comu}</td>
 						<td style="display:none;" scope="row" name="organGestor" >${procediment.organGestor}</td>
 						<td scope="row" name="id" width="10%">
-						<button onclick="window.top.location='/notib/notificacio/new/${procediment.id}';return false;" class="btn btn-primary"><spring:message code="notificacio.form.titol.procediments.iniciar"/></button>
+						<button onclick="window.top.location='<c:url value="/notificacio/new"/>/${procediment.id}';return false;" class="btn btn-primary"><spring:message code="notificacio.form.titol.procediments.iniciar"/></button>
 						</td>
 					</tr>
 			</c:forEach>

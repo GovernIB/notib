@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @SpringBootApplication(exclude = {
 		DataSourceAutoConfiguration.class, 
 		DataSourceTransactionManagerAutoConfiguration.class,
@@ -38,7 +37,8 @@ import org.springframework.context.annotation.Profile;
 				pattern = {
 						"es\\.caib\\.notib\\.logic\\..*",
 						"es\\.caib\\.notib\\.persist\\..*",
-						"es\\.caib\\.notib\\.ejb\\..*"}))
+						"es\\.caib\\.notib\\.ejb\\..*",
+						"es\\.caib\\.notib\\.api\\..*"}))
 public class NotibEjbApp extends NotibApp {
 
 	@Override

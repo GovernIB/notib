@@ -17,9 +17,7 @@ import org.springframework.context.annotation.PropertySource;
 public class NotibApp {
 
 	public static void main(String[] args) {
-		var appBulder = new SpringApplicationBuilder(NotibApp.class);
-		appBulder.sources(NotibApp.class);
-		appBulder.run();
+		new SpringApplicationBuilder(NotibApp.class).run();
 	}
 
 }

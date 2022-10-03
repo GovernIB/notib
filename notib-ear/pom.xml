@@ -29,9 +29,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-
-
-
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>notib-plugin</artifactId>
@@ -61,6 +58,30 @@
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
+		<!--
+			 La següent dependència ja està inclosa a dins el .war. Només s'inclou aquí per a que l'ear
+			 contengui les seves dependències. Després s'haurà d'excloure el fitxer emiserv-controller*.jar
+			 de dins la carpeta lib per a evitar conflictes per classes duplicades.
+		-->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>notib-controller</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<!--
+					Excloem la dependència de keycloak perquè si no ho feim ens dona errors en les classes
+					org.keycloak.* perquè estan carregades a dos classloaders diferents.
+				-->
+				<exclusion>
+					<groupId>org.keycloak</groupId>
+					<artifactId>keycloak-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 	
 	<profiles>
@@ -86,7 +107,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -127,7 +148,7 @@
 				<dependency>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.7</version>
+					<version>3.1.0</version>
 				</dependency>
 			</dependencies>
 			<build>
@@ -170,6 +191,24 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<verbose>false</verbose>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ear-plugin</artifactId>
 				<version>3.2.0</version>
@@ -178,7 +217,7 @@
 					<generateApplicationXml>true</generateApplicationXml>
 					<defaultLibBundleDir>/lib</defaultLibBundleDir>
 					<includeLibInApplicationXml>false</includeLibInApplicationXml>
-<!--					<packagingExcludes>lib/es.caib.emiserv-emiserv-controller-*.jar</packagingExcludes>-->
+					<packagingExcludes>lib/es.caib.notib-notib-controller-*.jar</packagingExcludes>
 					<version>6</version>
 					<initializeInOrder>true</initializeInOrder>
 					<archive>
@@ -215,13 +254,13 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.33.0</version>
+				<version>0.36.0</version>
 				<configuration>
 					<verbose>true</verbose>
 					<images>
 						<image>
-							<name>${docker.image.prefix}/${docker.image.name}</name>
-							<alias>notib</alias>
+							<name>${docker.image.prefix}/%g</name>
+							<alias>${project.parent.artifactId}</alias>
 							<build>
 								<!--copies artifact to docker build dir in target-->
 								<assembly>
@@ -238,34 +277,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-		           	<artifactId>lifecycle-mapping</artifactId>
-		           	<version>1.0.0</version>
-		           	<configuration>
-		           		<lifecycleMappingMetadata>
-		           			<pluginExecutions>
-		           				<pluginExecution>
-		           					<pluginExecutionFilter>
-		           						<groupId>org.codehaus.mojo</groupId>
-		           						<artifactId>flatten-maven-plugin</artifactId>
-		           						<versionRange>[0.0,)</versionRange>
-		           						<goals>
-		           							<goal>flatten</goal>
-		           						</goals>
-		           					</pluginExecutionFilter>
-		           					<action>
-		           						<ignore/>
-		           					</action>
-		           				</pluginExecution>
-		           			</pluginExecutions>
-		           		</lifecycleMappingMetadata>
-		           	</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<finalName>notib</finalName>
 	</build>
 </project>

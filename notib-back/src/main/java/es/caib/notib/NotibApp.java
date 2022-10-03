@@ -18,7 +18,6 @@ import java.util.jar.Manifest;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @Slf4j
 public abstract class NotibApp extends SpringBootServletInitializer {
 

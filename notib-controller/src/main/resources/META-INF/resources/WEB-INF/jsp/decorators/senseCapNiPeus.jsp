@@ -30,7 +30,7 @@
 			$.ajax({
 				type: "GET",
 				async: false,
-			    url: '/notib/usuari/configuracio/idioma',  
+			    url: '<c:url value="/usuari/configuracio/idioma"/>',
 			    success: function(data) {
 			    	userLanguage =  data; 
 			    }
