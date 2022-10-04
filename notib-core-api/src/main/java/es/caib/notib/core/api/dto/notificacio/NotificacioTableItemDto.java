@@ -149,6 +149,7 @@ public class NotificacioTableItemDto {
 				nFinalitzada++;
 				break;
 			case PROCESSADA:
+			case ENVIAT_SIR:
 				nProcessada++;
 				break;
 			default:
