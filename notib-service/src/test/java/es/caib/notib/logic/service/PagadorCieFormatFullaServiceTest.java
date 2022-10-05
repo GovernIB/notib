@@ -42,24 +42,19 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 
 	@Before
 	public void setUp()throws Exception {
+
 		addConfig("es.caib.notib.metriques.generar", "false");
-
-		CieDataDto cieDto = CieItemTest.getRandomInstance();
+		var cieDto = CieItemTest.getRandomInstance();
 		cieCreator.addObject("cie", cieDto);
+		database = createDatabase(EntitatItemTest.getRandomInstance(), cieCreator, cieFormatFullaCreator);
 
-		database = createDatabase(EntitatItemTest.getRandomInstance(),
-				cieCreator,
-				cieFormatFullaCreator
-		);
-
-
-		CieDto cieCreated = (CieDto) database.get("cie");
-		createPagadorCieFormatFulla=new CieFormatFullaDto();
+		var cieCreated = (CieDto) database.get("cie");
+		createPagadorCieFormatFulla = new CieFormatFullaDto();
 		createPagadorCieFormatFulla.setCodi("122");
 		createPagadorCieFormatFulla.setPagadorCieId(cieCreated.getId());
 		cieFormatFullaCreator.addObject("fulla1", createPagadorCieFormatFulla);
 
-		updatePagadorCieFormatFulla=new CieFormatFullaDto();
+		updatePagadorCieFormatFulla = new CieFormatFullaDto();
 		updatePagadorCieFormatFulla.setCodi("12333");
 		updatePagadorCieFormatFulla.setPagadorCieId(cieCreated.getId());
 		cieFormatFullaCreator.addObject("fulla2", updatePagadorCieFormatFulla);
@@ -70,10 +65,8 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 
 	@After
 	public final void tearDown() {
-		destroyDatabase(database.getEntitat().getId(),
-				cieCreator,
-				cieFormatFullaCreator
-		);
+
+		destroyDatabase(database.getEntitat().getId(), cieCreator, cieFormatFullaCreator);
 		log.info("-------------------------------------------------------------------");
 		log.info("-- ...test \"" + currentTestDescription + "\" executat.");
 		log.info("-------------------------------------------------------------------");
@@ -81,85 +74,68 @@ public class PagadorCieFormatFullaServiceTest extends BaseServiceTestV2{
 
 	@Test
 	public void create() {
+
 		currentTestDescription = "Create FORMAT FULLA";
-		CieDto cie = (CieDto) database.get("cie");
-		CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
+		var cie = (CieDto) database.get("cie");
+		var formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
 
 		assertNotNull(formatFullaCreada);
 		assertNotNull(formatFullaCreada.getId());
-		comprobarPagadorCieFormatFulla(
-				createPagadorCieFormatFulla,
-				formatFullaCreada);
+		comprobarPagadorCieFormatFulla(createPagadorCieFormatFulla, formatFullaCreada);
 		assertEquals(cie.getId(), formatFullaCreada.getPagadorCieId());
 	}
 	
-	
-	
 	@Test
 	public void update() {
+
 		currentTestDescription = "Update FORMAT FULLA";
-		CieDto cie = (CieDto) database.get("cie");
-		CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
+		var cie = (CieDto) database.get("cie");
+		var formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
 		authenticationTest.autenticarUsuari("admin");
 
 		updatePagadorCieFormatFulla.setId(formatFullaCreada.getId());
-		CieFormatFullaDto formatModificat = cieFormatFullaService.update(
-				updatePagadorCieFormatFulla);
+		var formatModificat = cieFormatFullaService.update(updatePagadorCieFormatFulla);
 
 		assertNotNull(formatModificat);
 		assertNotNull(formatModificat.getId());
-		assertEquals(
-				formatFullaCreada.getId(),
-				formatModificat.getId());
+		assertEquals(formatFullaCreada.getId(), formatModificat.getId());
 
-		comprobarPagadorCieFormatFulla(
-				updatePagadorCieFormatFulla,
-				formatModificat);
+		comprobarPagadorCieFormatFulla(updatePagadorCieFormatFulla, formatModificat);
 		assertEquals(cie.getId(), formatModificat.getPagadorCieId());
 	}
 	
 	@Test
 	public void delete() {
+
 		currentTestDescription = "Delete FORMAT FULLA";
-		CieFormatFullaDto formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
+		var formatFullaCreada = (CieFormatFullaDto) database.get("fulla1");
 		authenticationTest.autenticarUsuari("admin");
 
-		CieFormatFullaDto formatBorrat = cieFormatFullaService.delete(
-				formatFullaCreada.getId());
-		comprobarPagadorCieFormatFulla(
-				createPagadorCieFormatFulla,
-				formatBorrat);
+		var formatBorrat = cieFormatFullaService.delete(formatFullaCreada.getId());
+		comprobarPagadorCieFormatFulla(createPagadorCieFormatFulla, formatBorrat);
 		try {
 			cieFormatFullaService.findById(formatFullaCreada.getId());
 			fail("El format esborrat no s'hauria d'haver trobat");
-		}catch(NotFoundException expected) {
+		} catch (NotFoundException expected) {
 		}
-
 	}
-				
 	
 	@Test
 	public void findById() {
+
 		currentTestDescription = "FindById FORMAT FULLA";
 		authenticationTest.autenticarUsuari("admin");
-		CieFormatFullaDto formatCreat = (CieFormatFullaDto) database.get("fulla1");
-
-		CieFormatFullaDto formatTrobat = cieFormatFullaService.findById(
-				formatCreat.getId());
+		var formatCreat = (CieFormatFullaDto) database.get("fulla1");
+		var formatTrobat = cieFormatFullaService.findById(formatCreat.getId());
 
 		assertNotNull(formatTrobat);
 		assertNotNull(formatTrobat.getId());
-		comprobarPagadorCieFormatFulla(
-				createPagadorCieFormatFulla,
-				formatTrobat);
+		comprobarPagadorCieFormatFulla(createPagadorCieFormatFulla, formatTrobat);
 	}
 
-	private void comprobarPagadorCieFormatFulla(
-			CieFormatFullaDto original,
-			CieFormatFullaDto perComprovar) {
-		assertEquals(
-				original.getCodi(),
-				perComprovar.getCodi());
+	private void comprobarPagadorCieFormatFulla(CieFormatFullaDto original, CieFormatFullaDto perComprovar) {
+
+		assertEquals(original.getCodi(), perComprovar.getCodi());
 	}
 
 }

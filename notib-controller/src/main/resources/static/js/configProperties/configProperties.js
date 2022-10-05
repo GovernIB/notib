@@ -73,7 +73,7 @@ let guardarPropietat = (configKey, natejar) => {
     formData.append("key", configKeyReplaced);
     formData.append("value", value);
     $.ajax({
-        url: "/notib/config/update",
+        url: "config/update",
         type: "post",
         processData: false,
         contentType: false,

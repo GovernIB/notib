@@ -86,52 +86,36 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     protected OrganGestorEntity organGestor;
 
     public boolean isEntregaCieActivaAlgunNivell() {
+
         if (entregaCie != null) {
             return true;
         }
-
         if (organGestor != null && organGestor.getEntregaCie() != null) {
             return true;
         }
-
         if (entitat != null && entitat.getEntregaCie() != null) {
             return true;
         }
-
         return false;
     }
 
     public EntregaCieEntity getEntregaCieEfectiva() {
+
         if (entregaCie != null) {
             return entregaCie;
         }
-
         if (organGestor != null && organGestor.getEntregaCie() != null) {
             return organGestor.getEntregaCie();
         }
-
         if (entitat != null && entitat.getEntregaCie() != null) {
             return entitat.getEntregaCie();
         }
-
         return null;
     }
 
-    public void update(
-            String codi,
-            String nom,
-            EntitatEntity entitat,
-            EntregaCieEntity entregaCie,
-            int retard,
-            int caducitat,
-            boolean agrupar,
-            OrganGestorEntity organGestor,
-            String tipusAssumpte,
-            String tipusAssumpteNom,
-            String codiAssumpte,
-            String codiAssumpteNom,
-            boolean comu,
-            boolean requireDirectPermission) {
+    public void update(String codi, String nom, EntitatEntity entitat, EntregaCieEntity entregaCie, int retard, int caducitat, boolean agrupar,
+                       OrganGestorEntity organGestor, String tipusAssumpte, String tipusAssumpteNom, String codiAssumpte, String codiAssumpteNom, boolean comu, boolean requireDirectPermission) {
+
         this.codi = codi;
         this.nom = nom;
         this.entitat = entitat;
@@ -148,10 +132,8 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.requireDirectPermission = requireDirectPermission;
     }
 
-    public void update(
-            String nom,
-            OrganGestorEntity organGestor,
-            boolean comu) {
+    public void update(String nom, OrganGestorEntity organGestor, boolean comu) {
+
         this.nom = nom;
         this.organGestor = organGestor;
         this.comu= comu;
@@ -161,13 +143,17 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.ultimaActualitzacio = dataActualitzacio;
     }
 
-
     protected ProcSerEntity(ProcSerEntityBuilder<?, ?> b) {
+
         this.setId(b.id);
         this.setCreatedBy(b.createdBy);
-        this.setCreatedDate(toLocalDateTime(b.createdDate));
+        if (b.createdDate != null) {
+            this.setCreatedDate(toLocalDateTime(b.createdDate));
+        }
         this.setLastModifiedBy(b.lastModifiedBy);
-        this.setLastModifiedDate(toLocalDateTime(b.lastModifiedDate));
+        if (b.lastModifiedDate != null ) {
+            this.setLastModifiedDate(toLocalDateTime(b.lastModifiedDate));
+        }
         this.codi = b.codi;
         this.nom = b.nom;
         this.retard = b.retard;
@@ -186,18 +172,15 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     }
 
     private LocalDateTime toLocalDateTime(DateTime dateTime) {
-        if (dateTime == null)
+
+        if (dateTime == null) {
             return null;
-        return LocalDateTime.of(
-                dateTime.getYear(),
-                dateTime.getMonthOfYear(),
-                dateTime.getDayOfMonth(),
-                dateTime.getHourOfDay(),
-                dateTime.getMinuteOfDay(),
-                dateTime.getSecondOfDay());
+        }
+        return LocalDateTime.of(dateTime.getYear(), dateTime.getMonthOfYear(), dateTime.getDayOfMonth(), dateTime.getHourOfDay(), dateTime.getMinuteOfDay(), dateTime.getSecondOfDay());
     }
 
     public static abstract class ProcSerEntityBuilder<C extends ProcSerEntity, B extends ProcSerEntityBuilder<C, B>> {
+
         private String codi;
         private String nom;
         private Integer retard;
