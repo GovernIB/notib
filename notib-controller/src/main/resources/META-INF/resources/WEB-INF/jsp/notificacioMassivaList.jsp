@@ -180,7 +180,7 @@
 								{{:~eval('notificacioMassivaEstats["' + estatValidacio + '"]')}}
 								<span class="estat_info">[<span class="fa fa-check"></span> {{:notificacionsValidades}} / <span class="fa fa-times"></span> {{:totalNotificacions - notificacionsValidades}}]</span>
 							</span>
-							<a id="download-zip" title="Descarregar csv errors" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/errors/download"/>" target="_blank">
+							<a id="download-zip" title="Descarregar csv errors" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/errors/validacio/download"/>" target="_blank">
 								<span class="fa fa-download"></span>
 							</a>
 						{{else estatValidacio == 'FINALITZAT'}}
@@ -193,7 +193,7 @@
 								{{:~eval('notificacioMassivaEstats["' + estatValidacio + '"]')}}
 								<span class="estat_info">[<span class="fa fa-times"></span> {{:totalNotificacions}}]</span>
 							</span>
-							<a id="download-zip" title="Descarregar csv errors" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/errors/download"/>" target="_blank">
+							<a id="download-zip" title="Descarregar csv errors" class="btn btn-default btn-dwl pull-right" href="<c:url value="/notificacio/massiva/{{:id}}/errors/validacio/download"/>" target="_blank">
 								<span class="fa fa-download"></span>
 							</a>
 						{{/if}}
