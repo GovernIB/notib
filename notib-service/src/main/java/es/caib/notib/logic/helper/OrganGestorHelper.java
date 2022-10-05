@@ -156,7 +156,7 @@ public class OrganGestorHelper {
 //	 */
 //	public OrganGestorEntity crearOrganGestor(EntitatEntity entitat, String codiOrgan) {
 //		LlibreDto llibreOrgan = pluginHelper.llistarLlibreOrganisme(
-//				entitat.getCodi(),
+//				entitat.getDir3Codi(),
 //				codiOrgan);
 //		Map<String, NodeDir3> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitat.getDir3Codi());
 //		List<OficinaDto> oficinesSIR = cacheHelper.getOficinesSIRUnitat(

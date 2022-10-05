@@ -26,12 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -124,30 +126,28 @@ public class OrganGestorController extends BaseUserController{
 //		return "organGestorForm";
 //	}
 //
-//	@RequestMapping(value = "/new", method = RequestMethod.POST)
-//	public String save(HttpServletRequest request, @Valid OrganGestorCommand organGestorCommand, BindingResult bindingResult, Model model) {
-//
-//		if (bindingResult.hasErrors()) {
-//			EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
-//			model.addAttribute("entitat", entitat);
-//			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
-//			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
-//			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
-//			model.addAttribute("operadorPostalList", operadorPostalList);
-//			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
-//			model.addAttribute("cieList", cieList);
-//			if (organGestorCommand.getId() != null) {
-//				model.addAttribute("isModificacio", true);
-//			}
-//			return "organGestorForm";
-//		}
-//		if (organGestorCommand.getId() != null) {
-//			organGestorService.update(OrganGestorCommand.asDto(organGestorCommand));
-//		} else {
-//			organGestorService.create(OrganGestorCommand.asDto(organGestorCommand));
-//		}
-//		return getModalControllerReturnValueSuccess(request,"redirect:organgestor","organgestor.controller.creat.ok");
-//	}
+	@RequestMapping(value = "/new", method = RequestMethod.POST)
+	public String save(HttpServletRequest request, @Valid OrganGestorCommand organGestorCommand, BindingResult bindingResult, Model model) {
+
+		if (bindingResult.hasErrors()) {
+			EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+			model.addAttribute("entitat", entitat);
+			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
+			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			model.addAttribute("operadorPostalList", operadorPostalList);
+			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			model.addAttribute("cieList", cieList);
+			if (organGestorCommand.getId() != null) {
+				model.addAttribute("isModificacio", true);
+			}
+			return "organGestorForm";
+		}
+		if (organGestorCommand.getId() != null) {
+			organGestorService.update(OrganGestorCommand.asDto(organGestorCommand));
+		}
+		return getModalControllerReturnValueSuccess(request,"redirect:organgestor","organgestor.controller.creat.ok");
+	}
 	
 	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
 	public String update(HttpServletRequest request, Model model, @PathVariable Long organGestorId) {

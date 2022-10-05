@@ -184,17 +184,26 @@ public class IntegracioHelper {
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
-		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
+		var accions = accionsIntegracio.get(integracioCodi);
 		if (accions == null) {
 			accions = new LinkedList<>();
 			accions.add(accio);
 			return;
 		}
-		int max = getMaxAccions(integracioCodi);
+		var max = getMaxAccions(integracioCodi);
 		while (accions.size() >= max) {
 			accions.remove(accions.size() - 1);
 		}
-		accions.add(0, accio);
+		try {
+			accions.addFirst(accio);
+		} catch (Exception ex) {
+			log.error("Error afegint la acció: " + ex);
+			try {
+				accions.add(accio);
+			} catch (Exception e) {
+				log.error("Error afegint la acció: " + e);
+			}
+		}
 	}
 	
 	private void afegirParametreUsuari(IntegracioAccioDto accio, boolean obtenirUsuari) {

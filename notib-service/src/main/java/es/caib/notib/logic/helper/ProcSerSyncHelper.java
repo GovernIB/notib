@@ -260,12 +260,22 @@ public class ProcSerSyncHelper {
 
 	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
 
-		ProgresActualitzacioDto progres = ProcedimentServiceImpl.progresActualitzacio.get(codiDir3);
+		var progres = ProcedimentServiceImpl.progresActualitzacio.get(codiDir3);
 		log.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
-		Long t1 = System.currentTimeMillis();
-		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
-		Long t2 = System.currentTimeMillis();
+		var t1 = System.currentTimeMillis();
+		List<ProcSerDto> procedimentsEntitat = new ArrayList<>();
+		for (var i=0;i<3;i++) {
+			try {
+				procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3, numPagina);
+				break;
+			} catch (Exception ex) {
+				if (i == 2) {
+					throw ex;
+				}
+			}
+		}
+		var t2 = System.currentTimeMillis();
 		log.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
@@ -482,12 +492,22 @@ public class ProcSerSyncHelper {
 
 	private List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {
 
-		ProgresActualitzacioDto progres = ServeiServiceImpl.progresActualitzacioServeis.get(codiDir3);
+		var progres = ServeiServiceImpl.progresActualitzacioServeis.get(codiDir3);
 		log.debug(">>>> >> Obtenir tots els serveis de Rolsac...");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm"));
-		Long t1 = System.currentTimeMillis();
-		List<ProcSerDto> serveisEntitat = pluginHelper.getServeisGdaByEntitat(codiDir3, numPagina);
-		Long t2 = System.currentTimeMillis();
+		var t1 = System.currentTimeMillis();
+		List<ProcSerDto> serveisEntitat = new ArrayList<>();
+		for (int i=0;i<3;i++) {
+			try {
+				serveisEntitat = pluginHelper.getServeisGdaByEntitat(codiDir3, numPagina);
+				break;
+			} catch (Exception ex) {
+				if (i == 2) {
+					throw ex;
+				}
+			}
+		}
+		var t2 = System.currentTimeMillis();
 		log.debug(">>>> >> obtinguts" + serveisEntitat.size() + " serveis (" + (t2 - t1) + "ms)");
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm.result", new Object[] {serveisEntitat.size()}));
 		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));

@@ -85,25 +85,29 @@ public class NotificacioHelperTest {
 	public void whenBuildNotificacioData_thenReturn() {
 		
 		// Given	
-		EntitatEntity entidad = new EntitatEntity();
+		var entitat = new EntitatEntity();
 
-		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		Date enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		
-		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
-				"",
-				"",
-				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
-				entidad,
-				false,
-				null, // organGestor
-				null,
-				null,
-				null,
-				null,
-				false,
-				false).build();
+		var caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
+		var enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
+
+		var retard = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard");
+		var c = configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat");
+		var procediment = ProcedimentEntity.builder().codi("").nom("").retard(retard).caducitat(c).entitat(entitat).build();
+
+//		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
+//				"",
+//				"",
+//				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
+//				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+//				entitat,
+//				false,
+//				null, // organGestor
+//				null,
+//				null,
+//				null,
+//				null,
+//				false,
+//				false).build();
 		
 		ProcSerDto procedimentDto = new ProcSerDto();
 		procedimentDto.setId(1L);
@@ -150,9 +154,9 @@ public class NotificacioHelperTest {
                 .grup(grupDto)
                 .build();
 
-		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).build();
+		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entitat).build();
 		ProcSerOrganEntity procedimentOrgan = ProcSerOrganEntity.getBuilder(procediment, organGestor).build();
-		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
+		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entitat, organGestor).build();
 		String documentGesdocId = "documentGesdocId";
 		
 		Document documentArxiuUuid = initDocument(document2.getUuid());
@@ -197,14 +201,14 @@ public class NotificacioHelperTest {
 		Mockito.when(pluginHelper.estatElaboracioToValidesa(Mockito.any(DocumentEstatElaboracio.class))).thenReturn(ValidesaEnum.ORIGINAL.getValor());
 				
 		// When	
-		NotificacioData notificacioData = notificacioHelper.buildNotificacioData(entidad, notificacio, Boolean.TRUE);
+		NotificacioData notificacioData = notificacioHelper.buildNotificacioData(entitat, notificacio, Boolean.TRUE);
 		
 		// Then
 		Mockito.verify(documentRepository, Mockito.times(1)).findById(Long.valueOf(document.getId())); //ArxiuBase64
 		Mockito.verify(documentRepository, Mockito.times(2)).save(Mockito.any(DocumentEntity.class)); //Uuid y CSV
 		assertNotNull(notificacioData);
 		assertEquals(notificacio, notificacioData.getNotificacio());
-		assertEquals(entidad, notificacioData.getEntitat());
+		assertEquals(entitat, notificacioData.getEntitat());
 		assertEquals(grupNotificacio, notificacioData.getGrupNotificacio());
 		assertEquals(organGestor, notificacioData.getOrganGestor());
 		assertEquals(procediment, notificacioData.getProcSer());
