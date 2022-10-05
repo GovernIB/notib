@@ -28,7 +28,6 @@
 							isOcultarCounts="${isOcultarCounts}" fullesAtributCssClassCondition="${fullesAtributCssClassCondition}"
 							fullesAtributDreta="${fullesAtributDreta}" fullesMissatgeDreta="${fullesMissatgeDreta}"
 							fullesIconaDreta="${fullesIconaDreta}" fullesCondicioDreta="${fullesCondicioDreta}"/>
-				${fill.dades[fullesAtributDreta]}
 			<c:if test="${fullesCondicioDreta != fill.dades[fullesAtributDreta]}">
 				<span> </span><span class="${fullesIconaDreta}" <c:if test="${fill.dades[fullesAtributDreta]}">title="<spring:message code="${fullesMissatgeDreta}${fill.dades[fullesAtributDreta]}"/>"</c:if>></span>
 			</c:if>
