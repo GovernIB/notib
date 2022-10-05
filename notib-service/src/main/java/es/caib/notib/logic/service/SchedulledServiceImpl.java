@@ -404,25 +404,25 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 
 	private boolean isNotificaEnviamentsActiu() {
-		return configHelper.getAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.notifica.enviaments.actiu");
 	}
 	private boolean isEnviamentActualitzacioEstatActiu() {
-		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.actiu", false);
 	}
 	private boolean isEnviamentActualitzacioEstatRegistreActiu() {
-		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.actiu", true);
 	}
 	private boolean isTasquesActivesProperty() {
-		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives", true);
 	}
 	private boolean isActualitzacioProcedimentsActiuProperty() {
-		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.actiu");
 	}
 	private boolean isEnviamentActualitzacioCertificacioActiva() {
-		return configHelper.getAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.certificacio.finalitzades.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.enviament.actualitzacio.certificacio.finalitzades.actiu", true);
 	}
 	private boolean isActualitzacioServeisActiuProperty() {
-		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
 	}
 	private boolean isSemaforInUse() {
 		boolean inUse = true;

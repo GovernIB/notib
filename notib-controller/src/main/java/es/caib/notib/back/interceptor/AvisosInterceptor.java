@@ -5,6 +5,7 @@ import es.caib.notib.back.helper.AvisHelper;
 import es.caib.notib.back.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -22,7 +23,7 @@ import java.util.List;
 @Component
 public class AvisosInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	private AvisService avisService;
 
 	@Override

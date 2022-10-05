@@ -6,8 +6,8 @@ package es.caib.notib.api.interna.controller;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.util.UtilitatsNotib;
-import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ejb.EJBAccessException;
@@ -24,7 +24,7 @@ public abstract class NotificacioApiRestBaseController {
 	@Autowired
 	protected AplicacioService aplicacioService;
 	@Autowired
-	protected NotificacioServiceWsV2 notificacioServiceWsV2;
+	protected NotificacioServiceWs notificacioServiceWs;
 
 	protected String getErrorDescripcio(Exception e) {
 
@@ -53,7 +53,7 @@ public abstract class NotificacioApiRestBaseController {
 		try {
 			String referencia = extractIdentificador(request);
 			if (!referencia.isEmpty()) {
-				return notificacioServiceWsV2.consultaJustificantEnviament(referencia);
+				return notificacioServiceWs.consultaJustificantEnviament(referencia);
 			}
 			String msg = "No s'ha informat cap referència de l'enviament";
 			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
@@ -65,7 +65,7 @@ public abstract class NotificacioApiRestBaseController {
 	public String donarPermisConsulta(PermisConsulta permisConsulta) {
 
 		try {
-			return notificacioServiceWsV2.donarPermisConsulta(permisConsulta) ? "OK" : null;
+			return notificacioServiceWs.donarPermisConsulta(permisConsulta) ? "OK" : null;
 		} catch (Exception e) {
 			return getErrorDescripcio(e);
 		}

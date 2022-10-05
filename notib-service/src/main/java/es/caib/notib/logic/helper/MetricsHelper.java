@@ -56,6 +56,6 @@ public class MetricsHelper {
 	}
 	
 	private boolean getGenerarMetriques() {
-		return configHelper.getAsBoolean("es.caib.notib.metriques.generar");
+		return configHelper.getConfigAsBoolean("es.caib.notib.metriques.generar");
 	}
 }

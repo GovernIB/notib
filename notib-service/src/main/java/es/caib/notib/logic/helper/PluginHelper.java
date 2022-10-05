@@ -1815,7 +1815,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance("es.caib.notib.", ConfigHelper.JBossPropertiesHelper.getProperties().findAll());
+					.newInstance("es.caib.notib.", configHelper.getEnvironmentProperties());
 			arxiuPlugin.put(codiEntitat, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -1979,7 +1979,7 @@ public class PluginHelper {
 		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
-		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");
+		return configHelper.getConfigAsInteger("es.caib.notib.plugin.registre.segons.entre.peticions");
 	}
 	public String getOrganGestorsFile() {
 		return configHelper.getConfig("es.caib.notib.plugin.unitats.fitxer");
@@ -1988,34 +1988,34 @@ public class PluginHelper {
 	// PROPIETATS TASQUES EN SEGON PLA
 
 	public int getRegistreReintentsPeriodeProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.periode");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.periode");
 	}
 	public int getNotificaReintentsPeriodeProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.periode");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.periode");
 	}
 	public int getConsultaReintentsPeriodeProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.periode");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.periode");
 	}
 	public int getConsultaSirReintentsPeriodeProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.periode");
 	}
 	public int getRegistreReintentsMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.reintents.maxim");
 	}
 	public int getNotificaReintentsMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.reintents.maxim");
 	}
 	public int getConsultaReintentsMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.reintents.maxim");
 	}
 	public int getConsultaReintentsDEHMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.deh.reintents.maxim");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.deh.reintents.maxim");
 	}
 	public int getConsultaReintentsCIEMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.cie.reintents.maxim");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.cie.reintents.maxim");
 	}
 	public int getConsultaSirReintentsMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.reintents.maxim");
 	}
 
 	public NotificacioComunicacioTipusEnumDto getNotibTipusComunicacioDefecte() {
@@ -2071,7 +2071,7 @@ public class PluginHelper {
 	}
 
 	private boolean isReadDocsMetadataFromArxiu() {
-		return configHelper.getAsBoolean("es.caib.notib.documents.metadades.from.arxiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.documents.metadades.from.arxiu");
 	}
 
 	private static boolean isDocumentEstranger(String nie) {

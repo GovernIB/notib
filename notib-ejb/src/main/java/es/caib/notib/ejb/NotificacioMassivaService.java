@@ -7,10 +7,16 @@ import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.*;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.io.IOException;
@@ -25,63 +31,71 @@ import java.nio.file.NoSuchFileException;
 @Stateless
 public class NotificacioMassivaService extends AbstractService<es.caib.notib.logic.intf.service.NotificacioMassivaService> implements es.caib.notib.logic.intf.service.NotificacioMassivaService {
 
-	@Autowired
-    NotificacioMassivaService delegate;
-
 	@Override
+	@PermitAll
 	public void posposar(Long entitatId, Long notificacioMassivaId) {
-		delegate.posposar(entitatId, notificacioMassivaId);
+		getDelegateService().posposar(entitatId, notificacioMassivaId);
 	}
 	@Override
+	@PermitAll
 	public void reactivar(Long entitatId, Long notificacioMassivaId) {
-		delegate.reactivar(entitatId, notificacioMassivaId);
+		getDelegateService().reactivar(entitatId, notificacioMassivaId);
 	}
 
 	@Override
+	@PermitAll
 	public NotificacioMassivaDataDto findById(Long entitatId, Long id) {
-		return delegate.findById(entitatId, id);
+		return getDelegateService().findById(entitatId, id);
 	}
 
 	@Override
+	@PermitAll
 	public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
-		return delegate.findNotificacions(entitatId, notificacioMassivaId, filtre, paginacioParams);
+		return getDelegateService().findNotificacions(entitatId, notificacioMassivaId, filtre, paginacioParams);
 	}
 	@Override
+	@PermitAll
 	public NotificacioMassivaInfoDto getNotificacioMassivaInfo(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getNotificacioMassivaInfo(entitatId, notificacioMassivaId);
+		return getDelegateService().getNotificacioMassivaInfo(entitatId, notificacioMassivaId);
 	}
 	@Override
+	@PermitAll
 	public FitxerDto getCSVFile(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getCSVFile(entitatId, notificacioMassivaId);
+		return getDelegateService().getCSVFile(entitatId, notificacioMassivaId);
 	}
 	@Override
+	@PermitAll
 	public FitxerDto getZipFile(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getZipFile(entitatId, notificacioMassivaId);
+		return getDelegateService().getZipFile(entitatId, notificacioMassivaId);
 	}
 	@Override
+	@PermitAll
 	public FitxerDto getResumFile(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getResumFile(entitatId, notificacioMassivaId);
+		return getDelegateService().getResumFile(entitatId, notificacioMassivaId);
 	}
 
 	@Override
+	@PermitAll
 	public FitxerDto getErrorsValidacioFile(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getErrorsValidacioFile(entitatId, notificacioMassivaId);
+		return getDelegateService().getErrorsValidacioFile(entitatId, notificacioMassivaId);
 	}
 
 	@Override
+	@PermitAll
 	public FitxerDto getErrorsExecucioFile(Long entitatId, Long notificacioMassivaId) {
-		return delegate.getErrorsExecucioFile(entitatId, notificacioMassivaId);
+		return getDelegateService().getErrorsExecucioFile(entitatId, notificacioMassivaId);
 	}
 
 	@Override
 	@RolesAllowed({"tothom"})
 	public byte[] getModelDadesCarregaMassiuCSV() throws NoSuchFileException, IOException {
-		return delegate.getModelDadesCarregaMassiuCSV();
+		return getDelegateService().getModelDadesCarregaMassiuCSV();
 	}
 
 	@Override
+	@PermitAll
 	public void cancelar(Long entitatId, Long notificacioMassivaId) throws Exception {
-		delegate.cancelar(entitatId, notificacioMassivaId);
+		getDelegateService().cancelar(entitatId, notificacioMassivaId);
 	}
 
 	@Override
@@ -90,14 +104,14 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 			Long entitatId,
 			String usuariCodi,
 			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
-		return delegate.create(entitatId, usuariCodi, notificacioMassiu);
+		return getDelegateService().create(entitatId, usuariCodi, notificacioMassiu);
 	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void delete(
 			Long entitatId,
 			Long notificacioMassivaId) {
-		delegate.delete(entitatId, notificacioMassivaId);
+		getDelegateService().delete(entitatId, notificacioMassivaId);
 	}
 	@Override
 	@RolesAllowed({"tothom"})
@@ -106,6 +120,6 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 			NotificacioMassivaFiltreDto filtre,
 			RolEnumDto rol,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(entitatId, filtre, rol, paginacioParams);
+		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, rol, paginacioParams);
 	}
 }

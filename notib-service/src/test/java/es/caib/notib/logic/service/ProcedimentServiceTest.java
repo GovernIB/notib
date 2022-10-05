@@ -68,8 +68,8 @@ public class ProcedimentServiceTest {
 	public void setUp() {
 		Mockito.doNothing().when(metricsHelper).fiMetrica(Mockito.nullable(Timer.Context.class));
 		Mockito.when(metricsHelper.iniciMetrica()).thenReturn(null);
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
 	}
 
 	@After
@@ -128,8 +128,8 @@ public class ProcedimentServiceTest {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat,
 				false,
 				null, // organGestor

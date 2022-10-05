@@ -150,11 +150,11 @@ public class NotificacioServiceWsV2Test {
 	
 	@Before
 	public void setUp() {
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
-		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
+		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.retard"))).thenReturn(10);
+		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.procediment.alta.auto.caducitat"))).thenReturn(15);
+		Mockito.when(configHelper.getConfigAsLong(Mockito.eq("es.caib.notib.notificacio.document.size"))).thenReturn(10485760L);
 //		Mockito.when(configHelper.getAsLong(Mockito.eq("es.caib.notib.notificacio.document.total.size"))).thenReturn(15728640L);
-		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
+		Mockito.when(configHelper.getConfigAsBoolean(Mockito.eq("es.caib.notib.document.metadades.por.defecto"))).thenReturn(true);
 		Mockito.when(auth.getName()).thenReturn("mockedName");
 		Mockito.when(messageHelper.getMessage("error.validacio.nom.titular.longitud.max")).thenReturn("error.validacio.nom.titular.longitud.max");
 		Mockito.when(messageHelper.getMessage("error.validacio.llinatge1.titular.longitud.max")).thenReturn("error.validacio.llinatge1.titular.longitud.max");
@@ -197,8 +197,8 @@ public class NotificacioServiceWsV2Test {
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(
 				"",
 				"",
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"),
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"),
+				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitatMock,
 				false,
 				null, // organGestor
@@ -328,7 +328,7 @@ public class NotificacioServiceWsV2Test {
 		String notificacioId = Long.toString(System.currentTimeMillis());
 		EntitatEntity entitatMock = EntitatEntity.getBuilder("codi", "nom", null, "dir3Codi", "dir3CodiReg", "apiKey", false, null, null, "colorFons", "colorLletra", null, "oficina", "nomOficinaVirtual", false, "llibre", "llibreNom", false).build();
 		Date caducitat = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
-		ProcedimentEntity procediment = ProcedimentEntity.getBuilder("", "", configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"), configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"), entitatMock, false, null, /* organGestor*/ null, null, null, null, false, false).build();
+		ProcedimentEntity procediment = ProcedimentEntity.getBuilder("", "", configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"), configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"), entitatMock, false, null, /* organGestor*/ null, null, null, null, false, false).build();
 
 		List<GrupDto> grups = new ArrayList<GrupDto>();
 		GrupDto grupDto = new GrupDto();

@@ -15,10 +15,12 @@ import org.hibernate.dialect.Oracle10gDialect;
  */
 public class OracleCaibDialect extends Oracle10gDialect {
 
+	private static final String HIBERNATE_SEQ = "hibernate_seq";
+
 	@Override
 	public String getSelectSequenceNextValString(String sequenceName) {
 		if (sequenceName.equalsIgnoreCase("hibernate_sequence")) {
-			return AbstractAuditableEntity.TABLE_PREFIX + "_" + sequenceName + ".nextval";
+			return AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ + ".nextval";
 		} else {
 			return sequenceName + ".nextval";
 		}
@@ -28,7 +30,7 @@ public class OracleCaibDialect extends Oracle10gDialect {
 	public String getCreateSequenceString(String sequenceName) {
 		//starts with 1, implicitly
 		if (sequenceName.equalsIgnoreCase("hibernate_sequence")) {
-			return "create sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + sequenceName;
+			return "create sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ;
 		} else {
 			return "create sequence " + sequenceName;
 		}
@@ -37,7 +39,7 @@ public class OracleCaibDialect extends Oracle10gDialect {
 	@Override
 	public String getDropSequenceString(String sequenceName) {
 		if (sequenceName.equalsIgnoreCase("hibernate_sequence")) {
-			return "drop sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + sequenceName;
+			return "drop sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ;
 		} else {
 			return "drop sequence " + sequenceName;
 		}

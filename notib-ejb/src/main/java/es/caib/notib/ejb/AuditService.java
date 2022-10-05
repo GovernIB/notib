@@ -3,9 +3,8 @@
  */
 package es.caib.notib.ejb;
 
+import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementació de AuditaService com a EJB que empra una clase
@@ -16,17 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Stateless
 public class AuditService extends AbstractService<es.caib.notib.logic.intf.service.AuditService> implements es.caib.notib.logic.intf.service.AuditService {
 
-	@Autowired
-	AuditService delegate;
-
 	@Override
+	@PermitAll
 	public void audita(
 			Object objecteAuditar, 
 			TipusOperacio tipusOperacio, 
 			TipusEntitat tipusEntitat,
 			TipusObjecte tipusObjecte, 
 			String joinPoint) {
-		delegate.audita(
+		getDelegateService().audita(
 				objecteAuditar, 
 				tipusOperacio, 
 				tipusEntitat, 

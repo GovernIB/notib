@@ -1473,26 +1473,26 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	private int getRegistreEnviamentsProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.registre.enviaments.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.registre.enviaments.processar.max");
 	}
 	private int getNotificaEnviamentsProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.notifica.enviaments.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.notifica.enviaments.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.processar.max");
 	}
 	private int getEnviamentDEHActualitzacioCertProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.deh.actualitzacio.certificacio.processar.max");
 	}
 	private int getEnviamentCIEActualitzacioCertProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.cie.actualitzacio.certificacio.processar.max");
 	}
 	private int getEnviamentActualitzacioEstatRegistreProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.enviament.actualitzacio.estat.registre.processar.max");
 	}
 
 	private int getMidaMinIdCsv() {
-		return configHelper.getAsInt("es.caib.notib.document.consulta.id.csv.mida.min");
+		return configHelper.getConfigAsInteger("es.caib.notib.document.consulta.id.csv.mida.min");
 	}
 	
 	private void estatCalcularCampsAddicionals(NotificacioEnviamentEntity enviament, NotificacioEnviamenEstatDto estatDto) {

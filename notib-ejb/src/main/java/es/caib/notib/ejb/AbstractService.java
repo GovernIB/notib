@@ -3,15 +3,14 @@
  */
 package es.caib.notib.ejb;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import es.caib.notib.ejb.config.EjbContextConfig;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
-
-import es.caib.notib.ejb.EjbContextConfig;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * Funcionalitat bàsica pels EJBs.

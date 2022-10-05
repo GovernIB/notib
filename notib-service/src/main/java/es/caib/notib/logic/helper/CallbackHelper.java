@@ -258,11 +258,11 @@ public class CallbackHelper {
 
 	/** Propietat que assenayala el màxim de reintents. Si la propietat és null llavors no hi ha un màxim. */
 	private Integer getEventsIntentsMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max");
 	}
 
 	public int getIntentsPeriodeProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.periode");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.periode");
 	}
 
 }

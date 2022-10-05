@@ -13,7 +13,6 @@ import es.caib.notib.logic.intf.dto.cie.CieFiltreDto;
 import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -28,31 +27,28 @@ import java.util.List;
 @Stateless
 public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.service.PagadorCieService> implements es.caib.notib.logic.intf.service.PagadorCieService {
 
-	@Autowired
-	PagadorCieService delegate;
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public CieDto create(Long entitatId, CieDataDto cie) {
-		return delegate.create(entitatId, cie);
+		return getDelegateService().create(entitatId, cie);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public CieDto update(CieDataDto cie) throws NotFoundException {
-		return delegate.update(cie);
+		return getDelegateService().update(cie);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public CieDto delete(Long id) throws NotFoundException {
-		return delegate.delete(id);
+		return getDelegateService().delete(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public CieDto findById(Long id) {
-		return delegate.findById(id);
+		return getDelegateService().findById(id);
 	}
 
 	@Override
@@ -61,7 +57,7 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 			Long entitatId, 
 			CieFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(
+		return getDelegateService().findAmbFiltrePaginat(
 				entitatId, 
 				filtre, 
 				paginacioParams);
@@ -70,28 +66,28 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<CieDto> findAll() {
-		return delegate.findAll();
+		return getDelegateService().findAll();
 	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
-		return delegate.findAllIdentificadorText();
+		return getDelegateService().findAllIdentificadorText();
 	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		return delegate.findAllPaginat(paginacioParams);
+		return getDelegateService().findAllPaginat(paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<CieDto> findByEntitat(Long entitatId) {
-		return delegate.findByEntitat(entitatId);
+		return getDelegateService().findByEntitat(entitatId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
-		return delegate.findByEntitatAndOrganGestor(entitat, organGestor);
+		return getDelegateService().findByEntitatAndOrganGestor(entitat, organGestor);
 	}
 }

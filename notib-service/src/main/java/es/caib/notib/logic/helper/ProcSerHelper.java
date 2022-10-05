@@ -28,7 +28,7 @@ import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.persist.repository.ServeiRepository;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

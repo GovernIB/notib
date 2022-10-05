@@ -5,7 +5,6 @@ package es.caib.notib;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Profile;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -28,10 +27,10 @@ public abstract class NotibApp extends SpringBootServletInitializer {
 			Attributes attributes = manifest.getMainAttributes();
 			String version = attributes.getValue("Implementation-Version");
 			String buildTimestamp = attributes.getValue("Build-Timestamp");
-			log.info("Carregant l'aplicació EMISERV versió " + version + " generada en data " + buildTimestamp);
+			log.info("Carregant l'aplicació NOTIB versió " + version + " generada en data " + buildTimestamp);
 			/*
 			Implementation-SCM-Revision: 
-			Implementation-Title: emiserv-back-war
+			Implementation-Title: notib-back-war
 			Build-Timestamp: 2021-04-05T04:01:49Z
 			Implementation-Version: 2.0.1
 			Implementation-SCM-Branch: 

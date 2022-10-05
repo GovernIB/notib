@@ -272,7 +272,7 @@ public class RegistreNotificaHelper {
 	}
 
 	private boolean isSirActivat() {
-		return configHelper.getAsBoolean("es.caib.notib.emprar.sir");
+		return configHelper.getConfigAsBoolean("es.caib.notib.emprar.sir");
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class RegistreNotificaHelper {
 	 * @return boolean
 	 */
 	public boolean isSendDocumentsActive() {
-		return configHelper.getAsBoolean("es.caib.notib.plugin.registre.documents.enviar");
+		return configHelper.getConfigAsBoolean("es.caib.notib.plugin.registre.documents.enviar");
 	}
 
 	/**
@@ -292,6 +292,6 @@ public class RegistreNotificaHelper {
 	 * @return boolean
 	 */
 	private boolean isGenerarJustificantActive() {
-		return configHelper.getAsBoolean("es.caib.notib.plugin.registre.generar.justificant");
+		return configHelper.getConfigAsBoolean("es.caib.notib.plugin.registre.generar.justificant");
 	}
 }

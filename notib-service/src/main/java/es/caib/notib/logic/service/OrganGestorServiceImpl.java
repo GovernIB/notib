@@ -16,13 +16,10 @@ import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.cacheable.PermisosCacheable;
 import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.GrupEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.ProcSerOrganEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
-import es.caib.notib.persist.entity.cie.PagadorCieEntity;
-import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.repository.AvisRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
@@ -32,7 +29,7 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -1416,7 +1413,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Set<CodiValorDto> resposta = new HashSet<>();
 		List<String> codiFills;
 		OrganGestorEntity organFill;
-		boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+		boolean entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
 		for(OrganGestorEntity organ: organs) {
 			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
@@ -1510,7 +1507,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 		}
 		organsGestors = new ArrayList<>(setOrgansGestors);
-		if (!configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
+		if (!configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
 			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
 		}
 		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty()) {

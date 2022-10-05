@@ -14,7 +14,7 @@ import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;

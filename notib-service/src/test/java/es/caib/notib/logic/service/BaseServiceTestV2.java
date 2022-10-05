@@ -8,7 +8,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.persist.entity.config.ConfigEntity;
-import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import es.caib.notib.logic.test.AuthenticationTest;
@@ -40,22 +39,19 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.bind.ValidationException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
+import static es.caib.notib.logic.config.ReadDbPropertiesPostProcessor.DBAPP_PROPERTIES;
 import static org.junit.Assert.fail;
 
 /**
@@ -91,10 +87,42 @@ public class BaseServiceTestV2 {
 	protected OrganGestorService organGestorService;
 	@Autowired
 	protected EntitatService entitatService;
+//	@Autowired
+//	ConfigurableEnvironment environment;
 
 	@BeforeClass
 	public static void beforeClass() {
-		ConfigHelper.JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+//		JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+		loadProperties("classpath:es/caib/notib/core/test.properties");
+	}
+
+	public static void loadProperties(String path) {
+
+		Properties prop = new Properties();
+		try {
+			if (path.startsWith("classpath:")) {
+				prop.load(BaseServiceTestV2.class.getClassLoader().getResourceAsStream(path.substring("classpath:".length())));
+			} else if (path.startsWith("file://")) {
+				FileInputStream fis = new FileInputStream(path.substring("file://".length()));
+				prop.load(fis);
+			} else {
+				FileInputStream fis = new FileInputStream(path);
+				prop.load(fis);
+			}
+		} catch (Exception ex) {
+			log.error("No s'han pogut llegir els properties", ex);
+		}
+
+		prop.forEach((k, v) -> System.setProperty(k.toString(), v.toString()));
+
+//		Map<String, Object> propertySource = new HashMap<>();
+//		prop.forEach((k, v) -> propertySource.put(k.toString(), v));
+
+//		if (environment.getPropertySources().contains(DBAPP_PROPERTIES)) {
+//			environment.getPropertySources().replace(DBAPP_PROPERTIES, new MapPropertySource(DBAPP_PROPERTIES, propertySource));
+//		} else {
+//			environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
+//		}
 	}
 
 	@AfterClass

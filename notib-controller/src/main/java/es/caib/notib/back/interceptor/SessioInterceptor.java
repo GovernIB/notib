@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.back.helper.SessioHelper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -22,9 +23,9 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 @Component
 public class SessioInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	AplicacioService aplicacioService;
-	@Autowired
+	@Autowired @Lazy
 	EntitatService entitatService;
 
 	@Override

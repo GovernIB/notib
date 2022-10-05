@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.service.BaseServiceTestV2;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.logic.test.AuthenticationTest;
@@ -94,7 +95,8 @@ public class OrganGestorSyncHelperIT {
 
     @BeforeClass
     public static void beforeClass() {
-        ConfigHelper.JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+//        JBossPropertiesHelper.getProperties("classpath:es/caib/notib/core/test.properties");
+        BaseServiceTestV2.loadProperties("classpath:es/caib/notib/core/test.properties");
     }
 
     @Before

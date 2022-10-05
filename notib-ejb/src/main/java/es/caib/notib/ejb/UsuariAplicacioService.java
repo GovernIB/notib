@@ -3,15 +3,14 @@
  */
 package es.caib.notib.ejb;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import es.caib.notib.logic.intf.dto.AplicacioDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 
 /**
  * Implementació de UsuariAplicacioService com a EJB que empra una clase
@@ -22,21 +21,18 @@ import es.caib.notib.logic.intf.exception.NotFoundException;
 @Stateless
 public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.intf.service.UsuariAplicacioService> implements es.caib.notib.logic.intf.service.UsuariAplicacioService {
 
-	@Autowired
-	UsuariAplicacioService delegate;
-
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public AplicacioDto create(
 			AplicacioDto aplicacio) {
-		return delegate.create(aplicacio);
+		return getDelegateService().create(aplicacio);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
 	public AplicacioDto update(
 			AplicacioDto aplicacio) throws NotFoundException {
-		return delegate.update(aplicacio);
+		return getDelegateService().update(aplicacio);
 	}
 
 	@Override
@@ -44,27 +40,27 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	public AplicacioDto delete(
 			Long id, 
 			Long entitatId) throws NotFoundException {
-		return delegate.delete(id, entitatId);
+		return getDelegateService().delete(id, entitatId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findById(
 			Long aplicacioId) {
-		return delegate.findById(aplicacioId);
+		return getDelegateService().findById(aplicacioId);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findByEntitatAndId(Long entitatId, Long aplicacioId) {
-		return delegate.findByEntitatAndId(entitatId, aplicacioId);
+		return getDelegateService().findByEntitatAndId(entitatId, aplicacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
 	public AplicacioDto findByUsuariCodi(
 			String usuariCodi) {
-		return delegate.findByUsuariCodi(usuariCodi);
+		return getDelegateService().findByUsuariCodi(usuariCodi);
 	}
 	
 	@Override
@@ -72,31 +68,32 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 	public AplicacioDto findByEntitatAndUsuariCodi(
 			Long entitatId, 
 			String usuariCodi) {
-		return delegate.findByEntitatAndUsuariCodi(entitatId, usuariCodi);
+		return getDelegateService().findByEntitatAndUsuariCodi(entitatId, usuariCodi);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public PaginaDto<AplicacioDto> findPaginat(
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findPaginat(paginacioParams);
+		return getDelegateService().findPaginat(paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public PaginaDto<AplicacioDto> findPaginatByEntitat(Long entitatId, PaginacioParamsDto paginacioParams) {
-		return delegate.findPaginatByEntitat(entitatId, paginacioParams);
+		return getDelegateService().findPaginatByEntitat(entitatId, paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
 	public AplicacioDto findByEntitatAndText(Long entitatId, String text) {
-		return delegate.findByEntitatAndText(entitatId, text);
+		return getDelegateService().findByEntitatAndText(entitatId, text);
 	}
 
 	@Override
+	@PermitAll
 	public AplicacioDto updateActiva(Long id, boolean activa) {
-		return delegate.updateActiva(id, activa);
+		return getDelegateService().updateActiva(id, activa);
 	}
 
 }

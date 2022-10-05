@@ -4,8 +4,8 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 
@@ -18,75 +18,75 @@ import javax.ejb.Stateless;
 @Stateless
 public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.service.SchedulledService> implements es.caib.notib.logic.intf.service.SchedulledService {
 
-	@Autowired
-	SchedulledService delegate;
-
 //	@Override
 //	@RolesAllowed({"NOT_SUPER"})
 //	public void restartSchedulledTasks() {
-//		delegate.restartSchedulledTasks();
+//		getDelegateService().restartSchedulledTasks();
 //	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void notificaEnviamentsRegistrats() {
-		delegate.notificaEnviamentsRegistrats();
+		getDelegateService().notificaEnviamentsRegistrats();
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void registrarEnviamentsPendents() throws RegistreNotificaException {
-		delegate.registrarEnviamentsPendents();
+		getDelegateService().registrarEnviamentsPendents();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void enviamentRefrescarEstatPendents() {
-		delegate.enviamentRefrescarEstatPendents();
+		getDelegateService().enviamentRefrescarEstatPendents();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void enviamentRefrescarEstatEnviatSir() {
-		delegate.enviamentRefrescarEstatEnviatSir();
+		getDelegateService().enviamentRefrescarEstatEnviatSir();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void actualitzarProcediments() {
-		delegate.actualitzarProcediments();
+		getDelegateService().actualitzarProcediments();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public void refrescarNotificacionsExpirades() {
-		delegate.refrescarNotificacionsExpirades();
+		getDelegateService().refrescarNotificacionsExpirades();
 	}
 
 	@Override
+	@PermitAll
 	public void enviamentRefrescarEstatDEH() {
-		delegate.enviamentRefrescarEstatDEH();
+		getDelegateService().enviamentRefrescarEstatDEH();
 	}
 
 	@Override
+	@PermitAll
 	public void enviamentRefrescarEstatCIE() {
-		delegate.enviamentRefrescarEstatCIE();
+		getDelegateService().enviamentRefrescarEstatCIE();
 	}
 
 	@Override
+	@PermitAll
 	public void eliminarDocumentsTemporals() {
-		delegate.eliminarDocumentsTemporals();
+		getDelegateService().eliminarDocumentsTemporals();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER"})
 	public void actualitzarServeis() {
-		delegate.actualitzarServeis();
+		getDelegateService().actualitzarServeis();
 	}
 
     @Override
     public void consultaCanvisOrganigrama() {
-        delegate.consultaCanvisOrganigrama();
+        getDelegateService().consultaCanvisOrganigrama();
     }
 
 }

@@ -29,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -362,6 +363,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void restartSchedulledTasks() {
 		schedulingConfig.restartSchedulledTasks();
+	}
+
+	@Override
+	public void propagateDbProperties() {
+		configHelper.reloadDbProperties();
 	}
 
     private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);

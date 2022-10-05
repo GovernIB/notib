@@ -24,7 +24,7 @@ import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EntitatTipusDocRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
 import es.caib.notib.persist.repository.NotificacioRepository;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;

@@ -12,7 +12,7 @@ import es.caib.notib.logic.helper.OrganigramaHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -303,6 +303,6 @@ public class PermisosCacheable {
     }
 
     public boolean getGenerarLogsPermisosOrgan() {
-        return configHelper.getAsBoolean("es.caib.notib.permisos.organ.logs");
+        return configHelper.getConfigAsBoolean("es.caib.notib.permisos.organ.logs");
     }
 }

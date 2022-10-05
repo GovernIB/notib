@@ -1,6 +1,7 @@
 package es.caib.notib.logic.config;
 
 import es.caib.notib.logic.intf.service.CallbackService;
+import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.SchedulledService;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
@@ -9,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
@@ -44,8 +48,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
         if (taskRegistrar != null) {
             taskRegistrar.destroy();
             taskRegistrar.afterPropertiesSet();
+            registerSchedulledTasks();
         }
-
     }
 
     @Override
@@ -53,6 +57,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
     	taskRegistrar.setScheduler(taskScheduler);
         this.taskRegistrar = taskRegistrar;
 
+//        registerSchedulledTasks();
+    }
+
+    private void registerSchedulledTasks() {
         // 1. Enviament de notificacions pendents al registre y notific@
         ////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
@@ -66,12 +74,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long registrarEnviamentsPendentsInitialDelayLong = 0L; 
+                        Long registrarEnviamentsPendentsInitialDelayLong = 0L;
                         if (primeraVez[0]) {
-                        	registrarEnviamentsPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY);
+                        	registrarEnviamentsPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY, 300000L);
                         	primeraVez[0] = false;
                         }
                         trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
@@ -94,12 +102,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
                         if (primeraVez[1]) {
-                        	notificaEnviamentsRegistratsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY);
+                        	notificaEnviamentsRegistratsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY, 330000L);
                         	primeraVez[1] = false;
                         }
                         trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
@@ -122,12 +130,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
                         if (primeraVez[2]) {
-                        	enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY);
+                        	enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY, 360000L);
                         	primeraVez[2] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
@@ -150,12 +158,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
                         if (primeraVez[3]) {
-                        	enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY);
+                        	enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY, 390000L);
                         	primeraVez[3] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelayLong);
@@ -178,7 +186,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON));
+                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON, "0 0 1 * * *"));
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -198,7 +206,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON));
+                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON, "0 30 1 * * *"));
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -218,12 +226,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long processarPendentsInitialDelayLong = 0L;
                         if (primeraVez[4]) {
-                        	processarPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY);
+                        	processarPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY, 420000L);
                         	primeraVez[4] = false;
                         }
                         trigger.setInitialDelay(processarPendentsInitialDelayLong);
@@ -232,7 +240,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
-        
+
         // 8. Consulta certificació notificacions DEH finalitzades
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
@@ -246,12 +254,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
                         if (primeraVez[5]) {
-                        	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY);
+                        	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY, 450000L);
                         	primeraVez[5] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
@@ -260,7 +268,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
-        
+
         // 9. Consulta certificació notificacions CIE finalitzades
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
@@ -274,12 +282,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
                         if (primeraVez[6]) {
-                        	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY);
+                        	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY, 480000L);
                         	primeraVez[6] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
@@ -310,7 +318,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
-        
+
         // 11. Actualització dels serveis a partir de la informació de Rolsac
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
@@ -324,7 +332,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_SERVEIS_CRON));
+                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_SERVEIS_CRON, "0 0 2 * * *"));
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -344,9 +352,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        String cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA);
-                        if (cron == null)
-                            cron = "0 45 2 * * *";
+                        String cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA, "0 30 2 * * *");
                         CronTrigger trigger = new CronTrigger(cron);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;

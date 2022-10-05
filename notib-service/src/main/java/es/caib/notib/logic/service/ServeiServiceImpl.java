@@ -35,7 +35,7 @@ import es.caib.notib.persist.entity.ServeiFormEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.persist.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
@@ -587,11 +587,11 @@ public class ServeiServiceImpl implements ServeiService{
 //	}
 //
 //	private boolean isActualitzacioServeisModificarProperty() {
-//		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
+//		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
 //	}
 //
 //	private boolean isActualitzacioServeisEliminarOrgansProperty() {
-//		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
+//		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
 //	}
 
 	@Override

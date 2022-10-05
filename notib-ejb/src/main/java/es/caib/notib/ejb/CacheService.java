@@ -3,13 +3,11 @@
  */
 package es.caib.notib.ejb;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import es.caib.notib.logic.intf.dto.CacheDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 
 /**
  * Implementació de CacheService com a EJB que empra una clase
@@ -20,19 +18,16 @@ import es.caib.notib.logic.intf.dto.PaginaDto;
 @Stateless
 public class CacheService extends AbstractService<es.caib.notib.logic.intf.service.CacheService> implements es.caib.notib.logic.intf.service.CacheService {
 
-	@Autowired
-	CacheService delegate;
-
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public PaginaDto<CacheDto> getAllCaches() {
-		return delegate.getAllCaches();
+		return getDelegateService().getAllCaches();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public void removeCache(String value) {
-		delegate.removeCache(value);
+		getDelegateService().removeCache(value);
 	}
 
 }

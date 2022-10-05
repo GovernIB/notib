@@ -275,7 +275,7 @@ public class ProcSerSyncHelper {
 	private boolean isActualitzacioProcedimentsModificarProperty() {
 
 		try {
-			return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
+			return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
 		} catch (Exception e) {
 			return true;
 		}
@@ -284,7 +284,7 @@ public class ProcSerSyncHelper {
 	public boolean isActualitzacioProcedimentsEliminarOrgansProperty() {
 
 		try {
-			return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
+			return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
 		} catch (Exception e) {
 			return false;
 		}
@@ -495,10 +495,10 @@ public class ProcSerSyncHelper {
 	}
 
 	private boolean isActualitzacioServeisModificarProperty() {
-		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
+		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.modificar");
 	}
 
 	public boolean isActualitzacioServeisEliminarOrgansProperty() {
-		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
+		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.procediments.eliminar.organs");
 	}
 }

@@ -3,7 +3,6 @@ server:
     context-path: /notibback
   error:
     path: /error
-
 spring:
   mvc:
     view:

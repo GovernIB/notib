@@ -21,7 +21,7 @@ import org.springframework.context.annotation.FilterType;
 
 
 /**
- * Aplicació Spring Boot de EMISERV per a ser executada des de JBoss.
+ * Aplicació Spring Boot de NOTIB per a ser executada des de JBoss.
  *
  * @author Limit Tecnologies <limit@limit.es>
  */

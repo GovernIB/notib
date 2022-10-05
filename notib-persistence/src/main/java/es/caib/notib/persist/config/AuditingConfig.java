@@ -3,9 +3,7 @@
  */
 package es.caib.notib.persist.config;
 
-import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,8 +36,9 @@ public class AuditingConfig implements EnvironmentAware {
 				if (authentication != null && authentication.isAuthenticated()) {
 					return Optional.of(authentication.getName());
 				}
-				return Optional.ofNullable(environment.getProperty("es.caib.emiserv.default.auditor", "anonymous"));
+//				return Optional.ofNullable(environment.getProperty("es.caib.emiserv.default.auditor", "anonymous"));
 //						(defaultAuditor != null) ? defaultAuditor : "anonymous");
+				return Optional.empty();
 			}
 		};
 	}

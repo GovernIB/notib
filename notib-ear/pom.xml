@@ -60,7 +60,7 @@
 		</dependency>
 		<!--
 			 La següent dependència ja està inclosa a dins el .war. Només s'inclou aquí per a que l'ear
-			 contengui les seves dependències. Després s'haurà d'excloure el fitxer emiserv-controller*.jar
+			 contengui les seves dependències. Després s'haurà d'excloure el fitxer notib-controller*.jar
 			 de dins la carpeta lib per a evitar conflictes per classes duplicades.
 		-->
 		<dependency>
@@ -114,17 +114,17 @@
 								<configuration>
 									<target>
 <!-- 										<copy file="${basedir}/target/notib.ear" tofile="${jboss.directory}/notib.ear" /> -->
-										<echo> </echo>
-										<echo> </echo>
-										<echo>|      _____                      _ _          _     __                       _ ____   ____   _____ _____    |</echo>
-										<echo>|     / ____|                    (_) |        | |   / _|                     | |  _ \ / __ \ / ____/ ____|   |</echo>
-										<echo>|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __            | | |_) | |  | | (___| (___     |</echo>
-										<echo>|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|       _   | |  _ -| |  | |\___ \\___ \    |</echo>
-										<echo>|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |         | |__| | |_) | |__| |____) |___) |   |</echo>
-										<echo>|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|          \____/|____/ \____/|_____/_____/    |</echo>
-										<echo>|                          | |                                                                               |</echo>                                                                            
-										<echo>|                          |_|                                                                               |</echo>   
-										<echo> </echo>                                                                         										
+										<echo message=" " level="info" />
+										<echo message=" " level="info" />
+										<echo message="|      _____                      _ _          _     __                       _ ____   ____   _____ _____    |" level="info" />
+										<echo message="|     / ____|                    (_) |        | |   / _|                     | |  _ \ / __ \ / ____/ ____|   |" level="info" />
+										<echo message="|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __            | | |_) | |  | | (___| (___     |" level="info" />
+										<echo message="|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|       _   | |  _ -| |  | |\___ \\___ \    |" level="info" />
+										<echo message="|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |         | |__| | |_) | |__| |____) |___) |   |" level="info" />
+										<echo message="|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|          \____/|____/ \____/|_____/_____/    |" level="info" />
+										<echo message="|                          | |                                                                               |" level="info" />
+										<echo message="|                          |_|                                                                               |" level="info" />
+										<echo message=" " level="info" />
 									</target>
 								</configuration>
 								<goals>
@@ -161,17 +161,17 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<echo> </echo>
-										<echo> </echo>
-										<echo>|      _____                      _ _          _     __                  _______ ____  __  __  _____       _______    |</echo>
-										<echo>|     / ____|                    (_) |        | |   / _|                |__   __/ __ \|  \/  |/ ____|   /\|__   __|   |</echo>
-										<echo>|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __          | | | |  | | \  / | |       /  \  | |      |</echo>
-										<echo>|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|         | | | |  | | |\/| | |      / /\ \ | |      |</echo>
-										<echo>|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |            | | | |__| | |  | | |____ / ____ \| |      |</echo>
-										<echo>|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|            |_|  \____/|_|  |_|\_____/_/    \_\_|      |</echo>
-										<echo>|                          | |                                                                                        |</echo>
-										<echo>|                          |_|                                                                                        |</echo>
-										<echo> </echo>                                                                       										
+										<echo message=" " level="info"/>
+										<echo message=" " level="info"/>
+										<echo message="|      _____                      _ _          _     __                  _______ ____  __  __  _____       _______    |" level="info"/>
+										<echo message="|     / ____|                    (_) |        | |   / _|                |__   __/ __ \|  \/  |/ ____|   /\|__   __|   |" level="info"/>
+										<echo message="|    | |     ___  _ __ ___  _ __  _| | ___  __| |  | |_ ___  _ __          | | | |  | | \  / | |       /  \  | |      |" level="info"/>
+										<echo message="|    | |    / _ \| '_ ` _ \| '_ \| | |/ _ \/ _` |  |  _/ _ \| '__|         | | | |  | | |\/| | |      / /\ \ | |      |" level="info"/>
+										<echo message="|    | |___| (_) | | | | | | |_) | | |  __/ (_| |  | || (_) | |            | | | |__| | |  | | |____ / ____ \| |      |" level="info"/>
+										<echo message="|     \_____\___/|_| |_| |_| .__/|_|_|\___|\__,_|  |_| \___/|_|            |_|  \____/|_|  |_|\_____/_/    \_\_|      |" level="info"/>
+										<echo message="|                          | |                                                                                        |" level="info"/>
+										<echo message="|                          |_|                                                                                        |" level="info"/>
+										<echo message=" " level="info"/>
 									</tasks>
 								</configuration>
 								<goals>

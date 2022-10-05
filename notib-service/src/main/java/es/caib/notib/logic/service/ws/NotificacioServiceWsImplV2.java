@@ -16,6 +16,7 @@ import es.caib.notib.logic.intf.exception.NoMetadadesException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
+import es.caib.notib.logic.intf.service.NotificacioServiceWs;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.logic.cacheable.OrganGestorCachable;
@@ -70,7 +71,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 		portName = "NotificacioServiceV2Port",
 		targetNamespace = "http://www.caib.es/notib/ws/notificacio",
 		endpointInterface = "es.caib.notib.logic.intf.service.ws.NotificacioServiceV2")
-public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
+public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, NotificacioServiceWs {
 
 	private final static Pattern UUID_REGEX_PATTERN = Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");
 
@@ -2470,20 +2471,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		String property = "es.caib.notib.destinatari.multiple";
 		logger.debug("Consulta del valor de la property (" +
 				"property=" + property + ")");
-		return configHelper.getAsBoolean(property);
+		return configHelper.getConfigAsBoolean(property);
 	}
 	
 	private Long getMaxSizeFile() {
-		return configHelper.getAsLong("es.caib.notib.notificacio.document.size");
+		return configHelper.getConfigAsLong("es.caib.notib.notificacio.document.size");
 	}
 
 	private Long getMaxTotalSizeFile() {
-		return configHelper.getAsLong("es.caib.notib.notificacio.document.total.size");
+		return configHelper.getConfigAsLong("es.caib.notib.notificacio.document.total.size");
 	}
 	
 	// Indica si usar valores por defecto cuando ni el documento ni documentV2 tienen metadades
 	private boolean getUtilizarValoresPorDefecto() {
-		return configHelper.getAsBoolean("es.caib.notib.document.metadades.por.defecto");
+		return configHelper.getConfigAsBoolean("es.caib.notib.document.metadades.por.defecto");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 

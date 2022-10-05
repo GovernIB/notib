@@ -3,11 +3,14 @@
  */
 package es.caib.notib.ejb;
 
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.GrupFiltreDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -22,15 +25,12 @@ import java.util.List;
 @Stateless
 public class GrupService extends AbstractService<es.caib.notib.logic.intf.service.GrupService> implements es.caib.notib.logic.intf.service.GrupService {
 
-	@Autowired
-	GrupService delegate;
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public GrupDto create(
 			Long entitatId, 
 			GrupDto grup) {
-		return delegate.create(
+		return getDelegateService().create(
 				entitatId,
 				grup);
 	}
@@ -38,25 +38,25 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public GrupDto update(GrupDto grup) throws NotFoundException {
-		return delegate.update(grup);
+		return getDelegateService().update(grup);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public GrupDto delete(Long id) throws NotFoundException {
-		return delegate.delete(id);
+		return getDelegateService().delete(id);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<GrupDto> deleteGrupsProcediment(List<GrupDto> grups) throws NotFoundException {
-		return delegate.deleteGrupsProcediment(grups);
+		return getDelegateService().deleteGrupsProcediment(grups);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public GrupDto findById(Long entitatId, Long id) {
-		return delegate.findById(entitatId, id);
+		return getDelegateService().findById(entitatId, id);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 			Long entitatId, 
 			Long procedimentId,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findByProcSer(
+		return getDelegateService().findByProcSer(
 				entitatId, 
 				procedimentId,
 				paginacioParams);
@@ -74,7 +74,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<GrupDto> findByProcedimentAndUsuariGrups(Long procedimentId) {
-		return delegate.findByProcedimentAndUsuariGrups(procedimentId);
+		return getDelegateService().findByProcedimentAndUsuariGrups(procedimentId);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	public ProcSerGrupDto findProcedimentGrupById(
 			Long entitatId, 
 			Long procedimentGrupId) {
-		return delegate.findProcedimentGrupById(
+		return getDelegateService().findProcedimentGrupById(
 				entitatId, 
 				procedimentGrupId);
 	}
@@ -92,13 +92,13 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	public Boolean existProcedimentGrupByGrupId(
 			Long entitatId, 
 			Long grupId) {
-		return delegate.existProcedimentGrupByGrupId(entitatId, grupId);
+		return getDelegateService().existProcedimentGrupByGrupId(entitatId, grupId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<GrupDto> findByEntitat(Long entitatId) {
-		return delegate.findByEntitat(entitatId);
+		return getDelegateService().findByEntitat(entitatId);
 	}
 	
 	@Override
@@ -106,7 +106,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	public List<GrupDto> findByEntitatAndOrganGestor(
 			EntitatDto entitat, 
 			OrganGestorDto organGestor) {
-		return delegate.findByEntitatAndOrganGestor(entitat, organGestor);
+		return getDelegateService().findByEntitatAndOrganGestor(entitat, organGestor);
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 			Long entitatId, 
 			GrupFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(
+		return getDelegateService().findAmbFiltrePaginat(
 				entitatId, 
 				filtre, 
 				paginacioParams);
@@ -124,13 +124,13 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<GrupDto> findAll() {
-		return delegate.findAll();
+		return getDelegateService().findAll();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<GrupDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
-		return delegate.findAllPaginat(paginacioParams);
+		return getDelegateService().findAllPaginat(paginacioParams);
 	}
 
 	@Override
@@ -138,13 +138,13 @@ public class GrupService extends AbstractService<es.caib.notib.logic.intf.servic
 	public GrupDto findByCodi(
 			String grupCodi,
 			Long entitatId) {
-		return delegate.findByCodi(grupCodi,entitatId);
+		return getDelegateService().findByCodi(grupCodi,entitatId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<GrupDto> findGrupsByProcSer(Long procedimentId) {
-		return delegate.findGrupsByProcSer(procedimentId);
+		return getDelegateService().findGrupsByProcSer(procedimentId);
 	}
 
 }

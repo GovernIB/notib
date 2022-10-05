@@ -1,0 +1,10 @@
+        <subsystem xmlns="urn:jboss:domain:mail:3.0">
+            <mail-session name="default" jndi-name="java:jboss/mail/notib">
+                <smtp-server ssl="true" outbound-socket-binding-ref="correu.limit.es">
+                    <login name="proves_limit@limit.es" password="R8lmu-98TRN"/>
+                </smtp-server>
+            </mail-session>
+            <mail-session name="default" jndi-name="java:jboss/mail/Default">
+                <smtp-server outbound-socket-binding-ref="mail-smtp"/>
+            </mail-session>
+        </subsystem>

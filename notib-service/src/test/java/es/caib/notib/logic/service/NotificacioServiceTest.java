@@ -38,7 +38,7 @@ public class NotificacioServiceTest {
 	
 	@Before
 	public void setUp() {
-		Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.document.consulta.id.csv.mida.min"))).thenReturn(16);
+		Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.document.consulta.id.csv.mida.min"))).thenReturn(16);
 
 	}
 

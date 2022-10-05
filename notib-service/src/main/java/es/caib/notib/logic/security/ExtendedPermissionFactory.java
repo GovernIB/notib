@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.security;
 
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import org.springframework.security.acls.domain.DefaultPermissionFactory;
 import org.springframework.security.acls.model.Permission;
 

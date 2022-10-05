@@ -43,28 +43,29 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
 
         log.info("Executant processos inicials. Counter: " + counter++);
+        // TODO:
         addCustomAuthentication();
-        try {
-            List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
-            for (ProcesosInicialsEntity proces : processos) {
-                log.info("Executant procés inicial: {}",  proces.getCodi());
-                switch (proces.getCodi()) {
-                    case ACTUALITZAR_REFERENCIES:
-                        notificacioService.actualitzarReferencies();
-                        break;
-                    case PROPIETATS_CONFIG_ENTITATS:
-                        configService.crearPropietatsConfigPerEntitats();
-                        break;
-                    default:
-                        log.error("Procés inicial no definit");
-                        break;
-                }
-                processosInicialsRepository.updateInit(proces.getId(), false);
-            }
-            configService.actualitzarPropietatsJBossBdd();
-        } catch (Exception ex) {
-            log.error("Errror executant els processos inicials", ex);
-        }
+//        try {
+//            List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
+//            for (ProcesosInicialsEntity proces : processos) {
+//                log.info("Executant procés inicial: {}",  proces.getCodi());
+//                switch (proces.getCodi()) {
+//                    case ACTUALITZAR_REFERENCIES:
+//                        notificacioService.actualitzarReferencies();
+//                        break;
+//                    case PROPIETATS_CONFIG_ENTITATS:
+//                        configService.crearPropietatsConfigPerEntitats();
+//                        break;
+//                    default:
+//                        log.error("Procés inicial no definit");
+//                        break;
+//                }
+//                processosInicialsRepository.updateInit(proces.getId(), false);
+//            }
+//            configService.actualitzarPropietatsJBossBdd();
+//        } catch (Exception ex) {
+//            log.error("Errror executant els processos inicials", ex);
+//        }
         restoreAuthentication();
     }
 

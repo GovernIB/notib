@@ -393,7 +393,7 @@ public class NotificacioValidatorHelper {
 	}
 
 	private Long getMaxSizeFile() {
-		return configHelper.getAsLong("es.caib.notib.notificacio.document.size");
+		return configHelper.getConfigAsLong("es.caib.notib.notificacio.document.size");
 	}
 
 }

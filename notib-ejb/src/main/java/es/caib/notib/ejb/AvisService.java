@@ -1,10 +1,8 @@
 package es.caib.notib.ejb;
 
-import es.caib.notib.ejb.AbstractService;
 import es.caib.notib.logic.intf.dto.AvisDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -19,55 +17,52 @@ import java.util.List;
 @Stateless
 public class AvisService extends AbstractService<es.caib.notib.logic.intf.service.AvisService> implements es.caib.notib.logic.intf.service.AvisService {
 
-	@Autowired
-	AvisService delegate;
-
 	@Override
 	@RolesAllowed("NOT_SUPER")
 	public AvisDto create(AvisDto avis) {
-		return delegate.create(avis);
+		return getDelegateService().create(avis);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
 	public AvisDto update(AvisDto avis) {
-		return delegate.update(avis);
+		return getDelegateService().update(avis);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
 	public AvisDto updateActiva(Long id, boolean activa) {
-		return delegate.updateActiva(id, activa);
+		return getDelegateService().updateActiva(id, activa);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
 	public AvisDto delete(Long id) {
-		return delegate.delete(id);
+		return getDelegateService().delete(id);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
 	public AvisDto findById(Long id) {
-		return delegate.findById(id);
+		return getDelegateService().findById(id);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
 	public PaginaDto<AvisDto> findPaginat(PaginacioParamsDto paginacioParams) {
-		return delegate.findPaginat(paginacioParams);
+		return getDelegateService().findPaginat(paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"tothom", "NOT_SUPER"})
 	public List<AvisDto> findActive() {
-		return delegate.findActive();
+		return getDelegateService().findActive();
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public List<AvisDto> findActiveAdmin(Long entitatId) {
-		return delegate.findActiveAdmin(entitatId);
+		return getDelegateService().findActiveAdmin(entitatId);
 	}
 
 }

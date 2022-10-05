@@ -5,6 +5,7 @@ package es.caib.notib.back.interceptor;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -35,7 +36,7 @@ public class AplicacioInterceptor implements AsyncHandlerInterceptor {
 	public static final String REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES = "manifestAtributes";
 	private static Map<String, Object> manifestAtributsMap;
 
-	@Autowired
+	@Autowired @Lazy
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ServletContext servletContext;

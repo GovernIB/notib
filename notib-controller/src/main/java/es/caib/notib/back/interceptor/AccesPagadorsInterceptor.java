@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.helper.RolHelper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -22,7 +23,7 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 @Component
 public class AccesPagadorsInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	private AplicacioService aplicacioService;
 
 

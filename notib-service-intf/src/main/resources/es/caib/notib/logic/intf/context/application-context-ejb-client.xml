@@ -75,7 +75,7 @@
 	<jee:local-slsb
 			id="adviserWsV2Service"
 			jndi-name="notib/NotificaAdviserWsV2Bean/local"
-			business-interface="es.caib.notib.logic.wsdl.adviser.AdviserWsV2PortType"/>
+			business-interface="es.caib.notib.logic.intf.ws.adviser.AdviserWsV2PortType"/>
 	<jee:local-slsb
 			id="cacheService"
 			jndi-name="notib/CacheServiceBean/local"

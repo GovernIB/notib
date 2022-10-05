@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * Controlador amb utilitats per a l'aplicació EMISERV.
+ * Controlador amb utilitats per a l'aplicació NOTIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
@@ -52,7 +52,11 @@ public class IndexController {
 		return "redirect:/notificacio";
 	}
 
-//	@PostConstruct
+	@PostConstruct
+	public void propagateDbProperties() {
+		aplicacioService.propagateDbProperties();
+		aplicacioService.restartSchedulledTasks();
+	}
 //	public void listResources() throws IOException {
 //		for (File file: getResourceFolderFiles("")) {
 //			listFileDir(file, 0);
@@ -85,7 +89,5 @@ public class IndexController {
 //		}
 //		return new File(path).listFiles();
 //	}
-//	public void propagateDbProperties() {
-//		aplicacioService.propagateDbProperties();
-//	}
+
 }

@@ -73,13 +73,13 @@ public class CallbackServiceImpl implements CallbackService {
 	}
 
 	private boolean isTasquesActivesProperty() {
-		return configHelper.getAsBoolean("es.caib.notib.tasques.actives");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasques.actives");
 	}
 	private boolean isCallbackPendentsActiu() {
-		return configHelper.getAsBoolean("es.caib.notib.tasca.callback.pendents.actiu");
+		return configHelper.getConfigAsBoolean("es.caib.notib.tasca.callback.pendents.actiu");
 	}
 	private int getEventsProcessarMaxProperty() {
-		return configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
+		return configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.processar.max");
 	}
 
 }

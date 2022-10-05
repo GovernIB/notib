@@ -38,7 +38,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.logic.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.persist.repository.*;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;

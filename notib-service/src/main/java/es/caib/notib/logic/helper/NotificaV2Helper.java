@@ -742,6 +742,6 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 	private boolean isCodiDir3Entitat() {
-		return configHelper.getAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
+		return configHelper.getConfigAsBoolean("es.caib.notib.plugin.codi.dir3.entitat");
 	}
 }

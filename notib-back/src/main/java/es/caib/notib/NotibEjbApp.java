@@ -41,10 +41,10 @@ import org.springframework.context.annotation.Profile;
 						"es\\.caib\\.notib\\.api\\..*"}))
 public class NotibEjbApp extends NotibApp {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(NotibEjbApp.class);
-	}
+//	@Override
+//	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//		return application.sources(NotibEjbApp.class);
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(NotibEjbApp.class, args);

@@ -4,7 +4,20 @@
 package es.caib.notib.back.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.back.command.ConfigCommand;
+import es.caib.notib.back.command.EntitatCommand;
+import es.caib.notib.back.helper.DatatablesHelper;
+import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.back.helper.EntitatHelper;
+import es.caib.notib.back.helper.MessageHelper;
+import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.logic.intf.dto.CodiValorDescDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
+import es.caib.notib.logic.intf.dto.LlibreDto;
+import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
@@ -14,14 +27,8 @@ import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
-import es.caib.notib.back.command.ConfigCommand;
-import es.caib.notib.back.command.EntitatCommand;
-import es.caib.notib.back.helper.DatatablesHelper;
-import es.caib.notib.back.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.notib.back.helper.EntitatHelper;
-import es.caib.notib.back.helper.MessageHelper;
-import es.caib.notib.back.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -235,6 +243,7 @@ public class EntitatController extends BaseController {
 
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual == null) {
+			writeFileToResponse("Logo_cap.png", IOUtils.toByteArray(getDefaultLogo()), response);
 			return null;
 		}
 		if (entitatActual.getLogoCapBytes() != null) {
@@ -245,6 +254,12 @@ public class EntitatController extends BaseController {
 			writeFileToResponse("Logo_cap.png", entitatService.getCapLogo(), response);
 		} catch (Exception ex) {
 			log.debug("Error al obtenir el logo de la capçalera", ex);
+			return null;
+		}
+		try {
+			writeFileToResponse("Logo_cap.png", IOUtils.toByteArray(getDefaultLogo()), response);
+		} catch (Exception ex) {
+			log.debug("Error al obtenir el logo genèric de la capçalera", ex);
 		}
 		return null;
 	}
@@ -254,6 +269,7 @@ public class EntitatController extends BaseController {
 
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual == null) {
+			writeFileToResponse("Logo_cap.png", IOUtils.toByteArray(getDefaultLogo()), response);
 			return null;
 		}
 		if (entitatActual.getLogoPeuBytes() != null) {
@@ -262,8 +278,14 @@ public class EntitatController extends BaseController {
 		}
 		try {
 			writeFileToResponse("Logo_peu.png", entitatService.getPeuLogo(), response);
+			return null;
 		} catch (Exception ex) {
 			log.debug("Error al obtenir el logo del peu", ex);
+		}
+		try {
+			writeFileToResponse("Logo_cap.png", IOUtils.toByteArray(getDefaultLogo()), response);
+		} catch (Exception ex) {
+			log.debug("Error al obtenir el logo genèric de la capçalera", ex);
 		}
 		return null;
 	}
@@ -309,5 +331,9 @@ public class EntitatController extends BaseController {
 	@ResponseBody
 	public Map<String, OrganismeDto> getOrganigrama(@PathVariable String entitatCodi, HttpServletRequest request,HttpServletResponse response) throws IOException {
 		return entitatService.findOrganigramaByEntitat(entitatCodi);
+	}
+
+	private InputStream getDefaultLogo() {
+		return getClass().getResourceAsStream("/static/img/govern-logo.png");
 	}
 }

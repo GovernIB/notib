@@ -60,6 +60,7 @@ public class ConfigServiceImpl implements ConfigService {
             return null;
         }
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
+        configHelper.reloadDbProperties();
         pluginHelper.resetPlugins(configEntity.getGroupCode());
         cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
@@ -83,7 +84,7 @@ public class ConfigServiceImpl implements ConfigService {
     public List<String> syncFromJBossProperties() {
 
         log.info("Sincronitzant les propietats amb JBoss");
-        Properties properties = ConfigHelper.JBossPropertiesHelper.getProperties().findAll();
+        Properties properties = configHelper.getEnvironmentProperties();
         List<String> editedProperties = new ArrayList<>();
         List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
         Collections.sort(propertiesList);
@@ -96,6 +97,7 @@ public class ConfigServiceImpl implements ConfigService {
                 editedProperties.add(configEntity.getKey());
             }
         }
+        configHelper.reloadDbProperties();
         pluginHelper.resetAllPlugins();
         return editedProperties;
     }
@@ -134,6 +136,7 @@ public class ConfigServiceImpl implements ConfigService {
                 configRepository.save(nova);
             }
         }
+        configHelper.reloadDbProperties();
     }
 
     @Override
@@ -141,7 +144,7 @@ public class ConfigServiceImpl implements ConfigService {
 
         List<ConfigEntity> configs = configRepository.findJBossConfigurables();
         for(ConfigEntity config : configs) {
-            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            String property = configHelper.getConfigGlobal(config.getKey());
             config.setValue(property);
             configRepository.save(config);
         }
@@ -158,7 +161,7 @@ public class ConfigServiceImpl implements ConfigService {
                 config.setValue("*****");
             } else if (config.isJbossProperty()) {
                 // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
-                config.setValue(ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey(), config.getValue()));
+                config.setValue(configHelper.getConfig(config.getKey(), config.getValue()));
             }
         }
 

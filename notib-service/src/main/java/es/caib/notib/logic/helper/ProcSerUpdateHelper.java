@@ -46,7 +46,7 @@ public class ProcSerUpdateHelper {
 	public ProcedimentEntity nouProcediment(ProcSerDataDto procedimentGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
 
 		ProcedimentEntity procediment = ProcedimentEntity.getBuilder(procedimentGda.getCodi(), procedimentGda.getNom() != null ? procedimentGda.getNom().trim() : null,
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"), configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"), configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat, false, procedimentGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
 				null, null, null, null, procedimentGda.isComu(), false).build();
 		
@@ -67,7 +67,7 @@ public class ProcSerUpdateHelper {
 	public ServeiEntity nouServei(ProcSerDataDto serveiGda, EntitatEntity entitat, OrganGestorEntity organGestor) {
 
 		ServeiEntity servei = ServeiEntity.getBuilder(serveiGda.getCodi(), serveiGda.getNom() != null ? serveiGda.getNom().trim() : null,
-				configHelper.getAsInt("es.caib.notib.procediment.alta.auto.retard"), configHelper.getAsInt("es.caib.notib.procediment.alta.auto.caducitat"),
+				configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.retard"), configHelper.getConfigAsInteger("es.caib.notib.procediment.alta.auto.caducitat"),
 				entitat, false, serveiGda.isComu() ? organGestorRepository.findByCodi(entitat.getDir3Codi()) : organGestor,
 				null, null, null, null, serveiGda.isComu(), false).build();
 

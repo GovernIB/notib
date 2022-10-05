@@ -5,8 +5,8 @@ package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.util.List;
@@ -20,46 +20,44 @@ import java.util.List;
 @Stateless
 public class ConfigService extends AbstractService<es.caib.notib.logic.intf.service.ConfigService> implements es.caib.notib.logic.intf.service.ConfigService {
 
-	@Autowired
-	ConfigService delegate;
-
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public ConfigDto updateProperty(ConfigDto property) throws Exception{
-		return delegate.updateProperty(property);
+		return getDelegateService().updateProperty(property);
 	}
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public List<ConfigGroupDto> findAll(){
-		return delegate.findAll();
+		return getDelegateService().findAll();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public List<String> syncFromJBossProperties(){
-		return delegate.syncFromJBossProperties();
+		return getDelegateService().syncFromJBossProperties();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public List<ConfigDto> findEntitatsConfigByKey(String key) {
-		return delegate.findEntitatsConfigByKey(key);
+		return getDelegateService().findEntitatsConfigByKey(key);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public void crearPropietatsConfigPerEntitats() {
-		delegate.crearPropietatsConfigPerEntitats();
+		getDelegateService().crearPropietatsConfigPerEntitats();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public void actualitzarPropietatsJBossBdd() {
-		delegate.actualitzarPropietatsJBossBdd();
+		getDelegateService().actualitzarPropietatsJBossBdd();
 	}
 
 	@Override
+	@PermitAll
 	public String getPropertyValue(String key) {
-		return delegate.getPropertyValue(key);
+		return getDelegateService().getPropertyValue(key);
 	}
 }

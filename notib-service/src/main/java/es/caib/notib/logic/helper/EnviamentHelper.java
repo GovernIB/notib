@@ -85,13 +85,13 @@ public class EnviamentHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateDEHCertNovaConsulta(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		enviament.updateDEHCertNovaConsulta(configHelper.getAsInt(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE));
+		enviament.updateDEHCertNovaConsulta(configHelper.getConfigAsInteger(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE));
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateCIECertNovaConsulta(Long enviamentId) {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-		enviament.updateCIECertNovaConsulta(configHelper.getAsInt(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE));
+		enviament.updateCIECertNovaConsulta(configHelper.getConfigAsInteger(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE));
 	}
 
 	private void enviamentRefrescarEstat(

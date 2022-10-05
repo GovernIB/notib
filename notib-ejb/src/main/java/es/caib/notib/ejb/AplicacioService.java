@@ -3,16 +3,14 @@
  */
 package es.caib.notib.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
+
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import java.util.List;
 
 /**
  * Implementació de AplicacioService com a EJB que empra una clase
@@ -23,139 +21,147 @@ import es.caib.notib.logic.intf.dto.UsuariDto;
 @Stateless
 public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.service.AplicacioService> implements es.caib.notib.logic.intf.service.AplicacioService {
 
-	@Autowired
-	AplicacioService delegate;
-
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		delegate.actualitzarEntiatThreadLocal(entitat);
+		getDelegateService().actualitzarEntiatThreadLocal(entitat);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void processarAutenticacioUsuari() {
-		delegate.processarAutenticacioUsuari();
+		getDelegateService().processarAutenticacioUsuari();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto getUsuariActual() {
-		return delegate.getUsuariActual();
+		return getDelegateService().getUsuariActual();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
-		return delegate.findRolsUsuariAmbCodi(usuariCodi);
+		return getDelegateService().findRolsUsuariAmbCodi(usuariCodi);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<String> findRolsUsuariActual() {
-		return delegate.findRolsUsuariActual();
+		return getDelegateService().findRolsUsuariActual();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto findUsuariAmbCodi(String codi) {
-		return delegate.findUsuariAmbCodi(codi);
+		return getDelegateService().findUsuariAmbCodi(codi);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
-		return delegate.findUsuariAmbText(text);
+		return getDelegateService().findUsuariAmbText(text);
 	}
 
 	@Override
+	@PermitAll
 	public void excepcioSave(Throwable exception) {
-		delegate.excepcioSave(exception);
+		getDelegateService().excepcioSave(exception);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public ExcepcioLogDto excepcioFindOne(Long index) {
-		return delegate.excepcioFindOne(index);
+		return getDelegateService().excepcioFindOne(index);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public List<ExcepcioLogDto> excepcioFindAll() {
-		return delegate.excepcioFindAll();
+		return getDelegateService().excepcioFindAll();
 	}
 
 	@Override
+	@PermitAll
 	public List<String> permisosFindRolsDistinctAll() {
-		return delegate.permisosFindRolsDistinctAll();
+		return getDelegateService().permisosFindRolsDistinctAll();
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGetByEntitat(String property) {
-		return delegate.propertyGetByEntitat(property);
+		return getDelegateService().propertyGetByEntitat(property);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property) {
-		return delegate.propertyGet(property);
+		return getDelegateService().propertyGet(property);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGet(String property, String defaultValue) {
-		return delegate.propertyGet(property, defaultValue);
+		return getDelegateService().propertyGet(property, defaultValue);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public String propertyGetByEntitat(String property, String defaultValue) {
-		return delegate.propertyGetByEntitat(property, defaultValue);
+		return getDelegateService().propertyGetByEntitat(property, defaultValue);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public UsuariDto updateUsuariActual(UsuariDto usuariDto) {
-		return delegate.updateUsuariActual(usuariDto);
+		return getDelegateService().updateUsuariActual(usuariDto);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void updateRolUsuariActual(String rol) {
-		delegate.updateRolUsuariActual(rol);
+		getDelegateService().updateRolUsuariActual(rol);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public void updateEntitatUsuariActual(Long entitat) {
-		delegate.updateEntitatUsuariActual(entitat);
+		getDelegateService().updateEntitatUsuariActual(entitat);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
 	public String getMetrics() {
-		return delegate.getMetrics();
+		return getDelegateService().getMetrics();
 	}
 
 	@Override
+	@PermitAll
 	public String getAppVersion() {
-		return delegate.getAppVersion();
+		return getDelegateService().getAppVersion();
 	}
 	@Override
+	@PermitAll
 	public void setAppVersion(String appVersion) {
-		delegate.setAppVersion(appVersion);
+		getDelegateService().setAppVersion(appVersion);
 	}
 
 	@Override
+	@PermitAll
 	public String getMissatgeErrorAccesAdmin() {
-		return delegate.getMissatgeErrorAccesAdmin();
+		return getDelegateService().getMissatgeErrorAccesAdmin();
 	}
 
 	@Override
-	@RolesAllowed({"NOT_SUPER"})
+	@PermitAll
 	public void restartSchedulledTasks() {
-		delegate.restartSchedulledTasks();
+		getDelegateService().restartSchedulledTasks();
 	}
+
+    @Override
+	@PermitAll
+    public void propagateDbProperties() {
+        getDelegateService().propagateDbProperties();
+    }
 
 }

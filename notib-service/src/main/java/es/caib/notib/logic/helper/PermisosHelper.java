@@ -17,7 +17,7 @@ import es.caib.notib.persist.repository.acl.AclClassRepository;
 import es.caib.notib.persist.repository.acl.AclEntryRepository;
 import es.caib.notib.persist.repository.acl.AclObjectIdentityRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
-import es.caib.notib.logic.security.ExtendedPermission;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +59,8 @@ public class PermisosHelper {
 	private NotibMutableAclService aclService;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 	@Resource
 	private AclSidRepository aclSidRepository;
 	@Resource
@@ -677,9 +679,7 @@ public class PermisosHelper {
 	}
 
 	private String getMapeigRol(String rol) {
-
-		String propertyMapeig = (String) ConfigHelper.JBossPropertiesHelper.getProperties().get("es.caib.notib.mapeig.rol." + rol);
-		return propertyMapeig != null ? propertyMapeig : rol;
+		return configHelper.getConfig("es.caib.notib.mapeig.rol." + rol, rol);
 	}
 
 	public void revocarPermisosEntity(Long objectIdentifier, Class<?> clazz) {

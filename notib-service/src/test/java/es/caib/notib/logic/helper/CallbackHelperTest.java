@@ -48,7 +48,7 @@ public class CallbackHelperTest {
 
     @Before
     public void setUp() throws Exception {
-        Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max"))).thenReturn(3);
+        Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.tasca.callback.pendents.notifica.events.intents.max"))).thenReturn(3);
 
         entitatMock = Mockito.mock(EntitatEntity.class);
         Mockito.when(entitatMock.getId()).thenReturn(2L);

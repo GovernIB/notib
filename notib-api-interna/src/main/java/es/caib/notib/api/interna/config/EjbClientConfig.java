@@ -4,7 +4,6 @@
 package es.caib.notib.api.interna.config;
 
 import es.caib.notib.logic.intf.service.*;
-import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsV2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +34,8 @@ public class EjbClientConfig {
 		return getLocalEjbFactoyBean(NotificacioService.class);
 	}
 	@Bean
-	public LocalStatelessSessionProxyFactoryBean notificacioServiceWsV2() {
-		return getLocalEjbFactoyBean(NotificacioServiceWsV2.class);
+	public LocalStatelessSessionProxyFactoryBean notificacioServiceWs() {
+		return getLocalEjbFactoyBean(NotificacioServiceWs.class);
 	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {

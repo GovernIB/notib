@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.back.helper.PermisosHelper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -21,7 +22,7 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 @Component
 public class PermisosEntitatInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	private EntitatService entitatService;
 
 

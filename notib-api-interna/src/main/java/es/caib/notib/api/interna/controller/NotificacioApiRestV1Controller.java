@@ -7,7 +7,6 @@ import es.caib.notib.client.domini.DadesConsulta;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.PermisConsulta;
 import es.caib.notib.client.domini.RespostaAlta;
-import es.caib.notib.client.domini.RespostaAltaV2;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
@@ -21,13 +20,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,7 +47,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@PostMapping(value = "/alta", produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaAlta alta(@Parameter(description = "Objecte amb les dades necessàries per a generar una notificació", required = true) @RequestBody NotificacioV2 notificacio) {
 		try {
-			return notificacioServiceWsV2.alta(notificacio);
+			return notificacioServiceWs.alta(notificacio);
 		} catch (Exception e) {
 			return RespostaAlta.builder().error(true).errorDescripcio(getErrorDescripcio(e)).build();
 		}
@@ -66,7 +62,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 		String identificador = extractIdentificador(request);
 		try {
 			if (!identificador.isEmpty()) {
-				return notificacioServiceWsV2.consultaEstatNotificacio(identificador);
+				return notificacioServiceWs.consultaEstatNotificacio(identificador);
 			}
 			String msg = "No s'ha informat cap identificador de la notificació";
 			return RespostaConsultaEstatNotificacio.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
@@ -84,7 +80,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 		String referencia = extractIdentificador(request);
 		try {
 			if (!referencia.isEmpty()) {
-				return notificacioServiceWsV2.consultaEstatEnviament(referencia);
+				return notificacioServiceWs.consultaEstatEnviament(referencia);
 			}
 			String msg = "No s'ha informat cap referència de l'enviament";
 			return RespostaConsultaEstatEnviament.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
@@ -100,7 +96,7 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 			@RequestBody DadesConsulta dadesConsulta) {
 
 		try {
-			return notificacioServiceWsV2.consultaDadesRegistre(dadesConsulta);
+			return notificacioServiceWs.consultaDadesRegistre(dadesConsulta);
 		} catch (Exception e) {
 			return RespostaConsultaDadesRegistre.builder().error(true).errorDescripcio(getErrorDescripcio(e)).build();
 		}

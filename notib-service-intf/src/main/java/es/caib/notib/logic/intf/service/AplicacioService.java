@@ -172,4 +172,6 @@ public interface AplicacioService {
 	String getMissatgeErrorAccesAdmin();
 
 	void restartSchedulledTasks();
+
+    public void propagateDbProperties();
 }

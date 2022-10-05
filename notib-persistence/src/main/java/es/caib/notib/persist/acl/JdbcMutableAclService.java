@@ -459,7 +459,6 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     }
     
     private String getClassIdentityQuery() {
-//		String dialect = getHibernateDialect().toLowerCase();
 		if (dialect.contains("oracle")) {
 			return CLASS_IDENTITY_ORACLE;
 		} else if (dialect.contains("postgres")) {
@@ -472,7 +471,6 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
 	}
 
 	private String getSidIdentityQuery() {
-//		String dialect = getHibernateDialect().toLowerCase();
 		if (dialect.contains("oracle")) {
 			return SID_IDENTITY_ORACLE;
 		} else if (dialect.contains("postgres")) {
@@ -484,8 +482,4 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
 		}
 	}
 
-//	private String getHibernateDialect() {
-//        return dialect;
-////		return ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.notib.hibernate.dialect");
-//	}
 }

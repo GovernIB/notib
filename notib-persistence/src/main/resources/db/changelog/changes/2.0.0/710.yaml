@@ -7,3 +7,31 @@ databaseChangeLog:
             tableName: not_columnes
             oldColumnName: created_date
             newColumnName: data_enviament
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.EntitatEntity
+            where: class = 'es.caib.notib.core.entity.EntitatEntity'
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.OrganGestorEntity
+            where: class = 'es.caib.notib.core.entity.OrganGestorEntity'
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.ProcedimentEntity
+            where: class = 'es.caib.notib.core.entity.ProcedimentEntity'
+        - update:
+            tableName: not_acl_class
+            columns:
+              - column:
+                  name: class
+                  value: es.caib.notib.persist.entity.ProcSerOrganEntity
+            where: class = 'es.caib.notib.core.entity.ProcSerOrganEntity'

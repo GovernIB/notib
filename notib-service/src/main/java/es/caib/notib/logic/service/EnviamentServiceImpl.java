@@ -1269,7 +1269,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 			log.info("[Callback] Marcant notificació com processada per ser usuari aplicació...");
 			auditNotificacioHelper.updateNotificacioProcessada(not, "Notificació processada de forma automàtica. Estat final: " + enviament.getNotificaEstat());
 		}
-		int maxPendents = configHelper.getAsInt("es.caib.notib.tasca.callback.pendents.processar.max");
+		int maxPendents = configHelper.getConfigAsInteger("es.caib.notib.tasca.callback.pendents.processar.max");
 		Pageable page = PageRequest.of(0, maxPendents);
 		List<NotificacioEventEntity> events = notificacioEventRepository.findEventsAmbCallbackPendent();
 		for (NotificacioEventEntity event : events) {

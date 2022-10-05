@@ -3,13 +3,13 @@
  */
 package es.caib.notib.persist.config;
 
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.persist.acl.JdbcMutableAclService;
 import es.caib.notib.persist.acl.NotibMutableAclService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,7 +19,6 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.acls.AclPermissionCacheOptimizer;
 import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.AclAuthorizationStrategy;
-import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.ConsoleAuditLogger;
 import org.springframework.security.acls.domain.DefaultPermissionFactory;
 import org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy;
@@ -27,7 +26,6 @@ import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PermissionFactory;
 import org.springframework.security.acls.domain.SpringCacheBasedAclCache;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
-//import org.springframework.security.acls.jdbc.JdbcMutableAclService;
 import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.ObjectIdentity;
@@ -35,7 +33,6 @@ import org.springframework.security.acls.model.PermissionGrantingStrategy;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
-import javax.swing.*;
 import java.util.List;
 
 /**
@@ -253,7 +250,7 @@ public class AclConfig {
 	private class ExtendedPermissionFactory extends DefaultPermissionFactory {
 		private ExtendedPermissionFactory() {
 			super();
-			registerPublicPermissions(BasePermission.class);
+			registerPublicPermissions(ExtendedPermission.class);
 		}
 	}
 

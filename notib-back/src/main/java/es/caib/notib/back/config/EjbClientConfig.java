@@ -7,7 +7,8 @@ import es.caib.notib.logic.intf.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
 
 /**
@@ -15,9 +16,9 @@ import org.springframework.ejb.access.LocalStatelessSessionProxyFactoryBean;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Profile("!boot")
 @Slf4j
 @Configuration
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class EjbClientConfig {
 
 	private static final String EJB_JNDI_PREFIX = "java:app/notib-ejb/";
@@ -114,6 +115,11 @@ public class EjbClientConfig {
 	@Bean
 	public LocalStatelessSessionProxyFactoryBean usuariAplicacioService() {
 		return getLocalEjbFactoyBean(UsuariAplicacioService.class);
+	}
+
+	@Bean
+	public LocalStatelessSessionProxyFactoryBean monitorIntegracioService() {
+		return getLocalEjbFactoyBean(MonitorIntegracioService.class);
 	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {

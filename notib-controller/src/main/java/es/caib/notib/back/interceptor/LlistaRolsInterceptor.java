@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.back.helper.ContingutEstaticHelper;
 import es.caib.notib.back.helper.OrganGestorHelper;
 import es.caib.notib.back.helper.RolHelper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -24,9 +25,9 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 @Component
 public class LlistaRolsInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	private OrganGestorService organGestorService;
-	@Autowired
+	@Autowired @Lazy
 	private AplicacioService aplicacioService;
 
 	@Override

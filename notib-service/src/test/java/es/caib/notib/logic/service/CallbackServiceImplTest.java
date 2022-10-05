@@ -64,9 +64,9 @@ public class CallbackServiceImplTest {
                 .notificacio(notificacioMock)
                 .build();
         enviamentMock.setCreatedBy(mockUser);
-        Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.tasques.actives"))).thenReturn(true);
-        Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.tasca.callback.pendents.actiu"))).thenReturn(true);
-        Mockito.when(configHelper.getAsInt(Mockito.eq("es.caib.notib.tasca.callback.pendents.processar.max"))).thenReturn(3);
+        Mockito.when(configHelper.getConfigAsBoolean(Mockito.eq("es.caib.notib.tasques.actives"))).thenReturn(true);
+        Mockito.when(configHelper.getConfigAsBoolean(Mockito.eq("es.caib.notib.tasca.callback.pendents.actiu"))).thenReturn(true);
+        Mockito.when(configHelper.getConfigAsInteger(Mockito.eq("es.caib.notib.tasca.callback.pendents.processar.max"))).thenReturn(3);
 
 
 //        eventsMap = new HashMap<>();

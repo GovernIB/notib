@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.back.helper.ContingutEstaticHelper;
 import es.caib.notib.back.helper.EntitatHelper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -26,9 +27,9 @@ import java.security.Principal;
 @Component
 public class LlistaEntitatsInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	private AplicacioService aplicacioService;
-	@Autowired
+	@Autowired @Lazy
 	private EntitatService entitatService;
 
 

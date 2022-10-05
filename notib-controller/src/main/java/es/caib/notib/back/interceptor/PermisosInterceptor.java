@@ -11,6 +11,7 @@ import es.caib.notib.back.helper.OrganGestorHelper;
 import es.caib.notib.back.helper.PermisosHelper;
 import es.caib.notib.back.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -25,13 +26,13 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class PermisosInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired
+	@Autowired @Lazy
 	private ProcedimentService procedimentService;
-	@Autowired
+	@Autowired @Lazy
 	private ServeiService serveiService;
-	@Autowired
+	@Autowired @Lazy
 	private OrganGestorService organGestorService;
-	@Autowired
+	@Autowired @Lazy
 	private AplicacioService aplicacioService;
 
 	@Override

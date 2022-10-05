@@ -4,15 +4,23 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
-import es.caib.notib.ejb.AbstractService;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.ApiConsulta;
+import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.logic.intf.dto.NotificacioEnviamentFiltreDto;
+import es.caib.notib.logic.intf.dto.NotificacioEventDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.rest.consulta.Resposta;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import java.io.IOException;
@@ -30,16 +38,13 @@ import java.util.Set;
 @Stateless
 public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.service.EnviamentService> implements es.caib.notib.logic.intf.service.EnviamentService {
 
-	@Autowired
-	EnviamentService delegate;
-
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId, 
 			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
-		return delegate.findIdsAmbFiltre(entitatId, filtre);
+		return getDelegateService().findIdsAmbFiltre(entitatId, filtre);
 	}
 
 	@Override
@@ -51,7 +56,7 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 			String usuariCodi,
 			NotificacioEnviamentFiltreDto filtre,
 			PaginacioParamsDto paginacio) throws ParseException {
-		return delegate.enviamentFindByEntityAndFiltre(
+		return getDelegateService().enviamentFindByEntityAndFiltre(
 				entitatId,
 				rol,
 				organGestorCodi,
@@ -64,25 +69,25 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEnviamentDatatableDto> enviamentFindAmbNotificacio(Long notificacioId) {
-		return delegate.enviamentFindAmbNotificacio(notificacioId);
+		return getDelegateService().enviamentFindAmbNotificacio(notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public Set<Long> findIdsByNotificacioIds(Collection<Long> notificacionsIds) {
-		return delegate.findIdsByNotificacioIds(notificacionsIds);
+		return getDelegateService().findIdsByNotificacioIds(notificacionsIds);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
-		return delegate.enviamentFindAmbId(enviamentId);
+		return getDelegateService().enviamentFindAmbId(enviamentId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long notificacioId) {
-		return delegate.eventFindAmbNotificacio(notificacioId);
+		return getDelegateService().eventFindAmbNotificacio(notificacioId);
 	}
 	
 	@Override
@@ -91,7 +96,7 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 			UsuariDto usuaris, 
 			Long entitatId, 
 			ColumnesDto columnes) {
-		delegate.columnesCreate(
+		getDelegateService().columnesCreate(
 				usuaris, 
 				entitatId, 
 				columnes);
@@ -102,7 +107,7 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	public void columnesUpdate(
 			Long entitatId, 
 			ColumnesDto columnes) {
-		delegate.columnesUpdate(
+		getDelegateService().columnesUpdate(
 				entitatId, 
 				columnes);
 	}
@@ -112,7 +117,7 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	public ColumnesDto getColumnesUsuari(
 			Long entitatId, 
 			UsuariDto usuari) {
-		return delegate.getColumnesUsuari(
+		return getDelegateService().getColumnesUsuari(
 				entitatId, 
 				usuari);
 	}
@@ -124,7 +129,7 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 			Collection<Long> enviamentIds, 
 			String format)
 			throws IOException, NotFoundException, ParseException {
-		return delegate.exportacio(
+		return getDelegateService().exportacio(
 				entitatId, 
 				enviamentIds, 
 				format);
@@ -133,57 +138,59 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamentDtoV2 getOne(Long entitatId) {
-		return delegate.getOne(entitatId);
+		return getDelegateService().getOne(entitatId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
 	public byte[] getDocumentJustificant(Long enviamentId) {
-		return delegate.getDocumentJustificant(enviamentId);
+		return getDelegateService().getDocumentJustificant(enviamentId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public boolean reintentarCallback(Long eventId) {
-		return delegate.reintentarCallback(eventId);
+		return getDelegateService().reintentarCallback(eventId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void reactivaConsultes(Set<Long> enviaments) {
-		delegate.reactivaConsultes(enviaments);
+		getDelegateService().reactivaConsultes(enviaments);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public void reactivaSir(Set<Long> enviaments) {
-		delegate.reactivaSir(enviaments);
+		getDelegateService().reactivaSir(enviaments);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_CARPETA", "NOT_SUPER"})
 	public Resposta findEnviaments(ApiConsulta consulta) {
-		return delegate.findEnviaments(consulta);
+		return getDelegateService().findEnviaments(consulta);
 	}
 
     @Override
 	@RolesAllowed({"NOT_CARPETA", "NOT_SUPER"})
     public RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta) {
-        return delegate.findEnviamentsV2(consulta);
+        return getDelegateService().findEnviamentsV2(consulta);
     }
 
     @Override
 	public void actualitzarEstat(Long enviamentId) {
-		delegate.actualitzarEstat(enviamentId);
+		getDelegateService().actualitzarEstat(enviamentId);
 	}
 
 	@Override
+	@PermitAll
 	public void activarCallback(Long enviamentId) {
-		delegate.activarCallback(enviamentId);
+		getDelegateService().activarCallback(enviamentId);
 	}
 
 	@Override
+	@PermitAll
 	public void enviarCallback(Long enviamentId) throws Exception {
-		delegate.enviarCallback(enviamentId);
+		getDelegateService().enviarCallback(enviamentId);
 	}
 }

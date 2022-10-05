@@ -1,8 +1,7 @@
 package es.caib.notib.ejb;
 
+import javax.annotation.security.PermitAll;
 import javax.ejb.Stateless;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementació de CallbackService com a EJB que empra una clase
@@ -14,12 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Stateless
 public class CallbackService extends AbstractService<es.caib.notib.logic.intf.service.CallbackService> implements es.caib.notib.logic.intf.service.CallbackService {
 	
-	@Autowired
-	CallbackService delegate;
-
 	@Override
+	@PermitAll
 	public void processarPendents() {
-		delegate.processarPendents();
+		getDelegateService().processarPendents();
 	}
 
 }
