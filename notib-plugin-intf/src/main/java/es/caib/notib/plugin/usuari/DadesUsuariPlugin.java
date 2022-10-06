@@ -3,9 +3,9 @@
  */
 package es.caib.notib.plugin.usuari;
 
-import java.util.List;
-
 import es.caib.notib.plugin.SistemaExternException;
+
+import java.util.List;
 
 
 /**
@@ -40,7 +40,7 @@ public interface DadesUsuariPlugin {
 	/**
 	 * Retorna la llista d'usuaris d'un grup.
 	 * 
-	 * @param usuariNif
+	 * @param grupCodi
 	 *            Codi del grup que es vol consultar.
 	 * @return La llista d'usuaris del grup.
 	 * @throws SistemaExternException

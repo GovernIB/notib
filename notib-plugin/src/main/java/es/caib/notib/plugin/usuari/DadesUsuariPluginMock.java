@@ -5,6 +5,7 @@ package es.caib.notib.plugin.usuari;
 
 import es.caib.notib.plugin.SistemaExternException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -40,7 +41,7 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 	@Override
 	public List<String> consultarRolsAmbCodi(
 			String usuariCodi) throws SistemaExternException {
-		throw new SistemaExternException("Mètode no implementat");
+		return Arrays.asList("NOT_SUPER", "NOT_ADMIN", "NOT_CARPETA", "NOT_APL", "tothom");
 	}
 
 }

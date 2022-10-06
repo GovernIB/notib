@@ -6,7 +6,24 @@ import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.exception.DocumentNotFoundException;
+import es.caib.notib.logic.intf.dto.AccioParam;
+import es.caib.notib.logic.intf.dto.AnexoWsDto;
+import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
+import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FitxerDto;
+import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.logic.intf.dto.InteresadoWsDto;
+import es.caib.notib.logic.intf.dto.LlibreDto;
+import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.RegistreAnnexDto;
+import es.caib.notib.logic.intf.dto.RegistreModeFirmaDtoEnum;
+import es.caib.notib.logic.intf.dto.RegistreOrigenDtoEnum;
+import es.caib.notib.logic.intf.dto.RegistreTipusDocumentDtoEnum;
+import es.caib.notib.logic.intf.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.logic.intf.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -19,7 +36,6 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
-import es.caib.notib.logic.exception.DocumentNotFoundException;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.notib.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -28,7 +44,19 @@ import es.caib.notib.plugin.gesconadm.GcaServei;
 import es.caib.notib.plugin.gesconadm.GesconAdm;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.DadesOficina;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
+import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -1721,7 +1749,11 @@ public class PluginHelper {
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
-			dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(null));
+			if (pluginClass.endsWith("DadesUsuariPluginKeycloak")) {
+				dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(String.class, Properties.class).newInstance("es.caib.notib.plugin.dades.usuari.", configHelper.getAllEntityProperties(null));
+			} else {
+				dadesUsuariPlugin = (DadesUsuariPlugin) clazz.getDeclaredConstructor(Properties.class).newInstance(configHelper.getAllEntityProperties(null));
+			}
 			return dadesUsuariPlugin;
 		} catch (Exception ex) {
 			log.error("Error al crear la instància del plugin de dades d'usuari (" + pluginClass + "): ", ex);
