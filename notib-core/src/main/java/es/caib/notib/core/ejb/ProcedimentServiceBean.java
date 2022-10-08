@@ -54,7 +54,13 @@ public class ProcedimentServiceBean implements ProcedimentService {
 				isAdminEntitat);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+        return delegate.updateActiu(id, actiu);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(
 			Long entitatId, 
@@ -143,8 +149,14 @@ public class ProcedimentServiceBean implements ProcedimentService {
 	public boolean procedimentAmbGrups(Long procedimentId) {
 		return delegate.procedimentAmbGrups(procedimentId);
 	}
-	
-	@Override
+
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public boolean procedimentActiu(Long procedimentId) {
+        return delegate.procedimentActiu(procedimentId);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcSerGrupDto> findAllGrups() {
 		return delegate.findAllGrups();

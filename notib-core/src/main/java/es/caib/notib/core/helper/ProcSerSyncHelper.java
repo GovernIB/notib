@@ -14,6 +14,8 @@ import es.caib.notib.core.entity.AvisEntity;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.AvisRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ServeiRepository;
 import es.caib.notib.core.service.ProcedimentServiceImpl;
 import es.caib.notib.core.service.ServeiServiceImpl;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -42,7 +44,10 @@ public class ProcSerSyncHelper {
 
 	@Autowired
 	private AvisRepository avisRepository;
-
+	@Autowired
+	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private ServeiRepository serveiRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
@@ -90,10 +95,11 @@ public class ProcSerSyncHelper {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
-			progres.setNumOperacions((totalElementsCons * 2) + 1);
+			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
 
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
-			List<OrganGestorEntity> organsGestorsModificats = processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
+			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			Long tf = System.currentTimeMillis();
@@ -317,7 +323,7 @@ public class ProcSerSyncHelper {
 	}
 
 
-	// Sincronitzar procediments
+	// Sincronitzar serveis
 	// ///////////////////////////////////////////////////////////////////////////
 	public void actualitzaServeis(EntitatDto entitatDto) {
 
@@ -345,9 +351,12 @@ public class ProcSerSyncHelper {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalServeis(entitatDto.getDir3Codi());	// Procediments a processar
+			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
+
 
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
 			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
+			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			Long tf = System.currentTimeMillis();

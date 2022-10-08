@@ -268,6 +268,17 @@ public class ProcedimentController extends BaseUserController{
 		}
 	}
 
+	@RequestMapping(value = "/{procedimentId}/enable", method = RequestMethod.GET)
+	public String enable(HttpServletRequest request, @PathVariable Long procedimentId) {
+		procedimentService.updateActiu(procedimentId, true);
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "procediment.controller.activada.ok");
+	}
+	@RequestMapping(value = "/{procedimentId}/disable", method = RequestMethod.GET)
+	public String disable(HttpServletRequest request, @PathVariable Long procedimentId) {
+		procedimentService.updateActiu(procedimentId, false);
+		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "procediment.controller.desactivada.ok");
+	}
+
 	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 
