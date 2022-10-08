@@ -361,8 +361,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
-			@Param("isIdentificadorNull") boolean isReferenciaNull,
-			@Param("identificador") String referencia,
+			@Param("isReferenciaNull") boolean isReferenciaNull,
+			@Param("referencia") String referencia,
 			Pageable paginacio);
 
 
