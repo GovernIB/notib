@@ -6,6 +6,7 @@ package es.caib.notib.core.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -62,6 +63,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -439,10 +441,46 @@ public class NotificacioServiceImpl implements NotificacioService {
 			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
 			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
+			dto.setEnviadaDate(getEnviadaDate(notificacio));
+
 			return dto;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	private Date getEnviadaDate(NotificacioEntity notificacio) {
+
+		try {
+			if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
+				return null;
+			}
+
+			Date dataEnviament = null;
+			Iterator<NotificacioEnviamentEntity> it = notificacio.getEnviaments().iterator();
+			while (it.hasNext()) {
+				NotificacioEnviamentEntity env = it.next();
+				if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+						&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
+						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
+					dataEnviament = env.getRegistreData();
+				}
+
+				if (!env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+						&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
+						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
+						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
+					dataEnviament = notificacio.getNotificaEnviamentNotificaData();
+				}
+				if (dataEnviament != null)
+					break;
+			}
+			return dataEnviament;
+
+		} catch (Exception ex) {
+			log.error("Error actualitzant la data d'enviament a la taula del llistat", ex);
+		}
+		return null;
 	}
 
 	@Transactional(readOnly = true)

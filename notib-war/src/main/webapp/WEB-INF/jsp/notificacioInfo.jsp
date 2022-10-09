@@ -211,10 +211,10 @@ $(document).ready(function() {
 				</div>
 				<table class="table table-bordered" style="width: 100%">
 					<tbody>
-						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.tipus" /></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
-						</tr>
+<%--						<tr>--%>
+<%--							<td><strong><spring:message code="notificacio.info.dada.tipus" /></strong></td>--%>
+<%--							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>--%>
+<%--						</tr>--%>
 						<tr>
 							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
 							<td>${notificacio.organGestorCodi} - ${notificacio.organGestorNom}</td>
@@ -249,6 +249,10 @@ $(document).ready(function() {
 							<td>${notificacio.createdBy.nom}
 								(${notificacio.createdBy.codi})</td>
 						</tr>
+						<tr>
+							<td><strong><spring:message code="notificacio.info.dada.enviament.data" /></strong></td>
+							<td><fmt:formatDate value="${notificacio.enviadaDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
+						</tr>
 						<c:if test="${notificacio.enviamentDataProgramada != null}">
 							<tr>
 								<td><strong><spring:message code="notificacio.info.dada.enviament.programada.data"/></strong></td>
@@ -262,7 +266,7 @@ $(document).ready(function() {
 							</tr>
 						</c:if>
 						<c:if test="${notificacio.estatProcessatDate != null}">
-							<tr>estatProcessatDate
+							<tr>
 								<td><strong><spring:message code="notificacio.info.dada.processada.dada"/></strong></td>
 								<td><fmt:formatDate value="${notificacio.estatProcessatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 							</tr>
