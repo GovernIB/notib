@@ -28,4 +28,7 @@ public class ApiConsulta {
     public void setDniTitular(String dniTitular) {
         this.dniTitular = dniTitular != null ? dniTitular.toUpperCase() : null;
     }
+    public IdiomaEnumDto getIdioma() {
+        return idioma != null ? idioma : IdiomaEnumDto.CA;
+    }
 }
