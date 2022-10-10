@@ -216,9 +216,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             Map<String, Integer>  registres = new HashMap<>();
             for (NotificacioEnviamentDatatableDto env : enviaments) {
                 item.updateEstatTipusCount(env.getNotificaEstat());
-                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
-                    notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";
-                }
+//                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
+//                    notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";
+//                }
                 if (env.getRegistreEstat() != null) {
                     if (registres.containsKey(env.getRegistreEstat().name())) {
                         Integer count = registres.get(env.getRegistreEstat().name());
@@ -240,7 +240,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                     + "</div></div>" + data + notificaEstat;
             String padding = "; padding-left: 5px;";
             String boxShadow = "box-shadow: inset 3px 0px 0px ";
-            if (notificaEstat.length() == 0 && item.getContadorEstat().size() > 1) {
+
+            if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())
+                || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) || notificaEstat.length() > 0 || item.getContadorEstat().size() > 1) {
+
                 for (Map.Entry<EnviamentEstat, Integer> entry : item.getContadorEstat().entrySet()) {
                     estat += "<div style=\"font-size:11px;" + boxShadow + entry.getKey().getColor() + padding + "\">" +
                             entry.getValue() + " " + getMessage(request, "es.caib.notib.core.api.dto.EnviamentEstat." + entry.getKey())
