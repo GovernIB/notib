@@ -61,6 +61,9 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     @Column(name = "DIRECT_PERMISSION_REQUIRED")
     protected boolean requireDirectPermission;
 
+    @Column(name = "actiu")
+    protected boolean actiu;
+
     @Column(name = "ultima_act")
     @Temporal(TemporalType.DATE)
     protected Date ultimaActualitzacio;
@@ -160,6 +163,10 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.ultimaActualitzacio = dataActualitzacio;
     }
 
+    public void updateActiu(
+            boolean actiu) {
+        this.actiu = actiu;
+    }
 
     protected ProcSerEntity(ProcSerEntityBuilder<?, ?> b) {
         this.setId(b.id);
@@ -182,6 +189,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         this.entitat = b.entitat;
         this.entregaCie = b.entregaCie;
         this.organGestor = b.organGestor;
+        this.actiu = true;
     }
 
     public static abstract class ProcSerEntityBuilder<C extends ProcSerEntity, B extends ProcSerEntityBuilder<C, B>> {
@@ -196,6 +204,7 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
         private boolean agrupar;
         private boolean comu;
         private boolean requireDirectPermission;
+        private boolean actiu;
         private Date ultimaActualitzacio;
         private EntitatEntity entitat;
         private EntregaCieEntity entregaCie;
@@ -284,6 +293,11 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
 
         public B requireDirectPermission(boolean requireDirectPermission) {
             this.requireDirectPermission = requireDirectPermission;
+            return self();
+        }
+
+        public B actiu(boolean actiu) {
+            this.actiu = actiu;
             return self();
         }
 

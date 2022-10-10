@@ -54,7 +54,13 @@ public class ServeiServiceBean implements ServeiService {
 				isAdminEntitat);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+		return delegate.updateActiu(id, actiu);
+    }
+
+    @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(
 			Long entitatId, 

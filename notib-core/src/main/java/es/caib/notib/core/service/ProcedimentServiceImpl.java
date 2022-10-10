@@ -2,7 +2,20 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
+import es.caib.notib.core.api.dto.CodiValorComuDto;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
@@ -36,9 +49,28 @@ import es.caib.notib.core.entity.ProcedimentFormEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.ProcSerHelper;
+import es.caib.notib.core.helper.ProcSerSyncHelper;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.GrupProcSerRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
+import es.caib.notib.core.repository.ProcedimentFormRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
@@ -61,6 +93,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -300,8 +333,24 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
+
+    @Override
+	@Transactional
+    public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+        Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Actualitzant propietat actiu d'un procediment existent (id=" + id + ", activ=" + actiu + ")");
+			ProcedimentEntity procedimentEntity = procedimentRepository.findOne(id);
+			procedimentEntity.updateActiu(actiu);
+			cacheHelper.evictFindProcedimentServeisWithPermis();
+			cacheHelper.evictFindProcedimentsOrganWithPermis();
+			return conversioTipusHelper.convertir(procedimentEntity, ProcSerDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+    }
+
+    @Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
 	public ProcSerDto delete(
@@ -385,6 +434,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public boolean procedimentActiu(Long procedimentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravar si agrupar
+			ProcSerEntity procediment = procSerRepository.findById(procedimentId);
+			return procediment.isActiu();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
 		return progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError();
@@ -395,6 +457,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		try {
 			ProcSerDto proc = pluginHelper.getProcSerByCodiSia(codiSia, false);
 			if (proc == null) {
+				EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+				ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiSia, entity);
+				if (procediment != null) {
+					procediment.updateActiu(false);
+					procedimentRepository.save(procediment);
+//					procedimentRepository.updateActiu(procediment.getCodi(), false);
+				}
 				return false;
 			}
 			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
@@ -877,6 +946,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 			List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(usuariCodi, entitat, permisos);
+
 			// 7. Convertim els procediments/serveis a dto
 			return conversioTipusHelper.convertirList(procediments, ProcSerSimpleDto.class);
 		} finally {
@@ -894,6 +964,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
 			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
 			List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermisMenu(usuariCodi, entitat, permisos);
+
 			// 7. Convertim els procediments/serveis a dto
 			return conversioTipusHelper.convertirList(procediments, ProcSerSimpleDto.class);
 		} finally {
@@ -1069,6 +1140,14 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		List<ProcedimentEntity> procediments;
 		if (RolEnumDto.NOT_ADMIN.equals(rol)) {
 			procediments = recuperarProcedimentSensePermis(entitat, organCodi);
+			// Eliminam els procediments inactius
+			Iterator<ProcedimentEntity> it = procediments.iterator();
+			while (it.hasNext()) {
+				ProcedimentEntity curr = it.next();
+				if (!curr.isActiu()) {
+					it.remove();
+				}
+			}
 		} else if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)){
 			procediments = recuperarProcedimentAmbPermis(entitat, PermisEnum.COMUNIACIO_SIR, organCodi);
 		} else {

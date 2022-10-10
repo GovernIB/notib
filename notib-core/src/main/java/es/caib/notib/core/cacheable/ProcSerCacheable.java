@@ -2,14 +2,18 @@ package es.caib.notib.core.cacheable;
 
 import com.google.common.collect.Lists;
 import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.EntitatRepository;
-import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -20,10 +24,16 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Utilitat per a accedir a les caches dels procediments. Els mètodes cacheables es
@@ -81,6 +91,8 @@ public class ProcSerCacheable {
         procedimentsList.addAll(procedimentsAmbPermisOrgan);
         List<ProcSerEntity> procs = Lists.newArrayList(procedimentsList);
 
+        removeInactius(permisos, procs);
+
         // 6. Ordenam els procediments
         Collections.sort(procs, new Comparator<ProcSerEntity>() {
             @Override
@@ -125,6 +137,7 @@ public class ProcSerCacheable {
         procedimentsList.addAll(comunsGlobals);
 
         List<ProcSerEntity> procs = Lists.newArrayList(procedimentsList);
+        removeInactius(permisos, procs);
 
         // 6. Ordenam els procediments
         Collections.sort(procs, new Comparator<ProcSerEntity>() {
@@ -146,7 +159,9 @@ public class ProcSerCacheable {
             return new ArrayList<>();
         }
 
-        return  procSerRepository.findProcedimentsByEntitatAndGrupAndIds(entitat, grups, procedimentsAmbPermisIds);
+        List<ProcSerEntity> procs = procSerRepository.findProcedimentsByEntitatAndGrupAndIds(entitat, grups, procedimentsAmbPermisIds);
+        removeInactius(permisos, procs);
+        return procs;
     }
     private List<ProcSerEntity> getProcedimentsAmbPermisOrganGestor(EntitatEntity entitat, Permission[] permisos, List<String> grups) {
 
@@ -169,7 +184,10 @@ public class ProcSerCacheable {
         }
 
         // 4. Obtenim els procediments amb permisos per òrgan gestor
-        return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(organsGestorsCodisAmbPermis, grups);
+        List<ProcSerEntity> procs = procSerRepository.findProcedimentsAccesiblesPerOrganGestor(organsGestorsCodisAmbPermis, grups);
+        removeInactius(permisos, procs);
+
+        return procs;
     }
 
     /**
@@ -197,6 +215,7 @@ public class ProcSerCacheable {
                 ProcSerOrganEntity.class,
                 permisos,
                 auth);
+        removeProcedimentsInactius(permisos, procedimentOrgansAmbPermis);
         for (ProcSerOrganEntity procSerOrgan: procedimentOrgansAmbPermis) {
             Hibernate.initialize(procSerOrgan.getOrganGestor().getEntregaCie());
         }
@@ -213,7 +232,38 @@ public class ProcSerCacheable {
             procedimentsComunsSenseAccesDirecte = procSerRepository.findComusByEntitatSenseAccesDirecte(entitat, grups);
         }
 
+        removeInactius(permisos, procedimentsComunsSenseAccesDirecte);
         return procedimentsComunsSenseAccesDirecte;
+    }
+
+    private void removeInactius(Permission[] permisos, List<ProcSerEntity> procs) {
+        // Si consultam els permisos per notificar, eliminam els procediments inactius
+        List<Permission> permisList = Arrays.asList(permisos);
+        if ((permisList.size() == 1 && (permisList.contains(ExtendedPermission.NOTIFICACIO) || permisList.contains(ExtendedPermission.COMUNICACIO_SIR))) ||
+                (permisList.size() == 2 && permisList.contains(ExtendedPermission.NOTIFICACIO) && permisList.contains(ExtendedPermission.COMUNICACIO_SIR))) {
+            Iterator<ProcSerEntity> it = procs.iterator();
+            while (it.hasNext()) {
+                ProcSerEntity curr = it.next();
+                if (!curr.isActiu()) {
+                    it.remove();
+                }
+            }
+        }
+    }
+
+    private void removeProcedimentsInactius(Permission[] permisos, List<ProcSerOrganEntity> procOrgs) {
+        // Si consultam els permisos per notificar, eliminam els procediments inactius
+        List<Permission> permisList = Arrays.asList(permisos);
+        if ((permisList.size() == 1 && (permisList.contains(ExtendedPermission.NOTIFICACIO) || permisList.contains(ExtendedPermission.COMUNICACIO_SIR))) ||
+                (permisList.size() == 2 && permisList.contains(ExtendedPermission.NOTIFICACIO) && permisList.contains(ExtendedPermission.COMUNICACIO_SIR))) {
+            Iterator<ProcSerOrganEntity> it = procOrgs.iterator();
+            while (it.hasNext()) {
+                ProcSerOrganEntity curr = it.next();
+                if (!curr.getProcSer().isActiu()) {
+                    it.remove();
+                }
+            }
+        }
     }
 
     @Resource

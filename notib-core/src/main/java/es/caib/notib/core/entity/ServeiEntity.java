@@ -46,7 +46,8 @@ public class ServeiEntity extends ProcSerEntity {
 				.codiAssumpte(codiAssumpte)
 				.codiAssumpteNom(codiAssumpteNom)
 				.comu(comu)
-				.requireDirectPermission(requireDirectPermission);
+				.requireDirectPermission(requireDirectPermission)
+				.actiu(true);
 	}
 
 	

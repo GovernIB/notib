@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - property:
+      name: booleanTrue
+      value: 1
+      dbms: oracle
+  - property:
+      name: booleanTrue
+      value: true
+      dbms: postgresql
+  - changeSet:
+      id: 1665140886758-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_procediment
+            columns:
+              - column:
+                  name: actiu
+                  type: boolean
+                  defaultValue: ${booleanTrue}

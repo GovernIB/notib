@@ -115,6 +115,22 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 				}
 			}
 			if (procSer != null) {
+				boolean procedimentActiu = procedimentService.procedimentActiu(procSer);
+				if (!procedimentActiu) {
+					valid = false;
+					if (useProcediment) {
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.procediment.inactiu", null, locale))
+								.addNode("procedimentId")
+								.addConstraintViolation();
+					} else {
+						context.buildConstraintViolationWithTemplate(
+										MessageHelper.getInstance().getMessage("notificacio.form.valid.servei.inactiu", null, locale))
+								.addNode("serveiId")
+								.addConstraintViolation();
+					}
+				}
+
 				boolean procedimentAmbGrups = procedimentService.procedimentAmbGrups(procSer);
 				if (procedimentAmbGrups && notificacio.getGrupId() == null) {
 					valid = false;

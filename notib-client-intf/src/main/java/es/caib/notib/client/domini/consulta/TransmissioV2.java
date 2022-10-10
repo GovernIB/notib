@@ -3,8 +3,11 @@
  */
 package es.caib.notib.client.domini.consulta;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +19,9 @@ import java.util.List;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class TransmissioV2 {
 
 	private Long id;						// Identificador de l'enviament

@@ -278,7 +278,7 @@ public class ProcSerHelper {
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
 			progres.addSeparador();
-			progres.incrementOperacionsRealitzades();
+//			progres.incrementOperacionsRealitzades();
 			return false;
 		}
 
@@ -288,7 +288,7 @@ public class ProcSerHelper {
 					procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio())) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
 				progres.addSeparador();
-				progres.incrementOperacionsRealitzades();
+//				progres.incrementOperacionsRealitzades();
 				return false;
 			}
 		}
@@ -298,7 +298,7 @@ public class ProcSerHelper {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
 			progres.addSeparador();
-			progres.incrementOperacionsRealitzades();
+//			progres.incrementOperacionsRealitzades();
 			return false;
 		}
 		return true;
@@ -314,7 +314,7 @@ public class ProcSerHelper {
 		if (serveiGda.getCodi() == null || serveiGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat"));
 			progres.addSeparador();
-			progres.incrementOperacionsRealitzades();
+//			progres.incrementOperacionsRealitzades();
 			return false;
 		}
 
@@ -324,7 +324,7 @@ public class ProcSerHelper {
 					serveiEntity.getUltimaActualitzacio().after(serveiGda.getUltimaActualitzacio())) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat.data"));
 				progres.addSeparador();
-				progres.incrementOperacionsRealitzades();
+//				progres.incrementOperacionsRealitzades();
 				return false;
 			}
 		}
@@ -334,7 +334,7 @@ public class ProcSerHelper {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat.noOrganDinsOrganigrama", new Object[] {serveiGda.getOrganGestor()}));
 			progres.addSeparador();
-			progres.incrementOperacionsRealitzades();
+//			progres.incrementOperacionsRealitzades();
 			return false;
 		}
 		return true;
@@ -449,6 +449,18 @@ public class ProcSerHelper {
 		}
 	}
 
+	@Transactional
+	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, ProgresActualitzacioDto progres) {
+		List<String> procedimentsActiusNotib = procedimentRepository.findCodiActius();
+		for (ProcSerDto procedimentGda: procedimentsGda) {
+			procedimentsActiusNotib.remove(procedimentGda.getCodi());
+		}
+		for (String codi: procedimentsActiusNotib) {
+			procedimentRepository.updateActiu(codi, false);
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.deshabilitar.procediment", new Object[] {codi}));
+		}
+	}
+
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarServeiFromGda(
 			ProgresActualitzacioDto progres,
@@ -554,6 +566,18 @@ public class ProcSerHelper {
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
 		} catch (Exception ex) {
 			log.error("Error no esperat al actualitzar el servei", ex);
+		}
+	}
+
+	@Transactional
+	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, ProgresActualitzacioDto progres) {
+		List<String> serveisActiusNotib = serveiRepository.findCodiActius();
+		for (ProcSerDto serveiGda: serveisGda) {
+			serveisActiusNotib.remove(serveiGda.getCodi());
+		}
+		for (String codi: serveisActiusNotib) {
+			serveiRepository.updateActiu(codi, false);
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.deshabilitar.procediment", new Object[] {codi}));
 		}
 	}
 

@@ -30,6 +30,8 @@ public class ProcSerFormDto extends AuditoriaDto implements Serializable{
 	// 0 (Inactiva) / 1 (Activa per procediment) / 2 (Activa per òrgan gestor) / 3 (Activa per entitat)
 	protected int entregaCieActiva;
 	protected boolean requireDirectPermission;
+	private boolean organNoSincronitzat;
+	private boolean actiu;
 
 	public int getPermisosCount() {
 		if  (permisos == null)

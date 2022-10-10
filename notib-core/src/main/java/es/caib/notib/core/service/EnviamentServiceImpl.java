@@ -1131,6 +1131,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta) {
 		PaginaEnviaments paginaEnviaments = findEnviamentsByConsulta(consulta);
 		RespostaConsultaV2 resposta = RespostaConsultaV2.builder()

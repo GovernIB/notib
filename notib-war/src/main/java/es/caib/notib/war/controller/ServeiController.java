@@ -273,6 +273,17 @@ public class ServeiController extends BaseUserController{
 		}
 	}
 
+	@RequestMapping(value = "/{serveiId}/enable", method = RequestMethod.GET)
+	public String enable(HttpServletRequest request, @PathVariable Long serveiId) {
+		serveiService.updateActiu(serveiId, true);
+		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "servei.controller.activada.ok");
+	}
+	@RequestMapping(value = "/{serveiId}/disable", method = RequestMethod.GET)
+	public String disable(HttpServletRequest request, @PathVariable Long serveiId) {
+		serveiService.updateActiu(serveiId, false);
+		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "servei.controller.desactivada.ok");
+	}
+
 	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 

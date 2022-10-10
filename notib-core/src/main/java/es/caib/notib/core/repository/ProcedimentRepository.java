@@ -5,6 +5,7 @@ import es.caib.notib.core.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -216,5 +217,13 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("entitatActual") EntitatEntity entitat);
 
 	Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
-	
+
+	@Query(	"select distinct pro.codi " +
+			"  from ProcedimentEntity pro " +
+			" where pro.actiu = true")
+	public List<String> findCodiActius();
+
+	@Modifying
+	@Query("update ProcedimentEntity pro set pro.actiu = :actiu where pro.codi = :codi")
+	public void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
 }
