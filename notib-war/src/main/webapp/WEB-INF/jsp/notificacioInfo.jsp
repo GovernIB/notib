@@ -212,10 +212,6 @@ $(document).ready(function() {
 				<table class="table table-bordered" style="width: 100%">
 					<tbody>
 						<tr>
-							<td><strong><spring:message code="notificacio.info.dada.tipus" /></strong></td>
-							<td><spring:message code="es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto.${notificacio.enviamentTipus}" /></td>
-						</tr>
-						<tr>
 							<td width="30%"><strong><spring:message code="notificacio.info.dada.entitat" /></strong></td>
 							<td>${notificacio.organGestorCodi} - ${notificacio.organGestorNom}</td>
 						<tr>
@@ -262,7 +258,7 @@ $(document).ready(function() {
 							</tr>
 						</c:if>
 						<c:if test="${notificacio.estatProcessatDate != null}">
-							<tr>estatProcessatDate
+							<tr>
 								<td><strong><spring:message code="notificacio.info.dada.processada.dada"/></strong></td>
 								<td><fmt:formatDate value="${notificacio.estatProcessatDate}" pattern="dd/MM/yyyy HH:mm:ss" /></td>
 							</tr>
