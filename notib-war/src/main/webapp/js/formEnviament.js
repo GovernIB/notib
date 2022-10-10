@@ -678,7 +678,7 @@ function loadOrgansGestors(urlCercaUnitats){
                         if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir) {
                             list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
                         } else if (item.sir) {
-                            list_html += '<div style="cursor:pointer" title="' + textMessages["notificacio.sir.emprar.valib"] + '"><span  class="fa fa-warning text-danger" ></span> '
+                            list_html += '<div style="cursor:pointer; color:#AAA;" title="' + textMessages["notificacio.sir.emprar.valib"] + '"><span  class="fa fa-warning text-danger" ></span> '
                                 + textMessages["notificacio.sir.emprar.valib.text"] + '</div>';
                         }
                         list_html += '</td></tr>';
