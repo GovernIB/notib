@@ -2,7 +2,36 @@ package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.aspect.Audita;
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.cacheable.PermisosCacheable;
+import es.caib.notib.logic.cacheable.ProcSerCacheable;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EntityComprovarHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.OrganigramaHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.ProcSerHelper;
+import es.caib.notib.logic.helper.ProcSerSyncHelper;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.CodiAssumpteDto;
+import es.caib.notib.logic.intf.dto.CodiValorComuDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.TipusAssumpteDto;
+import es.caib.notib.logic.intf.dto.TipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
@@ -20,10 +49,6 @@ import es.caib.notib.logic.intf.service.AuditService.TipusObjecte;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
-import es.caib.notib.logic.aspect.Audita;
-import es.caib.notib.logic.cacheable.OrganGestorCachable;
-import es.caib.notib.logic.cacheable.PermisosCacheable;
-import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupEntity;
 import es.caib.notib.persist.entity.GrupProcSerEntity;
@@ -36,10 +61,17 @@ import es.caib.notib.persist.entity.ProcedimentFormEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
-import es.caib.notib.logic.helper.*;
-import es.caib.notib.logic.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.logic.intf.acl.ExtendedPermission;
-import es.caib.notib.persist.repository.*;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.EntregaCieRepository;
+import es.caib.notib.persist.repository.EnviamentTableRepository;
+import es.caib.notib.persist.repository.GrupProcSerRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.ProcSerOrganRepository;
+import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.persist.repository.ProcedimentFormRepository;
+import es.caib.notib.persist.repository.ProcedimentRepository;
 import es.caib.notib.plugin.registre.CodiAssumpte;
 import es.caib.notib.plugin.registre.TipusAssumpte;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -60,8 +92,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -242,7 +276,23 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	@Transactional
+	public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Actualitzant propietat actiu d'un procediment existent (id=" + id + ", activ=" + actiu + ")");
+			ProcSerEntity procedimentEntity = procSerRepository.findById(id).orElseThrow(() -> new NotFoundException(id, ProcedimentEntity.class));
+			procedimentEntity.updateActiu(actiu);
+			cacheHelper.evictFindProcedimentServeisWithPermis();
+			cacheHelper.evictFindProcedimentsOrganWithPermis();
+			return conversioTipusHelper.convertir(procedimentEntity, ProcSerDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
@@ -310,6 +360,19 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public boolean procedimentActiu(Long procedimentId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravar si agrupar
+			ProcSerEntity procediment = procSerRepository.findById(procedimentId).orElseThrow(() -> new NotFoundException(procedimentId, ProcedimentEntity.class));
+			return procediment.isActiu();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	public boolean isUpdatingProcediments(EntitatDto entitatDto) {
 
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getDir3Codi());
@@ -322,6 +385,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		try {
 			ProcSerDto proc = pluginHelper.getProcSerByCodiSia(codiSia, false);
 			if (proc == null) {
+				EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+				ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiSia, entity);
+				if (procediment != null) {
+					procediment.updateActiu(false);
+					procedimentRepository.save(procediment);
+//					procedimentRepository.updateActiu(procediment.getCodi(), false);
+				}
 				return false;
 			}
 			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
@@ -841,10 +911,24 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<ProcedimentEntity> procediments = RolEnumDto.NOT_ADMIN.equals(rol) ? recuperarProcedimentSensePermis(entitat, organCodi)
+		List<ProcedimentEntity> procediments = RolEnumDto.NOT_ADMIN.equals(rol) ? getProcedimentsActius(entitat, organCodi)
 								: TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ?  recuperarProcedimentAmbPermis(entitat, PermisEnum.COMUNIACIO_SIR, organCodi)
 								: recuperarProcedimentAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
 		return procedimentsToCodiValorOrganGestorComuDto(procediments);
+	}
+
+	private List<ProcedimentEntity> getProcedimentsActius(EntitatEntity entitat, String organCodi) {
+
+		var procediments = recuperarProcedimentSensePermis(entitat, organCodi);
+		// Eliminam els procediments inactius
+		Iterator<ProcedimentEntity> it = procediments.iterator();
+		while (it.hasNext()) {
+			ProcedimentEntity curr = it.next();
+			if (!curr.isActiu()) {
+				it.remove();
+			}
+		}
+		return procediments;
 	}
 
 	@Override

@@ -58,8 +58,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private static final String[] AUTH_WHITELIST = {
 			"/swagger-resources/**",
 			"/swagger-ui/**",
+			"/rest",
 			"/api/rest",
+			"/api/rest/appinfo",
 			"/api-docs",
+			"/api-docs/**",
 			"/webjars/**"
 	};
 

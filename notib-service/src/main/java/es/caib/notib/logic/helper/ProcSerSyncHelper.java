@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
@@ -9,19 +10,19 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
-import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.service.ProcedimentServiceImpl;
+import es.caib.notib.logic.service.ServeiServiceImpl;
 import es.caib.notib.persist.entity.AvisEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.repository.AvisRepository;
-import es.caib.notib.logic.service.ProcedimentServiceImpl;
-import es.caib.notib.logic.service.ServeiServiceImpl;
+import es.caib.notib.persist.repository.ProcedimentRepository;
+import es.caib.notib.persist.repository.ServeiRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -42,7 +43,10 @@ public class ProcSerSyncHelper {
 
 	@Autowired
 	private AvisRepository avisRepository;
-
+	@Autowired
+	private ProcedimentRepository procedimentRepository;
+	@Autowired
+	private ServeiRepository serveiRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
@@ -85,9 +89,11 @@ public class ProcSerSyncHelper {
 			progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
-			progres.setNumOperacions((totalElementsCons * 2) + 1);
+			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
+
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
-			List<OrganGestorEntity> organsGestorsModificats = processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
+			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
@@ -301,7 +307,7 @@ public class ProcSerSyncHelper {
 	}
 
 
-	// Sincronitzar procediments
+	// Sincronitzar serveis
 	// ///////////////////////////////////////////////////////////////////////////
 	public void actualitzaServeis(EntitatDto entitatDto) {
 
@@ -322,10 +328,14 @@ public class ProcSerSyncHelper {
 		try {
 			Long ti = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("servei.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
+
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalServeis(entitatDto.getDir3Codi());	// Procediments a processar
+			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
+
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
-			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
+			processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
+			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));

@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +70,8 @@ public class ServeiServiceImpl implements ServeiService{
 
 	@Resource
 	private ServeiRepository serveiRepository;
+	@Resource
+	private ProcSerRepository procSerRepository;
 	@Resource
 	private ServeiFormRepository serveiFormRepository;
 	@Resource
@@ -229,7 +232,23 @@ public class ServeiServiceImpl implements ServeiService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Override
+	@Transactional
+	public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Actualitzant propietat actiu d'un procediment existent (id=" + id + ", activ=" + actiu + ")");
+			ProcSerEntity serveiEntity = procSerRepository.findById(id).orElseThrow(() -> new NotFoundException(id, ProcedimentEntity.class));
+			serveiEntity.updateActiu(actiu);
+			cacheHelper.evictFindProcedimentServeisWithPermis();
+			cacheHelper.evictFindProcedimentsOrganWithPermis();
+			return conversioTipusHelper.convertir(serveiEntity, ProcSerDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.DELETE, returnType = TipusObjecte.DTO)
 	@Override
 	@Transactional
@@ -309,6 +328,12 @@ public class ServeiServiceImpl implements ServeiService{
 		try {
 			ProcSerDto proc = pluginHelper.getProcSerByCodiSia(codiSia, true);
 			if (proc == null) {
+				EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+				ServeiEntity servei = serveiRepository.findByCodiAndEntitat(codiSia, entity);
+				if (servei != null) {
+					servei.updateActiu(false);
+					serveiRepository.save(servei);
+				}
 				return false;
 			}
 			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
@@ -1030,10 +1055,24 @@ public class ServeiServiceImpl implements ServeiService{
 	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<ServeiEntity> serveis = RolEnumDto.NOT_ADMIN.equals(rol) ? recuperarServeiSensePermis(entitat, organCodi)
+		List<ServeiEntity> serveis = RolEnumDto.NOT_ADMIN.equals(rol) ? getServeisActius(entitat, organCodi)
 									: TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? recuperarServeiAmbPermis(entitat, PermisEnum.COMUNIACIO_SIR, organCodi)
 									: recuperarServeiAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
 		return serveisToCodiValorOrganGestorComuDto(serveis);
+	}
+
+	private List<ServeiEntity> getServeisActius(EntitatEntity entitat, String organCodi) {
+
+		var serveis = recuperarServeiSensePermis(entitat, organCodi);
+		// Eliminam els procediments inactius
+		Iterator<ServeiEntity> it = serveis.iterator();
+		while (it.hasNext()) {
+			ServeiEntity curr = it.next();
+			if (!curr.isActiu()) {
+				it.remove();
+			}
+		}
+		return serveis;
 	}
 
 	@Override

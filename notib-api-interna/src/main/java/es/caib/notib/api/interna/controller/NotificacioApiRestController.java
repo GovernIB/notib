@@ -4,16 +4,14 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.client.domini.AppInfo;
-import es.caib.notib.logic.intf.ws.callback.NotificacioCanviClient;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -32,18 +30,20 @@ import java.util.jar.Manifest;
 @Slf4j
 @Controller
 @RequestMapping("/api")
+@Tag(name = "Informació Notib", description = "API de informació de Notib")
 public class NotificacioApiRestController {
 
 	@Autowired
 	private ServletContext servletContext;
 
-	@RequestMapping(value = {"/apidoc", "/rest"}, method = RequestMethod.GET)
-	public String documentacio(HttpServletRequest request) {
-		return "apidoc";
-	}
+//	@RequestMapping(value = {"/apidoc", "/rest"}, method = RequestMethod.GET)
+//	public String documentacio(HttpServletRequest request) {
+//		return "apidoc";
+//	}
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = {"/rest/appinfo"}, method = RequestMethod.GET)
+	@Operation(summary = "Consulta la informació de Notib", description = "Retorna la data i la versió de Notib")
 	@ResponseBody
 	public AppInfo getAppInfo(HttpServletRequest request) throws IOException {
 
@@ -64,9 +64,9 @@ public class NotificacioApiRestController {
 		return appInfo;
 	}
 
-	@RequestMapping(value = "/rest/notificaCanvi", method = RequestMethod.POST)
-	@ResponseStatus(value = HttpStatus.OK)
-	public void enviarContingutPost(@RequestBody NotificacioCanviClient notificacioCanvi) {
-		log.info("Notificacio canvi " + notificacioCanvi.toString());
-	}
+//	@RequestMapping(value = "/rest/notificaCanvi", method = RequestMethod.POST)
+//	@ResponseStatus(value = HttpStatus.OK)
+//	public void enviarContingutPost(@RequestBody NotificacioCanviClient notificacioCanvi) {
+//		log.info("Notificacio canvi " + notificacioCanvi.toString());
+//	}
 }

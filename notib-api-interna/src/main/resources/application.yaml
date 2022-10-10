@@ -12,5 +12,8 @@ springdoc:
   packages-to-scan: es.caib.notib.api.interna.controller
   api-docs.path: /api-docs
   swagger-ui:
+#    configUrl: /notibapi/interna/api-docs
     path: /rest
     operationsSorter: method
+#    url: /notibapi/interna/
+    use-root-path: true

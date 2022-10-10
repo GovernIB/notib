@@ -18,6 +18,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.PropertySource;
 
 
 /**
@@ -49,6 +50,7 @@ import org.springframework.context.annotation.FilterType;
 						"es\\.caib\\.notib\\.backoffice\\..*",
 						"es\\.caib\\.notib\\.back\\..*",
 						"es\\.caib\\.notib\\.war\\..*"}))
+@PropertySource(value = "classpath:application.yaml")
 public class NotibApiInternaApp extends SpringBootServletInitializer {
 
 	@Override

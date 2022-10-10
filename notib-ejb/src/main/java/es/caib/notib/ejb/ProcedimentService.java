@@ -65,6 +65,12 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+		return getDelegateService().updateActiu(id, actiu);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(
 			Long entitatId, 
 			Long id,
@@ -152,7 +158,12 @@ public class ProcedimentService extends AbstractService<es.caib.notib.logic.intf
 	public boolean procedimentAmbGrups(Long procedimentId) {
 		return getDelegateService().procedimentAmbGrups(procedimentId);
 	}
-	
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public boolean procedimentActiu(Long procedimentId) {
+		return getDelegateService().procedimentActiu(procedimentId);
+	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
 	public List<ProcSerGrupDto> findAllGrups() {

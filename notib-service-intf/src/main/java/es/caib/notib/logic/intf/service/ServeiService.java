@@ -38,6 +38,22 @@ public interface ServeiService {
 	public ProcSerDto update(Long entitatId, ProcSerDataDto servei, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
 
 	/**
+	 * Marca el servei amb l'id especificat com a actiu/inactiu.
+	 *
+	 * @param id
+	 *            Atribut id del servei a activar.
+	 * @param actiu
+	 *            true si es vol activar o false en cas contrari.
+	 * @return El servei modificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	public ProcSerDto updateActiu(
+			Long id,
+			boolean actiu) throws NotFoundException;
+
+	/**
 	 * Esborra el servei amb el mateix id que l'especificat.
 	 * 
 	 * @param id Atribut id del servei a esborrar.

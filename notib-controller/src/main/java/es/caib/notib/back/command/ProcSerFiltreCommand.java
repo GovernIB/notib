@@ -21,6 +21,7 @@ public class ProcSerFiltreCommand {
 	private Long entitatId;
 	private boolean comu;
 	private boolean entregaCieActiva;
+	private boolean actiu;
 	
 	
 	public static ProcSerFiltreCommand asCommand(ProcSerFiltreDto dto) {

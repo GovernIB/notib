@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 //@EntityListeners(NotibAuditingEntityListener.class)
-public class NotibAuditable<PK extends Serializable> extends AbstractAuditable<UsuariEntity, PK> {
+public class NotibAuditable<PK extends Serializable> extends AbstractAuditable<UsuariEntity, PK> implements Serializable {
 
 	private static final long serialVersionUID = 5373083799666869320L;
 

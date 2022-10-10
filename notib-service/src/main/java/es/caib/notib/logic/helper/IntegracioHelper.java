@@ -46,9 +46,34 @@ public class IntegracioHelper {
 	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
 	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
-	
-	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<>();
-	private Map<String, Integer> maxAccionsIntegracio = new HashMap<>();
+
+	private static Map<String, Integer> maxAccionsIntegracio = new HashMap<>();
+	private static Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<>();
+
+	static {
+		LinkedList<IntegracioAccioDto> listAccionsUsuaris = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_USUARIS, listAccionsUsuaris);
+		LinkedList<IntegracioAccioDto> listAccionsRegistre = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_REGISTRE, listAccionsRegistre);
+		LinkedList<IntegracioAccioDto> listAccionsNotifica = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_NOTIFICA, listAccionsNotifica);
+		LinkedList<IntegracioAccioDto> listAccionsArxiu = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_ARXIU, listAccionsArxiu);
+		LinkedList<IntegracioAccioDto> listAccionsClient = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_CLIENT, listAccionsClient);
+		LinkedList<IntegracioAccioDto> listAccionsGestDoc = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_GESDOC, listAccionsGestDoc);
+		LinkedList<IntegracioAccioDto> listAccionsUnitats = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_UNITATS, listAccionsUnitats);
+		LinkedList<IntegracioAccioDto> listAccionsRolsac = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_GESCONADM, listAccionsRolsac);
+		LinkedList<IntegracioAccioDto> listAccionsProcediments = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_PROCEDIMENT, listAccionsProcediments);
+		LinkedList<IntegracioAccioDto> listAccionsConvert = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_CONVERT, listAccionsConvert);
+		LinkedList<IntegracioAccioDto> listAccionsFirma = new LinkedList<>();
+		accionsIntegracio.put(INTCODI_FIRMASERV, listAccionsFirma);
+	}
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<>();

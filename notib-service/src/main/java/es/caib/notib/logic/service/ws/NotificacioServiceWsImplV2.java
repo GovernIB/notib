@@ -208,6 +208,12 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 					if (procediment != null) {
 
+						if (!procediment.isActiu()) {
+							String errorDescripcio = messageHelper.getMessage("error.validacio.alta.notificacio.procediment.inactiu");
+							integracioHelper.addAccioError(info, errorDescripcio);
+							return setRespostaError(errorDescripcio);
+						}
+
 						if (ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(enviamentTipus)) {
 							String errorDescripcio = messageHelper.getMessage("error.validacio.alta.notificacio.amb.servei.nomes.comunicacions");
 							integracioHelper.addAccioError(info, errorDescripcio);
@@ -1506,6 +1512,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	// 1022 | El camp 'organ gestor' no pot ser null en una comunicació amb l'administració on no s'especifica un procediment
 	// 1023 | El camp 'organ gestor' no es correspon a cap Òrgan Gestor de l'entitat especificada
 	// 1024 | El camp 'organ gestor' no es correspon a l'òrgan gestor de l'procediment
+	// 1025 | El procediment es troba actualment deshabilitat
 	// 1029 | No es pot donar d'alta un enviament amb entrega postal activa pel procediment indicat
 	// 1030 | El concepte de la notificació no pot ser null
 	// 1031 | El concepte de la notificació no pot tenir una longitud superior a 255 caràcters

@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.io.Serializable;
 
 /**
  * Classe de model de dades que conté la informació dels procediments.
@@ -17,7 +18,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @Entity
 @DiscriminatorValue("SERVEI")
-public class ServeiEntity extends ProcSerEntity {
+public class ServeiEntity extends ProcSerEntity implements Serializable {
 	
 	public static ServeiEntity.ServeiEntityBuilder getBuilder(
 			String codi,
@@ -46,7 +47,8 @@ public class ServeiEntity extends ProcSerEntity {
 				.codiAssumpte(codiAssumpte)
 				.codiAssumpteNom(codiAssumpteNom)
 				.comu(comu)
-				.requireDirectPermission(requireDirectPermission);
+				.requireDirectPermission(requireDirectPermission)
+				.actiu(true);
 	}
 
 	

@@ -156,6 +156,12 @@ $(document).ready(function() {
 					{{if requireDirectPermission}}<span class="fa fa-check"></span>{{/if}}
 				</script>
 			</th>
+			<th data-col-name="actiu" data-template="#cellActiuTemplate">
+				<spring:message code="procediment.list.columna.actiu"/>
+				<script id="cellActiuTemplate" type="text/x-jsrender">
+					{{if actiu}}<span class="fa fa-check"></span>{{/if}}
+				</script>
+			</th>
 			<th data-col-name="agrupar" data-visible="false" id="agrupable"></th>
 
 			<c:if test="${not simplifiedView}">
@@ -181,6 +187,11 @@ $(document).ready(function() {
 							<ul class="dropdown-menu">
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:codi}}/update" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="procediment.list.boto.actualitzar"/></a></li>
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								{{if !actiu}}
+								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+								{{else}}
+								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{{/if}}
 								<li><a href="${unitatCodiUrlPrefix}procediment/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="procediment.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

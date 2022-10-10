@@ -13,6 +13,8 @@ import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -71,6 +73,8 @@ public class NotificacioTableItemDto {
 	private int nFinalitzada;
 	private int nProcessada;
 
+	private Map<EnviamentEstat, Integer> contadorEstat = new HashMap<>();
+
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
 	}
@@ -114,47 +118,53 @@ public class NotificacioTableItemDto {
 
 	public void updateEstatTipusCount(EnviamentEstat estat) {
 
-		switch (estat) {
-
-			case NOTIB_PENDENT:
-			case REGISTRADA:
-			case NOTIB_ENVIADA:
-			case ENVIAMENT_PROGRAMAT:
-				nTramitacio++;
-				break;
-			case ENVIADA:
-			case ENVIADA_CI:
-			case ENVIADA_DEH:
-			case PENDENT:
-			case ENTREGADA_OP:
-			case PENDENT_ENVIAMENT:
-			case PENDENT_SEU:
-			case PENDENT_CIE:
-			case PENDENT_DEH:
-				nCompareixenca++;
-				break;
-			case LLEGIDA:
-				nLlegida++;
-				break;
-			case REBUTJADA:
-				nRebutjada++;
-				break;
-			case EXPIRADA:
-				nExpirada++;
-				break;
-			case ANULADA:
-				nAnulada++;
-				break;
-			case FINALITZADA:
-				nFinalitzada++;
-				break;
-			case PROCESSADA:
-			case ENVIAT_SIR:
-				nProcessada++;
-				break;
-			default:
-				nError++;
+		if (!contadorEstat.containsKey(estat)) {
+			contadorEstat.put(estat, 1);
+			return;
 		}
+		contadorEstat.put(estat, contadorEstat.get(estat) + 1);
+//
+//		switch (estat) {
+//
+//			case NOTIB_PENDENT:
+//			case REGISTRADA:
+//			case NOTIB_ENVIADA:
+//			case ENVIAMENT_PROGRAMAT:
+//				nTramitacio++;
+//				break;
+//			case ENVIADA:
+//			case ENVIADA_CI:
+//			case ENVIADA_DEH:
+//			case PENDENT:
+//			case ENTREGADA_OP:
+//			case PENDENT_ENVIAMENT:
+//			case PENDENT_SEU:
+//			case PENDENT_CIE:
+//			case PENDENT_DEH:
+//				nCompareixenca++;
+//				break;
+//			case LLEGIDA:
+//				nLlegida++;
+//				break;
+//			case REBUTJADA:
+//				nRebutjada++;
+//				break;
+//			case EXPIRADA:
+//				nExpirada++;
+//				break;
+//			case ANULADA:
+//				nAnulada++;
+//				break;
+//			case FINALITZADA:
+//				nFinalitzada++;
+//				break;
+//			case PROCESSADA:
+//			case ENVIAT_SIR:
+//				nProcessada++;
+//				break;
+//			default:
+//				nError++;
+//		}
 	}
 
 	@Override

@@ -41,6 +41,22 @@ public interface ProcedimentService {
 	public ProcSerDto update(Long entitatId, ProcSerDataDto procediment, boolean isAdmin, boolean isAdminEntitat) throws NotFoundException;
 
 	/**
+	 * Marca el procediment amb l'id especificat com a actiu/inactiu.
+	 *
+	 * @param id
+	 *            Atribut id del procediment a activar.
+	 * @param actiu
+	 *            true si es vol activar o false en cas contrari.
+	 * @return El procediment modificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	public ProcSerDto updateActiu(
+			Long id,
+			boolean actiu) throws NotFoundException;
+
+	/**
 	 * Esborra el procediment amb el mateix id que l'especificat.
 	 * 
 	 * @param id
@@ -137,6 +153,10 @@ public interface ProcedimentService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean procedimentAmbGrups(Long procedimentId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	public boolean procedimentActiu(Long procedimentId);
+
 	/**
 	 * Llistat amb tots els grups.
 	 * 

@@ -48,6 +48,7 @@ public class ProcSerCommand {
 	private int caducitat;
 	private boolean comu;
 	protected boolean requireDirectPermission;
+	private boolean actiu;
 
 	private boolean entregaCieActiva;
 	private Long operadorPostalId;

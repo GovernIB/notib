@@ -9,6 +9,24 @@ import es.caib.notib.client.domini.consulta.GenericInfo;
 import es.caib.notib.client.domini.consulta.PersonaConsultaV2;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
+import es.caib.notib.logic.helper.AuditEnviamentHelper;
+import es.caib.notib.logic.helper.AuditNotificacioHelper;
+import es.caib.notib.logic.helper.CallbackHelper;
+import es.caib.notib.logic.helper.ConfigHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EntityComprovarHelper;
+import es.caib.notib.logic.helper.FiltreHelper;
+import es.caib.notib.logic.helper.FiltreHelper.FiltreField;
+import es.caib.notib.logic.helper.FiltreHelper.StringField;
+import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.MessageHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.NotificacioEventHelper;
+import es.caib.notib.logic.helper.OrganGestorHelper;
+import es.caib.notib.logic.helper.OrganigramaHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.ProcSerHelper;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
@@ -16,7 +34,6 @@ import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDt
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
-import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.rest.consulta.Estat;
 import es.caib.notib.logic.intf.rest.consulta.Persona;
 import es.caib.notib.logic.intf.rest.consulta.PersonaTipus;
@@ -35,9 +52,6 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.entity.UsuariEntity;
-import es.caib.notib.logic.helper.*;
-import es.caib.notib.logic.helper.FiltreHelper.FiltreField;
-import es.caib.notib.logic.helper.FiltreHelper.StringField;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.ColumnesRepository;
 import es.caib.notib.persist.repository.EntitatRepository;
@@ -51,7 +65,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-//import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,15 +76,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -1048,6 +1067,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public RespostaConsultaV2 findEnviamentsV2(ApiConsulta consulta) {
 
 		PaginaEnviaments paginaEnviaments = findEnviamentsByConsulta(consulta);

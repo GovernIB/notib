@@ -3,6 +3,7 @@ server:
     context-path: /notibback
   error:
     path: /error
+  forward-headers-strategy: framework
 spring:
   mvc:
     view:

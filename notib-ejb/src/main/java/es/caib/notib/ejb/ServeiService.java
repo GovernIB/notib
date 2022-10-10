@@ -62,6 +62,12 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public ProcSerDto updateActiu(Long id, boolean actiu) throws NotFoundException {
+		return getDelegateService().updateActiu(id, actiu);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public ProcSerDto delete(
 			Long entitatId, 
 			Long id,

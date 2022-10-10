@@ -245,18 +245,18 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query( " select count(distinct ne) " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-		    " where ne.notificacio.enviamentTipus = :tipus " +
-		    "   and (:esVisibleCarpetaNull = true and (ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA)) " +
-		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
-		    "   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
+			" where ne.notificacio.enviamentTipus = :tipus " +
+			"   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
+			"   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+			"   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
 			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular)))" +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
-			"   and (:esVisibleCarpetaNull = false and (:visibleCarpeta = false " +
+			"   and (:esVisibleCarpetaNull = true or :visibleCarpeta = false " +
 			"		or (ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_ENVIAMENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_SEU " +
@@ -275,7 +275,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.DESCONEGUT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.MORT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXTRAVIADA " +
-			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO)))")
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO))")
 	Integer countEnviaments(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,
@@ -291,18 +291,18 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	@Query( " select distinct ne " +
 			" from NotificacioEnviamentEntity ne " +
 			" left outer join ne.destinataris d " +
-		    " where ne.notificacio.enviamentTipus =  :tipus " +
-		    "   and (:esVisibleCarpetaNull = true and (ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
-		    "    or ne.notificacio.estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA)) " +
-		    "   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
+			" where ne.notificacio.enviamentTipus =  :tipus " +
+			"   and (ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS " +
+			"    or ne.notificacio.estat = es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto.PROCESSADA) " +
+			"   and (:esEstatFinalNull = true or ne.notificaEstatFinal = :estatFinal) " +
 			"   and ne.notificaEstat <> es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
 			"   and ((ne.titular.incapacitat = false and upper(ne.titular.nif) = upper(:dniTitular)) or (upper(d.nif) = upper(:dniTitular))) " +
 			"	and (:esDataInicialNull = true or ne.notificacio.notificaEnviamentData >= :dataInicial) " +
 			"	and (:esDataFinalNull = true or ne.notificacio.notificaEnviamentData <= :dataFinal) " +
-			"   and (:esVisibleCarpetaNull = false and (:visibleCarpeta = false " +
+			"   and (:esVisibleCarpetaNull = true or :visibleCarpeta = false " +
 			"		or (ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_ENVIAMENT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.PENDENT_SEU " +
@@ -321,7 +321,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.DESCONEGUT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.MORT " +
 			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXTRAVIADA " +
-			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO)))")
+			"		or ne.notificaEstat = es.caib.notib.client.domini.EnviamentEstat.SENSE_INFORMACIO))")
 	Page<NotificacioEnviamentEntity> findEnviaments(
 			@Param("dniTitular") String dniTitular,
 			@Param("esDataInicialNull") boolean esDataInicialNull,

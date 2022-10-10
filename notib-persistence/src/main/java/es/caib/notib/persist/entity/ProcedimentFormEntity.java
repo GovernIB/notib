@@ -39,7 +39,8 @@ import javax.persistence.*;
 		+ "			pro.retard as retard, "
 		+ "			pro.comu as comu, "
 		+ "         pro.DIRECT_PERMISSION_REQUIRED as requireDirectPermission, "
-		+ "         pro.entitat as entitat_id"
+		+ "         pro.entitat as entitat_id, "
+		+ "         pro.actiu as actiu "
 		+ " from	not_procediment pro "
 		+ " left outer join not_entitat ent on ent.id = pro.entitat "
 //		+ " left outer join not_pagador_postal postal on postal.id = pro.pagadorpostal "
@@ -104,4 +105,7 @@ public class ProcedimentFormEntity {
 
 	@Column(name = "requireDirectPermission")
 	protected boolean requireDirectPermission;
+
+	@Column(name = "actiu")
+	protected boolean actiu;
 }
