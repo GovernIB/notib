@@ -1,8 +1,11 @@
 package es.caib.notib.back.helper;
 
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
@@ -32,8 +35,8 @@ public class PermisosHelper {
 		if (entitatActual == null || usuariActual == null || !RolHelper.isUsuariActualUsuari(request)) {
 			return;
 		}
-		List<ProcSerSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-		List<ProcSerSimpleDto> procedimentsSIR = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
+		List<ProcSerCacheDto> procedimentsDisponibles = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+		List<ProcSerCacheDto> procedimentsSIR = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
 		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
 		request.setAttribute("permisNotificacioComunicacioMenu", !procedimentsDisponibles.isEmpty());
 		request.setAttribute("permisComunicacioSirMenu", !organs.isEmpty() || !procedimentsSIR.isEmpty());

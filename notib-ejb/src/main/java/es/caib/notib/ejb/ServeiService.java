@@ -13,6 +13,7 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
@@ -176,7 +177,7 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().findServeisWithPermis(entitatId, usuariCodi, permis);
 	}
 

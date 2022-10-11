@@ -1,14 +1,42 @@
 package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
-import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.aspect.Audita;
+import es.caib.notib.logic.cacheable.OrganGestorCachable;
+import es.caib.notib.logic.cacheable.PermisosCacheable;
+import es.caib.notib.logic.cacheable.ProcSerCacheable;
+import es.caib.notib.logic.helper.CacheHelper;
+import es.caib.notib.logic.helper.ConversioTipusHelper;
+import es.caib.notib.logic.helper.EntityComprovarHelper;
+import es.caib.notib.logic.helper.MetricsHelper;
+import es.caib.notib.logic.helper.OrganigramaHelper;
+import es.caib.notib.logic.helper.PaginacioHelper;
+import es.caib.notib.logic.helper.PermisosHelper;
+import es.caib.notib.logic.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.notib.logic.helper.PluginHelper;
+import es.caib.notib.logic.helper.ProcSerHelper;
+import es.caib.notib.logic.helper.ProcSerSyncHelper;
+import es.caib.notib.logic.intf.acl.ExtendedPermission;
+import es.caib.notib.logic.intf.dto.CodiValorComuDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
+import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDataDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFiltreDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerGrupDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganCacheDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -19,10 +47,6 @@ import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
-import es.caib.notib.logic.aspect.Audita;
-import es.caib.notib.logic.cacheable.OrganGestorCachable;
-import es.caib.notib.logic.cacheable.PermisosCacheable;
-import es.caib.notib.logic.cacheable.ProcSerCacheable;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.GrupProcSerEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -33,10 +57,17 @@ import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.persist.entity.ServeiEntity;
 import es.caib.notib.persist.entity.ServeiFormEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
-import es.caib.notib.logic.helper.*;
-import es.caib.notib.logic.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.logic.intf.acl.ExtendedPermission;
-import es.caib.notib.persist.repository.*;
+import es.caib.notib.persist.repository.EntitatRepository;
+import es.caib.notib.persist.repository.EntregaCieRepository;
+import es.caib.notib.persist.repository.EnviamentTableRepository;
+import es.caib.notib.persist.repository.GrupProcSerRepository;
+import es.caib.notib.persist.repository.NotificacioRepository;
+import es.caib.notib.persist.repository.NotificacioTableViewRepository;
+import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.ProcSerOrganRepository;
+import es.caib.notib.persist.repository.ProcSerRepository;
+import es.caib.notib.persist.repository.ServeiFormRepository;
+import es.caib.notib.persist.repository.ServeiRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +85,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementació del servei de gestió de serveis.
@@ -911,12 +942,12 @@ public class ServeiServiceImpl implements ServeiService{
 	@Override
 	@Transactional(readOnly = true)
 //	@Cacheable(value = "serveisPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
-	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			List<ProcSerSimpleDto> procedimentsAmbPermis = new ArrayList<>();
-			for (ProcSerSimpleDto procSer : procedimentService.findProcedimentServeisWithPermis(entitatId, usuariCodi, permis)) {
+			List<ProcSerCacheDto> procedimentsAmbPermis = new ArrayList<>();
+			for (var procSer : procedimentService.findProcedimentServeisWithPermis(entitatId, usuariCodi, permis)) {
 				if (ProcSerTipusEnum.SERVEI.equals(procSer.getTipus())) {
 					procedimentsAmbPermis.add(procSer);
 				}
@@ -997,8 +1028,7 @@ public class ServeiServiceImpl implements ServeiService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<CodiValorComuDto> serveisOrgan = new ArrayList<>();
-			List<ServeiEntity> serveis = new ArrayList<>();
+
 			String organFiltreCodi = null;
 			if (organFiltre != null) {
 				OrganGestorEntity organGestorEntity = organGestorRepository.findById(organFiltre).orElse(null);
@@ -1008,11 +1038,14 @@ public class ServeiServiceImpl implements ServeiService{
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				serveis = recuperarServeiAmbPermis(entitat, permis, organFiltreCodi);
-				Set<ServeiEntity> auxSet = serveiRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
-				auxSet.addAll(serveis);
-				serveis = new ArrayList<>(auxSet);
+				var serveisPermis = recuperarServeiAmbPermis(entitat, permis, organFiltreCodi);
+				serveisPermis.addAll(serveiRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat).stream().map(ProcSerCacheable::toProcSerCacheDto).collect(Collectors.toList()));
+
+				var serveis = new ArrayList<>(new HashSet<>(serveisPermis));
+				Collections.sort(serveis, Comparator.comparing((ProcSerCacheDto p) -> p.getNom()));
+				return serveis.stream().map(s -> new CodiValorComuDto(s.getId().toString(), getServeiCodiNom(s.getCodi(), s.getNom()), s.isComu())).collect(Collectors.toList());
 			} else {
+				List<ServeiEntity> serveis = new ArrayList<>();
 				if (organFiltreCodi != null) {
 					List<ServeiEntity> serveisDisponibles = serveiRepository.findByEntitat(entitat);
 					if (serveisDisponibles != null) {
@@ -1031,48 +1064,31 @@ public class ServeiServiceImpl implements ServeiService{
 						serveis = serveiRepository.findByOrganGestorCodiInOrComu(organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organCodi), entitat);
 					}
 				}
+				Collections.sort(serveis, Comparator.comparing((ServeiEntity p) -> p.getNom()));
+				return serveis.stream().map(s -> new CodiValorComuDto(s.getId().toString(), getServeiCodiNom(s.getCodi(), s.getNom()), s.isComu())).collect(Collectors.toList());
 			}
-			Collections.sort(serveis, new Comparator<ServeiEntity>() {
-				@Override
-				public int compare(ServeiEntity p1, ServeiEntity p2) {
-					return p1.getNom().compareTo(p2.getNom());
-				}
-			});
-			for (ServeiEntity servei : serveis) {
-				String nom = servei.getCodi();
-				if (servei.getNom() != null && !servei.getNom().isEmpty()) {
-					nom += " - " + servei.getNom();
-				}
-				serveisOrgan.add(new CodiValorComuDto(servei.getId().toString(), nom, servei.isComu()));
-			}
-			return serveisOrgan;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	private String getServeiCodiNom(String codi, String nom) {
+		return codi + (nom != null && !nom.isBlank() ? " - " + nom : "");
 	}
 
 	@Override
 	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		List<ServeiEntity> serveis = RolEnumDto.NOT_ADMIN.equals(rol) ? getServeisActius(entitat, organCodi)
+		List<ProcSerCacheDto> serveis = RolEnumDto.NOT_ADMIN.equals(rol) ? getServeisActius(entitat, organCodi)
 									: TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? recuperarServeiAmbPermis(entitat, PermisEnum.COMUNIACIO_SIR, organCodi)
 									: recuperarServeiAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
 		return serveisToCodiValorOrganGestorComuDto(serveis);
 	}
 
-	private List<ServeiEntity> getServeisActius(EntitatEntity entitat, String organCodi) {
-
+	private List<ProcSerCacheDto> getServeisActius(EntitatEntity entitat, String organCodi) {
 		var serveis = recuperarServeiSensePermis(entitat, organCodi);
-		// Eliminam els procediments inactius
-		Iterator<ServeiEntity> it = serveis.iterator();
-		while (it.hasNext()) {
-			ServeiEntity curr = it.next();
-			if (!curr.isActiu()) {
-				it.remove();
-			}
-		}
-		return serveis;
+		return serveis.stream().filter(s -> s.isActiu()).map(ProcSerCacheable::toProcSerCacheDto).collect(Collectors.toList());
 	}
 
 	@Override
@@ -1088,18 +1104,11 @@ public class ServeiServiceImpl implements ServeiService{
 		return organGestorsAmbPermis != null && !organGestorsAmbPermis.isEmpty();
 	}
 
-	private List<CodiValorOrganGestorComuDto> serveisToCodiValorOrganGestorComuDto(List<ServeiEntity> serveis) {
-
-		List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
-		for (ServeiEntity servei : serveis) {
-			String nom = servei.getCodi();
-			if (servei.getNom() != null && !servei.getNom().isEmpty()) {
-				nom += " - " + servei.getNom();
-			}
-			String organCodi = servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "";
-			response.add(new CodiValorOrganGestorComuDto(servei.getId().toString(), nom, organCodi, servei.isComu()));
-		}
-		return response;
+	private List<CodiValorOrganGestorComuDto> serveisToCodiValorOrganGestorComuDto(List<ProcSerCacheDto> serveis) {
+		return serveis.stream().map(p -> new CodiValorOrganGestorComuDto(p.getId().toString(), getServeiCodiNom(p.getCodi(), p.getNom()), getOrganCodi(p), p.isComu())).collect(Collectors.toList());
+	}
+	private String getOrganCodi(ProcSerCacheDto servei) {
+		return servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "";
 	}
 
 	private List<ServeiEntity> recuperarServeiSensePermis(EntitatEntity entitat, String organCodi){
@@ -1111,18 +1120,18 @@ public class ServeiServiceImpl implements ServeiService{
 		return serveiRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
 	}
 
-	private List<ServeiEntity> recuperarServeiAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
+	private List<ProcSerCacheDto> recuperarServeiAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		List<ProcSerEntity> serveis = serveisCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
-		List<ProcSerOrganEntity> serveisOrgans = serveisCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
-		List<ProcSerEntity> procSerAmbPermis;
+		var serveis = serveisCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
+		var serveisOrgans = serveisCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
+		List<ProcSerCacheDto> procSerAmbPermis;
 		if (organFiltre != null) {
-			List<ProcSerOrganEntity> serveisOrgansAmbPermis = new ArrayList<>();
+			List<ProcSerOrganCacheDto> serveisOrgansAmbPermis = new ArrayList<>();
 			if(serveisOrgans != null && !serveisOrgans.isEmpty()) {
 				List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-				for (ProcSerOrganEntity serveiOrgan: serveisOrgans) {
+				for (var serveiOrgan: serveisOrgans) {
 					if (organsFills.contains(serveiOrgan.getOrganGestor().getCodi())) {
 						serveisOrgansAmbPermis.add(serveiOrgan);
 					}
@@ -1134,19 +1143,19 @@ public class ServeiServiceImpl implements ServeiService{
 				List<ServeiEntity> serveisComuns = serveiRepository.findByEntitatAndComuTrue(entitat);
 				for (ServeiEntity servei: serveisComuns) {
 					if (!procSerAmbPermis.contains(servei)) {
-						procSerAmbPermis.add(servei);
+						procSerAmbPermis.add(ProcSerCacheable.toProcSerCacheDto(servei));
 					}
 				}
 			}
 			return filtraServeis(procSerAmbPermis);
 		}
 
-		Set<ProcSerEntity> setServeis = new HashSet<>();
+		Set<ProcSerCacheDto> setServeis = new HashSet<>();
 		if (serveis != null) {
 			setServeis = new HashSet<>(serveis);
 		}
 		if (serveisOrgans != null && !serveisOrgans.isEmpty()) {
-			for (ProcSerOrganEntity serveiOrgan : serveisOrgans) {
+			for (var serveiOrgan : serveisOrgans) {
 				setServeis.add(serveiOrgan.getProcSer());
 			}
 		}
@@ -1154,12 +1163,12 @@ public class ServeiServiceImpl implements ServeiService{
 		return filtraServeis(procSerAmbPermis);
 	}
 
-	private List<ServeiEntity> filtraServeis(List<ProcSerEntity> procSerAmbPermis) {
+	private List<ProcSerCacheDto> filtraServeis(List<ProcSerCacheDto> procSerAmbPermis) {
 
-		List<ServeiEntity> serveisAmbPermis = new ArrayList<>();
-		for (ProcSerEntity procSer : procSerAmbPermis) {
+		List<ProcSerCacheDto> serveisAmbPermis = new ArrayList<>();
+		for (var procSer : procSerAmbPermis) {
 			if (ProcSerTipusEnum.SERVEI.equals(procSer.getTipus())) {
-				serveisAmbPermis.add((ServeiEntity) procSer);
+				serveisAmbPermis.add(procSer);
 			}
 		}
 		return serveisAmbPermis;
@@ -1177,21 +1186,21 @@ public class ServeiServiceImpl implements ServeiService{
 		return false;
 	}
 
-	private List<ProcSerEntity> addServeisOrgan(List<ProcSerEntity> serveis, List<ProcSerOrganEntity> serveisOrgans, String organFiltre) {
+	private List<ProcSerCacheDto> addServeisOrgan(List<ProcSerCacheDto> serveis, List<ProcSerOrganCacheDto> serveisOrgans, String organFiltre) {
 
-		Set<ProcSerEntity> setServeis = new HashSet<>();
+		Set<ProcSerCacheDto> setServeis = new HashSet<>();
 		if (organFiltre != null) {
 			return new ArrayList<>(setServeis);
 		}
 		if (serveis != null) {
-			for (ProcSerEntity proc : serveis) {
+			for (ProcSerCacheDto proc : serveis) {
 				if (proc.isComu() || (proc.getOrganGestor() != null && organFiltre.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
 					setServeis.add(proc);
 				}
 			}
 		}
 		if (serveisOrgans != null && !serveisOrgans.isEmpty()) {
-			for (ProcSerOrganEntity serveiOrgan : serveisOrgans) {
+			for (var serveiOrgan : serveisOrgans) {
 				setServeis.add(serveiOrgan.getProcSer());
 			}
 		}

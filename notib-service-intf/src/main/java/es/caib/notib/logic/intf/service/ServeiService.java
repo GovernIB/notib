@@ -198,7 +198,7 @@ public interface ServeiService {
 	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 //	/**
 //	 * Recupera els tipus d'assumpte d'una entitat.

@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Helper per a convertir entities a dto
@@ -100,11 +101,7 @@ public class ProcSerHelper {
 	public List<String> findCodiProcedimentsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
 
 		// Procediments comuns amb permís a un òrgan gestor
-		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
-		Set<String> codis = new HashSet<>();
-		for (ProcSerEntity procediment : procediments) {
-			codis.add(procediment.getCodi());
-		}
+		var codis = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos).stream().map(p -> p.getCodi()).collect(Collectors.toSet());
 		return new ArrayList<>(codis);
 	}
 
@@ -118,9 +115,9 @@ public class ProcSerHelper {
 	 */
 	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
 
-		List<ProcSerOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
+		var procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
 		List<String> codisProcedimentsOrgans = new ArrayList<>();
-		for (ProcSerOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
+		for (var procedimentOrganEntity : procedimentOrgansAmbPermis) {
 			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcSer().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
 		}
 		return codisProcedimentsOrgans;
