@@ -29,7 +29,7 @@
 							fullesAtributDreta="${fullesAtributDreta}" fullesMissatgeDreta="${fullesMissatgeDreta}"
 							fullesIconaDreta="${fullesIconaDreta}" fullesCondicioDreta="${fullesCondicioDreta}"/>
 			<c:if test="${fullesCondicioDreta != fill.dades[fullesAtributDreta]}">
-				<span> </span><span class="${fullesIconaDreta}" <c:if test="${fill.dades[fullesAtributDreta]}">title="<spring:message code="${fullesMissatgeDreta}${fill.dades[fullesAtributDreta]}"/>"</c:if>></span>
+				<span> </span><span class="${fullesIconaDreta}" <c:if test="${fill.dades[fullesAtributDreta] != null}">title="<spring:message code="${fullesMissatgeDreta}${fill.dades[fullesAtributDreta]}"/>"</c:if>></span>
 			</c:if>
 
 		</li>

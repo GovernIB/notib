@@ -642,7 +642,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Transactional(readOnly = true)
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+ 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 
 		boolean isFirstSincronization = entitat.getDataSincronitzacio() == null;
 		List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();

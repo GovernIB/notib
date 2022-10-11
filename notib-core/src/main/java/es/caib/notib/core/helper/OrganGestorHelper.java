@@ -355,6 +355,7 @@ public class OrganGestorHelper {
 		if (unitat != null) {
 			unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
 			updateLlibreAndOficina(unitat, entitat.getDir3Codi());
+			organGestorRepository.save(unitat);
 			return unitat;
 		}
 		// Venen les unitats ordenades, primer el pare i després els fills?

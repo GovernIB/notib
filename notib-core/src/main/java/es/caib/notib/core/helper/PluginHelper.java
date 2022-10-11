@@ -52,6 +52,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.mail.Message;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -110,7 +111,7 @@ public class PluginHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Resource
-	private CacheManager cacheManager;
+	private MessageHelper messageManager;
 	@Resource
 	private EntitatRepository entitatRepository;
 
@@ -945,8 +946,8 @@ public class PluginHelper {
 			info.setCodiEntitat(entitat.getCodi());
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
-				String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
-				integracioHelper.addAccioError(info, errorMissatge);
+				String errorMissatge = messageManager.getMessage("organgestor.actualitzacio.sense.canvis");
+				integracioHelper.addAccioError(info, errorMissatge.substring(0,errorMissatge.length()-3) + pareCodi);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 			integracioHelper.addAccioOk(info);
