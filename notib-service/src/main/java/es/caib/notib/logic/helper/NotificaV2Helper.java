@@ -3,6 +3,9 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.logic.aspect.Audita;
+import es.caib.notib.logic.aspect.UpdateEnviamentTable;
+import es.caib.notib.logic.aspect.UpdateNotificacioTable;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -13,9 +16,26 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
-import es.caib.notib.logic.aspect.Audita;
-import es.caib.notib.logic.aspect.UpdateEnviamentTable;
-import es.caib.notib.logic.aspect.UpdateNotificacioTable;
+import es.caib.notib.logic.wsdl.notificaV2.NotificaWsV2PortType;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Destinatarios;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Documento;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.EntregaDEH;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.EntregaPostal;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Envio;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Envios;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Opcion;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Opciones;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.Persona;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
+import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Certificacion;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Datado;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
+import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.PersonaEntity;
@@ -24,22 +44,6 @@ import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
 import es.caib.notib.persist.repository.NotificacioEnviamentRepository;
 import es.caib.notib.persist.repository.ProcSerRepository;
-import es.caib.notib.logic.wsdl.notificaV2.NotificaWsV2PortType;
-import es.caib.notib.logic.wsdl.notificaV2.altaremesaenvios.*;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Certificacion;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.Datado;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
-import es.caib.notib.logic.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPFaultException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.DecoderException;
@@ -51,16 +55,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ejb.CreateException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MalformedObjectNameException;
-import javax.naming.NamingException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -679,7 +686,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		notificacioEventHelper.addErrorEvent(notificacio, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
 	}
 
-	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
+	private NotificaWsV2PortType getNotificaWs(String apiKey) throws Exception {
 		return new WsClientHelper<NotificaWsV2PortType>().generarClientWs(
 				getClass().getResource("/es/caib/notib/logic/wsdl/NotificaWsV21.wsdl"), getNotificaUrlProperty(),
 				new QName("https://administracionelectronica.gob.es/notifica/ws/notificaws_v2/1.0/","NotificaWsV2Service"),

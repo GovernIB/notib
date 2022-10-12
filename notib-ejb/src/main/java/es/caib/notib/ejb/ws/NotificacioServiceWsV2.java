@@ -1,12 +1,23 @@
 /**
  * 
  */
-package es.caib.notib.logic.ejb.ws;
+package es.caib.notib.ejb.ws;
 
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.DadesConsulta;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.PermisConsulta;
+import es.caib.notib.client.domini.RespostaAlta;
+import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistre;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviament;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
 import es.caib.notib.ejb.AbstractService;
+import es.caib.notib.ejb.helper.UsuariHelper;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
-import es.caib.notib.logic.helper.UsuariHelper;
 import org.jboss.ws.api.annotation.WebContext;
 import org.springframework.beans.factory.annotation.Autowired;
 

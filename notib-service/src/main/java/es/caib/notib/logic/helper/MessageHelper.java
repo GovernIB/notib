@@ -3,9 +3,6 @@
  */
 package es.caib.notib.logic.helper;
 
-import java.util.Locale;
-
-import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.UsuariRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.notib.logic.intf.service.AplicacioService;
+import java.util.Locale;
 
 /**
  * Helper per a mostrar missatges multiidioma.

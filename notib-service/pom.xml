@@ -35,6 +35,12 @@
 			<artifactId>orika-spring-boot-starter</artifactId>
 			<version>${orika.starter.version}</version>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.github.miachm.sods</groupId>-->
+<!--			<artifactId>SODS</artifactId>-->
+<!--			<version>1.5.1</version>-->
+<!--		</dependency>-->
+
 
 		<dependency>
 			<groupId>${project.groupId}</groupId>

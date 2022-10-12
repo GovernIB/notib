@@ -34,6 +34,8 @@ import es.caib.notib.logic.intf.dto.notenviament.NotificacioEnviamentDatatableDt
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
+import es.caib.notib.logic.intf.exception.ValidationException;
+import es.caib.notib.logic.intf.exception.WriteCsvException;
 import es.caib.notib.logic.intf.rest.consulta.Estat;
 import es.caib.notib.logic.intf.rest.consulta.Persona;
 import es.caib.notib.logic.intf.rest.consulta.PersonaTipus;
@@ -75,12 +77,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.io.ICsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -772,9 +780,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 			columnes[23] = messageHelper.getMessage("enviament.service.exportacio.estat.processat.date");
 
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-			List<String[]> files = new ArrayList<String[]>();
+			List<String[]> files = new ArrayList<>();
 			boolean llibreOrgan = !entitatEntity.isLlibreEntitat();
-			
+
+			var dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
 			for (NotificacioEnviamentEntity enviament : enviaments) {
 				String[] fila = new String[numColumnes];
 				String csvUuid = "";
@@ -785,7 +795,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					csvUuid = enviament.getNotificacio().getDocument().getUuid();
 				}
 
-				fila[0] = enviament.getCreatedDate().isPresent() ? sdf.format(enviament.getCreatedDate()) : "";
+
+				fila[0] = enviament.getCreatedDate().isPresent() ? dtf.format(enviament.getCreatedDate().get()) : "";
 				fila[1] = enviament.getNotificacio().getEnviamentDataProgramada() != null ? sdf.format(enviament.getNotificacio().getEnviamentDataProgramada()) : "";
 				fila[2] = enviament.getNotificaIdentificador();
 				fila[3] = enviament.getNotificacio().getProcedimentCodiNotib();
@@ -798,39 +809,92 @@ public class EnviamentServiceImpl implements EnviamentService {
 				fila[10] = enviament.getTitular().getNif();
 				fila[11] = enviament.getTitular().getNom();
 				fila[12] = enviament.getTitular().getEmail();
-				fila[13] = (enviament.getDestinataris().size() > 0) ? enviament.getDestinataris().get(0).getNif() : null;
+				fila[13] = enviament.getDestinataris().size() > 0 ? enviament.getDestinataris().get(0).getNif() : null;
 				if (llibreOrgan) {
 					if (enviament.getNotificacio().getProcediment() != null)
 						fila[14] = enviament.getNotificacio().getProcediment().getOrganGestor().getLlibre();
 				} else {
 					fila[14] = entitatEntity.getLlibre();
 				}
-				fila[15] = String.valueOf(enviament.getNotificacio().getRegistreNumero());
-				fila[16] = (enviament.getNotificacio().getRegistreData() != null)? enviament.getNotificacio().getRegistreData().toString() : "";
+				fila[15] = enviament.getNotificacio().getRegistreNumero() != null ? String.valueOf(enviament.getNotificacio().getRegistreNumero()) : "";
+				fila[16] = enviament.getNotificacio().getRegistreData() != null? sdf.format(enviament.getNotificacio().getRegistreData()) : "";
 				fila[17] = enviament.getNotificacio().getCaducitat() != null ? sdf.format(enviament.getNotificacio().getCaducitat()) : "";
 				fila[19] = enviament.getNotificaCertificacioNumSeguiment();
 				fila[20] = csvUuid;
 				fila[21] = enviament.getNotificacio().getEstat().name();
-				fila[22] = (enviament.getNotificacio().getEstatDate() != null ? enviament.getNotificacio().getEstatDate() + "" : "");
-				fila[23] = (enviament.getNotificacio().getEstatProcessatDate() != null ? enviament.getNotificacio().getEstatProcessatDate() + "" : "");
+				fila[22] = enviament.getNotificacio().getEstatDate() != null ? sdf.format(enviament.getNotificacio().getEstatDate()) + "" : "";
+				fila[23] = enviament.getNotificacio().getEstatProcessatDate() != null ? sdf.format(enviament.getNotificacio().getEstatProcessatDate()) + "" : "";
 				files.add(fila);
 			}
 
 			FitxerDto fitxer = new FitxerDto();
 			// TODO: Substutuit la llibreria jopendocument
-//			if (!"ODS".equalsIgnoreCase(format)) {
-//				throw new ValidationException("Format de fitxer no suportat: " + format);
-//			}
+			if (!"ODS".equalsIgnoreCase(format)) {
+				throw new ValidationException("Format de fitxer no suportat: " + format);
+			}
 //			Object[][] filesArray = files.toArray(new Object[files.size()][numColumnes]);
-//			TableModel model = new DefaultTableModel(filesArray, columnes);
 //			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//			SpreadSheet.createEmpty(model).getPackage().save(baos);
-//			fitxer.setNom("exportacio.ods");
+//
+//			SpreadSheet spreadSheet = new SpreadSheet();
+//			Sheet sheet = new Sheet("Fulla 1");
+//			sheet.appendRows(files.size() + 1);
+//			sheet.appendColumns(24);
+//			sheet.getRange(0, 0, 1, 24).setValues(columnes);
+//			sheet.getRange(0, 0, 1, 24).setFontBold(true);
+//			sheet.getRange(1, 0 , files.size(), 24).setValues(filesArray);
+//			spreadSheet.appendSheet(sheet);
+//			spreadSheet.save(baos);
+//			var contingut = baos.toByteArray();
+
+			StringWriter writerList = new StringWriter();
+			ICsvListWriter listWriter = initCsvWritter(writerList);
+			writeCsvHeader(listWriter, columnes);
+
+			files.forEach(f -> writeCsvLinia(listWriter, f));
+
+			listWriter.flush();
+			var contingut = writerList.toString().getBytes();
+			writeCsvClose(listWriter);
+
+			fitxer.setNom("exportacio.csv");
 //			fitxer.setContentType("application/vnd.oasis.opendocument.spreadsheet");
-//			fitxer.setContingut(baos.toByteArray());
+			fitxer.setContentType("text/csv");
+			fitxer.setContingut(contingut);
+
 			return fitxer;
 		} finally {
 			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private ICsvListWriter initCsvWritter(Writer writer) {
+		return new CsvListWriter(writer, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
+	}
+	private ICsvListWriter writeCsvHeader(ICsvListWriter listWriter, String[] csvHeader) {
+		try {
+			listWriter.writeHeader(csvHeader);
+			return listWriter;
+		} catch (IOException e) {
+			log.error("S'ha produït un error a l'escriure la capçalera de l'fitxer CSV.", e);
+			throw new WriteCsvException(messageHelper.getMessage("error.escriure.capcalera.fitxer.csv"));
+		}
+	}
+	private void writeCsvLinia(ICsvListWriter listWriter, String... linia) {
+		try {
+			listWriter.write(linia);
+		} catch (IOException e) {
+			log.error("S'ha produït un error a l'escriure la línia en el fitxer CSV.", e);
+			throw new WriteCsvException(messageHelper.getMessage("error.escriure.linia.fitxer.csv"));
+		}
+	}
+	private void writeCsvClose(ICsvListWriter listWriter) {
+		try {
+			if( listWriter != null ) {
+				listWriter.close();
+			}
+		} catch (IOException e) {
+			log.error("S'ha produït un error a l'tancar el fitxer CSV.", e);
+			throw new WriteCsvException(messageHelper.getMessage("error.tancar.fitxer.csv"));
 		}
 	}
 

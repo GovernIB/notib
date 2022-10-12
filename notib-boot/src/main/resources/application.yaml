@@ -74,3 +74,18 @@ logging:
 #    org.keycloak: DEBUG
 #    org.springframework: DEBUG
 #    org.hibernate: DEBUG
+
+es:
+  caib:
+    notib:
+      plugin:
+        dades:
+          usuari:
+            pluginsib:
+              userinformation:
+                keycloak:
+                  serverurl: http://localhost:8081/auth/
+                  realm: GOIB
+                  client_id: goib-ws
+                  client_id_for_user_autentication: goib-ws
+                  password_secret: d5c15941-64f1-4097-9da1-3d447fa37ab7

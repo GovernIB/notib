@@ -15,7 +15,7 @@ import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacio;
 import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
 import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
-import es.caib.notib.logic.helper.UsuariHelper;
+import es.caib.notib.ejb.helper.UsuariHelper;
 import es.caib.notib.logic.intf.ws.notificacio.NotificacioServiceWsException;
 import org.springframework.beans.factory.annotation.Autowired;
 
