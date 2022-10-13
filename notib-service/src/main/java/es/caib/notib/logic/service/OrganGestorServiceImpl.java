@@ -472,6 +472,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 
 	@Override
+	@Transactional
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
@@ -504,6 +505,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			//		progres.incrementOperacionsRealitzades();	// 2%
 			progres.setProgres(2);
 			Long tf = System.currentTimeMillis();
+			List<String> codis = new ArrayList<>();
+			for (NodeDir3 u : unitatsWs) {
+				codis.add(u.getCodi());
+			}
+			obsoleteUnitats = calcularExitngides(codis);
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi.resultat", new Object[]{unitatsWs.size()}));
@@ -569,7 +575,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			ti = tf;
 			progres.setFase(5);
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar"));
-			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
+//			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
 			//		progres.incrementOperacionsRealitzades();	// 99%
 			progres.setProgres(99);
 			tf = System.currentTimeMillis();
@@ -599,7 +605,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();
 
 		if (isFirstSincronization) {
-			return PrediccioSincronitzacio.builder().isFirstSincronization(isFirstSincronization).unitatsVigents(predictFirstSynchronization(entitat)).build();
+			return predictFirstSynchronization(entitat);
 		}
 		try {
 			// Obtenir lista de canvis del servei web
@@ -685,11 +691,41 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 
-	private List<UnitatOrganitzativaDto> predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
+
+	private PrediccioSincronitzacio predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
 
 		EntitatDto e = conversioTipusHelper.convertir(entitat, EntitatDto.class);
 		List<NodeDir3> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindByPare(e, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
-		return conversioTipusHelper.convertirList(unitatsVigentsWS, UnitatOrganitzativaDto.class);
+		List<UnitatOrganitzativaDto> vigents = conversioTipusHelper.convertirList(unitatsVigentsWS, UnitatOrganitzativaDto.class);
+		List<String> codis = new ArrayList<>();
+		List<UnitatOrganitzativaDto> noves = new ArrayList<>();
+		OrganGestorEntity o;
+		for (UnitatOrganitzativaDto u : vigents) {
+			o = organGestorRepository.findByCodi(u.getCodi());
+			if (o == null) {
+				noves.add(u);
+				continue;
+			}
+			codis.add(u.getCodi());
+		}
+		List<OrganGestorEntity> extingides = calcularExitngides(codis);
+		List<UnitatOrganitzativaDto> ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
+		List<UnitatOrganitzativaDto> n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
+		return PrediccioSincronitzacio.builder().isFirstSincronization(true).unitatsVigents(vigents).unitatsNew(n).unitatsExtingides(ex).build();
+	}
+
+	private List<OrganGestorEntity> calcularExitngides(List<String> codis) {
+		List<OrganGestorEntity> extingides = new ArrayList<>();
+		int maxInSize = 1000;
+		int nParts = (codis.size() / maxInSize) + 1;
+		int inici = 0;
+		int fi = codis.size() - maxInSize > 0 ? maxInSize - 1 : codis.size() - 1 ;
+		for (int foo= 0; foo < nParts; foo++) {
+			extingides.addAll(organGestorRepository.findByCodiNotIn(codis.subList(inici, fi)));
+			inici = fi + 1 ;
+			fi = codis.size() - inici > maxInSize ? maxInSize : codis.size() - 1;
+		}
+		return extingides;
 	}
 
 	@Override

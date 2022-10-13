@@ -24,6 +24,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
+import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.persist.audit.NotibAuditable;
@@ -396,7 +397,16 @@ public class ConversioTipusHelper {
 //				field("procser", "procSer").
 				byDefault().
 				register();
-
+		mapperFactory.classMap(OrganGestorEntity.class, UnitatOrganitzativaDto.class)
+				.customize(
+						new CustomMapper<OrganGestorEntity, UnitatOrganitzativaDto>() {
+							public void mapAtoB(OrganGestorEntity a, UnitatOrganitzativaDto b, MappingContext context) {
+								// add your custom mapping code here
+								b.setDenominacio(a.getNom());
+							}
+						})
+				.byDefault()
+				.register();
 		defineConverters();
 	}
 

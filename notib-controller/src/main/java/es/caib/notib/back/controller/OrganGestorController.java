@@ -256,9 +256,12 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
 			model.addAttribute("isUpdatingOrgans", organGestorService.isUpdatingOrgans(entitat));
 			return "synchronizationPrediction";
-		} catch (Exception e) {
-			log.error("Error al obtenir la predicció de la sincronitzacio", e);
-			return getModalControllerReturnValueErrorMessageText(request, redirect, e.getMessage());
+		} catch (Exception ex) {
+			log.error("Error al obtenir la predicció de la sincronitzacio", ex);
+			String msg = "organgestor.actualitzacio.sense.canvis";
+			return ex.getMessage() != null && ex.getMessage().contains(getMessage(request,msg))
+					? getModalControllerReturnValueSuccess(request, redirect, msg, new Object[] {entitat.getDir3Codi()})
+					: getModalControllerReturnValueErrorMessageText(request, redirect, ex.getMessage());
 		}
 	}
 

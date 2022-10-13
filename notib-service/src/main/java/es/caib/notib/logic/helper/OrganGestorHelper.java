@@ -266,7 +266,7 @@ public class OrganGestorHelper {
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
 		}
 		progres.setProgres(22);
-		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+//		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
 		// Definint tipus de transició
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();

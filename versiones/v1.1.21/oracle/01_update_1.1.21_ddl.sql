@@ -7,6 +7,7 @@ ALTER TABLE not_organ_gestor ADD sir NUMBER(1) DEFAULT '0';
 ALTER TABLE not_organ_gestor ADD tipus_transicio VARCHAR2(12 CHAR);
 
 ALTER TABLE not_procediment ADD organ_no_sinc NUMBER(1) DEFAULT '0';
+ALTER TABLE not_procediment ADD actiu NUMBER(1) DEFAULT '1';
 
 ALTER TABLE not_entitat ADD data_sincronitzacio TIMESTAMP;
 
