@@ -42,7 +42,7 @@
 <!--		<lombok.version>1.18.12</lombok.version>-->
 <!--	  	<liquibase.version>4.4.3</liquibase.version>-->
 <!--		<apache.poi.version>4.1.2</apache.poi.version>-->
-		<xdocreport.version>2.0.2</xdocreport.version>
+		<xdocreport.version>2.0.4</xdocreport.version>
 		<itext.pdf.version>5.5.13.3</itext.pdf.version>
 	  	<docker.image.prefix>280421</docker.image.prefix>
 <!--		<docker.image.name>notib</docker.image.name>-->

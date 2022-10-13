@@ -2,12 +2,18 @@ package es.caib.notib.logic.intf.dto.procediment;
 
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter @Setter
 public class ProcSerSimpleDto extends AuditoriaDto implements Serializable{
 

@@ -1,24 +1,5 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.client.domini.DocumentTipusEnumDto;
-import es.caib.notib.client.domini.IdiomaEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.TipusDocumentalEnum;
-import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.logic.intf.dto.*;
-import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
-import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
-import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
-import es.caib.notib.logic.intf.service.*;
 import es.caib.notib.back.command.DocumentCommand;
 import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.command.EnviamentCommand;
@@ -33,9 +14,53 @@ import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.PropertiesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
+import es.caib.notib.client.domini.DocumentTipusEnumDto;
+import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.OrigenEnum;
+import es.caib.notib.client.domini.TipusDocumentalEnum;
+import es.caib.notib.client.domini.ValidesaEnum;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.logic.intf.dto.DocumentDto;
+import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.GrupDto;
+import es.caib.notib.logic.intf.dto.LocalitatsDto;
+import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.PaisosDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProvinciesDto;
+import es.caib.notib.logic.intf.dto.RegistreDocumentacioFisicaEnumDto;
+import es.caib.notib.logic.intf.dto.RespostaConsultaArxiuDto;
+import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentDto;
+import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
+import es.caib.notib.logic.intf.dto.UsuariDto;
+import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
+import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
+import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganCacheDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
+import es.caib.notib.logic.intf.service.AplicacioService;
+import es.caib.notib.logic.intf.service.EntitatService;
+import es.caib.notib.logic.intf.service.GestioDocumentalService;
+import es.caib.notib.logic.intf.service.GrupService;
+import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PagadorCieFormatFullaService;
+import es.caib.notib.logic.intf.service.PagadorCieFormatSobreService;
+import es.caib.notib.logic.intf.service.ProcedimentService;
+import es.caib.notib.logic.intf.service.ServeiService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import java.util.Base64;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
@@ -61,6 +86,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -170,17 +196,17 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("entitat", entitatActual);
         UsuariDto usuariActual = aplicacioService.getUsuariActual();
 
-        Set<ProcSerSimpleDto> procedimentsDisponibles = new HashSet<ProcSerSimpleDto>();
+        Set<ProcSerCacheDto> procedimentsDisponibles = new HashSet<>();
         List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
 
         if (RolHelper.isUsuariActualUsuari(request)) {
-        	List<ProcSerSimpleDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-        	List<ProcSerSimpleDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
+        	List<ProcSerCacheDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+        	List<ProcSerCacheDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
         	procedimentsDisponibles.addAll(procedimentsDisponiblesPerNotificacio);
         	procedimentsDisponibles.addAll(procedimentsDisponiblesPerComunicacioSir);
             model.addAttribute("procediments", procedimentsDisponibles);
-            List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-            for (ProcSerSimpleDto pro : procedimentsDisponibles) {
+            List<Long> procedimentsDisponiblesIds = new ArrayList<>();
+            for (ProcSerCacheDto pro : procedimentsDisponibles) {
                 procedimentsDisponiblesIds.add(pro.getId());
             }
             organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
@@ -419,7 +445,7 @@ public class NotificacioFormController extends BaseUserController {
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
-        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ?
+        	List<ProcSerOrganCacheDto> procedimentsOrgansAmbPermis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ?
                     procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR)
                     :  procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
             dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));

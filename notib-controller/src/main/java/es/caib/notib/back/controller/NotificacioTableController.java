@@ -245,7 +245,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
                 for (Map.Entry<EnviamentEstat, Integer> entry : item.getContadorEstat().entrySet()) {
                     estat += "<div style=\"font-size:11px;" + boxShadow + entry.getKey().getColor() + padding + "\">" +
-                            entry.getValue() + " " + getMessage(request, "es.caib.notib.core.api.dto.EnviamentEstat." + entry.getKey())
+                            entry.getValue() + " " + getMessage(request, "es.caib.notib.logic.intf.dto.EnviamentEstat." + entry.getKey())
                             + "</div>";
                 }
             }
