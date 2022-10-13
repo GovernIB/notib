@@ -27,6 +27,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Getter
+@Setter
 @Entity
 @Table(name = "not_organ_gestor")
 @EntityListeners(AuditingEntityListener.class)

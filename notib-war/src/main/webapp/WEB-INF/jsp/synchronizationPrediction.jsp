@@ -294,39 +294,39 @@
 	<div class="panel-group prediccio">
 	
 		<!-- If this is first sincronization it shows all currently vigent unitats that will be created in db  -->
-		<c:if test="${isFirstSincronization}">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<spring:message
-						code="organgestor.synchronize.prediction.firstSincroHeader" />
-				</div>
-				<div class="panel-body">
+<%--		<c:if test="${isFirstSincronization}">--%>
+<%--			<div class="panel panel-default">--%>
+<%--				<div class="panel-heading">--%>
+<%--					<spring:message--%>
+<%--						code="organgestor.synchronize.prediction.firstSincroHeader" />--%>
+<%--				</div>--%>
+<%--				<div class="panel-body">--%>
 
-					<c:if test="${empty unitatsVigents}">
-						<spring:message code="organgestor.synchronize.prediction.firstSincroNoUnitatsVigent" />
-					</c:if>
+<%--					<c:if test="${empty unitatsVigents}">--%>
+<%--						<spring:message code="organgestor.synchronize.prediction.firstSincroNoUnitatsVigent" />--%>
+<%--					</c:if>--%>
 
-					<c:if test="${!empty unitatsVigents}">
-						<c:forEach var="unitatVigentFirstSincro" items="${unitatsVigents}">
+<%--					<c:if test="${!empty unitatsVigents}">--%>
+<%--						<c:forEach var="unitatVigentFirstSincro" items="${unitatsVigents}">--%>
 
-							<div class=horizontal-left>
-								<div id="wrapper">
-									<span class="label bg-success border-green overflow-ellipsis create-label"></span>
-									<div class="branch lv1">
-										<div class="entry sole">
-											<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacio}">
-													${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacio}
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</c:forEach>
-					</c:if>
-				</div>
-			</div>
-		</c:if>
-		<c:if test="${!isFirstSincronization}">
+<%--							<div class=horizontal-left>--%>
+<%--								<div id="wrapper">--%>
+<%--									<span class="label bg-success border-green overflow-ellipsis create-label"></span>--%>
+<%--									<div class="branch lv1">--%>
+<%--										<div class="entry sole">--%>
+<%--											<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacio}">--%>
+<%--													${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacio}--%>
+<%--											</span>--%>
+<%--										</div>--%>
+<%--									</div>--%>
+<%--								</div>--%>
+<%--							</div>--%>
+<%--						</c:forEach>--%>
+<%--					</c:if>--%>
+<%--				</div>--%>
+<%--			</div>--%>
+<%--		</c:if>--%>
+<%--		<c:if test="${!isFirstSincronization}">--%>
 
 			<!-- If unitats didn't change from the last time of synchronization show message: no changes -->
 			<c:if test="${isAllEmpty}">
@@ -516,7 +516,7 @@
 					</div>
 				</div>
 			</c:if>
-		</c:if>
+<%--		</c:if>--%>
 
 	</div>
 
