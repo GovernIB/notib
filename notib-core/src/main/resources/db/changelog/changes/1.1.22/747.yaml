@@ -39,14 +39,14 @@ databaseChangeLog:
                 columns:
                     - column:
                         constraints:
-                        nullable: false
-                        primaryKey: true
-                        primaryKeyName: DIS_MON_INT_PK
+                            nullable: false
+                            primaryKey: true
+                            primaryKeyName: NOT_MON_INT_PK
                         name: ID
                         type: ${type.pk}
                     - column:
                         constraints:
-                        nullable: false
+                            nullable: false
                         name: CODI
                         type: varchar(100 ${varcharUnit})
                     - column:
@@ -76,6 +76,32 @@ databaseChangeLog:
                     - column:
                         name: excepcio_stacktrace
                         type: varchar(2048 ${varcharUnit})
-                tableName: DIS_MON_INT
-                sql : "ALTER TABLE DIS_MON_INT ADD (CONSTRAINT DIS_MON_INT_PK PRIMARY KEY (ID));
-                    GRANT SELECT, UPDATE, INSERT, DELETE ON DIS_MON_INT TO WWW_NOTIB;"
+                tableName: NOT_MON_INT
+            - createTable:
+                columns:
+                    - column:
+                          constraints:
+                              nullable: false
+                              primaryKey: true
+                              primaryKeyName: NOT_MON_INT_PARAM_PK
+                          name: ID
+                          type: ${type.pk}
+                    - column:
+                          constraints:
+                              nullable: false
+                          name: MON_INT_ID
+                          type: ${type.pk}
+                    - column:
+                        constraints:
+                            nullable: false
+                        name: nom
+                        type: varchar(64 ${varcharUnit})
+                    - column:
+                          name: descripcio
+                          type: varchar(1024 ${varcharUnit})
+                tableName: NOT_MON_INT_PARAM
+            - sql : "ALTER TABLE NOT_MON_INT ADD (CONSTRAINT NOT_MON_INT_PK PRIMARY KEY (ID));
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT TO WWW_NOTIB;
+                    ALTER TABLE NOT_MON_INT_PARAM ADD (CONSTRAINT NOT_MON_INT_PARAM_PK PRIMARY KEY (ID));
+                    ALTER TABLE NOT_MON_INT_PARAM ADD CONSTRAINT NOT_MONINTPARAM_MONINT_FK FOREIGN KEY (MON_INT_ID) REFERENCES NOT_MON_INT(ID);
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT_PARAM TO WWW_NOTIB;"
