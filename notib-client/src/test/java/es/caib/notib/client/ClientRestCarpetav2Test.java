@@ -26,8 +26,8 @@ public class ClientRestCarpetav2Test {
 	private static final String PASSWORD = "admin";
 
 //	private static final String URL = "https://dev.caib.es/notib";
-//	private static final String USERNAME = "$ripea_notib";
-//	private static final String PASSWORD = "ripea_notib";
+//	private static final String USERNAME = "$carpeta_notib";
+//	private static final String PASSWORD = "carpeta_notib";
 
 	private static final String DNI_TITULAR = "18225486x";
 	private static final String DATA_INICI = "07/02/2022";
