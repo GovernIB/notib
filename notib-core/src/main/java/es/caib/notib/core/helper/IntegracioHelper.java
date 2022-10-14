@@ -8,8 +8,10 @@ import es.caib.notib.core.api.dto.IntegracioFiltreDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
+import es.caib.notib.core.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -42,6 +44,8 @@ public class IntegracioHelper {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private AplicacioRepository aplicacioRepository;
+	@Autowired
+	private MonitorIntegracioRepository monitorRepository;
 	
 	public static final int DEFAULT_MAX_ACCIONS = 250;
 
@@ -219,6 +223,10 @@ public class IntegracioHelper {
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
+		MonitorIntegracioEntity m = MonitorIntegracioEntity.builder().codi(integracioCodi).data(accio.getData()).descripcio(accio.getDescripcio()).tipus(accio.getTipus())
+				.tempsResposta(accio.getTempsResposta()).estat(accio.getEstat()).codiUsuari(getUsuariNomCodi(obtenirUsuari)).codiEntitat(accio.getCodiEntitat())
+				.descripcio(accio.getDescripcio()).excepcioMessage(accio.getExcepcioMessage()).excepcioStacktrace(accio.getExcepcioStacktrace()).build();
+		monitorRepository.save(m);
 		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 		if (accions == null) {
 			accions = new LinkedList<>();
