@@ -240,8 +240,8 @@ public class OrganGestorController extends BaseUserController{
 	@RequestMapping(value = "/sync/dir3", method = RequestMethod.GET)
 	public String syncDir3(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		String redirect = "redirect:../../organgestor";
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var redirect = "redirect:../../organgestor";
 		if (entitat.getDir3Codi() == null || entitat.getDir3Codi().isEmpty()) {
 			return getAjaxControllerReturnValueError(request, redirect, "L'entitat actual no té cap codi DIR3 associat");
 		}
@@ -258,9 +258,10 @@ public class OrganGestorController extends BaseUserController{
 			return "synchronizationPrediction";
 		} catch (Exception ex) {
 			log.error("Error al obtenir la predicció de la sincronitzacio", ex);
-			String msg = "organgestor.actualitzacio.sense.canvis";
-			return ex.getMessage() != null && ex.getMessage().contains(getMessage(request,msg))
-					? getModalControllerReturnValueSuccess(request, redirect, msg, new Object[] {entitat.getDir3Codi()})
+			var msg = "[NC-007]";
+			var text = "organgestor.actualitzacio.sense.canvis";
+			return ex.getMessage() != null && ex.getMessage().contains(msg)
+					? getModalControllerReturnValueSuccess(request, redirect, text, new Object[] {entitat.getDir3Codi()})
 					: getModalControllerReturnValueErrorMessageText(request, redirect, ex.getMessage());
 		}
 	}
