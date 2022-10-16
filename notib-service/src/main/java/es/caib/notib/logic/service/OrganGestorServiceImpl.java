@@ -1414,11 +1414,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			organExsitent = buscarOrgan(node.getCodi());
 			o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
 			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, o);
-			if (!filtres.isEmpty() && filtres.filtresOk(o)) {
+			boolean ok = filtres.filtresOk(o);
+			if (!filtres.isEmpty() && ok) {
 				actual.setRetornatFiltre(true);
 			}
 			List<ArbreNode<OrganGestorDto>> nets = generarFillsArbre(organs, actual, node.getCodi(), filtres);
 			actual.setFills(nets);
+			if (nets != null && nets.isEmpty() && !ok) {
+				continue;
+			}
 			nodes.add(actual);
 		}
 		return nodes;

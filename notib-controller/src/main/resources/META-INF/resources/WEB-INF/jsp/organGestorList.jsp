@@ -169,6 +169,12 @@
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'V'}}
 							<spring:message code="es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.V"/>
+						{{else estat == 'E'}}
+							<spring:message code="es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.E"/>
+						{{else estat == 'A'}}
+							<spring:message code="es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.A"/>
+						{{else estat == 'T'}}
+							<spring:message code="es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.T"/>
 						{{else}}
 							<spring:message code="es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.ALTRES"/>
 						{{/if}}
