@@ -442,7 +442,15 @@
 			<c:if test="${!empty unitatsVigents}">
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<spring:message code="organgestor.synchronize.prediction.atributesChanged" />
+						<c:choose>
+							<c:when test="${isFirstSincronization}">
+								<spring:message code="organgestor.synchronize.prediction.primera.sync.atributesChanged" />
+							</c:when>
+							<c:otherwise>
+								<spring:message code="organgestor.synchronize.prediction.atributesChanged" />
+							</c:otherwise>
+						</c:choose>
+
 					</div>
 					<div class="panel-body">
 						<c:forEach var="unitatVigent" items="${unitatsVigents}">
