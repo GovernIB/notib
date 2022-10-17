@@ -24,6 +24,8 @@ public class OrganGestorFiltreDto extends AuditoriaDto implements Serializable {
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
 
+	private boolean isFiltre;
+
 	private static final long serialVersionUID = -2393511650074099319L;
 
 	public boolean isEmpty() {
