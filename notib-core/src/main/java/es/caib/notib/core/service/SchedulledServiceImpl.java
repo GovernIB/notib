@@ -16,6 +16,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EnviamentHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
@@ -75,6 +76,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -330,7 +333,14 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
     }
 
-    private void esborrarTemporals(String dir) throws Exception {
+	@Override
+	public void monitorIntegracionsEliminarAntics() {
+
+//		configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE)
+//		integracioHelper.eliminarAntics()
+	}
+
+	private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
 			return;

@@ -13,6 +13,7 @@ import es.caib.notib.core.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,17 +128,13 @@ public class IntegracioHelper {
 
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		MonitorIntegracioEntity accio = new MonitorIntegracioEntity();
+		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio())
+			.tipus(info.getTipus()).codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK)
+//			.parametres(conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class))
+				.build();
+		addAccio(accio, obtenirUsuari);
 //		accio.setIntegracio(novaIntegracio(info.getCodi()));
-		accio.setData(new Date());
-		accio.setDescripcio(info.getDescripcio());
 //		accio.setAplicacio(info.getAplicacio());
-		accio.setParametres(conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class));
-		accio.setTipus(info.getTipus());
-		accio.setCodiEntitat(info.getCodiEntitat());
-		accio.setTempsResposta(info.getTempsResposta());
-		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
-		addAccio(info.getCodi(), accio, obtenirUsuari);
 	}
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio) {
@@ -156,22 +153,16 @@ public class IntegracioHelper {
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		MonitorIntegracioEntity accio = new MonitorIntegracioEntity();
+		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.ERROR).errorDescripcio(errorDescripcio)
+				.parametres(conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class)).build();
 //		accio.setIntegracio(novaIntegracio(info.getCodi()));
-		accio.setData(new Date());
-		accio.setDescripcio(info.getDescripcio());
 //		accio.setAplicacio(info.getAplicacio());
-		accio.setParametres(conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class));
-		accio.setTipus(info.getTipus());
-		accio.setCodiEntitat(info.getCodiEntitat());
-		accio.setTempsResposta(info.getTempsResposta());
-		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
-		accio.setErrorDescripcio(errorDescripcio);
 		if (throwable != null) {
 			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
 			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
 		}
-		addAccio(info.getCodi(),accio, obtenirUsuari);
+		addAccio(accio, obtenirUsuari);
 		log.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "(integracioCodi=" + info.getCodi() + ", "
 				+ "parametres=" + info.getParams() + ", tipus=" + info.getTipus() + ", tempsResposta=" + info.getTempsResposta() + ")", throwable);
 	}
@@ -186,14 +177,10 @@ public class IntegracioHelper {
 		return conversio.convertirList(monitorRepository.findAllByCodi(integracioCodi), IntegracioAccioDto.class);
 	}
 
-	private void addAccio(String integracioCodi, MonitorIntegracioEntity accio, boolean obtenirUsuari) {
+	private void addAccio(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
-		MonitorIntegracioEntity m = MonitorIntegracioEntity.builder().codi(integracioCodi).data(accio.getData()).descripcio(accio.getDescripcio()).tipus(accio.getTipus())
-				.tempsResposta(accio.getTempsResposta()).estat(accio.getEstat()).codiUsuari(getUsuariNomCodi(obtenirUsuari)).codiEntitat(accio.getCodiEntitat())
-				.descripcio(accio.getDescripcio()).excepcioMessage(accio.getExcepcioMessage()).excepcioStacktrace(accio.getExcepcioStacktrace())
-				.parametres(accio.getParametres()).build();
-		monitorRepository.saveAndFlush(m);
+		monitorRepository.saveAndFlush(accio);
 	}
 	
 	private void afegirParametreUsuari(MonitorIntegracioEntity accio, boolean obtenirUsuari) {

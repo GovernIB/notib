@@ -72,7 +72,7 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
     @Column(name = "excepcio_stacktrace", length = 2048)
     private String excepcioStacktrace;
 
-    @OneToMany(mappedBy = "monitorIntegracio", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
+    @OneToMany(mappedBy = "monitorIntegracioEntity", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
     private List<MonitorIntegracioParamEntity> parametres = new ArrayList<>();
 
 }
