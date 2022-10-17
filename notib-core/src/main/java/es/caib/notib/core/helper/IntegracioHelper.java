@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,6 +47,8 @@ public class IntegracioHelper {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private MonitorIntegracioRepository monitorRepository;
+	@Autowired
+	private ConversioTipusHelper conversio;
 	
 	public static final int DEFAULT_MAX_ACCIONS = 250;
 
@@ -104,11 +107,6 @@ public class IntegracioHelper {
 		return integracions;
 	}
 
-	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
-
-		return getLlistaAccions(integracioCodi, filtre);
-	}
-	
 	public Map<String, Integer> countErrorsGroupByCodi() {
 		Map<String ,Integer> errorsGroupByCodi = new HashMap<String, Integer>();
 		errorsGroupByCodi.put(INTCODI_USUARIS,countErrors(INTCODI_USUARIS));
@@ -130,7 +128,7 @@ public class IntegracioHelper {
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
 		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(info.getCodi()));
+//		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		accio.setData(new Date());
 		accio.setDescripcio(info.getDescripcio());
 		accio.setAplicacio(info.getAplicacio());
@@ -159,7 +157,7 @@ public class IntegracioHelper {
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
 		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(info.getCodi()));
+//		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		accio.setData(new Date());
 		accio.setDescripcio(info.getDescripcio());
 		accio.setAplicacio(info.getAplicacio());
@@ -193,23 +191,11 @@ public class IntegracioHelper {
 		}
 		return accionsAmbError;
 	}
-	
-	private synchronized LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, IntegracioFiltreDto filtre) {
+	@Transactional
+//	public synchronized List<IntegracioAccioDto> getLlistaAccions(String integracioCodi, IntegracioFiltreDto filtre) {
+	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
 
-		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
-		if (accions == null) {
-			accions = new LinkedList<>();
-			accionsIntegracio.put(integracioCodi, accions);
-			return accions;
-		}
-		LinkedList<IntegracioAccioDto> accionsBones = new LinkedList<>();
-		for (IntegracioAccioDto accio: accions) {
-			if (filtre != null && !filtre.filtresOK(accio, integracioCodi)) {
-				continue;
-			}
-			accionsBones.add(accio);
-		}
-		return accionsBones;
+		return conversio.convertirList(monitorRepository.findAllByCodi(integracioCodi), IntegracioAccioDto.class);
 	}
 	private int getMaxAccions(String integracioCodi) {
 		Integer max = maxAccionsIntegracio.get(integracioCodi);

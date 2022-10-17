@@ -68,6 +68,9 @@ databaseChangeLog:
                         name: codi_usuari
                         type: varchar(64 ${varcharUnit})
                     - column:
+                        name: codi_entitat
+                        type: varchar(64 ${varcharUnit})
+                    - column:
                         name: error_descripcio
                         type: varchar(1024 ${varcharUnit})
                     - column:

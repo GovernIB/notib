@@ -23,7 +23,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name="dis_mon_int_param")
+@Table(name="not_mon_int_param")
 @EntityListeners(AuditingEntityListener.class)
 public class MonitorIntegracioParamEntity extends AbstractPersistable<Long> {
 

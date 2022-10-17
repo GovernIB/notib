@@ -22,17 +22,18 @@ public class IntegracioAccioDto implements Serializable {
 	private Long index;
 	private Date data;
 	private String descripcio;
-	private String aplicacio;
-	private List<AccioParam> parametres;
-	private IntegracioDto integracio;
 	private IntegracioAccioTipusEnumDto tipus;
 	private long tempsResposta;
 	private IntegracioAccioEstatEnumDto estat;
-	private EntitatDto entitat;
+	private String codiUsuari;
 	private String codiEntitat;
 	private String errorDescripcio;
 	private String excepcioMessage;
 	private String excepcioStacktrace;
+	private List<AccioParam> parametres;
+	private String aplicacio;
+//	private IntegracioDto integracio;
+//	private EntitatDto entitat;
 
 	public int getParametresCount() {
 		if (parametres == null) {
