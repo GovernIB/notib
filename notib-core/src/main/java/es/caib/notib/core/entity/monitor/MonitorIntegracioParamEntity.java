@@ -33,9 +33,9 @@ public class MonitorIntegracioParamEntity extends AbstractPersistable<Long> {
     private MonitorIntegracioEntity monitorIntegracio;
 
     @Column(name = "nom", length = 256, nullable = false)
-    private String nom;
+    private String codi;
 
     @Column(name = "descripcio", length = 1024)
-    private String descripcio;
+    private String valor;
 
 }

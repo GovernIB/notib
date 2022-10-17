@@ -9,13 +9,12 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.entity.AplicacioEntity;
 import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.entity.monitor.MonitorIntegracioEntity;
+import es.caib.notib.core.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,32 +64,32 @@ public class IntegracioHelper {
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
 
 	private static Map<String, Integer> maxAccionsIntegracio = new HashMap<>();
-	private static Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<>();
+//	private static Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = new HashMap<>();
 
-	static {
-		LinkedList<IntegracioAccioDto> listAccionsUsuaris = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_USUARIS, listAccionsUsuaris);
-		LinkedList<IntegracioAccioDto> listAccionsRegistre = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_REGISTRE, listAccionsRegistre);
-		LinkedList<IntegracioAccioDto> listAccionsNotifica = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_NOTIFICA, listAccionsNotifica);
-		LinkedList<IntegracioAccioDto> listAccionsArxiu = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_ARXIU, listAccionsArxiu);
-		LinkedList<IntegracioAccioDto> listAccionsClient = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_CLIENT, listAccionsClient);
-		LinkedList<IntegracioAccioDto> listAccionsGestDoc = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_GESDOC, listAccionsGestDoc);
-		LinkedList<IntegracioAccioDto> listAccionsUnitats = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_UNITATS, listAccionsUnitats);
-		LinkedList<IntegracioAccioDto> listAccionsRolsac = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_GESCONADM, listAccionsRolsac);
-		LinkedList<IntegracioAccioDto> listAccionsProcediments = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_PROCEDIMENT, listAccionsProcediments);
-		LinkedList<IntegracioAccioDto> listAccionsConvert = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_CONVERT, listAccionsConvert);
-		LinkedList<IntegracioAccioDto> listAccionsFirma = new LinkedList<>();
-		accionsIntegracio.put(INTCODI_FIRMASERV, listAccionsFirma);
-	}
+//	static {
+//		LinkedList<IntegracioAccioDto> listAccionsUsuaris = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_USUARIS, listAccionsUsuaris);
+//		LinkedList<IntegracioAccioDto> listAccionsRegistre = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_REGISTRE, listAccionsRegistre);
+//		LinkedList<IntegracioAccioDto> listAccionsNotifica = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_NOTIFICA, listAccionsNotifica);
+//		LinkedList<IntegracioAccioDto> listAccionsArxiu = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_ARXIU, listAccionsArxiu);
+//		LinkedList<IntegracioAccioDto> listAccionsClient = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_CLIENT, listAccionsClient);
+//		LinkedList<IntegracioAccioDto> listAccionsGestDoc = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_GESDOC, listAccionsGestDoc);
+//		LinkedList<IntegracioAccioDto> listAccionsUnitats = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_UNITATS, listAccionsUnitats);
+//		LinkedList<IntegracioAccioDto> listAccionsRolsac = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_GESCONADM, listAccionsRolsac);
+//		LinkedList<IntegracioAccioDto> listAccionsProcediments = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_PROCEDIMENT, listAccionsProcediments);
+//		LinkedList<IntegracioAccioDto> listAccionsConvert = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_CONVERT, listAccionsConvert);
+//		LinkedList<IntegracioAccioDto> listAccionsFirma = new LinkedList<>();
+//		accionsIntegracio.put(INTCODI_FIRMASERV, listAccionsFirma);
+//	}
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<>();
@@ -125,14 +124,15 @@ public class IntegracioHelper {
 	public void addAccioOk(IntegracioInfo info) {
 		addAccioOk(info, true);
 	}
+
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		IntegracioAccioDto accio = new IntegracioAccioDto();
+		MonitorIntegracioEntity accio = new MonitorIntegracioEntity();
 //		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		accio.setData(new Date());
 		accio.setDescripcio(info.getDescripcio());
-		accio.setAplicacio(info.getAplicacio());
-		accio.setParametres(info.getParams());
+//		accio.setAplicacio(info.getAplicacio());
+		accio.setParametres(conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class));
 		accio.setTipus(info.getTipus());
 		accio.setCodiEntitat(info.getCodiEntitat());
 		accio.setTempsResposta(info.getTempsResposta());
@@ -156,12 +156,12 @@ public class IntegracioHelper {
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		IntegracioAccioDto accio = new IntegracioAccioDto();
+		MonitorIntegracioEntity accio = new MonitorIntegracioEntity();
 //		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		accio.setData(new Date());
 		accio.setDescripcio(info.getDescripcio());
-		accio.setAplicacio(info.getAplicacio());
-		accio.setParametres(info.getParams());
+//		accio.setAplicacio(info.getAplicacio());
+		accio.setParametres(conversio.convertirList(info.getParams(), MonitorIntegracioParamEntity.class));
 		accio.setTipus(info.getTipus());
 		accio.setCodiEntitat(info.getCodiEntitat());
 		accio.setTempsResposta(info.getTempsResposta());
@@ -172,76 +172,36 @@ public class IntegracioHelper {
 			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
 		}
 		addAccio(info.getCodi(),accio, obtenirUsuari);
-		logger.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "("
-				+ "integracioCodi=" + info.getCodi() + ", "
-				+ "parametres=" + info.getParams() + ", "
-				+ "tipus=" + info.getTipus() + ", "
-				+ "tempsResposta=" + info.getTempsResposta() + ")",
-				throwable);
+		log.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "(integracioCodi=" + info.getCodi() + ", "
+				+ "parametres=" + info.getParams() + ", tipus=" + info.getTipus() + ", tempsResposta=" + info.getTempsResposta() + ")", throwable);
 	}
 
 	private Integer countErrors(String codi) {
-		Integer accionsAmbError = 0;
-		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(codi);
-		if (accions != null) {
-			for (IntegracioAccioDto integracioAccioDto : accions) {
-				if (integracioAccioDto.getEstat().equals(IntegracioAccioEstatEnumDto.ERROR))
-					accionsAmbError++;
-			}
-		}
-		return accionsAmbError;
+		return monitorRepository.countByCodiAndEstat(codi, IntegracioAccioEstatEnumDto.ERROR);
 	}
+
 	@Transactional
-//	public synchronized List<IntegracioAccioDto> getLlistaAccions(String integracioCodi, IntegracioFiltreDto filtre) {
 	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
 
 		return conversio.convertirList(monitorRepository.findAllByCodi(integracioCodi), IntegracioAccioDto.class);
 	}
-	private int getMaxAccions(String integracioCodi) {
-		Integer max = maxAccionsIntegracio.get(integracioCodi);
-		if (max == null) {
-			max = new Integer(DEFAULT_MAX_ACCIONS);
-			maxAccionsIntegracio.put(integracioCodi, max);
-		}
-		return max.intValue();
-	}
 
-	private void addAccio(String integracioCodi, IntegracioAccioDto accio, boolean obtenirUsuari) {
+	private void addAccio(String integracioCodi, MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
 		MonitorIntegracioEntity m = MonitorIntegracioEntity.builder().codi(integracioCodi).data(accio.getData()).descripcio(accio.getDescripcio()).tipus(accio.getTipus())
 				.tempsResposta(accio.getTempsResposta()).estat(accio.getEstat()).codiUsuari(getUsuariNomCodi(obtenirUsuari)).codiEntitat(accio.getCodiEntitat())
-				.descripcio(accio.getDescripcio()).excepcioMessage(accio.getExcepcioMessage()).excepcioStacktrace(accio.getExcepcioStacktrace()).build();
-		monitorRepository.save(m);
-		LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
-		if (accions == null) {
-			accions = new LinkedList<>();
-			accions.add(accio);
-			return;
-		}
-		int max = getMaxAccions(integracioCodi);
-		while (accions.size() >= max) {
-			accions.remove(accions.size() - 1);
-		}
-		try {
-//			accions.add(0, accio);
-			accions.addFirst(accio);
-		} catch (Exception ex) {
-			log.error("Error afegint la acció: " + ex);
-			try {
-				accions.add(accio);
-			} catch (Exception e) {
-				log.error("Error afegint la acció: " + e);
-			}
-		}
+				.descripcio(accio.getDescripcio()).excepcioMessage(accio.getExcepcioMessage()).excepcioStacktrace(accio.getExcepcioStacktrace())
+				.parametres(accio.getParametres()).build();
+		monitorRepository.saveAndFlush(m);
 	}
 	
-	private void afegirParametreUsuari(IntegracioAccioDto accio, boolean obtenirUsuari) {
+	private void afegirParametreUsuari(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		if (accio.getParametres() == null) {
-			accio.setParametres(new ArrayList<AccioParam>());
+			accio.setParametres(new ArrayList<MonitorIntegracioParamEntity>());
 		}
-		accio.getParametres().add(new AccioParam("Usuari", getUsuariNomCodi(obtenirUsuari)));
+		accio.getParametres().add(MonitorIntegracioParamEntity.builder().codi("Usuari").valor(getUsuariNomCodi(obtenirUsuari)).build());
 	}
 
 	private String getUsuariNomCodi(boolean obtenirUsuari) {
@@ -302,7 +262,4 @@ public class IntegracioHelper {
 		AplicacioEntity aplicacio = aplicacioRepository.findByUsuariCodiAndEntitatId(usuariCodi, entitatId);
 		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(IntegracioHelper.class);
-	
 }
