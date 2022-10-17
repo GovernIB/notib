@@ -23,6 +23,7 @@ public class OrganGestorFiltreCommand {
 	private String oficina;
 	private OrganGestorEstatEnum estat;
 	private boolean entregaCie;
+	private String isFiltre;
 
 	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
 		if (dto == null) {

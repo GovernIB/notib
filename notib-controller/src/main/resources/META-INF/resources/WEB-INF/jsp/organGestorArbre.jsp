@@ -65,9 +65,12 @@
 
 
             $(document).ready(function() {
-                if ("${filtresEmpty}" === "false") {
+                if (!${isFiltre}) {
                     let node = $('#arbreOrgans').jstree().get_node("root");
                     $('#arbreOrgans').jstree().open_node(node);
+                } else {
+                    console.log("goo");
+                    $('#arbreOrgans').jstree().open_all(null, 200);
                 }
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
@@ -82,13 +85,20 @@
                     });
                     $('#btn-entregaCie').removeClass('active');
                     $('#entregaCie').val(false);
+                    $('#isFiltre').val(false);
                     $('#form-filtre').submit();
                 });
+
+                $("#btnFiltrar").click(() => {
+                    $('#isFiltre').val(true);
+                    $('#form-filtre').submit();
+                })
+
                 $('#btn-entregaCie').click(function() {
-                    console.log("entrega cie arbre");
                     let entregaCieActiva = !$(this).hasClass('active');
                     $('#entregaCie').val(entregaCieActiva);
                 })
+
                 $(".panel-heading:first").css({"display": "flex", "justify-content": "space-between"})
                 $(".panel-heading:first").append("<div><button id='canviarVistaOrganGestor' class='btn btn-primary'><spring:message code='boto.canviar.vista'/></button></div>");
                 $("#canviarVistaOrganGestor").click(function(){
@@ -104,6 +114,7 @@
     <body>
         <c:set var="formActionFiltre"><not:modalUrl value="/organgestorArbre"/></c:set>
         <form:form id="filtre" action="${formActionFiltre}" method="post" cssClass="well" modelAttribute="organGestorFiltreCommand">
+            <not:inputHidden name="isFiltre"/>
             <div class="row">
                 <div class="col-md-2">
                     <not:inputText name="codi" inline="true" placeholderKey="organgestor.list.columna.codi"/>
@@ -140,7 +151,7 @@
                 <div class="col-md-2 pull-right">
                     <div class="pull-right">
                         <button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-                        <button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+                        <button id="btnFiltrar" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
                     </div>
                 </div>
             </div>
