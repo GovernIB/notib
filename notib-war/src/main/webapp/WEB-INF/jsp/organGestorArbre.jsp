@@ -65,13 +65,10 @@
 
 
             $(document).ready(function() {
-                <%--if ("${filtresEmpty}" === "false" || !${isFiltre}) {--%>
-                console.log(${isFiltre});
                 if (!${isFiltre}) {
                     let node = $('#arbreOrgans').jstree().get_node("root");
                     $('#arbreOrgans').jstree().open_node(node);
                 } else {
-                    console.log("goo");
                     $('#arbreOrgans').jstree().open_all(null, 200);
                 }
                 $('#btnNetejar').click(function() {
