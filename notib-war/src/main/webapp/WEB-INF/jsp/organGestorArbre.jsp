@@ -67,7 +67,7 @@
             $(document).ready(function() {
                 if ("${filtresEmpty}" === "false") {
                     let node = $('#arbreOrgans').jstree().get_node("root");
-                    $('#arbreOrgans').jstree().open_node(node)
+                    $('#arbreOrgans').jstree().open_node(node);
                 }
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
