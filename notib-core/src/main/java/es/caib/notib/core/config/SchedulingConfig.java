@@ -1,5 +1,6 @@
 package es.caib.notib.core.config;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.helper.ConfigHelper;
@@ -354,27 +355,34 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
 
-        // 12. Consulta de canvis en l'organigrama
+        // 13. Eliminar entrades al monitor integracions antigues
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
-                new Runnable() {
-                    @SneakyThrows
-                    @Override
-                    public void run() {
-                        schedulledService.monitorIntegracionsEliminarAntics();
-                    }
-                },
-                new Trigger() {
-                    @Override
-                    public Date nextExecutionTime(TriggerContext triggerContext) {
-                        String cron = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
-                        if (cron == null)
-                            cron = "0 45 2 * * *";
-                        CronTrigger trigger = new CronTrigger(cron);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        return nextExecution;
-                    }
+            new Runnable() {
+                @SneakyThrows
+                @Override
+                public void run() {
+                    schedulledService.monitorIntegracionsEliminarAntics();
                 }
+            },
+            new Trigger() {
+                @Override
+                public Date nextExecutionTime(TriggerContext triggerContext) {
+
+                    Long d = 3l;
+                    String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
+                    try {
+                        d = Long.valueOf(dies);
+                    } catch (Exception ex) {
+                        logger.error("La propietat no retorna un número -> " + dies);
+                    }
+                    PeriodicTrigger trigger = new PeriodicTrigger(d, TimeUnit.DAYS);
+                    trigger.setFixedRate(true);
+                    trigger.setInitialDelay(calcularDelay());
+                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                    return nextExecution;
+                }
+            }
         );
     }
 

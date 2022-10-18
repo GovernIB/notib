@@ -24,6 +24,7 @@ import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
 import es.caib.notib.core.repository.EntitatRepository;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import static java.util.Calendar.DAY_OF_MONTH;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -336,8 +342,18 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
 
-//		configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE)
-//		integracioHelper.eliminarAntics()
+		logger.debug("Execució tasca periòdica: Natejar monitor integracions");
+		String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES);
+		int d = 3;
+		try {
+			d = Integer.parseInt(dies);
+		} catch (Exception ex) {
+			logger.error("La propietat no retorna un número -> " + dies);
+		}
+		Calendar c = Calendar.getInstance();
+		c.add(DAY_OF_MONTH, -d);
+		Date llindar = c.getTime();
+		integracioHelper.eliminarAntics(llindar);
 	}
 
 	private void esborrarTemporals(String dir) throws Exception {

@@ -93,4 +93,9 @@ public class SchedulledServiceBean implements SchedulledService {
         delegate.consultaCanvisOrganigrama();
     }
 
+	@Override
+	public void monitorIntegracionsEliminarAntics() {
+
+	}
+
 }

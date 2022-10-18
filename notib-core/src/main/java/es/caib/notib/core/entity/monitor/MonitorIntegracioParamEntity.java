@@ -29,7 +29,7 @@ public class MonitorIntegracioParamEntity extends AbstractPersistable<Long> {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "mon_int_id")
     @ForeignKey(name = "NOT_MONINTPARAM_MONINT_FK")
-    private MonitorIntegracioEntity monitorIntegracioEntity;
+    private MonitorIntegracioEntity monitorIntegracio;
 
     @Column(name = "codi", length = 256, nullable = false)
     private String codi;

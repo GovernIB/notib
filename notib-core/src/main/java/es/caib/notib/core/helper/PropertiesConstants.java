@@ -44,5 +44,5 @@ public class PropertiesConstants {
 
     public static final String MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO = "es.caib.notib.monitor.integracions.eliminar.periode";
 
-    public static final String MONITOR_INTEGRACIONS_ELIMINAR_DIES = "es.caib.notib.monitor.integracions.eliminar.dies";
+    public static final String MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES = "es.caib.notib.monitor.integracions.eliminar.anterior.dies";
 }

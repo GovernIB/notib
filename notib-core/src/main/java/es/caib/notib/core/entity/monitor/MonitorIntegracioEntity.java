@@ -50,6 +50,9 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
     @Enumerated(EnumType.STRING)
     protected IntegracioAccioTipusEnumDto tipus;
 
+    @Column(name = "aplicacio", length = 64)
+    private String aplicacio;
+
     @Column(name = "temps_resposta")
     private Long tempsResposta;
 
@@ -57,7 +60,8 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
     @Enumerated(EnumType.STRING)
     private IntegracioAccioEstatEnumDto estat = IntegracioAccioEstatEnumDto.OK;
 
-    @Column(name = "codi_usuari", length = 64, nullable = false)
+//    @Column(name = "codi_usuari", length = 64, nullable = false)
+    @Column(name = "codi_usuari", length = 64)
     private String codiUsuari;
 
     @Column(name = "codi_entitat", length = 64)
@@ -72,7 +76,7 @@ public class MonitorIntegracioEntity extends AbstractPersistable<Long> {
     @Column(name = "excepcio_stacktrace", length = 2048)
     private String excepcioStacktrace;
 
-    @OneToMany(mappedBy = "monitorIntegracioEntity", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
+    @OneToMany(mappedBy = "monitorIntegracio", fetch = FetchType.LAZY, orphanRemoval = true, cascade={CascadeType.ALL})
     private List<MonitorIntegracioParamEntity> parametres = new ArrayList<>();
 
 }
