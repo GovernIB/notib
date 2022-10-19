@@ -5,13 +5,15 @@ import es.caib.notib.core.entity.monitor.MonitorIntegracioEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegracioEntity, Long> {
 
-
+    @Transactional
     @Query("from MonitorIntegracioEntity n " +
             "where lower(n.codi) like concat('%', lower(:codi),'%') " +
             "and (:isCodiEntitatNull = true or lower(n.codiEntitat) like concat('%', lower(:codiEntitat), '%')) " +
@@ -23,9 +25,10 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
                                               @Param("isAplicacioNull") boolean isAplicacioNull,
                                               @Param("aplicacio") String aplicacio);
 
-    List<MonitorIntegracioEntity> findAllByCodiOrderByDataDesc(@Param("codi") String codi);
-
     int countByCodiAndEstat(@Param("codi") String codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
 
     void deleteByDataIsBefore(@Param("llindar") Date llindar);
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    MonitorIntegracioEntity save(@Param("integracio") MonitorIntegracioEntity integracio);
 }
