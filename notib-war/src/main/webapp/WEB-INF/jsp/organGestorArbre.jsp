@@ -73,13 +73,16 @@
                 }
                 $('#btnNetejar').click(function() {
                     $(':input', $('#filtre')).each (function() {
-                        var type = this.type, tag = this.tagName.toLowerCase();
+                        let type = this.type;
+                        let tag = this.tagName.toLowerCase();
+                        console.log(tag);
                         if (type == 'text' || type == 'password' || tag == 'textarea') {
                             this.value = '';
                         } else if (type == 'checkbox' || type == 'radio') {
                             this.checked = false;
                         } else if (tag == 'select') {
-                            this.selectedIndex = 0;
+                            this.selectedIndex = this.name === "estat" ? 1 : 0;
+                            console.log(this);
                         }
                     });
                     $('#btn-entregaCie').removeClass('active');
