@@ -64,8 +64,8 @@ public class OrganGestorArbreController extends BaseUserController {
     public String get(HttpServletRequest request, Model model) {
 
         try {
-            OrganGestorFiltreCommand filtres = controller.getFiltreCommand(request);
             EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            OrganGestorFiltreCommand filtres = controller.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
             Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto());

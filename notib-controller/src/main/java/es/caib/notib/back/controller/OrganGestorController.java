@@ -68,6 +68,8 @@ public class OrganGestorController extends BaseUserController{
 	public String get(HttpServletRequest request, Model model) {
 
 		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+		OrganGestorFiltreCommand filtres = getFiltreCommand(request);
+		model.addAttribute("organGestorFiltreCommand", filtres);
 		model.addAttribute("organsEntitat", organService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
 		String prefix = "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.";
