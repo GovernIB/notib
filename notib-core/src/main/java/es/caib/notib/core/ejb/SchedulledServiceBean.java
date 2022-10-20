@@ -95,7 +95,7 @@ public class SchedulledServiceBean implements SchedulledService {
 
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
-
+		delegate.monitorIntegracionsEliminarAntics();
 	}
 
 }
