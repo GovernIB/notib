@@ -301,6 +301,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
         }
     }
 
+    @Transactional
     @Override
     public PaginaDto<NotificacioTableItemDto> findNotificacions(Long entitatId, Long notificacioMassivaId, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
