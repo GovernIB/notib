@@ -68,6 +68,7 @@
                 if (!${isFiltre}) {
                     let node = $('#arbreOrgans').jstree().get_node("root");
                     $('#arbreOrgans').jstree().open_node(node);
+                    $('#isFiltre').val(true);
                 } else {
                     $('#arbreOrgans').jstree().open_all(null, 200);
                 }
@@ -75,20 +76,25 @@
                     $(':input', $('#filtre')).each (function() {
                         let type = this.type;
                         let tag = this.tagName.toLowerCase();
-                        console.log(tag);
                         if (type == 'text' || type == 'password' || tag == 'textarea') {
                             this.value = '';
                         } else if (type == 'checkbox' || type == 'radio') {
                             this.checked = false;
                         } else if (tag == 'select') {
                             this.selectedIndex = this.name === "estat" ? 1 : 0;
-                            console.log(this);
                         }
                     });
                     $('#btn-entregaCie').removeClass('active');
                     $('#entregaCie').val(false);
                     $('#isFiltre').val(false);
                     $('#form-filtre').submit();
+                });
+
+                $(':input', $('#filtre')).keypress(key => {
+                    if (key.keyCode !== 13 || key.which !== 13) {
+                        return;
+                    }
+                    $('#isFiltre').val(true);
                 });
 
                 $("#btnFiltrar").click(() => {
