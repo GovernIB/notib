@@ -14,6 +14,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
@@ -84,6 +85,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	@Override
 	public void restartSchedulledTasks() {

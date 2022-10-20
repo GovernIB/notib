@@ -4,8 +4,10 @@
 package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
@@ -16,6 +18,8 @@ import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
@@ -74,6 +78,10 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 	private MetricsHelper metricsHelper;
 	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	private final Object lock = new Object();
 	
@@ -183,7 +191,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				integracioHelper.addAccioError(info, "No s'ha trobat cap enviament amb l'identificador especificat");
 				return enviament;
 			}
-
+			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(enviament.getNotificacio().getEntitat(), EntitatDto.class));
+			}
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			}
