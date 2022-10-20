@@ -62,31 +62,17 @@ public class PersonaDto implements Serializable{
 	}
 
 	public String getNomFormatted() {
-		StringBuilder sb = new StringBuilder();
-		String llinatges = concatenarLlinatges();
-		if (nif != null) {
-			sb.append(nif);
-			sb.append(" - ");
-		}
-		if (llinatges != null && !llinatges.isEmpty()) {
-			sb.append("[");
-			sb.append(llinatges);
-		}
 
-		if (nom != null && !nom.isEmpty()) {
-			sb.append(", ");
-			sb.append(nom);
-
-			if (raoSocial == null) {
-				sb.append("]");
-			}
+		var llinatges = concatenarLlinatges();
+		var formatted = "";
+		if (raoSocial == null || raoSocial.isEmpty()) {
+			formatted = nom != null ? nom : "";
+			formatted += llinatges != null && !llinatges.isEmpty() ? " " + llinatges : "";
+		} else {
+			formatted += raoSocial != null && !raoSocial.isEmpty() ? raoSocial : "";
 		}
-		if (raoSocial != null && !raoSocial.isEmpty()) {
-			sb.append(" | ");
-			sb.append(raoSocial);
-			sb.append("]");
-		}
-		return sb.toString();
+		formatted += nif != null && !nif.isEmpty() ? " (" + nif + ")" : "";
+		return formatted;
 	}
 
 
