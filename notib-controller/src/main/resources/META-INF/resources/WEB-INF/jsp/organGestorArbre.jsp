@@ -68,8 +68,8 @@
                 if (!${isFiltre}) {
                     let node = $('#arbreOrgans').jstree().get_node("root");
                     $('#arbreOrgans').jstree().open_node(node);
+                    $('#isFiltre').val(true);
                 } else {
-                    console.log("goo");
                     $('#arbreOrgans').jstree().open_all(null, 200);
                 }
                 $('#btnNetejar').click(function() {
