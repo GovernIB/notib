@@ -1,0 +1,5 @@
+- changeSet:
+    id: 1665140886759-1
+    author: limit
+    changes:
+      - sql : "UPDATE NOT_USUARI SET REBRE_EMAILS_CREATS = 1 WHERE REBRE_EMAILS_CREATS = 0;"
