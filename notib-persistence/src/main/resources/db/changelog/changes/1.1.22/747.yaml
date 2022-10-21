@@ -1,0 +1,107 @@
+databaseChangeLog:
+  - property:
+      dbms: oracle
+      name: type.pk
+      value: number(19,0)
+  - property:
+      dbms: postgresql
+      name: type.pk
+      value: SERIAL
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - property:
+      name: booleanTrue
+      value: 1
+      dbms: oracle
+  - property:
+      name: booleanTrue
+      value: true
+      dbms: postgresql
+  - property:
+      name: tempsResposta
+      value: number(19, 0)
+      dbms: oracle
+  - property:
+      name: tempsResposta
+      value: numeric
+      dbms: postgresql
+  - changeSet:
+      id: 1665140886759-1
+      author: limit
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_MON_INT_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: CODI
+                  type: varchar(100 ${varcharUnit})
+              - column:
+                  name: data
+                  type: TIMESTAMP(6)
+              - column:
+                  name: descripcio
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: tipus
+                  type: varchar(10 ${varcharUnit})
+              - column:
+                  name: temps_resposta
+                  type: ${tempsResposta}
+              - column:
+                  name: estat
+                  type: varchar(5 ${varcharUnit})
+              - column:
+                  name: codi_usuari
+                  type: varchar(64 ${varcharUnit})
+              - column:
+                  name: error_descripcio
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: excepcio_msg
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: excepcio_stacktrace
+                  type: varchar(2048 ${varcharUnit})
+            tableName: NOT_MON_INT
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_MON_INT_PARAM_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: MON_INT_ID
+                  type: ${type.pk}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: nom
+                  type: varchar(64 ${varcharUnit})
+              - column:
+                  name: descripcio
+                  type: varchar(1024 ${varcharUnit})
+            tableName: NOT_MON_INT_PARAM
+        - sql : "ALTER TABLE NOT_MON_INT ADD (CONSTRAINT NOT_MON_INT_PK PRIMARY KEY (ID));
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT TO WWW_NOTIB;
+                    ALTER TABLE NOT_MON_INT_PARAM ADD (CONSTRAINT NOT_MON_INT_PARAM_PK PRIMARY KEY (ID));
+                    ALTER TABLE NOT_MON_INT_PARAM ADD CONSTRAINT NOT_MONINTPARAM_MONINT_FK FOREIGN KEY (MON_INT_ID) REFERENCES NOT_MON_INT(ID);
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT_PARAM TO WWW_NOTIB;"

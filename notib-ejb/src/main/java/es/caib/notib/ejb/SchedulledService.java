@@ -89,4 +89,9 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
         getDelegateService().consultaCanvisOrganigrama();
     }
 
+	@Override
+	public void monitorIntegracionsEliminarAntics() {
+		getDelegateService().monitorIntegracionsEliminarAntics();
+	}
+
 }

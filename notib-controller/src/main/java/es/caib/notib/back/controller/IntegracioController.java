@@ -128,7 +128,9 @@ public class IntegracioController extends BaseUserController {
 		dto.setPrimera(true);
 		dto.setPosteriors(false);
 		dto.setDarrera(true);
-		accions = accions.subList(inici, inici + paginacio.getPaginaTamany());
+		int fi = inici + paginacio.getPaginaTamany();
+		fi = fi < accions.size() ? fi : inici + (accions.size() - inici);
+		accions = accions.subList(inici, fi);
 		dto.setContingut(accions);
 		return DatatablesHelper.getDatatableResponse(request, dto);
 	}
