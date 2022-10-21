@@ -19,6 +19,7 @@ public class UnitatOrganitzativaDto implements Serializable {
 
 	private String codi;
 	private String denominacio;
+	private String oldDenominacio;
 	private String estat; // V: Vigente, E: Extinguido, A: Anulado, T: Transitorio
 	private String arrel;
 	private String superior;
