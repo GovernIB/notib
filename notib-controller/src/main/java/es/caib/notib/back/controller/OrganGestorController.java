@@ -261,7 +261,7 @@ public class OrganGestorController extends BaseUserController{
 		} catch (Exception ex) {
 			log.error("Error al obtenir la predicció de la sincronitzacio", ex);
 			var msg = "[NC-007]";
-			var text = "organgestor.actualitzacio.sense.canvis";
+			var text = "organgestor.actualitzacio.sense.canvis.no.codi.error";
 			return ex.getMessage() != null && ex.getMessage().contains(msg)
 					? getModalControllerReturnValueSuccess(request, redirect, text, new Object[] {entitat.getDir3Codi()})
 					: getModalControllerReturnValueErrorMessageText(request, redirect, ex.getMessage());
