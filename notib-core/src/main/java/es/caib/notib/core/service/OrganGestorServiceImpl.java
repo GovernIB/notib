@@ -542,6 +542,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
 
 		try {
+			// 0. Buidar cache de l'organigrama
+			cacheHelper.clearAllCaches();
+
 			// 1. Obtenir canvis a l'organigrama
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
