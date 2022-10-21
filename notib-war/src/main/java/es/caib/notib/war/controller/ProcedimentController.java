@@ -72,7 +72,22 @@ public class ProcedimentController extends BaseUserController{
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		
+		model.addAttribute("isModal", false);
+		return "procedimentListPage";
+	}
+
+	@RequestMapping(value = "/filtre/codi/{procCodi}", method = RequestMethod.GET)
+	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String procCodi, Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		this.currentFiltre = PROCEDIMENTS_FILTRE;
+		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		procSerFiltreCommand.setCodi(procCodi);
+		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
+		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		model.addAttribute("isModal", false);
 		return "procedimentListPage";
 	}
 
@@ -85,6 +100,7 @@ public class ProcedimentController extends BaseUserController{
 		this.currentFiltre = PROCEDIMENTS_FILTRE_MODAL;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
+		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
