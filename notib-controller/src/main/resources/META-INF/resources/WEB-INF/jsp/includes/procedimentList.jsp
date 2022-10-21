@@ -121,7 +121,16 @@ $(document).ready(function() {
 		<tr>
 			<th data-col-name="id" data-visible="false" width="4%">#</th>
 			<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
-			<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
+			<th data-col-name="nom" data-template="#cellNom">
+				<spring:message code="procediment.list.columna.nom"/>
+				<script id="cellNom" type="text/x-jsrender">
+					{{if ${isModal}}}
+						<a href="<c:url value='/procediment/filtre/codi/{{:codi}}'/>" target="_blank"> {{:nom}}</a>
+					{{else}}
+						{{:nom}}
+					{{/if}}
+				</script>
+			</th>
 
 			<c:if test="${not simplifiedView}">
 			<th data-col-name="organGestorEstat" data-orderable="false" data-visible="false"></th>
