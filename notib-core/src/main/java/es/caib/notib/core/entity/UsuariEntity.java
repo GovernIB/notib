@@ -37,10 +37,10 @@ public class UsuariEntity implements Serializable {
 	private String emailAlt;
 	@Column(name = "rebre_emails")
 	@Builder.Default
-	private boolean rebreEmailsNotificacio = true;
+	private boolean rebreEmailsNotificacio = false;
 	@Column(name = "rebre_emails_creats")
 	@Builder.Default
-	private boolean rebreEmailsNotificacioCreats = false;
+	private boolean rebreEmailsNotificacioCreats = true;
 	@Column(name = "ultim_rol", length = 40)
 	private String ultimRol;
 	@Column(name = "ultima_entitat")
