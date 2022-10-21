@@ -46,7 +46,7 @@ public class UsuariEntity implements Serializable {
 	private String emailAlt;
 	@Column(name = "rebre_emails")
 	@Builder.Default
-	private boolean rebreEmailsNotificacio = false;
+	private boolean rebreEmailsNotificacio = true;
 	@Column(name = "rebre_emails_creats")
 	@Builder.Default
 	private boolean rebreEmailsNotificacioCreats = true;
