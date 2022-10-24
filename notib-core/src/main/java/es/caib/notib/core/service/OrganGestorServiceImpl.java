@@ -783,15 +783,21 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 
 	private List<OrganGestorEntity> calcularExitngides(List<String> codis) {
+
+		String codi = codis.get(0);
 		List<OrganGestorEntity> extingides = new ArrayList<>();
 		int maxInSize = 1000;
 		int nParts = (codis.size() / maxInSize) + 1;
 		int inici = 0;
-		int fi = codis.size() - maxInSize > 0 ? maxInSize - 1 : codis.size() - 1 ;
+		int fi = codis.size() - maxInSize > 0 ? maxInSize : codis.size();
+		List<String>  subList;
 		for (int foo= 0; foo < nParts; foo++) {
-			extingides.addAll(organGestorRepository.findByCodiNotIn(codis.subList(inici, fi)));
+			subList = codis.subList(inici, fi);
+			if (!subList.isEmpty()) {
+				extingides.addAll(organGestorRepository.findByCodiNotIn(subList));
+			}
 			inici = fi + 1 ;
-			fi = codis.size() - inici > maxInSize ? maxInSize : codis.size() - 1;
+			fi = codis.size() - inici > maxInSize ? maxInSize : codis.size();
 		}
 		return extingides;
 	}
