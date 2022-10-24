@@ -68,9 +68,6 @@ databaseChangeLog:
                         name: estat
                         type: varchar(5 ${varcharUnit})
                     - column:
-                        name: aplicacio
-                        type: varchar(64 ${varcharUnit})
-                    - column:
                         name: codi_usuari
                         type: varchar(64 ${varcharUnit})
                     - column:
@@ -109,9 +106,7 @@ databaseChangeLog:
                           name: valor
                           type: varchar(1024 ${varcharUnit})
                 tableName: NOT_MON_INT_PARAM
-            - sql : "ALTER TABLE NOT_MON_INT ADD (CONSTRAINT NOT_MON_INT_PK PRIMARY KEY (ID));
-                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT TO WWW_NOTIB;
-                    ALTER TABLE NOT_MON_INT_PARAM ADD (CONSTRAINT NOT_MON_INT_PARAM_PK PRIMARY KEY (ID));
+            - sql : "GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT TO WWW_NOTIB;
                     ALTER TABLE NOT_MON_INT_PARAM ADD CONSTRAINT NOT_MONINTPARAM_MONINT_FK FOREIGN KEY (MON_INT_ID) REFERENCES NOT_MON_INT(ID);
                     GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT_PARAM TO WWW_NOTIB;
                     INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.monitor.integracions.eliminar.periode', '3', 'Periode execució en dies de la nateja del monitor integracions', 'GENERAL', 0, 0, 'INT');
