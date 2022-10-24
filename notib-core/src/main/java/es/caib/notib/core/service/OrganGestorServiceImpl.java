@@ -50,6 +50,7 @@ import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.slf4j.Logger;
@@ -80,6 +81,8 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+
+@Slf4j
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService{
 
@@ -512,16 +515,22 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Override
 	@Transactional
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
+		String prefix = "[SYNC-ORGANS] ";
+		log.debug(prefix + "Inici sync organs gestors");
+		String msg = "";
 		if (entitat.getDir3Codi() == null || entitat.getDir3Codi().isEmpty()) {
-			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
+			msg = "L'entitat actual no té cap codi DIR3 associat";
+			log.debug(prefix + msg);
+			throw new Exception(msg);
 		}
 
 		// Comprova si hi ha una altre instància del procés en execució
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-			logger.debug("[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització");
+			msg = "[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització";
+			logger.debug(prefix + msg);
 			return null;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 
@@ -543,23 +552,28 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		try {
 			// 0. Buidar cache de l'organigrama
+			log.debug(prefix + "Buidant caches");
 			cacheHelper.clearAllCaches();
 
 			// 1. Obtenir canvis a l'organigrama
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
+			log.debug(prefix + "Obtenint unitats organitzatives");
 			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
 					entitatDto,
 					entitat.getDir3Codi(),
 					entitat.getDataActualitzacio(),
 					entitat.getDataSincronitzacio());
 			//		progres.incrementOperacionsRealitzades();	// 2%
+			log.debug(prefix + "nombre d'unitats obtingutdes: " + unitatsWs.size());
 			progres.setProgres(2);
 			Long tf = System.currentTimeMillis();
 			List<String> codis = new ArrayList<>();
 			for (NodeDir3 u : unitatsWs) {
 				codis.add(u.getCodi());
 			}
-			obsoleteUnitats = calcularExitngides(codis);
+			log.debug(prefix + "calculant unitats extingides");
+			obsoleteUnitats = calcularExtingides(codis);
+			log.debug(prefix + "nombre d'unitats extingides: " + obsoleteUnitats.size());
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canis.fi.resultat", new Object[]{unitatsWs.size()}));
@@ -578,6 +592,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
 
 			// 3. Actualitzar procediments
+			log.debug(prefix + "Actualitzant procediments");
 			ti = tf;
 			progres.setFase(2);
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.procediments"));
@@ -594,6 +609,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.procediments.fi"));
 
 			// 4. Actualitzar serveis
+			log.debug(prefix + "Actualitzant serveis");
 			ti = tf;
 			progres.setFase(3);
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.serveis"));
@@ -611,6 +627,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.serveis.fi"));
 
 			// 5. Actualitzar permisos
+			log.debug(prefix + "Actualitzant permisos");
 			ti = tf;
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos"));
 			permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
@@ -622,6 +639,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.permisos.fi"));
 
 			// 6. Eliminar òrgans no utilitzats
+			log.debug(prefix + "Eliminant òrgans no utilitzats");
 			ti = tf;
 			progres.setFase(5);
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar"));
@@ -776,15 +794,14 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 			codis.add(u.getCodi());
 		}
-		List<OrganGestorEntity> extingides = calcularExitngides(codis);
+		List<OrganGestorEntity> extingides = calcularExtingides(codis);
 		List<UnitatOrganitzativaDto> ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
 		List<UnitatOrganitzativaDto> n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
 		return PrediccioSincronitzacio.builder().isFirstSincronization(true).unitatsVigents(vigents).unitatsNew(n).unitatsExtingides(ex).build();
 	}
 
-	private List<OrganGestorEntity> calcularExitngides(List<String> codis) {
+	private List<OrganGestorEntity> calcularExtingides(List<String> codis) {
 
-		String codi = codis.get(0);
 		List<OrganGestorEntity> extingides = new ArrayList<>();
 		int maxInSize = 1000;
 		int nParts = (codis.size() / maxInSize) + 1;
