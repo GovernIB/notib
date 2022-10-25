@@ -357,6 +357,7 @@ public class ProcSerHelper {
 
 		try {
 			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
+			procediment.updateActiu(true);
 
 			if (!procedimentHasToBeUpdated(procedimentGda, procediment, codiOrgansGda, progres)) {
 				return;
@@ -450,8 +451,8 @@ public class ProcSerHelper {
 	}
 
 	@Transactional
-	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, ProgresActualitzacioDto progres) {
-		List<String> procedimentsActiusNotib = procedimentRepository.findCodiActius();
+	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, String entitatCodi, ProgresActualitzacioDto progres) {
+		List<String> procedimentsActiusNotib = procedimentRepository.findCodiActiusByEntitat(entitatCodi);
 		for (ProcSerDto procedimentGda: procedimentsGda) {
 			procedimentsActiusNotib.remove(procedimentGda.getCodi());
 		}
@@ -477,6 +478,7 @@ public class ProcSerHelper {
 
 		try {
 			ServeiEntity servei = serveiRepository.findByCodiAndEntitat(serveiGda.getCodi(), entitat);
+			servei.updateActiu(true);
 
 			if (!serveiHasToBeUpdated(serveiGda, servei, codiOrgansGda, progres)) {
 				return;
@@ -570,8 +572,8 @@ public class ProcSerHelper {
 	}
 
 	@Transactional
-	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, ProgresActualitzacioDto progres) {
-		List<String> serveisActiusNotib = serveiRepository.findCodiActius();
+	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, String entitatCodi, ProgresActualitzacioDto progres) {
+		List<String> serveisActiusNotib = serveiRepository.findCodiActiusByEntitat(entitatCodi);
 		for (ProcSerDto serveiGda: serveisGda) {
 			serveisActiusNotib.remove(serveiGda.getCodi());
 		}
