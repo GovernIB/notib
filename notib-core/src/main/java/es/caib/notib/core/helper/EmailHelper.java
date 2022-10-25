@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @Component
 public abstract class EmailHelper<T> {
 
-    private static final String CODI_ENTORN = "es.caib.notib.codi.entorn";
+
 
     @Resource
     protected CacheHelper cacheHelper;
@@ -71,7 +71,7 @@ public abstract class EmailHelper<T> {
         helper = new MimeMessageHelper(missatge, true);
         helper.setTo(emailDestinatari);
         helper.setFrom(getRemitent());
-        helper.setSubject(getPrefix() + " " + getMailSubject());
+        helper.setSubject(configHelper.getPrefix() + " " + getMailSubject());
 
         //Html text
         helper.setText(getMailPlainTextBody(item), getMailHtmlBody(item));
@@ -82,12 +82,6 @@ public abstract class EmailHelper<T> {
             }
         }
         mailSender.send(missatge);
-    }
-
-    public String getPrefix() {
-
-        String prefix = configHelper.getConfig(CODI_ENTORN);
-        return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
     }
 
     public static final Pattern EMAIL_REGEX = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$", Pattern.CASE_INSENSITIVE);

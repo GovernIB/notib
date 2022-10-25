@@ -113,6 +113,12 @@ public class ConfigHelper {
         }
     }
 
+    public String getPrefix() {
+
+        String prefix = getConfig(PropertiesConstants.CODI_ENTORN);
+        return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
+    }
+
     public boolean getAsBoolean(String key) {
         return Boolean.parseBoolean(getConfig(key));
     }

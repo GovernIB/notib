@@ -17,7 +17,6 @@ import es.caib.notib.core.helper.EmailHelper.Attachment;
 import es.caib.notib.core.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -60,8 +59,6 @@ public class EmailNotificacioSenseNifHelper {
 	private DocumentHelper documentHelper;
 	@Autowired
 	protected ConfigHelper configHelper;
-	@Autowired
-	protected EmailHelper emailHelper;
 	@Resource
 	protected JavaMailSender mailSender;
 
@@ -205,7 +202,7 @@ public class EmailNotificacioSenseNifHelper {
 		MimeMessageHelper helper = new MimeMessageHelper(missatge, true, StandardCharsets.UTF_8.name());
 		helper.setTo(emailDestinatari);
 		helper.setFrom(getRemitent());
-		helper.setSubject(emailHelper.getPrefix() + " " + subject);
+		helper.setSubject(configHelper.getPrefix() + " " + subject);
 		// Contingut del missatge
 		boolean teLogoPeu = (logoPeu != null && logoPeu.length > 0) || getPeuLogo() != null;
 		helper.setText(textBody, getHeader() + htmlBody + getFooter(entitatNom, teLogoPeu));
