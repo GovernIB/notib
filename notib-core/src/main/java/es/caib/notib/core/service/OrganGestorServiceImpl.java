@@ -20,12 +20,6 @@ import es.caib.notib.core.entity.GrupEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.GrupEntity;
-import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcSerEntity;
-import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
@@ -38,17 +32,9 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
-import es.caib.notib.core.repository.EntregaCieRepository;
-import es.caib.notib.core.repository.EnviamentTableRepository;
-import es.caib.notib.core.repository.GrupRepository;
-import es.caib.notib.core.repository.NotificacioTableViewRepository;
-import es.caib.notib.core.repository.OrganGestorRepository;
-import es.caib.notib.core.repository.PagadorCieRepository;
-import es.caib.notib.core.repository.PagadorPostalRepository;
-import es.caib.notib.core.repository.ProcedimentRepository;
+
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MultiHashMap;
@@ -72,7 +58,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -132,6 +117,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private PluginHelper pluginHelper;
 	@Resource
 	private MessageHelper messageHelper;
+	@Resource
+	private IntegracioHelper integracioHelper;
 
 	List<OrganGestorDto> sotredOrgans = new ArrayList<>();
 
@@ -550,6 +537,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
 		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
 
+		Exception e = null;
 		try {
 			// 0. Buidar cache de l'organigrama
 			log.debug(prefix + "Buidant caches");
@@ -655,11 +643,25 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 		} catch (Exception ex) {
+			e = ex;
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.ERROR, messageHelper.getMessage("organgestor.actualitzacio.error") + ex.getMessage());
 			throw ex;
 		} finally {
 			progres.setProgres(100);
 			progres.setFinished(true);
+			IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Actualització d'òrgans gestors",
+					IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
+			info.setCodiEntitat(entitatDto.getCodi());
+			for (ProgresActualitzacioDto.ActualitzacioInfo inf: progres.getInfo()) {
+				if (inf.getText() != null)
+					info.getParams().add(new AccioParam("Msg. procés:", inf.getText()));
+
+			}
+			if (e != null) {
+				integracioHelper.addAccioError(info, "Error actualitzant procediments: ", e);
+			} else {
+				integracioHelper.addAccioOk(info);
+			}
 		}
 
 		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};
