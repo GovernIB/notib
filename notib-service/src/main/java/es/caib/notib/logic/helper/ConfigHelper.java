@@ -104,6 +104,12 @@ public class ConfigHelper {
         return getPropietat(entitatCodi, propietatGlobal).map(Boolean::parseBoolean).orElse(defaultValue);
     }
 
+    public String getPrefix() {
+
+        String prefix = getConfig(PropertiesConstants.CODI_ENTORN);
+        return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
+    }
+
     private Optional<String> getPropietat(String entitatCodi, String globalKey) {
         String propertyValue = null;
         String entitatKey = null;

@@ -163,7 +163,7 @@ public class EmailNotificacioSenseNifHelper {
 		List<Attachment> attachments = new ArrayList<>(Arrays.asList(new Attachment(arxiu.getNom(), arxiu.getContingut())));
 		String htmlBody = getComunicacioMailHtmlBody(enviament);
 		String textBody = getComunicacioMailPlainTextBody(enviament);
-		String subject = "[Notib] Nova comunicació / Nueva comunicación";
+		String subject = "Nova comunicació / Nueva comunicación";
 		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
 		return null;
 	}
@@ -176,7 +176,7 @@ public class EmailNotificacioSenseNifHelper {
 		String textBody = getNotificacioMailPlainTextBody(enviament);
 		sendEmail(
 				enviament.getTitular().getEmail(),
-				"[Notib] Avís de nova notificació / Aviso de nueva notificación",
+				"Avís de nova notificació / Aviso de nueva notificación",
 				htmlBody,
 				textBody,
 				entitat.getNom(),
@@ -202,7 +202,7 @@ public class EmailNotificacioSenseNifHelper {
 		MimeMessageHelper helper = new MimeMessageHelper(missatge, true, StandardCharsets.UTF_8.name());
 		helper.setTo(emailDestinatari);
 		helper.setFrom(getRemitent());
-		helper.setSubject(subject);
+		helper.setSubject(configHelper.getPrefix() + " " + subject);
 		// Contingut del missatge
 		boolean teLogoPeu = (logoPeu != null && logoPeu.length > 0) || getPeuLogo() != null;
 		helper.setText(textBody, getHeader() + htmlBody + getFooter(entitatNom, teLogoPeu));
