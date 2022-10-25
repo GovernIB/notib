@@ -1157,7 +1157,7 @@ public class ServeiServiceImpl implements ServeiService{
 			if (hasComunsPermission && (PermisEnum.NOTIFICACIO.equals(permis) || PermisEnum.COMUNIACIO_SIR.equals(permis))) {
 				List<ServeiEntity> serveisComuns = serveiRepository.findByEntitatAndComuTrue(entitat);
 				for (ServeiEntity servei: serveisComuns) {
-					if (!procSerAmbPermis.contains(servei))
+					if (!procSerAmbPermis.contains(servei) && servei.isActiu())
 						procSerAmbPermis.add(servei);
 				}
 			}

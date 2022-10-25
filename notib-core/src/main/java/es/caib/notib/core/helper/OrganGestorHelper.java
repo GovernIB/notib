@@ -284,11 +284,13 @@ public class OrganGestorHelper {
 								   List<OrganGestorEntity> organsFusionats,
 								   List<OrganGestorEntity> organsSubstituits,
 								   ProgresActualitzacioDto progres) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
 		int nombreUnitatsTotal = unitatsWs.size();
 		int nombreUnitatsProcessades = 0;
 		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
+		String prefix = "[SYNC-ORGANS] ";
+		log.debug(prefix + "Sincronitzant òrgans gestors");
 		for (NodeDir3 unitatWS: unitatsWs) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.unitat", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
 			sincronizarUnitat(unitatWS, entitat);
@@ -297,6 +299,7 @@ public class OrganGestorHelper {
 		progres.setProgres(12);
 
 		// Històrics
+		log.debug(prefix + "Sincronitzant històric unitats");
 		nombreUnitatsProcessades = 0;
 		for (NodeDir3 unitatWS : unitatsWs) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.historic", new Object[] {unitatWS.getCodi() + " - " + unitatWS.getDenominacio()}));
@@ -307,6 +310,7 @@ public class OrganGestorHelper {
 		progres.setProgres(22);
 //		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
 		// Definint tipus de transició
+		log.debug(prefix + "Sincronitzant unitats obsoletes");
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
@@ -327,17 +331,20 @@ public class OrganGestorHelper {
 					}
 				}
 			}
+			log.debug(prefix + "Unitat extingida " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom());
 			obsoleteUnitat.setEstat(OrganGestorEstatEnum.E);
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
 
 		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
+		log.debug(prefix + "Esborrant avisos ");
 		if (avisosSinc != null && !avisosSinc.isEmpty()) {
 			avisRepository.delete(avisosSinc);
 		}
 		progres.setProgres(27);
 
 		Date ara = new Date();
+		log.debug(prefix + "Data de sincronització " + ara);
 		// Si és la primera sincronització
 		if (entitat.getDataSincronitzacio() == null) {
 			entitat.setDataSincronitzacio(ara);
@@ -352,13 +359,14 @@ public class OrganGestorHelper {
 			return unitat;
 		}
 
-
+		String prefix = "[SYNC-ORGANS] ";
 		// checks if unitat already exists in database
 		unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
 		// if not it creates a new one
 		if (unitat != null) {
 			unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), unitatWS.getSuperior());
 			updateLlibreAndOficina(unitat, entitat.getDir3Codi());
+			log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
 			organGestorRepository.save(unitat);
 			return unitat;
 		}
@@ -366,6 +374,7 @@ public class OrganGestorHelper {
 		unitat = OrganGestorEntity.builder().codi(unitatWS.getCodi()).entitat(entitat).nom(unitatWS.getDenominacio()).codiPare(unitatWS.getSuperior())
 				.estat(unitatWS.getEstat()).build();
 		updateLlibreAndOficina(unitat, entitat.getDir3Codi());
+		log.debug(prefix + "guardant nova unitat amb codi " + unitat.getCodi() + " - " + unitat.getNom());
 		organGestorRepository.save(unitat);
 		return unitat;
 
