@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Getter @Setter
 public class ProgresActualitzacioDto {
 
@@ -32,6 +34,8 @@ public class ProgresActualitzacioDto {
 	String errorMsg;
 
 	public void addInfo(TipusInfo tipus, String text) {
+
+		log.info("[Progres Actualitzacio] " + text);
 		info.add(new ActualitzacioInfo(tipus, text));
 	}
 	
