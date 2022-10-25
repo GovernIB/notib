@@ -1230,7 +1230,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (hasComunsPermission && (PermisEnum.NOTIFICACIO.equals(permis) || PermisEnum.COMUNIACIO_SIR.equals(permis))) {
 				List<ProcedimentEntity> procedimentsComuns = procedimentRepository.findByEntitatAndComuTrue(entitat);
 				for (ProcedimentEntity procediment: procedimentsComuns) {
-					if (!procSerAmbPermis.contains(procediment)) {
+					if (!procSerAmbPermis.contains(procediment) && procediment.isActiu()) {
 						procSerAmbPermis.add(procediment);
 					}
 				}
