@@ -7,7 +7,25 @@ import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.CodiValorDto;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FirmaValidDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.LocalitatsDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.PaisosDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProvinciesDto;
+import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
+import es.caib.notib.core.api.dto.RespostaConsultaArxiuDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.SignatureInfoDto;
+import es.caib.notib.core.api.dto.TipusDocumentDto;
+import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
+import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -18,7 +36,16 @@ import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.GestioDocumentalService;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
+import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
@@ -44,6 +71,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -53,6 +81,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -256,13 +285,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
         if (bindingResult.hasErrors()) {
-            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
-            for (ObjectError error: bindingResult.getAllErrors()) {
-                log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
-            }
-            model.addAttribute(notificacioCommand);
-            emplenarModelNotificacio(request, model, notificacioCommand);
+            relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
             return "notificacioForm";
         }
 
@@ -273,7 +296,11 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute(new OrganGestorFiltreCommand());
         try {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
-            updateDocuments(notificacioCommand);
+            updateDocuments(notificacioCommand, bindingResult);
+            if (bindingResult.hasErrors()) {
+                relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
+                return "notificacioForm";
+            }
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(entitatActual.getId(), notificacioCommand.asDatabaseDto(), RolHelper.isUsuariActualAdministradorEntitat(request));
             } else {
@@ -292,8 +319,18 @@ public class NotificacioFormController extends BaseUserController {
         return "redirect:../notificacio";
     }
 
-    
-    private void updateDocuments(NotificacioCommand notificacioCommand) throws IOException {
+    private void relooadForm(HttpServletRequest request, NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model, List<String> tipusDocumentEnumDto, EntitatDto entitatActual, ProcSerDto procedimentActual) {
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
+        ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+        for (ObjectError error: bindingResult.getAllErrors()) {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
+        }
+        model.addAttribute(notificacioCommand);
+        emplenarModelNotificacio(request, model, notificacioCommand);
+    }
+
+
+    private void updateDocuments(NotificacioCommand notificacioCommand, BindingResult bindingResult) throws IOException {
 
         for (int i = 0; i < 5; i++) {
 
@@ -302,11 +339,14 @@ public class NotificacioFormController extends BaseUserController {
                 switch (notificacioCommand.getTipusDocument()[i]) {
                     case ARXIU:
                         if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
+                            byte[] contingut = notificacioCommand.getArxiu()[i].getBytes();
+                            String contentType = notificacioCommand.getArxiu()[i].getContentType();
                             notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
-                            String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
+                            String contingutBase64 = Base64.encodeBase64String(contingut);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                            notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
+                            notificacioCommand.getDocuments()[i].setMediaType(contentType);
                             notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+                            validaFirma(contentType, bindingResult, i, contingut);
                         } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
                             byte[] result;
                             if (notificacioCommand.getId() != null) {
@@ -317,6 +357,7 @@ public class NotificacioFormController extends BaseUserController {
 
                             String contingutBase64 = Base64.encodeBase64String(result);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                            validaFirma(notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
                         } else {
                             notificacioCommand.getDocuments()[i] = null;
                         }
@@ -349,6 +390,34 @@ public class NotificacioFormController extends BaseUserController {
             } else {
                 notificacioCommand.getDocuments()[i] = null;
             }
+        }
+    }
+
+    @RequestMapping(value = "/valida/firma", method = RequestMethod.POST, headers="Content-Type=application/json")
+    @ResponseBody
+    public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam("fitxer") MultipartFile fitxer) throws IOException {
+
+        String nom = fitxer.getOriginalFilename();
+        byte[] content = fitxer.getBytes();
+        String contentType = fitxer.getContentType();
+        String contingutBase64 = Base64.encodeBase64String(content);
+        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+        SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, contentType);
+        return FirmaValidDto.builder()
+                .arxiuGestdocId(arxiuGestdocId)
+                .nom(nom)
+                .mida(fitxer.getSize())
+                .signed(signatureInfo.isSigned())
+                .error(signatureInfo.isError())
+                .errorMsg(signatureInfo.getErrorMsg())
+                .build();
+    }
+
+    private void validaFirma(String mediaType, BindingResult bindingResult, int position, byte[] content) {
+        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, mediaType);
+        if (signatureInfoDto.isError()) {
+            String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
+            bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
         }
     }
 

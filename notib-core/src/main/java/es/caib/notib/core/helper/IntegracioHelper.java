@@ -14,7 +14,6 @@ import es.caib.notib.core.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,8 +58,9 @@ public class IntegracioHelper {
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_GESCONADM = "GESCONADM";
 	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
-	public static final String INTCODI_CONVERT = "CONVERT";
+//	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
+	public static final String INTCODI_VALIDASIG = "VALIDASIG";
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<>();
@@ -75,6 +74,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_GESCONADM));
 		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
 		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
+		integracions.add(novaIntegracio(INTCODI_VALIDASIG));
 		return integracions;
 	}
 
@@ -90,6 +90,7 @@ public class IntegracioHelper {
 		errorsGroupByCodi.put(INTCODI_GESCONADM,countErrors(INTCODI_GESCONADM));
 		errorsGroupByCodi.put(INTCODI_PROCEDIMENT,countErrors(INTCODI_PROCEDIMENT));
 		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_FIRMASERV));
+		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_VALIDASIG));
 		return errorsGroupByCodi;
 	}
 
@@ -97,8 +98,12 @@ public class IntegracioHelper {
 	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
 
 //		return conversio.convertirList(monitorRepository.findAllByCodiOrderByDataDesc(integracioCodi), IntegracioAccioDto.class);
-		return conversio.convertirList(monitorRepository.getByFiltre(integracioCodi, Strings.isNullOrEmpty(filtre.getEntitatCodi()), filtre.getEntitatCodi(),
-				Strings.isNullOrEmpty(filtre.getAplicacio()), filtre.getAplicacio()), IntegracioAccioDto.class);
+		return conversio.convertirList(monitorRepository.getByFiltre(
+				integracioCodi,
+				Strings.isNullOrEmpty(filtre.getEntitatCodi()),
+				filtre.getEntitatCodi(),
+				Strings.isNullOrEmpty(filtre.getAplicacio()),
+				filtre.getAplicacio()), IntegracioAccioDto.class);
 	}
 
 	public void addAccioOk(IntegracioInfo info) {
@@ -107,9 +112,15 @@ public class IntegracioHelper {
 
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio())
-			.tipus(info.getTipus()).codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK)
-			.aplicacio(info.getAplicacio()).build();
+		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
+				.codi(info.getCodi())
+				.data(new Date())
+				.descripcio(info.getDescripcio())
+				.tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat())
+				.tempsResposta(info.getTempsResposta())
+				.estat(IntegracioAccioEstatEnumDto.OK)
+				.aplicacio(info.getAplicacio()).build();
 
 		assignarAccioAParams(info, accio);
 		addAccio(accio, obtenirUsuari);
@@ -128,8 +139,15 @@ public class IntegracioHelper {
 
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
-		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus())
-				.codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.ERROR).errorDescripcio(errorDescripcio)
+		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
+				.codi(info.getCodi())
+				.data(new Date())
+				.descripcio(info.getDescripcio())
+				.tipus(info.getTipus())
+				.codiEntitat(info.getCodiEntitat())
+				.tempsResposta(info.getTempsResposta())
+				.estat(IntegracioAccioEstatEnumDto.ERROR)
+				.errorDescripcio(errorDescripcio)
 				.aplicacio(info.getAplicacio()).build();
 //		accio.setIntegracio(novaIntegracio(info.getCodi()));
 		assignarAccioAParams(info, accio);
@@ -166,7 +184,10 @@ public class IntegracioHelper {
 		if (accio.getParametres() == null) {
 			accio.setParametres(new ArrayList<MonitorIntegracioParamEntity>());
 		}
-		accio.getParametres().add(MonitorIntegracioParamEntity.builder().monitorIntegracio(accio).codi("Usuari").valor(getUsuariNomCodi(obtenirUsuari)).build());
+		accio.getParametres().add(MonitorIntegracioParamEntity.builder()
+				.monitorIntegracio(accio)
+				.codi("Usuari")
+				.valor(getUsuariNomCodi(obtenirUsuari)).build());
 	}
 
 	private String getUsuariNomCodi(boolean obtenirUsuari) {
@@ -211,6 +232,8 @@ public class IntegracioHelper {
 				integracio.setNom("Procediments");
 		} else if (INTCODI_FIRMASERV.equals(codi)) {
 			integracio.setNom("Firma servidor");
+		} else if (INTCODI_VALIDASIG.equals(codi)) {
+			integracio.setNom("Validacio firma");
 		}
 		return integracio;
 	}

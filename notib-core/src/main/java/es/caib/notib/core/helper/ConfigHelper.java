@@ -9,7 +9,6 @@ import es.caib.notib.core.entity.config.ConfigGroupEntity;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
 import es.caib.notib.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,6 +113,13 @@ public class ConfigHelper {
     }
 
     public boolean getAsBoolean(String key) {
+        return Boolean.parseBoolean(getConfig(key));
+    }
+    public boolean getAsBoolean(String key, boolean defaultValue) {
+        String value = getConfig(key);
+        if (Strings.isNullOrEmpty(value)) {
+            return defaultValue;
+        }
         return Boolean.parseBoolean(getConfig(key));
     }
 

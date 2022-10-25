@@ -11,7 +11,6 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.service.MonitorIntegracioService;
 import es.caib.notib.war.command.IntegracioFiltreCommand;
-import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
@@ -57,7 +56,8 @@ public class IntegracioController extends BaseUserController {
 		UNITATS,
 		GESCONADM,
 		PROCEDIMENTS,
-		FIRMASERV
+		FIRMASERV,
+		VALIDASIG
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

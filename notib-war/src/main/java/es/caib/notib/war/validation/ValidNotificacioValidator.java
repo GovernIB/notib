@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommand;
@@ -35,6 +36,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ProcedimentService procedimentService;
+	@Autowired
+	private NotificacioService notificacioService;
 	
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
@@ -190,6 +193,9 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 									extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
 									contentType = notificacio.getArxiu()[i].getContentType();
 									fileSize = notificacio.getArxiu()[i].getSize();
+									// Validar firma del document
+//									notificacioService.checkIfSignedAttached(notificacio.getArxiu()[i].getBytes(), contentType);
+
 								}
 								log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
 								boolean formatValid = true;
