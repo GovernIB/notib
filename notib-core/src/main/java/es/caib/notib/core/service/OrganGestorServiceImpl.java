@@ -52,7 +52,6 @@ import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.ProcSerSyncHelper;
-import es.caib.notib.core.repository.AvisRepository;
 import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -104,8 +103,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private ProcSerRepository procSerRepository;
 	@Resource
 	private NotificacioRepository notificacioRepository;
-	@Resource
-	private AvisRepository avisRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -568,7 +565,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		try {
 			// 0. Buidar cache de l'organigrama
 			log.debug(prefix + "Buidant caches");
-			cacheHelper.clearAllCaches();
 
 			// 1. Obtenir canvis a l'organigrama
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
@@ -666,7 +662,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar.fi"));
 
-			cacheHelper.evictFindOrgansGestorWithPermis();
+			cacheHelper.clearAllCaches();
+//			cacheHelper.evictFindOrgansGestorWithPermis();
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 		} catch (Exception ex) {
@@ -1038,10 +1035,14 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 					}
 				} else {
-					getLastHistoricosRecursive(
-							unitatFromCodi,
-							unitatsFromWebService,
-							lastHistorics);
+					if (!unitatFromCodi.equals(unitat)) {
+						getLastHistoricosRecursive(
+								unitatFromCodi,
+								unitatsFromWebService,
+								lastHistorics);
+					} else {
+						lastHistorics.add(unitat);
+					}
 				}
 			}
 		}
