@@ -335,10 +335,11 @@ public class ProcSerHelper {
 	public void actualitzarProcedimentFromGda(ProgresActualitzacioDto progres, ProcSerDataDto procedimentGda, EntitatEntity entitat, List<String> codiOrgansGda,
 											  boolean modificar, List<OrganGestorEntity> organsGestorsModificats, Map<String, String[]> avisosProcedimentsOrgans) {
 		
-		Long t1 = System.currentTimeMillis();
+		var t1 = System.currentTimeMillis();
 		OrganGestorEntity organGestorGda = null;
 		try {
-			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
+			var procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
+			procediment.updateActiu(true);
 			if (!procedimentHasToBeUpdated(procedimentGda, procediment, codiOrgansGda, progres)) {
 				return;
 			}
@@ -422,8 +423,8 @@ public class ProcSerHelper {
 	}
 
 	@Transactional
-	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, ProgresActualitzacioDto progres) {
-		List<String> procedimentsActiusNotib = procedimentRepository.findCodiActius();
+	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, String entitatCodi, ProgresActualitzacioDto progres) {
+		List<String> procedimentsActiusNotib = procedimentRepository.findCodiActiusByEntitat(entitatCodi);
 		for (ProcSerDto procedimentGda: procedimentsGda) {
 			procedimentsActiusNotib.remove(procedimentGda.getCodi());
 		}
@@ -437,10 +438,11 @@ public class ProcSerHelper {
 	public void actualitzarServeiFromGda(ProgresActualitzacioDto progres, ProcSerDataDto serveiGda, EntitatEntity entitat, List<String> codiOrgansGda, 
 										 boolean modificar, List<OrganGestorEntity> organsGestorsModificats, Map<String, String[]> avisosProcedimentsOrgans) {
 
-		Long t1 = System.currentTimeMillis();
+		var t1 = System.currentTimeMillis();
 		OrganGestorEntity organGestorGda = null;
 		try {
-			ServeiEntity servei = serveiRepository.findByCodiAndEntitat(serveiGda.getCodi(), entitat);
+			var servei = serveiRepository.findByCodiAndEntitat(serveiGda.getCodi(), entitat);
+			servei.updateActiu(true);
 			if (!serveiHasToBeUpdated(serveiGda, servei, codiOrgansGda, progres)) {
 				return;
 			}
@@ -529,12 +531,13 @@ public class ProcSerHelper {
 	}
 
 	@Transactional
-	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, ProgresActualitzacioDto progres) {
-		List<String> serveisActiusNotib = serveiRepository.findCodiActius();
-		for (ProcSerDto serveiGda: serveisGda) {
+	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, String entitatCodi, ProgresActualitzacioDto progres) {
+
+		var serveisActiusNotib = serveiRepository.findCodiActiusByEntitat(entitatCodi);
+		for (var serveiGda: serveisGda) {
 			serveisActiusNotib.remove(serveiGda.getCodi());
 		}
-		for (String codi: serveisActiusNotib) {
+		for (var codi: serveisActiusNotib) {
 			serveiRepository.updateActiu(codi, false);
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.deshabilitar.procediment", new Object[] {codi}));
 		}

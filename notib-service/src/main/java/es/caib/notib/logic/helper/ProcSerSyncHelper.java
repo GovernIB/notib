@@ -93,7 +93,7 @@ public class ProcSerSyncHelper {
 
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, progres);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
@@ -158,9 +158,10 @@ public class ProcSerSyncHelper {
 			// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
 			int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
 			progres.incrementOperacionsRealitzades(elementsPagina);
-//			if (reintents > 0) {
+			if (reintents > 0) {
+				progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
 //				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
-//			}
+			}
 			numPagina++;
 		} while (numPagina * 30 < totalElementsCons);
 
@@ -335,7 +336,7 @@ public class ProcSerSyncHelper {
 
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
 			processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
-			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, progres);
+			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
@@ -392,16 +393,16 @@ public class ProcSerSyncHelper {
 					// Si obté la pàgina posam reintents a 0, de manera que la condició sigui fals, i finalitzi del do-while
 					reintents = 0;
 				} catch (Exception e) {
-					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.obtenir.serveis.error"));
 					reintents++;
 				}
 			} while (reintents > 0 && reintents < 3);
 			// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
 			int elementsPagina = numPagina == pagines ? elementsUltimaPagina : 30;
 			progres.incrementOperacionsRealitzades(elementsPagina);
-//			if (reintents > 0) {
+			if (reintents > 0) {
+				progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.obtenir.serveis.error"));
 //				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
-//			}
+			}
 			numPagina++;
 		} while (numPagina * 30 < totalElementsCons);
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;

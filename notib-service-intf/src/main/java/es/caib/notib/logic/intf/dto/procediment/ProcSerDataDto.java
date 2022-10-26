@@ -38,7 +38,7 @@ public class ProcSerDataDto extends AuditoriaDto implements Serializable {
 	protected String codiAssumpteNom;
 	protected boolean comu;
 	protected boolean requireDirectPermission;
-	protected boolean actiu;
+	protected boolean actiu = true;
 	protected Date ultimaActualitzacio;
 
 	protected int retard;

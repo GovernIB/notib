@@ -219,8 +219,8 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 
 	@Query(	"select distinct pro.codi " +
 			"  from ProcedimentEntity pro " +
-			" where pro.actiu = true")
-	public List<String> findCodiActius();
+			" where pro.entitat.codi = :entitatCodi and pro.actiu = true")
+	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Modifying
 	@Query("update ProcedimentEntity pro set pro.actiu = :actiu where pro.codi = :codi")

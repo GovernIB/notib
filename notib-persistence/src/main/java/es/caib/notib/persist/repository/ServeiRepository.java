@@ -219,8 +219,8 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 
 	@Query(	"select distinct pro.codi " +
 			"  from ServeiEntity pro " +
-			" where pro.actiu = true")
-	public List<String> findCodiActius();
+			" where pro.entitat.codi = :entitatCodi and pro.actiu = true")
+	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Modifying
 	@Query("update ServeiEntity pro set pro.actiu = :actiu where pro.codi = :codi")
