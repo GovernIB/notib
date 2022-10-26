@@ -99,7 +99,7 @@ public class ProcSerSyncHelper {
 
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(),progres);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			Long tf = System.currentTimeMillis();
@@ -356,7 +356,7 @@ public class ProcSerSyncHelper {
 
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
 			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
-			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(),progres);
+			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			Long tf = System.currentTimeMillis();
