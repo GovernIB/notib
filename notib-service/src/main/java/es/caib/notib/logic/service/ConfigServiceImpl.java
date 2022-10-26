@@ -54,8 +54,8 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigDto updateProperty(ConfigDto property) {
 
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
-        ConfigEntity configEntity = configRepository.findById(property.getKey()).orElseThrow();
-        if (!configEntity.isConfigurable()) {
+        var configEntity = configRepository.findById(property.getKey()).orElseThrow();
+        if (configEntity == null || configEntity.isJbossProperty()) {
             log.error("ATENCIÓ S'ESTÀ INTENTANT GUARDAR UNA PROPIETAT QUE NO ÉS CONFIGURABLE");
             return null;
         }
@@ -71,9 +71,9 @@ public class ConfigServiceImpl implements ConfigService {
     public List<ConfigGroupDto> findAll() {
 
         log.info("Consulta totes les propietats");
-        List<ConfigGroupEntity> groups = configGroupRepository.findByParentCodeIsNull(Sort.by(Sort.Direction.ASC, "position"));
-        List<ConfigGroupDto> configGroupDtoList =  conversioTipusHelper.convertirList(groups, ConfigGroupDto.class);
-        for (ConfigGroupDto cGroup: configGroupDtoList) {
+        var groups = configGroupRepository.findByParentCodeIsNull(Sort.by(Sort.Direction.ASC, "position"));
+        var configGroupDtoList =  conversioTipusHelper.convertirList(groups, ConfigGroupDto.class);
+        for (var cGroup: configGroupDtoList) {
             processPropertyValues(cGroup);
         }
         return configGroupDtoList;
