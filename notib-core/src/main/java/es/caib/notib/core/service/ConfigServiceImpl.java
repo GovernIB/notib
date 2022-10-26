@@ -54,8 +54,9 @@ public class ConfigServiceImpl implements ConfigService {
     public ConfigDto updateProperty(ConfigDto property) {
 
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
+
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
-        if (!configEntity.isConfigurable()) {
+        if (configEntity == null || configEntity.isJbossProperty()) {
             log.error("ATENCIÓ S'ESTÀ INTENTANT GUARDAR UNA PROPIETAT QUE NO ÉS CONFIGURABLE");
             return null;
         }
