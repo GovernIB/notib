@@ -35,9 +35,24 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.AuditEnviamentHelper;
+import es.caib.notib.core.helper.AuditNotificacioHelper;
+import es.caib.notib.core.helper.CallbackHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.FiltreHelper;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
+import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MessageHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificacioEventHelper;
+import es.caib.notib.core.helper.OrganGestorHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.ProcSerHelper;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.ColumnesRepository;
 import es.caib.notib.core.repository.EntitatRepository;
@@ -72,7 +87,16 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació del servei de gestió de enviaments.
@@ -608,9 +632,13 @@ public class EnviamentServiceImpl implements EnviamentService {
 			}
 
 			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
-			if (entitatEntity.isLlibreEntitat()) {
-				for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
-						tableItem.setLlibre(entitatEntity.getLlibre());
+			for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
+				if (entitatEntity.isLlibreEntitat()) {
+					tableItem.setLlibre(entitatEntity.getLlibre());
+				}
+				NotificacioEntity not = notificacioRepository.findById(tableItem.getNotificacioId());
+				if (not != null && not.getOrganGestor() != null) {
+					tableItem.setOrganEstat(not.getOrganGestor().getEstat());
 				}
 			}
 

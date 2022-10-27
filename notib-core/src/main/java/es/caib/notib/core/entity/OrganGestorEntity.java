@@ -177,13 +177,17 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 		if (nous == null) {
 			nous = new ArrayList<>();
 		}
-		nous.add(nou);
+		if (!nous.contains(nou)) {
+			nous.add(nou);
+		}
 	}
 	public void addAntic(OrganGestorEntity antic) {
 		if (antics == null) {
 			antics = new ArrayList<>();
 		}
-		antics.add(antic);
+		if (!antics.contains(antic)) {
+			antics.add(antic);
+		}
 	}
 
 	@Override

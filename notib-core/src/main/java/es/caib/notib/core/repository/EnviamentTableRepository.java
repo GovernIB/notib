@@ -3,10 +3,9 @@ package es.caib.notib.core.repository;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EnviamentTableEntity;
-import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -350,11 +349,17 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("referenciaNotificacio") String referenciaNotificacio,
 			Pageable pageable);
 	
-	@Modifying
-	@Query("update EnviamentTableEntity et " +
-			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
-			"where et.organCodi is not null")
-	void updateOrganGestorEstat();
+//	@Modifying
+//	@Query("update EnviamentTableEntity et " +
+//			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
+//			"where et.organCodi is not null")
+//	void updateOrganGestorEstat();
+//
+//	@Modifying
+//	@Query("update EnviamentTableEntity et " +
+//			"set et.organEstat = :estat " +
+//			"where et.organCodi in :organs")
+//	void updateOrganGestorEstat(@Param("estat") OrganGestorEstatEnum estat, @Param("organs") List<String> organs);
 
 	@Modifying
 	@Query("update EnviamentTableEntity nt " +
