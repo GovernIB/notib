@@ -145,6 +145,8 @@ public class IntegracioHelper {
 	private void addAccio(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
+		String st = accio.getExcepcioStacktrace();
+		accio.setExcepcioStacktrace(st != null && st.getBytes().length > 2048 ? st.substring(0, 2048) : st);
 		monitorRepository.save(accio);
 	}
 
