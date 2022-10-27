@@ -1852,6 +1852,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if(enviament.getTitular().getDir3Codi() == null) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.dir3codi.administracio.titular.enviament.no.null"));
 				}
+				senseNif = false;
 				OrganGestorDto organDir3 = cacheHelper.unitatPerCodi(enviament.getTitular().getDir3Codi());
 				if (organDir3 == null) {
 					return setRespostaError(

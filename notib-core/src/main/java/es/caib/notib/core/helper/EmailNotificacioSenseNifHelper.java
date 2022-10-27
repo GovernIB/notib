@@ -125,6 +125,7 @@ public class EmailNotificacioSenseNifHelper {
 	public String sendEmailInfoEnviamentSenseNif(NotificacioEnviamentEntity enviament) {
 		String resposta = null;
 		try {
+
 			String email = enviament.getTitular().getEmail();
 			if (email == null || email.isEmpty()) {
 				String errorDescripció = "L'interessat no té correu electrònic per a enviar-li la comunicació.";
@@ -156,7 +157,7 @@ public class EmailNotificacioSenseNifHelper {
 		String textBody = getComunicacioMailPlainTextBody(enviament);
 		sendEmail(
 				email,
-				"[Notib] Nova comunicació / Nueva comunicación",
+				" Nova comunicació / Nueva comunicación",
 				htmlBody,
 				textBody,
 				entitat.getNom(),
@@ -174,7 +175,7 @@ public class EmailNotificacioSenseNifHelper {
 		String textBody = getNotificacioMailPlainTextBody(enviament);
 		sendEmail(
 				enviament.getTitular().getEmail(),
-				"[Notib] Avís de nova notificació / Aviso de nueva notificación",
+				"Avís de nova notificació / Aviso de nueva notificación",
 				htmlBody,
 				textBody,
 				entitat.getNom(),
@@ -194,13 +195,14 @@ public class EmailNotificacioSenseNifHelper {
 			List<Attachment> attatchments,
 			byte[] logoEntitat,
 			byte[] logoPeu) throws MessagingException, IOException {
+
 		MimeMessage missatge = mailSender.createMimeMessage();
 //		MimeMessage missatge = mailSender.createMimeMessage();
 		missatge.setHeader("Content-Type", "text/html charset=UTF-8");
 		MimeMessageHelper helper = new MimeMessageHelper(missatge, true, StandardCharsets.UTF_8.name());
 		helper.setTo(emailDestinatari);
 		helper.setFrom(getRemitent());
-		helper.setSubject(subject);
+		helper.setSubject(configHelper.getPrefix() + " " + subject);
 		// Contingut del missatge
 		boolean teLogoPeu = (logoPeu != null && logoPeu.length > 0) || getPeuLogo() != null;
 		helper.setText(textBody, getHeader() + htmlBody + getFooter(entitatNom, teLogoPeu));

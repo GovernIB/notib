@@ -80,7 +80,9 @@ public class ConfigController extends BaseUserController{
         String msg = "config.controller.edit.ok";
         int status = 1;
         try {
-            configService.updateProperty(configCommand.asDto());
+            ConfigDto c = configService.updateProperty(configCommand.asDto());
+            msg = c == null ? "config.controller.edit.error" : msg;
+            status = c == null ? 0 : status;
         } catch (Exception e) {
             e.printStackTrace();
             msg = "config.controller.edit.error";
