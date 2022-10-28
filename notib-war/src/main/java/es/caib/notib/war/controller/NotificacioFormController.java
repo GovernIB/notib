@@ -341,12 +341,13 @@ public class NotificacioFormController extends BaseUserController {
                         if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
                             byte[] contingut = notificacioCommand.getArxiu()[i].getBytes();
                             String contentType = notificacioCommand.getArxiu()[i].getContentType();
-                            notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
+                            String nom = notificacioCommand.getArxiu()[i].getOriginalFilename();
+                            notificacioCommand.getDocuments()[i].setArxiuNom(nom);
                             String contingutBase64 = Base64.encodeBase64String(contingut);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
                             notificacioCommand.getDocuments()[i].setMediaType(contentType);
                             notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
-                            validaFirma(contentType, bindingResult, i, contingut);
+                            validaFirma(nom, contentType, bindingResult, i, contingut);
                         } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
                             byte[] result;
                             if (notificacioCommand.getId() != null) {
@@ -357,7 +358,7 @@ public class NotificacioFormController extends BaseUserController {
 
                             String contingutBase64 = Base64.encodeBase64String(result);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                            validaFirma(notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
+                            validaFirma(notificacioCommand.getDocuments()[i].getArxiuNom(), notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
                         } else {
                             notificacioCommand.getDocuments()[i] = null;
                         }
@@ -393,28 +394,29 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    @RequestMapping(value = "/valida/firma", method = RequestMethod.POST, headers="Content-Type=application/json")
+    @RequestMapping(value = "/valida/firma", method = RequestMethod.POST)
     @ResponseBody
-    public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam("fitxer") MultipartFile fitxer) throws IOException {
+    public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
 
         String nom = fitxer.getOriginalFilename();
         byte[] content = fitxer.getBytes();
         String contentType = fitxer.getContentType();
-        String contingutBase64 = Base64.encodeBase64String(content);
-        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
-        SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, contentType);
+//        String contingutBase64 = Base64.encodeBase64String(content);
+//        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+        SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
         return FirmaValidDto.builder()
-                .arxiuGestdocId(arxiuGestdocId)
+//                .arxiuGestdocId(arxiuGestdocId)
                 .nom(nom)
                 .mida(fitxer.getSize())
+                .mediaType(fitxer.getContentType())
                 .signed(signatureInfo.isSigned())
                 .error(signatureInfo.isError())
                 .errorMsg(signatureInfo.getErrorMsg())
                 .build();
     }
 
-    private void validaFirma(String mediaType, BindingResult bindingResult, int position, byte[] content) {
-        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, mediaType);
+    private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {
+        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
         if (signatureInfoDto.isError()) {
             String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
             bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));

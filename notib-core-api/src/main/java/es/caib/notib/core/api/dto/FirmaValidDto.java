@@ -17,6 +17,7 @@ public class FirmaValidDto {
 
 	String arxiuGestdocId;
 	String nom;
+	String mediaType;
 	Long mida;
 	private boolean signed;
 	private boolean error = false;

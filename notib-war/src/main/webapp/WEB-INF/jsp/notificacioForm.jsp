@@ -486,15 +486,19 @@
 		});
 
 		// Validacio firma document fisic
-		$('input[type="file"]:visible').change((event) => {
-			$file = $(event.currentTarget);
-			if ($file.files.length == 0)
+		$('input[type="file"]').on('change', (event) => {
+			let file = event.currentTarget;
+			let $file = $(file);
+			if (file.files.length == 0)
 				return;
 
-			let file = $file.files[0];
+			let fitxer = file.files[0];
 			let formData = new FormData();
-			formData.append('fitxer', file, file.name);
+			formData.append('fitxer', fitxer, fitxer.name);
 			$file.prop("disabled", true);
+
+			let metadadesId = $file.closest(".row").next(".doc-metadades").prop("id");
+			let id = metadadesId.charAt(metadadesId.length - 1);
 
 			$.ajax({
 				type: "POST",
@@ -510,6 +514,23 @@
 					console.log("SUCCESS : ", data);
 					$file.prop("disabled", false);
 
+					if (data.mediaType == 'application/pdf') {
+						$('#documents\\[' + id + '\\]\\.modoFirma').prop('checked', data.signed);
+					}
+					if (data.error) {
+						$file.closest(".form-group").addClass("has-error");
+						$file.closest(".fileinput").next(".help-block").remove();
+						<%--$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.firma"/></span></p>').insertAfter($file.closest(".fileinput"));--%>
+						$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors">' + data.errorMsg +'</span></p>').insertAfter($file.closest(".fileinput"));
+					} else {
+						$file.closest(".form-group").removeClass("has-error");
+						$file.closest(".fileinput").next(".help-block").remove();
+					}
+					// $('documents\\[' + id + '\\]\\.arxiuGestdocId').val(data.arxiuGestdocId);
+					// $('documents\\[' + id + '\\]\\.arxiuNom').val(data.nom);
+					// $('documents\\[' + id + '\\]\\.mediaType').val(data.mediaType);
+					// $('documents\\[' + id + '\\]\\.mida').val(data.mida);
+
 				},
 				error: function (e) {
 
@@ -519,7 +540,7 @@
 				}
 			});
 
-		})
+		});
 
 		//Consulta al arxiu de los identificadores CSV o Uuid 
 		//para comprobar si existe el documento y sus metadatos	

@@ -406,8 +406,8 @@ public class NotificacioServiceBean implements NotificacioService {
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-    public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType) {
-        return delegate.checkIfSignedAttached(contingut, contentType);
+    public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType) {
+        return delegate.checkIfSignedAttached(contingut, nom, contentType);
     }
 
     @SuppressWarnings("rawtypes")

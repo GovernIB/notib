@@ -36,7 +36,7 @@ databaseChangeLog:
         author: limit
         changes:
             - sql : "
-                    INSERT INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('VALSIG_CLASS', 'org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.caib.valsig.ValidacioFirmesPluginMock');
+                    INSERT INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('VALSIG_CLASS', 'org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.ValidacioFirmesPluginMock');
                     
                     INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (1, 'FIRMA', 'VALIDATE_SIGNATURE', 'Configuració del plugin validació de firmes' );
                     

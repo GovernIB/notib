@@ -1785,7 +1785,14 @@ public class PluginHelper {
 	// Validació de firmes
 	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(
 			byte[] documentContingut,
+			String nom,
 			String firmaContentType) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_VALIDASIG,
+				"Enviament notificació a registre (SIR activat)",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("Nom del document", nom),
+				new AccioParam("ContentType", firmaContentType));
 		try {
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
 			validationRequest.setSignatureData(documentContingut);
@@ -1800,17 +1807,31 @@ public class PluginHelper {
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
 
 			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+			SignatureInfoDto signatureInfoDto;
+
 			if (validationStatus.getStatus() == 1) {
-				return SignatureInfoDto.builder().signed(true).error(false).build();
+				signatureInfoDto = SignatureInfoDto.builder().signed(true).error(false).build();
 			} else {
-				return new SignatureInfoDto(true, true, validationStatus.getErrorMsg());
+				signatureInfoDto = SignatureInfoDto.builder().signed(true).error(true).errorMsg(validationStatus.getErrorMsg()).build();
 			}
+			info.addParam("Document firmat", Boolean.toString(signatureInfoDto.isSigned()));
+			info.addParam("Error de firma", Boolean.toString(signatureInfoDto.isError()));
+			if (signatureInfoDto.isError()) {
+				info.addParam("Missatge d'error", signatureInfoDto.getErrorMsg());
+			}
+			integracioHelper.addAccioOk(info);
+			return signatureInfoDto;
 		} catch (Exception e) {
 			Throwable throwable = ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
 			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")) {
+				info.addParam("Document firmat", "false");
+				info.addParam("Error de firma", "false");
+				info.addParam("Missatge d'error", throwable.getMessage());
+				integracioHelper.addAccioOk(info);
 				return SignatureInfoDto.builder().signed(false).error(false).build();
 			} else {
 				logger.error("Error al detectar firma de document", e);
+				integracioHelper.addAccioError(info, "Error al validar la firma", throwable);
 				return SignatureInfoDto.builder().signed(false).error(true).errorMsg(e.getMessage()).build();
 			}
 		}
