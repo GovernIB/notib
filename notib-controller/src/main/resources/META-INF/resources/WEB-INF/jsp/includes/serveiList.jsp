@@ -73,6 +73,10 @@ $(document).ready(function() {
 				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 		</c:if>
+		<div class="col-md-1">
+			<not:inputSelect name="estat" optionItems="${procedimentEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+							 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
+		</div>
 		<div class="col-md-2 pull-right">
 			<div class="pull-right">
 				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

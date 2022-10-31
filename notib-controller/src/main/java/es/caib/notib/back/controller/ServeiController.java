@@ -1,9 +1,11 @@
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerFormDto;
+import es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.*;
@@ -72,6 +74,7 @@ public class ServeiController extends BaseUserController{
 		this.currentFiltre = SERVEIS_FILTRE;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
+		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.core.api.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		String property = aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false");
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(property));
