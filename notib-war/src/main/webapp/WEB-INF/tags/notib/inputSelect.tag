@@ -97,7 +97,7 @@
 						<c:choose>
 							<c:when test="${not empty optionValueAttribute}">
 								<c:choose>
-									<c:when test="${not empty optionTextAttribute}"><form:option value="${opt[optionValueAttribute]}">${nivellTxt}${opt[optionTextAttribute]}</form:option></c:when>
+									<c:when test="${not empty optionTextAttribute}"><form:option value="${opt[optionValueAttribute]}">${nivellTxt}${opt[optionTextAttribute]}z</form:option></c:when>
 									<c:when test="${not empty optionTextKeyAttribute}"><form:option value="${opt[optionValueAttribute]}">${nivellTxt}<spring:message code="${opt[optionTextKeyAttribute]}"/></form:option></c:when>
 									<c:otherwise><form:option value="${opt[optionValueAttribute]}"/></c:otherwise>
 								</c:choose>

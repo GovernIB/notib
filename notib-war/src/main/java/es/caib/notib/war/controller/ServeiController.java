@@ -171,17 +171,18 @@ public class ServeiController extends BaseUserController{
 			HttpServletRequest request,
 			@Valid ProcSerCommand procSerCommand,
 			BindingResult bindingResult,
-			Model model) {		
-		
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelServei(
 					request,
 					procSerCommand.getId(),
 					model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
@@ -217,6 +218,8 @@ public class ServeiController extends BaseUserController{
 			HttpServletRequest request, 
 			@PathVariable Long serveiId,
 			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerCommand procSerCommand;
 		ProcSerDto servei = emplenarModelServei(
 				request,
@@ -233,9 +236,9 @@ public class ServeiController extends BaseUserController{
 			procSerCommand = new ProcSerCommand();
 		}
 		model.addAttribute(procSerCommand);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}

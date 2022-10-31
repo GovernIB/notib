@@ -136,9 +136,9 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("entitat", entitat);
 			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			if (organGestorCommand.getId() != null) {
 				model.addAttribute("isModificacio", true);
@@ -164,9 +164,9 @@ public class OrganGestorController extends BaseUserController{
 			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
 			model.addAttribute("isModificacio", true);
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "organGestorForm";
 		} catch (Exception e) {

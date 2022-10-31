@@ -15,6 +15,7 @@ import es.caib.notib.core.api.service.PagadorCieService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
+import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -228,12 +230,29 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 					true,
 					false);
 			return conversioTipusHelper.convertirList(
-					pagadorCieReposity.findAll(),
+					pagadorCieReposity.findByContracteDataVigGreaterThanEqual(new Date()),
 					IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			List<PagadorPostalEntity> p = pagadorCieReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<CieDto> findByEntitat(Long entitatId) {
