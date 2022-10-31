@@ -13,6 +13,7 @@ import java.io.Serializable;
  */
 @Getter @Setter
 public class ProcSerFiltreDto extends AuditoriaDto implements Serializable {
+
 	private String id;
 	private String codi;
 	private String nom;
@@ -20,4 +21,5 @@ public class ProcSerFiltreDto extends AuditoriaDto implements Serializable {
 	private Long entitatId;
 	private boolean comu;
 	private boolean entregaCieActiva;
+	private ProcedimentEstat estat;
 }
