@@ -2,7 +2,23 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.Arbre;
+import es.caib.notib.core.api.dto.ArbreNode;
+import es.caib.notib.core.api.dto.CodiValorDto;
+import es.caib.notib.core.api.dto.CodiValorEstatDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
@@ -23,8 +39,19 @@ import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
-import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.AvisRepository;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MessageHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganGestorHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.ProcSerSyncHelper;
 import es.caib.notib.core.repository.EntregaCieRepository;
 import es.caib.notib.core.repository.GrupRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
@@ -32,7 +59,6 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
-
 import es.caib.notib.core.security.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.Getter;
@@ -77,8 +103,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private ProcSerRepository procSerRepository;
 	@Resource
 	private NotificacioRepository notificacioRepository;
-	@Resource
-	private AvisRepository avisRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -541,7 +565,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		try {
 			// 0. Buidar cache de l'organigrama
 			log.debug(prefix + "Buidant caches");
-			cacheHelper.clearAllCaches();
 
 			// 1. Obtenir canvis a l'organigrama
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
@@ -560,7 +583,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				codis.add(u.getCodi());
 			}
 			log.debug(prefix + "calculant unitats extingides");
-			obsoleteUnitats = calcularExtingides(codis);
+			obsoleteUnitats = calcularExtingides(entitat.getCodi(), codis);
 			log.debug(prefix + "nombre d'unitats extingides: " + obsoleteUnitats.size());
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
@@ -639,7 +662,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar.fi"));
 
-			cacheHelper.evictFindOrgansGestorWithPermis();
+			cacheHelper.clearAllCaches();
+//			cacheHelper.evictFindOrgansGestorWithPermis();
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 		} catch (Exception ex) {
@@ -796,27 +820,36 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 			codis.add(u.getCodi());
 		}
-		List<OrganGestorEntity> extingides = calcularExtingides(codis);
+		List<OrganGestorEntity> extingides = calcularExtingides(entitat.getCodi(), codis);
 		List<UnitatOrganitzativaDto> ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
 		List<UnitatOrganitzativaDto> n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
 		return PrediccioSincronitzacio.builder().isFirstSincronization(true).unitatsVigents(vigents).unitatsNew(n).unitatsExtingides(ex).build();
 	}
 
-	private List<OrganGestorEntity> calcularExtingides(List<String> codis) {
-
+	private List<OrganGestorEntity> calcularExtingides(String entitatCodi, List<String> codis) {
 		List<OrganGestorEntity> extingides = new ArrayList<>();
+		List<String> organsAExtingir = organGestorRepository.findCodiActiusByEntitat(entitatCodi);
+		if (organsAExtingir.isEmpty())
+			return extingides;
+
+		for (String codi: codis) {
+			organsAExtingir.remove(codi);
+		}
+		if (organsAExtingir.isEmpty())
+			return extingides;
+
 		int maxInSize = 1000;
-		int nParts = (codis.size() / maxInSize) + 1;
+		int nParts = (organsAExtingir.size() / maxInSize) + 1;
 		int inici = 0;
-		int fi = codis.size() - maxInSize > 0 ? maxInSize : codis.size();
+		int fi = organsAExtingir.size() - maxInSize > 0 ? maxInSize : organsAExtingir.size();
 		List<String>  subList;
 		for (int foo= 0; foo < nParts; foo++) {
-			subList = codis.subList(inici, fi);
+			subList = organsAExtingir.subList(inici, fi);
 			if (!subList.isEmpty()) {
-				extingides.addAll(organGestorRepository.findByCodiNotIn(subList));
+				extingides.addAll(organGestorRepository.findByEntitatCodiAndCodiIn(entitatCodi, subList));
 			}
 			inici = fi + 1 ;
-			fi = codis.size() - inici > maxInSize ? maxInSize : codis.size();
+			fi = organsAExtingir.size() - inici > maxInSize ? maxInSize : organsAExtingir.size();
 		}
 		return extingides;
 	}
@@ -981,7 +1014,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			List<NodeDir3> unitatsFromWebService,
 			List<NodeDir3> lastHistorics) {
 
-		logger.debug("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
+		logger.info("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
 
 		if (unitat.getHistoricosUO() == null || unitat.getHistoricosUO().isEmpty()) {
 			lastHistorics.add(unitat);
@@ -1002,10 +1035,14 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 						throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 					}
 				} else {
-					getLastHistoricosRecursive(
-							unitatFromCodi,
-							unitatsFromWebService,
-							lastHistorics);
+					if (!unitatFromCodi.equals(unitat)) {
+						getLastHistoricosRecursive(
+								unitatFromCodi,
+								unitatsFromWebService,
+								lastHistorics);
+					} else {
+						lastHistorics.add(unitat);
+					}
 				}
 			}
 		}

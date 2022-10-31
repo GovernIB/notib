@@ -6,3 +6,4 @@
 /.attach_pid*
 /notib-core.iml
 /pom.xml.versionsBackup
+/liquibase/databasechangelog.csv

@@ -711,6 +711,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
 				not.setDocumentId(id);
 				not.setEnvCerData(cerData);
+				not.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
 			}
 			return pag;
 		} finally {

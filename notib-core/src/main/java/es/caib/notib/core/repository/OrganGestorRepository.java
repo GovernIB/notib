@@ -150,7 +150,12 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 
 	public List<OrganGestorEntity> findByCodiIn(List<String> organs);
 
-	List<OrganGestorEntity> findByCodiNotIn(List<String> organs);
+	List<OrganGestorEntity> findByEntitatCodiAndCodiIn(String entitatCodi, List<String> organs);
+
+	@Query(	"select distinct og.codi " +
+			"  from OrganGestorEntity og " +
+			" where og.entitat.codi = :entitatCodi and og.estat <> es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V")
+	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Query(	" select " +
 			"	CASE WHEN count(og) > 0 THEN true ELSE false END " +

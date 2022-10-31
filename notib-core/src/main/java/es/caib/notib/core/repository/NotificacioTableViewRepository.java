@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
@@ -442,11 +443,17 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 
-	@Modifying
-	@Query("update NotificacioTableEntity nt " +
-			"set nt.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = nt.organCodi) " +
-			"where nt.organCodi is not null")
-	void updateOrganGestorEstat();
+//	@Modifying
+//	@Query("update NotificacioTableEntity nt " +
+//			"set nt.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = nt.organCodi) " +
+//			"where nt.organCodi is not null")
+//	void updateOrganGestorEstat();
+//
+//	@Modifying
+//	@Query("update NotificacioTableEntity nt " +
+//			"set nt.organEstat = :estat " +
+//			"where nt.organCodi in :organs")
+//	void updateOrganGestorEstat(@Param("estat") OrganGestorEstatEnum estat, @Param("organs") List<String> organs);
 
 	@Modifying
 	@Query("update NotificacioTableEntity nt " +
