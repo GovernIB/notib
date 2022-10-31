@@ -13,6 +13,7 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.exception.NoMetadadesException;
+import es.caib.notib.core.api.exception.SignatureValidationException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.JustificantService;
@@ -362,6 +363,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						String errorDescripcio = messageHelper.getMessage("error.obtenint.metadades.document") + numDoc + ": " + me.getMessage();
 						integracioHelper.addAccioError(info, errorDescripcio, me);
 						return setRespostaError(errorDescripcio);
+					} catch (SignatureValidationException sve) {
+						logger.error("Error al validar la firma del document: " + sve.getNom(), sve);
+						String errorDescripcio = messageHelper.getMessage("error.validant.firma.document") + sve.getNom() + ": " + sve.getMessage();
+						integracioHelper.addAccioError(info, errorDescripcio, sve);
+						return setRespostaError(errorDescripcio);
 					} catch (Exception e) {
 						logger.error("Error al obtenir el document " + numDoc, e);
 						String errorDescripcio = messageHelper.getMessage("error.obtenint.document") + numDoc + ": " + e.getMessage();
@@ -380,6 +386,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					try {
 						document = comprovaDocument(notificacio.getDocument()); //, !comunicacioAmbAdministracio);
 						documentEntity = getDocument(notificacio.getDocument(), document);
+					} catch (SignatureValidationException sve) {
+						logger.error("Error al validar la firma del document: " + sve.getNom(), sve);
+						String errorDescripcio = messageHelper.getMessage("error.validant.firma.document") + sve.getNom() + ": " + sve.getMessage();
+						integracioHelper.addAccioError(info, errorDescripcio, sve);
+						return setRespostaError(errorDescripcio);
 					} catch (Exception e) {
 						logger.error("Error al obtenir el document", e);
 						String errorDescripcio = messageHelper.getMessage("error.obtenint.document") + " a notificar: " + e.getMessage();
@@ -1347,12 +1358,17 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if(documentV2.getContingutBase64() != null) {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
+			String mediaType = getMimeTypeFromContingut(contingut);
+			SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
+			if (signatureInfo.isError()) {
+				throw new SignatureValidationException(documentV2.getArxiuNom(), signatureInfo.getErrorMsg());
+			}
 			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
 					contingut);
 			document.setArxiuGestdocId(documentGesdocId);
 			document.setMida(Long.valueOf(contingut.length));
-			document.setMediaType(getMimeTypeFromContingut(contingut));
+			document.setMediaType(mediaType);
 			document.setOrigen(origen);
 			document.setValidesa(validesa);
 			document.setTipoDocumental(tipoDocumental);
