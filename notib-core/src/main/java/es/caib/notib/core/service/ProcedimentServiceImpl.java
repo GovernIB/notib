@@ -25,6 +25,7 @@ import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -740,6 +741,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
+							filtre.getEstat() == null,
+							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							pageable);
@@ -752,6 +755,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
+							filtre.getEstat() == null,
+							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							pageable);
@@ -766,6 +771,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
 							organsFills,
+							filtre.getEstat() == null,
+							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
 							pageable);

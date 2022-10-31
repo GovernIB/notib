@@ -86,6 +86,19 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
 		return delegate.findAllIdentificadorText();
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+		return null;
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
+		return delegate.findNoCaducatsByEntitat(entitat);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {

@@ -1,5 +1,6 @@
 package es.caib.notib.war.command;
 
+import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
@@ -22,22 +23,16 @@ public class ProcSerFiltreCommand {
 	private boolean comu;
 	private boolean entregaCieActiva;
 	private boolean actiu;
+	private ProcedimentEstat estat;
 	
 	
 	public static ProcSerFiltreCommand asCommand(ProcSerFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		ProcSerFiltreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				ProcSerFiltreCommand.class );
-		return command;
+
+		return dto != null ? ConversioTipusHelper.convertir(dto, ProcSerFiltreCommand.class ) : null;
 	}
 
 	public ProcSerFiltreDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				ProcSerFiltreDto.class);
+		return ConversioTipusHelper.convertir(this, ProcSerFiltreDto.class);
 	}
 
 	@Override

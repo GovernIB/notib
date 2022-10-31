@@ -192,9 +192,9 @@ public class OrganGestorArbreController extends BaseUserController {
         model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
         model.addAttribute("setOficina", !entitat.isOficinaEntitat());
         model.addAttribute("isModificacio", organ != null && organ.getId() != null);
-        List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+        List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
         model.addAttribute("operadorPostalList", operadorPostalList);
-        List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+        List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
         model.addAttribute("cieList", cieList);
         List<OficinaDto> oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
         if (!entitat.isOficinaEntitat()) {

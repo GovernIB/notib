@@ -93,9 +93,13 @@ public interface PagadorCieService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	List<CieDto> findAll();
 
+	@PreAuthorize("hasRole('tothom')")
 	List<IdentificadorTextDto> findAllIdentificadorText();
 
-	/**
+	@PreAuthorize("hasRole('tothom')")
+    List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat);
+
+    /**
 	 * Llistat amb els pagadors cie d'una entitat.
 	 *
 	 * @return La llista dels pagadors postals.

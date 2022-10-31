@@ -95,6 +95,12 @@ public interface OperadorPostalService {
 	@PreAuthorize("hasRole('tothom')")
 	List<IdentificadorTextDto> findAllIdentificadorText();
 
+	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitatId);
+
 	/**
 	 * Llistat amb els pagadors postal d'una entitat.
 	 * 
