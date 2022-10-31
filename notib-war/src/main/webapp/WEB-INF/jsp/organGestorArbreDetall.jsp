@@ -219,11 +219,11 @@
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/>
                 </a>
             </div>
-            <div>
-                <a id="actualitzar" class="btn btn-default" href="" data-toggle="ajax" data-adjust-height="false" data-height="650px">
-                    <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/>
-                </a>
-            </div>
+<%--            <div>--%>
+<%--                <a id="actualitzar" class="btn btn-default" href="" data-toggle="ajax" data-adjust-height="false" data-height="650px">--%>
+<%--                    <span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="organgestor.list.boto.actualitzar"/>--%>
+<%--                </a>--%>
+<%--            </div>--%>
             <button id="guardar" type="" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
         </div>
     </form:form>
