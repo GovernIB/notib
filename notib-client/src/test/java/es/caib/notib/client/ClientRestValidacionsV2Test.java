@@ -4,6 +4,7 @@
 package es.caib.notib.client;
 
 import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EnviamentReferenciaV2;
 import es.caib.notib.client.domini.EnviamentTipusEnum;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
@@ -19,6 +20,7 @@ import org.junit.Test;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -242,7 +244,51 @@ public class ClientRestValidacionsV2Test extends ClientBaseTest {
 		document2.setContingutBase64(notificacio.getDocument().getContingutBase64());
 		notificacio.setDocument2(document2);
 		enviaNotificacioError(notificacio, "1067");
-	}		
+	}
+
+	// Test de validació de firma:
+	// 1. Document sense firma --> OK
+	// 2. Document amb firma --> OK
+	// 3. Document amb firma invàlida --> Error 1068
+	@Test
+	public void test1068_1() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		RespostaAltaV2 respostaAlta = client.alta(notificacio);
+
+		assertFalse(respostaAlta.isError());
+		assertNull(respostaAlta.getErrorDescripcio());
+		assertNotNull(respostaAlta.getReferencies());
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
+		assertEquals(1, referencies.size());
+		assertNotNull(referencies.get(0).getReferencia());
+		assertEquals(NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
+	}
+
+	@Test
+	public void test1068_2() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjuntFirmat());
+		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		notificacio.getDocument().setContingutBase64(arxiuB64);
+		RespostaAltaV2 respostaAlta = client.alta(notificacio);
+
+		assertFalse(respostaAlta.isError());
+		assertNull(respostaAlta.getErrorDescripcio());
+		assertNotNull(respostaAlta.getReferencies());
+		List<EnviamentReferenciaV2> referencies = respostaAlta.getReferencies();
+		assertEquals(1, referencies.size());
+		assertNotNull(referencies.get(0).getReferencia());
+		assertEquals(NotificacioEstatEnum.PENDENT, respostaAlta.getEstat());
+	}
+
+	@Test
+	public void test1068_3() throws DatatypeConfigurationException, IOException, DecoderException {
+		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
+		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjuntFirmatInvalid());
+		String arxiuB64 = Base64.encodeBase64String(arxiuBytes);
+		notificacio.getDocument().setContingutBase64(arxiuB64);
+		enviaNotificacioError(notificacio, "1068");
+	}
 		
 	@Test
 	public void test1070() throws DatatypeConfigurationException, IOException, DecoderException {

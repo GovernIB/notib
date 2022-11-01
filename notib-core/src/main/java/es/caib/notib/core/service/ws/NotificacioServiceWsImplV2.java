@@ -4,10 +4,31 @@
 package es.caib.notib.core.service.ws;
 
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.DocumentDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
+import es.caib.notib.core.api.dto.SignatureInfoDto;
+import es.caib.notib.core.api.dto.TipusEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -20,9 +41,44 @@ import es.caib.notib.core.api.service.JustificantService;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsException;
 import es.caib.notib.core.api.ws.notificacio.NotificacioServiceWsV2;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
-import es.caib.notib.core.entity.*;
-import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.entity.AplicacioEntity;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.helper.AuditEnviamentHelper;
+import es.caib.notib.core.helper.AuditNotificacioHelper;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.CaducitatHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.CreacioSemaforDto;
+import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MessageHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NifHelper;
+import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.OrganGestorHelper;
+import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.RegistreNotificaHelper;
+import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -48,6 +104,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -164,10 +221,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			ProcSerEntity procediment = null;
 			OrganGestorEntity organGestor = null;
 			ProcSerOrganEntity procedimentOrgan = null;
-			
+
 			// Generar informació per al monitor d'integracions
 			IntegracioInfo info = generateInfoAlta(notificacio);
-			
+
 			// Obtenir dades bàsiques per a la notificació
 			String emisorDir3Codi = notificacio.getEmisorDir3Codi();
 //			info.setCodiEntitat(emisorDir3Codi);
@@ -178,7 +235,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				info.setCodiEntitat(entitat.getCodi());
 			}
 			logger.debug(">> [ALTA] entitat: " + (entitat == null ? "null": (entitat.getCodi() + " - " + entitat.getNom())));
-			
+
 			String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
 			logger.debug(">> [ALTA] usuariCodi: " + usuariCodi);
 			
@@ -1490,18 +1547,74 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	}
 
 	private IntegracioInfo generateInfoAlta(NotificacioV2 notificacio) {
-		String json = "S'ha produït un error al intentar llegir la informació de la notificació";
-		ObjectMapper mapper  = new ObjectMapper();
-		try {
-			json = mapper.writeValueAsString(notificacio);
-		} catch (Exception e) { }
+
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_CLIENT,
 				"Alta de notificació",
-				IntegracioAccioTipusEnumDto.RECEPCIO,
-				new AccioParam("Notificacio", json));
+				IntegracioAccioTipusEnumDto.RECEPCIO);
+
+		ObjectMapper mapper  = new ObjectMapper();
+		Map<String, Object> notificaAtributMap = new HashMap<>();
+		mapper.registerModule(new SimpleModule() {
+			@Override
+			public void setupModule(SetupContext context) {
+				super.setupModule(context);
+				context.addBeanSerializerModifier(new BeanSerializerModifier() {
+					@Override
+					public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+						List<BeanPropertyWriter> serializableProperties = new ArrayList<>();
+						for (BeanPropertyWriter beanPropertyWriter: beanProperties) {
+							if (!"contingutBase64".equals(beanPropertyWriter.getName())) {
+								serializableProperties.add(beanPropertyWriter);
+							}
+						}
+						return serializableProperties;
+					}
+				});
+			}
+		});
+
+		try {
+			notificaAtributMap = mapper.readValue(mapper.writeValueAsString(notificacio), HashMap.class);
+		} catch (Exception e) {
+			notificaAtributMap.put("Error", "S'ha produït un error al intentar llegir la informació de la notificació");
+		}
+
+		addMapToInfo(info, notificaAtributMap);
 		integracioHelper.addAplicacioAccioParam(info, null);
 		return info;
+	}
+
+	private void addMapToInfo(IntegracioInfo info, Map<String, Object> notificaAtributMap) {
+		for (Map.Entry<String, Object> atribut: notificaAtributMap.entrySet()) {
+			if (atribut.getValue() == null)
+				continue;
+
+//			if (atribut.getValue() instanceof Map) {
+//				info.addParam("Inici " + atribut.getKey(), "------------------------------");
+//				addMapToInfo(info, (Map<String, Object>) atribut.getValue());
+//				info.addParam("Fi " + atribut.getKey(), "------------------------------");
+//			} else if (atribut.getValue() instanceof List) {
+//				info.addParam("Inici " + atribut.getKey(), "------------------------------");
+//				int i = 0;
+//				for (Object element: (List) atribut.getValue()) {
+//					if (element == null)
+//						continue;
+//
+//					i++;
+//					if (element instanceof Map) {
+//						info.addParam("Inici " + atribut.getKey() + "[" + i + "]", "------------------------------");
+//						addMapToInfo(info, (Map<String, Object>) element);
+//						info.addParam("Fi " + atribut.getKey() + "[" + i + "]", "------------------------------");
+//					} else {
+//						info.addParam(atribut.getKey() + "[" + i + "]", element.toString());
+//					}
+//				}
+//				info.addParam("Fi " + atribut.getKey(), "------------------------------");
+//			} else {
+				info.addParam(atribut.getKey(), atribut.getValue().toString());
+//			}
+		}
 	}
 
 	// Taula de codis d'error de la validació de la API
@@ -1535,6 +1648,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// 1065 | La longitud del document supera el màxim definit
 	// 1066 | Error en les metadades del document
 	// 1067 | Les notificacions i comunicacions a ciutadà només admeten 1 únic document.
+	// 1068 | Error validant la firma del document.
 	// 1070 | El camp 'usuariCodi' no pot ser null (Requisit per fer el registre de sortida)
 	// 1071 | El camp 'usuariCodi' no pot pot tenir una longitud superior a 64 caràcters
 	// 1072 | El camp 'arxiuNom' no pot pot tenir una longitud superior a 200 caràcters."
