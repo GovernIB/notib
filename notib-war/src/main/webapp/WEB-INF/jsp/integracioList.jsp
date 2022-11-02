@@ -143,7 +143,7 @@
 			   data-search-enabled="true"
 			   data-info-type="search"
 			</c:if>
-		   data-page-length="250" class="table table-striped table-bordered" style="width:100%"
+		   class="table table-striped table-bordered" style="width:100%"
 		   data-botons-template="#botonsTemplate">
 		<thead>
 			<tr>
