@@ -75,6 +75,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.predictSyncDir3OrgansGestors(entitatId);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN"})
+	public void syncOficinesSIR(Long entitatId) throws Exception {
+		delegate.syncOficinesSIR(entitatId);
+	}
+
 //	@Override
 //	@RolesAllowed({"NOT_ADMIN", "tothom"})
 //	public void updateAll(Long entitatId, String organActualCodiDir3) {

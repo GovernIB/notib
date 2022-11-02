@@ -1740,6 +1740,31 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //	}
 
 	@Override
+	@Transactional
+	public void syncOficinesSIR(Long entitatId) {
+
+		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitatId);
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<OrganGestorEntity> organs = organGestorRepository.findByEntitatDir3Codi(entity.getDir3Codi());
+			Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entity.getDir3Codi());
+			List<OficinaDto> oficines;
+			for (OrganGestorEntity organ : organs) {
+				oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
+				if (oficines == null || oficines.isEmpty()) {
+					continue;
+				}
+				if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.contains(organ.getOficina())) {
+					organ.setOficina(oficines.get(0).getCodi());
+				}
+			}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public List<OficinaDto> getOficinesSIR(Long entitatId, String dir3codi, boolean isFiltre) {
 
