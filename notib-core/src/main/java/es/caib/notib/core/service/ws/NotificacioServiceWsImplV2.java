@@ -1416,9 +1416,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] document contingut Base64");
 			byte[] contingut = Base64.decodeBase64(documentV2.getContingutBase64());
 			String mediaType = getMimeTypeFromContingut(contingut);
-			SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
-			if (signatureInfo.isError()) {
-				throw new SignatureValidationException(documentV2.getArxiuNom(), signatureInfo.getErrorMsg());
+			if (isValidaFirmaRestEnabled()) {
+				SignatureInfoDto signatureInfo = pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, documentV2.getArxiuNom(), mediaType);
+				if (signatureInfo.isError()) {
+					throw new SignatureValidationException(documentV2.getArxiuNom(), signatureInfo.getErrorMsg());
+				}
 			}
 			String documentGesdocId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_NOTIFICACIONS,
@@ -2607,6 +2609,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 	// Indica si usar valores por defecto cuando ni el documento ni documentV2 tienen metadades
 	private boolean getUtilizarValoresPorDefecto() {
 		return configHelper.getAsBoolean("es.caib.notib.document.metadades.por.defecto");
+	}
+
+	private boolean isValidaFirmaRestEnabled() {
+		return configHelper.getAsBoolean("es.caib.notib.plugins.validatesignature.enable.rest");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 

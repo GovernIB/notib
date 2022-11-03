@@ -416,10 +416,12 @@ public class NotificacioFormController extends BaseUserController {
     }
 
     private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {
-        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
-        if (signatureInfoDto.isError()) {
-            String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
-            bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
+        if (isValidaFirmaWebEnabled()) {
+            SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
+            if (signatureInfoDto.isError()) {
+                String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
+                bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
+            }
         }
     }
 
@@ -617,6 +619,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         String referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
         model.addAttribute("referer", referer);
+        model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
     }
 
 
@@ -807,6 +810,10 @@ public class NotificacioFormController extends BaseUserController {
 
     private boolean isAdministrador(HttpServletRequest request) {
         return RolHelper.isUsuariActualAdministrador(request);
+    }
+
+    private boolean isValidaFirmaWebEnabled() {
+        return Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugins.validatesignature.enable.web", "true"));
     }
 
     @InitBinder

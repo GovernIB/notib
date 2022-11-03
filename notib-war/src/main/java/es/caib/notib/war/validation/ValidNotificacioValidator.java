@@ -193,8 +193,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 									extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
 									contentType = notificacio.getArxiu()[i].getContentType();
 									fileSize = notificacio.getArxiu()[i].getSize();
-									// Validar firma del document
-//									notificacioService.checkIfSignedAttached(notificacio.getArxiu()[i].getBytes(), contentType);
 
 								}
 								log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
