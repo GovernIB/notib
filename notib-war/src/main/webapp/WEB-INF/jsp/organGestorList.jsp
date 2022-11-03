@@ -70,7 +70,10 @@
 
 		$("#estat").on("change", () => $('#btnFiltrar').click());
 
-		$("#organ-boto-update-oficines").on("click", () => bloquejar());
+		$("#organ-boto-update-oficines").on("click", () => {
+			bloquejar();
+			console.log("bloquejant");
+		});
 	});
 	</script>
 </head>
@@ -216,7 +219,7 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
 			<c:if test="${setOficina}">
-			<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines">
+			<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines"  onClick="bloquejar()">
 					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
 			</a>
 			</c:if>
