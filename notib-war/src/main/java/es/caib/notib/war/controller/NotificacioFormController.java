@@ -243,6 +243,20 @@ public class NotificacioFormController extends BaseUserController {
         return destinatari;
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/organ/oficina/{organCodi}")
+    public OficinaDto getOficina(HttpServletRequest request, Model model, @PathVariable String organCodi) {
+
+        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+        try {
+            OrganGestorDto o = organGestorService.findByCodi(entitat.getId(), organCodi);
+            return o.getOficina();
+        } catch (Exception ex) {
+            log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
+            return null;
+        }
+    }
+
     @RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
     public String save(HttpServletRequest request, @Valid NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model) throws IOException {
 

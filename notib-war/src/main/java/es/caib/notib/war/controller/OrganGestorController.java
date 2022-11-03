@@ -317,6 +317,7 @@ public class OrganGestorController extends BaseUserController{
 			organGestorService.syncOficinesSIR(entitat.getId());
 			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.list.boto.actualitzar.oficines.ok");
 		} catch (Exception ex) {
+			logger.error("Error actualitzant les oficines SIR ", ex);
 			return getAjaxControllerReturnValueError(request, redirect,"organgestor.list.boto.actualitzar.oficines.error");
 		}
 	}

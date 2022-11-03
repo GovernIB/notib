@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -107,6 +108,19 @@
 	    }
 		setIdioma();
 
+		function bloquejar() {
+			// Bloquejar la pantalla
+			// var height = $(".panel-body").css('height');
+			// var width = $(".panel-body").css('width');
+			// var top = $(".panel-body").css('top');
+			// $(".loading-screen").css('height', height);
+			// $(".loading-screen").css('width', width);
+			// $(".loading-screen").css('top', top);
+			$("#spinner-container").removeClass("ocult");
+			$("#spinner-container").addClass("visible");
+			// $(".loading-screen").show();
+		}
+
 	</script>
 	<decorator:head />
 <style>
@@ -175,9 +189,41 @@ body {
 .btn-processar {
 	margin-top: 10px;
 }
+
+.ocult {
+	display: none;
+}
+
+.visible {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.loading-screen {
+	background-color: rgba(0,0,0,0.4);
+	position:absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+}
+
+.spin-box {
+	display:flex;
+	justify-content: center;
+}
+
 </style>
 </head>
 <body>
+
+	<div id="spinner-container" class="loading-screen ocult">
+		<div class="spin-box">
+				<span class="fa fa-spin fa-circle-o-notch  fa-3x"></span>
+		</div>
+	</div>
 
 	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
 		<div class="container container-custom">
@@ -502,7 +548,7 @@ body {
         	</p>
         </div>
     </div>
-     <div class="divider"></div>	
+     <div class="divider"></div>
 
 </body>
 </html>

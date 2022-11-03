@@ -378,10 +378,10 @@ public class OrganGestorHelper {
 	private void updateLlibreAndOficina(OrganGestorEntity organ, String entitatDir3Codi) {
 
 		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(entitatDir3Codi, organ.getCodi());
-		List<OficinaDto> oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
 		if (llibre != null) {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
+		List<OficinaDto> oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
 		if (oficines != null && !oficines.isEmpty()) {
 			OficinaDto o = oficines.get(0);
 			organ.updateOficina(o.getCodi(), o.getNom());

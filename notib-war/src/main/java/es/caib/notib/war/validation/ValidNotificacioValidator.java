@@ -4,13 +4,16 @@ package es.caib.notib.war.validation;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.EnviamentCommand;
 import es.caib.notib.war.command.NotificacioCommand;
 import es.caib.notib.war.command.PersonaCommand;
 import es.caib.notib.war.helper.EmailValidHelper;
 import es.caib.notib.war.helper.MessageHelper;
+import es.caib.notib.war.helper.OrganGestorHelper;
 import es.caib.notib.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -35,7 +38,9 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ProcedimentService procedimentService;
-	
+	@Autowired
+	private OrganGestorService organService;
+
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
 	}
@@ -85,6 +90,15 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							comunicacioSenseAdministracio = true;
 						}
 					}
+				}
+			}
+			if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(notificacio.getEnviamentTipus())) {
+				String organ = notificacio.getOrganGestor();
+				OrganGestorDto o = organService.findByCodi(null, organ);
+				valid = o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
+				if (!valid) {
+					String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
 				}
 			}
 			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
