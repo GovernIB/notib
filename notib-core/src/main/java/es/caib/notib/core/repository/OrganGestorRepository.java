@@ -29,6 +29,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	@Query("from OrganGestorEntity og where og.entitat.dir3Codi = :entitatDir3Codi order by og.codi asc")
 	List<OrganGestorEntity> findByEntitatDir3Codi(@Param("entitatDir3Codi") String entitatDir3Codi);
 
+	@Query("from OrganGestorEntity og where og.entitat.dir3Codi = :entitatDir3Codi and og.estat = es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V order by og.codi asc")
+	List<OrganGestorEntity> findExtingidesByEntitatDir3Codi(@Param("entitatDir3Codi") String entitatDir3Codi);
+
 	@Modifying
 	@Query( " update " +
 			"    OrganGestorEntity og " +
