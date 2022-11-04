@@ -69,10 +69,40 @@
 		});
 
 		$("#estat").on("change", () => $('#btnFiltrar').click());
+
+		$("#organ-boto-update-oficines").on("click", () => {
+			bloquejar();
+			console.log("bloquejant");
+		});
 	});
+	// Bloquejar la pantalla
+	function bloquejar() {
+		$("#spinner-container").removeClass("ocult");
+		$("#spinner-container").addClass("visible");
+	}
 	</script>
+	<style>
+		.ocult {display: none;}
+		.visible {display: flex; justify-content: center; flex-direction: column;}
+		.loading-screen {
+			background-color: rgba(0,0,0,0.4);
+			position:absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 9999;
+		}
+		.spin-box {display:flex; justify-content: center;}
+	</style>
 </head>
 <body>
+	<div id="spinner-container" class="loading-screen ocult">
+		<div class="spin-box">
+			<span class="fa fa-spin fa-circle-o-notch  fa-3x"></span>
+		</div>
+	</div>
+
 	<div id="botoVistes" class="row">
 
 	</div>
@@ -213,6 +243,11 @@
 	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
+			<c:if test="${setOficina}">
+			<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines"  onClick="bloquejar()">
+					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+			</a>
+			</c:if>
 			<a id="organ-boto-update"
 					class="btn btn-default" href="organgestor/sync/dir3"
 					data-toggle="modal"

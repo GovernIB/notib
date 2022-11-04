@@ -112,14 +112,39 @@
                 $("#canviarVistaOrganGestor").click(function(){
                     window.location.replace("/notib/organgestor");
                 });
+
+                $("#organ-boto-update-oficines").on("click", () => bloquejar());
             });
+            // Bloquejar la pantalla
+            function bloquejar() {
+                $("#spinner-container").removeClass("ocult");
+                $("#spinner-container").addClass("visible");
+            }
         </script>
         <style>
             #detall .container-custom {width: 100%;}
             #detall .container-foot {display: none;}
+            .ocult {display: none;}
+            .visible {display: flex; justify-content: center; flex-direction: column;}
+            .loading-screen {
+                background-color: rgba(0,0,0,0.4);
+                position:absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+            }
+            .spin-box {display:flex; justify-content: center;}
         </style>
     </head>
     <body>
+        <div id="spinner-container" class="loading-screen ocult">
+            <div class="spin-box">
+                <span class="fa fa-spin fa-circle-o-notch  fa-3x"></span>
+            </div>
+        </div>
+
         <c:set var="formActionFiltre"><not:modalUrl value="/organgestorArbre"/></c:set>
         <form:form id="filtre" action="${formActionFiltre}" method="post" cssClass="well" commandName="organGestorFiltreCommand">
             <not:inputHidden name="isFiltre"/>
@@ -183,12 +208,18 @@
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">
+                    <c:if test="${setOficina}">
+                        <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines"
+                                data-refresh-pagina="true" data-maximized="false">
+                                <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+                        </a>
+                    </c:if>
                     <a id="organ-boto-update"
-                            class="btn btn-default" href="organgestor/sync/dir3"
-                            data-toggle="modal"
-                            data-refresh-pagina="true"
-                            data-maximized="false">
-                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
+                       class="btn btn-default" href="organgestor/sync/dir3"
+                       data-toggle="modal"
+                       data-refresh-pagina="true"
+                       data-maximized="false">
+                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
                     </a>
                 </div>
                 <div id="detall">

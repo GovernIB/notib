@@ -3,8 +3,12 @@ package es.caib.notib.war.validation;
 
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.EnviamentCommand;
@@ -37,8 +41,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	@Autowired
 	private ProcedimentService procedimentService;
 	@Autowired
-	private NotificacioService notificacioService;
-	
+	private OrganGestorService organService;
+	@Autowired
+	private EntitatService entitatService;
+
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
 	}
@@ -88,6 +94,18 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							comunicacioSenseAdministracio = true;
 						}
 					}
+				}
+			}
+
+			if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(notificacio.getEnviamentTipus())) {
+				String organ = notificacio.getOrganGestor();
+				OrganGestorDto o = organService.findByCodi(null, organ);
+				EntitatDto entitat = entitatService.findById(o.getEntitatId());
+
+				valid = entitat.isOficinaEntitat() || o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
+				if (!valid) {
+					String msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
 				}
 			}
 			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {
@@ -193,7 +211,6 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 									extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
 									contentType = notificacio.getArxiu()[i].getContentType();
 									fileSize = notificacio.getArxiu()[i].getSize();
-
 								}
 								log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
 								boolean formatValid = true;

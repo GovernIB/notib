@@ -664,8 +664,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			cacheHelper.clearAllCaches();
 //			cacheHelper.evictFindOrgansGestorWithPermis();
+			// 7.-
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sync.oficines.organ"));
+			syncOficinesSIR(entitat.getDir3Codi(), unitatsWs);
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sync.oficines.organ.fi"));
 
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
+			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
 		} catch (Exception ex) {
 			e = ex;
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.ERROR, messageHelper.getMessage("organgestor.actualitzacio.error") + ex.getMessage());
@@ -1695,10 +1699,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<String> codiFills;
 		OrganGestorEntity organFill;
 		boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+		boolean isOficinaOrganSir = !entity.isOficinaEntitat() && PermisEnum.COMUNIACIO_SIR.equals(permis);
 		for(OrganGestorEntity organ: organs) {
 
-			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
-			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
+			boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
+			if ((entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) && !excloure) {
+				organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 				resposta.add(organCodiValor);
 			}
 			//buscar fills
@@ -1709,8 +1715,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				}
 				organFill = organGestorRepository.findByCodi(fill);
 				if (organFill != null) {
-					organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
-					resposta.add(organCodiValor);
+					boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
+					if (!excloureFill) {
+						organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
+						resposta.add(organCodiValor);
+					}
 				}
 			}
 		}
@@ -1738,6 +1747,90 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 //	private List<OrganGestorEntity> generarFills(String entiatDir3Codi, OrganGestorEntity o) {
 //		List<String> fills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entiatDir3Codi, o.getCodi());
 //	}
+
+	private void syncOficinesSIR(String entitatDir3Codi, List<NodeDir3> unitats) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi ,
+				IntegracioAccioTipusEnumDto.PROCESSAR);
+		Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitatDir3Codi);
+		for (NodeDir3 unitat : unitats) {
+			actualitzarOficinaOrgan(unitat.getCodi(), arbreUnitats, info);
+		}
+	}
+
+	private void actualitzarOficinaOrgan(String codi, Map<String, OrganismeDto> arbreUnitats, IntegracioInfo info) {
+
+		OrganGestorEntity organ = organGestorRepository.findByCodi(codi);
+		List<OficinaDto> oficines = null;
+		try {
+			oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
+		} catch (Exception ex) {
+			String msg = "Error obtinguent les oficines per l'òrgan " + organ.getCodi();
+			log.error(msg);
+			info.addParam(organ.getCodi(), msg);
+			return;
+		}
+		if (oficines == null || oficines.isEmpty()) {
+			info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
+			return;
+		}
+		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
+			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
+			organGestorHelper.actualitzarOficinaOrgan(codi, oficines.get(0));
+		}
+	}
+
+
+
+	@Override
+	public void syncOficinesSIR(Long entitatId) {
+
+		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitatId);
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Actualització d'oficines SIR per l'entitat " + entity.getCodi() ,
+				IntegracioAccioTipusEnumDto.PROCESSAR);
+		log.info("OFISYNC - Iniciant procés d'actualització d'oficines de l'entitat amb id {}", entitatId);
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			List<OrganGestorEntity> organs = organGestorRepository.findExtingidesByEntitatDir3Codi(entity.getDir3Codi());
+			log.info("OFISYNC - Obtinguts {} òrgans", organs == null ? 0 : organs.size());
+			Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entity.getDir3Codi());
+			log.info("OFISYNC - Obtingut arbre d'unitats");
+			List<OficinaDto> oficines = null;
+			for (OrganGestorEntity organ : organs) {
+				try {
+					log.info("OFISYNC - Obtenint oficines de l'òrgan {} - {}", organ.getCodi(), organ.getNom());
+					oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
+					log.info("OFISYNC - Obtingudes {} oficines", oficines == null ? 0 : oficines.size());
+				} catch (Exception ex) {
+					String msg = "S'ha produit un error obtenint les oficines de l'òrgan " + organ.getCodi() + " - " + organ.getNom();
+					log.error(msg);
+					info.addParam(organ.getCodi(), msg);
+					continue;
+				}
+				if (oficines == null || oficines.isEmpty()) {
+					info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
+					continue;
+				}
+				if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
+					log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
+					info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
+					organGestorHelper.actualitzarOficinaOrgan(organ.getCodi(), oficines.get(0));
+					log.info("OFISYNC - Oficina actualitzada");
+					continue;
+				} else {
+					log.info("OFISYNC - L'oficina no s'ha d'actualitzar");
+				}
+//				info.addParam(organ.getCodi(), "No hi han canvis");
+			}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			integracioHelper.addAccioError(info, "Error actualitzant les oficines SIR");
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	//@Transactional(requires=new)
 
 	@Override
 	@Transactional(readOnly = true)

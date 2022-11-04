@@ -982,7 +982,8 @@ public class PluginHelper {
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
 				String errorMissatge = messageManager.getMessage("organgestor.actualitzacio.sense.canvis");
-				integracioHelper.addAccioError(info, errorMissatge.substring(0,errorMissatge.length()-3) + pareCodi);
+				info.addParam("Resultat", "No s'han obtingut canvis.");
+				integracioHelper.addAccioOk(info);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 			integracioHelper.addAccioOk(info);

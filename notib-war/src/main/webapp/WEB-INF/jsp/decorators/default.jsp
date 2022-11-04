@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -106,7 +107,6 @@
 			  });
 	    }
 		setIdioma();
-
 	</script>
 	<decorator:head />
 <style>
@@ -175,10 +175,10 @@ body {
 .btn-processar {
 	margin-top: 10px;
 }
+
 </style>
 </head>
 <body>
-
 	<div class="navbar navbar-default navbar-fixed-top navbar-app" role="navigation">
 		<div class="container container-custom">
 			<div class="navbar-header">
@@ -502,7 +502,7 @@ body {
         	</p>
         </div>
     </div>
-     <div class="divider"></div>	
+     <div class="divider"></div>
 
 </body>
 </html>

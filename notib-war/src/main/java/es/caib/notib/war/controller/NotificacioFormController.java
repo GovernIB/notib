@@ -272,6 +272,20 @@ public class NotificacioFormController extends BaseUserController {
         return destinatari;
     }
 
+    @ResponseBody
+    @RequestMapping(value = "/organ/oficina/{organCodi}")
+    public OficinaDto getOficina(HttpServletRequest request, Model model, @PathVariable String organCodi) {
+
+        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+        try {
+            OrganGestorDto o = organGestorService.findByCodi(entitat.getId(), organCodi);
+            return o.getOficina();
+        } catch (Exception ex) {
+            log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
+            return null;
+        }
+    }
+
     @RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
     public String save(HttpServletRequest request, @Valid NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model) throws IOException {
 
@@ -753,9 +767,9 @@ public class NotificacioFormController extends BaseUserController {
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
-            PermisEnum tipus = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
+            PermisEnum permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
 //            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
-            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), tipus);
+            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
         }
 
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {

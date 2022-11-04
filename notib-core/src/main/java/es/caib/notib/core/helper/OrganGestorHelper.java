@@ -378,10 +378,10 @@ public class OrganGestorHelper {
 	private void updateLlibreAndOficina(OrganGestorEntity organ, String entitatDir3Codi) {
 
 		LlibreDto llibre = pluginHelper.llistarLlibreOrganisme(entitatDir3Codi, organ.getCodi());
-		List<OficinaDto> oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
 		if (llibre != null) {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
+		List<OficinaDto> oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
 		if (oficines != null && !oficines.isEmpty()) {
 			OficinaDto o = oficines.get(0);
 			organ.updateOficina(o.getCodi(), o.getNom());
@@ -431,5 +431,13 @@ public class OrganGestorHelper {
 				progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.error", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
 			}
 		}
+	}
+
+	@Transactional
+	public void actualitzarOficinaOrgan(String organCodi, OficinaDto oficina) {
+		OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
+		organ.setOficina(oficina.getCodi());
+		organ.setOficinaNom(oficina.getNom());
+		organGestorRepository.save(organ);
 	}
 }
