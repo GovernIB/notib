@@ -359,8 +359,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType) {
-		return getDelegateService().checkIfSignedAttached(contingut, contentType);
+	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType) {
+		return getDelegateService().checkIfSignedAttached(contingut, nom, contentType);
 	}
 
 	@SuppressWarnings("rawtypes")
