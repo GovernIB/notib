@@ -65,6 +65,8 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
 
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	void syncOficinesSIR(Long entitatId) throws Exception;
 
 //	/**
 //	 * Actualitza les dades dels organs gestors de la base de dades

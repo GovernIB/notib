@@ -303,6 +303,19 @@ public class OrganGestorController extends BaseUserController{
 //		}
 //	}
 
+	@RequestMapping(value = "/sync/oficines")
+	public String syncOficinesSIR(HttpServletRequest request, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var redirect = "redirect:../../organgestor";
+		try {
+			organGestorService.syncOficinesSIR(entitat.getId());
+			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.list.boto.actualitzar.oficines.ok");
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(request, redirect,"organgestor.list.boto.actualitzar.oficines.error");
+		}
+	}
+
 	@ResponseBody
 	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
 	private LlibreDto getLlibreOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {

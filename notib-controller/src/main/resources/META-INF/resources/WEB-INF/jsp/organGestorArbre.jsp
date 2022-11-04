@@ -177,12 +177,19 @@
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">
+                    <a id="organ-boto-update-oficines"
+                       class="btn btn-default" href="organgestor/sync/oficines"
+                       data-toggle="modal"
+                       data-refresh-pagina="true"
+                       data-maximized="false">
+                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+                    </a>
                     <a id="organ-boto-update"
-                            class="btn btn-default" href="organgestor/sync/dir3"
-                            data-toggle="modal"
-                            data-refresh-pagina="true"
-                            data-maximized="false">
-                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
+                        class="btn btn-default" href="organgestor/sync/dir3"
+                        data-toggle="modal"
+                        data-refresh-pagina="true"
+                        data-maximized="false">
+                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.tots"/>
                     </a>
                 </div>
                 <div id="detall">
