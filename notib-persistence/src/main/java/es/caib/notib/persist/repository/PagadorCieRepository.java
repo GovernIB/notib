@@ -2,12 +2,14 @@ package es.caib.notib.persist.repository;
 
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
+import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +19,10 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Long> {
+
+	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
+
+	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
 
 	List<PagadorCieEntity> findByEntitat(EntitatEntity entitat);
 	public List<PagadorCieEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);

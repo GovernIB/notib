@@ -179,7 +179,7 @@ public class OrganGestorArbreController extends BaseUserController {
 
     private void omplirModel(Model model, EntitatDto entitat, OrganGestorDto organ) {
 
-        OrganGestorCommand command = organ != null ? OrganGestorCommand.asCommand(organ) : new OrganGestorCommand();
+        var command = organ != null ? OrganGestorCommand.asCommand(organ) : new OrganGestorCommand();
         command.setEntitatId(entitat.getId());
         model.addAttribute("organsEntitat", organService.getOrgansAsList());
         model.addAttribute("id", organ != null && organ.getId() != null ? organ.getId() : 0);
@@ -188,11 +188,11 @@ public class OrganGestorArbreController extends BaseUserController {
         model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
         model.addAttribute("setOficina", !entitat.isOficinaEntitat());
         model.addAttribute("isModificacio", organ != null && organ.getId() != null);
-        List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+        var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
         model.addAttribute("operadorPostalList", operadorPostalList);
-        List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+        var cieList = cieService.findNoCaducatsByEntitat(entitat);
         model.addAttribute("cieList", cieList);
-        List<OficinaDto> oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
+        var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
         if (!entitat.isOficinaEntitat()) {
             model.addAttribute("oficinesEntitat", oficinesEntitat);
         }
@@ -202,9 +202,9 @@ public class OrganGestorArbreController extends BaseUserController {
         List<LlibreDto> llibres = new ArrayList<>();
         llibres.add(organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()));
         model.addAttribute("llibres", llibres);
-        List<OficinaDto> oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),false);
+        var oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),false);
         model.addAttribute("oficines", oficines);
-        for(OficinaDto oficina: oficines) {
+        for(var oficina: oficines) {
             if (oficina.getCodi() != null && oficina.getCodi().equals(entitat.getOficina())) {
                 command.setOficinaNom(oficina.getCodi() + " - " + oficina.getNom());
                 break;

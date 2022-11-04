@@ -1753,7 +1753,7 @@ public class PluginHelper {
 				integracioHelper.addAccioOk(info);
 				return SignatureInfoDto.builder().signed(false).error(false).build();
 			} else {
-				logger.error("Error al detectar firma de document", e);
+				log.error("Error al detectar firma de document", e);
 				integracioHelper.addAccioError(info, "Error al validar la firma", throwable);
 				return SignatureInfoDto.builder().signed(false).error(true).errorMsg(e.getMessage()).build();
 			}

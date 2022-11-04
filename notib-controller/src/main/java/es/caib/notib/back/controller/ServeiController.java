@@ -145,25 +145,26 @@ public class ServeiController extends BaseUserController{
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid ProcSerCommand procSerCommand, BindingResult bindingResult, Model model) {
-		
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelServei(request, procSerCommand.getId(), model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			var cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
 
-		String url = "redirect:../servei";
-		String msg = procSerCommand.getId() == null ? "servei.controller.creat.ok" : "servei.controller.modificat.ok";
+		var url = "redirect:../servei";
+		var msg = procSerCommand.getId() == null ? "servei.controller.creat.ok" : "servei.controller.modificat.ok";
 		if (procSerCommand.getId() == null) {
 			serveiService.create(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand));
 			return getModalControllerReturnValueSuccess(request, url, msg);
 		}
 		try {
-			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+			var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			serveiService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), isAdminEntitat);
 		} catch (NotFoundException | ValidationException ev) {
 			log.debug("Error al actualitzar el procediment", ev);
@@ -174,13 +175,14 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(value = "/{serveiId}", method = RequestMethod.GET)
 	public String formGet(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 
+		var entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerCommand procSerCommand;
-		ProcSerDto servei = emplenarModelServei(request, serveiId, model);
+		var servei = emplenarModelServei(request, serveiId, model);
 		procSerCommand = servei != null ? ProcSerCommand.asCommand(servei) : new ProcSerCommand();
 		model.addAttribute(procSerCommand);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		var cieList = cieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}

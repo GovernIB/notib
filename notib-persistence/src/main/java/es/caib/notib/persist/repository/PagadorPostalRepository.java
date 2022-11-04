@@ -8,21 +8,35 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
  * de dades del tipus pagador postal.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEntity, Long> {
 
 	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
 	List<PagadorPostalEntity> findByEntitat(EntitatEntity entitat);
+
+	@Query("SELECT n.entregaCie.operadorPostal FROM EntitatEntity n where n = :entitat")
+	PagadorPostalEntity obtenirPagadorsEntitat(@Param("entitat") EntitatEntity entitat);
+
+//	@Query("FROM PagadorPostalEntity nap " +
+//			"JOIN EntregaCieEntity nec on nec.operadorPostalId = nap.id " +
+//			"JOIN EntitatEntity n ON n.entregaCie = nec and n = :entitat")
+//	IdentificadorTextDto obtenirPagadorsEntitat(@Param("entitat") EntitatEntity entitat);
+
+
+	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
+
+	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
-	
+
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
@@ -36,7 +50,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 			@Param("numContracte") String filtreNumContracte,
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
-	
+
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +

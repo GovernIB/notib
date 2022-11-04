@@ -107,7 +107,7 @@ public class EntitatController extends BaseController {
 		if (entitatId != null) {
 			entitat = entitatService.findById(entitatId);
 		}
-		boolean modificant = false;
+		var modificant = false;
 		EntitatCommand command = null;
 		if (entitat != null) {
 			command = EntitatCommand.asCommand( entitat );
@@ -119,9 +119,9 @@ public class EntitatController extends BaseController {
 		model.addAttribute(command != null ? command : new EntitatCommand());
 		model.addAttribute("modificant", modificant);
 		model.addAttribute("TipusDocumentEnumDto", TipusDocumentEnumDto.class);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		var operadorPostalList = entitat != null ? operadorPostalService.findPagadorsByEntitat(entitat) : operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		var cieList = entitat != null ? cieService.findAllIdentificadorText() : cieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}

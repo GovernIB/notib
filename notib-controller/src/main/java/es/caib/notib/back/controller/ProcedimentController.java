@@ -161,24 +161,25 @@ public class ProcedimentController extends BaseUserController{
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid ProcSerCommand procSerCommand, BindingResult bindingResult, Model model) {
-		
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelProcediment(request, procSerCommand.getId(), model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			var cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "procedimentAdminForm";
 		}
-		String url = "redirect:../procediment";
-		String msg = procSerCommand.getId() != null ? "procediment.controller.modificat.ok" : "procediment.controller.creat.ok";
+		var url = "redirect:../procediment";
+		var msg = procSerCommand.getId() != null ? "procediment.controller.modificat.ok" : "procediment.controller.creat.ok";
 		if (procSerCommand.getId() == null) {
 			procedimentService.create(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand));
 			return getModalControllerReturnValueSuccess(request, url, msg);
 		}
 		try {
-			boolean usuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+			var usuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			procedimentService.update(procSerCommand.getEntitatId(), ProcSerCommand.asDto(procSerCommand), isAdministrador(request), usuariEntitat);
 		} catch(NotFoundException | ValidationException ev) {
 			log.debug("Error al actualitzar el procediment", ev);
@@ -189,16 +190,17 @@ public class ProcedimentController extends BaseUserController{
 	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
 	public String formGet(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
-		ProcSerCommand procSerCommand = new ProcSerCommand();
-		ProcSerDto procediment = emplenarModelProcediment(request, procedimentId, model);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var procSerCommand = new ProcSerCommand();
+		var procediment = emplenarModelProcediment(request, procedimentId, model);
 		if (procediment != null) {
 			procSerCommand = ProcSerCommand.asCommand(procediment);
 			procSerCommand.setEntitatId(procediment.getEntitat().getId());
 		}
 		model.addAttribute(procSerCommand);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		var cieList = cieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "procedimentAdminForm";
 	}

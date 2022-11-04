@@ -70,13 +70,27 @@ var codiDir3Actual =  '${entitatCommand.dir3Codi}';
 var codiDir3RegActual = '${entitatCommand.dir3CodiReg}';
 var llibreChecked = "${entitatCommand.llibreEntitat}" === "false" ? false : true;
 
+let operadorsPostal = [];
+operadorsPostal.push({id:"", text:"", estat:"V"});
+<c:forEach items="${operadorPostalList}" var="operadorsPostal">
+operadorsPostal.push({id:"${operadorsPostal.id}", text:"${operadorsPostal.text}", obsolet:"${operadorsPostal.icona}"});
+</c:forEach>
+
+let operadorsCie = [];
+operadorsCie.push({id:"", text:"", estat:"V"});
+<c:forEach items="${cieList}" var="operadorsCie">
+operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", obsolet:"${operadorsCie.icona}"});
+</c:forEach>
+
 $(document).ready(function() {
 
 
-	var entitatId = document.getElementById('id').value;
+	let entitatId = document.getElementById('id').value;
+	loadPagadorPostal($('#operadorPostalId'), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
+	loadPagadorPostal($('#cieId'), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
 
 	if (entitatId != '' && !"${tipusDocSelected}") {
-		var getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
+		let getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
 		 $.get(getUrl).done(function(data) {
 			 var dataMod =[]
 		 	$("#tipusDocName").webutilInputSelect2(data);

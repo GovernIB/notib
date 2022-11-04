@@ -6,4 +6,5 @@ import lombok.Data;
 public class IdentificadorTextDto {
     private long id;
     private String text;
+    private String icona;
 }

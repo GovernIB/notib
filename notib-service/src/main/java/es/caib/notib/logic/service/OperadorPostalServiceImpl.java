@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +179,42 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			entityComprovarHelper.comprovarPermisos(null, true, true, false);
-			return conversioTipusHelper.convertirList(pagadorPostalReposity.findAll(), IdentificadorTextDto.class);
+			var pagadors = pagadorPostalReposity.findByContracteDataVigGreaterThanEqual(new Date());
+			return conversioTipusHelper.convertirList(pagadors, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<IdentificadorTextDto> pagadors = findNoCaducatsByEntitat(entitat);
+		PagadorPostalEntity pagador = pagadorPostalReposity.obtenirPagadorsEntitat(e);
+		if (pagador == null) {
+			return pagadors;
+		}
+		IdentificadorTextDto i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
+		if (!pagadors.contains(i)) {
+			i.setIcona("fa fa-warning text-danger");
+			pagadors.add(0, i);
+		}
+		return pagadors;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
