@@ -240,6 +240,9 @@
 	margin-right: 15px;
 	margin-left: 15px;
 }
+.validating-block {
+	font-size: x-small;
+}
 </style>
 </head>
 <body>
@@ -484,7 +487,76 @@
 				$(provincia).parent().parent().removeClass('hidden');
 			}
 		});
-		
+
+		// Validacio firma document fisic
+		if (${validaFirmaWebEnabled} == true) {
+			$('input[type="file"]').on('change', (event) => {
+				let file = event.currentTarget;
+				let $file = $(file);
+				if (file.files.length == 0)
+					return;
+
+				let fitxer = file.files[0];
+				let formData = new FormData();
+				formData.append('fitxer', fitxer, fitxer.name);
+				$file.prop("disabled", true);
+
+				let metadadesId = $file.closest(".row").next(".doc-metadades").prop("id");
+				let id = metadadesId.charAt(metadadesId.length - 1);
+
+				$file.closest(".fileinput").next(".validating-block").remove();
+				$('<p class="validating-block text-info"><span class="fa fa-spin fa-circle-o-notch"></span>&nbsp;<spring:message code="notificacio.form.valid.document.validant"/></p>').insertAfter($file.closest(".fileinput"));
+
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "<c:url value='/notificacio/valida/firma'/>",
+					data: formData,
+					processData: false,
+					contentType: false,
+					cache: false,
+					timeout: 600000,
+					success: function (data) {
+
+						console.log("SUCCESS : ", data);
+						$file.prop("disabled", false);
+						$file.closest(".fileinput").next(".validating-block").remove();
+
+						if (data.mediaType == 'application/pdf') {
+							$('#documents\\[' + id + '\\]\\.modoFirma').prop('checked', data.signed);
+						}
+						if (data.error) {
+							$file.closest(".form-group").addClass("has-error");
+							$file.closest(".fileinput").next(".help-block").remove();
+							<%--$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.firma"/></span></p>').insertAfter($file.closest(".fileinput"));--%>
+							$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + data.errorMsg + '</span></p>').insertAfter($file.closest(".fileinput"));
+						} else {
+							$file.closest(".form-group").removeClass("has-error");
+							$file.closest(".fileinput").next(".help-block").remove();
+
+							if (data.signed) {
+								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.firma.ok"/></p>').insertAfter($file.closest(".fileinput"));
+							} else {
+								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.sense.firma"/></p>').insertAfter($file.closest(".fileinput"));
+							}
+						}
+						// $('documents\\[' + id + '\\]\\.arxiuGestdocId').val(data.arxiuGestdocId);
+						// $('documents\\[' + id + '\\]\\.arxiuNom').val(data.nom);
+						// $('documents\\[' + id + '\\]\\.mediaType').val(data.mediaType);
+						// $('documents\\[' + id + '\\]\\.mida').val(data.mida);
+
+					},
+					error: function (e) {
+
+						console.log("ERROR : ", e);
+						$file.prop("disabled", false);
+
+					}
+				});
+
+			});
+		}
+
 		//Consulta al arxiu de los identificadores CSV o Uuid 
 		//para comprobar si existe el documento y sus metadatos	
 		$(".docArxiu").focusout(function() {

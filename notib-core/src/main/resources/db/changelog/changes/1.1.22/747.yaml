@@ -32,7 +32,7 @@ databaseChangeLog:
           value: numeric
           dbms: postgresql
     - changeSet:
-        id: 1665140886759-1
+        id: 1665140886759-2
         author: limit
         changes:
             - createTable:

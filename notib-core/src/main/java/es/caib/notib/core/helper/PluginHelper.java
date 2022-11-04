@@ -2,11 +2,31 @@ package es.caib.notib.core.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfReader;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.AnexoWsDto;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.InteresadoWsDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.RegistreAnnexDto;
+import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
+import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
+import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
+import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
+import es.caib.notib.core.api.dto.SignatureInfoDto;
+import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -28,7 +48,19 @@ import es.caib.notib.plugin.gesconadm.GcaServei;
 import es.caib.notib.plugin.gesconadm.GesconAdm;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.DadesOficina;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
+import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -45,19 +77,21 @@ import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import lombok.Synchronized;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
+import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.mail.Message;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -103,6 +137,7 @@ public class PluginHelper {
 	private Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugin = new HashMap<>();
 	private Map<String, GestorContingutsAdministratiuPlugin> gestorDocumentalAdministratiuPlugin = new HashMap<>();
 	private Map<String, FirmaServidorPlugin> firmaServidorPlugin = new HashMap<>();
+	private Map<String, IValidateSignaturePlugin> validaSignaturaPlugins = new HashMap<>();
 
 	@Autowired
 	private IntegracioHelper integracioHelper;
@@ -1733,18 +1768,105 @@ public class PluginHelper {
 		notificacio.setRegistreLlibreNom(dadesOficina.getLlibreNom());
 	}
 	
-	public static DocumentBuilder getDocumentBuilder() throws Exception {
+//	public static DocumentBuilder getDocumentBuilder() throws Exception {
+//		try {
+//			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//			dbf.setIgnoringComments(true);
+//			dbf.setCoalescing(true);
+//			dbf.setIgnoringElementContentWhitespace(true);
+//			dbf.setValidating(false);
+//			return dbf.newDocumentBuilder();
+//    	} catch (Exception exc) {
+//    		throw new Exception(exc.getMessage());
+//    	}
+//	}
+
+
+	// Validació de firmes
+	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(
+			byte[] documentContingut,
+			String nom,
+			String firmaContentType) {
+		IntegracioInfo info = new IntegracioInfo(
+				IntegracioHelper.INTCODI_VALIDASIG,
+				"Enviament notificació a registre (SIR activat)",
+				IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("Nom del document", nom),
+				new AccioParam("ContentType", firmaContentType));
 		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			dbf.setIgnoringComments(true);
-			dbf.setCoalescing(true);
-			dbf.setIgnoringElementContentWhitespace(true);
-			dbf.setValidating(false);
-			return dbf.newDocumentBuilder();
-    	} catch (Exception exc) {
-    		throw new Exception(exc.getMessage());
-    	}
+			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
+			validationRequest.setSignatureData(documentContingut);
+			SignatureRequestedInformation sri = new SignatureRequestedInformation();
+			sri.setReturnSignatureTypeFormatProfile(true);
+			sri.setReturnCertificateInfo(true);
+			sri.setReturnValidationChecks(false);
+			sri.setValidateCertificateRevocation(false);
+			sri.setReturnCertificates(false);
+			sri.setReturnTimeStampInfo(true);
+			validationRequest.setSignatureRequestedInformation(sri);
+			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
+
+			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+			SignatureInfoDto signatureInfoDto;
+
+			if (validationStatus.getStatus() == 1) {
+				signatureInfoDto = SignatureInfoDto.builder().signed(true).error(false).build();
+			} else {
+				signatureInfoDto = SignatureInfoDto.builder().signed(true).error(true).errorMsg(validationStatus.getErrorMsg()).build();
+			}
+			info.addParam("Document firmat", Boolean.toString(signatureInfoDto.isSigned()));
+			info.addParam("Error de firma", Boolean.toString(signatureInfoDto.isError()));
+			if (signatureInfoDto.isError()) {
+				info.addParam("Missatge d'error", signatureInfoDto.getErrorMsg());
+			}
+			integracioHelper.addAccioOk(info);
+			return signatureInfoDto;
+		} catch (Exception e) {
+			Throwable throwable = ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
+			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El documento OOXML no está firmado(urn:oasis:names:tc:dss:1.0:resultmajor:ResponderError)")) {
+				info.addParam("Document firmat", "false");
+				info.addParam("Error de firma", "false");
+				info.addParam("Missatge d'error", throwable.getMessage());
+				integracioHelper.addAccioOk(info);
+				return SignatureInfoDto.builder().signed(false).error(false).build();
+			} else {
+				logger.error("Error al detectar firma de document", e);
+				integracioHelper.addAccioError(info, "Error al validar la firma", throwable);
+				return SignatureInfoDto.builder().signed(false).error(true).errorMsg(e.getMessage()).build();
+			}
+		}
 	}
+
+//	public SignatureInfoDto detectSignedAttachedUsingPdfReader(byte[] documentContingut, String contentType) {
+//
+//		boolean isSigned = isFitxerSigned(documentContingut, contentType);
+//		boolean validationError = false; // !isSigned;
+//		String validationErrorMsg = ""; // "error error error error error error ";
+//
+//		return SignatureInfoDto.builder().signed(isSigned).error(validationError).errorMsg(validationErrorMsg).build();
+//	}
+
+	private boolean isFitxerSigned(byte[] contingut, String contentType) {
+
+		if (contentType.equals("application/pdf")) {
+			PdfReader reader;
+			try {
+				reader = new PdfReader(contingut);
+				AcroFields acroFields = reader.getAcroFields();
+				List<String> signatureNames = acroFields.getSignatureNames();
+				if (signatureNames != null && !signatureNames.isEmpty()) {
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			return false;
+		}
+	}
+
 
 	public boolean isDadesUsuariPluginDisponible() {
 		String pluginClass = getPropertyPluginDadesUsuari();
@@ -2002,6 +2124,35 @@ public class PluginHelper {
 		}
 	}
 
+	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (Strings.isNullOrEmpty(entitatCodi)) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
+		IValidateSignaturePlugin plugin = validaSignaturaPlugins.get(entitatCodi);
+//		loadPluginProperties("VALIDATE_SIGNATURE");
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginValidaSignatura();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			String error = "No està configurada la classe per al plugin de validació de firma";
+			logger.error(error);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_VALIDASIG, error);
+//			return null;
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+			validaSignaturaPlugins.put(entitatCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_VALIDASIG, "Error al crear la instància del plugin de validació de signatures", ex);
+		}
+	}
+
 	public void resetPlugins(String grup) {
 		switch (grup) {
 			case "ARXIU":
@@ -2062,6 +2213,9 @@ public class PluginHelper {
 	}
 	private String getPropertyPluginFirmaServidor() {
 		return configHelper.getConfig("es.caib.notib.plugin.firmaservidor.class");
+	}
+	private String getPropertyPluginValidaSignatura() {
+		return configHelper.getConfig("es.caib.notib.plugin.validatesignature.class");
 	}
 	public int getSegonsEntreReintentRegistreProperty() {
 		return configHelper.getAsInt("es.caib.notib.plugin.registre.segons.entre.peticions");

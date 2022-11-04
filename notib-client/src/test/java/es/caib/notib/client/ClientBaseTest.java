@@ -167,6 +167,16 @@ public class ClientBaseTest {
 				"/es/caib/notib/client/notificacio_adjunt_grande.pdf");
 	}
 
+	protected InputStream getContingutNotificacioAdjuntFirmat() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/client/notificacio_adjunt_firmat.pdf");
+	}
+
+	protected InputStream getContingutNotificacioAdjuntFirmatInvalid() {
+		return getClass().getResourceAsStream(
+				"/es/caib/notib/client/notificacio_adjunt_firmat_invalid.pdf");
+	}
+
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
 		GregorianCalendar c = new GregorianCalendar();
 		c.setTime(date);
