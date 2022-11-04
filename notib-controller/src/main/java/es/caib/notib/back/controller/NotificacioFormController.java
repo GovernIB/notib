@@ -29,6 +29,7 @@ import es.caib.notib.logic.intf.dto.FirmaValidDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.LocalitatsDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PaisosDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProvinciesDto;
@@ -271,6 +272,20 @@ public class NotificacioFormController extends BaseUserController {
     public PersonaCommand altaDestinatari(HttpServletRequest request, Model model) {
         PersonaCommand destinatari = new PersonaCommand();
         return destinatari;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/organ/oficina/{organCodi}")
+    public OficinaDto getOficina(HttpServletRequest request, Model model, @PathVariable String organCodi) {
+
+        var entitat = getEntitatActualComprovantPermisos(request);
+        try {
+            var o = organGestorService.findByCodi(entitat.getId(), organCodi);
+            return o.getOficina();
+        } catch (Exception ex) {
+            log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
+            return null;
+        }
     }
 
     @RequestMapping(value = "/newOrModify", method = RequestMethod.POST)

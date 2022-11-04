@@ -4,8 +4,10 @@ package es.caib.notib.back.validation;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.back.command.EnviamentCommand;
 import es.caib.notib.back.command.NotificacioCommand;
@@ -38,6 +40,8 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 	private ProcedimentService procedimentService;
 	@Autowired
 	private NotificacioService notificacioService;
+	@Autowired
+	private OrganGestorService organService;
 	
 	@Override
 	public void initialize(final ValidNotificacio constraintAnnotation) {
@@ -88,6 +92,15 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							comunicacioSenseAdministracio = true;
 						}
 					}
+				}
+			}
+			if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(notificacio.getEnviamentTipus())) {
+				var organ = notificacio.getOrganGestor();
+				var o = organService.findByCodi(null, organ);
+				valid = o.getOficina() != null && !Strings.isNullOrEmpty(o.getOficina().getCodi());
+				if (!valid) {
+					var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.organ.sense.oficina", null, locale);
+					context.buildConstraintViolationWithTemplate(msg).addNode("organGestor").addConstraintViolation();
 				}
 			}
 			if (comunicacioAmbAdministracio && comunicacioSenseAdministracio) {

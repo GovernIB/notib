@@ -941,6 +941,23 @@
 				organ = "-";
 			}
 
+			$("#organGestor").closest(".form-group").removeClass("has-error");
+			$("#organGestor").closest(".form-group").find(".help-block").remove();
+
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value="/notificacio/organ/oficina/"/>"+ organ,
+				success: data => {
+					let e = "${enviamentTipus}"
+					if (data && !data.codi && e === 'COMUNICACIO_SIR') {
+						$("#organGestor").closest(".form-group").addClass("has-error");
+						let msg = "<spring:message code="notificacio.form.valid.organ.sense.oficina"/>"
+						$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp' + msg+ '</p>').insertAfter($("#organGestor").closest(".form-group").find(".select2-container"));
+					}
+				},
+				error: () => console.log("error obtenint els dies de caducitat a partir de la data")
+			});
+
 			// if (num_organs > 0) {
 				loadProcediments(organ);
 				loadServeis(organ, '${notificacioCommand.tipusProcSer}' == 'PROCEDIMENT' );

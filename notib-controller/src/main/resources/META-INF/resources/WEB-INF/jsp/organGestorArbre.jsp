@@ -105,6 +105,8 @@
                 $("#canviarVistaOrganGestor").click(function(){
                     window.location.replace("/notib/organgestor");
                 });
+
+                $("#organ-boto-update-oficines").on("click", () => bloquejar());
             });
         </script>
         <style>
@@ -177,13 +179,12 @@
             </div>
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">
-                    <a id="organ-boto-update-oficines"
-                       class="btn btn-default" href="organgestor/sync/oficines"
-                       data-toggle="modal"
-                       data-refresh-pagina="true"
-                       data-maximized="false">
-                        <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
-                    </a>
+                    <c:if test="${setOficina}">
+                        <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines"
+                           data-refresh-pagina="true" data-maximized="false">
+                            <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
+                        </a>
+                    </c:if>
                     <a id="organ-boto-update"
                         class="btn btn-default" href="organgestor/sync/dir3"
                         data-toggle="modal"
