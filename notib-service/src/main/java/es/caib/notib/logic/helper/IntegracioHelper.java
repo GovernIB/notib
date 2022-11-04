@@ -59,8 +59,9 @@ public class IntegracioHelper {
 	public static final String INTCODI_UNITATS = "UNITATS";
 	public static final String INTCODI_GESCONADM = "GESCONADM";
 	public static final String INTCODI_PROCEDIMENT = "PROCEDIMENTS";
-	public static final String INTCODI_CONVERT = "CONVERT";
+//	public static final String INTCODI_CONVERT = "CONVERT";
 	public static final String INTCODI_FIRMASERV = "FIRMASERV";
+	public static final String INTCODI_VALIDASIG = "VALIDASIG";
 
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<>();
@@ -74,6 +75,7 @@ public class IntegracioHelper {
 		integracions.add(novaIntegracio(INTCODI_GESCONADM));
 		integracions.add(novaIntegracio(INTCODI_PROCEDIMENT));
 		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
+		integracions.add(novaIntegracio(INTCODI_VALIDASIG));
 		return integracions;
 	}
 
@@ -89,6 +91,7 @@ public class IntegracioHelper {
 		errorsGroupByCodi.put(INTCODI_GESCONADM,countErrors(INTCODI_GESCONADM));
 		errorsGroupByCodi.put(INTCODI_PROCEDIMENT,countErrors(INTCODI_PROCEDIMENT));
 		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_FIRMASERV));
+		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_VALIDASIG));
 		return errorsGroupByCodi;
 	}
 
@@ -97,8 +100,7 @@ public class IntegracioHelper {
 
 //		return conversio.convertirList(monitorRepository.findAllByCodiOrderByDataDesc(integracioCodi), IntegracioAccioDto.class);
 		return conversio.convertirList(monitorRepository.getByFiltre(integracioCodi, Strings.isNullOrEmpty(filtre.getEntitatCodi()), filtre.getEntitatCodi(),
-				Strings.isNullOrEmpty(filtre.getAplicacio()), filtre.getAplicacio()), IntegracioAccioDto.class);
-	}
+				Strings.isNullOrEmpty(filtre.getAplicacio()), filtre.getAplicacio()), IntegracioAccioDto.class);}
 
 	public void addAccioOk(IntegracioInfo info) {
 		addAccioOk(info, true);
@@ -106,9 +108,8 @@ public class IntegracioHelper {
 
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
-		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio())
-				.tipus(info.getTipus()).codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK)
-				.aplicacio(info.getAplicacio()).build();
+		var accio = MonitorIntegracioEntity.builder().codi(info.getCodi()).data(new Date()).descripcio(info.getDescripcio()).tipus(info.getTipus()).
+				codiEntitat(info.getCodiEntitat()).tempsResposta(info.getTempsResposta()).estat(IntegracioAccioEstatEnumDto.OK).aplicacio(info.getAplicacio()).build();
 
 		assignarAccioAParams(info, accio);
 		addAccio(accio, obtenirUsuari);
@@ -213,6 +214,8 @@ public class IntegracioHelper {
 			integracio.setNom("Procediments");
 		} else if (INTCODI_FIRMASERV.equals(codi)) {
 			integracio.setNom("Firma servidor");
+		} else if (INTCODI_VALIDASIG.equals(codi)) {
+			integracio.setNom("Validacio firma");
 		}
 		return integracio;
 	}

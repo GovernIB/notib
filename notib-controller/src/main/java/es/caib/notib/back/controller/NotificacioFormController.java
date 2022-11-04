@@ -25,6 +25,7 @@ import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.FirmaValidDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.LocalitatsDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
@@ -35,6 +36,7 @@ import es.caib.notib.logic.intf.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.logic.intf.dto.RespostaConsultaArxiuDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
+import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
@@ -69,6 +71,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -78,6 +81,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -281,13 +285,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
         if (bindingResult.hasErrors()) {
-            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
-            for (ObjectError error: bindingResult.getAllErrors()) {
-                log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
-            }
-            model.addAttribute(notificacioCommand);
-            emplenarModelNotificacio(request, model, notificacioCommand);
+            relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
             return "notificacioForm";
         }
         if (RolHelper.isUsuariActualAdministrador(request)) {
@@ -297,7 +295,11 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute(new OrganGestorFiltreCommand());
         try {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
-            updateDocuments(notificacioCommand);
+            updateDocuments(notificacioCommand, bindingResult);
+            if (bindingResult.hasErrors()) {
+                relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
+                return "notificacioForm";
+            }
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(entitatActual.getId(), notificacioCommand.asDatabaseDto(), RolHelper.isUsuariActualAdministradorEntitat(request));
             } else {
@@ -316,59 +318,104 @@ public class NotificacioFormController extends BaseUserController {
         }
     }
 
-    private void updateDocuments(NotificacioCommand notificacioCommand) throws IOException {
+    private void relooadForm(HttpServletRequest request, NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model, List<String> tipusDocumentEnumDto, EntitatDto entitatActual, ProcSerDto procedimentActual) {
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
+        ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+        for (ObjectError error: bindingResult.getAllErrors()) {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
+        }
+        model.addAttribute(notificacioCommand);
+        emplenarModelNotificacio(request, model, notificacioCommand);
+    }
+
+    private void updateDocuments(NotificacioCommand notificacioCommand, BindingResult bindingResult) throws IOException {
 
         for (int i = 0; i < 5; i++) {
 
-            if (notificacioCommand.getTipusDocument()[i] == null) {
-                notificacioCommand.getDocuments()[i] = null;
-                continue;
-            }
-            String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
-            switch (notificacioCommand.getTipusDocument()[i]) {
-                case ARXIU:
-                    if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
-                        notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
-                        String contingutBase64 = Base64.getEncoder().encodeToString(notificacioCommand.getArxiu()[i].getBytes());
-                        notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                        notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
-                        notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
-                    } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
-                        byte[] result;
-                        if (notificacioCommand.getId() != null) {
-                            result = gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId);
-                        } else {
-                            result = gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
-                        }
+            if (notificacioCommand.getTipusDocument()[i] != null) {
+                String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
+                switch (notificacioCommand.getTipusDocument()[i]) {
+                    case ARXIU:
+                        if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
+                            byte[] contingut = notificacioCommand.getArxiu()[i].getBytes();
+                            String contentType = notificacioCommand.getArxiu()[i].getContentType();
+                            notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
+                            String contingutBase64 = Base64.getEncoder().encodeToString(contingut);
+                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                            notificacioCommand.getDocuments()[i].setMediaType(contentType);
+                            notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+                            validaFirma(contentType, bindingResult, i, contingut);
+                        } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
+                            byte[] result;
+                            if (notificacioCommand.getId() != null) {
+                                result = gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId);
+                            } else {
+                                result = gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
+                            }
 
-                        String contingutBase64 = Base64.getEncoder().encodeToString(result);
-                        notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                    } else {
-                        notificacioCommand.getDocuments()[i] = null;
-                    }
-                    break;
-                case CSV:
-                    if (notificacioCommand.getDocumentArxiuCsv()[i] != null && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
-                        notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
-                    } else {
-                        notificacioCommand.getDocuments()[i] = null;
-                    }
-                    break;
-                case UUID:
-                    if (notificacioCommand.getDocumentArxiuUuid()[i] != null && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
-                        notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
-                    } else {
-                        notificacioCommand.getDocuments()[i] = null;
-                    }
-                    break;
-                case URL:
-                    if (notificacioCommand.getDocumentArxiuUrl()[i] != null && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
-                        notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
-                    } else {
-                        notificacioCommand.getDocuments()[i] = null;
-                    }
-                    break;
+                            String contingutBase64 = Base64.getEncoder().encodeToString(result);
+                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                            validaFirma(notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
+                        }
+                        break;
+                    case CSV:
+                        if (notificacioCommand.getDocumentArxiuCsv()[i] != null
+                                && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
+                        }
+                        break;
+                    case UUID:
+                        if (notificacioCommand.getDocumentArxiuUuid()[i] != null
+                                && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
+                        }
+                        break;
+                    case URL:
+                        if (notificacioCommand.getDocumentArxiuUrl()[i] != null
+                                && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
+                            notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
+                        } else {
+                            notificacioCommand.getDocuments()[i] = null;
+                        }
+                        break;
+                }
+            } else {
+                notificacioCommand.getDocuments()[i] = null;
             }
+        }
+    }
+
+    @RequestMapping(value = "/valida/firma", method = RequestMethod.POST, headers="Content-Type=application/json")
+    @ResponseBody
+    public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam("fitxer") MultipartFile fitxer) throws IOException {
+
+        String nom = fitxer.getOriginalFilename();
+        byte[] content = fitxer.getBytes();
+        String contentType = fitxer.getContentType();
+        String contingutBase64 = Base64.getEncoder().encodeToString(content);
+        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+        SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, contentType);
+        return FirmaValidDto.builder()
+                .arxiuGestdocId(arxiuGestdocId)
+                .nom(nom)
+                .mida(fitxer.getSize())
+                .signed(signatureInfo.isSigned())
+                .error(signatureInfo.isError())
+                .errorMsg(signatureInfo.getErrorMsg())
+                .build();
+    }
+
+    private void validaFirma(String mediaType, BindingResult bindingResult, int position, byte[] content) {
+        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, mediaType);
+        if (signatureInfoDto.isError()) {
+            String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
+            bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
         }
     }
 

@@ -1439,6 +1439,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 	}
 
 	@Override
+	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType) {
+//		if (configHelper.getAsBoolean("es.caib.notib.firma.detectar.attached.validate.signature", true)) {
+		return pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(contingut, contentType);
+//		} else {
+//			return pluginHelper.detectSignedAttachedUsingPdfReader(
+//					contingut,
+//					contentType);
+//		}
+	}
+
+	@Override
 	public void refrescarEnviamentsExpirats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {

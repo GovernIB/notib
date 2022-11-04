@@ -484,6 +484,42 @@
 				$(provincia).parent().parent().removeClass('hidden');
 			}
 		});
+
+		// Validacio firma document fisic
+		$('input[type="file"]:visible').change((event) => {
+			$file = $(event.currentTarget);
+			if ($file.files.length == 0)
+				return;
+
+			let file = $file.files[0];
+			let formData = new FormData();
+			formData.append('fitxer', file, file.name);
+			$file.prop("disabled", true);
+
+			$.ajax({
+				type: "POST",
+				enctype: 'multipart/form-data',
+				url: "<c:url value='/notificacio/valida/firma'/>",
+				data: formData,
+				processData: false,
+				contentType: false,
+				cache: false,
+				timeout: 600000,
+				success: function (data) {
+
+					console.log("SUCCESS : ", data);
+					$file.prop("disabled", false);
+
+				},
+				error: function (e) {
+
+					console.log("ERROR : ", e);
+					$file.prop("disabled", false);
+
+				}
+			});
+
+		})
 		
 		//Consulta al arxiu de los identificadores CSV o Uuid 
 		//para comprobar si existe el documento y sus metadatos	

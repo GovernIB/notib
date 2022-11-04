@@ -20,6 +20,7 @@ import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto;
 import es.caib.notib.logic.intf.dto.ProvinciesDto;
 import es.caib.notib.logic.intf.dto.RegistreIdDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
+import es.caib.notib.logic.intf.dto.SignatureInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
@@ -46,12 +47,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDtoV2 findAmbId(
-			Long id,
-			boolean isAdministrador) {
-		return getDelegateService().findAmbId(
-				id,
-				isAdministrador);
+	public NotificacioDtoV2 findAmbId(Long id, boolean isAdministrador) {
+		return getDelegateService().findAmbId(id, isAdministrador);
 	}
 
 	@Override
@@ -62,12 +59,8 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public List<NotificacioEventDto> eventFindAmbNotificacio(
-			Long entitatId,
-			Long notificacioId) {
-		return getDelegateService().eventFindAmbNotificacio(
-				entitatId,
-				notificacioId);
+	public List<NotificacioEventDto> eventFindAmbNotificacio(Long entitatId, Long notificacioId) {
+		return getDelegateService().eventFindAmbNotificacio(entitatId, notificacioId);
 	}
 
 	@Override
@@ -85,47 +78,31 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<NotificacioEventDto> eventFindAmbEnviament(
-			Long entitatId,
-			Long notificacioId,
-			Long enviamentId) {
-		return getDelegateService().eventFindAmbEnviament(
-				entitatId,
-				notificacioId,
-				enviamentId);
+	public List<NotificacioEventDto> eventFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
+		return getDelegateService().eventFindAmbEnviament(entitatId, notificacioId, enviamentId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(
-			Long entitatId,
-			Long notificacioId,
-			Long enviamentId) {
-		return getDelegateService().historicFindAmbEnviament(
-				entitatId,
-				notificacioId,
-				enviamentId);
+	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
+		return getDelegateService().historicFindAmbEnviament(entitatId, notificacioId, enviamentId);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
-	public ArxiuDto getDocumentArxiu(
-			Long notificacioId) {
+	public ArxiuDto getDocumentArxiu(Long notificacioId) {
 		return getDelegateService().getDocumentArxiu(notificacioId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
-	public ArxiuDto getDocumentArxiu(
-			Long notificacioId,
-			Long documentId) {
+	public ArxiuDto getDocumentArxiu(Long notificacioId, Long documentId) {
 		return getDelegateService().getDocumentArxiu(notificacioId, documentId);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_CARPETA"})
-	public ArxiuDto enviamentGetCertificacioArxiu(
-			Long enviamentId) {
+	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
 		return getDelegateService().enviamentGetCertificacioArxiu(enviamentId);
 	}
 
@@ -137,9 +114,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(
-			Long entitatId,
-			Long enviamentId) {
+	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
 		return getDelegateService().enviamentRefrescarEstat(
 				entitatId,
 				enviamentId);
@@ -147,22 +122,15 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDatabaseDto create(
-			Long entitatId,
-			NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
+	public NotificacioDatabaseDto create(Long entitatId, NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, notificacio);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDatabaseDto update(
-			Long entitatId,
-			NotificacioDatabaseDto notificacio,
+	public NotificacioDatabaseDto update(Long entitatId, NotificacioDatabaseDto notificacio,
 			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
-		return getDelegateService().update(
-				entitatId, 
-				notificacio,
-				isAdministradorEntitat);
+		return getDelegateService().update(entitatId, notificacio, isAdministradorEntitat);
 	}
 	
 	@Override
@@ -173,46 +141,19 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findAmbFiltrePaginat(
-				entitatId,
-				rol,
-				organGestorCodi,
-				usuariCodi,
-				filtre,
-				paginacioParams);
+	public PaginaDto<NotificacioTableItemDto> findAmbFiltrePaginat(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findAmbFiltrePaginat(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public List<Long> findIdsAmbFiltre(Long entitatId,
-									   RolEnumDto rol,
-									   String organGestorCodi,
-									   String usuariCodi,
-									   NotificacioFiltreDto filtre) {
-		return getDelegateService().findIdsAmbFiltre(
-				entitatId,
-				rol,
-				organGestorCodi,
-				usuariCodi,
-				filtre);
+	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre) {
+		return getDelegateService().findIdsAmbFiltre(entitatId, rol, organGestorCodi, usuariCodi, filtre);
 	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public String marcarComProcessada(
-			Long enviamentId,
-			String motiu,
-			boolean isAdministrador) throws Exception {
-		return getDelegateService().marcarComProcessada(
-				enviamentId,
-				motiu,
-				isAdministrador);
+	public String marcarComProcessada(Long enviamentId, String motiu, boolean isAdministrador) throws Exception {
+		return getDelegateService().marcarComProcessada(enviamentId, motiu, isAdministrador);
 	}
 
 	@Override
@@ -307,24 +248,14 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(
-			Long entitatId,
-			NotificacioRegistreErrorFiltreDto filtre,
-			PaginacioParamsDto paginacioDtoFromRequest) {
-		return getDelegateService().findNotificacionsAmbErrorRegistre(
-				entitatId,
-				filtre, 
-				paginacioDtoFromRequest);
+	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest) {
+		return getDelegateService().findNotificacionsAmbErrorRegistre(entitatId, filtre, paginacioDtoFromRequest);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
-	public List<Long> findNotificacionsIdAmbErrorRegistre(
-			Long entitatId, 
-			NotificacioRegistreErrorFiltreDto filtre) {
-		return getDelegateService().findNotificacionsIdAmbErrorRegistre(
-				entitatId,
-				filtre);
+	public List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre) {
+		return getDelegateService().findNotificacionsIdAmbErrorRegistre(entitatId, filtre);
 	}
 
 	@Override
@@ -353,11 +284,11 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio,
-                                             Long comunitatAutonoma, Boolean ambOficines, Boolean esUnitatArrel, Long provincia, String municipi) {
+	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines,
+											 Boolean esUnitatArrel, Long provincia, String municipi) {
+
 		return getDelegateService().cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 	}
-	
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
@@ -424,6 +355,12 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
 		return getDelegateService().reactivarNotificacioAmbErrors(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+	public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType) {
+		return getDelegateService().checkIfSignedAttached(contingut, contentType);
 	}
 
 	@SuppressWarnings("rawtypes")
