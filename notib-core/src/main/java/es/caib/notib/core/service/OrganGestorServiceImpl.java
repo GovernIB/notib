@@ -1699,13 +1699,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<String> codiFills;
 		OrganGestorEntity organFill;
 		boolean entitatPermesa = configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+		boolean isOficinaOrganSir = !entity.isOficinaEntitat() && PermisEnum.COMUNIACIO_SIR.equals(permis);
 		for(OrganGestorEntity organ: organs) {
 
-			if (entity.isOficinaEntitat() || Strings.isNullOrEmpty(organ.getOficina()) && PermisEnum.COMUNIACIO_SIR.equals(permis)) {
-				continue;
-			}
-			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
-			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
+			boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
+			if ((entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) && !excloure) {
+				organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 				resposta.add(organCodiValor);
 			}
 			//buscar fills
@@ -1716,8 +1715,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				}
 				organFill = organGestorRepository.findByCodi(fill);
 				if (organFill != null) {
-					organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
-					resposta.add(organCodiValor);
+					boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
+					if (!excloureFill) {
+						organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
+						resposta.add(organCodiValor);
+					}
 				}
 			}
 		}
@@ -1774,17 +1776,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
 			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
-			actualitzarOficinaOrgan(codi, oficines);
+			organGestorHelper.actualitzarOficinaOrgan(codi, oficines.get(0));
 		}
 	}
 
-	@Transactional
-	public void actualitzarOficinaOrgan(String organCodi, List<OficinaDto> oficines) {
 
-		OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
-		organ.setOficina(oficines.get(0).getCodi());
-		organ.setOficinaNom(oficines.get(0).getNom());
-	}
 
 	@Override
 	public void syncOficinesSIR(Long entitatId) {
@@ -1818,7 +1814,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
 					log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
 					info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
-					actualitzarOficinaOrgan(organ.getCodi(), oficines);
+					organGestorHelper.actualitzarOficinaOrgan(organ.getCodi(), oficines.get(0));
 					log.info("OFISYNC - Oficina actualitzada");
 					continue;
 				} else {

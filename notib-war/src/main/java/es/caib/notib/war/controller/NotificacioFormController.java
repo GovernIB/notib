@@ -693,9 +693,9 @@ public class NotificacioFormController extends BaseUserController {
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
-            PermisEnum tipus = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
+            PermisEnum permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
 //            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
-            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), tipus);
+            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
         }
 
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
