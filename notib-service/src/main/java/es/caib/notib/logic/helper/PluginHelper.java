@@ -149,7 +149,7 @@ public class PluginHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Resource
-	private CacheManager cacheManager;
+	private MessageHelper messageHelper;
 	@Resource
 	private EntitatRepository entitatRepository;
 
@@ -961,8 +961,9 @@ public class PluginHelper {
 			info.setCodiEntitat(entitat.getCodi());
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
-				String errorMissatge = "No s'han obtingut òrgans o canvis per la unitat organitzativa amb codi=" + pareCodi + "";
-				integracioHelper.addAccioError(info, errorMissatge);
+				String errorMissatge = messageHelper.getMessage("organgestor.actualitzacio.sense.canvis");
+				info.addParam("Resultat", "No s'han obtingut canvis.");
+				integracioHelper.addAccioOk(info);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 			integracioHelper.addAccioOk(info);
