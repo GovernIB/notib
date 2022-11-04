@@ -97,12 +97,6 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private OrganGestorRepository organGestorRepository;
 	@Resource
-	private ProcSerRepository procSerRepository;
-	@Resource
-	private NotificacioRepository notificacioRepository;
-	@Resource
-	private AvisRepository avisRepository;
-	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
@@ -507,17 +501,17 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Transactional
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
 		String prefix = "[SYNC-ORGANS] ";
 		log.debug(prefix + "Inici sync organs gestors");
-		String msg = "";
+		var msg = "";
 		if (entitat.getDir3Codi() == null || entitat.getDir3Codi().isEmpty()) {
 			msg = "L'entitat actual no té cap codi DIR3 associat";
 			log.debug(prefix + msg);
 			throw new Exception(msg);
 		}
 		// Comprova si hi ha una altre instància del procés en execució
-		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getDir3Codi());
+		var progres = progresActualitzacio.get(entitat.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			msg = "[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització";
 			log.debug(prefix + msg);
@@ -544,17 +538,17 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			// 1. Obtenir canvis a l'organigrama
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 			log.debug(prefix + "Obtenint unitats organitzatives");
-			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+			var unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 			//		progres.incrementOperacionsRealitzades();	// 2%
 			log.debug(prefix + "nombre d'unitats obtingutdes: " + unitatsWs.size());
 			progres.setProgres(2);
 			Long tf = System.currentTimeMillis();
 			List<String> codis = new ArrayList<>();
-			for (NodeDir3 u : unitatsWs) {
+			for (var u : unitatsWs) {
 				codis.add(u.getCodi());
 			}
 			log.debug(prefix + "calculant unitats extingides");
-			obsoleteUnitats = calcularExtingides(codis);
+			obsoleteUnitats = calcularExtingides(entitat.getCodi(), codis);
 			log.debug(prefix + "nombre d'unitats extingides: " + obsoleteUnitats.size());
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
@@ -633,7 +627,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(tf - ti)}));
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.eliminar.fi"));
 
-			cacheHelper.evictFindOrgansGestorWithPermis();
+			cacheHelper.clearAllCaches();
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 		} catch (Exception ex) {
 			e = ex;
@@ -772,27 +766,36 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 			codis.add(u.getCodi());
 		}
-		List<OrganGestorEntity> extingides = calcularExtingides(codis);
+		List<OrganGestorEntity> extingides = calcularExtingides(entitat.getCodi(), codis);
 		List<UnitatOrganitzativaDto> ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
 		List<UnitatOrganitzativaDto> n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
 		return PrediccioSincronitzacio.builder().isFirstSincronization(true).unitatsVigents(vigents).unitatsNew(n).unitatsExtingides(ex).build();
 	}
 
-	private List<OrganGestorEntity> calcularExtingides(List<String> codis) {
-
+	private List<OrganGestorEntity> calcularExtingides(String entitatCodi, List<String> codis) {
 		List<OrganGestorEntity> extingides = new ArrayList<>();
-		var maxInSize = 1000;
-		var nParts = (codis.size() / maxInSize) + 1;
-		var inici = 0;
-		var fi = codis.size() - maxInSize > 0 ? maxInSize : codis.size();
+		List<String> organsAExtingir = organGestorRepository.findCodiActiusByEntitat(entitatCodi);
+		if (organsAExtingir.isEmpty())
+			return extingides;
+
+		for (String codi: codis) {
+			organsAExtingir.remove(codi);
+		}
+		if (organsAExtingir.isEmpty())
+			return extingides;
+
+		int maxInSize = 1000;
+		int nParts = (organsAExtingir.size() / maxInSize) + 1;
+		int inici = 0;
+		int fi = organsAExtingir.size() - maxInSize > 0 ? maxInSize : organsAExtingir.size();
 		List<String>  subList;
-		for (var foo = 0; foo < nParts; foo++) {
-			subList = codis.subList(inici, fi);
+		for (int foo= 0; foo < nParts; foo++) {
+			subList = organsAExtingir.subList(inici, fi);
 			if (!subList.isEmpty()) {
-				extingides.addAll(organGestorRepository.findByCodiNotIn(subList));
+				extingides.addAll(organGestorRepository.findByEntitatCodiAndCodiIn(entitatCodi, subList));
 			}
 			inici = fi + 1 ;
-			fi = codis.size() - inici > maxInSize ? maxInSize : codis.size();
+			fi = organsAExtingir.size() - inici > maxInSize ? maxInSize : organsAExtingir.size();
 		}
 		return extingides;
 	}
@@ -950,7 +953,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		for (String historicCodi : unitat.getHistoricosUO()) {
 			NodeDir3 unitatFromCodi = getUnitatFromCodi(historicCodi, unitatsFromWebService);
 			if (unitatFromCodi != null) {
-				getLastHistoricosRecursive(unitatFromCodi, unitatsFromWebService, lastHistorics);
+				if (!unitatFromCodi.equals(unitat)) {
+					getLastHistoricosRecursive(unitatFromCodi, unitatsFromWebService, lastHistorics);
+				} else {
+					lastHistorics.add(unitat);
+				}
 				continue;
 			}
 			// Looks for historico in database

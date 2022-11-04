@@ -445,10 +445,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 		log.info("Consulta taula de remeses ...");
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			boolean isUsuari = RolEnumDto.tothom.equals(rol);
-			boolean isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
-			boolean isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
-			boolean isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
+			var isUsuari = RolEnumDto.tothom.equals(rol);
+			var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
+			var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
+			var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
 			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
 			Page<NotificacioTableEntity> notificacions = null;
 			Pageable pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
@@ -471,9 +471,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 			}
 
-			boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
-			boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
-			boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+			var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+			var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+			var esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
 
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
@@ -495,10 +495,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
 				//Consulta totes les notificacions de les entitats actives
 				} else if (isSuperAdmin) {
-					List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
+					var entitatsActiva = entitatRepository.findByActiva(true);
 					notificacions = notificacioTableViewRepository.findByEntitatActiva(entitatsActiva, pageable);
 				} else if (isAdminOrgan) {
-					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
+					var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
 							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
@@ -507,7 +507,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 				}
 			} else {
-				NotificacioListHelper.NotificacioFiltre filtreNetejat = notificacioListHelper.getFiltre(filtre);
+				var filtreNetejat = notificacioListHelper.getFiltre(filtre);
 				if (isUsuari) {
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,
@@ -557,7 +557,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 
 				} else if (isUsuariEntitat || isSuperAdmin) {
-					Long entitatFiltre = isUsuariEntitat ? entitatId :filtreNetejat.getEntitatId().getField();
+					var entitatFiltre = isUsuariEntitat ? entitatId :filtreNetejat.getEntitatId().getField();
 					notificacions = notificacioTableViewRepository.findAmbFiltre(
 							entitatFiltre == null,
 							entitatFiltre,
@@ -596,7 +596,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							pageable);
 
 				} else if (isAdminOrgan) {
-					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
+					var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotib(
 							entitatActual,
 							filtreNetejat.getEntitatId().isNull(),
@@ -639,16 +639,17 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
-			List<NotificacioTableItemDto> nots = pag.getContingut();
-			for (int foo = 0; foo < nots.size(); foo++) {
-				NotificacioTableItemDto not = nots.get(foo);
-				NotificacioEntity e = notificacioRepository.findById(not.getId()).orElse(null);
-				List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
-				Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
-				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
+			var pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
+			var nots = pag.getContingut();
+			for (var foo = 0; foo < nots.size(); foo++) {
+				var not = nots.get(foo);
+				var e = notificacioRepository.findById(not.getId()).orElse(null);
+				var envs = enviamentRepository.findByNotificacio(e);
+				var cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
+				var id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
 				not.setDocumentId(id);
 				not.setEnvCerData(cerData);
+				not.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
 			}
 			return pag;
 		} finally {

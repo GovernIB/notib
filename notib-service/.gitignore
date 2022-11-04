@@ -7,3 +7,4 @@
 /notib-core.iml
 /pom.xml.versionsBackup
 /notib-service.iml
+/liquibase/databasechangelog.csv

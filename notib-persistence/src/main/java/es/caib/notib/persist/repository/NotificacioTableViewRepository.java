@@ -442,11 +442,11 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 
-	@Modifying
-	@Query("update NotificacioTableEntity nt " +
-			"set nt.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = nt.organCodi) " +
-			"where nt.organCodi is not null")
-	void updateOrganGestorEstat();
+//	@Modifying
+//	@Query("update NotificacioTableEntity nt " +
+//			"set nt.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = nt.organCodi) " +
+//			"where nt.organCodi is not null")
+//	void updateOrganGestorEstat();
 
 	@Modifying
 	@Query("update NotificacioTableEntity nt " +

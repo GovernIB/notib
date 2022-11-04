@@ -368,22 +368,22 @@ public class EnviamentServiceImpl implements EnviamentService {
 			mapeigPropietatsOrdenacio.put("estat", new String[] {"estat"});
 			mapeigPropietatsOrdenacio.put("codiNotibEnviament", new String[] {"notificaReferencia"});
 			mapeigPropietatsOrdenacio.put("referenciaNotificacio", new String[] {"referenciaNotificacio"});
-			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
+			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			NotificacioEnviamentFiltre filtreFields = getFiltre(entitatId, filtre);
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+				var auth = SecurityContextHolder.getContext().getAuthentication();
+				var permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 				// Procediments accessibles per qualsevol òrgan gestor
-				List<String> codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
+				var codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-				List<String> codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
+				var codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
-				List<String> codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatEntity, permisos);
+				var codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatEntity, permisos);
 
-				boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
-				boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
-				boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
+				var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
+				var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
+				var esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
 
 				pageEnviaments = enviamentTableRepository.find4UserRole(
 						filtreFields.codiProcediment.isNull(),
@@ -454,7 +454,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						filtreFields.referenciaNotificacio.getField(),
 						pageable);
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
-				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
+				var organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
 				pageEnviaments = enviamentTableRepository.find4OrganAdminRole(
 						filtreFields.codiProcediment.isNull(),
 						filtreFields.codiProcediment.getField(),
@@ -517,7 +517,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 						organs,
 						pageable);
 			} else if (isUsuariEntitat) {
-				long ti = System.nanoTime();
+				var ti = System.nanoTime();
 				pageEnviaments = enviamentTableRepository.find4EntitatAdminRole(
 						filtreFields.codiProcediment.isNull(),
 						filtreFields.codiProcediment.getField(),
@@ -584,10 +584,14 @@ public class EnviamentServiceImpl implements EnviamentService {
 				pageEnviaments = new PageImpl<>(new ArrayList<EnviamentTableEntity>());
 			}
 
-			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
-			if (entitatEntity.isLlibreEntitat()) {
-				for (NotEnviamentTableItemDto tableItem : paginaDto.getContingut()) {
-						tableItem.setLlibre(entitatEntity.getLlibre());
+			var paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
+			for (var tableItem : paginaDto.getContingut()) {
+				if (entitatEntity.isLlibreEntitat()) {
+					tableItem.setLlibre(entitatEntity.getLlibre());
+				}
+				var not = notificacioRepository.findById(tableItem.getNotificacioId());
+				if (not != null && not.get() != null &&  not.get().getOrganGestor() != null) {
+					tableItem.setOrganEstat(not.get().getOrganGestor().getEstat());
 				}
 			}
 			return paginaDto;

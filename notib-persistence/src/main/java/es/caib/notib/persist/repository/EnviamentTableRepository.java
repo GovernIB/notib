@@ -348,11 +348,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("referenciaNotificacio") String referenciaNotificacio,
 			Pageable pageable);
 	
-	@Modifying
-	@Query("update EnviamentTableEntity et " +
-			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
-			"where et.organCodi is not null")
-	void updateOrganGestorEstat();
+//	@Modifying
+//	@Query("update EnviamentTableEntity et " +
+//			"set et.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = et.organCodi) " +
+//			"where et.organCodi is not null")
+//	void updateOrganGestorEstat();
 
 	@Modifying
 	@Query("update EnviamentTableEntity nt " +
