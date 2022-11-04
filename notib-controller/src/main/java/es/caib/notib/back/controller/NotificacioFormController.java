@@ -414,9 +414,13 @@ public class NotificacioFormController extends BaseUserController {
     }
 
     private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {
-        SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
+
+        if (!isValidaFirmaWebEnabled()) {
+            return;
+        }
+        var signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
         if (signatureInfoDto.isError()) {
-            String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
+            var codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
             bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
         }
     }
@@ -579,10 +583,10 @@ public class NotificacioFormController extends BaseUserController {
 
     private void emplenarModelNotificacio(HttpServletRequest request, Model model, NotificacioCommand notificacioCommand) {
 
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        List<String> tipusDocumentEnumDto = new ArrayList<String>();
-        List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var usuariActual = aplicacioService.getUsuariActual();
+        List<String> tipusDocumentEnumDto = new ArrayList<>();
+        var tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
         if (tipusDocuments != null) {
             for (TipusDocumentDto tipusDocument : tipusDocuments) {
                 tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
@@ -605,8 +609,9 @@ public class NotificacioFormController extends BaseUserController {
         } catch (Exception ex) {
             log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
-        String referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
+        var referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
         model.addAttribute("referer", referer);
+        model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
     }
 
 
@@ -794,6 +799,10 @@ public class NotificacioFormController extends BaseUserController {
 
     private boolean isAdministrador(HttpServletRequest request) {
         return RolHelper.isUsuariActualAdministrador(request);
+    }
+
+    private boolean isValidaFirmaWebEnabled() {
+        return Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugins.validatesignature.enable.web", "true"));
     }
 
     @InitBinder
