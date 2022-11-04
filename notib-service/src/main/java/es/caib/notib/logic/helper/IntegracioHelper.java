@@ -146,8 +146,14 @@ public class IntegracioHelper {
 
 		afegirParametreUsuari(accio, obtenirUsuari);
 		String st = accio.getExcepcioStacktrace();
-		accio.setExcepcioStacktrace(st != null && st.getBytes().length > 2048 ? st.substring(0, 2048) : st);
-		monitorRepository.save(accio);
+		accio.setExcepcioStacktrace(st != null && st.getBytes().length > 2000 ? st.substring(0, 1997) + "..." : st);
+		try {
+			monitorRepository.save(accio);
+		} catch (Exception ex) {
+			log.error("Error al desar la acció del monitor.");
+			log.error("Acció: {}", accio);
+			log.error("Excepció: ", ex);
+		}
 	}
 
 	private Integer countErrors(String codi) {
