@@ -3,6 +3,7 @@ package es.caib.notib.core.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
@@ -386,11 +387,10 @@ public class OrganGestorHelper {
 		if (llibre != null) {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
-		List<OficinaDto> oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
-		if (oficines != null && !oficines.isEmpty()) {
-			OficinaDto o = oficines.get(0);
-			organ.updateOficina(o.getCodi(), o.getNom());
-		}
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi,
+				IntegracioAccioTipusEnumDto.PROCESSAR);
+		Map<String, OrganismeDto> arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitatDir3Codi);
+		processarOficinaOrgan(info, arbreUnitats, organ);
 	}
 
 	private void sincronizarHistoricsUnitat(
@@ -439,7 +439,7 @@ public class OrganGestorHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void procesarOficinaOrgan(IntegracioInfo info, Map<String, OrganismeDto> arbreUnitats, OrganGestorEntity organ) {
+	public void processarOficinaOrgan(IntegracioInfo info, Map<String, OrganismeDto> arbreUnitats, OrganGestorEntity organ) {
 
 		List<OficinaDto> oficines;
 		try {
