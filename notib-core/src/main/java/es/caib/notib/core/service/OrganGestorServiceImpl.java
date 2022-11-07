@@ -524,7 +524,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	}
 
 	@Override
-	@Transactional
+	@Transactional(timeout = 3600)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false);
@@ -665,9 +665,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			cacheHelper.clearAllCaches();
 //			cacheHelper.evictFindOrgansGestorWithPermis();
 			// 7.-
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sync.oficines.organ"));
-			syncOficinesSIR(entitat.getDir3Codi(), unitatsWs);
-			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sync.oficines.organ.fi"));
+//			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sync.oficines.organ"));
+//			syncOficinesSIR(entitat.getDir3Codi(), unitatsWs);
+//			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sync.oficines.organ.fi"));
 
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBINFO, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar.fi"));
 		} catch (Exception ex) {
@@ -1761,28 +1761,13 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private void actualitzarOficinaOrgan(String codi, Map<String, OrganismeDto> arbreUnitats, IntegracioInfo info) {
 
 		OrganGestorEntity organ = organGestorRepository.findByCodi(codi);
-		List<OficinaDto> oficines = null;
-		try {
-			oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
-		} catch (Exception ex) {
-			String msg = "Error obtinguent les oficines per l'òrgan " + organ.getCodi();
-			log.error(msg);
-			info.addParam(organ.getCodi(), msg);
-			return;
-		}
-		if (oficines == null || oficines.isEmpty()) {
-			info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
-			return;
-		}
-		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
-			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
-			organGestorHelper.actualitzarOficinaOrgan(codi, oficines.get(0));
-		}
+		organGestorHelper.processarOficinaOrgan(info, arbreUnitats, organ);
 	}
 
 
 
 	@Override
+	@Transactional(timeout = 3600)
 	public void syncOficinesSIR(Long entitatId) {
 
 		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitatId);
@@ -1797,40 +1782,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			log.info("OFISYNC - Obtingut arbre d'unitats");
 			List<OficinaDto> oficines = null;
 			for (OrganGestorEntity organ : organs) {
-				try {
-					log.info("OFISYNC - Obtenint oficines de l'òrgan {} - {}", organ.getCodi(), organ.getNom());
-					oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
-					log.info("OFISYNC - Obtingudes {} oficines", oficines == null ? 0 : oficines.size());
-				} catch (Exception ex) {
-					String msg = "S'ha produit un error obtenint les oficines de l'òrgan " + organ.getCodi() + " - " + organ.getNom();
-					log.error(msg);
-					info.addParam(organ.getCodi(), msg);
-					continue;
-				}
-				if (oficines == null || oficines.isEmpty()) {
-					info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
-					continue;
-				}
-				if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
-					log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
-					info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
-					organGestorHelper.actualitzarOficinaOrgan(organ.getCodi(), oficines.get(0));
-					log.info("OFISYNC - Oficina actualitzada");
-					continue;
-				} else {
-					log.info("OFISYNC - L'oficina no s'ha d'actualitzar");
-				}
-//				info.addParam(organ.getCodi(), "No hi han canvis");
+				organGestorHelper.processarOficinaOrgan(info, arbreUnitats, organ);
 			}
-			integracioHelper.addAccioOk(info);
+			integracioHelper.addAccioOk(info, false);
 		} catch (Exception ex) {
-			integracioHelper.addAccioError(info, "Error actualitzant les oficines SIR");
+			integracioHelper.addAccioError(info, "Error actualitzant les oficines SIR", false);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-
-	//@Transactional(requires=new)
 
 	@Override
 	@Transactional(readOnly = true)
