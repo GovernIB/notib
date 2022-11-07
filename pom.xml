@@ -18,7 +18,7 @@
 		<orika.version>1.4.6</orika.version>
 		<jackson.version>2.6.3</jackson.version>
 		<regweb.version>3.2.5</regweb.version>
-		<dir3caib.version>1.0.7</dir3caib.version>
+		<dir3caib.version>1.0.15</dir3caib.version>
 		<rolsac.version>1.8.0</rolsac.version>
 		<slf4j.version>1.6.6</slf4j.version>
 		<cxf.version>2.2.12</cxf.version>
