@@ -1,11 +1,14 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.organisme.TipusTransicioEnumDto;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.AvisEntity;
@@ -24,6 +27,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -33,6 +37,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -433,8 +438,36 @@ public class OrganGestorHelper {
 		}
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void procesarOficinaOrgan(IntegracioInfo info, Map<String, OrganismeDto> arbreUnitats, OrganGestorEntity organ) {
+
+		List<OficinaDto> oficines;
+		try {
+			log.info("OFISYNC - Obtenint oficines de l'òrgan {} - {}", organ.getCodi(), organ.getNom());
+			oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
+			log.info("OFISYNC - Obtingudes {} oficines", oficines == null ? 0 : oficines.size());
+		} catch (Exception ex) {
+			String msg = "S'ha produit un error obtenint les oficines de l'òrgan " + organ.getCodi() + " - " + organ.getNom();
+			log.error(msg);
+			info.addParam(organ.getCodi(), msg);
+			return;
+		}
+		if (oficines == null || oficines.isEmpty()) {
+			info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
+			return;
+		}
+		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
+			log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
+			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
+			actualitzarOficinaOrgan(organ.getCodi(), oficines.get(0));
+			log.info("OFISYNC - Oficina actualitzada");
+		} else {
+			log.info("OFISYNC - L'oficina no s'ha d'actualitzar");
+		}
+	}
+
 	public void actualitzarOficinaOrgan(String organCodi, OficinaDto oficina) {
+
 		OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
 		organ.setOficina(oficina.getCodi());
 		organ.setOficinaNom(oficina.getNom());
