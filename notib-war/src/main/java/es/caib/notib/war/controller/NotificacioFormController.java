@@ -250,7 +250,7 @@ public class NotificacioFormController extends BaseUserController {
         EntitatDto entitat = getEntitatActualComprovantPermisos(request);
         try {
             OrganGestorDto o = organGestorService.findByCodi(entitat.getId(), organCodi);
-            return o.getOficina();
+            return o == null ? null : o.getOficina();
         } catch (Exception ex) {
             log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
             return null;
