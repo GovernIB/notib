@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -61,6 +62,8 @@ public class EmailNotificacioSenseNifHelper {
 	protected ConfigHelper configHelper;
 	@Resource
 	protected JavaMailSender mailSender;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 
 	@UpdateNotificacioTable
@@ -147,23 +150,22 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	public String sendEmailInfoEnviamentComunicacioSenseNif(NotificacioEnviamentEntity enviament) throws Exception {
+
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		String email = enviament.getTitular().getEmail();
 		log.info("Enviant correu enviament comunicació (Id= {}) a {}", enviament.getId(), email);
+
+		if (configHelper.getEntitatActualCodi() == null) {
+			configHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+		}
 		DocumentEntity document = enviament.getNotificacio().getDocument();
 		ArxiuDto arxiu = documentHelper.documentToArxiuDto(document.getArxiuNom(), document);
+		configHelper.setEntitat(null);
 		List<Attachment> attachments = new ArrayList<>(Arrays.asList(new Attachment(arxiu.getNom(), arxiu.getContingut())));
 		String htmlBody = getComunicacioMailHtmlBody(enviament);
 		String textBody = getComunicacioMailPlainTextBody(enviament);
-		sendEmail(
-				email,
-				" Nova comunicació / Nueva comunicación",
-				htmlBody,
-				textBody,
-				entitat.getNom(),
-				attachments,
-				entitat.getLogoCapBytes(),
-				entitat.getLogoPeuBytes());
+		String subject = "[Notib] Nova comunicació / Nueva comunicación";
+		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
 		return null;
 	}
 
@@ -444,39 +446,41 @@ public class EmailNotificacioSenseNifHelper {
 
 		String desc = enviament.getNotificacio().getDescripcio();
 		desc = desc != null ? desc : catala ? "Sense informació adicional" : "Sin información adicional";
+		String procedimentNom = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getNom() : "";
 		return catala ?  "\t- Destinatari: " + enviament.getTitular().getNomSencer() + "\n" +
 				"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
-				"\t- Procediment: " + enviament.getNotificacio().getProcediment().getNom() + "\n" +
+				"\t- Procediment: " + procedimentNom + "\n" +
 				"\t- Concepte: " + enviament.getNotificacio().getConcepte() + "\n" +
 				"\t- Informació addicional: " + desc + "\n"
 				:
 				"\t- Destinatario: " + enviament.getTitular().getNomSencer() + "\n" +
-				"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
-				"\t- Procedimiento: " + enviament.getNotificacio().getProcediment().getNom() + "\n" +
-				"\t- Concepto: " + enviament.getNotificacio().getConcepte() + "\n" +
-				"\t- Información adicional: " + desc + "\n";
+						"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
+						"\t- Procedimiento: " + procedimentNom + "\n" +
+						"\t- Concepto: " + enviament.getNotificacio().getConcepte() + "\n" +
+						"\t- Información adicional: " + desc + "\n";
 	}
 
 	private String getInformacioEnviamentHtml(NotificacioEnviamentEntity enviament, boolean catala) {
 
 		String desc = enviament.getNotificacio().getDescripcio();
 		desc = desc != null ? desc : catala ? "Sense informació adicional" : "Sin información adicional";
+		String procedimentNom = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getNom() : "";
 		return  catala ?
-			"<ul>" +
-				"<li><span class='info-titol'>Destinatari:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
-				"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
-				"<li><span class='info-titol'>Procediment:</span><span class='info-desc'>" + enviament.getNotificacio().getProcediment().getNom() + "</span></li>" +
-				"<li><span class='info-titol'>Concepte:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
-				"<li><span class='info-titol'>Informació addicional:</span><span class='info-desc'>" + desc + "</span></li>" +
-			"</ul>"
-			:
-			 "<ul>" +
-				"<li><span class='info-titol'>Destinatario:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
-				"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
-				"<li><span class='info-titol'>Procedimiento:</span><span class='info-desc'>" + enviament.getNotificacio().getProcediment().getNom() + "</span></li>" +
-				"<li><span class='info-titol'>Concepto:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
-				"<li><span class='info-titol'>Información adicional:</span><span class='info-desc'>" + desc + "</span></li>" +
-			"</ul>";
+				"<ul>" +
+						"<li><span class='info-titol'>Destinatari:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
+						"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
+						"<li><span class='info-titol'>Procediment:</span><span class='info-desc'>" + procedimentNom + "</span></li>" +
+						"<li><span class='info-titol'>Concepte:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
+						"<li><span class='info-titol'>Informació addicional:</span><span class='info-desc'>" + desc + "</span></li>" +
+						"</ul>"
+				:
+				"<ul>" +
+						"<li><span class='info-titol'>Destinatario:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +
+						"<li><span class='info-titol'>Identificador:</span><span class='info-desc'>" + enviament.getNotificaReferencia() + "</span></li>" +
+						"<li><span class='info-titol'>Procedimiento:</span><span class='info-desc'>" + procedimentNom + "</span></li>" +
+						"<li><span class='info-titol'>Concepto:</span><span class='info-desc'>" + enviament.getNotificacio().getConcepte() + "</span></li>" +
+						"<li><span class='info-titol'>Información adicional:</span><span class='info-desc'>" + desc + "</span></li>" +
+						"</ul>";
 	}
 
 	private String getRemitent() {
