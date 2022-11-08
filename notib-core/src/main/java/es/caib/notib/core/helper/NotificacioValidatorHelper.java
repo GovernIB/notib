@@ -161,10 +161,11 @@ public class NotificacioValidatorHelper {
 						}
 					}
 					// - Email
-					if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 160) {
+					String email = enviament.getTitular().getEmail();
+					if (email != null && email.length() > 160) {
 						errors.add(messageHelper.getMessage("error.validacio.email.titular.longitud.max"));
 					}
-					if (enviament.getTitular().getEmail() != null && !isEmailValid(enviament.getTitular().getEmail())) {
+					if (email != null && (!EmailHelper.isEmailValid(email) || !isEmailValid(email))) {
 						errors.add(messageHelper.getMessage("error.validacio.email.titular.format.invalid"));
 					}
 					// - Telèfon
