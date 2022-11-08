@@ -395,4 +395,12 @@ public class OrganGestorHelper {
 			}
 		}
 	}
+
+	@Transactional
+	public void actualitzarOficinaOrgan(String organCodi, OficinaDto oficina) {
+		OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
+		organ.setOficina(oficina.getCodi());
+		organ.setOficinaNom(oficina.getNom());
+		organGestorRepository.save(organ);
+	}
 }

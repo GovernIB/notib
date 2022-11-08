@@ -1537,13 +1537,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<String> codiFills;
 		OrganGestorEntity organFill;
 		boolean entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+		boolean isOficinaOrganSir = !entity.isOficinaEntitat() && PermisEnum.COMUNIACIO_SIR.equals(permis);
 		for(var organ: organs) {
 
-			if (entity.isOficinaEntitat() || Strings.isNullOrEmpty(organ.getOficina()) && PermisEnum.COMUNIACIO_SIR.equals(permis)) {
-				continue;
-			}
-			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
-			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
+			boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
+			if ((entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) && !excloure) {
+				organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 				resposta.add(organCodiValor);
 			}
 			//buscar fills
@@ -1554,8 +1553,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				}
 				organFill = organGestorRepository.findByCodi(fill);
 				if (organFill != null) {
-					organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
-					resposta.add(organCodiValor);
+					boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
+					if (!excloureFill) {
+						organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
+						resposta.add(organCodiValor);
+					}
 				}
 			}
 		}
