@@ -108,13 +108,35 @@
 
                 $("#organ-boto-update-oficines").on("click", () => bloquejar());
             });
+            // Bloquejar la pantalla
+            function bloquejar() {
+                $("#spinner-container").removeClass("ocult");
+                $("#spinner-container").addClass("visible");
+            }
         </script>
         <style>
             #detall .container-custom {width: 100%;}
             #detall .container-foot {display: none;}
+            .ocult {display: none;}
+            .visible {display: flex; justify-content: center; flex-direction: column;}
+            .loading-screen {
+                background-color: rgba(0,0,0,0.4);
+                position:absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+            }
+            .spin-box {display:flex; justify-content: center;}
         </style>
     </head>
     <body>
+        <div id="spinner-container" class="loading-screen ocult">
+            <div class="spin-box">
+                <span class="fa fa-spin fa-circle-o-notch  fa-3x"></span>
+            </div>
+        </div>
         <c:set var="formActionFiltre"><not:modalUrl value="/organgestorArbre"/></c:set>
         <form:form id="filtre" action="${formActionFiltre}" method="post" cssClass="well" modelAttribute="organGestorFiltreCommand">
             <not:inputHidden name="isFiltre"/>
