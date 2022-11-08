@@ -1639,37 +1639,43 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			log.info("OFISYNC - Obtingut arbre d'unitats");
 			List<OficinaDto> oficines = null;
 			for (OrganGestorEntity organ : organs) {
-				try {
-					log.info("OFISYNC - Obtenint oficines de l'òrgan {} - {}", organ.getCodi(), organ.getNom());
-					oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
-					log.info("OFISYNC - Obtingudes {} oficines", oficines == null ? 0 : oficines.size());
-				} catch (Exception ex) {
-					String msg = "S'ha produit un error obtenint les oficines de l'òrgan " + organ.getCodi() + " - " + organ.getNom();
-					log.error(msg);
-					info.addParam(organ.getCodi(), msg);
-					continue;
-				}
-				if (oficines == null || oficines.isEmpty()) {
-					info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
-					continue;
-				}
-				if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
-					log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
-					info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
-					actualitzarOficinaOrgan(organ.getCodi(), oficines);
-					log.info("OFISYNC - Oficina actualitzada");
-					continue;
-				} else {
-					log.info("OFISYNC - L'oficina no s'ha d'actualitzar");
-				}
+				processarOficinaOrgan(info, arbreUnitats, organ);
 //				info.addParam(organ.getCodi(), "No hi han canvis");
 			}
-			integracioHelper.addAccioOk(info);
+			integracioHelper.addAccioOk(info, false);
 		} catch (Exception ex) {
-			integracioHelper.addAccioError(info, "Error actualitzant les oficines SIR");
+			integracioHelper.addAccioError(info, "Error actualitzant les oficines SIR", false);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	private boolean processarOficinaOrgan(IntegracioInfo info, Map<String, OrganismeDto> arbreUnitats, OrganGestorEntity organ) {
+		List<OficinaDto> oficines;
+		try {
+			log.info("OFISYNC - Obtenint oficines de l'òrgan {} - {}", organ.getCodi(), organ.getNom());
+			oficines = cacheHelper.getOficinesSIRUnitat(arbreUnitats, organ.getCodi());
+			log.info("OFISYNC - Obtingudes {} oficines", oficines == null ? 0 : oficines.size());
+		} catch (Exception ex) {
+			String msg = "S'ha produit un error obtenint les oficines de l'òrgan " + organ.getCodi() + " - " + organ.getNom();
+			log.error(msg);
+			info.addParam(organ.getCodi(), msg);
+			return true;
+		}
+		if (oficines == null || oficines.isEmpty()) {
+			info.addParam(organ.getCodi(), "No s'han obtingut oficines oficines");
+			return true;
+		}
+		if (Strings.isNullOrEmpty(organ.getOficina()) || !Strings.isNullOrEmpty(organ.getOficina()) && !oficines.toString().contains(organ.getOficina())) {
+			log.info("OFISYNC - Actualitzant oficina. Antiga: {} - {} , Nova: {} - {}", new Object[] {organ.getOficina(), organ.getOficinaNom(), oficines.get(0).getCodi(), oficines.get(0).getNom()});
+			info.addParam(organ.getCodi(), "Actualitzant la oficina. Antiga: " + organ.getOficina() + " - Nova: " + oficines.get(0).getCodi());
+			organGestorHelper.actualitzarOficinaOrgan(organ.getCodi(), oficines.get(0));
+			log.info("OFISYNC - Oficina actualitzada");
+			return true;
+		} else {
+			log.info("OFISYNC - L'oficina no s'ha d'actualitzar");
+		}
+		return false;
 	}
 
 	@Override

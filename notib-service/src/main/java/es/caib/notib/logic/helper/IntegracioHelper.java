@@ -121,6 +121,11 @@ public class IntegracioHelper {
 		addAccioError(info, errorDescripcio, null,true);
 	}
 
+	public void addAccioError(IntegracioInfo info, String errorDescripcio, boolean obtenirUsuari) {
+
+		addAccioError(info, errorDescripcio, null, obtenirUsuari);
+	}
+
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable) {
 
 		addAccioError(info, errorDescripcio, throwable,true);
