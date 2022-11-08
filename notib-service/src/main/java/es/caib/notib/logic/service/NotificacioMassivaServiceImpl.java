@@ -177,7 +177,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             if (linea.length >=23) { // si hi ha les metadades
                 builder.origen(linea[18]).estadoElaboracion(linea[19]).tipoDocumental(linea[20]).pdfFirmado(linea[21]).errores(linea[22]);
             } else {
-                builder.errores(linea[18]);
+                builder.errores(linea.length == 21 ? linea[20] : linea[18]);
             }
             if (messageHelper.getMessage("notificacio.massiva.cancelada").equals(linea[linea.length - 1])) {
                 builder.cancelada(true);
@@ -236,12 +236,12 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 List<String> errors = notificacioValidatorHelper.validarNotificacioMassiu(notificacio, entitat, documentsProcessatsMassiu);
                 try {
                     ProcSerEntity procediment = !Strings.isNullOrEmpty(notificacio.getProcediment().getCodi()) ?
-                                                procSerRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat) : null;
+                            procSerRepository.findByCodiAndEntitat(notificacio.getProcediment().getCodi(), entitat) : null;
                     if (procediment == null && !NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus())) {
                         errors.add(messageHelper.getMessage("error.validacio.procser.amb.codi.no.trobat"));
                     } else if (procediment != null && ProcSerTipusEnum.SERVEI.equals(procediment.getTipus()) && NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacio.getEnviamentTipus())) {
                         errors.add(messageHelper.getMessage("error.validacio.alta.notificacio.amb.servei.nomes.comunicacions"));
-                    } else if (procediment != null){
+                    } else if (procediment != null) {
                         notificacio.setProcediment(conversioTipusHelper.convertir(procediment, ProcSerDto.class));
                     }
                 } catch (Exception e) {

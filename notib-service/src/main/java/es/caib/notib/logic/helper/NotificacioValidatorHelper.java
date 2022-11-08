@@ -277,9 +277,10 @@ public class NotificacioValidatorHelper {
 			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
 				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
 			}
-		} else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) && notificacio.getOrganGestorCodi() == null){
-			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.null.comunicacio.administracio.sense.procediment"));
 		}
+//		else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) && notificacio.getOrganGestorCodi() == null){
+//			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.null.comunicacio.administracio.sense.procediment"));
+//		}
 //		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO && comunicacioSenseAdministracio) {
 //			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
 //				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
