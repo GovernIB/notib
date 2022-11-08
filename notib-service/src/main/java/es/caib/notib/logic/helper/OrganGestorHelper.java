@@ -3,6 +3,7 @@ package es.caib.notib.logic.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
@@ -350,11 +351,10 @@ public class OrganGestorHelper {
 		if (llibre != null) {
 			organ.updateLlibre(llibre.getCodi(), llibre.getNomLlarg());
 		}
-		var oficines = cacheHelper.getOficinesSIREntitat(entitatDir3Codi);
-		if (oficines != null && !oficines.isEmpty()) {
-			var o = oficines.get(0);
-			organ.updateOficina(o.getCodi(), o.getNom());
-		}
+		var info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Actualització d'oficines SIR per l'entitat " + entitatDir3Codi,
+				IntegracioAccioTipusEnumDto.PROCESSAR);
+		var arbreUnitats = cacheHelper.findOrganigramaNodeByEntitat(entitatDir3Codi);
+		procesarOficinaOrgan(info, arbreUnitats, organ);
 	}
 
 	private void sincronizarHistoricsUnitat(OrganGestorEntity unitat, NodeDir3 unidadWS, EntitatEntity entitat) {
