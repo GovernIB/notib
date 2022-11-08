@@ -26,6 +26,7 @@ public class OrganGestorCacheDto implements Serializable {
 	private OrganGestorEstatEnum estat = null;
 	private boolean actiu;
 //	private boolean entregaCieActiva;
+	private String oficina;
 
 	public void setOrganGestorEstatEnum(OrganGestorEstatEnum estat) {
 		this.estat = estat;

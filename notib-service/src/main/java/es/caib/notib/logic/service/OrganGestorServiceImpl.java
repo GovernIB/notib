@@ -1538,6 +1538,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		OrganGestorEntity organFill;
 		boolean entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
 		for(var organ: organs) {
+
+			if (entity.isOficinaEntitat() || Strings.isNullOrEmpty(organ.getOficina()) && PermisEnum.COMUNIACIO_SIR.equals(permis)) {
+				continue;
+			}
 			organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
 			if (entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) {
 				resposta.add(organCodiValor);
