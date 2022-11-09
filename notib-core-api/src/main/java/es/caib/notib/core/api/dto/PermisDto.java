@@ -3,13 +3,12 @@
  */
 package es.caib.notib.core.api.dto;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * Informació d'un permís.
@@ -40,8 +39,9 @@ public class PermisDto implements Serializable {
 	private boolean comuns;
 	
 	private boolean notificacio;
+	private boolean comunicacio;
 	private boolean comunicacioSir;
-	
+
 	// Booleà per a indicar si en cas de procediment comú, 
 	// l'usuari administrador d'òrgan pot editar el permís
 	private boolean permetEdicio;
@@ -67,6 +67,8 @@ public class PermisDto implements Serializable {
 		
 		this.processar= false;
 		this.notificacio= false;
+		this.comunicacio = false;
+		this.comunicacioSir = false;
 	}
 	
 	@Override

@@ -3,22 +3,20 @@
  */
 package es.caib.notib.war.command;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.constraints.Size;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Command per al manteniment de permisos.
@@ -51,6 +49,7 @@ public class PermisCommand {
 	private boolean selectAll;
 
 	private boolean notificacio;
+	private boolean comunicacio;
 	private boolean comunicacioSir;
 
 	public static List<PermisCommand> toPermisCommands(

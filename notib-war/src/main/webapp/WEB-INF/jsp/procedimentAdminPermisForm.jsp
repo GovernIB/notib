@@ -20,9 +20,11 @@
 	<title>${titol}</title>
 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/css/iosCheckbox.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/iosCheckbox.js"/>"></script>
 	<not:modalHead/>
 <script>
 
@@ -58,20 +60,35 @@
 			$("form#permisCommand *:disabled").removeAttr('disabled');
 		});
 
-		$("#selectAll").on('change', function() {
-			if ($(this).prop("checked"))
-				$("div.permisosInput :checkbox").prop('checked', true);
-			else
-				$("div.permisosInput :checkbox").prop('checked', false);
+		$("input:checkbox").iosCheckbox();
+
+		$("#selectAll").on('ios_change', function() {
+			let selectAllChecked = $(this).attr("checked");
+			$("div.permisosInput :checkbox").each(function () {
+				if (selectAllChecked) {
+					$(this).attr('checked','checked');
+					$(this).next().addClass("checked");
+				} else {
+					$(this).removeAttr('checked');
+					$(this).next().removeClass("checked");
+				}
+			})
 		});
 
-		$("div.permisosInput :checkbox").on('change', function() {
+		$("div.permisosInput :checkbox").on('ios_change', function() {
 			var totsSeleccionats = true;
 			$("div.permisosInput :checkbox").each(function() {
-				  if(!$(this).prop('checked'))
-					  totsSeleccionats = false;
+				if(!$(this).attr('checked')) {
+					totsSeleccionats = false;
+				}
 			});
-			$("#selectAll").prop('checked', totsSeleccionats);
+			if (totsSeleccionats) {
+				$("#selectAll").attr('checked','checked');
+				$("#selectAll").next().addClass("checked");
+			} else {
+				$("#selectAll").removeAttr('checked');
+				$("#selectAll").next().removeClass("checked");
+			}
 		});
 		
 		$("#principal").on('change', function() {
@@ -92,6 +109,9 @@
 </script>
 <style>
 	.permisosInput {margin-left: 45px}
+	.check-label {display: flex; align-items: center;}
+	.check-label>span {font-size: 24px; padding-right: 15px; width: 50px; color: #888;}
+	.checkbox-primary {text-align: right; padding-right: 30px;}
 </style>
 
 
