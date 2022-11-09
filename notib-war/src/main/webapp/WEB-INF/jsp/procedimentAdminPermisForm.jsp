@@ -138,13 +138,65 @@
 				emptyOption="false"/>
 		</c:if>
 
-		<not:inputCheckbox name="selectAll" textKey="procediment.permis.form.camp.all"/>
+		<div class="row" style="margin-right: 0px; margin-left: 0px;">
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="selectAll"><span class="fa fa-toggle-on"></span> <spring:message code="procediment.permis.form.camp.all"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="selectAll" cssClass="span12" id="selectAll" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="permisosInput">
-			<not:inputCheckbox name="read" textKey="procediment.permis.form.camp.consulta"/>
-			<not:inputCheckbox name="processar" textKey="procediment.permis.form.camp.processar"/>
-			<not:inputCheckbox name="administration" textKey="procediment.permis.form.camp.gestio"/>
-			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
-			<not:inputCheckbox name="comunicacioSir" textKey="procediment.permis.form.camp.comunicacio.sir"/>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="read"><span class="fa fa-search"></span> <spring:message code="procediment.permis.form.camp.consulta"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="read" cssClass="span12" id="read" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="processar"><span class="fa fa-check-square-o"></span> <spring:message code="procediment.permis.form.camp.processar"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="processar" cssClass="span12" id="processar" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administration"><span class="fa fa-cog"></span> <spring:message code="procediment.permis.form.camp.gestio"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="administration" cssClass="span12" id="administration" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="notificacio"><span class="fa fa-gavel"></span> <spring:message code="procediment.permis.form.camp.notificacio"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="notificacio" cssClass="span12" id="notificacio" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacio"><span class="fa fa-envelope-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="comunicacio" cssClass="span12" id="comunicacio" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-envelope"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sir"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label><form:checkbox path="comunicacioSir" cssClass="span12" id="comunicacioSir" autocomplete="off"/></label>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
