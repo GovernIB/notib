@@ -53,44 +53,29 @@
 			$("#principal").val($("#principal").val().trim().toLowerCase());
 		}
 	}
-	
+
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisCommand *:disabled").removeAttr('disabled');
 		});
 
-		$("input:checkbox").iosCheckbox();
-
-		$("#selectAll").on('ios_change', function() {
-			let selectAllChecked = $(this).attr("checked");
-			$("div.permisosInput :checkbox").each(function () {
-				if (selectAllChecked) {
-					$(this).attr('checked','checked');
-					$(this).next().addClass("checked");
-				} else {
-					$(this).removeAttr('checked');
-					$(this).next().removeClass("checked");
-				}
-			})
+		$("#selectAll").on('change', function() {
+			if ($(this).prop("checked"))
+				$("div.permisosInput :checkbox").prop('checked', true);
+			else
+				$("div.permisosInput :checkbox").prop('checked', false);
 		});
 
-		$("div.permisosInput :checkbox").on('ios_change', function() {
+		$("div.permisosInput :checkbox").on('change', function() {
 			var totsSeleccionats = true;
 			$("div.permisosInput :checkbox").each(function() {
-				if(!$(this).attr('checked')) {
+				if(!$(this).prop('checked'))
 					totsSeleccionats = false;
-				}
 			});
-			if (totsSeleccionats) {
-				$("#selectAll").attr('checked','checked');
-				$("#selectAll").next().addClass("checked");
-			} else {
-				$("#selectAll").removeAttr('checked');
-				$("#selectAll").next().removeClass("checked");
-			}
+			$("#selectAll").prop('checked', totsSeleccionats);
 		});
-		
+
 		$("#principal").on('change', function() {
 			resetErrors();
 			
@@ -143,7 +128,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="selectAll"><span class="fa fa-toggle-on"></span> <spring:message code="procediment.permis.form.camp.all"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="selectAll" cssClass="span12" id="selectAll" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="selectAll" cssClass="span12" id="selectAll" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -153,7 +138,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="read"><span class="fa fa-search"></span> <spring:message code="procediment.permis.form.camp.consulta"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="read" cssClass="span12" id="read" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="read" cssClass="span12" id="read" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -161,7 +146,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="processar"><span class="fa fa-check-square-o"></span> <spring:message code="procediment.permis.form.camp.processar"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="processar" cssClass="span12" id="processar" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="processar" cssClass="span12" id="processar" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -169,7 +154,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administration"><span class="fa fa-cog"></span> <spring:message code="procediment.permis.form.camp.gestio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="administration" cssClass="span12" id="administration" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="administration" cssClass="span12" id="administration" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -177,7 +162,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="notificacio"><span class="fa fa-gavel"></span> <spring:message code="procediment.permis.form.camp.notificacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="notificacio" cssClass="span12" id="notificacio" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="notificacio" cssClass="span12" id="notificacio" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -185,7 +170,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacio"><span class="fa fa-envelope-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="comunicacio" cssClass="span12" id="comunicacio" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="comunicacio" cssClass="span12" id="comunicacio" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -193,7 +178,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-envelope"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sir"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="comunicacioSir" cssClass="span12" id="comunicacioSir" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="comunicacioSir" cssClass="span12" id="comunicacioSir" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>

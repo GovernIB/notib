@@ -155,7 +155,7 @@ public class ServeiPermisController extends BaseUserController{
 			}
 		}
 		if (permis != null)
-			model.addAttribute(PermisCommand.asCommand(permis));
+			model.addAttribute(PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.SERVEI));
 		else
 			model.addAttribute(new PermisCommand());
 		if (servei.isComu())

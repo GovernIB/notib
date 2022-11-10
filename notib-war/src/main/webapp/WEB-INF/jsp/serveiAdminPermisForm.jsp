@@ -20,11 +20,9 @@
 	<title>${titol}</title>
 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
-	<link href="<c:url value="/css/iosCheckbox.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-	<script src="<c:url value="/js/iosCheckbox.js"/>"></script>
 	<not:modalHead/>
 <script>
 
@@ -33,7 +31,7 @@
 		$("#id_error").remove();
 		$("#principal").parent().closest('.form-group').removeClass('has-error');
 	}
-	
+
 	function errorRolTothomPerAdminOrgan() {
 		if ($("#tipus").val().toUpperCase() == "ROL" && $("#principal").val().trim().toLowerCase() == 'tothom' && isRolActualAdministradorOrgan) {
 			$("#principal").parent().closest('.form-group').addClass('has-error');
@@ -42,9 +40,9 @@
 		}
 		return false;
 	}
-	
+
 	function formatRolUsuari() {
-		if ($("#tipus").val().toUpperCase() == "ROL") { 
+		if ($("#tipus").val().toUpperCase() == "ROL") {
 			if ($("#principal").val().trim().toLowerCase() == "tothom")
 				$("#principal").val($("#principal").val().trim().toLowerCase());
 			else
@@ -53,53 +51,38 @@
 			$("#principal").val($("#principal").val().trim().toLowerCase());
 		}
 	}
-	
+
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
 			$("form#permisCommand *:disabled").removeAttr('disabled');
 		});
 
-		$("input:checkbox").iosCheckbox();
-
-		$("#selectAll").on('ios_change', function() {
-			let selectAllChecked = $(this).attr("checked");
-			$("div.permisosInput :checkbox").each(function () {
-				if (selectAllChecked) {
-					$(this).attr('checked','checked');
-					$(this).next().addClass("checked");
-				} else {
-					$(this).removeAttr('checked');
-					$(this).next().removeClass("checked");
-				}
-			})
+		$("#selectAll").on('change', function() {
+			if ($(this).prop("checked"))
+				$("div.permisosInput :checkbox").prop('checked', true);
+			else
+				$("div.permisosInput :checkbox").prop('checked', false);
 		});
 
-		$("div.permisosInput :checkbox").on('ios_change', function() {
+		$("div.permisosInput :checkbox").on('change', function() {
 			var totsSeleccionats = true;
 			$("div.permisosInput :checkbox").each(function() {
-				if(!$(this).attr('checked')) {
-					totsSeleccionats = false;
-				}
+				  if(!$(this).prop('checked'))
+					  totsSeleccionats = false;
 			});
-			if (totsSeleccionats) {
-				$("#selectAll").attr('checked','checked');
-				$("#selectAll").next().addClass("checked");
-			} else {
-				$("#selectAll").removeAttr('checked');
-				$("#selectAll").next().removeClass("checked");
-			}
+			$("#selectAll").prop('checked', totsSeleccionats);
 		});
-		
+
 		$("#principal").on('change', function() {
 			resetErrors();
-			
+
 			if (errorRolTothomPerAdminOrgan())
 				return;
-	
+
 			formatRolUsuari();
 		});
-		
+
 		$("#tipus").on('change', function() {
 			resetErrors();
 			errorRolTothomPerAdminOrgan();
@@ -127,10 +110,10 @@
 		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
 			inputMaxLength="${principalSize}" showsize="true"/>
 		<c:if test="${servei.comu}">
-			<not:inputSelect 
-				name="organ" 
-				textKey="entitat.permis.form.camp.organ" 
-				disabled="${not empty permisCommand.id}" 
+			<not:inputSelect
+				name="organ"
+				textKey="entitat.permis.form.camp.organ"
+				disabled="${not empty permisCommand.id}"
 				optionItems="${organs}"
 				optionTextAttribute="nomComplet"
 				optionValueAttribute="codi"
@@ -143,7 +126,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="selectAll"><span class="fa fa-toggle-on"></span> <spring:message code="procediment.permis.form.camp.all"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="selectAll" cssClass="span12" id="selectAll" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="selectAll" cssClass="span12" id="selectAll" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -153,7 +136,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="read"><span class="fa fa-search"></span> <spring:message code="procediment.permis.form.camp.consulta"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="read" cssClass="span12" id="read" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="read" cssClass="span12" id="read" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -161,7 +144,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="processar"><span class="fa fa-check-square-o"></span> <spring:message code="procediment.permis.form.camp.processar"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="processar" cssClass="span12" id="processar" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="processar" cssClass="span12" id="processar" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -169,7 +152,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administration"><span class="fa fa-cog"></span> <spring:message code="procediment.permis.form.camp.gestio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="administration" cssClass="span12" id="administration" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="administration" cssClass="span12" id="administration" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -177,7 +160,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="notificacio"><span class="fa fa-gavel"></span> <spring:message code="procediment.permis.form.camp.notificacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="notificacio" cssClass="span12" id="notificacio" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="notificacio" cssClass="span12" id="notificacio" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -185,7 +168,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacio"><span class="fa fa-envelope-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="comunicacio" cssClass="span12" id="comunicacio" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="comunicacio" cssClass="span12" id="comunicacio" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
@@ -193,7 +176,7 @@
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-envelope"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sir"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
-						<label><form:checkbox path="comunicacioSir" cssClass="span12" id="comunicacioSir" autocomplete="off"/></label>
+						<label class="form-switch"><form:checkbox path="comunicacioSir" cssClass="span12" id="comunicacioSir" autocomplete="off"/><i></i></label>
 					</div>
 				</div>
 			</div>
