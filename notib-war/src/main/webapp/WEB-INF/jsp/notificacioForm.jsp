@@ -243,6 +243,14 @@
 .validating-block {
 	font-size: x-small;
 }
+
+
+#entregaPostalCaducada {
+	display: none;
+	color:red;
+	margin-top:15px;
+}
+
 </style>
 </head>
 <body>
@@ -1415,6 +1423,11 @@
 					}
 
 					viewModel.ambEntregaCIE = data.entregaCieActiva;
+					if (!data.entreCieVigent) {
+						$("#entregaPostalCaducada").show();
+					} else {
+						$("#entregaPostalCaducada").hide();
+					}
 
 					// TODO: Afegir formats de fulla i sobre
 					// Format fulla
@@ -1791,11 +1804,13 @@
 										<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 									  	<strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
 									</div>
-									<div class="entrega-activa">
+									<div class="entrega-activa" style="margin-bottom:15px;">
 										<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									</div>
 									<div class="entrega-cie-activa">
+										<span id="entregaPostalCaducada">* <spring:message code="notificacio.form.camp.entregapostal.caducada"/></span>
 										<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
+
 									</div>
 								</div>
 								<!-- ENTREGA POSTAL -->

@@ -87,6 +87,11 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
     @ForeignKey(name = "not_proc_organ_fk")
     protected OrganGestorEntity organGestor;
 
+    public boolean isEntregaCieVigent() {
+
+        return false;
+    }
+
     public boolean isEntregaCieActivaAlgunNivell() {
         if (entregaCie != null) {
             return true;

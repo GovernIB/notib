@@ -84,6 +84,11 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+		return delegate.findPagadorsByEntitat(entitat);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 		return delegate.findNoCaducatsByEntitat(entitat);

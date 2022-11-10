@@ -280,7 +280,7 @@ public class NotificacioFormController extends BaseUserController {
         EntitatDto entitat = getEntitatActualComprovantPermisos(request);
         try {
             OrganGestorDto o = organGestorService.findByCodi(entitat.getId(), organCodi);
-            return o.getOficina();
+            return o != null ? o.getOficina() : null;
         } catch (Exception ex) {
             log.error("Error obtinguent la oficina de l'órgan " + organCodi, ex);
             return null;
@@ -516,6 +516,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         dadesProcediment.setComu(procedimentActual.isComu());
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
+        dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
         	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
@@ -776,7 +777,6 @@ public class NotificacioFormController extends BaseUserController {
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
-
         if (organsGestors != null) {
             for (OrganGestorDto o : organsGestors) {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
@@ -849,6 +849,7 @@ public class NotificacioFormController extends BaseUserController {
         private List<CieFormatSobreDto> formatsSobre = new ArrayList<CieFormatSobreDto>();
         private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
         private boolean comu;
+        private boolean entregaCieVigent;
         private boolean entregaCieActiva;
 
         private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");

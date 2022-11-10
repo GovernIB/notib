@@ -733,16 +733,11 @@ function loadOrgans($selector, organsGestors, missatgeObsolets){
 	$selector.select2(select2Options);
 }
 
-function loadPagadorPostal($selector, organsGestors, missatgeObsolets){
+function loadPagadorPostal($selector, pagadors, missatgeObsolets){
 
-	function formatState(organ) {
-		let msgObsolet = missatgeObsolets;
-		if (!organ.obsolet) {
-			return organ.text;
-		}
-		return $("<span title='" + msgObsolet + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
-	}
-	$selector.empty();
-	let select2Options = {theme: 'bootstrap', width: 'auto', data: organsGestors, allowClear: true, templateResult: formatState};
-	$selector.select2(select2Options);
+	let formatState = organ => !organ.obsolet ? organ.text
+		: $("<span title='" + missatgeObsolets + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
+
+	$selector.select2({ data: pagadors, templateResult: formatState, templateSelection: formatState});
+	$selector.change();
 }
