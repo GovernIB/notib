@@ -8,7 +8,9 @@ import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.ActualitzacioInfo;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
+import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.AvisEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -77,14 +79,14 @@ public class ProcSerSyncHelper {
 		log.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 
 		// Comprova si hi ha una altre instància del procés en execució
-		ProgresActualitzacioDto progres = ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi());
+		ProgresActualitzacioProcSer progres = ProcedimentServiceImpl.progresActualitzacio.get(entitatDto.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			log.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
 			return;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 
 		// inicialitza el seguiment del prgrés d'actualització
-		progres = new ProgresActualitzacioDto();
+		progres = new ProgresActualitzacioProcSer();
 		ProcedimentServiceImpl.progresActualitzacio.put(entitatDto.getDir3Codi(), progres);
 		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
 
@@ -98,6 +100,7 @@ public class ProcSerSyncHelper {
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
 
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
+			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
 			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(),progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
@@ -105,6 +108,7 @@ public class ProcSerSyncHelper {
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.fi.resultat", new Object[] {procedimentsGda.size(), totalElementsCons}));
+			crearResum(progres);
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
 			for (ActualitzacioInfo inf: progres.getInfo()) {
 				if (inf.getText() != null)
@@ -133,6 +137,31 @@ public class ProcSerSyncHelper {
 			integracioHelper.addAccioError(info, "Error actualitzant procediments: ", e);
 			throw e;
 		}
+	}
+
+	private void crearResum(ProgresActualitzacioProcSer progres) {
+
+		progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.resum"));
+		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.procser.sense.codi.sia"));
+		List<ProcSerDataDto> procs = progres.getSenseCodiSia();
+		for (ProcSerDataDto proc : procs) {
+			progres.addInfo(TipusInfo.INFO, proc.getNom());
+		}
+
+		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.procser.organ.no.pertany.entitat"));
+		procs = progres.getOrganNoPertanyEntitat();
+		for (ProcSerDataDto proc : procs) {
+			progres.addInfo(TipusInfo.INFO, proc.getCodi() + " - " + proc.getNom() + " - " + proc.getOrganGestor());
+		}
+
+		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.metriques"));
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.obtinguts") + " " + progres.getProcedimentsObtinguts().size());
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.procser.sense.codi.sia") + " " + progres.getSenseCodiSia().size());
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.procser.organ.no.pertany.entitat") + " " + progres.getOrganNoPertanyEntitat().size());
+		int activats = progres.getProcedimentsObtinguts().size() - progres.getSenseCodiSia().size() - progres.getOrganNoPertanyEntitat().size();
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.activats") + " " + activats);
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.desactivats.no.provinents.rolsac") +  " " + progres.getNoActius().size());
+
 	}
 
 	private List<ProcSerDto> obtenirProcediments(EntitatDto entitatDto, ProgresActualitzacioDto progres, int totalElementsCons) {
@@ -185,7 +214,7 @@ public class ProcSerSyncHelper {
 		return procedimentsGda;
 	}
 
-	private List<OrganGestorEntity> processarProcediments(EntitatEntity entitat, List<ProcSerDto> procedimentsGda, ProgresActualitzacioDto progres, Map<String, String[]> avisosProcedimentsOrgans) {
+	private List<OrganGestorEntity> processarProcediments(EntitatEntity entitat, List<ProcSerDto> procedimentsGda, ProgresActualitzacioProcSer progres, Map<String, String[]> avisosProcedimentsOrgans) {
 
 		long startTime = System.nanoTime();
 		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();
@@ -333,14 +362,14 @@ public class ProcSerSyncHelper {
 		log.debug("[SERVEIS] Inici actualitzar serveis");
 
 		// Comprova si hi ha una altre instància del procés en execució
-		ProgresActualitzacioDto progres = ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi());
+		ProgresActualitzacioProcSer progres = ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			log.debug("[SERVEIS] Ja existeix un altre procés que està executant l'actualització");
 			return;	// Ja existeix un altre procés que està executant l'actualització.
 		}
 
 		// inicialitza el seguiment del prgrés d'actualització
-		progres = new ProgresActualitzacioDto();
+		progres = new ProgresActualitzacioProcSer();
 		ServeiServiceImpl.progresActualitzacioServeis.put(entitatDto.getDir3Codi(), progres);
 		Map<String, String[]> avisosServeisOrgans = new HashMap<>();
 
@@ -355,6 +384,7 @@ public class ProcSerSyncHelper {
 
 
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
+			progres.setProcedimentsObtinguts(procedimentsGda);
 			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
 			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(),progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
@@ -362,6 +392,7 @@ public class ProcSerSyncHelper {
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.fi.resultat", new Object[] {procedimentsGda.size(), totalElementsCons}));
+			crearResum(progres);
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("servei.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
 			for (ActualitzacioInfo inf: progres.getInfo()) {
 				if (inf.getText() != null)
@@ -440,7 +471,7 @@ public class ProcSerSyncHelper {
 		return serveisGda;
 	}
 
-	private List<OrganGestorEntity> processarServeis(EntitatEntity entitat, List<ProcSerDto> serveisGda, ProgresActualitzacioDto progres, Map<String, String[]> avisosServeisOrgans) {
+	private List<OrganGestorEntity> processarServeis(EntitatEntity entitat, List<ProcSerDto> serveisGda, ProgresActualitzacioProcSer progres, Map<String, String[]> avisosServeisOrgans) {
 
 		long startTime = System.nanoTime();
 		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();

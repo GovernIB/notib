@@ -6,6 +6,7 @@ import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
+import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -273,12 +274,19 @@ public class ProcSerHelper {
 			ProcedimentEntity procedimentEntity,
 //			Map<String, OrganismeDto> organigramaEntitat,
 			List<String> codiOrgansGda,
-			ProgresActualitzacioDto progres) {
+			ProgresActualitzacioProcSer progres) {
 
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
 			progres.addSeparador();
 //			progres.incrementOperacionsRealitzades();
+			//id i nom de procediment gda.
+			if (procedimentEntity != null) {
+				procedimentEntity.setActiu(false);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
+			}
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
+			progres.addSenseCodiSia(procedimentGda);
 			return false;
 		}
 
@@ -288,6 +296,8 @@ public class ProcSerHelper {
 					procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio())) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
 				progres.addSeparador();
+				procedimentEntity.setActiu(true);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.activat"));
 //				progres.incrementOperacionsRealitzades();
 				return false;
 			}
@@ -296,8 +306,15 @@ public class ProcSerHelper {
 		if (!codiOrgansGda.contains(procedimentGda.getOrganGestor())) {
 			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
+
+			//id i nom de procediment gda. sense organ gestor pertanyent a l'entiatt
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
 			progres.addSeparador();
+			progres.addAmbOrganNoPertanyEntitat(procedimentGda);
+			if (procedimentEntity != null) {
+				procedimentEntity.setActiu(false);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
+			}
 //			progres.incrementOperacionsRealitzades();
 			return false;
 		}
@@ -314,6 +331,10 @@ public class ProcSerHelper {
 		if (serveiGda.getCodi() == null || serveiGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat"));
 			progres.addSeparador();
+			if (serveiEntity != null) {
+				serveiEntity.setActiu(false);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.desactivat"));
+			}
 //			progres.incrementOperacionsRealitzades();
 			return false;
 		}
@@ -324,6 +345,8 @@ public class ProcSerHelper {
 					serveiEntity.getUltimaActualitzacio().after(serveiGda.getUltimaActualitzacio())) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat.data"));
 				progres.addSeparador();
+				serveiEntity.setActiu(true);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.activat"));
 //				progres.incrementOperacionsRealitzades();
 				return false;
 			}
@@ -334,6 +357,10 @@ public class ProcSerHelper {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat.noOrganDinsOrganigrama", new Object[] {serveiGda.getOrganGestor()}));
 			progres.addSeparador();
+			if (serveiEntity != null) {
+				serveiEntity.setActiu(false);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.desactivat"));
+			}
 //			progres.incrementOperacionsRealitzades();
 			return false;
 		}
@@ -343,7 +370,7 @@ public class ProcSerHelper {
 
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarProcedimentFromGda(
-			ProgresActualitzacioDto progres,
+			ProgresActualitzacioProcSer progres,
 			ProcSerDataDto procedimentGda,
 			EntitatEntity entitat,
 //			Map<String, OrganismeDto> organigramaEntitat,
@@ -384,11 +411,12 @@ public class ProcSerHelper {
 					return;
 				}
 				procediment = procSerUpdateHelper.nouProcediment(procedimentGda, entitat, organGestorGda);
+				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.activat"));
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.creat"));
 			} else {
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.si"));
 				procediment.updateActiu(true);
-
+				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.activat"));
 				if (modificar) {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat"));
 
@@ -450,11 +478,12 @@ public class ProcSerHelper {
 	}
 
 	@Transactional
-	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, String entitatCodi, ProgresActualitzacioDto progres) {
+	public void deshabilitarProcedimentsNoActius(List<ProcSerDto> procedimentsGda, String entitatCodi, ProgresActualitzacioProcSer progres) {
 		List<String> procedimentsActiusNotib = procedimentRepository.findCodiActiusByEntitat(entitatCodi);
 		for (ProcSerDto procedimentGda: procedimentsGda) {
 			procedimentsActiusNotib.remove(procedimentGda.getCodi());
 		}
+		progres.setNoActius(procedimentsActiusNotib);
 		for (String codi: procedimentsActiusNotib) {
 			procedimentRepository.updateActiu(codi, false);
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.deshabilitar.procediment", new Object[] {codi}));
@@ -463,7 +492,7 @@ public class ProcSerHelper {
 
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarServeiFromGda(
-			ProgresActualitzacioDto progres,
+			ProgresActualitzacioProcSer progres,
 			ProcSerDataDto serveiGda,
 			EntitatEntity entitat,
 //			Map<String, OrganismeDto> organigramaEntitat,
@@ -505,10 +534,12 @@ public class ProcSerHelper {
 					return;
 				}
 				procSerUpdateHelper.nouServei(serveiGda, entitat, organGestorGda);
+				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.activat"));
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.creat"));
 			} else {
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.result.si"));
 				servei.updateActiu(true);
+				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.activat"));
 				if (modificar) {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.servei.entitat"));
 
@@ -570,11 +601,12 @@ public class ProcSerHelper {
 	}
 
 	@Transactional
-	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, String entitatCodi, ProgresActualitzacioDto progres) {
+	public void deshabilitarServeisNoActius(List<ProcSerDto> serveisGda, String entitatCodi, ProgresActualitzacioProcSer progres) {
 		List<String> serveisActiusNotib = serveiRepository.findCodiActiusByEntitat(entitatCodi);
 		for (ProcSerDto serveiGda: serveisGda) {
 			serveisActiusNotib.remove(serveiGda.getCodi());
 		}
+		progres.setNoActius(serveisActiusNotib);
 		for (String codi: serveisActiusNotib) {
 			serveiRepository.updateActiu(codi, false);
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.deshabilitar.procediment", new Object[] {codi}));

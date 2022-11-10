@@ -60,4 +60,6 @@ public class ProgresActualitzacioDto {
 		TipusInfo tipus;
 		String text;
 	}
+
+
 }
