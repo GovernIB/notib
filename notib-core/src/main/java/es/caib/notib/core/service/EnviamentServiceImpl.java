@@ -1346,13 +1346,17 @@ public class EnviamentServiceImpl implements EnviamentService {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		auditEnviamentHelper.resetConsultaNotifica(enviament);
 		auditEnviamentHelper.resetConsultaSir(enviament);
-		// si l'enviament esta pendent de refrescar estat a notifica
-		if (enviament.isPendentRefrescarEstatNotifica()) {
-			notificacioService.enviamentRefrescarEstat(enviamentId);
-		}
-		// si l'enviament esta pendent de refrescar l'estat enviat SIR
-		if (enviament.isPendentRefrescarEstatRegistre()) {
-			notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+
+		if (enviament.getNotificacio().isComunicacioSir()) {
+			// si l'enviament esta pendent de refrescar l'estat enviat SIR
+			if (enviament.isPendentRefrescarEstatRegistre()) {
+				notificacioService.enviamentRefrescarEstatRegistre(enviamentId);
+			}
+		} else {
+			// si l'enviament esta pendent de refrescar estat a notifica
+			if (enviament.isPendentRefrescarEstatNotifica()) {
+				notificacioService.enviamentRefrescarEstat(enviamentId);
+			}
 		}
 	}
 

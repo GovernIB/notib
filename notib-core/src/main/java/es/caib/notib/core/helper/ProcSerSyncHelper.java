@@ -174,7 +174,7 @@ public class ProcSerSyncHelper {
 //				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
 			}
 			numPagina++;
-		} while (numPagina * 30 < totalElementsCons);
+		} while ((numPagina - 1) * 30 < totalElementsCons);
 
 //				// Actualitzem el número d'operacions
 //				progres.setNumOperacions(procedimentsGda.size() + pagines);
@@ -361,7 +361,7 @@ public class ProcSerSyncHelper {
 
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
-			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.fi.resultat", new Object[] {progres.getNumOperacionsRealitzades(), totalElementsCons}));
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.fi.resultat", new Object[] {procedimentsGda.size(), totalElementsCons}));
 			progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("servei.actualitzacio.auto.fi", new Object[] {entitatDto.getNom()}));
 			for (ActualitzacioInfo inf: progres.getInfo()) {
 				if (inf.getText() != null)
@@ -432,7 +432,7 @@ public class ProcSerSyncHelper {
 //				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
 			}
 			numPagina++;
-		} while (numPagina * 30 < totalElementsCons);
+		} while ((numPagina - 1) * 30 < totalElementsCons);
 
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [TIMER-PRO] Recorregut procediments i actualització: " + elapsedTime + " ms");
