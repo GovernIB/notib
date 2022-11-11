@@ -279,14 +279,13 @@ public class ProcSerHelper {
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
 			progres.addSeparador();
+			progres.addSenseCodiSia(procedimentGda);
 //			progres.incrementOperacionsRealitzades();
 			//id i nom de procediment gda.
 			if (procedimentEntity != null) {
 				procedimentEntity.setActiu(false);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
 			}
-			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
-			progres.addSenseCodiSia(procedimentGda);
 			return false;
 		}
 
