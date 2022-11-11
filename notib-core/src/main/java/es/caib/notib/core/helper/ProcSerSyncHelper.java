@@ -95,6 +95,10 @@ public class ProcSerSyncHelper {
 			Long ti = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("procediment.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
 
+			progres.setTotalInicial(procedimentRepository.countByEntitatId(entitatDto.getId()));
+			progres.setActiusInicial(procedimentRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
+			progres.setInactiusInicial(procedimentRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
+
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
@@ -104,6 +108,10 @@ public class ProcSerSyncHelper {
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
 			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(),progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
+
+			progres.setTotalFinal(procedimentRepository.countByEntitatId(entitatDto.getId()));
+			progres.setActiusFinal(procedimentRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
+			progres.setInactiusFinal(procedimentRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
 
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(tf - ti)}));
@@ -155,13 +163,18 @@ public class ProcSerSyncHelper {
 		}
 
 		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.metriques"));
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.total.inicial") + " " + progres.getTotalInicial());
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actius") + " " + progres.getActiusInicial());
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.inactius") + " " + progres.getInactiusInicial());
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.obtinguts") + " " + progres.getProcedimentsObtinguts().size());
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.procser.sense.codi.sia") + " " + progres.getSenseCodiSia().size());
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.procser.organ.no.pertany.entitat") + " " + progres.getOrganNoPertanyEntitat().size());
 		int activats = progres.getProcedimentsObtinguts().size() - progres.getSenseCodiSia().size() - progres.getOrganNoPertanyEntitat().size();
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.activats") + " " + activats);
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.desactivats.no.provinents.rolsac") +  " " + progres.getNoActius().size());
-
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.total.final") + " " + progres.getTotalFinal());
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actius") + " " + progres.getActiusFinal());
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.inactius") + " " + progres.getInactiusFinal());
 	}
 
 	private List<ProcSerDto> obtenirProcediments(EntitatDto entitatDto, ProgresActualitzacioDto progres, int totalElementsCons) {
@@ -378,6 +391,10 @@ public class ProcSerSyncHelper {
 			Long ti = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TITOL, messageHelper.getMessage("servei.actualitzacio.auto.inici", new Object[] {entitatDto.getNom()}));
 
+			progres.setTotalInicial(serveiRepository.countByEntitatId(entitatDto.getId()));
+			progres.setActiusInicial(serveiRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
+			progres.setInactiusInicial(serveiRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
+
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			int totalElementsCons = getTotalServeis(entitatDto.getDir3Codi());	// Procediments a processar
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
@@ -388,6 +405,10 @@ public class ProcSerSyncHelper {
 			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
 			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(),progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
+
+			progres.setTotalFinal(serveiRepository.countByEntitatId(entitatDto.getId()));
+			progres.setActiusFinal(serveiRepository.countByEntitatIdAndActiuTrue(entitatDto.getId()));
+			progres.setInactiusFinal(serveiRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
 
 			Long tf = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(tf - ti)}));

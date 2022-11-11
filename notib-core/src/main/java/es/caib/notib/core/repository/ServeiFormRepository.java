@@ -49,6 +49,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
+			" and (:isActiuNull = true or pro.actiu = :isActiu)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ServeiFormEntity> findAmbEntitatAndFiltre(
@@ -61,6 +62,8 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("organ") String organGestor,
             @Param("isComu") boolean isComu,
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isActiuNull") boolean isActiuNull,
+			@Param("isActiu") Boolean isActiu,
             Pageable paginacio);
 	
 	@Query(	"from " +
@@ -68,6 +71,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
 			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
 			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
+			" and (:isActiuNull = true or pro.actiu = :isActiu)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ServeiFormEntity> findAmbFiltre(
@@ -79,6 +83,8 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("organ") String organGestor,
             @Param("isComu") boolean isComu,
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isActiuNull") boolean isActiuNull,
+			@Param("isActiu") Boolean isActiu,
             Pageable paginacio);
 
 	@Query(	"from " +
@@ -88,6 +94,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
 			" and ((pro.organGestor in (:organsGestors)) or pro.comu = true)" +
+			" and (:isActiuNull = true or pro.actiu = :isActiu)" +
 			" and (:isComu = false or pro.comu = true)" +
 			" and (:isEntregaCieActiva = false or pro.entregaCieActiva != 0)")
 	Page<ServeiFormEntity> findAmbOrganGestorOrComuAndFiltre(
@@ -101,6 +108,8 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("organsGestors") List<String> organsGestors,
             @Param("isComu") boolean isComu,
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
+			@Param("isActiuNull") boolean isActiuNull,
+			@Param("isActiu") Boolean isActiu,
             Pageable paginacio);
 
 }
