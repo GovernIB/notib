@@ -2,6 +2,7 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
+import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -111,7 +112,7 @@ public class ProcedimentHelperTest {
         codiOrgansGda.add(ORGAN_CODI);
 
         // When
-        ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+        ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
         progres.setNumOperacions(1);
         Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
         procedimentHelper.actualitzarProcedimentFromGda(
