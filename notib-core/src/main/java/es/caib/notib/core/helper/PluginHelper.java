@@ -6,7 +6,23 @@ import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.AnexoWsDto;
+import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
+import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.InteresadoWsDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.RegistreAnnexDto;
+import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
+import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
+import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
+import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
 import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -28,7 +44,19 @@ import es.caib.notib.plugin.gesconadm.GcaServei;
 import es.caib.notib.plugin.gesconadm.GesconAdm;
 import es.caib.notib.plugin.gesconadm.GestorContingutsAdministratiuPlugin;
 import es.caib.notib.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.notib.plugin.registre.*;
+import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
+import es.caib.notib.plugin.registre.CodiAssumpte;
+import es.caib.notib.plugin.registre.DadesOficina;
+import es.caib.notib.plugin.registre.Llibre;
+import es.caib.notib.plugin.registre.LlibreOficina;
+import es.caib.notib.plugin.registre.Oficina;
+import es.caib.notib.plugin.registre.Organisme;
+import es.caib.notib.plugin.registre.RegistrePlugin;
+import es.caib.notib.plugin.registre.RegistrePluginException;
+import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
+import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.registre.TipusAssumpte;
+import es.caib.notib.plugin.registre.TipusRegistreRegweb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
@@ -48,11 +76,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.mail.Message;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -780,6 +806,35 @@ public class PluginHelper {
 		return totalElements;
 	}
 
+	public List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir procediments per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
+		List<ProcSerDto> procediments = new ArrayList<>();
+		try {
+			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
+			if (procs != null) {
+				for (GcaProcediment proc : procs) {
+					ProcSerDto dto = new ProcSerDto();
+					dto.setCodi(proc.getCodiSIA());
+					dto.setNom(proc.getNom());
+					dto.setComu(proc.isComu());
+					dto.setUltimaActualitzacio(proc.getDataActualitzacio());
+					if (proc.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
+					}
+					procediments.add(dto);
+				}
+			}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
+		}
+		return procediments;
+	}
+
 	public ProcSerDto getProcSerByCodiSia(String codiSia, boolean isServei) {
 
 		String msg = "Obtenint " + (isServei ? "servei" : "procediment") + " amb codi SIA " + codiSia + " del gestor documental administratiu";
@@ -847,6 +902,35 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
 		return totalElements;
+	}
+
+	public List<ProcSerDto> getServeisGdaByEntitat(String codiDir3) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir serveis per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
+		List<ProcSerDto> serveis = new ArrayList<>();
+		try {
+			List<GcaServei> servs = getGestorDocumentalAdministratiuPlugin().getServeisByUnitat(codiDir3);
+			if (servs != null) {
+				for (GcaServei servei : servs) {
+					ProcSerDto dto = new ProcSerDto();
+					dto.setCodi(servei.getCodiSIA());
+					dto.setNom(servei.getNom());
+					dto.setComu(servei.isComu());
+					dto.setUltimaActualitzacio(servei.getDataActualitzacio());
+					if (servei.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(servei.getUnitatAdministrativacodi());
+					}
+					serveis.add(dto);
+				}
+			}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
+		}
+		return serveis;
 	}
 
 	public List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {
