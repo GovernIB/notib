@@ -125,7 +125,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 					ex);
 		}
 	}
-	
+
 	@Override
 	public List<GcaProcediment> getProcedimentsByUnitat(
 			String codi,
@@ -149,6 +149,43 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 					accept(MediaType.APPLICATION_JSON_TYPE).
 					post(String.class, form);
 			
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta != null)
+				procediments = resposta.getResultado();
+			return toProcedimentDto(procediments);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar els procediments via REST",
+					ex);
+		}
+	}
+
+	@Override
+	public List<GcaProcediment> getProcedimentsByUnitat(
+			String codi) throws SistemaExternException {
+		List<Procediment> procediments = new ArrayList<Procediment>();
+		try {
+			int numElements = getTotalProcediments(codi);
+
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
+
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"" + numElements + "\"}");
+			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+
 			ObjectMapper mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
@@ -289,6 +326,42 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 			Form form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"" + numPagina + "\", \"size\":\"30\"}");
+			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
+
+			String json = jerseyClient.
+					resource(urlAmbMetode).
+					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).
+					post(String.class, form);
+
+			ObjectMapper mapper  = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta != null)
+				serveis = resposta.getResultado();
+			return toServeiDto(serveis);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'han pogut consultar els procediments via REST",
+					ex);
+		}
+	}
+
+	@Override
+	public List<GcaServei> getServeisByUnitat(String codi) throws SistemaExternException {
+		List<Servei> serveis = new ArrayList<Servei>();
+		try {
+			int numElements = getTotalServeis(codi);
+
+			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
+
+			Client jerseyClient = generarClient();
+			autenticarClient(
+					jerseyClient,
+					urlAmbMetode);
+
+			Form form = new Form();
+			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"" + numElements + "\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 
 			String json = jerseyClient.
