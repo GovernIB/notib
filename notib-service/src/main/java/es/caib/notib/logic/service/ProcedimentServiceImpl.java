@@ -576,6 +576,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			PaginaDto<ProcSerFormDto> procedimentsPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor"});
+			// Evitar problema quan s'ordena per actiu
+			if (paginacioParams.getOrdres().size() == 1 && "actiu".equals(paginacioParams.getOrdres().get(0).getCamp())) {
+				paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			List<String> organsFills = new ArrayList<String>();
 			if (organGestorActual != null) { // Administrador d'òrgan

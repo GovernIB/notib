@@ -77,7 +77,7 @@ $(document).ready(function() {
 			<not:inputText name="nom" inline="true" placeholderKey="procediment.list.columna.nom"/>
 		</div>
 		<c:if test="${not simplifiedView}">
-			<div class="col-md-4">
+			<div class="col-md-5">
 				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 		</c:if>
@@ -85,12 +85,7 @@ $(document).ready(function() {
 			<not:inputSelect name="estat" optionItems="${procedimentEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
 							 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
 		</div>
-		<div class="col-md-2 pull-right">
-			<div class="pull-right">
-				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
-			</div>
-		</div>
+
 	</div>
 	<div class="row">
 		<div class="col-md-4">
@@ -104,6 +99,13 @@ $(document).ready(function() {
 				</button>
 				<not:inputHidden name="entregaCieActiva"/>
 			</div>
+			<div class="col-md-2 pull-right">
+				<div class="pull-right">
+					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+				</div>
+			</div>
+		</div>
 		</div>
 	</div>
 </form:form>
