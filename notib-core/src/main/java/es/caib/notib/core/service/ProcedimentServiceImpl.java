@@ -25,6 +25,7 @@ import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
@@ -749,8 +750,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -765,8 +764,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -783,8 +780,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				}

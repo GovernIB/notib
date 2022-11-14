@@ -25,6 +25,8 @@ import es.caib.notib.core.api.dto.RegistreModeFirmaDtoEnum;
 import es.caib.notib.core.api.dto.RegistreOrigenDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentDtoEnum;
 import es.caib.notib.core.api.dto.RegistreTipusDocumentalDtoEnum;
+import es.caib.notib.core.api.dto.SignatureInfoDto;
+import es.caib.notib.core.api.dto.config.ConfigDto;
 import es.caib.notib.core.api.dto.notificacio.EnviamentSirTipusDocumentEnviarEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;

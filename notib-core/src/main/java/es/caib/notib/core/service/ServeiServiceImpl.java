@@ -705,8 +705,6 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -721,8 +719,6 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -739,8 +735,6 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				}
