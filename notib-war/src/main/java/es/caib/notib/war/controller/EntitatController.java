@@ -133,6 +133,13 @@ public class EntitatController extends BaseController {
 		return "configEntitat";
 	}
 
+	@RequestMapping(value = "/{entitatId}/reset/actualitzacio/organs", method = RequestMethod.GET)
+	public String resetActualitzacioOrgans(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
+
+		entitatService.resetActualitzacioOrgans(entitatId);
+		return "configEntitat";
+	}
+
 	private void fillFormsModel(ConfigGroupDto cGroup, Model model, String entiatCodi){
 
 		List<ConfigDto> confs = new ArrayList<>();
