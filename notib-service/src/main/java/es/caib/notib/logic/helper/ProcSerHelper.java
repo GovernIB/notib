@@ -279,44 +279,51 @@ public class ProcSerHelper {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
 			progres.addSeparador();
 //			progres.incrementOperacionsRealitzades();
+			//id i nom de procediment gda.
+			if (procedimentEntity != null) {
+				procedimentEntity.setActiu(false);
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
+//				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " DESACTIVAT - No té codi SIA");
+			}
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
+			progres.addSenseCodiSia(procedimentGda);
 			return false;
 		}
+
 		if (procedimentEntity != null) {
 			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
 			if (procedimentEntity.getUltimaActualitzacio() != null && procedimentGda.getUltimaActualitzacio() != null &&
 					procedimentEntity.getUltimaActualitzacio().after(procedimentGda.getUltimaActualitzacio())) {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.data"));
 				progres.addSeparador();
-//				progres.incrementOperacionsRealitzades();
-				//id i nom de procediment gda.
-				if (procedimentEntity != null) {
-					procedimentEntity.setActiu(false);
-					progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
-				}
-				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
-				progres.addSenseCodiSia(procedimentGda);
 				procedimentEntity.setActiu(true);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.activat"));
+//				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " ACTIVAT - Sense modificacions");
+//				progres.incrementOperacionsRealitzades();
 				return false;
 			}
 		}
+
 		if (!codiOrgansGda.contains(procedimentGda.getOrganGestor())) {
 			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
+
+			//id i nom de procediment gda. sense organ gestor pertanyent a l'entiatt
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat.noOrganDinsOrganigrama", new Object[] {procedimentGda.getOrganGestor()}));
 			progres.addSeparador();
-//			progres.incrementOperacionsRealitzades();
 			progres.addAmbOrganNoPertanyEntitat(procedimentGda);
 			if (procedimentEntity != null) {
 				procedimentEntity.setActiu(false);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
+//				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " DESACTIVAT - Òrgan invàlid");
 			}
+//			progres.incrementOperacionsRealitzades();
 			return false;
 		}
 		return true;
 	}
 
-	private boolean serveiHasToBeUpdated(ProcSerDataDto serveiGda, ServeiEntity serveiEntity, List<String> codiOrgansGda, ProgresActualitzacioDto progres) {
+	private boolean serveiHasToBeUpdated(ProcSerDataDto serveiGda, ServeiEntity serveiEntity, List<String> codiOrgansGda, ProgresActualitzacioProcSer progres) {
 
 		if (serveiGda.getCodi() == null || serveiGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat"));
@@ -325,9 +332,10 @@ public class ProcSerHelper {
 				serveiEntity.setActiu(false);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.desactivat"));
 			}
-//			progres.incrementOperacionsRealitzades();
+			progres.addSenseCodiSia(serveiGda);
 			return false;
 		}
+
 		if (serveiEntity != null) {
 			// Si el darrer pic que el varem actualitzar es posterior a la darrera actualització a GDA no fa falta actualitzar
 			if (serveiEntity.getUltimaActualitzacio() != null && serveiGda.getUltimaActualitzacio() != null &&
@@ -336,20 +344,20 @@ public class ProcSerHelper {
 				progres.addSeparador();
 				serveiEntity.setActiu(true);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.activat"));
-//				progres.incrementOperacionsRealitzades();
 				return false;
 			}
 		}
+
 		if (!codiOrgansGda.contains(serveiGda.getOrganGestor())) {
 			//if (organigramaEntitat.get(procedimentGda.getOrganGestor())==null) {
 			// Si l'Organ gestor del procediment no existeix dins el nostre organigrama, no es guarda el procediment
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.processar.servei.descartat.noOrganDinsOrganigrama", new Object[] {serveiGda.getOrganGestor()}));
 			progres.addSeparador();
+			progres.addAmbOrganNoPertanyEntitat(serveiGda);
 			if (serveiEntity != null) {
 				serveiEntity.setActiu(false);
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.desactivat"));
 			}
-//			progres.incrementOperacionsRealitzades();
 			return false;
 		}
 		return true;
@@ -358,91 +366,122 @@ public class ProcSerHelper {
 
 	@Transactional(timeout = 300, propagation = Propagation.REQUIRES_NEW)
 	public void actualitzarProcedimentFromGda(ProgresActualitzacioProcSer progres, ProcSerDataDto procedimentGda, EntitatEntity entitat, List<String> codiOrgansGda,
-											  boolean modificar, List<OrganGestorEntity> organsGestorsModificats, Map<String, String[]> avisosProcedimentsOrgans) {
-		
-		var t1 = System.currentTimeMillis();
+												boolean modificar, List<OrganGestorEntity> organsGestorsModificats, Map<String, String[]> avisosProcedimentsOrgans) {
+
+		Long t1 = System.currentTimeMillis();
 		OrganGestorEntity organGestorGda = null;
+
 		try {
-			var procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
+			ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(procedimentGda.getCodi(), entitat);
+
+//			System.out.println("SYNCPROC >>> Processant el procediment " + procedimentGda.getCodi() + " - " + procedimentGda.getNom());
 
 			if (!procedimentHasToBeUpdated(procedimentGda, procediment, codiOrgansGda, progres)) {
+//				if (procediment != null) {
+//					ProcedimentEntity procBD = procedimentRepository.findById(procediment.getId());
+//					System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + (procBD.isActiu() ? " ACTIU" : " INACTIU"));
+//				}
 				return;
 			}
+
 			// Organ gestor
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ", new Object[]{procedimentGda.getOrganGestor()}));
+
 			if (!procedimentGda.isComu() && procedimentGda.getOrganGestor() != null && !procedimentGda.getOrganGestor().isEmpty()) {
 				organGestorGda = organGestorRepository.findByCodi(procedimentGda.getOrganGestor());
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.organ.result." + (organGestorGda == null ? "no" : "si")));
 			}
 			log.trace(">>>> >> organ gestor " + (organGestorGda == null ? "NOU" : "EXISTENT"));
+
 			progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment", new Object[]{procedimentGda.getCodi()}));
 			if (procediment == null) {
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.no"));
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.crear", new Object[]{procedimentGda.getCodi()}));
+
 				// CREATE
 				if (!procedimentGda.isComu() && organGestorGda == null) {
 					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.result.no", new Object[]{procedimentGda.getOrganGestor()}));
 					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.sync", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
 					avisosProcedimentsOrgans.put(procedimentGda.getNom(), new String[] { "sense òrgan", procedimentGda.getOrganGestor() });
+//					System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + " NO CREAT - No comú sense òrgan");
 					return;
 				}
 				procediment = procSerUpdateHelper.nouProcediment(procedimentGda, entitat, organGestorGda);
+//				System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + " CREAT - ACTIVAT");
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.activat"));
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.creat"));
 			} else {
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.result.si"));
 				procediment.updateActiu(true);
+//				System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + " ACTIVAT");
 				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.activat"));
-				if (!modificar) {
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.modificar.inactiu"));
-					return;
-				}
-				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat"));
+				if (modificar) {
+					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat"));
 
-				if (!entitat.equals(procediment.getEntitat())) {
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.result.no", new Object[]{procediment.getEntitat().getNom()}));
-					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.revisar", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
-					return;
-				}
-
-				if (!procedimentGda.isComu() && organGestorGda == null) {
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.result.no", new Object[]{procedimentGda.getOrganGestor()}));
-					progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.sync", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
-					// Organ no sincronitzat
-					procediment.setOrganNoSincronitzat(true);
-					String organOriginal = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() + " - " + procediment.getOrganGestor().getNom() : "sense òrgan";
-					avisosProcedimentsOrgans.put(procedimentGda.getNom(), new String[] { organOriginal, procedimentGda.getOrganGestor() });
-					return;
-				}
-
-				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.result.si"));
-				progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update"));
-
-				// UPDATE
-				OrganGestorEntity organProcediment = procediment.getOrganGestor();
-				boolean haCanviatOrgan = (organProcediment == null && procedimentGda.getOrganGestor() != null) || 
-											(organProcediment != null && !organProcediment.getCodi().equals(procedimentGda.getOrganGestor()));
-				if (haCanviatOrgan || !procediment.getNom().equals(procedimentGda.getNom()) || procediment.isComu() != procedimentGda.isComu()) {
-					// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
-					if (haCanviatOrgan) {
-						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.organ"));
-						organsGestorsModificats.add(organProcediment);
+					if (!entitat.equals(procediment.getEntitat())) {
+						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.result.no", new Object[]{procediment.getEntitat().getNom()}));
+						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.revisar", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
+						return;
 					}
-					if (!procediment.getNom().equals(procedimentGda.getNom())) {
-						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.nom"));
-					}
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.result.si"));
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.updating", new Object[]{procedimentGda.getCodi()}));
 
-					procSerUpdateHelper.updateProcediment(procedimentGda, procediment, organGestorGda);
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.updated"));
+					if (!procedimentGda.isComu() && organGestorGda == null) {
+						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.result.no", new Object[]{procedimentGda.getOrganGestor()}));
+						progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.organ.sync", new Object[]{procedimentGda.getCodi(), procediment.getEntitat().getNom()}));
+						// Organ no sincronitzat
+						procediment.setOrganNoSincronitzat(true);
+						String organOriginal = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() + " - " + procediment.getOrganGestor().getNom() : "sense òrgan";
+						avisosProcedimentsOrgans.put(procedimentGda.getNom(), new String[] { organOriginal, procedimentGda.getOrganGestor() });
+//						System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + " amb òrgan no sincronitzat");
+						return;
+					}
+
+					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.entitat.result.si"));
+					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update"));
+
+					// UPDATE
+					OrganGestorEntity organProcediment = procediment.getOrganGestor();
+					boolean haCanviatOrgan = (organProcediment == null && procedimentGda.getOrganGestor() != null) ||
+							(organProcediment != null && !organProcediment.getCodi().equals(procedimentGda.getOrganGestor()));
+					if (haCanviatOrgan ||
+							!procediment.getNom().equals(procedimentGda.getNom()) ||
+							procediment.isComu() != procedimentGda.isComu()) {
+
+						// Si canviam l'organ gestor, i aquest no s'utilitza en cap altre procediment, l'eliminarem (1)
+						if (haCanviatOrgan) {
+							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.organ"));
+							organsGestorsModificats.add(organProcediment);
+//							System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + " òrgan canviat");
+						}
+						if (!procediment.getNom().equals(procedimentGda.getNom())) {
+							progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.nom"));
+//							System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + " nom canviat");
+						}
+						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.result.si"));
+						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.updating", new Object[]{procedimentGda.getCodi()}));
+
+						procSerUpdateHelper.updateProcediment(procedimentGda, procediment, organGestorGda);
+						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.updated"));
+
+					} else {
+						progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.result.no"));
+					}
 				} else {
-					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.procediment.update.result.no"));
+					progres.addInfo(TipusInfo.SUBINFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.modificar.inactiu"));
+//					if (procediment != null) {
+//						ProcedimentEntity procBD = procedimentRepository.findById(procediment.getId());
+//						System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + (procBD.isActiu() ? " ACTIU" : " INACTIU"));
+//					}
+					return;
 				}
 			}
 			Long t2 = System.currentTimeMillis();
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.result", new Object[]{procedimentGda.getNom()}));
 			progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[]{(t2 - t1)}));
+
+//			if (procediment != null) {
+//				ProcedimentEntity procBD = procedimentRepository.findById(procediment.getId());
+//				System.out.println("SYNCPROC >>> Procediment " + procediment.getCodi() + (procBD.isActiu() ? " ACTIU" : " INACTIU"));
+//			}
 		} catch (Exception ex) {
 			log.error("Error no esperat al actualitzar el procediment", ex);
 		}

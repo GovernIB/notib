@@ -797,6 +797,35 @@ public class PluginHelper {
 		return totalElements;
 	}
 
+	public List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir procediments per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
+		List<ProcSerDto> procediments = new ArrayList<>();
+		try {
+			List<GcaProcediment> procs = getGestorDocumentalAdministratiuPlugin().getProcedimentsByUnitat(codiDir3);
+			if (procs != null) {
+				for (GcaProcediment proc : procs) {
+					ProcSerDto dto = new ProcSerDto();
+					dto.setCodi(proc.getCodiSIA());
+					dto.setNom(proc.getNom());
+					dto.setComu(proc.isComu());
+					dto.setUltimaActualitzacio(proc.getDataActualitzacio());
+					if (proc.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(proc.getUnitatAdministrativacodi());
+					}
+					procediments.add(dto);
+				}
+			}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
+		}
+		return procediments;
+	}
+
 	public ProcSerDto getProcSerByCodiSia(String codiSia, boolean isServei) {
 
 		String msg = "Obtenint " + (isServei ? "servei" : "procediment") + " amb codi SIA " + codiSia + " del gestor documental administratiu";
@@ -864,6 +893,35 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
 		}
 		return totalElements;
+	}
+
+	public List<ProcSerDto> getServeisGdaByEntitat(String codiDir3) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_GESCONADM,"Obtenir serveis per entitat", IntegracioAccioTipusEnumDto.ENVIAMENT);
+		info.setCodiEntitat(getCodiEntitatActual());
+		List<ProcSerDto> serveis = new ArrayList<>();
+		try {
+			List<GcaServei> servs = getGestorDocumentalAdministratiuPlugin().getServeisByUnitat(codiDir3);
+			if (servs != null) {
+				for (GcaServei servei : servs) {
+					ProcSerDto dto = new ProcSerDto();
+					dto.setCodi(servei.getCodiSIA());
+					dto.setNom(servei.getNom());
+					dto.setComu(servei.isComu());
+					dto.setUltimaActualitzacio(servei.getDataActualitzacio());
+					if (servei.getUnitatAdministrativacodi() != null) {
+						dto.setOrganGestor(servei.getUnitatAdministrativacodi());
+					}
+					serveis.add(dto);
+				}
+			}
+			integracioHelper.addAccioOk(info);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al obtenir els procediments del gestor documental administratiu";
+			integracioHelper.addAccioError(info, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_GESCONADM, errorDescripcio, ex);
+		}
+		return serveis;
 	}
 
 	public List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {

@@ -96,13 +96,16 @@ public class ProcSerSyncHelper {
 
 
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
-			var totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
+			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres);
+
+//			int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
+			int totalElementsCons = procedimentsGda.size();	// Procediments a processar
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
 
-			var procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
+//			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(), progres);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(),progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			progres.setTotalFinal(procedimentRepository.countByEntitatId(entitatDto.getId()));
@@ -168,6 +171,41 @@ public class ProcSerSyncHelper {
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.total.final") + " " + progres.getTotalFinal());
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actius") + " " + progres.getActiusFinal());
 		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.inactius") + " " + progres.getInactiusFinal());
+	}
+
+	private List<ProcSerDto> obtenirProcediments(EntitatDto entitatDto, ProgresActualitzacioDto progres) {
+		List<ProcSerDto> procedimentsGda = new ArrayList<>();
+		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments"));
+		long startTime = System.nanoTime();
+
+		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		log.info(" [PROCEDIMENTS] Obtenir nombre de procediments de l'entitat: " + elapsedTime + " ms");
+		startTime = System.nanoTime();
+		Long t1 = System.currentTimeMillis();
+
+		// Recuperam tots els procediments del Rolsac
+		int reintents = 0;
+		do {
+			try {
+				procedimentsGda = getProcedimentsGdaByEntitat(entitatDto.getDir3Codi());
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.result", new Object[] {procedimentsGda.size()}));
+				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(System.currentTimeMillis() - t1)}));
+				// Si obté la pàgina posam reintents a 0, de manera que la condició sigui fals, i finalitzi del do-while
+				reintents = 0;
+			} catch (Exception e) {
+				reintents++;
+			}
+		} while (reintents > 0 && reintents < 3);
+		// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
+		progres.incrementOperacionsRealitzades(procedimentsGda.size());
+		if (reintents > 0) {
+			progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("procediment.actualitzacio.auto.obtenir.procediments.error"));
+		}
+
+		elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		log.info(" [TIMER-PRO] Obtenció de procediments: " + elapsedTime + " ms");
+
+		return procedimentsGda;
 	}
 
 	private List<ProcSerDto> obtenirProcediments(EntitatDto entitatDto, ProgresActualitzacioProcSer progres, int totalElementsCons) {
@@ -310,6 +348,20 @@ public class ProcSerSyncHelper {
 		return totalElements;
 	}
 
+	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3) {
+
+		ProgresActualitzacioDto progres = ProcedimentServiceImpl.progresActualitzacio.get(codiDir3);
+		log.debug(">>>> >> Obtenir tots els procediments de Rolsac...");
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm"));
+		Long t1 = System.currentTimeMillis();
+		List<ProcSerDto> procedimentsEntitat = pluginHelper.getProcedimentsGdaByEntitat(codiDir3);
+		Long t2 = System.currentTimeMillis();
+		log.debug(">>>> >> obtinguts" + procedimentsEntitat.size() + " procediments (" + (t2 - t1) + "ms)");
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.consulta.gesconadm.result", new Object[] {procedimentsEntitat.size()}));
+		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("procediment.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
+		return procedimentsEntitat;
+	}
+
 	private List<ProcSerDto> getProcedimentsGdaByEntitat(String codiDir3, int numPagina) {
 
 		var progres = ProcedimentServiceImpl.progresActualitzacio.get(codiDir3);
@@ -380,10 +432,13 @@ public class ProcSerSyncHelper {
 			progres.setInactiusInicial(serveiRepository.countByEntitatIdAndActiuFalse(entitatDto.getId()));
 
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
-			int totalElementsCons = getTotalServeis(entitatDto.getDir3Codi());	// Procediments a processar
+			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres);
+
+			int totalElementsCons = procedimentsGda.size();	// Procediments a processar
+//			int totalElementsCons = getTotalServeis(entitatDto.getDir3Codi());	// Procediments a processar
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
 
-			var procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
+//			var procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
 			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(), progres);
@@ -422,6 +477,41 @@ public class ProcSerSyncHelper {
 			integracioHelper.addAccioError(info, "Error actualitzant serveis: ", e);
 			throw e;
 		}
+	}
+
+	private List<ProcSerDto> obtenirServeis(EntitatDto entitatDto, ProgresActualitzacioDto progres) {
+		List<ProcSerDto> serveisGda  = new ArrayList<>();
+		progres.addInfo(TipusInfo.SUBTITOL, messageHelper.getMessage("servei.actualitzacio.auto.obtenir.serveis"));
+		long startTime = System.nanoTime();
+
+		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		log.info(" [SERVEIS] Obtenir nombre de serveis de l'entitat: " + elapsedTime + " ms");
+		startTime = System.nanoTime();
+		Long t1 = System.currentTimeMillis();
+
+		// Recuperam tots els procediments del Rolsac
+		int reintents = 0;
+		do {
+			try {
+				serveisGda = getServeisGdaByEntitat(entitatDto.getDir3Codi());
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.obtenir.serveis.result", new Object[] {serveisGda.size()}));
+				progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(System.currentTimeMillis() - t1)}));
+				// Si obté la pàgina posam reintents a 0, de manera que la condició sigui fals, i finalitzi del do-while
+				reintents = 0;
+			} catch (Exception e) {
+				reintents++;
+			}
+		} while (reintents > 0 && reintents < 3);
+		// Actualitzam el percentatge. Si no s'ha pogut obtenir la pàgina, eliminan les operacions d'una pàgina i marcam la obtenció de la pàgina com a feta
+		progres.incrementOperacionsRealitzades(serveisGda.size());
+		if (reintents > 0) {
+			progres.addInfo(TipusInfo.ERROR, messageHelper.getMessage("servei.actualitzacio.auto.obtenir.serveis.error"));
+		}
+
+		elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		log.info(" [TIMER-PRO] Recorregut procediments i actualització: " + elapsedTime + " ms");
+
+		return serveisGda;
 	}
 
 	private List<ProcSerDto> obtenirServeis(EntitatDto entitatDto, ProgresActualitzacioDto progres, int totalElementsCons) {
@@ -555,6 +645,23 @@ public class ProcSerSyncHelper {
 		Long t2 = System.currentTimeMillis();
 		log.debug(">>>> >> resultat"  + totalElements + " serveis (" + (t2 - t1) + "ms)");
 		return totalElements;
+	}
+
+	private List<ProcSerDto> getServeisGdaByEntitat(String codiDir3) {
+		ProgresActualitzacioDto progres = ServeiServiceImpl.progresActualitzacioServeis.get(codiDir3);
+
+		log.debug(">>>> >> Obtenir tots els serveis de Rolsac...");
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm"));
+		Long t1 = System.currentTimeMillis();
+
+		List<ProcSerDto> serveisEntitat = pluginHelper.getServeisGdaByEntitat(codiDir3);
+
+		Long t2 = System.currentTimeMillis();
+		log.debug(">>>> >> obtinguts" + serveisEntitat.size() + " serveis (" + (t2 - t1) + "ms)");
+		progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("servei.actualitzacio.auto.consulta.gesconadm.result", new Object[] {serveisEntitat.size()}));
+		progres.addInfo(TipusInfo.TEMPS, messageHelper.getMessage("servei.actualitzacio.auto.temps", new Object[] {(t2 - t1)}));
+
+		return serveisEntitat;
 	}
 
 	private List<ProcSerDto> getServeisGdaByEntitat(String codiDir3, int numPagina) {
