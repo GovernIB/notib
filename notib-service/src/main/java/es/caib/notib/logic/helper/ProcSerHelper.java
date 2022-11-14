@@ -278,6 +278,7 @@ public class ProcSerHelper {
 		if (procedimentGda.getCodi() == null || procedimentGda.getCodi().isEmpty()) {
 			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
 			progres.addSeparador();
+			progres.addSenseCodiSia(procedimentGda);
 //			progres.incrementOperacionsRealitzades();
 			//id i nom de procediment gda.
 			if (procedimentEntity != null) {
@@ -285,8 +286,6 @@ public class ProcSerHelper {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
 //				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " DESACTIVAT - No té codi SIA");
 			}
-			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
-			progres.addSenseCodiSia(procedimentGda);
 			return false;
 		}
 
