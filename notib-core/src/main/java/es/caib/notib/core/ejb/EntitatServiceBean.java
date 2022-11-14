@@ -185,4 +185,10 @@ public class EntitatServiceBean implements EntitatService {
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		delegate.setConfigEntitat(entitatDto);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void resetActualitzacioOrgans(Long id) {
+		delegate.resetActualitzacioOrgans(id);
+	}
 }
