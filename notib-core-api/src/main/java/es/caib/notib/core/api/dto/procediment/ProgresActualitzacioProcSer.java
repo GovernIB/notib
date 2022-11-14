@@ -10,6 +10,13 @@ import java.util.List;
 @Setter
 public class ProgresActualitzacioProcSer extends ProgresActualitzacioDto {
 
+    private Integer totalInicial;
+    private Integer totalFinal;
+    private Integer actiusInicial;
+    private Integer actiusFinal;
+    private Integer inactiusInicial;
+    private Integer inactiusFinal;
+
     private List<ProcSerDto> procedimentsObtinguts = new ArrayList<>();
     private List<ProcSerDataDto> senseCodiSia = new ArrayList<>();
     private List<ProcSerDataDto> organNoPertanyEntitat = new ArrayList<>();

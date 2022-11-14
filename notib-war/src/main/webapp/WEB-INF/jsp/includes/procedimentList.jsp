@@ -77,7 +77,7 @@ $(document).ready(function() {
 			<not:inputText name="nom" inline="true" placeholderKey="procediment.list.columna.nom"/>
 		</div>
 		<c:if test="${not simplifiedView}">
-			<div class="col-md-4">
+			<div class="col-md-5">
 				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 		</c:if>

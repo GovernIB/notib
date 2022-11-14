@@ -664,6 +664,10 @@ public class ServeiServiceImpl implements ServeiService{
 			PaginaDto<ProcSerFormDto> serveisPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor"});
+			// Evitar problema quan s'ordena per actiu
+			if (paginacioParams.getOrdres().size() == 1 && "actiu".equals(paginacioParams.getOrdres().get(0).getCamp())) {
+				paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			List<String> organsFills = new ArrayList<>();
@@ -701,6 +705,8 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.getActiu() == null,
+							filtre.getActiu(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -715,6 +721,8 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.getActiu() == null,
+							filtre.getActiu(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -731,6 +739,8 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
+							filtre.getActiu() == null,
+							filtre.getActiu(),
 							pageable);
 
 				}
