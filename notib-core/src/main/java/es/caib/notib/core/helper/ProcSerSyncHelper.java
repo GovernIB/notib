@@ -101,7 +101,12 @@ public class ProcSerSyncHelper {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres);
-
+			if (procedimentsGda.isEmpty()) {
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediments.actualitzacio.error.rolsac"));
+				progres.setProgres(100);
+				progres.setFinished(true);
+				return;
+			}
 //			int totalElementsCons = getTotalProcediments(entitatDto.getDir3Codi());	// Procediments a processar
 			int totalElementsCons = procedimentsGda.size();	// Procediments a processar
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
@@ -450,7 +455,12 @@ public class ProcSerSyncHelper {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false);
 			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres);
-
+			if (procedimentsGda.isEmpty()) {
+				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("serveis.actualitzacio.error.rolsac"));
+				progres.setProgres(100);
+				progres.setFinished(true);
+				return;
+			}
 			int totalElementsCons = procedimentsGda.size();	// Procediments a processar
 //			int totalElementsCons = getTotalServeis(entitatDto.getDir3Codi());	// Procediments a processar
 			progres.setNumOperacions((totalElementsCons * 2) + Math.max(1, totalElementsCons/50));
