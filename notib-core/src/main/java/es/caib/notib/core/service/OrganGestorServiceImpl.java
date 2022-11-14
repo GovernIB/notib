@@ -594,7 +594,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			ti = tf;
 			progres.setFase(1);
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.sincronitzar"));
-//			organGestorHelper.sincronitzarOrgans(entitat.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+			organGestorHelper.sincronitzarOrgans(entitat.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
 			//		progres.incrementOperacionsRealitzades();	// 27%
 			progres.setProgres(27);
 			tf = System.currentTimeMillis();
