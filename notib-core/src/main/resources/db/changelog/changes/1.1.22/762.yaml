@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1668153867375-1
+      author: limit
+      changes:
+        - sql : "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.comunicacions.sir.internes', 'false','Permetre realitzar comunicacions SIR dins la pròpia entitat', 'GENERAL', 0, 0, 'BOOL', 1)"
