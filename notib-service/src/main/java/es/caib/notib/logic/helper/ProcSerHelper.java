@@ -286,6 +286,8 @@ public class ProcSerHelper {
 				progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.desactivat"));
 //				System.out.println("SYNCPROC >>> Procediment " + procedimentEntity.getCodi() + " DESACTIVAT - No té codi SIA");
 			}
+			progres.addInfo(TipusInfo.INFO, messageHelper.getMessage("procediment.actualitzacio.auto.processar.procediment.descartat"));
+			progres.addSenseCodiSia(procedimentGda);
 			return false;
 		}
 
