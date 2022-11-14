@@ -163,7 +163,7 @@ public class ProcSerSyncHelper {
 //				progres.setNumOperacions(progres.getNumOperacions() - elementsPagina);
 			}
 			numPagina++;
-		} while (numPagina * 30 < totalElementsCons);
+		} while ((numPagina - 1) * 30 < totalElementsCons);
 
 //				// Actualitzem el número d'operacions
 //				progres.setNumOperacions(procedimentsGda.size() + pagines);
