@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -19,6 +20,8 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
+
+	Optional<EntitatEntity> findById(Long id);
 
 	EntitatEntity findByCodi(String codi);
 

@@ -247,4 +247,8 @@ public interface EntitatService {
 	 * seves propietats
 	 */
 	void setConfigEntitat(EntitatDto entitatDto);
+
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void resetActualitzacioOrgans(Long id);
 }

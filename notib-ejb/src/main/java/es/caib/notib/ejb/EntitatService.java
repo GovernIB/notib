@@ -192,4 +192,10 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		getDelegateService().setConfigEntitat(entitatDto);
 	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void resetActualitzacioOrgans(Long id) {
+		getDelegateService().resetActualitzacioOrgans(id);
+	}
 }

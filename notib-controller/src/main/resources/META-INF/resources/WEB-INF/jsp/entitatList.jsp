@@ -85,6 +85,7 @@
 								<ul class="dropdown-menu">
 									<li><a href="<c:url value="/entitat/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 									<li><a href="<c:url value="/entitat/{{:id}}/configurar"/>"><span class="fa fa-gear"></span>&nbsp;&nbsp;<spring:message code="comu.boto.configurar"/></a></li>
+									<li><a href="<c:url value="/entitat/{{:id}}/reset/actualitzacio/organs"/>" data-toggle="ajax"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="entitat.boto.reset.actualitzacions.organs"/></a></li>
 									{{if !activa}}
 									<li><a href="<c:url value="/entitat/{{:id}}/enable"/>" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 									{{else}}

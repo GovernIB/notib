@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -564,5 +565,17 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		ConfigHelper.setEntitat(entitatDto);
+	}
+
+	@Override
+	@Transactional
+	public void resetActualitzacioOrgans(Long id) {
+
+		var opt = entitatRepository.findById(id);
+		if (opt.isEmpty()) {
+			return;
+		}
+		opt.get().setDataActualitzacio(null);
+		opt.get().setDataSincronitzacio(null);
 	}
 }
