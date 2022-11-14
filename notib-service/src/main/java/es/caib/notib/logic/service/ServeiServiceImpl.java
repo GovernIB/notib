@@ -40,6 +40,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganCacheDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat;
+import es.caib.notib.logic.intf.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.PermissionDeniedException;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
@@ -155,7 +156,7 @@ public class ServeiServiceImpl implements ServeiService{
 	private ProcedimentService procedimentService;
 
 	public static final String SERVEI_ORGAN_NO_SYNC = "Hi ha serveis que pertanyen a òrgans no existents en l'organigrama actual";
-	public static Map<String, ProgresActualitzacioDto> progresActualitzacioServeis = new HashMap<>();
+	public static Map<String, ProgresActualitzacioProcSer> progresActualitzacioServeis = new HashMap<>();
 	public static Map<Long, Integer> serveisAmbOrganNoSincronitzat = new HashMap<>();
 	
 	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -368,7 +369,7 @@ public class ServeiServiceImpl implements ServeiService{
 				}
 				return false;
 			}
-			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+			ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosServeisOrgans = new HashMap<>();
 //			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
