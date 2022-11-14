@@ -121,7 +121,8 @@ public class EntitatController extends BaseController {
 		model.addAttribute("TipusDocumentEnumDto", TipusDocumentEnumDto.class);
 		var operadorPostalList = entitat != null ? operadorPostalService.findPagadorsByEntitat(entitat) : operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		var cieList = entitat != null ? cieService.findAllIdentificadorText() : cieService.findAllIdentificadorText();
+		model.addAttribute("entitatNova", entitat != null && entitat.getId() != null);
+		List<IdentificadorTextDto> cieList = entitat != null ? cieService.findPagadorsByEntitat(entitat) : cieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}

@@ -179,6 +179,24 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<IdentificadorTextDto> pagadors = findNoCaducatsByEntitat(entitat);
+		PagadorCieEntity pagador = pagadorCieReposity.obtenirPagadorsEntitat(e);
+		if (pagador == null) {
+			return pagadors;
+		}
+		IdentificadorTextDto i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
+		if (!pagadors.contains(i)) {
+			i.setIcona("fa fa-warning text-danger");
+			pagadors.add(0, i);
+		}
+		return pagadors;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();

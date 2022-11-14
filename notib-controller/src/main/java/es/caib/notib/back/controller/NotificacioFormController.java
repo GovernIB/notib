@@ -511,6 +511,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         dadesProcediment.setComu(procedimentActual.isComu());
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
+        dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
         	List<ProcSerOrganCacheDto> procedimentsOrgansAmbPermis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ?
@@ -841,6 +842,7 @@ public class NotificacioFormController extends BaseUserController {
         private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
         private boolean comu;
         private boolean entregaCieActiva;
+        private boolean entregaCieVigent;
         private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
         public void setCaducitat(Date data) {

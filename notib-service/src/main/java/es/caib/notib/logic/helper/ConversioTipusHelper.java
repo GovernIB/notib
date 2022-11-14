@@ -454,11 +454,11 @@ public class ConversioTipusHelper {
 				tipusDocumentDto.setEntitat(entitatEntity.getId());
 				tipusDocumentDto.setTipusDocEnum(entitatEntity.getTipusDocDefault());
 				entitatDto.setTipusDocDefault(tipusDocumentDto);
-				entitatDto.setEntregaCieActiva(entitatEntity.getEntregaCie() != null);
-				if (entitatEntity.getEntregaCie() != null) {
-					entitatDto.setOperadorPostalId(entitatEntity.getEntregaCie().getOperadorPostalId());
-					entitatDto.setCieId(entitatEntity.getEntregaCie().getCieId());
-				}
+			}
+			entitatDto.setEntregaCieActiva(entitatEntity.getEntregaCie() != null);
+			if (entitatEntity.getEntregaCie() != null) {
+				entitatDto.setOperadorPostalId(entitatEntity.getEntregaCie().getOperadorPostalId());
+				entitatDto.setCieId(entitatEntity.getEntregaCie().getCieId());
 			}
 		}
 	}

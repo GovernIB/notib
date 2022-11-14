@@ -92,6 +92,9 @@ public interface PagadorCieService {
 	List<IdentificadorTextDto> findAllIdentificadorText();
 
 	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("hasRole('tothom')")
 	List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat);
 
 	/**
