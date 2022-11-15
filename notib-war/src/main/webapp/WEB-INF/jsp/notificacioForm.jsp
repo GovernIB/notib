@@ -1423,7 +1423,7 @@
 					}
 
 					viewModel.ambEntregaCIE = data.entregaCieActiva;
-					if (!data.entreCieVigent) {
+					if (!data.entregaCieVigent) {
 						$("#entregaPostalCaducada").show();
 					} else {
 						$("#entregaPostalCaducada").hide();
