@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentEstatGrup;
 import es.caib.notib.core.api.dto.*;
@@ -899,6 +900,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (notificacio != null && notificacio.getGrupCodi() != null) {
             GrupDto grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);
+        }
+        if (!Strings.isNullOrEmpty(notificacio.getNotificaErrorDescripcio())) {
+            notificacio.setNotificaErrorDescripcio(htmlEscape(notificacio.getNotificaErrorDescripcio()));
         }
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
