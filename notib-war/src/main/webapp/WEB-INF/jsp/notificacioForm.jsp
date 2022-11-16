@@ -247,7 +247,7 @@
 
 #entregaPostalCaducada {
 	display: none;
-	color:red;
+	/*color:red;*/
 	margin-top:15px;
 }
 
@@ -1809,7 +1809,6 @@
 										<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									</div>
 									<div class="entrega-cie-activa">
-										<span id="entregaPostalCaducada">* <spring:message code="notificacio.form.camp.entregapostal.caducada"/></span>
 										<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
 
 									</div>
@@ -1817,6 +1816,7 @@
 								<!-- ENTREGA POSTAL -->
 								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!enviament.entregaPostal.activa}">style="display:none"</c:if>>
 									<div class="col-md-12">
+										<div id="entregaPostalCaducada" class="alert alert-warning"><spring:message code="notificacio.form.camp.entregapostal.caducada"/></div>
 										<div class="col-md-12">
 											<not:inputSelect name="enviaments[${j}].entregaPostal.domiciliConcretTipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true"
 															 optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>
