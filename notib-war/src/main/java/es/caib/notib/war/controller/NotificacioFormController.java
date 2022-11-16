@@ -554,11 +554,12 @@ public class NotificacioFormController extends BaseUserController {
 
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
-        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
+//        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
     	if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
-    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
+//    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
+    	return prepararResposta(validacioIdCsv, doc, request);
     }
 
     @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST, headers="Content-Type=application/json" )

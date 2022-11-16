@@ -188,90 +188,91 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			Long fileTotalSize = 0L;
 
 			for (int i = 0; i < 5; i++) {
-				if(notificacio.getTipusDocument()[i] != null) {
-					switch (notificacio.getTipusDocument()[i]) {
-						case ARXIU:
-							if (i == 0 && ((notificacio.getContingutArxiu(i) == null || notificacio.getContingutArxiu(i).length == 0 || notificacio.getDocuments()[i].getArxiuGestdocId() == null)
-									&& (notificacio.getDocuments()[i].getArxiuGestdocId() == null || notificacio.getDocuments()[i].getArxiuGestdocId().isEmpty()))) {
-								valid = false;
-								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-										.addNode("arxiu[" + i + "]")
-										.addConstraintViolation();
+				if(notificacio.getTipusDocument()[i] == null) {
+					continue;
+				}
+				switch (notificacio.getTipusDocument()[i]) {
+					case ARXIU:
+						if (i == 0 && ((notificacio.getContingutArxiu(i) == null || notificacio.getContingutArxiu(i).length == 0 || notificacio.getDocuments()[i].getArxiuGestdocId() == null)
+								&& (notificacio.getDocuments()[i].getArxiuGestdocId() == null || notificacio.getDocuments()[i].getArxiuGestdocId().isEmpty()))) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
+									.addNode("arxiu[" + i + "]")
+									.addConstraintViolation();
+						}
+						if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) ||
+								(notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty())) {
+							String extensio;
+							String contentType;
+							Long fileSize;
+							if (notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty()) {
+								extensio = FilenameUtils.getExtension(notificacio.getDocuments()[i].getArxiuNom());
+								contentType = notificacio.getDocuments()[i].getMediaType();
+								fileSize = notificacio.getDocuments()[i].getMida();
+							} else {
+								extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
+								contentType = notificacio.getArxiu()[i].getContentType();
+								fileSize = notificacio.getArxiu()[i].getSize();
 							}
-							if ((notificacio.getContingutArxiu(i) != null && notificacio.getContingutArxiu(i).length != 0) ||
-									(notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty())) {
-								String extensio;
-								String contentType;
-								Long fileSize;
-								if (notificacio.getDocuments()[i].getArxiuGestdocId() != null && !notificacio.getDocuments()[i].getArxiuGestdocId().trim().isEmpty()) {
-									extensio = FilenameUtils.getExtension(notificacio.getDocuments()[i].getArxiuNom());
-									contentType = notificacio.getDocuments()[i].getMediaType();
-									fileSize = notificacio.getDocuments()[i].getMida();
-								} else {
-									extensio = FilenameUtils.getExtension(notificacio.getArxiu()[i].getOriginalFilename());
-									contentType = notificacio.getArxiu()[i].getContentType();
-									fileSize = notificacio.getArxiu()[i].getSize();
-								}
-								log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
-								boolean formatValid = true;
-								if (comunicacioAmbAdministracio) {
-									log.info("NOTIFICACIO-VAL: > Extensió: '{}'", extensio);
-									if (!extensionsDisponibles.contains(extensio.toLowerCase())) {
-										log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
-										formatValid = false;
-										valid = false;
-										context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale))
-												.addNode("arxiu[" + i + "]")
-												.addConstraintViolation();
-									}
-								} else {
-									log.info("NOTIFICACIO-VAL: > ContentType: '{}'", contentType);
-									if (!formatsDisponibles.contains(contentType)) {
-										log.info("NOTIFICACIO-VAL: > ContentType no vàlid!!");
-										formatValid = false;
-										valid = false;
-										context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale))
-												.addNode("arxiu[" + i + "]")
-												.addConstraintViolation();
-									}
-								}
-								if (formatValid)
-									log.info("NOTIFICACIO-VAL: > Format de document vàlid");
-
-								fileTotalSize += fileSize;
-								if (fileSize > fileMaxSize) {
+							log.info("NOTIFICACIO-VAL: Validant format de document a notificar");
+							boolean formatValid = true;
+							if (comunicacioAmbAdministracio) {
+								log.info("NOTIFICACIO-VAL: > Extensió: '{}'", extensio);
+								if (!extensionsDisponibles.contains(extensio.toLowerCase())) {
+									log.info("NOTIFICACIO-VAL: > Extensió no vàlida!");
+									formatValid = false;
 									valid = false;
-									context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size", null, locale))
+									context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale))
+											.addNode("arxiu[" + i + "]")
+											.addConstraintViolation();
+								}
+							} else {
+								log.info("NOTIFICACIO-VAL: > ContentType: '{}'", contentType);
+								if (!formatsDisponibles.contains(contentType)) {
+									log.info("NOTIFICACIO-VAL: > ContentType no vàlid!!");
+									formatValid = false;
+									valid = false;
+									context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.format", null, locale))
 											.addNode("arxiu[" + i + "]")
 											.addConstraintViolation();
 								}
 							}
-							break;
-						case URL:
-							if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].trim().isEmpty())) {
+							if (formatValid) {
+								log.info("NOTIFICACIO-VAL: > Format de document vàlid");
+							}
+							fileTotalSize += fileSize;
+							if (fileSize > fileMaxSize) {
 								valid = false;
-								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-										.addNode("documentArxiuUrl[" + i + "]")
+								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.document.size", null, locale))
+										.addNode("arxiu[" + i + "]")
 										.addConstraintViolation();
 							}
-							break;
-						case CSV:
-							if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].trim().isEmpty())) {
-								valid = false;
-								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-										.addNode("documentArxiuCsv[" + i + "]")
-										.addConstraintViolation();
-							}
-							break;
-						case UUID:
-							if (i == 0 && (notificacio.getDocumentArxiuUuid()[i] == null || notificacio.getDocumentArxiuUuid()[i].trim().isEmpty())) {
-								valid = false;
-								context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
-										.addNode("documentArxiuUuid[" + i + "]")
-										.addConstraintViolation();
-							}
-							break;
-					}
+						}
+						break;
+					case URL:
+						if (i == 0 && (notificacio.getDocumentArxiuUrl()[i] == null || notificacio.getDocumentArxiuUrl()[i].trim().isEmpty())) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
+									.addNode("documentArxiuUrl[" + i + "]")
+									.addConstraintViolation();
+						}
+						break;
+					case CSV:
+						if (i == 0 && (notificacio.getDocumentArxiuCsv()[i] == null || notificacio.getDocumentArxiuCsv()[i].trim().isEmpty())) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
+									.addNode("documentArxiuCsv[" + i + "]")
+									.addConstraintViolation();
+						}
+						break;
+					case UUID:
+						if (i == 0 && (notificacio.getDocumentArxiuUuid()[i] == null || notificacio.getDocumentArxiuUuid()[i].trim().isEmpty())) {
+							valid = false;
+							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, locale))
+									.addNode("documentArxiuUuid[" + i + "]")
+									.addConstraintViolation();
+						}
+						break;
 				}
 			}
 
