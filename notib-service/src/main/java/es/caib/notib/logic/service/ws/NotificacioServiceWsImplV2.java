@@ -1958,7 +1958,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 								+ enviament.getTitular().getDir3Codi() +
 								messageHelper.getMessage("error.validacio.dir3codi.no.oficina.sir.b"));
 					}
-					if (organigramaByEntitat.containsKey(enviament.getTitular().getDir3Codi())) {
+					if (!isPermesComunicacionsSirPropiaEntitat() && organigramaByEntitat.containsKey(enviament.getTitular().getDir3Codi())) {
 						return setRespostaError(
 								messageHelper.getMessage("error.validacio.dir3.codi.referencia.administracio.propia.entitat.a")
 								+ enviament.getTitular().getDir3Codi() +
@@ -2579,6 +2579,11 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 	private boolean isValidaFirmaRestEnabled() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.plugins.validatesignature.enable.rest");
 	}
+
+	private boolean isPermesComunicacionsSirPropiaEntitat() {
+		return configHelper.getConfigAsBoolean("es.caib.notib.comunicacions.sir.internes");
+	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioServiceWsImplV2.class);
 

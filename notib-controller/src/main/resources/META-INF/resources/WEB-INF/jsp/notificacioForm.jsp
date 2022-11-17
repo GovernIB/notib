@@ -312,6 +312,7 @@
 	} else {
 		var serveiIdAux = null;
 	}
+	var isPermesComunicacionsSirPropiaEntitat = ${isPermesComunicacionsSirPropiaEntitat};
 	var interessatsTipus = new Array();
 	var interessatTipusOptions = "";
 	var numDocuments = 1;
