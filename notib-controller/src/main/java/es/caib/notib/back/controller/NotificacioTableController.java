@@ -1,5 +1,6 @@
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.command.MarcarProcessatCommand;
 import es.caib.notib.back.command.NotificacioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
@@ -894,6 +895,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         if (notificacio != null && notificacio.getGrupCodi() != null) {
             GrupDto grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);
+        }
+        if (!Strings.isNullOrEmpty(notificacio.getNotificaErrorDescripcio())) {
+            notificacio.setNotificaErrorDescripcio(htmlEscape(notificacio.getNotificaErrorDescripcio()));
         }
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
