@@ -1,12 +1,15 @@
 package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto.TipusInfo;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupEntity;
@@ -50,7 +53,9 @@ import java.util.Set;
 @Slf4j
 @Component
 public class ProcSerHelper {
-	
+
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
@@ -81,15 +86,16 @@ public class ProcSerHelper {
 	 *
 	 * @param auth
 	 * @param entitat
-	 * @param permisos
+	 * @param permis
 	 * @return
 	 */
-	public List<String> findCodiProcedimentsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
+	public List<String> findCodiProcedimentsWithPermis(Authentication auth, EntitatEntity entitat, PermisEnum permis) {
 
 		// Procediments comuns amb permís a un òrgan gestor
-		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
+//		List<ProcSerEntity> procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entitat, permisos);
+		List<CodiValorOrganGestorComuDto> procediments = permisosService.getProcSersAmbPermis(entitat.getId(), auth.getName(), permis);
 		Set<String> codis = new HashSet<>();
-		for (ProcSerEntity procediment : procediments) {
+		for (CodiValorOrganGestorComuDto procediment : procediments) {
 			codis.add(procediment.getCodi());
 		}
 

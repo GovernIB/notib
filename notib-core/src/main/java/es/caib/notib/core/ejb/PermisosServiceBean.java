@@ -3,6 +3,10 @@
  */
 package es.caib.notib.core.ejb;
 
+import es.caib.notib.core.api.dto.CodiValorDto;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
@@ -10,6 +14,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de ConfigService com a EJB que empra una clase
@@ -40,6 +45,48 @@ public class PermisosServiceBean implements PermisosService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public Boolean hasPermisComunicacioSir(Long entitatId, String usuariCodi) {
 		return delegate.hasPermisComunicacioSir(entitatId, usuariCodi);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return delegate.getOrgansAmbPermis(entitatId, usuariCodi, permis);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto) {
+		return delegate.getOrgansCodisAmbPermisPerProcedimentComu(entitatId, usuariCodi, permis, procSetDto);
+	}
+
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus) {
+//		return delegate.getProcedimentsOrganNotificables(entitatId, usuariCodi, enviamentTipus);
+//	}
+//
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus) {
+//		return delegate.getServeisOrganNotificables(entitatId, usuariCodi, enviamentTipus);
+//	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return delegate.getProcSersAmbPermis(entitatId, usuariCodi, permis);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return delegate.getProcedimentsAmbPermis(entitatId, usuariCodi, permis);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+		return delegate.getServeisAmbPermis(entitatId, usuariCodi, permis);
 	}
 
 }

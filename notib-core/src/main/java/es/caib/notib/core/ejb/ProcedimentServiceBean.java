@@ -174,22 +174,22 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.findProcediments(entitatId, grups);
 	}
 	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcSerSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-		return delegate.findProcedimentsWithPermis(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+//	public List<ProcSerSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+//		return delegate.findProcedimentsWithPermis(entitatId, usuariCodi, permis);
+//	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcSerSimpleDto> findProcedimentServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-		return delegate.findProcedimentServeisWithPermis(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+//	public List<ProcSerSimpleDto> findProcedimentServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+//		return delegate.findProcedimentServeisWithPermis(entitatId, usuariCodi, permis);
+//	}
 
-	@Override
-	public List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis) {
-		return delegate.findProcedimentServeisWithPermisMenu(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	public List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis) {
+//		return delegate.findProcedimentServeisWithPermisMenu(entitatId, usuariCodi, permis);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
@@ -361,7 +361,7 @@ public class ProcedimentServiceBean implements ProcedimentService {
 
     @Override
     @RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<CodiValorComuDto> getProcedimentsOrgan(
+    public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,
 			Long organFiltre,
@@ -411,14 +411,14 @@ public class ProcedimentServiceBean implements ProcedimentService {
 		return delegate.getProgresActualitzacio(dir3Codi);
 	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ProcSerOrganDto> findProcedimentsOrganWithPermis(
-			Long entitatId,
-			String usuariCodi,
-			PermisEnum permis) {
-		return delegate.findProcedimentsOrganWithPermis(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<ProcSerOrganDto> findProcedimentsOrganWithPermis(
+//			Long entitatId,
+//			String usuariCodi,
+//			PermisEnum permis) {
+//		return delegate.findProcedimentsOrganWithPermis(entitatId, usuariCodi, permis);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})

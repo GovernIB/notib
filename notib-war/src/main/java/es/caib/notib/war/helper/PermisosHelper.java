@@ -29,12 +29,6 @@ public class PermisosHelper {
 		if (entitatActual == null || usuariActual == null || !RolHelper.isUsuariActualUsuari(request)) {
 			return;
 		}
-//		List<ProcSerSimpleDto> procedimentsDisponibles = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-//		List<ProcSerSimpleDto> procedimentsSIR = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-//		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-//		request.setAttribute("permisNotificacioMenu", !procedimentsDisponibles.isEmpty());
-//		request.setAttribute("permisComunicacioMenu", !procedimentsDisponibles.isEmpty());
-//		request.setAttribute("permisComunicacioSirMenu", !organs.isEmpty() || !procedimentsSIR.isEmpty());
 
 		request.setAttribute("permisNotificacioMenu", permisosService.hasPermisNotificacio(entitatActual.getId(), usuariActual.getCodi()));
 		request.setAttribute("permisComunicacioMenu", permisosService.hasPermisComunicacio(entitatActual.getId(), usuariActual.getCodi()));

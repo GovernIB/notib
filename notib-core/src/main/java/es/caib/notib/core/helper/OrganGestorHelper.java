@@ -2,15 +2,18 @@ package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.organisme.TipusTransicioEnumDto;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.AvisEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -49,6 +52,8 @@ import java.util.Set;
 @Slf4j
 @Component
 public class OrganGestorHelper {
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -110,37 +115,38 @@ public class OrganGestorHelper {
 
 	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth,
 														EntitatEntity entitat,
-														Permission[] permisos) {
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
-				entitat,
-				auth,
-				permisos);
+														PermisEnum permis) {
+		List<CodiValorDto> organs = permisosService.getOrgansAmbPermis(entitat.getId(), auth.getName(), permis);
+//		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermisDirecte(
+//				entitat,
+//				auth,
+//				permisos);
 		List<String> codis = new ArrayList<>();
-		for (OrganGestorEntity organGestorDto : organs) {
-			codis.add(organGestorDto.getCodi());
+		for (CodiValorDto organ : organs) {
+			codis.add(organ.getCodi());
 		}
 		return codis;
 	}
 
-	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
-															   EntitatEntity entitat,
-															   Permission[] permisos) {
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
-				entitat,
-				auth,
-				permisos);
-
-		if (organs.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		Set<String> codisOrgansAmbDescendents = new HashSet<>();
-		for (OrganGestorEntity organGestorEntity : organs) {
-			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
-		}
-		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
-
-	}
+//	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
+//															   EntitatEntity entitat,
+//															   Permission[] permisos) {
+//		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
+//				entitat,
+//				auth,
+//				permisos);
+//
+//		if (organs.isEmpty()) {
+//			return new ArrayList<>();
+//		}
+//
+//		Set<String> codisOrgansAmbDescendents = new HashSet<>();
+//		for (OrganGestorEntity organGestorEntity : organs) {
+//			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
+//		}
+//		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
+//
+//	}
 
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
 		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(

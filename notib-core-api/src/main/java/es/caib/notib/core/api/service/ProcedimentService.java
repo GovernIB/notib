@@ -206,12 +206,12 @@ public interface ProcedimentService {
 	 * @param permis
 	 * @return Procediments with the given permission for the given user
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcSerSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcSerSimpleDto> findProcedimentServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ProcSerSimpleDto> findProcedimentsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ProcSerSimpleDto> findProcedimentServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ProcSerSimpleDto> findProcedimentServeisWithPermisMenu(Long entitatId, String usuariCodi, PermisEnum permis);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public List<ProcSerDto> findProcedimentsSenseGrups(Long entitatId);
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
@@ -219,17 +219,17 @@ public interface ProcedimentService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis);
 
-	/**
-	 * Consulta tots els procediments amb permís per algún organ gestor
-	 *
-	 * @param entitatId
-	 * @param usuariCodi
-	 * @param permis
-	 *
-	 * @return
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcSerOrganDto> findProcedimentsOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	/**
+//	 * Consulta tots els procediments amb permís per algún organ gestor
+//	 *
+//	 * @param entitatId
+//	 * @param usuariCodi
+//	 * @param permis
+//	 *
+//	 * @return
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ProcSerOrganDto> findProcedimentsOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 	/**
 	 * Selecciona tots els procediments als que l'organ indicat té accés
@@ -410,7 +410,7 @@ public interface ProcedimentService {
 			PermisEnum permis);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<CodiValorComuDto> getProcedimentsOrgan(
+	List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(
 			Long entitatId,
 			String organCodi,
 			Long organFiltre,

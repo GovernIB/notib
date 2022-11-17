@@ -39,12 +39,27 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"     og.estat = :estat")
 	void updateAllStatus(@Param("estat") OrganGestorEstatEnum estat);
 
+	@Query("select count(og) " +
+			" from " +
+			"    OrganGestorEntity og " +
+			" where " +
+			"     (og.entitat = :entitat) " +
+			"	and og.estat = es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V " +
+			" 	and og.id in (:ids)")
+	Long countVigentsByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
 	@Query("from " +
 			"    OrganGestorEntity og " +
 			" where " +
 			"     (og.entitat = :entitat)" +
 			" 	and og.id in (:ids)")
 	List<OrganGestorEntity> findByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
+	@Query("from " +
+			"    OrganGestorEntity og " +
+			" where " +
+			"     (og.entitat = :entitat)" +
+			"	and og.estat = es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V " +
+			" 	and og.id in (:ids)")
+	List<OrganGestorEntity> findVigentsByEntitatAndIds(@Param("entitat") EntitatEntity entitat, @Param("ids") List<Long> ids);
 
 
 	@Query(	"select distinct og " +
@@ -79,7 +94,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitatAndGrup(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups);
-	
+
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +

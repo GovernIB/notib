@@ -3,7 +3,6 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -206,15 +205,15 @@ public class CacheHelper {
 		return cacheManager.getCacheNames(); 
 	}
 
-	@CacheEvict(value = {"procsersPermis", "procedimentEntitiesPermis", "procsersPermisMenu", "procedimentEntitiesPermisMenu"}, allEntries = true)
+	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu"}, allEntries = true)
 	public void evictFindProcedimentServeisWithPermis() {
 	}
 	
-	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procedimentEntitiessOrganPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
-	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsAmbPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 
