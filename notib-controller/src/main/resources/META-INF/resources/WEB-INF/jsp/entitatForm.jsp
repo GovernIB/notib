@@ -302,10 +302,10 @@ function updateLlibre(dir3codi) {
 				<div id="entrega-cie-form">
 					<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
 									 optionTextAttribute="text" required="true" emptyOption="true"
-									 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+									 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal"/>
 					<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id"
 									 optionTextAttribute="text" required="true" emptyOption="true"
-									 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+									 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.operadorpostal"/>
 				</div>
 			</c:if>
 			<not:inputCheckbox name="llibreEntitat" textKey="entitat.form.camp.llibreEntitat"/>

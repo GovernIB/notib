@@ -738,6 +738,6 @@ function loadPagadorPostal($selector, pagadors, missatgeObsolets){
 	let formatState = organ => !organ.obsolet ? organ.text
 		: $("<span title='" + missatgeObsolets + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
 
-	$selector.select2({ data: pagadors, templateResult: formatState, templateSelection: formatState});
+	$selector.select2({ data: pagadors, templateResult: formatState, templateSelection: formatState, minimumResultsForSearch: Infinity});
 	$selector.change();
 }

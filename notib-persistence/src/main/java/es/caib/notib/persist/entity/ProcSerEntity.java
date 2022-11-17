@@ -91,8 +91,46 @@ public abstract class ProcSerEntity extends NotibAuditable<Long> {
 
     public boolean isEntregaCieVigent() {
 
-        return false;
+        if (entregaCie != null && entregaCie.getOperadorPostal() != null && entregaCie.getCie() != null) {
+            return checkEntregaCieProcSer();
+        }
+        EntregaCieEntity entrega = organGestor.getEntregaCie();
+        if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
+            return checkEntregaCieOrgan();
+        }
+        entrega = entitat.getEntregaCie();
+        if (entrega != null && entrega.getOperadorPostal() != null && entrega.getCie() != null) {
+            return checkEntregaCieEntitat();
+        }
+        return true;
     }
+
+    private boolean checkEntregaCieOrgan() {
+
+        Date d = new Date();
+        EntregaCieEntity entrega = organGestor.getEntregaCie();
+        Date opData = entrega.getOperadorPostal().getContracteDataVig();
+        Date cieData = entrega.getCie().getContracteDataVig();
+        return opData != null && cieData != null && d.before(opData) && d.before(cieData);
+    }
+
+    private boolean checkEntregaCieProcSer() {
+
+        Date d = new Date();
+        Date opData = entregaCie.getOperadorPostal().getContracteDataVig();
+        Date cieData = entregaCie.getCie().getContracteDataVig();
+        return opData != null && cieData != null && d.before(opData) && d.before(cieData);
+    }
+
+    private boolean checkEntregaCieEntitat() {
+
+        EntregaCieEntity entrega = entitat.getEntregaCie();
+        Date d = new Date();
+        Date opData = entrega.getOperadorPostal().getContracteDataVig();
+        Date cieData = entrega.getCie().getContracteDataVig();
+        return opData != null && cieData != null && d.before(opData) && d.before(cieData);
+    }
+
     public boolean isEntregaCieActivaAlgunNivell() {
 
         if (entregaCie != null) {
