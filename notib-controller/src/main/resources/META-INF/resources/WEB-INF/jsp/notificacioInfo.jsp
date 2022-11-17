@@ -72,7 +72,7 @@ $(document).ready(function() {
 		var api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
 			var data = this.data();
-			if (!data.error) {
+			if (!data.error || data.errorDescripcio == null) {
 			$('td:last-child', this.node()).empty();
 			}
 		});
