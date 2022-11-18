@@ -584,8 +584,12 @@ public class PermisosHelper {
 						permis.setComuns(true);
 					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
 						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNICACIO.equals(ace.getPermission()))
+						permis.setComunicacio(true);
 					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
 						permis.setComunicacioSir(true);
+					if (ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT.equals(ace.getPermission()))
+						permis.setComunicacioSenseProcediment(true);
 				}
 			}
 			resposta.addAll(permisosUsuari.values());
@@ -643,8 +647,12 @@ public class PermisosHelper {
 						permis.setComuns(true);
 					if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission()))
 						permis.setNotificacio(true);
+					if (ExtendedPermission.COMUNICACIO.equals(ace.getPermission()))
+						permis.setComunicacio(true);
 					if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission()))
 						permis.setComunicacioSir(true);
+					if (ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT.equals(ace.getPermission()))
+						permis.setComunicacioSenseProcediment(true);
 				}
 			}
 		}
@@ -766,8 +774,12 @@ public class PermisosHelper {
 			permissions.add(ExtendedPermission.COMUNS);
 		if (permis.isNotificacio())
 			permissions.add(ExtendedPermission.NOTIFICACIO);
+		if (permis.isComunicacio())
+			permissions.add(ExtendedPermission.COMUNICACIO);
 		if (permis.isComunicacioSir())
 			permissions.add(ExtendedPermission.COMUNICACIO_SIR);
+		if (permis.isComunicacioSenseProcediment())
+			permissions.add(ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT);
 
 		return permissions.toArray(new Permission[permissions.size()]);
 	}
@@ -825,6 +837,9 @@ public class PermisosHelper {
 			case "notificacio":
 				comp = desc ? PermisDto.decending(PermisDto.sortByNotificacio()) : PermisDto.sortByNotificacio();
 				break;
+			case "comunicacio":
+				comp = desc ? PermisDto.decending(PermisDto.sortByComunicacio()) : PermisDto.sortByComunicacio();
+				break;
 			case "comuns":
 				comp = desc ? PermisDto.decending(PermisDto.sortByComuns()) : PermisDto.sortByComuns();
 				break;
@@ -836,6 +851,10 @@ public class PermisosHelper {
 				break;
 			case "comunicacioSir":
 				comp = desc ? PermisDto.decending(PermisDto.sortByComunicacioSir()) : PermisDto.sortByComunicacioSir();
+				break;
+			case "comunicacioSenseProcediment":
+				comp = desc ? PermisDto.decending(PermisDto.sortByComunicacioSenseProcediment()) : PermisDto.sortByComunicacioSenseProcediment();
+				break;
 			default:
 				break;
 		}

@@ -141,7 +141,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		if (isAdminOrgan && permis != null && permis.isAdministrador()) {
 			throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
 		}
-		model.addAttribute(permis != null ? PermisCommand.asCommand(permis) : new PermisCommand());
+		model.addAttribute(permis != null ? PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.ORGAN) : new PermisCommand());
 		return "organGestorPermisForm";
 	}
 	

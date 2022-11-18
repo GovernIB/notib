@@ -162,7 +162,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			}
 		}
 		if (permis != null)
-			model.addAttribute(PermisCommand.asCommand(permis));
+			model.addAttribute(PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.PROCEDIMENT));
 		else
 			model.addAttribute(new PermisCommand());
 		if (procediment.isComu())

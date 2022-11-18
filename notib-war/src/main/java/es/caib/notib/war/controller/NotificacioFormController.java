@@ -7,36 +7,14 @@ import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
-import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
-import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.EntitatDto;
-import es.caib.notib.core.api.dto.FirmaValidDto;
-import es.caib.notib.core.api.dto.GrupDto;
-import es.caib.notib.core.api.dto.LocalitatsDto;
-import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.OficinaDto;
-import es.caib.notib.core.api.dto.PaisosDto;
-import es.caib.notib.core.api.dto.PermisEnum;
-import es.caib.notib.core.api.dto.ProvinciesDto;
-import es.caib.notib.core.api.dto.RegistreDocumentacioFisicaEnumDto;
-import es.caib.notib.core.api.dto.RespostaConsultaArxiuDto;
-import es.caib.notib.core.api.dto.RolEnumDto;
-import es.caib.notib.core.api.dto.ServeiTipusEnumDto;
-import es.caib.notib.core.api.dto.SignatureInfoDto;
-import es.caib.notib.core.api.dto.TipusDocumentDto;
-import es.caib.notib.core.api.dto.TipusDocumentEnumDto;
-import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.cie.CieFormatFullaDto;
 import es.caib.notib.core.api.dto.cie.CieFormatSobreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.GestioDocumentalService;
@@ -45,6 +23,7 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
 import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.command.DocumentCommand;
@@ -58,7 +37,6 @@ import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
 import lombok.Data;
@@ -92,11 +70,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -135,6 +110,8 @@ public class NotificacioFormController extends BaseUserController {
     private PagadorCieFormatFullaService pagadorCieFormatFullaService;
     @Autowired
     private GestioDocumentalService gestioDocumentalService;
+    @Autowired
+    private PermisosService permisosService;
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -191,35 +168,35 @@ public class NotificacioFormController extends BaseUserController {
 
     }
 
-    @RequestMapping(value = "/procediments", method = RequestMethod.GET)
-    public String formProcediments(HttpServletRequest request, Model model) {
-
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        model.addAttribute("entitat", entitatActual);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-//		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
-
-        Set<ProcSerSimpleDto> procedimentsDisponibles = new HashSet<ProcSerSimpleDto>();
-        List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
-
-        if (RolHelper.isUsuariActualUsuari(request)) {
-//			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
-        	List<ProcSerSimpleDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-        	List<ProcSerSimpleDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerNotificacio);
-        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerComunicacioSir);
-        	
-            model.addAttribute("procediments", procedimentsDisponibles);
-            List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-            for (ProcSerSimpleDto pro : procedimentsDisponibles) {
-                procedimentsDisponiblesIds.add(pro.getId());
-            }
-            organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
-            model.addAttribute("organsGestors", organsGestorsDisponibles);
-        }
-
-        return "notificacioProcedimentsForm";
-    }
+//    @RequestMapping(value = "/procediments", method = RequestMethod.GET)
+//    public String formProcediments(HttpServletRequest request, Model model) {
+//
+//        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+//        model.addAttribute("entitat", entitatActual);
+//        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+////		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
+//
+//        Set<ProcSerSimpleDto> procedimentsDisponibles = new HashSet<ProcSerSimpleDto>();
+//        List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
+//
+//        if (RolHelper.isUsuariActualUsuari(request)) {
+////			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+//        	List<ProcSerSimpleDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+//        	List<ProcSerSimpleDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNICACIO_SIR);
+//        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerNotificacio);
+//        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerComunicacioSir);
+//
+//            model.addAttribute("procediments", procedimentsDisponibles);
+//            List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
+//            for (ProcSerSimpleDto pro : procedimentsDisponibles) {
+//                procedimentsDisponiblesIds.add(pro.getId());
+//            }
+//            organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+//            model.addAttribute("organsGestors", organsGestorsDisponibles);
+//        }
+//
+//        return "notificacioProcedimentsForm";
+//    }
 
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
@@ -522,13 +499,17 @@ public class NotificacioFormController extends BaseUserController {
         dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
-        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
-        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
-                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-            } else {
-        		procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-            }
-            dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
+            PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+                                TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO :
+                                PermisEnum.NOTIFICACIO;
+            dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), usuariActual.getCodi(), permis, procedimentActual));
+//        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
+//        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
+//                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNICACIO_SIR);
+//            } else {
+//        		procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+//            }
+//            dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
         }
         return dadesProcediment;
     }
@@ -644,41 +625,41 @@ public class NotificacioFormController extends BaseUserController {
     }
 
 
-    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
-
-        // 1-recuperam els òrgans dels procediments disponibles (amb permís)
-        List<String> codisOrgansGestorsProcediments = new ArrayList<>();
-        for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles)
-            codisOrgansGestorsProcediments.add(pro.getOrganGestor());
-
-        // 2-Descartam els organs vigents i els transformam a Dto
-        List<OrganGestorDto> organsGestorsProcediments = new ArrayList<>();
-        if (!codisOrgansGestorsProcediments.isEmpty())
-            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.V);
-
-        // 3-Obtenim els òrgans amb permís de notificació
-        List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
-                entitatActual.getId(),
-                SecurityContextHolder.getContext().getAuthentication().getName(),
-                permis); //PermisEnum.NOTIFICACIO || PermisEnum.COMUNICACIO_SIR);
-
-        // 4-juntam tots els òrgans i ordenam per nom
-        Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
-        setOrgansGestors.addAll(organsGestorsAmbPermis);
-
-        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
-        if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
-            organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
-        }
-
-        Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
-            @Override
-            public int compare(OrganGestorDto p1, OrganGestorDto p2) {
-                return p1.getNom().compareTo(p2.getNom());
-            }
-        });
-        return organsGestors;
-    }
+//    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
+//
+//        // 1-recuperam els òrgans dels procediments disponibles (amb permís)
+//        List<String> codisOrgansGestorsProcediments = new ArrayList<>();
+//        for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles)
+//            codisOrgansGestorsProcediments.add(pro.getOrganGestor());
+//
+//        // 2-Descartam els organs vigents i els transformam a Dto
+//        List<OrganGestorDto> organsGestorsProcediments = new ArrayList<>();
+//        if (!codisOrgansGestorsProcediments.isEmpty())
+//            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.V);
+//
+//        // 3-Obtenim els òrgans amb permís de notificació
+//        List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
+//                entitatActual.getId(),
+//                SecurityContextHolder.getContext().getAuthentication().getName(),
+//                permis); //PermisEnum.NOTIFICACIO || PermisEnum.COMUNICACIO_SIR);
+//
+//        // 4-juntam tots els òrgans i ordenam per nom
+//        Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
+//        setOrgansGestors.addAll(organsGestorsAmbPermis);
+//
+//        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
+//        if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
+//            organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
+//        }
+//
+//        Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
+//            @Override
+//            public int compare(OrganGestorDto p1, OrganGestorDto p2) {
+//                return p1.getNom().compareTo(p2.getNom());
+//            }
+//        });
+//        return organsGestors;
+//    }
 
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
                                     BindingResult bindingResult, List<String> tipusDocumentEnumDto, Model model) {
@@ -758,10 +739,17 @@ public class NotificacioFormController extends BaseUserController {
         if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
             organFiltreProcediments = getOrganGestorActual(request).getCodi();
         }
-        List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organFiltreProcediments,
-                                                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
-        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(entitatActual.getId(), organFiltreProcediments,
-                                                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
+        List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organFiltreProcediments,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+                tipusEnviament);
+        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(
+                entitatActual.getId(),
+                organFiltreProcediments,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+                tipusEnviament);
+
         List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
@@ -774,9 +762,12 @@ public class NotificacioFormController extends BaseUserController {
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
-            PermisEnum permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
+            PermisEnum permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNICACIO_SIR :
+                                tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO) ? PermisEnum.COMUNICACIO :
+                                PermisEnum.NOTIFICACIO;
 //            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
-            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
+//            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
+            codisValor = permisosService.getOrgansAmbPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), permis);
         }
 
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {

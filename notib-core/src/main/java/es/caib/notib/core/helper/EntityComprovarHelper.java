@@ -489,7 +489,7 @@ public class EntityComprovarHelper {
 			checkPermisProcediment(procediment, auth, PermisEnum.GESTIO);
 		}
 		if (comprovarPermisComunicacioSir) {
-			checkPermisProcediment(procediment, auth, PermisEnum.COMUNIACIO_SIR);
+			checkPermisProcediment(procediment, auth, PermisEnum.COMUNICACIO_SIR);
 		}
 
 		return procediment;
@@ -531,7 +531,7 @@ public class EntityComprovarHelper {
 			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.GESTIO);
 		}
 		if (comprovarPermisComunicacioSir) {
-			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.COMUNIACIO_SIR);
+			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.COMUNICACIO_SIR);
 		}
 		return procediment;
 	}
@@ -667,13 +667,14 @@ public class EntityComprovarHelper {
 	
 	public Permission getPermissionFromName(PermisEnum permis) {
 		switch (permis) {
-		case CONSULTA: return ExtendedPermission.READ;
-		case PROCESSAR: return ExtendedPermission.PROCESSAR;
-		case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
-		case GESTIO: return ExtendedPermission.ADMINISTRATION;
-		case COMUNIACIO_SIR: return ExtendedPermission.COMUNICACIO_SIR;
-		case COMUNS: return ExtendedPermission.COMUNS;
-		default: return null;
+			case CONSULTA: return ExtendedPermission.READ;
+			case PROCESSAR: return ExtendedPermission.PROCESSAR;
+			case NOTIFICACIO: return ExtendedPermission.NOTIFICACIO;
+			case COMUNICACIO: return ExtendedPermission.COMUNICACIO;
+			case COMUNICACIO_SIR: return ExtendedPermission.COMUNICACIO_SIR;
+			case GESTIO: return ExtendedPermission.ADMINISTRATION;
+			case COMUNS: return ExtendedPermission.COMUNS;
+			default: return null;
 		}
 	}
 
@@ -695,7 +696,7 @@ public class EntityComprovarHelper {
 		case PROCESSAR: return "PROCESSAR";
 		case NOTIFICACIO: return "NOTIFICACIO";
 		case GESTIO: return "ADMINISTRATION";
-		case COMUNIACIO_SIR: return "COMUNIACIO_SIR";
+		case COMUNICACIO_SIR: return "COMUNIACIO_SIR";
 		default: return null;
 		}
 	}

@@ -108,4 +108,8 @@
 			id="MonitorIntegracioService"
 			jndi-name="notib/MonitorIntegracioServiceBean/local"
 			business-interface="es.caib.notib.core.api.service.MonitorIntegracioService"/>
+	<jee:local-slsb
+			id="PermisosService"
+			jndi-name="notib/PermisosServiceBean/local"
+			business-interface="es.caib.notib.core.api.service.PermisosService"/>
 </beans>

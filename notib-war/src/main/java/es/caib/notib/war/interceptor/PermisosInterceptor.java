@@ -4,7 +4,7 @@
 package es.caib.notib.war.interceptor;
 
 import es.caib.notib.core.api.service.AplicacioService;
-import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.helper.OrganGestorHelper;
@@ -28,14 +28,14 @@ public class PermisosInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	private ServeiService serveiService;
 	@Autowired
-	private OrganGestorService organGestorService;
+	private PermisosService permisosService;
 	@Autowired
 	private AplicacioService aplicacioService;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		
-		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(request, procedimentService, organGestorService, aplicacioService);
+		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(request, permisosService, aplicacioService);
 
 		if (RolHelper.isUsuariActualAdministradorEntitat(request) || RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 			OrganGestorHelper.setOrgansProcedimentsNoSincronitzats(request, procedimentService);

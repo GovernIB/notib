@@ -2,15 +2,18 @@ package es.caib.notib.core.helper;
 
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.organisme.TipusTransicioEnumDto;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.entity.AvisEntity;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -24,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -35,11 +37,9 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Helper per a convertir entities a dto
@@ -49,6 +49,8 @@ import java.util.Set;
 @Slf4j
 @Component
 public class OrganGestorHelper {
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -76,71 +78,72 @@ public class OrganGestorHelper {
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
-	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
-	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
-			String usuariCodi,
-			Authentication auth,
-			EntitatEntity entitat,
-			Permission[] permisos) {
-
-		// 1. Obtenim els òrgans gestors amb permisos
-		List<OrganGestorEntity> organsDisponibles = findOrganismesEntitatAmbPermis(entitat,
-				permisos);
-
-		if (organsDisponibles != null && !organsDisponibles.isEmpty()) {
-			Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
-
-			// 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-			for (OrganGestorEntity organGestorEntity : organsDisponibles) {
-				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitat.getDir3Codi(),
-						organGestorEntity.getCodi());
-				if (organsFills != null)
-					for(String organCodi: organsFills) {
-						organsGestorsAmbPermis.add(organGestorRepository.findByCodi(organCodi));
-					}
-
-			}
-
-			organsDisponibles = new ArrayList<>(organsGestorsAmbPermis);
-		}
-
-		return organsDisponibles;
-	}
+//	@Cacheable(value = "organsEntitiesPermis", key="#entitat.getId().toString().concat('-').concat(#usuariCodi).concat('-').concat(#permisos[0].getPattern())")
+//	public List<OrganGestorEntity> getOrgansGestorsWithPermis(
+//			String usuariCodi,
+//			Authentication auth,
+//			EntitatEntity entitat,
+//			Permission[] permisos) {
+//
+//		// 1. Obtenim els òrgans gestors amb permisos
+//		List<OrganGestorEntity> organsDisponibles = findOrganismesEntitatAmbPermis(entitat,
+//				permisos);
+//
+//		if (organsDisponibles != null && !organsDisponibles.isEmpty()) {
+//			Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
+//
+//			// 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
+//			for (OrganGestorEntity organGestorEntity : organsDisponibles) {
+//				List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
+//						entitat.getDir3Codi(),
+//						organGestorEntity.getCodi());
+//				if (organsFills != null)
+//					for(String organCodi: organsFills) {
+//						organsGestorsAmbPermis.add(organGestorRepository.findByCodi(organCodi));
+//					}
+//
+//			}
+//
+//			organsDisponibles = new ArrayList<>(organsGestorsAmbPermis);
+//		}
+//
+//		return organsDisponibles;
+//	}
 
 	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth,
 														EntitatEntity entitat,
-														Permission[] permisos) {
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
-				entitat,
-				auth,
-				permisos);
+														PermisEnum permis) {
+		List<CodiValorDto> organs = permisosService.getOrgansAmbPermis(entitat.getId(), auth.getName(), permis);
+//		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermisDirecte(
+//				entitat,
+//				auth,
+//				permisos);
 		List<String> codis = new ArrayList<>();
-		for (OrganGestorEntity organGestorDto : organs) {
-			codis.add(organGestorDto.getCodi());
+		for (CodiValorDto organ : organs) {
+			codis.add(organ.getCodi());
 		}
 		return codis;
 	}
 
-	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
-															   EntitatEntity entitat,
-															   Permission[] permisos) {
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
-				entitat,
-				auth,
-				permisos);
-
-		if (organs.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		Set<String> codisOrgansAmbDescendents = new HashSet<>();
-		for (OrganGestorEntity organGestorEntity : organs) {
-			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
-		}
-		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
-
-	}
+//	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth,
+//															   EntitatEntity entitat,
+//															   Permission[] permisos) {
+//		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(
+//				entitat,
+//				auth,
+//				permisos);
+//
+//		if (organs.isEmpty()) {
+//			return new ArrayList<>();
+//		}
+//
+//		Set<String> codisOrgansAmbDescendents = new HashSet<>();
+//		for (OrganGestorEntity organGestorEntity : organs) {
+//			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
+//		}
+//		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
+//
+//	}
 
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
 		List<Long> objectsIds = permisosHelper.getObjectsIdsWithPermission(

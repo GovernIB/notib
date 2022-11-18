@@ -39,8 +39,11 @@
 			"requestParameterCanviRol",
 			es.caib.notib.war.helper.RolHelper.getRequestParameterCanviRol());
 	pageContext.setAttribute(
-			"permisNotificacioComunicacioMenu",
-			request.getAttribute("permisNotificacioComunicacioMenu"));
+			"permisNotificacioMenu",
+			request.getAttribute("permisNotificacioMenu"));
+	pageContext.setAttribute(
+			"permisComunicacioMenu",
+			request.getAttribute("permisComunicacioMenu"));
 	pageContext.setAttribute(
 			"permisComunicacioSirMenu",
 			request.getAttribute("permisComunicacioSirMenu"));
@@ -341,8 +344,10 @@ body {
 												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
 											</button>
 											<ul class="dropdown-menu">
-												<c:if test="${permisNotificacioComunicacioMenu}">
+												<c:if test="${permisNotificacioMenu}">
 													<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+												</c:if>
+												<c:if test="${permisComunicacioMenu}">
 													<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
 												</c:if>
 												<c:if test="${permisComunicacioSirMenu}">
