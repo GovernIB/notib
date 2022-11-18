@@ -1226,54 +1226,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		return procediments;
 	}
 
-//	private List<ProcedimentEntity> filtraProcediments(List<ProcSerEntity> procSerAmbPermis) {
-//		List<ProcedimentEntity> procedimentsAmbPermis = new ArrayList<>();
-//		for (ProcSerEntity procSer : procSerAmbPermis) {
-//			if (ProcSerTipusEnum.PROCEDIMENT.equals(procSer.getTipus())) {
-//				procedimentsAmbPermis.add((ProcedimentEntity) procSer);
-//			}
-//		}
-//		return procedimentsAmbPermis;
-//	}
-
-//	private boolean hasPermisProcedimentsComuns(String codiEntitat, String codiOrgan) {
-//		List<String> organsPares = organGestorCachable.getCodisAncestors(codiEntitat, codiOrgan);
-//		for (String codiDir3 : organsPares) {
-//			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(codiDir3);
-//			if(organGestorEntity != null && permisosHelper.hasPermission(
-//					organGestorEntity.getId(),
-//					OrganGestorEntity.class,
-//					new Permission[]{ExtendedPermission.COMUNS})
-//			) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
-//	private List<ProcSerEntity> addProcedimentsOrgan(
-//			List<ProcSerEntity> procediments,
-//			List<ProcSerOrganEntity> procedimentsOrgans,
-//			String organFiltre) {
-//
-//		Set<ProcSerEntity> setProcediments = new HashSet<>();
-//		if (organFiltre != null) {
-//			if (procediments != null) {
-//				for (ProcSerEntity proc : procediments) {
-//					if (proc.isComu() || (proc.getOrganGestor() != null && organFiltre.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
-//						setProcediments.add(proc);
-//					}
-//				}
-//			}
-//			if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
-//				for (ProcSerOrganEntity procedimentOrgan : procedimentsOrgans) {
-//					setProcediments.add(procedimentOrgan.getProcSer());
-//				}
-//			}
-//		}
-//		return new ArrayList<>(setProcediments);
-//	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public boolean hasAnyProcedimentsWithPermis(Long entitatId, List<String> grups, PermisEnum permis) {

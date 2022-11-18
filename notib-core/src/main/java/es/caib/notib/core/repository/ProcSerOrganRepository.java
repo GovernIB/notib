@@ -1,5 +1,6 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
@@ -80,7 +81,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query(	"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
@@ -100,7 +101,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query(	"select count(po.procSer) " +
 			"from ProcSerOrganEntity po " +
@@ -140,7 +141,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query(	"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
@@ -161,5 +162,5 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 }

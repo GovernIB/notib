@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
@@ -65,11 +66,6 @@ public class PermisosServiceImpl implements PermisosService {
     private OrganGestorRepository organGestorRepository;
 
 
-    public enum ProcSerTipus {
-        PROCEDIMENT,
-        SERVEI
-    }
-
     // MENUS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Comprova si un usuari disposa de permisos per notificar sobre algun procediment
@@ -78,8 +74,13 @@ public class PermisosServiceImpl implements PermisosService {
     @Transactional(readOnly = true)
     public Boolean hasPermisNotificacio(Long entitatId, String usuariCodi) {
 
-        Permission[] permisos = new Permission[] {ExtendedPermission.NOTIFICACIO};
-        return hasPermis(entitatId, usuariCodi, permisos);
+        try {
+            Permission[] permisos = new Permission[]{ExtendedPermission.NOTIFICACIO};
+            return hasPermis(entitatId, usuariCodi, permisos);
+        } catch (Exception ex) {
+            log.error("Error comprovant si l'usuari " + usuariCodi + " té permís de notificació a l'entitat " + entitatId, ex);
+            throw ex;
+        }
     }
 
     // Comprova si un usuari disposa de permisos per comunicar sobre algun procediment
@@ -88,8 +89,13 @@ public class PermisosServiceImpl implements PermisosService {
     @Transactional(readOnly = true)
     public Boolean hasPermisComunicacio(Long entitatId, String usuariCodi) {
 
-        Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO};
-        return hasPermis(entitatId, usuariCodi, permisos);
+        try {
+            Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO};
+            return hasPermis(entitatId, usuariCodi, permisos);
+        } catch (Exception ex) {
+            log.error("Error comprovant si l'usuari " + usuariCodi + " té permís de comunicació a l'entitat " + entitatId, ex);
+            throw ex;
+        }
     }
 
     // Comprova si un usuari disposa de permisos per realitzar comunicacions SIR sobre algun procediment
@@ -98,8 +104,13 @@ public class PermisosServiceImpl implements PermisosService {
     @Transactional(readOnly = true)
     public Boolean hasPermisComunicacioSir(Long entitatId, String usuariCodi) {
 
-        Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO_SIR};
-        return hasPermis(entitatId, usuariCodi, permisos);
+        try {
+            Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO_SIR};
+            return hasPermis(entitatId, usuariCodi, permisos);
+        } catch (Exception ex) {
+            log.error("Error comprovant si l'usuari " + usuariCodi + " té permís de comunicació SIR a l'entitat " + entitatId, ex);
+            throw ex;
+        }
     }
 
 
@@ -109,14 +120,19 @@ public class PermisosServiceImpl implements PermisosService {
     @Cacheable(value = "organsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+        try {
+            List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 
-        if (permis.isPermisNotCom()) {
-            return getOrgansAmbPermisPerNotificar(entitat, grups, permis);
-        } else {
-            // Per ara només retorna el permís directe sobre òrgan
-            return getOrgansAmbPermisDirecte(entitat, grups, permis);
+            if (permis.isPermisNotCom()) {
+                return getOrgansAmbPermisPerNotificar(entitat, grups, permis);
+            } else {
+                // Per ara només retorna el permís directe sobre òrgan
+                return getOrgansAmbPermisDirecte(entitat, grups, permis);
+            }
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
         }
     }
 
@@ -125,42 +141,52 @@ public class PermisosServiceImpl implements PermisosService {
     @Cacheable(value = "organsPermisPerProcedimentComu", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name()).concat('-').concat(#procSetDto.getId().toString())")
     @Transactional(readOnly = true)
     public List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto) {
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-        List<OrganGestorEntity> organsAmbPermisComu = getOrgansAmbPermisComu(entitat, grups);
-        List<ProcSerOrganEntity> procedimentsOrganAmbPermisDirecte = getProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
-        for (ProcSerOrganEntity procedimentOrgan: procedimentsOrganAmbPermisDirecte) {
-            if (procedimentOrgan.getProcSer().getId().equals(procSetDto.getId())) {
-                organsAmbPermisComu.add(procedimentOrgan.getOrganGestor());
+        try {
+            EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
+            List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+            List<OrganGestorEntity> organsAmbPermisComu = getOrgansAmbPermisComu(entitat, grups);
+            List<ProcSerOrganEntity> procedimentsOrganAmbPermisDirecte = getProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
+            for (ProcSerOrganEntity procedimentOrgan: procedimentsOrganAmbPermisDirecte) {
+                if (procedimentOrgan.getProcSer().getId().equals(procSetDto.getId())) {
+                    organsAmbPermisComu.add(procedimentOrgan.getOrganGestor());
+                }
             }
-        }
 
-        Set<String> organsDisponibles = new HashSet<>();
-        for (OrganGestorEntity organ: organsAmbPermisComu) {
-            if (!organsDisponibles.contains(organ.getCodi()))
-                organsDisponibles.addAll(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(
-                        entitat.getDir3Codi(),
-                        organ.getCodi()));
-        }
+            Set<String> organsDisponibles = new HashSet<>();
+            for (OrganGestorEntity organ: organsAmbPermisComu) {
+                if (!organsDisponibles.contains(organ.getCodi()))
+                    organsDisponibles.addAll(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(
+                            entitat.getDir3Codi(),
+                            organ.getCodi()));
+            }
 
-        return new ArrayList<>(organsDisponibles);
+            return new ArrayList<>(organsDisponibles);
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " d'òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId + " pel procediment comú " + procSetDto.getCodi(), ex);
+            throw ex;
+        }
     }
 
     @Override
     @Cacheable(value = "procserOrgansCodisAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+        try {
+            List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+            EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+            Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
 
-        List<ProcSerOrganEntity> procedimentsOrganAmbPermisDirecte = getProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
-        List<String> codisProcedimentsOrgans = new ArrayList<>();
-        for (ProcSerOrganEntity procSerOrgan : procedimentsOrganAmbPermisDirecte) {
-            codisProcedimentsOrgans.add(procSerOrgan.getProcSer().getCodi() + "-" + procSerOrgan.getOrganGestor().getCodi());
+            List<ProcSerOrganEntity> procedimentsOrganAmbPermisDirecte = getProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
+            List<String> codisProcedimentsOrgans = new ArrayList<>();
+            for (ProcSerOrganEntity procSerOrgan : procedimentsOrganAmbPermisDirecte) {
+                codisProcedimentsOrgans.add(procSerOrgan.getProcSer().getCodi() + "-" + procSerOrgan.getOrganGestor().getCodi());
+            }
+            return codisProcedimentsOrgans;
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " de procediment-òrgan per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
         }
-        return codisProcedimentsOrgans;
     }
 
 
@@ -169,50 +195,40 @@ public class PermisosServiceImpl implements PermisosService {
     @Cacheable(value = "procserAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-        return getProcSerAmPermis(entitatId, usuariCodi, permisos, null, permis.isPermisNotCom());
+        try {
+            Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, null, permis.isPermisNotCom());
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " de procediments i serveis per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
     }
 
     @Override
     @Cacheable(value = "procedimentsAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorOrganGestorComuDto> getProcedimentsAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-        return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipus.PROCEDIMENT, permis.isPermisNotCom());
+        try {
+            Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.PROCEDIMENT, permis.isPermisNotCom());
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " de procediments per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
     }
 
     @Override
     @Cacheable(value = "serveisAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
     @Transactional(readOnly = true)
     public List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-        return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipus.PROCEDIMENT, permis.isPermisNotCom());
+        try {
+            Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.SERVEI, permis.isPermisNotCom());
+        } catch (Exception ex) {
+            log.error("Error obtenint permisos de " + permis.name() + " de serveis per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
+            throw ex;
+        }
     }
-
-//    @Override
-//    @Cacheable(value = "procserAmbPermisProcediment", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name()).concat('-').concat(#tipus.name())")
-//    @Transactional(readOnly = true)
-//    public List<CodiValorOrganGestorComuDto> getProcSersAmbPermisProcediment(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerTipus tipus) {
-//        Set<ProcSerEntity> procSerAmbPermis = new HashSet<>();
-//
-//        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-//        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
-//        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-//
-//        // 1. Obtenim procediments amb permís directe sobre procediments
-//        procSerAmbPermis.addAll(getProcSerAmbPermisDirecte(entitat, permisos, grups, true, tipus));
-//
-//        return procedimentsToCodiValorOrganGestorComuDto(procSerAmbPermis);
-//    }
-//
-//    @Override
-//    @Cacheable(value = "procserAmbPermisOrgan", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name()).concat('-').concat(#tipus.name())")
-//    @Transactional(readOnly = true)
-//    public List<CodiValorOrganGestorComuDto> getProcSersAmbPermisOrgan(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerTipus tipus) {
-//        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-//        return getProcSerAmPermis(entitatId, usuariCodi, permisos, null, permis.isPermisNotCom());
-//    }
-
 
 
 
@@ -266,13 +282,13 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class ProcSerPermisDirecteCountCommand implements Command<Long, Long> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return procSerRepository.countProcedimentsByEntitatAndGrupAndIds(entitat, grups, subList);
         }
     }
     public class ProcSerActiusPermisDirecteCountCommand implements Command<Long, Long> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return procSerRepository.countProcedimentsActiusByEntitatAndGrupAndIds(entitat, grups, subList);
         }
     }
@@ -296,13 +312,13 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class ProcedimentsPermisComuDirecteCountCommand implements Command<Long, Long> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return procSerOrganRepository.countProcedimentsByEntitatAndGrupAndIds(entitat, grups, subList);
         }
     }
     public class ProcedimentsActiusPermisComuDirecteCountCommand implements Command<Long, Long> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return procSerOrganRepository.countProcedimentsActiusByEntitatAndGrupAndIds(entitat, grups, subList);
         }
     }
@@ -321,7 +337,7 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class OrgansPermisSenseProcedimentCountCommand implements Command<Long, Long> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return organGestorRepository.countVigentsByEntitatAndIds(entitat, subList);
         }
     }
@@ -385,13 +401,13 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class ProcSerPermisOrganCountCommand implements Command<Long, String> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
             return procSerRepository.countProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList);
         }
     }
     public class ProcSerActiusPermisOrganCountCommand implements Command<Long, String> {
         @Override
-        public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipus tipus) {
+        public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
             return procSerRepository.countProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList);
         }
     }
@@ -497,7 +513,7 @@ public class PermisosServiceImpl implements PermisosService {
 
 
     // PERMIS PROCEDIMENT-ORGAN AMB PERMIS DIRECTE
-    private List<ProcSerOrganEntity> getProcedimentsOrganAmbPermisDirecte(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipus tipus) {
+    private List<ProcSerOrganEntity> getProcedimentsOrganAmbPermisDirecte(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 
         List<Long> procedimentsOrganAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(ProcSerOrganEntity.class, permisos);
 
@@ -513,14 +529,14 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class ProcedimentsOrganAmbPermisDirecteCommand implements Command<List<ProcSerOrganEntity>, Long> {
         @Override
-        public List<ProcSerOrganEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
-            return procSerOrganRepository.findByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerOrganEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
+            return procSerOrganRepository.findByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus);
         }
     }
     public class ProcedimentsOrganActiusAmbPermisDirecteCommand implements Command<List<ProcSerOrganEntity>, Long> {
         @Override
-        public List<ProcSerOrganEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
-            return procSerOrganRepository.findActiusByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerOrganEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
+            return procSerOrganRepository.findActiusByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus);
         }
     }
 
@@ -576,7 +592,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PROCEDIMENTS I SERVEIS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public List<CodiValorOrganGestorComuDto> getProcSerAmPermis(Long entitatId, String usuariCodi, Permission[] permisos, ProcSerTipus tipus, boolean incloureComuns) {
+    public List<CodiValorOrganGestorComuDto> getProcSerAmPermis(Long entitatId, String usuariCodi, Permission[] permisos, ProcSerTipusEnum tipus, boolean incloureComuns) {
 
         Set<ProcSerEntity> procSerAmbPermis = new HashSet<>();
 
@@ -602,7 +618,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PERMÍS DIRECTE
 
-    private List<ProcSerEntity> getProcSerAmbPermisDirecte(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipus tipus) {
+    private List<ProcSerEntity> getProcSerAmbPermisDirecte(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 
         List<Long> procedimentsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(ProcedimentEntity.class, permisos);
 
@@ -618,30 +634,30 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class ProcSerPermisDirecteCommand implements Command<List<ProcSerEntity>, Long> {
         @Override
-        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
-            return procSerRepository.findProcedimentsByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
+            return procSerRepository.findProcedimentsByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus);
         }
     }
     public class ProcSerActiusPermisDirecteCommand implements Command<List<ProcSerEntity>, Long> {
         @Override
-        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
-            return procSerRepository.findProcedimentsActiusByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
+            return procSerRepository.findProcedimentsActiusByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus);
         }
     }
 
 
     // PERMÍS PROCEDIMENT COMU ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private List<ProcSerEntity> getProcSerComunsAmbPermisPerOrgan(EntitatEntity entitat, List<String> grups, boolean removeInactius, ProcSerTipus tipus) {
+    private List<ProcSerEntity> getProcSerComunsAmbPermisPerOrgan(EntitatEntity entitat, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 
         List<ProcSerEntity> procedimentsComunsSenseAccesDirecte = new ArrayList<>();
         List<OrganGestorEntity> organsAmbPermis = getOrgansAmbPermisComu(entitat, grups);
 
         if (organsAmbPermis != null && !organsAmbPermis.isEmpty()) {
             if (removeInactius)
-                procedimentsComunsSenseAccesDirecte = procSerRepository.findProcedimentsComusActiusByEntitatSenseAccesDirecte(entitat, grups, tipus == null, tipus != null ? tipus.name() : null);
+                procedimentsComunsSenseAccesDirecte = procSerRepository.findProcedimentsComusActiusByEntitatSenseAccesDirecte(entitat, grups, tipus == null, tipus);
             else
-                procedimentsComunsSenseAccesDirecte = procSerRepository.findProcedimentsComusByEntitatSenseAccesDirecte(entitat, grups, tipus == null, tipus != null ? tipus.name() : null);
+                procedimentsComunsSenseAccesDirecte = procSerRepository.findProcedimentsComusByEntitatSenseAccesDirecte(entitat, grups, tipus == null, tipus);
         }
 
         return procedimentsComunsSenseAccesDirecte;
@@ -649,7 +665,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PERMÍS PROCEDIMENT-ORGAN //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private List<ProcSerEntity> getProcedimentsForProcedimentsOrganAmbPermisDirecte(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipus tipus) {
+    private List<ProcSerEntity> getProcedimentsForProcedimentsOrganAmbPermisDirecte(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 
         List<Long> procedimentsOrganAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(ProcSerOrganEntity.class, permisos);
 
@@ -665,20 +681,20 @@ public class PermisosServiceImpl implements PermisosService {
     }
     public class ProcedimentsForProcedimentsOrganAmbPermisDirecteCommand implements Command<List<ProcSerEntity>, Long> {
         @Override
-        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
-            return procSerOrganRepository.findProcedimentsByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
+            return procSerOrganRepository.findProcedimentsByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus);
         }
     }
     public class ProcedimentsActiusForProcedimentsOrganAmbPermisDirecteCommand implements Command<List<ProcSerEntity>, Long> {
         @Override
-        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
-            return procSerOrganRepository.findProcedimentsActiusByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
+            return procSerOrganRepository.findProcedimentsActiusByEntitatAndGrupAndIds(entitat, grups, subList, tipus == null, tipus);
         }
     }
 
     // PERMÍS PER ORGAN //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private List<ProcSerEntity> getProcSerAmbPermisPerOrgan(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipus tipus) {
+    private List<ProcSerEntity> getProcSerAmbPermisPerOrgan(EntitatEntity entitat, Permission[] permisos, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 
         // 1. Obtenim els òrgans gestors amb permisos
         List<OrganGestorEntity> organsAmbPermis = getOrgansAmbPermis(
@@ -709,26 +725,26 @@ public class PermisosServiceImpl implements PermisosService {
 
     public class OrgansPermisCommand implements Command<List<OrganGestorEntity>, Long> {
         @Override
-        public List<OrganGestorEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public List<OrganGestorEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return organGestorRepository.findByEntitatAndIds(entitat, subList);
         }
     }
     public class OrgansVigentsPermisCommand implements Command<List<OrganGestorEntity>, Long> {
         @Override
-        public List<OrganGestorEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipus tipus) {
+        public List<OrganGestorEntity> execute(EntitatEntity entitat, List<String> grups, List<Long> subList, ProcSerTipusEnum tipus) {
             return organGestorRepository.findByEntitatAndIds(entitat, subList);
         }
     }
     public class ProcedimentsPermisOrganCommand implements Command<List<ProcSerEntity>, String> {
         @Override
-        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipus tipus) {
-            return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
+            return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus);
         }
     }
     public class ProcedimentsActiusPermisOrganCommand implements Command<List<ProcSerEntity>, String> {
         @Override
-        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipus tipus) {
-            return procSerRepository.findProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus != null ? tipus.name() : null);
+        public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
+            return procSerRepository.findProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus);
         }
     }
 
@@ -793,7 +809,7 @@ public class PermisosServiceImpl implements PermisosService {
             Command<Long, U> commandCountMantainingInactius,
             EntitatEntity entitat,
             List<String> grups,
-            ProcSerTipus tipus) {
+            ProcSerTipusEnum tipus) {
 
         Boolean hasElements = false;
 
@@ -853,7 +869,7 @@ public class PermisosServiceImpl implements PermisosService {
             Command<List<T>,U> commandMantainingInactius,
             EntitatEntity entitat,
             List<String> grups,
-            ProcSerTipus tipus) {
+            ProcSerTipusEnum tipus) {
         List<T> llistaResultats = new ArrayList<>();
 
         if (ids == null || ids.isEmpty())
@@ -879,12 +895,8 @@ public class PermisosServiceImpl implements PermisosService {
         return llistaResultats;
     }
 
-//    public interface Command<T> {
-//        public T execute(EntitatEntity entitat, List<String> grups, List<Long> subList);
-//    }
-
     public interface Command<T,U> {
-        public T execute(EntitatEntity entitat, List<String> grups, List<U> subList, ProcSerTipus tipus);
+        public T execute(EntitatEntity entitat, List<String> grups, List<U> subList, ProcSerTipusEnum tipus);
     }
 
 }

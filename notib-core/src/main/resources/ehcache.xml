@@ -5,6 +5,8 @@
 
 	<defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false" />
 
+	<!-- ATENCIÓ!!: Si s'afegeix alguna caché, pensar a actualitzar l'ordre en CacheServiceImpl -->
+
 	<cache name="aclCache" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="600" overflowToDisk="false" />
 
 	<!-- USUARI -->

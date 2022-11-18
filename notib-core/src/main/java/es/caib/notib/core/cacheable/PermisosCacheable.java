@@ -14,6 +14,7 @@ import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -47,8 +48,6 @@ public class PermisosCacheable {
     private PermisosHelper permisosHelper;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
-//    @Autowired
-//    private OrganigramaHelper organigramaHelper;
     @Autowired
     private ConfigHelper configHelper;
 
@@ -203,64 +202,6 @@ public class PermisosCacheable {
                 OrganGestorDto.class);
     }
 
-//    @Transactional(readOnly = true)
-//    @Cacheable(value = "organsPermisDirecte", key="#entitat.getId().toString().concat('-').concat(#auth.name).concat('-').concat(#permisos[0].getPattern())")
-//    public List<OrganGestorEntity> findOrgansGestorsWithPermisDirecte(EntitatEntity entitat,
-//                                                                      Authentication auth,
-//                                                                      Permission[] permisos) {
-//
-//        // 1. Obtenim els òrgans gestors amb permisos
-//        List<OrganGestorEntity> organsDisponibles;
-//        if (!ExtendedPermission.READ.equals(permisos[0])){
-//            organsDisponibles = organGestorRepository.findByEntitatAndEstat(entitat, OrganGestorEstatEnum.V);
-//        } else {
-//            organsDisponibles = organGestorRepository.findByEntitat(entitat);
-//        }
-//
-//        permisosHelper.filterGrantedAll(
-//                organsDisponibles,
-//                new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {
-//                    public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-//                        return organGestor.getId();
-//                    }
-//                },
-//                OrganGestorEntity.class,
-//                permisos,
-//                auth);
-//
-//
-//        List<OrganGestorEntity> resultats = new ArrayList<>(organsDisponibles);
-//        if (organsDisponibles != null && !organsDisponibles.isEmpty()) {
-//            Set<OrganGestorEntity> organsGestorsAmbPermis = new HashSet<>(organsDisponibles);
-//
-//            // 2. Obtenim els òrgans gestors fills dels organs gestors amb permisos
-//            if (!organsDisponibles.isEmpty()) {
-//                for (OrganGestorEntity organGestorEntity : organsDisponibles) {
-//                    List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-//                            entitat.getDir3Codi(),
-//                            organGestorEntity.getCodi());
-//                    if (organsFills != null)
-//                        for(String organCodi: organsFills) {
-//                            OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
-//                            if (ExtendedPermission.READ.equals(permisos[0]) || organ.getEstat() == OrganGestorEstatEnum.V) {
-//                                organsGestorsAmbPermis.add(organ);
-//                            }
-//                        }
-//                }
-//            }
-//
-//            resultats = new ArrayList<>(organsGestorsAmbPermis);
-//            Collections.sort(resultats, new Comparator<OrganGestorEntity>() {
-//                @Override
-//                public int compare(OrganGestorEntity o1, OrganGestorEntity o2) {
-//                    return o1.getCodi().compareTo(o2.getCodi());
-//                }
-//            });
-//        }
-//
-//        return resultats;
-//    }
-
     @Resource
     private CacheManager cacheManager;
 
@@ -274,21 +215,29 @@ public class PermisosCacheable {
         if (entitatsIds != null && !entitatsIds.isEmpty()) {
             List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
             if (entitatsAccessibles != null) {
+                Cache cacheOrgansAmbPermis = cacheManager.getCache("organsAmbPermis");
                 for (EntitatEntity entitatEntity : entitatsAccessibles) {
                     String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
-                    for (PermisEnum permis: PermisEnum.values())
-                        cacheManager.getCache("organsAmbPermis").evict(cacheKeyPrefix.concat(permis.name()));
+                    for (PermisEnum permis: PermisEnum.values()) {
+                        if (cacheOrgansAmbPermis != null)
+                            cacheOrgansAmbPermis.evict(cacheKeyPrefix.concat(permis.name()));
+                    }
                 }
             }
         }
-        cacheManager.getCache("organsGestorsUsuari").evict(auth.getName());
-        cacheManager.getCache("getPermisosEntitatsUsuariActual").evict(auth.getName());
+        Cache cacheOrgansGestorsUsuari = cacheManager.getCache("organsGestorsUsuari");
+        Cache cacheEntitatsUsuariActual = cacheManager.getCache("getPermisosEntitatsUsuariActual");
+        Cache cacheEntitatsUsuari = cacheManager.getCache("entitatsUsuari");
 
-        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_SUPER.name()));
-        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_ADMIN.name()));
-        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.tothom.name()));
-        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_APL.name()));
-        cacheManager.getCache("entitatsUsuari").evict(auth.getName().concat("-").concat(RolEnumDto.NOT_ADMIN_ORGAN.name()));
+        if (cacheOrgansGestorsUsuari != null)
+            cacheOrgansGestorsUsuari.evict(auth.getName());
+        if (cacheEntitatsUsuariActual != null)
+            cacheEntitatsUsuariActual.evict(auth.getName());
+
+        for (RolEnumDto rol: RolEnumDto.values()) {
+            if (cacheEntitatsUsuari != null)
+                cacheEntitatsUsuari.evict(auth.getName().concat("-").concat(rol.name()));
+        }
 
     }
 
