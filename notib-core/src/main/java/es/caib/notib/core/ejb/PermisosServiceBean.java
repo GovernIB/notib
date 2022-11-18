@@ -59,17 +59,11 @@ public class PermisosServiceBean implements PermisosService {
 		return delegate.getOrgansCodisAmbPermisPerProcedimentComu(entitatId, usuariCodi, permis, procSetDto);
 	}
 
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus) {
-//		return delegate.getProcedimentsOrganNotificables(entitatId, usuariCodi, enviamentTipus);
-//	}
-//
-//	@Override
-//	@RolesAllowed({"NOT_ADMIN", "tothom"})
-//	public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus) {
-//		return delegate.getServeisOrganNotificables(entitatId, usuariCodi, enviamentTipus);
-//	}
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+    public List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+        return delegate.getProcedimentsOrgansAmbPermis(entitatId, usuariCodi, permis);
+    }
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})

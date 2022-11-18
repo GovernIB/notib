@@ -30,6 +30,7 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -76,7 +77,9 @@ import java.util.Set;
 @Slf4j
 @Service
 public class NotificacioServiceImpl implements NotificacioService {
-	
+
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -518,7 +521,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
-				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatActual, permisos);
+				codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
 
 			} else if (isAdminOrgan && entitatActual != null) {
 				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);

@@ -102,23 +102,23 @@ public class ProcSerHelper {
 		return new ArrayList<>(codis);
 	}
 
-	/**
-	 * Retorna un codi únic per a totes les tuples organ-procediment que tenen el permís indicat per paràmetre.
-	 *
-	 * @param auth
-	 * @param entitat
-	 * @param permisos
-	 * @return
-	 */
-	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
-
-		List<ProcSerOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
-		List<String> codisProcedimentsOrgans = new ArrayList<>();
-		for (ProcSerOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
-			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcSer().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
-		}
-		return codisProcedimentsOrgans;
-	}
+//	/**
+//	 * Retorna un codi únic per a totes les tuples organ-procediment que tenen el permís indicat per paràmetre.
+//	 *
+//	 * @param auth
+//	 * @param entitat
+//	 * @param permisos
+//	 * @return
+//	 */
+//	public List<String> findCodiProcedimentsOrganWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
+//
+//		List<ProcSerOrganEntity> procedimentOrgansAmbPermis = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
+//		List<String> codisProcedimentsOrgans = new ArrayList<>();
+//		for (ProcSerOrganEntity procedimentOrganEntity : procedimentOrgansAmbPermis) {
+//			codisProcedimentsOrgans.add(procedimentOrganEntity.getProcSer().getCodi() + "-" + procedimentOrganEntity.getOrganGestor().getCodi());
+//		}
+//		return codisProcedimentsOrgans;
+//	}
 
 	public void omplirPermisos(ProcSerDto procediment, boolean ambLlistaPermisos) {
 

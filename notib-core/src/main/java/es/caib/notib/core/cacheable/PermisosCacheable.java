@@ -8,7 +8,6 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -48,8 +47,8 @@ public class PermisosCacheable {
     private PermisosHelper permisosHelper;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
-    @Autowired
-    private OrganigramaHelper organigramaHelper;
+//    @Autowired
+//    private OrganigramaHelper organigramaHelper;
     @Autowired
     private ConfigHelper configHelper;
 

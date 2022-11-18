@@ -128,16 +128,16 @@ public class PermisosServiceImpl implements PermisosService {
         EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId,true,false,false);
         List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
         Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-        List<OrganGestorEntity> organsAmbPermis = getOrgansAmbPermisComu(entitat, grups);
+        List<OrganGestorEntity> organsAmbPermisComu = getOrgansAmbPermisComu(entitat, grups);
         List<ProcSerOrganEntity> procedimentsOrganAmbPermisDirecte = getProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
         for (ProcSerOrganEntity procedimentOrgan: procedimentsOrganAmbPermisDirecte) {
             if (procedimentOrgan.getProcSer().getId().equals(procSetDto.getId())) {
-                organsAmbPermis.add(procedimentOrgan.getOrganGestor());
+                organsAmbPermisComu.add(procedimentOrgan.getOrganGestor());
             }
         }
 
         Set<String> organsDisponibles = new HashSet<>();
-        for (OrganGestorEntity organ: organsAmbPermis) {
+        for (OrganGestorEntity organ: organsAmbPermisComu) {
             if (!organsDisponibles.contains(organ.getCodi()))
                 organsDisponibles.addAll(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(
                         entitat.getDir3Codi(),
@@ -147,26 +147,22 @@ public class PermisosServiceImpl implements PermisosService {
         return new ArrayList<>(organsDisponibles);
     }
 
+    @Override
+    @Cacheable(value = "procserOrgansCodisAmbPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+    @Transactional(readOnly = true)
+    public List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+        List<String> grups = cacheHelper.findRolsUsuariAmbCodi(usuariCodi);
+        EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
 
-//    @Override
-//    @Cacheable(value = "procedimentsNotificables", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#tipusEnviament.name())")
-//    @Transactional(readOnly = true)
-//    public List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus) {
-//        Permission[] permisos = new Permission[] { enviamentTipus.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? ExtendedPermission.COMUNICACIO_SIR :
-//                enviamentTipus.equals(TipusEnviamentEnumDto.COMUNICACIO) ? ExtendedPermission.COMUNICACIO :
-//                        ExtendedPermission.NOTIFICACIO};
-//        return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipus.PROCEDIMENT, true);
-//    }
-//
-//    @Override
-//    @Cacheable(value = "serveisNotificables", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#tipusEnviament.name())")
-//    @Transactional(readOnly = true)
-//    public List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus) {
-//        Permission[] permisos = new Permission[] { enviamentTipus.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? ExtendedPermission.COMUNICACIO_SIR :
-//                enviamentTipus.equals(TipusEnviamentEnumDto.COMUNICACIO) ? ExtendedPermission.COMUNICACIO :
-//                        ExtendedPermission.NOTIFICACIO};
-//        return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipus.SERVEI, true);
-//    }
+        List<ProcSerOrganEntity> procedimentsOrganAmbPermisDirecte = getProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, null);
+        List<String> codisProcedimentsOrgans = new ArrayList<>();
+        for (ProcSerOrganEntity procSerOrgan : procedimentsOrganAmbPermisDirecte) {
+            codisProcedimentsOrgans.add(procSerOrgan.getProcSer().getCodi() + "-" + procSerOrgan.getOrganGestor().getCodi());
+        }
+        return codisProcedimentsOrgans;
+    }
+
 
     // PROCEDIMENTS I SERVEIS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -414,46 +410,6 @@ public class PermisosServiceImpl implements PermisosService {
         // Afegim els òrgans fills
         return getOrgansAfegintFills(entitat, new HashSet<>(organs), permis);
     }
-
-//    private List<CodiValorDto> getOrgansAmbPermisNoNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
-//        Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-//
-//
-////        // 2. Obté òrgans amb permis per comunicacions sense procediments --> Només per els permisos de COMUNICACIO i COMUNICACIO_SIR
-////        List<OrganGestorEntity> organsAmbPermisComunicacionsSenseProcediment = new ArrayList<>();
-////        if (PermisEnum.COMUNICACIO.equals(permis) || PermisEnum.COMUNICACIO_SIR.equals(permis)) {
-////            organsAmbPermisComunicacionsSenseProcediment = getOrgansAmbPermisComunicacionsSenseProcediment(entitat, grups);
-////        }
-//
-//        // 1. Obtenim els òrgans gestors amb permisos
-//        List<OrganGestorEntity> organsAmbPermis = getOrgansAmbPermis(
-//                entitat,
-//                permisos,
-//                grups);
-//
-//        // 4. Obté procediments d'òrgans amb permís per procediment/organ
-//        List<ProcSerEntity> procSerAmbPermisProcedimentOrgan = getProcSerComunsAmbPermisPerOrgan(entitat, grups, true, null);
-//
-//        // 5. Obté procediments d'òrgans amb permis per procediment directe
-//        List<ProcSerEntity> procSerAmbPermisDirecte = getProcSerAmbPermisDirecte(entitat, permisos, grups, true, null);
-//
-//        // Agrupam els òrgans
-//        Set<OrganGestorEntity> organs = new HashSet<>(organsAmbPermisComu);
-//        organs.addAll(organsAmbPermisComunicacionsSenseProcediment);
-//
-//        // Agrupam els procediments
-//        Set<ProcSerEntity> procSers = new HashSet<>(procSerAmbPermisOrgan);
-//        procSers.addAll(procSerAmbPermisProcedimentOrgan);
-//        procSers.addAll(procSerAmbPermisDirecte);
-//
-//        // Afegim els òrgans dels procediments al conjunt d'òrgans
-//        for(ProcSerEntity procSer: procSers) {
-//            organs.add(procSer.getOrganGestor());
-//        }
-//
-//        // Afegim els òrgans fills
-//        return getOrgansAfegintFills(entitat, organs, permis);
-//    }
 
     private List<CodiValorDto> getOrgansAmbPermisPerNotificar(EntitatEntity entitat, List<String> grups, PermisEnum permis) {
         Permission[] permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };

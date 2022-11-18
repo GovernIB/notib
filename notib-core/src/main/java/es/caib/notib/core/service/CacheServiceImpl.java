@@ -42,7 +42,7 @@ public class CacheServiceImpl implements CacheService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Recuperant el llistat de les caches disponibles");
-			List<CacheDto> caches = new ArrayList<CacheDto>();	
+			List<CacheDto> caches = new ArrayList<>();
 			Collection<String> cachesValues = cacheHelper.getAllCaches();
 			for (String cacheValue : cachesValues) {
 //				if (!cacheValue.equals("aclCache")) {
@@ -70,6 +70,17 @@ public class CacheServiceImpl implements CacheService {
 		}
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
+    @Override
+    public void removeAllCaches() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Esborrant totes les caches");
+			cacheHelper.clearAllCaches();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
 }

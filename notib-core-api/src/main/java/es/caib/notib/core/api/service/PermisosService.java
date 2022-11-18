@@ -59,6 +59,9 @@ public interface PermisosService {
     List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto);
 
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    List<String> getProcedimentsOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+
+    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
     List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
