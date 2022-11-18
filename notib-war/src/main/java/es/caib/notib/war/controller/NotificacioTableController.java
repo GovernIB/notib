@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.EnviamentEstatGrup;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.missatges.Missatge;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
@@ -542,20 +543,22 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return DatatablesHelper.getDatatableResponse(request, notificacioService.historicFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
     }
 
+    @ResponseBody
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatNotifica", method = RequestMethod.GET)
-    public String refrescarEstatNotifica(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
+    public Missatge refrescarEstatNotifica(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
         boolean totbe = !enviamentEstat.isNotificaError();
         String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-        if (totbe) {
-            MissatgesHelper.success(request, getMessage(request, msg));
-        } else {
-            MissatgesHelper.error(request, getMessage(request, msg));
-        }
-        emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
-        return "enviamentInfo";
+//        if (totbe) {
+//            MissatgesHelper.success(request, getMessage(request, msg));
+//        } else {
+//            MissatgesHelper.error(request, getMessage(request, msg));
+//        }
+//        emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
+//        return "enviamentInfo";
+        return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
     }
 
     @RequestMapping(value = "/{notificacioId}/documentDescarregar/{documentId}", method = RequestMethod.GET)

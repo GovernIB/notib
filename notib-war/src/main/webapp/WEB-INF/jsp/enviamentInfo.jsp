@@ -72,10 +72,27 @@ $(document).ready(function() {
 			error: err => console.error(err)
 		});
 	});
+
+	$("#refrescarEstat").click(e => {
+		$("#refrescarEstat").prop("disabled", true);
+		e.preventDefault();
+		$.ajax({
+			url: "/notib/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica",
+			success: data => {
+				$("#refrescarEstat").prop("disabled", false);
+				let classe = data.ok ? "alert-success" : "alert-danger";
+				let div = '<div class="alert ' + classe +'"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true">' +
+						'<span class="fa fa-times"></span></button>' + data.msg + '</div>';
+				$("#contingut-missatges").append(div);
+			},
+			error: err => console.error(err)
+		});
+	});
 });
 </script>
 </head>
 <body>
+<div id="contingut-missatges"></div>
 	<c:if test="${enviament.notificacio.notificaError}">
 		<div class="alert alert-danger well-sm">
 			<span class="fa fa-warning text-danger"></span>
@@ -398,10 +415,11 @@ $(document).ready(function() {
 					</c:when>
 					<c:otherwise>
 						<p class="text-right" style="margin-top: 1em">
-							<a href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">
+<%--							<a id="refrescarEstat" href="<not:modalUrl value="/notificacio/${notificacioId}/enviament/${enviamentId}/refrescarEstatNotifica"/>" class="btn btn-default">--%>
+							<button id="refrescarEstat" class="btn btn-default">
 								<span class="fa fa-refresh"></span>
 								<spring:message code="enviament.info.accio.refrescar.estat"/>
-							</a>
+							</button>
 						</p>
 					</c:otherwise>
 				</c:choose>
