@@ -294,6 +294,7 @@ public class NotificacioFormController extends BaseUserController {
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         ProcSerDto procedimentActual = null;
+        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
 
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
@@ -309,6 +310,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         model.addAttribute(new NotificacioFiltreCommand());
         model.addAttribute(new OrganGestorFiltreCommand());
+
         try {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
             updateDocuments(notificacioCommand, bindingResult);
@@ -326,7 +328,8 @@ public class NotificacioFormController extends BaseUserController {
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+            relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
+//            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
             model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
@@ -516,6 +519,7 @@ public class NotificacioFormController extends BaseUserController {
         }
         dadesProcediment.setComu(procedimentActual.isComu());
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
+        dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
         	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
@@ -553,11 +557,12 @@ public class NotificacioFormController extends BaseUserController {
 
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
-        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
+//        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
     	if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
-    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
+//    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
+    	return prepararResposta(validacioIdCsv, doc, request);
     }
 
     @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST, headers="Content-Type=application/json" )
@@ -635,6 +640,7 @@ public class NotificacioFormController extends BaseUserController {
         String referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
         model.addAttribute("referer", referer);
         model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
+        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
     }
 
 
@@ -776,7 +782,6 @@ public class NotificacioFormController extends BaseUserController {
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
-
         if (organsGestors != null) {
             for (OrganGestorDto o : organsGestors) {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
@@ -849,6 +854,7 @@ public class NotificacioFormController extends BaseUserController {
         private List<CieFormatSobreDto> formatsSobre = new ArrayList<CieFormatSobreDto>();
         private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
         private boolean comu;
+        private boolean entregaCieVigent;
         private boolean entregaCieActiva;
 
         private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");

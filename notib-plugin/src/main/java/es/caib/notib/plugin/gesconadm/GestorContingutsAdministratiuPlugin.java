@@ -45,6 +45,9 @@ public interface GestorContingutsAdministratiuPlugin {
 	public List<GcaProcediment> getProcedimentsByUnitat(
 			String codi,
 			int numPagina) throws SistemaExternException;
+
+	public List<GcaProcediment> getProcedimentsByUnitat(
+			String codi) throws SistemaExternException;
 	
 	/**
 	 * Retorna una unitat administrativa donat el seu codi.
@@ -90,6 +93,9 @@ public interface GestorContingutsAdministratiuPlugin {
 	public List<GcaServei> getServeisByUnitat(
 			String codi,
 			int numPagina) throws SistemaExternException;
+
+	public List<GcaServei> getServeisByUnitat(
+			String codi) throws SistemaExternException;
 
 	/**
 	 * Retorna el total de serveis per una entitat.

@@ -578,6 +578,15 @@ public class EntitatServiceImpl implements EntitatService {
 		ConfigHelper.setEntitat(entitatDto);
 	}
 
+	@Override
+	@Transactional
+	public void resetActualitzacioOrgans(Long id) {
+
+		EntitatEntity entitat = entitatRepository.findById(id);
+		entitat.setDataActualitzacio(null);
+		entitat.setDataSincronitzacio(null);
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 
 }

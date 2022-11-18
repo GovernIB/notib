@@ -26,6 +26,7 @@ import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
+import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.exception.SistemaExternException;
@@ -159,7 +160,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	private PermisosCacheable permisosCacheable;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
-	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
+	public static Map<String, ProgresActualitzacioProcSer> progresActualitzacio = new HashMap<>();
 	public static Map<Long, Integer> procedimentsAmbOrganNoSincronitzat = new HashMap<>();
 	
 	@Audita(entityType = TipusEntitat.PROCEDIMENT, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -467,7 +468,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 				return false;
 			}
-			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+			ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
 			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat, entitat.getDir3Codi(), null, null);
@@ -708,8 +709,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			PaginaDto<ProcSerFormDto> procedimentsPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor"});
+			// Evitar problema quan s'ordena per actiu
+			if (paginacioParams.getOrdres().size() == 1 && "actiu".equals(paginacioParams.getOrdres().get(0).getCamp())) {
+				paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
-			
+
 			List<String> organsFills = new ArrayList<String>();
 			if (organGestorActual != null) { // Administrador d'òrgan
 				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
@@ -731,7 +736,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 							pageable);
 				}
 			} else {
-			
+
 				if (isUsuariEntitat) {
 					procediments = procedimentFormRepository.findAmbEntitatAndFiltre(
 							entitatActual.getId(),

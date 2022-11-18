@@ -77,39 +77,29 @@ public class NotificacioMassivaServiceTest {
 
 	String entitatCodiDir3 = "A000000";
 
+	private static String csvNom = "csv_test.csv";
+	private static String zipNom = "zip_test.zip";
+	private static String email = "test@limit.com";
+	private static String codiUsuari = "CODI_USER";
+
 	@Before
 	public void setUp() {
+
 		entitatMock = Mockito.mock(EntitatEntity.class);
 		procSerMock = Mockito.mock(ProcSerEntity.class);
-
 		Mockito.when(entitatMock.getDir3Codi()).thenReturn(entitatCodiDir3);
-
-		Mockito.when(metricsHelper.iniciMetrica())
-				.thenReturn(null);
-		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId)))
-				.thenReturn(entitatMock);
-		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId),
-				Mockito.anyBoolean(),
-				Mockito.anyBoolean(),
-				Mockito.anyBoolean()))
-				.thenReturn(entitatMock);
-		Mockito.when(registreNotificaHelper.isSendDocumentsActive())
-				.thenReturn(false);
-		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class)))
-				.thenReturn("rnd_gesid");
-		Mockito.when(notificacioHelper.saveNotificacio(
-						Mockito.any(EntitatEntity.class),
-						Mockito.any(NotificacioDatabaseDto.class),
-						Mockito.anyBoolean(),
-						Mockito.any(NotificacioMassivaEntity.class),
-						Mockito.<Map<String, Long>>any()
-					))
+		Mockito.when(metricsHelper.iniciMetrica()).thenReturn(null);
+		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId))).thenReturn(entitatMock);
+		Mockito.when(entityComprovarHelper.comprovarEntitat(Mockito.eq(entitatId), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(entitatMock);
+		Mockito.when(registreNotificaHelper.isSendDocumentsActive()).thenReturn(false);
+		Mockito.when(pluginHelper.gestioDocumentalCreate(Mockito.anyString(), Mockito.any(byte[].class))).thenReturn("rnd_gesid");
+		Mockito.when(notificacioHelper.saveNotificacio(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioDatabaseDto.class), Mockito.anyBoolean(), Mockito.any(NotificacioMassivaEntity.class), Mockito.<Map<String, Long>>any()))
 				.thenReturn(NotificacioEntity.builder().build());
 		Mockito.when(procSerRepository.findByCodiAndEntitat(Mockito.anyString(), Mockito.<EntitatEntity>any())).thenReturn(procSerMock);
-
 		setUpNotificacioMassiva();
 //		setUpAuthentication();
 	}
+
 
 //	private void setUpAuthentication() {
 //		Authentication authentication = Mockito.mock(Authentication.class);
@@ -136,6 +126,27 @@ public class NotificacioMassivaServiceTest {
 				Mockito.eq(notMassivaId)))
 				.thenReturn(notificacioMassivaMock);
 	}
+
+	@Test
+	public void whenCreate_interessat_sense_nif_ok() throws Exception {
+
+		// Given
+		Mockito.when(notificacioValidatorHelper.validarNotificacioMassiu(Mockito.any(NotificacioDatabaseDto.class), Mockito.any(EntitatEntity.class), Mockito.<Map<String, Long>>any()))
+				.thenReturn(new ArrayList<String>());
+
+		NotificacioMassivaTests.TestMassiusFiles test = NotificacioMassivaTests.getTestInteressatSenseNif();
+		NotificacioMassivaDto not = NotificacioMassivaDto.builder().build();
+		NotificacioMassivaDto notificacioMassiu = NotificacioMassivaDto.builder().ficheroCsvNom(csvNom).ficheroZipNom(zipNom).ficheroCsvBytes(test.getCsvContent())
+				.ficheroZipBytes(test.getZipContent()).caducitat(new Date()).email(email).build();
+
+		// When
+		notificacioMassivaService.create(entitatId, codiUsuari, notificacioMassiu);
+
+		// Then
+		Mockito.verify(notificacioHelper, Mockito.times(1)).
+				altaEnviamentsWeb(Mockito.any(EntitatEntity.class), Mockito.any(NotificacioEntity.class), Mockito.<List<NotEnviamentDatabaseDto>>any());
+	}
+
 	@Test
 	public void whenCreate_GivenNoErrors_ThenCallAltaNotificacioWeb() throws Exception {
 		// Given

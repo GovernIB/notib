@@ -20,6 +20,8 @@ import java.util.List;
  */
 public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 
+	EntitatEntity findById(Long id);
+
 	EntitatEntity findByCodi(String codi);
 
 	EntitatEntity findByDir3Codi(String dir3Codi);

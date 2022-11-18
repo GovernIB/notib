@@ -664,7 +664,7 @@ function loadOrgansGestors(urlCercaUnitats){
                 } else {
                     $.each(data, (i, item) => {
                         let enviamentTipus = $('input#enviamentTipus').val();
-                        let local = $('#organigrama').val().indexOf(item.codi) != -1;
+                        let local = ($('#organigrama').val().indexOf(item.codi) != -1) && !isPermesComunicacionsSirPropiaEntitat;
                         let clase = (i % 2 == 0 ? 'even' : 'odd');
                         let socSir = (item.sir ? textMessages['comu.si'] : textMessages['comu.no']);
                         let comSir = enviamentTipus === 'COMUNICACIO_SIR' && !local && item.sir;

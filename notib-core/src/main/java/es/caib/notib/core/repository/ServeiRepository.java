@@ -218,6 +218,10 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 
     Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 
+	Integer countByEntitatId(Long entitatId);
+	Integer countByEntitatIdAndActiuTrue(Long entitatId);
+	Integer countByEntitatIdAndActiuFalse(Long entitatId);
+
 	@Query(	"select distinct pro.codi " +
 			"  from ServeiEntity pro " +
 			" where pro.entitat.codi = :entitatCodi and pro.actiu = true")
@@ -226,4 +230,5 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 	@Modifying
 	@Query("update ServeiEntity pro set pro.actiu = :actiu where pro.codi = :codi")
 	public void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
+
 }

@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
+import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
@@ -124,7 +125,7 @@ public class ServeiServiceImpl implements ServeiService{
 	private ProcedimentService procedimentService;
 
 	public static final String SERVEI_ORGAN_NO_SYNC = "Hi ha serveis que pertanyen a òrgans no existents en l'organigrama actual";
-	public static Map<String, ProgresActualitzacioDto> progresActualitzacioServeis = new HashMap<>();
+	public static Map<String, ProgresActualitzacioProcSer> progresActualitzacioServeis = new HashMap<>();
 	public static Map<Long, Integer> serveisAmbOrganNoSincronitzat = new HashMap<>();
 	
 	@Audita(entityType = TipusEntitat.SERVEI, operationType = TipusOperacio.CREATE, returnType = TipusObjecte.DTO)
@@ -422,7 +423,7 @@ public class ServeiServiceImpl implements ServeiService{
 				}
 				return false;
 			}
-			ProgresActualitzacioDto progres = new ProgresActualitzacioDto();
+			ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosServeisOrgans = new HashMap<>();
 //			Map<String, OrganismeDto> organigrama = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
@@ -663,6 +664,10 @@ public class ServeiServiceImpl implements ServeiService{
 			PaginaDto<ProcSerFormDto> serveisPage = null;
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
 			mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organGestor"});
+			// Evitar problema quan s'ordena per actiu
+			if (paginacioParams.getOrdres().size() == 1 && "actiu".equals(paginacioParams.getOrdres().get(0).getCamp())) {
+				paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+			}
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			
 			List<String> organsFills = new ArrayList<>();

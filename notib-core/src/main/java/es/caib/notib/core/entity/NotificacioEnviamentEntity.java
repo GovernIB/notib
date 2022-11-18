@@ -42,6 +42,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @AllArgsConstructor
 @Getter
 @Entity
+@Setter
 @Table(name="not_notificacio_env")
 @EntityListeners(AuditingEntityListener.class)
 public class NotificacioEnviamentEntity extends NotibAuditable<Long> {

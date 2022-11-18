@@ -30,7 +30,15 @@ public class NotificacioMassivaTests {
                 .zipContent(getFileContent("/es/caib/notib/core/massiu/test1.zip"))
                 .build();
     }
+
+    public static TestMassiusFiles getTestInteressatSenseNif() {
+
+        return TestMassiusFiles.builder().csvContent(getFileContent("/es/caib/notib/core/massiu/test_interessat_sense_nif.csv"))
+                .zipContent(getFileContent("/es/caib/notib/core/massiu/test_interessat_sense_nif.zip")).build();
+    }
+
     private static byte[] getFileContent(String filename) {
+
         InputStream is =  NotificacioMassivaTests.class.getResourceAsStream(filename);
         byte[] targetArray = new byte[0];
         try {

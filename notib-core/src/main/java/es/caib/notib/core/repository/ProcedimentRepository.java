@@ -218,6 +218,10 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 
 	Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 
+	Integer countByEntitatId(Long entitatId);
+	Integer countByEntitatIdAndActiuTrue(Long entitatId);
+	Integer countByEntitatIdAndActiuFalse(Long entitatId);
+
 	@Query(	"select distinct pro.codi " +
 			"  from ProcedimentEntity pro " +
 			" where pro.entitat.codi = :entitatCodi and pro.actiu = true")

@@ -2,6 +2,7 @@ package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
+import es.caib.notib.client.domini.DocumentTipusEnumDto;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
@@ -789,11 +790,6 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             enviament.setNotificaReferencia(referencia); //si no se envía, Notific@ genera una
             enviament.setEntregaDehActiva(false); // De momento dejamos false
 
-            // Entrega postal
-            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
-            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
-            setEntregaPostal(linia, entitat, enviament);
-
             // Servei tipus
             columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.prioritat.servei.missatge");
@@ -818,6 +814,11 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.cifnif.missatge");
             titular.setNif(linia[9]);
 
+            // Email
+            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.columna");
+            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.missatge");
+            titular.setEmail(linia[10]);
+
             // Interessat tipus
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.interessat.tipus.missatge");
             // TODO:  Igual lo hemos planteado mal. Si es un nif, podria ser el Nif de la administración.
@@ -825,12 +826,21 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             //Si es persona física o jurídica no tiene sentido
             //Entonces podriamos utilizar este campo para saber si es una administración
             setInteressatTipus(notificacio, titular);
+            boolean senseNif = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus());
+            enviament.setPerEmail(senseNif);
 
-            // Email
-            columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.columna");
-            missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.email.missatge");
-            titular.setEmail(linia[10]);
+            if (senseNif) {
+                DocumentTipusEnumDto tipus = Strings.isNullOrEmpty(linia[12]) ? DocumentTipusEnumDto.ALTRE :
+                        DocumentTipusEnumDto.PASSAPORT.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.PASSAPORT :
+                                DocumentTipusEnumDto.ESTRANGER.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.ESTRANGER : DocumentTipusEnumDto.ALTRE;
+                titular.setDocumentTipus(tipus);
+            } else {
 
+                // Entrega postal
+                columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.columna");
+                missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.entrega.postal.missatge");
+                setEntregaPostal(linia, entitat, enviament);
+            }
             // Codi Dir3
             columna = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.columna");
             missatge = messageHelper.getMessage("error.csv.to.notificacio.enviaments.dir3.missatge");
@@ -1074,27 +1084,29 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     }
 
     private void setInteressatTipus(NotificacioDatabaseDto notificacio, PersonaDto titular) {
-        if (titular.getNif() != null && !titular.getNif().isEmpty()) {
-            if (NifHelper.isValidCif(titular.getNif())) {
-                titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
-            } else if (NifHelper.isValidNifNie(titular.getNif())) {
-                titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
-            } else {
-//                try {
-                    List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
-                    if (lista != null && lista.size() > 0) {
-                        titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-                    } else {
-                        notificacio.getErrors().add(
-                                messageHelper.getMessage("error.nifcif.no.valid.a")
-                                + titular.getNif() +
-                                messageHelper.getMessage("error.nifcif.no.valid.b"));
-                    }
-//                } catch (Exception e) {
-//                    notificacio.getErrors().add("");
-//                }
-            }
+
+        if (Strings.isNullOrEmpty(titular.getNif()) && !Strings.isNullOrEmpty(titular.getEmail())) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA_SENSE_NIF);
+            return;
         }
+        if (Strings.isNullOrEmpty(titular.getNif()) && Strings.isNullOrEmpty(titular.getEmail())) {
+            notificacio.getErrors().add(messageHelper.getMessage("error.persona.sense.nif.no.email"));
+            return;
+        }
+        if (NifHelper.isValidCif(titular.getNif())) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+            return;
+        }
+        if (NifHelper.isValidNifNie(titular.getNif())) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+            return;
+        }
+        List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
+        if (lista != null && lista.size() > 0) {
+            titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+            return;
+        }
+        notificacio.getErrors().add(messageHelper.getMessage("error.nifcif.no.valid.a") + titular.getNif() + messageHelper.getMessage("error.nifcif.no.valid.b"));
     }
 
     public boolean isNumeric(String strNum) {
