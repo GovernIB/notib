@@ -293,8 +293,10 @@ public class NotificacioFormController extends BaseUserController {
 
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
         List<String> tipusDocumentEnumDto = new ArrayList<>();
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+        var entitatActual = EntitatHelper.getEntitatActual(request);
         ProcSerDto procedimentActual = null;
+        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
+
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
         }
@@ -327,7 +329,8 @@ public class NotificacioFormController extends BaseUserController {
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+            relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
+//            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
             model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
