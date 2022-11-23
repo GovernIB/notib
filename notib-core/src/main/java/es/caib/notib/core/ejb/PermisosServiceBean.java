@@ -83,4 +83,9 @@ public class PermisosServiceBean implements PermisosService {
 		return delegate.getServeisAmbPermis(entitatId, usuariCodi, permis);
 	}
 
+	@Override
+	public boolean hasNotificacioPermisProcessar(Long notId, Long entitat, String usuari, PermisEnum permis) {
+		return delegate.hasNotificacioPermisProcessar(notId, entitat, usuari, permis);
+	}
+
 }

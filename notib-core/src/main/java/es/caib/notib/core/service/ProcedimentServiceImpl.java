@@ -1216,19 +1216,29 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	}
 
 	private List<CodiValorOrganGestorComuDto> recuperarProcedimentAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<CodiValorOrganGestorComuDto> procediments = permisosService.getProcedimentsAmbPermis(entitat.getId(), auth.getName(), permis);
-		if (organFiltre != null) {
-			List<CodiValorOrganGestorComuDto> procedimentsAmbPermis = new ArrayList<>();
-			List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-			for (CodiValorOrganGestorComuDto procediment: procediments) {
-				if (organsFills.contains(procediment.getOrganGestor())) {
-					procedimentsAmbPermis.add(procediment);
-				}
-			}
-			return procedimentsAmbPermis;
+		if (organFiltre == null) {
+			return procediments;
 		}
-		return procediments;
+		List<CodiValorOrganGestorComuDto> procedimentsAmbPermis = new ArrayList<>();
+		List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+		List<ProcedimentEntity> procs = new ArrayList<>();
+		for (String organ : organsFills) {
+			OrganGestorEntity o = organGestorRepository.findByCodi(organ);
+			procs = procedimentRepository.findByOrganGestor(o);
+			for (ProcedimentEntity p : procs) {
+				String valor = p.getCodi() + ((p.getNom() != null && !p.getNom().isEmpty()) ? " - " + p.getNom() : "");
+				procedimentsAmbPermis.add(CodiValorOrganGestorComuDto.builder().codi(p.getId().toString()).comu(p.isComu()).valor(valor).organGestor(organ).build());
+			}
+		}
+		for (CodiValorOrganGestorComuDto procediment: procediments) {
+			if (organsFills.contains(procediment.getOrganGestor()) || procediment.isComu()) {
+				procedimentsAmbPermis.add(procediment);
+			}
+		}
+		return procedimentsAmbPermis;
 	}
 
 	@Override

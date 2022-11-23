@@ -5,10 +5,14 @@ import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
@@ -18,6 +22,7 @@ import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
 import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
@@ -64,6 +69,8 @@ public class PermisosServiceImpl implements PermisosService {
     private ProcSerOrganRepository procSerOrganRepository;
     @Autowired
     private OrganGestorRepository organGestorRepository;
+    @Autowired
+    private NotificacioRepository notificacioRepository;
 
 
     // MENUS /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,6 +235,29 @@ public class PermisosServiceImpl implements PermisosService {
             log.error("Error obtenint permisos de " + permis.name() + " de serveis per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
             throw ex;
         }
+    }
+
+    // UTILITATS
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public boolean hasNotificacioPermisProcessar(Long notId, Long entitat, String usuari, PermisEnum permis) {
+
+        NotificacioEntity not = notificacioRepository.findById(notId);
+        List<String> codis = new ArrayList<>();
+        List<CodiValorOrganGestorComuDto> procSersAmbPermis = getProcSersAmbPermis(entitat, usuari, PermisEnum.PROCESSAR);
+        List<CodiValorDto> organs =  getOrgansAmbPermis(entitat, usuari, PermisEnum.PROCESSAR);
+        if (procSersAmbPermis != null && !procSersAmbPermis.isEmpty()) {
+            for (CodiValorOrganGestorComuDto procedimentOrgan : procSersAmbPermis) {
+                codis.add(procedimentOrgan.getCodi());
+            }
+        }
+        if (organs != null && !organs.isEmpty()) {
+            for (CodiValorDto organ : organs) {
+                codis.add(organ.getCodi());
+            }
+        }
+        return not.getProcediment().getCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat())
+                && (codis.contains(not.getProcediment().getCodi()) || codis.contains(not.getOrganGestor().getCodi()));
     }
 
 
@@ -463,7 +493,9 @@ public class PermisosServiceImpl implements PermisosService {
 
         // Afegim els òrgans dels procediments al conjunt d'òrgans
         for(ProcSerEntity procSer: procSers) {
-            organs.add(procSer.getOrganGestor());
+            if (!entitat.getDir3Codi().equals(procSer.getOrganGestor().getCodi())) {
+                organs.add(procSer.getOrganGestor());
+            }
         }
 
         // Afegim els òrgans fills

@@ -1,5 +1,6 @@
 package es.caib.notib.core.helper;
 
+import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -80,11 +81,17 @@ public class NotificacioListHelper {
             return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
         }
 
-        List<String> codisProcedimentsProcessables = new ArrayList<>();
+        List<String> codis = new ArrayList<>();
         List<CodiValorOrganGestorComuDto> procSersAmbPermis = permisosService.getProcSersAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        List<CodiValorDto> organs =  permisosService.getOrgansAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
         if (procSersAmbPermis != null) {
             for (CodiValorOrganGestorComuDto procedimentOrgan : procSersAmbPermis) {
-                codisProcedimentsProcessables.add(procedimentOrgan.getCodi());
+                codis.add(procedimentOrgan.getCodi());
+            }
+        }
+        if (organs != null && !organs.isEmpty()) {
+            for (CodiValorDto organ : organs) {
+                codis.add(organ.getCodi());
             }
         }
 
@@ -110,8 +117,8 @@ public class NotificacioListHelper {
         
         for (NotificacioTableEntity notificacio : notificacions) {
             boolean permisProcessar = false;
-            if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
-                permisProcessar = codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi());
+             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
+                    permisProcessar = codis.contains(notificacio.getProcedimentCodi()) || codis.contains(notificacio.getOrganCodi());
             }
 
 //            // Si no te permís de processar per procediment, mirar si té permís de processar per òrgan gestor
