@@ -84,8 +84,9 @@ public class PermisosServiceBean implements PermisosService {
 	}
 
 	@Override
-	public boolean hasNotificacioPermisProcessar(Long notId, Long entitat, String usuari, PermisEnum permis) {
-		return delegate.hasNotificacioPermisProcessar(notId, entitat, usuari, permis);
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis) {
+		return delegate.hasNotificacioPermis(notId, entitat, usuari, permis);
 	}
 
 }

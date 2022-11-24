@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
@@ -228,8 +229,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres) {
-		return delegate.generarArbreOrgans(entitat, filtres);
+	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres, boolean isAdminOrgan, OrganGestorDto organActual) {
+		return delegate.generarArbreOrgans(entitat, filtres, isAdminOrgan, organActual);
 	}
 
 	@Override
@@ -248,6 +249,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto getOrganNou(String codiSia) {
 		return delegate.getOrganNou(codiSia);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis) {
+		return delegate.hasPermisOrgan(entitatId, organCodi, permis);
 	}
 
 //	@Override

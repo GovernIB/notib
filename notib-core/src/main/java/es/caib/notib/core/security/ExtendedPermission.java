@@ -16,7 +16,7 @@ public class ExtendedPermission extends BasePermission {
 	private static final long serialVersionUID = 1L;
 
 	public static final Permission USUARI = new ExtendedPermission(1 << 5, 'U'); // 32
-	public static final Permission ADMINISTRADOR = new ExtendedPermission(1 << 6, 'M'); // 64
+	public static final Permission ADMINISTRADOR = new ExtendedPermission(1 << 6, 'M'); // 64 (admin entiat/organ)
 	public static final Permission ADMINISTRADORENTITAT = new ExtendedPermission(1 << 7, 'E'); // 128
 	public static final Permission APLICACIO = new ExtendedPermission(1 << 8, 'L'); // 256
 

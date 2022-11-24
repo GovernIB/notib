@@ -1153,7 +1153,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
-			if (!isAdministrador && !permisosService.hasNotificacioPermisProcessar(notificacioId, notificacioEntity.getEntitat().getId(), notificacioEntity.getUsuariCodi(), PermisEnum.PROCESSAR)) {
+			if (!isAdministrador && !permisosService.hasNotificacioPermis(notificacioId, notificacioEntity.getEntitat().getId(), notificacioEntity.getUsuariCodi(), PermisEnum.PROCESSAR)) {
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}
 

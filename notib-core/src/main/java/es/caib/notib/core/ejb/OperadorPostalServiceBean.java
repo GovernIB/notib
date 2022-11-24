@@ -100,6 +100,11 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 	}
 
 	@Override
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi) {
+		return delegate.findNoCaducatsByEntitatAndOrgan(entitatId, organCodi);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);

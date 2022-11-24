@@ -2,6 +2,7 @@ package es.caib.notib.core.repository;
 
 import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,8 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
+
+	List<PagadorPostalEntity> findByEntitatAndOrganismePagadorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
 	

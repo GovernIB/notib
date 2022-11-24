@@ -263,7 +263,7 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		try {
 			logger.debug("Consulta de tots els pagadors postals");
 			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
 			List<PagadorPostalEntity> p = pagadorCieReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {

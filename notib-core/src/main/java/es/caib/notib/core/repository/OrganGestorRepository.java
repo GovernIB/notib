@@ -20,6 +20,7 @@ import java.util.List;
  */
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
 
+	OrganGestorEntity findById(Long id);
 	List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);

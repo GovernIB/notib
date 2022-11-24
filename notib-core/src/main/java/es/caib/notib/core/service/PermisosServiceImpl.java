@@ -239,13 +239,13 @@ public class PermisosServiceImpl implements PermisosService {
 
     // UTILITATS
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public boolean hasNotificacioPermisProcessar(Long notId, Long entitat, String usuari, PermisEnum permis) {
+    @Transactional
+    public boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis) {
 
         NotificacioEntity not = notificacioRepository.findById(notId);
         List<String> codis = new ArrayList<>();
-        List<CodiValorOrganGestorComuDto> procSersAmbPermis = getProcSersAmbPermis(entitat, usuari, PermisEnum.PROCESSAR);
-        List<CodiValorDto> organs =  getOrgansAmbPermis(entitat, usuari, PermisEnum.PROCESSAR);
+        List<CodiValorOrganGestorComuDto> procSersAmbPermis = getProcSersAmbPermis(entitat, usuari, permis);
+        List<CodiValorDto> organs =  getOrgansAmbPermis(entitat, usuari, permis);
         if (procSersAmbPermis != null && !procSersAmbPermis.isEmpty()) {
             for (CodiValorOrganGestorComuDto procedimentOrgan : procSersAmbPermis) {
                 codis.add(procedimentOrgan.getCodi());
@@ -256,7 +256,8 @@ public class PermisosServiceImpl implements PermisosService {
                 codis.add(organ.getCodi());
             }
         }
-        return not.getProcediment().getCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat())
+        return not.getProcediment().getCodi() != null
+                && (PermisEnum.PROCESSAR.equals(permis) ? NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) : true)
                 && (codis.contains(not.getProcediment().getCodi()) || codis.contains(not.getOrganGestor().getCodi()));
     }
 

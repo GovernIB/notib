@@ -71,6 +71,6 @@ public interface PermisosService {
     List<CodiValorOrganGestorComuDto> getServeisAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-    boolean hasNotificacioPermisProcessar(Long notId, Long entitat, String usuari, PermisEnum permis);
+    boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis);
 }
 

@@ -4,7 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
+<%
+    pageContext.setAttribute(
+            "isRolActualAdministradorOrgan",
+            es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
     <title>
         <c:choose>
             <c:when test="${!isModificacio}">
@@ -79,6 +83,10 @@
     </style>
 
     <script type="text/javascript">
+
+        function isAdminOrgan() {
+            return ${isRolActualAdministradorOrgan};
+        }
 
         $(document).on("click", "#expandAll", function() {
             $('#arbreOrgans').jstree().open_all(null, 200);

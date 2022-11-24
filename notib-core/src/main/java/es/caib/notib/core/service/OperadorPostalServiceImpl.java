@@ -16,6 +16,7 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private PagadorPostalRepository pagadorPostalReposity;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private PaginacioHelper paginacioHelper;
 	@Resource
@@ -266,8 +269,25 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		try {
 			logger.debug("Consulta de tots els pagadors postals");
 			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
 			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndOrganismePagadorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -17,8 +17,11 @@ import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.JustificantService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.ServeiService;
+import es.caib.notib.core.helper.EntityComprovarHelper;
 import es.caib.notib.war.command.MarcarProcessatCommand;
 import es.caib.notib.war.command.NotificacioFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -35,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -95,6 +99,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private JustificantService justificantService;
     @Autowired
     private NotificacioListHelper notificacioListHelper;
+    @Autowired
+    private PermisosService permisService;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -910,10 +916,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         model.addAttribute("notificacio", notificacio);
         String text = "es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.";
         model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, text));
-        model.addAttribute("permisGestio", null);
+        boolean permisGestio = false;
         if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
-            model.addAttribute("permisGestio", procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO));
+            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), notificacio.getUsuariCodi(), PermisEnum.GESTIO);
+            permisGestio = permisGestio || procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO);
         }
+        model.addAttribute("permisGestio", permisGestio);
         model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
     }
 

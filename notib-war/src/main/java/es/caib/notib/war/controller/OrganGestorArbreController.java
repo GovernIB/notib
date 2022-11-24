@@ -19,6 +19,7 @@ import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MessageHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
+import es.caib.notib.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -70,7 +71,9 @@ public class OrganGestorArbreController extends BaseUserController {
             OrganGestorFiltreCommand filtres = controller.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum."));
-            Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
+            boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            OrganGestorDto organ = getOrganGestorActual(request);
+            Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             model.addAttribute("isFiltre", "true".equals(filtres.getIsFiltre()));
@@ -160,6 +163,10 @@ public class OrganGestorArbreController extends BaseUserController {
         try {
             model.addAttribute("desactivarAvisos", true);
             EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codiSia);
+            model.addAttribute("operadorPostalList", operadorPostalList);
+            List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+            model.addAttribute("cieList", cieList);
             OrganGestorDto o = organService.findByCodi(entitat.getId(), codiSia);
             //o = o == null ? organService.getOrganNou(codiSia) : o;
             if (o == null) {
@@ -192,10 +199,6 @@ public class OrganGestorArbreController extends BaseUserController {
         model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
         model.addAttribute("setOficina", !entitat.isOficinaEntitat());
         model.addAttribute("isModificacio", organ != null && organ.getId() != null);
-        List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
-        model.addAttribute("operadorPostalList", operadorPostalList);
-        List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
-        model.addAttribute("cieList", cieList);
         if (!entitat.isOficinaEntitat()) {
             List<OficinaDto> oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
             model.addAttribute("oficinesEntitat", oficinesEntitat);
