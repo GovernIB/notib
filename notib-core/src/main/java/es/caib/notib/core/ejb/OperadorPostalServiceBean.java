@@ -37,19 +37,8 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public OperadorPostalDto create(
-			Long entitatId,
-			OperadorPostalDataDto postal) {
-		return delegate.create(
-				entitatId, 
-				postal);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public OperadorPostalDto update(OperadorPostalDataDto postal) throws NotFoundException {
-		return delegate.update(postal);
-	}
+	public OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal) {
+		return delegate.upsert(entitatId, postal);}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
@@ -65,14 +54,8 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
-			Long entitatId, 
-			OperadorPostalFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(
-				entitatId, 
-				filtre, 
-				paginacioParams);
+	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override

@@ -85,7 +85,7 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 		authenticationTest.autenticarUsuari("admin");
 
 		updatePagadorCie.setId(cieCreat.getId());
-		CieDto pagadorCieModificat = pagadorCieService.update(updatePagadorCie);
+		CieDto pagadorCieModificat = pagadorCieService.upsert(entitatCreada.getId(), updatePagadorCie);
 
 		assertNotNull(pagadorCieModificat);
 		assertNotNull(pagadorCieModificat.getId());
@@ -139,14 +139,14 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplCreate() {
 		authenticationTest.autenticarUsuari("apl");
-		pagadorCieService.create(1L, createPagadorCie);
+		pagadorCieService.upsert(1L, createPagadorCie);
 	}
-	
-	@Test(expected = AccessDeniedException.class)
-	public void errorSiAccesAplUpdate() {
-		authenticationTest.autenticarUsuari("apl");
-		pagadorCieService.update(createPagadorCie);
-	}
+//
+//	@Test(expected = AccessDeniedException.class)
+//	public void errorSiAccesAplUpdate() {
+//		authenticationTest.autenticarUsuari("apl");
+//		pagadorCieService.update(createPagadorCie);
+//	}
 
 	@Test(expected = AccessDeniedException.class)
 	public void errorSiAccesAplDelete() {

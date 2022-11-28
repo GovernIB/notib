@@ -54,65 +54,58 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	
 	@Override
 	@Transactional
-	public CieDto create(
-			Long entitatId,
-			CieDataDto cie) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Creant un nou pagador cie ("
-					+ "pagador=" + cie + ")");
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
-			
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-//			OrganGestorEntity organGestor = null;
-//			if (cie.getOrganGestorId() != null) {
-//				organGestor = entityComprovarHelper.comprovarOrganGestor(
-//						entitat,
-//						cie.getOrganGestorId());
-//			}
-			
-			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.save(
-					PagadorCieEntity.builder(
-							cie.getOrganismePagadorCodi(),
-							cie.getNom(),
-							cie.getContracteDataVig(),
-							entitat)
-//							.organGestor(organGestor)
-							.build());
-			
-			return conversioTipusHelper.convertir(
-					pagadorCieEntity, 
-					CieDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+	public CieDto upsert(Long entitatId, CieDataDto cie) {
 
-	@Override
-	@Transactional
-	public CieDto update(CieDataDto cie) throws NotFoundException {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant pagador cie ("
-					+ "pagador=" + cie + ")");
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
-			
-			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
-			pagadorCieEntity.update(
-							cie.getOrganismePagadorCodi(),
-							cie.getContracteDataVig());
-			
-			pagadorCieReposity.save(pagadorCieEntity);
-			
-			return conversioTipusHelper.convertir(
-					pagadorCieEntity, 
-					CieDto.class);
+			logger.debug("Creant un nou pagador cie (pagador=" + cie + ")");
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			OrganGestorEntity organGestor = null;
+			if (cie.getOrganGestorId() != null) {
+				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganGestorId());
+			}
+			PagadorCieEntity p;
+			if (cie.getId() != null) {
+				p = PagadorCieEntity.builder().organGestor(organGestor).nom(cie.getNom()).contracteDataVig(cie.getContracteDataVig()).entitat(entitat).build();
+			} else {
+				logger.debug("Actualitzant pagador cie (pagador=" + cie + ")");
+				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());
+				if (organGestor != null) {
+					p.setOrganGestor(organGestor);
+				}
+				p.setContracteDataVig(cie.getContracteDataVig());
+			}
+			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.save(p);
+			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+//
+//	@Override
+//	@Transactional
+//	public CieDto update(CieDataDto cie) throws NotFoundException {
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//			logger.debug("Actualitzant pagador cie ("
+//					+ "pagador=" + cie + ")");
+//
+//			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
+//
+//			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
+//			pagadorCieEntity.update(
+//							cie.getOrganismePagadorCodi(),
+//							cie.getContracteDataVig());
+//
+//			pagadorCieReposity.save(pagadorCieEntity);
+//
+//			return conversioTipusHelper.convertir(
+//					pagadorCieEntity,
+//					CieDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional

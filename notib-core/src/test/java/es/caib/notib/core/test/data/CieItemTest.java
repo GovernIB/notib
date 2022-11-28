@@ -24,9 +24,7 @@ public class CieItemTest extends DatabaseItemTest<CieDataDto>{
 
     @Override
     public CieDataDto create(Object element, Long entitatId) throws Exception{
-        return cieService.create(
-                entitatId,
-                (CieDataDto) element);
+        return cieService.upsert(entitatId, (CieDataDto) element);
     }
 
     @Override

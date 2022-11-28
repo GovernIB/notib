@@ -293,7 +293,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			if (grupsByOrganGestor != null && !grupsByOrganGestor.isEmpty())
 				return true;
 
-			List<PagadorCieEntity> pagCiesByOrganGestor = pagadorCieReposity.findByOrganGestorId(organId);
+			List<PagadorCieEntity> pagCiesByOrganGestor = pagadorCieReposity.findByOrganGestor(organGestor);
 			if (pagCiesByOrganGestor != null && !pagCiesByOrganGestor.isEmpty())
 				return true;
 

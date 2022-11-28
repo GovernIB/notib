@@ -105,41 +105,18 @@ public class CieController extends BaseUserController{
 	}
 	
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
-	public String save(
-			HttpServletRequest request,
-			@Valid CieCommand cieCommand,
-			BindingResult bindingResult,
-			Model model) {
+	public String save(HttpServletRequest request, @Valid CieCommand cieCommand, BindingResult bindingResult, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 			model.addAttribute("organsGestors", organsGestors);
 			return "cieForm";
 		}
-		// if it is modified
-		if (cieCommand.getId() != null) {
-			pagadorCieService.update(
-					cieCommand.asDto());
-			
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:cie",
-					"cie.controller.modificat.ok");
-		//if it is new	
-		} else {
-			CieDataDto dto = cieCommand.asDto();
-			OrganGestorDto organGestorActual = getOrganGestorActual(request);
-			if (organGestorActual != null)
-				dto.setOrganGestorId(organGestorActual.getId());
-			
-			pagadorCieService.create(
-					entitatActual.getId(),
-					dto);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:cie",
-					"cie.controller.creat.ok");
-		}
+		String msg = cieCommand.getId() != null ? "cie.controller.modificat.ok" : "cie.controller.creat.ok";
+		CieDataDto dto = cieCommand.asDto();
+		pagadorCieService.upsert(entitatActual.getId(), dto);
+		return getModalControllerReturnValueSuccess(request, "redirect:cie", msg);
 	}
 	
 	@RequestMapping(value = "/{pagadorCieId}", method = RequestMethod.GET)

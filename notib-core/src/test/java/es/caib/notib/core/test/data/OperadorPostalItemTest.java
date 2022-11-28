@@ -21,7 +21,7 @@ public class OperadorPostalItemTest extends DatabaseItemTest<OperadorPostalDto>{
 
     @Override
     public OperadorPostalDto create(Object element, Long entitatId) throws Exception{
-        return operadorPostalService.create(
+        return operadorPostalService.upsert(
                 entitatId,
                 (OperadorPostalDto) element);
     }

@@ -37,14 +37,8 @@ public class PagadorCieServiceBean implements PagadorCieService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public CieDto create(Long entitatId, CieDataDto cie) {
-		return delegate.create(entitatId, cie);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public CieDto update(CieDataDto cie) throws NotFoundException {
-		return delegate.update(cie);
+	public CieDto upsert(Long entitatId, CieDataDto cie) {
+		return delegate.upsert(entitatId, cie);
 	}
 
 	@Override

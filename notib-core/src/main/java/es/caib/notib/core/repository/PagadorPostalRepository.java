@@ -22,7 +22,7 @@ import java.util.List;
  */
 public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEntity, Long> {
 
-	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
+//	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
 	List<PagadorPostalEntity> findByEntitat(EntitatEntity entitat);
 
 	@Query("SELECT n.entregaCie.operadorPostal FROM EntitatEntity n where n = :entitat")
@@ -34,24 +34,18 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 //	IdentificadorTextDto obtenirPagadorsEntitat(@Param("entitat") EntitatEntity entitat);
 
 
-	//    SELECT * FROM NOT_PAGADOR_POSTAL nap
-//    JOIN NOT_ENTREGA_CIE nec ON nec.OPERADOR_POSTAL_ID = nap.id
-//--JOIN not_entitat n ON n.ENTREGA_CIE_ID = nec.id and n.id = 21
-//            --JOIN NOT_ORGAN_GESTOR nog ON nog.ENTREGA_CIE_ID = nec.id AND nog.id = 1205
-//    JOIN NOT_PROCEDIMENT np ON np.ENTREGA_CIE_ID = nec.id AND np.id = 236015
-
 	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
 
-	List<PagadorPostalEntity> findByEntitatAndOrganismePagadorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
+	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
 	
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and b.entitat = :entitat")
 	Page<PagadorPostalEntity> findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
@@ -65,7 +59,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and (b.organGestor.codi in (:organsGestors)) " +
 			"and b.entitat = :entitat")
