@@ -89,6 +89,12 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+		return delegate.findNoCaducatsByEntitatAndOrgan(entitat, organCodi, isAdminOrgan);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return delegate.findAllPaginat(paginacioParams);

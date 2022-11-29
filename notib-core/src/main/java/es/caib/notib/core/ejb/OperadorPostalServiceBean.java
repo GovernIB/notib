@@ -83,8 +83,8 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 	}
 
 	@Override
-	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi) {
-		return delegate.findNoCaducatsByEntitatAndOrgan(entitatId, organCodi);
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan) {
+		return delegate.findNoCaducatsByEntitatAndOrgan(entitatId, organCodi, isAdminOrgan);
 	}
 
 	@Override

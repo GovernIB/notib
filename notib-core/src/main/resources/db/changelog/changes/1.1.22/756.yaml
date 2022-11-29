@@ -4,4 +4,6 @@ databaseChangeLog:
       author: limit
       changes:
         - sql: "UPDATE NOT_PAGADOR_POSTAL  SET ORGAN_GESTOR = (SELECT nog.id FROM NOT_ORGAN_GESTOR nog WHERE DIR3_CODI IS NOT NULL AND DIR3_CODI = codi) WHERE ORGAN_GESTOR IS null;
-              ALTER TABLE not_pagador_postal DROP COLUMN dir3_codi;"
+              ALTER TABLE not_pagador_postal DROP COLUMN dir3_codi;
+              UPDATE NOT_PAGADOR_CIE  SET ORGAN_GESTOR = (SELECT nog.id FROM NOT_ORGAN_GESTOR nog WHERE DIR3_CODI IS NOT NULL AND DIR3_CODI = codi) WHERE ORGAN_GESTOR IS null;
+              ALTER TABLE not_pagador_cie DROP COLUMN dir3_codi;"

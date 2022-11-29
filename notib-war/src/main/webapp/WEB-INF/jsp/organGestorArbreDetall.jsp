@@ -199,15 +199,25 @@
                                  optionTextAttribute="nom" required="true" emptyOption="true"
                                  textKey="organgestor.form.camp.oficina" placeholderKey="organgestor.form.camp.oficina" optionMinimumResultsForSearch="0"/>
             </c:if>
-            <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
-            <div id="entrega-cie-form" class="flex-column">
-                <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
-                                 optionTextAttribute="text" required="true" emptyOption="true"
-                                 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-                <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
-                                 optionTextAttribute="text" required="true" emptyOption="true"
-                                 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
-            </div>
+            <c:choose>
+                <c:when test="${not empty operadorPostalList && not empty cieList}">
+                    <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+                </c:when>
+                <c:otherwise>
+                    <not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+<%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
+                </c:otherwise>
+            </c:choose>
+            <c:if test="${not empty operadorPostalList && not empty cieList}">
+                <div id="entrega-cie-form" class="flex-column">
+                    <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
+                                     optionTextAttribute="text" required="true" emptyOption="true"
+                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+                    <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
+                                     optionTextAttribute="text" required="true" emptyOption="true"
+                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+                </div>
+            </c:if>
         </div>
         <div class="flex-space-around">
 <%--

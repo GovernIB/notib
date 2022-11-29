@@ -89,7 +89,7 @@ public interface OperadorPostalService {
 	List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitatId);
 
 	@PreAuthorize("hasRole('tothom')")
-	List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi);
+	List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan);
 
 	/**
 	 * Llistat amb els pagadors postal d'una entitat.

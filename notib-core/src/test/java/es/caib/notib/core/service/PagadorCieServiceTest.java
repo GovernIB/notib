@@ -63,6 +63,7 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 
 	@Test
 	public void create() {
+
 		currentTestDescription = "Create PAGADOR CIE";
 		EntitatDto entitatCreada = database.getEntitat();
 		CieDto pagadorCreateCie = (CieDto) database.get("cie");
@@ -70,9 +71,7 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 		assertNotNull(pagadorCreateCie);
 		assertNotNull(pagadorCreateCie.getId());
 
-		compararPagadorCie(
-				createPagadorCie,
-				pagadorCreateCie);
+		compararPagadorCie(createPagadorCie, pagadorCreateCie);
 		assertEquals(entitatCreada.getId(), pagadorCreateCie.getEntitatId());
 	}
 	

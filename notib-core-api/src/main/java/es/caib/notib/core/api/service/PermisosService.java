@@ -48,6 +48,9 @@ public interface PermisosService {
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
     List<CodiValorDto> getOrgansAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
+    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis);
+
 //    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //    List<CodiValorOrganGestorComuDto> getProcedimentsOrganNotificables(Long entitatId, String usuariCodi, TipusEnviamentEnumDto enviamentTipus);
 //

@@ -54,6 +54,11 @@ public class PermisosServiceBean implements PermisosService {
 	}
 
 	@Override
+	public boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis) {
+		return delegate.hasUsrPermisOrgan(entitatId, usr, organCodi, permis);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<String> getOrgansCodisAmbPermisPerProcedimentComu(Long entitatId, String usuariCodi, PermisEnum permis, ProcSerDto procSetDto) {
 		return delegate.getOrgansCodisAmbPermisPerProcedimentComu(entitatId, usuariCodi, permis, procSetDto);

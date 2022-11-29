@@ -5,6 +5,7 @@ import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -13,6 +14,7 @@ import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.core.api.service.OperadorPostalService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.war.command.OrganGestorCommand;
 import es.caib.notib.war.command.OrganGestorFiltreCommand;
 import es.caib.notib.war.helper.EnumHelper;
@@ -25,6 +27,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -62,6 +65,8 @@ public class OrganGestorArbreController extends BaseUserController {
     private PagadorCieService cieService;
     @Autowired
     private AplicacioService aplicacioService;
+    @Autowired
+    private PermisosService permisosService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -163,13 +168,15 @@ public class OrganGestorArbreController extends BaseUserController {
         try {
             model.addAttribute("desactivarAvisos", true);
             EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-            List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codiSia);
+            boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codiSia, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
-            List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+            List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitatAndOrgan(entitat, codiSia, isAdminOrgan);
             model.addAttribute("cieList", cieList);
             OrganGestorDto o = organService.findByCodi(entitat.getId(), codiSia);
+            String usr = SecurityContextHolder.getContext().getAuthentication().getName();
             //o = o == null ? organService.getOrganNou(codiSia) : o;
-            if (o == null) {
+            if (o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, codiSia, PermisEnum.ADMIN))) {
                 throw new NotFoundException(codiSia, OrganGestorDto.class);
             }
             o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));

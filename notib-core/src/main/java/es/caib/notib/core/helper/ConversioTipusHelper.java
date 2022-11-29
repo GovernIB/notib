@@ -255,11 +255,11 @@ public class ConversioTipusHelper {
 			byDefault().
 			register();
 
-		mapperFactory.classMap(PagadorCieEntity.class, CieDto.class).
-			field("entitat.id", "entitatId").
-			field("organGestor.id", "organGestorId").
-			byDefault().
-			register();
+		mapperFactory.classMap(PagadorCieEntity.class, CieDto.class)
+			.field("entitat.id", "entitatId")
+			.field("organGestor.id", "organGestorId")
+			.field("organGestor.codi", "organismePagadorCodi")
+			.byDefault().register();
 
 		mapperFactory.classMap(PagadorCieEntity.class, CieTableItemDto.class)
 			.customize(

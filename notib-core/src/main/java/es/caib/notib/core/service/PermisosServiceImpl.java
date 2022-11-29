@@ -143,6 +143,18 @@ public class PermisosServiceImpl implements PermisosService {
         }
     }
 
+    @Override
+    public boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis) {
+
+        List<CodiValorDto> organs = getOrgansAmbPermis(entitatId, usr, permis);
+        for (CodiValorDto o : organs) {
+            if (o.getCodi().equals(organCodi)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Obté òrgans amb permís per notificar per un procediment comú
     @Override
     @Cacheable(value = "organsPermisPerProcedimentComu", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name()).concat('-').concat(#procSetDto.getId().toString())")

@@ -89,6 +89,8 @@ public interface PagadorCieService {
 	@PreAuthorize("hasRole('tothom')")
     List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat);
 
+    List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan);
+
     /**
 	 * Llistat amb els pagadors cie d'una entitat.
 	 *
