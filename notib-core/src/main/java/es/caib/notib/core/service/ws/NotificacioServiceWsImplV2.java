@@ -80,6 +80,7 @@ import es.caib.notib.core.repository.PersonaRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.Builder;
@@ -237,6 +238,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] entitat: " + (entitat == null ? "null": (entitat.getCodi() + " - " + entitat.getNom())));
 
 			String usuariCodi = SecurityContextHolder.getContext().getAuthentication().getName();
+
 			logger.debug(">> [ALTA] usuariCodi: " + usuariCodi);
 			
 			AplicacioEntity aplicacio = null;
@@ -1766,7 +1768,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		// Emisor
 		if (emisorDir3Codi == null || emisorDir3Codi.isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.emisordir3codi.no.null"));
-		} 
+		}
 		if (emisorDir3Codi.length() > 9) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.emisordir3codi.longitud.max"));
 		}
@@ -1780,7 +1782,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		}
 		// Aplicacio
 		if (aplicacio == null) {
-			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.no.assignat.entitat")  + emisorDir3Codi);
+			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.no.assignat.entitat") + emisorDir3Codi);
 		}
 		// Procediment
 		if (notificacio.getProcedimentCodi() != null && notificacio.getProcedimentCodi().length() > 9) {
@@ -1799,14 +1801,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					+ messageHelper.getMessage("error.validacio.concepte.format.invalid.b"));
 		}
 		// Descripcio
-		if (notificacio.getDescripcio() != null && notificacio.getDescripcio().length() > 1000){
+		if (notificacio.getDescripcio() != null && notificacio.getDescripcio().length() > 1000) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.descripcio.notificacio.longitud.max"));
 		}
 		if (notificacio.getDescripcio() != null && !validFormat(notificacio.getDescripcio()).isEmpty()) {
 			return setRespostaError(
 					messageHelper.getMessage("error.validacio.descripcio.invalid.a")
-					+ listToString(validFormat(notificacio.getDescripcio())) +
-					messageHelper.getMessage("error.validacio.descripcio.invalid.b"));
+							+ listToString(validFormat(notificacio.getDescripcio())) +
+							messageHelper.getMessage("error.validacio.descripcio.invalid.b"));
 		}
 		if (notificacio.getDescripcio() != null && hasSaltLinia(notificacio.getDescripcio())) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.descripcio.no.salts.liniea"));
@@ -1828,7 +1830,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		if (document.getArxiuNom() != null && document.getArxiuNom().length() > 200) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.arxiu.nom.longitud.max"));
 		}
-		if (	(document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
+		if ((document.getContingutBase64() == null || document.getContingutBase64().isEmpty()) &&
 				(document.getCsv() == null || document.getCsv().isEmpty()) &&
 				(document.getUrl() == null || document.getUrl().isEmpty()) &&
 				(document.getUuid() == null || document.getUuid().isEmpty())) {
@@ -1837,10 +1839,15 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 		// Usuari
 		if (notificacio.getUsuariCodi() == null || notificacio.getUsuariCodi().isEmpty()) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.codi.no.null"));
-		} 
+		}
 		if (notificacio.getUsuariCodi().length() > 64) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.codi.longitud.max"));
 		}
+		DadesUsuari dades = cacheHelper.findUsuariAmbCodi(notificacio.getUsuariCodi());
+		if (dades == null || Strings.isNullOrEmpty(dades.getCodi())) {
+			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.no.trobat"));
+		}
+
 		// Número d'expedient
 		if (notificacio.getNumExpedient() != null && notificacio.getNumExpedient().length() > 80) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.num.expedient.longitud.max"));
