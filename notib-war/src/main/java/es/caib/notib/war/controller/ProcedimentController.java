@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
@@ -73,6 +74,10 @@ public class ProcedimentController extends BaseUserController{
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = PROCEDIMENTS_FILTRE;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		String codi = request.getParameter("codi");
+		if (!Strings.isNullOrEmpty(codi)) {
+			procSerFiltreCommand.setCodi(codi);
+		}
 		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.core.api.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
@@ -84,34 +89,11 @@ public class ProcedimentController extends BaseUserController{
 	@RequestMapping(value = "/filtre/codi/{procCodi}", method = RequestMethod.GET)
 	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String procCodi, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = PROCEDIMENTS_FILTRE;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setCodi(procCodi);
-		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
-		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.core.api.dto.procediment.ProcedimentEstat."));
-		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
-		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		model.addAttribute("isModal", false);
-		return "procedimentListPage";
-	}
-
-	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
-	public String getByOrganGestor(HttpServletRequest request,
-								   @PathVariable String organCodi,
-								   Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		this.currentFiltre = PROCEDIMENTS_FILTRE_MODAL;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
-		procSerFiltreCommand.setOrganGestor(organCodi);
-		model.addAttribute("isModal", true);
-		model.addAttribute("organCodi", organCodi);
-		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
-		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
-		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		return "procedimentListModal";
+		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
+		return "redirect:/procediment";
 	}
 
 	private List<CodiValorEstatDto> findOrgansGestorsAccessibles (EntitatDto entitatActual, OrganGestorDto organGestorActual) {

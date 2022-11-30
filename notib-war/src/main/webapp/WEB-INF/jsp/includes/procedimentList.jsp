@@ -81,7 +81,7 @@ $(document).ready(function() {
 				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 		</c:if>
-		<div class="col-md-1">
+		<div class="col-md-2">
 			<not:inputSelect name="estat" optionItems="${procedimentEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
 							 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
 		</div>
@@ -108,7 +108,6 @@ $(document).ready(function() {
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
 			</div>
-		</div>
 	</div>
 </form:form>
 </c:if>
