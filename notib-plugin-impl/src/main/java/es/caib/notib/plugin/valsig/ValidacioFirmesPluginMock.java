@@ -45,8 +45,8 @@ public class ValidacioFirmesPluginMock implements IValidateSignaturePlugin {
     public ValidateSignatureResponse validateSignature(ValidateSignatureRequest validateSignatureRequest) throws Exception {
         ValidateSignatureResponse validateSignatureResponse = new ValidateSignatureResponse();
         ValidationStatus validationStatus = new ValidationStatus();
-//        validationStatus.setStatus(ValidationStatus.SIGNATURE_VALID); // Validacio VALID
-        validationStatus.setStatus(ValidationStatus.SIGNATURE_INVALID); // Validacio INVALID
+        validationStatus.setStatus(ValidationStatus.SIGNATURE_VALID); // Validacio VALID
+//        validationStatus.setStatus(ValidationStatus.SIGNATURE_INVALID); // Validacio INVALID
         validateSignatureResponse.setValidationStatus(validationStatus);
         return validateSignatureResponse;
     }
