@@ -66,12 +66,14 @@ $(document).ready(function() {
 	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
 			$(td).empty();
-			$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+			let data = rowData["errorDescripcio"];
+			data = data ? data : "";
+			$(td).append('<textarea style="width:100%" rows="10">' + data + '</textarea>');
 	});
 	$tableEvents.on('draw.dt', function(e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
-			var data = this.data();
+			let data = this.data();
 			if (!data.error || data.errorDescripcio == null) {
 				$('td:last-child', this.node()).empty();
 			}
