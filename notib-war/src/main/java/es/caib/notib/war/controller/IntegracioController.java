@@ -5,6 +5,7 @@ package es.caib.notib.war.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
@@ -148,4 +149,16 @@ public class IntegracioController extends BaseUserController {
 		return "integracioDetall";
 	}
 
+	@RequestMapping(value = "/netejar", method = RequestMethod.GET)
+	public String natejar(HttpServletRequest request, Model model) {
+
+		String redirect = "redirect:../integracio";
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		try {
+			monitorIntegracioService.netejarMonitor();
+			return getAjaxControllerReturnValueSuccess(request, redirect, "integracio.netejar.ok");
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(request, redirect, "integracio.netejar.error");
+		}
+	}
 }

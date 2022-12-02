@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import es.caib.notib.core.api.dto.IntegracioFiltreDto;
+import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private MonitorIntegracioRepository monitorRepository;
 	
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
@@ -86,7 +89,19 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
+
+	@Transactional
+	@Override
+	public void netejarMonitor() {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			monitorRepository.deleteAll();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(MonitorIntegracioServiceImpl.class);
 
 }

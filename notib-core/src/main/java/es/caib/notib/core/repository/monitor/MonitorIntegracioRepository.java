@@ -3,6 +3,7 @@ package es.caib.notib.core.repository.monitor;
 import es.caib.notib.core.api.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.core.entity.monitor.MonitorIntegracioEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,6 +29,9 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
     int countByCodiAndEstat(@Param("codi") String codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
 
     void deleteByDataIsBefore(@Param("llindar") Date llindar);
+
+    @Modifying
+    void deleteByCodiAndCodiEntitat(@Param("codi") String codi, @Param("codiEntitat") String codiEntitat);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     MonitorIntegracioEntity save(@Param("integracio") MonitorIntegracioEntity integracio);
