@@ -73,13 +73,13 @@ var llibreChecked = "${entitatCommand.llibreEntitat}" === "false" ? false : true
 let operadorsPostal = [];
 operadorsPostal.push({id:"", text:"", estat:"V"});
 <c:forEach items="${operadorPostalList}" var="operadorsPostal">
-operadorsPostal.push({id:"${operadorsPostal.id}", text:"${operadorsPostal.text}", obsolet:"${operadorsPostal.icona}"});
+operadorsPostal.push({id:"${operadorsPostal.id}", text:"${operadorsPostal.text}", icona:"${operadorsPostal.icona}"});
 </c:forEach>
 
 let operadorsCie = [];
 operadorsCie.push({id:"", text:"", estat:"V"});
 <c:forEach items="${cieList}" var="operadorsCie">
-operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", obsolet:"${operadorsCie.icona}"});
+operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", icona:"${operadorsCie.icona}"});
 </c:forEach>
 
 $(document).ready(function() {

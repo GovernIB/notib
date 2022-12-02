@@ -2,6 +2,7 @@ package es.caib.notib.war.controller;
 
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.cie.Operadors;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -215,17 +217,61 @@ public class ProcedimentController extends BaseUserController{
 					"procediment.controller.creat.ok");
 		}
 	}
-	
+
+	@ResponseBody
+	@RequestMapping(value = "/operadors/{organ}", method = RequestMethod.GET)
+	public Operadors getOperadors(HttpServletRequest request, @PathVariable String organ) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		List<IdentificadorTextDto> postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		List<IdentificadorTextDto> cie = cieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
+	}
+
+	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId) {
+
+		try {
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+
+			if (procedimentService.procedimentEnUs(procedimentId)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../procediment",
+						"procediment.controller.esborrat.enUs");
+			} else {
+				procedimentService.delete(
+						entitat.getId(),
+						procedimentId,
+						RolHelper.isUsuariActualAdministradorEntitat(request));
+
+				return getAjaxControllerReturnValueSuccess(
+						request,
+						"redirect:../../procediment",
+						"procediment.controller.esborrat.ok");
+			}
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../procediment",
+					"procediment.controller.esborrat.ko",
+					e);
+		}
+	}
+
 	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
 	public String formGet(
-			HttpServletRequest request, 
-			@PathVariable Long procedimentId, 
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
 			Model model) {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerCommand procSerCommand;
 		ProcSerDto procediment = emplenarModelProcediment(
-				request, 
+				request,
 				procedimentId,
 				model);
 		if (procediment != null) {
@@ -240,39 +286,6 @@ public class ProcedimentController extends BaseUserController{
 		List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "procedimentAdminForm";
-	}
-	
-	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long procedimentId) {		
-		
-		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			
-			if (procedimentService.procedimentEnUs(procedimentId)) {
-				return getAjaxControllerReturnValueError(
-						request,
-						"redirect:../../procediment",
-						"procediment.controller.esborrat.enUs");
-			} else {
-				procedimentService.delete(
-						entitat.getId(),
-						procedimentId,
-						RolHelper.isUsuariActualAdministradorEntitat(request));
-				
-				return getAjaxControllerReturnValueSuccess(
-						request,
-						"redirect:../../procediment",
-						"procediment.controller.esborrat.ok");
-			}
-		} catch (Exception e) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../procediment",
-					"procediment.controller.esborrat.ko",
-					e);
-		}
 	}
 
 	@RequestMapping(value = "/{procedimentId}/enable", method = RequestMethod.GET)

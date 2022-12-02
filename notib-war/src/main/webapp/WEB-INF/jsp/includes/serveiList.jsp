@@ -97,7 +97,6 @@ $(document).ready(function() {
 				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
-		</div>
 	</div>
 </form:form>
 </c:if>
