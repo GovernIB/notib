@@ -1412,22 +1412,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
 				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
 				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+				// Recuperar csv
+				Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
+				if (metadadesAddicionals != null) {
+					if (metadadesAddicionals.containsKey("csv"))
+						document.setCsv((String) metadadesAddicionals.get("csv"));
+					else if (metadadesAddicionals.containsKey("eni:csv"))
+						document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+				}
 			} else {
 				document.setOrigen(origen);
 				document.setValidesa(validesa);
 				document.setTipoDocumental(tipoDocumental);
 				document.setModoFirma(modoFirma);
 			}
-
-			// Recuperar csv
-			Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
-			if (metadadesAddicionals != null) {
-				if (metadadesAddicionals.containsKey("csv"))
-					document.setCsv((String) metadadesAddicionals.get("csv"));
-				else if (metadadesAddicionals.containsKey("eni:csv"))
-					document.setCsv((String) metadadesAddicionals.get("eni:csv"));
-			}
-
 		} else if (documentV2.getCsv() != null) {
 			String arxiuCsv = documentV2.getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
