@@ -139,6 +139,8 @@ public class EnviamentTableHelper {
         for(PersonaEntity destinatari: destinataris) {
             destinatarisNomLlinatges.append(destinatari.asDto().getNomFormatted()).append("<br>");
         }
+        if (destinatarisNomLlinatges.length() > 0)
+            destinatarisNomLlinatges.delete(destinatarisNomLlinatges.length() - 4, destinatarisNomLlinatges.length());
         return destinatarisNomLlinatges.toString();
     }
 }
