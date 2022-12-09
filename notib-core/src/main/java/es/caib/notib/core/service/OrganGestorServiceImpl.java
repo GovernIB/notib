@@ -345,7 +345,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
 			for (OrganGestorEntity organ: organs) {
-				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
+				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 			return organsGestors;
 		} finally {
@@ -1568,7 +1568,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 				if (organGestor.getNom() != null && !organGestor.getNom().isEmpty()) {
 					nom += " - " + organGestor.getNom();
 				}
-				organsGestors.add(new CodiValorEstatDto(organGestor.getId().toString(), nom, organGestor.getEstat()));
+				organsGestors.add(CodiValorEstatDto.builder()
+						.id(organGestor.getId())
+						.codi(organGestor.getCodi())
+						.valor(nom)
+						.estat(organGestor.getEstat())
+						.build());
 			}
 //		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
 //		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
@@ -1889,7 +1894,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<Long> procedimentsDisponiblesIds = new ArrayList<>();
 		List<CodiValorOrganGestorComuDto> procedimentsDisponibles = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuari, permis);
 		for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles) {
-			procedimentsDisponiblesIds.add(Long.parseLong(pro.getCodi()));
+			procedimentsDisponiblesIds.add(pro.getId());
 		}
 		if (!procedimentsDisponiblesIds.isEmpty())
 			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);

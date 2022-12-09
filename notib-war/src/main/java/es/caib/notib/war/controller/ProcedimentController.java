@@ -1,17 +1,27 @@
 package es.caib.notib.war.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
+import es.caib.notib.core.api.dto.CodiValorEstatDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IdentificadorTextDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
 import es.caib.notib.core.api.dto.cie.Operadors;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OperadorPostalService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcSerCommand;
 import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
@@ -33,7 +43,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.ws.rs.Path;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -98,6 +107,23 @@ public class ProcedimentController extends BaseUserController{
 		return "redirect:/procediment";
 	}
 
+	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
+	public String getByOrganGestor(HttpServletRequest request,
+								   @PathVariable String organCodi,
+								   Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		this.currentFiltre = PROCEDIMENTS_FILTRE_MODAL;
+		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		procSerFiltreCommand.setOrganGestor(organCodi);
+		model.addAttribute("isModal", true);
+		model.addAttribute("organCodi", organCodi);
+		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
+		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
+		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
+		return "procedimentListModal";
+	}
+
 	private List<CodiValorEstatDto> findOrgansGestorsAccessibles (EntitatDto entitatActual, OrganGestorDto organGestorActual) {
 
 		List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
@@ -107,8 +133,7 @@ public class ProcedimentController extends BaseUserController{
 			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(),
 					organGestorActual.getCodi());
 			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(),
-						organ.getEstat()));
+				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 		}
 		return organsGestors;

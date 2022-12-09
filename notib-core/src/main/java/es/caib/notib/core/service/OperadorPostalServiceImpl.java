@@ -251,8 +251,10 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
 			List<PagadorPostalEntity> pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
-			List<PagadorPostalEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
-			pagadors.addAll(pagadorsPare);
+			if (!e.getDir3Codi().equals(organCodi)) {
+				List<PagadorPostalEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				pagadors.addAll(pagadorsPare);
+			}
 			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorPostalEntity> p = new ArrayList<>();
 			for (PagadorPostalEntity pagador : pagadors) {

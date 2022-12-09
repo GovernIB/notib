@@ -70,6 +70,7 @@ public class NotificacioListHelper {
         mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"procedimentNom"});
         mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
         mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
+        mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
     public PaginaDto<NotificacioTableItemDto> complementaNotificacions(

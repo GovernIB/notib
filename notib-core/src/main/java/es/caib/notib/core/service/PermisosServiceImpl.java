@@ -5,14 +5,12 @@ import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
@@ -797,7 +795,8 @@ public class PermisosServiceImpl implements PermisosService {
         List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
         for (ProcSerEntity procSer : procSers) {
             response.add(CodiValorOrganGestorComuDto.builder()
-                    .codi(procSer.getId().toString())
+                    .id(procSer.getId())
+                    .codi(procSer.getCodi())
                     .valor(procSer.getCodi() + ((procSer.getNom() != null && !procSer.getNom().isEmpty()) ? " - " + procSer.getNom() : ""))
                     .organGestor(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getCodi() : "")
                     .comu(procSer.isComu())
