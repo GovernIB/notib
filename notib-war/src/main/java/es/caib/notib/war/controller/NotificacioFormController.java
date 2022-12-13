@@ -115,6 +115,8 @@ public class NotificacioFormController extends BaseUserController {
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
+    private TipusEnviamentEnumDto tipusEnviament;
+
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
         initForm(request, model, TipusEnviamentEnumDto.NOTIFICACIO);
@@ -163,6 +165,7 @@ public class NotificacioFormController extends BaseUserController {
             notificacioCommand.getDocuments()[i].setValidesa(ValidesaEnum.ORIGINAL);
             notificacioCommand.getDocuments()[i].setTipoDocumental(TipusDocumentalEnum.ALTRES);
         }
+        this.tipusEnviament = tipusEnviament;
         notificacioCommand.setEnviamentTipus(tipusEnviament);
         emplenarModelNotificacio(request, model, notificacioCommand);
 
@@ -201,10 +204,9 @@ public class NotificacioFormController extends BaseUserController {
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
-    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
-                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), enviamentTipus);
+                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
     }
 
     @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)

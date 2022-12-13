@@ -1506,6 +1506,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			} else {
 				permisosHelper.updatePermis(id, ProcedimentEntity.class, permis);
 			}
+			permisosService.evictGetOrgansAmbPermis();
+			cacheHelper.evictFindOrgansGestorWithPermis();
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindProcedimentsOrganWithPermis();
 			if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {

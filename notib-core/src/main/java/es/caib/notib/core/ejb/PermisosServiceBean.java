@@ -94,4 +94,10 @@ public class PermisosServiceBean implements PermisosService {
 		return delegate.hasNotificacioPermis(notId, entitat, usuari, permis);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public void evictGetOrgansAmbPermis() {
+
+	}
+
 }

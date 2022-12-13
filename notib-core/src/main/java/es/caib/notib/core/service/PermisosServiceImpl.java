@@ -27,6 +27,7 @@ import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
@@ -140,6 +141,12 @@ public class PermisosServiceImpl implements PermisosService {
             throw ex;
         }
     }
+
+    @Override
+    @CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
+    public void evictGetOrgansAmbPermis() {
+    }
+
 
     @Override
     public boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis) {
@@ -443,13 +450,13 @@ public class PermisosServiceImpl implements PermisosService {
     public class ProcSerPermisOrganCountCommand implements Command<Long, String> {
         @Override
         public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.countProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList);
+            return procSerRepository.countProcedimentsAccesiblesPerOrganGestor(entitat, subList, grups);
         }
     }
     public class ProcSerActiusPermisOrganCountCommand implements Command<Long, String> {
         @Override
         public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.countProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList);
+            return procSerRepository.countProcedimentsActiusAccesiblesPerOrganGestor(entitat, subList, grups);
         }
     }
 
@@ -500,7 +507,7 @@ public class PermisosServiceImpl implements PermisosService {
         // Agrupam els procediments
         Set<ProcSerEntity> procSers = new HashSet<>(procSerAmbPermisOrgan);
         procSers.addAll(procSerAmbPermisProcedimentOrgan);
-        procSers.addAll(procSerAmbPermisDirecte);
+//        procSers.addAll(procSerAmbPermisDirecte);
 
         // Afegim els òrgans dels procediments al conjunt d'òrgans
         for(ProcSerEntity procSer: procSers) {
@@ -510,7 +517,14 @@ public class PermisosServiceImpl implements PermisosService {
         }
 
         // Afegim els òrgans fills
-        return getOrgansAfegintFills(entitat, organs, permis);
+        List<CodiValorDto> o =  getOrgansAfegintFills(entitat, organs, permis);
+
+        // Afegir procediments amb permis directe
+        for (ProcSerEntity e : procSerAmbPermisDirecte) {
+            o.add(CodiValorDto.builder().codi(e.getOrganGestor().getCodi()).valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
+        }
+        Set<CodiValorDto> organsFinals = new HashSet<>(o);
+        return new ArrayList<>(organsFinals);
     }
 
 
@@ -781,13 +795,13 @@ public class PermisosServiceImpl implements PermisosService {
     public class ProcedimentsPermisOrganCommand implements Command<List<ProcSerEntity>, String> {
         @Override
         public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus);
+            return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(entitat, subList, grups, tipus == null, tipus);
         }
     }
     public class ProcedimentsActiusPermisOrganCommand implements Command<List<ProcSerEntity>, String> {
         @Override
         public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.findProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus);
+            return procSerRepository.findProcedimentsActiusAccesiblesPerOrganGestor(entitat, subList, grups, tipus == null, tipus);
         }
     }
 
