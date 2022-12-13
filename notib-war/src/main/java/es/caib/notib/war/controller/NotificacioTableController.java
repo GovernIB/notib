@@ -554,13 +554,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
         boolean totbe = !enviamentEstat.isNotificaError();
         String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-//        if (totbe) {
-//            MissatgesHelper.success(request, getMessage(request, msg));
-//        } else {
-//            MissatgesHelper.error(request, getMessage(request, msg));
-//        }
-//        emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
-//        return "enviamentInfo";
         return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
     }
 
@@ -579,11 +572,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void certificacioDescarregar(HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+    public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
 
-        ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        try {
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        } catch (Exception ex) {
+            log.error("Error descarregant la certificacio", ex);
+            EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+            NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        }
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar", method = RequestMethod.GET)
