@@ -58,7 +58,7 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.CreacioSemaforDto;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -517,12 +517,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
-					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+					synchronized(SemaforNotificacio.agafar(notificacioGuardada.getId())) {
 						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
 						if (notificar) {
 							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 						}
 					}
+					SemaforNotificacio.alliberar(notificacioGuardada.getId());
 				} else {
 					inicialitzaCallbacks(notificacioGuardada);
 				}

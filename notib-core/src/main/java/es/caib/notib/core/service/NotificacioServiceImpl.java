@@ -359,12 +359,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 //			### Realitzar el procés de registre i notific@
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-				synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+				synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
 					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(
 							notificacioEntity);
 					if (notificar)
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				}
+				SemaforNotificacio.alliberar(notificacioEntity.getId());
 			}
 
 			return conversioTipusHelper.convertir(

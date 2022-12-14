@@ -9,11 +9,13 @@ import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.SchedulledService;
 import es.caib.notib.core.api.service.ServeiService;
+import es.caib.notib.core.clases.RegistrarThread;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.CreacioSemaforDto;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -103,9 +105,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 				return;
 			}
 			logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
+			RegistrarThread thread;
 			for (Long pendent : pendents) {
-				logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent + "]");
-				notificacioHelper.registrarNotificar(pendent);
+
+				thread = new RegistrarThread(pendent, notificacioHelper);
+				thread.run();
+//				logger.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
+//				notificacioHelper.registrarNotificar(pendent.getId());
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -118,13 +124,17 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void notificaEnviamentsRegistrats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			if (!isSemaforInUse() && isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+//			if (!isSemaforInUse() && isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
+			if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
 				logger.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
 				List<Long> pendents = notificacioService.getNotificacionsPendentsEnviar();
 				if (pendents != null && !pendents.isEmpty()) {
 					logger.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents");
 					for (Long pendent: pendents) {
-						logger.info("[NOT] >>> Realitzant enviament a Notifica de la notificació: [Id: " + pendent + "]");
+						logger.info("[NOT] >>> Realitzant enviament a Notifica de la notificació amb id: " + pendent);
+						if (SemaforNotificacio.isSemaforInUse(pendent)) {
+							continue;
+						}
 						notificacioService.notificacioEnviar(pendent);
 					}
 				} else {
@@ -440,13 +450,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 	private boolean isActualitzacioServeisActiuProperty() {
 		return configHelper.getAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
-	}
-	private boolean isSemaforInUse() {
-		boolean inUse = true;
-		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-			inUse = false;
-		}
-		return inUse;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(SchedulledServiceImpl.class);
