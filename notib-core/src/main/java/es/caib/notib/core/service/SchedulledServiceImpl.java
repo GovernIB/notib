@@ -23,6 +23,7 @@ import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
 import es.caib.notib.core.repository.EntitatRepository;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,14 +287,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 		try {
 			logger.info("Eliminant documents temporals del directori " + baseDir);
-			esborrarTemporals(baseDir);
-//			TODO: Provar d'eliminar els fitxers amb una comanda'
-//			String command = SystemUtils.IS_OS_LINUX ?
-//					"find " + baseDir + " -type f -mindepth 1 -mtime +1 -delete" :
-//					"forfiles /p \"" + baseDir + "\" /s /d -1 /c \"cmd /c del /q @file\"";
-//			Process process = Runtime.getRuntime().exec(command);
-//			process.waitFor();
-//			process.destroy();
+//			esborrarTemporals(baseDir);
+			String command = SystemUtils.IS_OS_LINUX ?
+					"find " + baseDir + " -mindepth 1 -type f -mtime +1 -delete" :
+					"forfiles /p \"" + baseDir + "\" /s /d -1 /c \"cmd /c del /q @file\"";
+			Process process = Runtime.getRuntime().exec(command);
+			process.waitFor();
+			process.destroy();
 		} catch(Exception ex) {
 			logger.error("SchedulledService.eliminarDocumentsTemporals -> Error eliminant els documents temporals del directori " + baseDir);
 		} finally {
@@ -370,7 +370,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 				esborrarTemporals(file.toString());
 			}
 			File f = file.toFile();
-			long periode = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000L);;
+			long periode = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000L);
 			if (f.lastModified() < periode) {
 				logger.info("Esborrant fitxer " + file);
 				Files.delete(file);
