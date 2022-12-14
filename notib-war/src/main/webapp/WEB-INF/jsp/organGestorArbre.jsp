@@ -122,8 +122,8 @@
             }
         </script>
         <style>
-            #detall .container-custom {width: 100%;}
-            #detall .container-foot {display: none;}
+            #detall > .container-custom {width: 100%;}
+            #detall > .container-foot {display: none;}
             .ocult {display: none;}
             .visible {display: flex; justify-content: center; flex-direction: column;}
             .loading-screen {

@@ -70,10 +70,23 @@ var codiDir3Actual =  '${entitatCommand.dir3Codi}';
 var codiDir3RegActual = '${entitatCommand.dir3CodiReg}';
 var llibreChecked = "${entitatCommand.llibreEntitat}" === "false" ? false : true;
 
+let operadorsPostal = [];
+operadorsPostal.push({id:"", text:"", estat:"V"});
+<c:forEach items="${operadorPostalList}" var="operadorsPostal">
+operadorsPostal.push({id:"${operadorsPostal.id}", text:"${operadorsPostal.text}", icona:"${operadorsPostal.icona}"});
+</c:forEach>
+
+let operadorsCie = [];
+operadorsCie.push({id:"", text:"", estat:"V"});
+<c:forEach items="${cieList}" var="operadorsCie">
+operadorsCie.push({id:"${operadorsCie.id}", text:"${operadorsCie.text}", icona:"${operadorsCie.icona}"});
+</c:forEach>
+
 $(document).ready(function() {
 
-
 	var entitatId = document.getElementById('id').value;
+	loadPagadorPostal($('#operadorPostalId'), operadorsPostal, "<spring:message code='operador.postal.obsolet'/>");
+	loadPagadorPostal($('#cieId'), operadorsCie, "<spring:message code='operador.postal.obsolet'/>");
 
 	if (entitatId != '' && !"${tipusDocSelected}") {
 		var getUrl = "<c:url value="/entitat/"/>" + entitatId + "/tipusDocument";
@@ -283,15 +296,17 @@ function updateLlibre(dir3codi) {
 			<not:inputText name="dir3CodiReg" textKey="entitat.form.camp.codidir3reg" info="true" messageInfo="entitat.form.camp.codidir3reg.info"/>
 			<not:inputText name="apiKey" textKey="entitat.form.camp.apiKey" required="true"/>
 			<not:inputCheckbox name="ambEntregaDeh" textKey="entitat.form.camp.entregadeh"/>
-			<not:inputCheckbox name="entregaCieActiva" textKey="entitat.form.camp.entregacie"/>
-			<div id="entrega-cie-form">
-				<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
-								 optionTextAttribute="text" required="true" emptyOption="true"
-								 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-				<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id"
-								 optionTextAttribute="text" required="true" emptyOption="true"
-								 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-			</div>
+			<c:if test="${entitatNova}">
+				<not:inputCheckbox name="entregaCieActiva" textKey="entitat.form.camp.entregacie"/>
+				<div id="entrega-cie-form">
+					<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
+									 optionTextAttribute="text" required="true" emptyOption="true"
+									 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal"/>
+					<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id"
+									 optionTextAttribute="text" required="true" emptyOption="true"
+									 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.operadorpostal"/>
+				</div>
+			</c:if>
 			<not:inputCheckbox name="llibreEntitat" textKey="entitat.form.camp.llibreEntitat"/>
 			<div id="llibre-entitat">
 				<div class="form-group">

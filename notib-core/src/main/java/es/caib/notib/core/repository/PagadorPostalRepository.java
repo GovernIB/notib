@@ -1,13 +1,17 @@
 package es.caib.notib.core.repository;
 
+import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.method.P;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,15 +22,30 @@ import java.util.List;
  */
 public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEntity, Long> {
 
-	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
+//	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
 	List<PagadorPostalEntity> findByEntitat(EntitatEntity entitat);
+
+	@Query("SELECT n.entregaCie.operadorPostal FROM EntitatEntity n where n = :entitat")
+	PagadorPostalEntity obtenirPagadorsEntitat(@Param("entitat") EntitatEntity entitat);
+
+//	@Query("FROM PagadorPostalEntity nap " +
+//			"JOIN EntregaCieEntity nec on nec.operadorPostalId = nap.id " +
+//			"JOIN EntitatEntity n ON n.entregaCie = nec and n = :entitat")
+//	IdentificadorTextDto obtenirPagadorsEntitat(@Param("entitat") EntitatEntity entitat);
+
+
+	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
+
+	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
+
+	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
 	
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and b.entitat = :entitat")
 	Page<PagadorPostalEntity> findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
@@ -40,7 +59,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and (b.organGestor.codi in (:organsGestors)) " +
 			"and b.entitat = :entitat")

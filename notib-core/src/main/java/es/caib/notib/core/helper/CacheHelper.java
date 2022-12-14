@@ -3,7 +3,6 @@ package es.caib.notib.core.helper;
 import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.repository.OrganGestorRepository;
@@ -71,11 +70,11 @@ public class CacheHelper {
 				usuariCodi);
 	}
 
-	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
-	public String findDenominacioOrganisme(
-			String codiDir3) {
-		return pluginHelper.getDenominacio(codiDir3);
-	}
+//	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
+//	public String findDenominacioOrganisme(
+//			String codiDir3) {
+//		return pluginHelper.getDenominacio(codiDir3);
+//	}
 	
 	@Cacheable(value = "findOficinesEntitat", key="#codiDir3")
 	public List<OficinaDto> llistarOficinesEntitat(
@@ -85,15 +84,15 @@ public class CacheHelper {
 				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 	}
 	
-	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
-	public List<LlibreDto> llistarLlibresOficina(
-			String codiDir3Entitat,
-			String codiDir3Oficina) {
-		return pluginHelper.llistarLlibres(
-				codiDir3Entitat, 
-				codiDir3Oficina, 
-				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
-	}
+//	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
+//	public List<LlibreDto> llistarLlibresOficina(
+//			String codiDir3Entitat,
+//			String codiDir3Oficina) {
+//		return pluginHelper.llistarLlibres(
+//				codiDir3Entitat,
+//				codiDir3Oficina,
+//				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+//	}
 	
 	@Cacheable(value = "findLlibreOrganisme", key="#codiDir3Organ")
 	public LlibreDto getLlibreOrganGestor(
@@ -206,15 +205,15 @@ public class CacheHelper {
 		return cacheManager.getCacheNames(); 
 	}
 
-	@CacheEvict(value = {"procsersPermis", "procedimentEntitiesPermis", "procsersPermisMenu", "procedimentEntitiesPermisMenu"}, allEntries = true)
+	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu"}, allEntries = true)
 	public void evictFindProcedimentServeisWithPermis() {
 	}
 	
-	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 	
-	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 

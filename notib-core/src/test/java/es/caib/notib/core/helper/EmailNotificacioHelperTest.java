@@ -41,7 +41,7 @@ public class EmailNotificacioHelperTest {
 //	private static final String EMAIL_USER = "xxxx@gmail.com";
 	private static final String EMAIL_PASS = "xxxxxx";
 	private static final String EMAIL_USER = "proves_limit@limit.es";
-	private static final String EMAIL_DEST = "";
+	private static final String EMAIL_DEST = "test@limit.es";
 	private static final String FILE_PATH = "";
 
 	@Mock
@@ -131,7 +131,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.estat.motiu"))).thenReturn("Motiu");
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.notificacio.info"))).thenReturn("Detall");
 		Mockito.when(messageHelper.getMessage(Mockito.eq("notificacio.email.notificacio.detall"))).thenReturn("Detall notificació");
-
+		Mockito.when(configHelper.getPrefix()).thenReturn("[NOTIB]");
 	}
 	
 	@Test
@@ -141,11 +141,10 @@ public class EmailNotificacioHelperTest {
 		EntitatEntity entidad = new EntitatEntity();
 		Set<String> usuaris = new HashSet<>(Arrays.asList("user"));
 		DadesUsuari dadesUsuari = DadesUsuari.builder().email(EMAIL_DEST).build();
-		UsuariEntity usuari = UsuariEntity.hiddenBuilder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(false).build();
+		UsuariEntity usuari = UsuariEntity.hiddenBuilder().codi("user").rebreEmailsNotificacio(true).rebreEmailsNotificacioCreats(true).build();
 		ProcedimentEntity procediment = ProcedimentEntity.builder().nom("Nom del procediment").agrupar(false).createdBy(usuari).build();
 		OrganGestorEntity organGestor = OrganGestorEntity.builder().entitat(entidad).build();
 		GrupEntity grupNotificacio = GrupEntity.getBuilder(null, null, entidad, organGestor).build();
-
 		notificacioMock =  Mockito.mock(NotificacioEntity.class);
 		Mockito.when(notificacioMock.getId()).thenReturn(666L);
 		Mockito.when(notificacioMock.getProcediment()).thenReturn(procediment);
@@ -155,6 +154,7 @@ public class EmailNotificacioHelperTest {
 		Mockito.when(notificacioMock.getEstat()).thenReturn(NotificacioEstatEnumDto.ENVIADA);
 		Mockito.when(notificacioMock.getMotiu()).thenReturn("Motiu de la notificació");
 		Mockito.when(notificacioMock.getEmisorDir3Codi()).thenReturn("A03001234");
+		Mockito.when(notificacioMock.getCreatedBy()).thenReturn(usuari);
 
 //		Document documentArxiuUuid = initDocument(document2.getUuid());
 //		Document documentArxiuCsv = initDocument(document3.getCsv());

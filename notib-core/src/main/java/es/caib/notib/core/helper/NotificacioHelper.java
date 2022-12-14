@@ -26,6 +26,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.plugins.arxiu.api.ArxiuException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import lombok.Builder;
@@ -82,6 +83,8 @@ public class NotificacioHelper {
 	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	@Transactional
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
@@ -321,7 +324,9 @@ public class NotificacioHelper {
 		DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3(), null);
 		DocumentEntity document4Entity = getDocumentEntity(notificacio.getDocument4(), null);
 		DocumentEntity document5Entity = getDocumentEntity(notificacio.getDocument5(), null);
-
+		if (documentEntity == null) {
+			throw new NoDocumentException(messageHelper.getMessage("error.alta.remesa.sense.document"));
+		}
 		return NotificacioData.builder()
 				.notificacio(notificacio)
 				.entitat(entitat)
@@ -373,7 +378,12 @@ public class NotificacioHelper {
 				DocumentDto doc = new DocumentDto();
 				String arxiuUuid = document.getUuid();
 				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
+					Document documentArxiu = null;
+					try {
+						documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuUuid, null, true, true);
+					} catch (Exception ex) {
+						throw new ArxiuException(messageHelper.getMessage("error.document.inexistent") + " - " + arxiuUuid);
+					}
 					doc.setArxiuNom(documentArxiu.getNom());
 					doc.setNormalitzat(document.isNormalitzat());
 					doc.setGenerarCsv(document.isGenerarCsv());
@@ -425,7 +435,12 @@ public class NotificacioHelper {
 				DocumentDto doc = new DocumentDto();
 				String arxiuCsv = document.getCsv();
 				if (pluginHelper.isArxiuPluginDisponible()) {
-					Document documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
+					Document documentArxiu = null;
+					try {
+						 documentArxiu = pluginHelper.arxiuDocumentConsultar(arxiuCsv, null, true, false);
+					} catch (Exception ex) {
+						throw new ArxiuException(messageHelper.getMessage("error.document.inexistent") + " - " + arxiuCsv);
+					}
 					doc.setArxiuNom(documentArxiu.getNom());
 					doc.setNormalitzat(document.isNormalitzat());
 					doc.setGenerarCsv(document.isGenerarCsv());

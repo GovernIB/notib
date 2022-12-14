@@ -1,17 +1,32 @@
 package es.caib.notib.war.controller;
 
-import es.caib.notib.core.api.dto.*;
+import com.google.common.base.Strings;
+import es.caib.notib.core.api.dto.CodiAssumpteDto;
+import es.caib.notib.core.api.dto.CodiValorEstatDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.IdentificadorTextDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.TipusAssumpteDto;
+import es.caib.notib.core.api.dto.cie.Operadors;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.OperadorPostalService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PagadorCieService;
+import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.war.command.ProcSerCommand;
 import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
@@ -65,15 +80,31 @@ public class ProcedimentController extends BaseUserController{
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
+
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = PROCEDIMENTS_FILTRE;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		String codi = request.getParameter("codi");
+		if (!Strings.isNullOrEmpty(codi)) {
+			procSerFiltreCommand.setCodi(codi);
+		}
+		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.core.api.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
-		
+		model.addAttribute("isModal", false);
 		return "procedimentListPage";
+	}
+
+	@RequestMapping(value = "/filtre/codi/{procCodi}", method = RequestMethod.GET)
+	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String procCodi, Model model) {
+
+		this.currentFiltre = PROCEDIMENTS_FILTRE;
+		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		procSerFiltreCommand.setCodi(procCodi);
+		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
+		return "redirect:/procediment";
 	}
 
 	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
@@ -85,6 +116,7 @@ public class ProcedimentController extends BaseUserController{
 		this.currentFiltre = PROCEDIMENTS_FILTRE_MODAL;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
+		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
@@ -101,8 +133,7 @@ public class ProcedimentController extends BaseUserController{
 			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(),
 					organGestorActual.getCodi());
 			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(),
-						organ.getEstat()));
+				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 		}
 		return organsGestors;
@@ -170,17 +201,18 @@ public class ProcedimentController extends BaseUserController{
 			HttpServletRequest request,
 			@Valid ProcSerCommand procSerCommand,
 			BindingResult bindingResult,
-			Model model) {		
-		
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelProcediment(
 					request,
 					procSerCommand.getId(),
 					model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "procedimentAdminForm";
 		}
@@ -210,39 +242,26 @@ public class ProcedimentController extends BaseUserController{
 					"procediment.controller.creat.ok");
 		}
 	}
-	
-	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
-	public String formGet(
-			HttpServletRequest request, 
-			@PathVariable Long procedimentId, 
-			Model model) {
-		ProcSerCommand procSerCommand;
-		ProcSerDto procediment = emplenarModelProcediment(
-				request, 
-				procedimentId,
-				model);
-		if (procediment != null) {
-			procSerCommand = ProcSerCommand.asCommand(procediment);
-			procSerCommand.setEntitatId(procediment.getEntitat().getId());
-		} else {
-			procSerCommand = new ProcSerCommand();
-		}
-		model.addAttribute(procSerCommand);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
-		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
-		model.addAttribute("cieList", cieList);
-		return "procedimentAdminForm";
+
+	@ResponseBody
+	@RequestMapping(value = "/operadors/{organ}", method = RequestMethod.GET)
+	public Operadors getOperadors(HttpServletRequest request, @PathVariable String organ) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		List<IdentificadorTextDto> postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		List<IdentificadorTextDto> cie = cieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
 	}
-	
+
 	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
-			@PathVariable Long procedimentId) {		
-		
+			@PathVariable Long procedimentId) {
+
 		try {
 			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			
+
 			if (procedimentService.procedimentEnUs(procedimentId)) {
 				return getAjaxControllerReturnValueError(
 						request,
@@ -253,7 +272,7 @@ public class ProcedimentController extends BaseUserController{
 						entitat.getId(),
 						procedimentId,
 						RolHelper.isUsuariActualAdministradorEntitat(request));
-				
+
 				return getAjaxControllerReturnValueSuccess(
 						request,
 						"redirect:../../procediment",
@@ -266,6 +285,32 @@ public class ProcedimentController extends BaseUserController{
 					"procediment.controller.esborrat.ko",
 					e);
 		}
+	}
+
+	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
+	public String formGet(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ProcSerCommand procSerCommand;
+		ProcSerDto procediment = emplenarModelProcediment(
+				request,
+				procedimentId,
+				model);
+		if (procediment != null) {
+			procSerCommand = ProcSerCommand.asCommand(procediment);
+			procSerCommand.setEntitatId(procediment.getEntitat().getId());
+		} else {
+			procSerCommand = new ProcSerCommand();
+		}
+		model.addAttribute(procSerCommand);
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+		model.addAttribute("operadorPostalList", operadorPostalList);
+		List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
+		model.addAttribute("cieList", cieList);
+		return "procedimentAdminForm";
 	}
 
 	@RequestMapping(value = "/{procedimentId}/enable", method = RequestMethod.GET)

@@ -232,14 +232,14 @@ public interface ServeiService {
 	 *
 	 * @return
 	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
 
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 //	/**
 //	 * Recupera els tipus d'assumpte d'una entitat.
@@ -396,15 +396,15 @@ public interface ServeiService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi);
 
-	@PreAuthorize("hasRole('tothom')")
-	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
-            Long entitatId,
-            String organGestorCodi,
-            List<String> grups,
-            PermisEnum permis);
+//	@PreAuthorize("hasRole('tothom')")
+//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
+//            Long entitatId,
+//            String organGestorCodi,
+//            List<String> grups,
+//            PermisEnum permis);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<CodiValorComuDto> getServeisOrgan(
+	List<CodiValorOrganGestorComuDto> getServeisOrgan(
             Long entitatId,
             String organCodi,
             Long organFiltre,
@@ -429,14 +429,14 @@ public interface ServeiService {
             RolEnumDto rol,
             TipusEnviamentEnumDto enviamentTipus);
 
-	/**
-	 * Consulta si l'usuari té permís de notificació a tots els serveis comuns per a algún òrgan gestor.
-	 *
-	 * @param entitatId Identificador de l'entitat actual
-	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
-	 * @return boleà indicant si es te permis de serveis comuns a algun òrgan
-	 */
-	boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus);
+//	/**
+//	 * Consulta si l'usuari té permís de notificació a tots els serveis comuns per a algún òrgan gestor.
+//	 *
+//	 * @param entitatId Identificador de l'entitat actual
+//	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
+//	 * @return boleà indicant si es te permis de serveis comuns a algun òrgan
+//	 */
+//	boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Actualitza el servei indicat amb la informació del servei actual

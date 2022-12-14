@@ -114,7 +114,7 @@ public class ProcSerSyncHelper {
 //			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(),progres);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			progres.setTotalFinal(procedimentRepository.countByEntitatId(entitatDto.getId()));
@@ -469,7 +469,7 @@ public class ProcSerSyncHelper {
 //			List<ProcSerDto> procedimentsGda = obtenirServeis(entitatDto, progres, totalElementsCons);
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			List<OrganGestorEntity> organsGestorsModificats = processarServeis(entitat, procedimentsGda, progres, avisosServeisOrgans);
-			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(),progres);
+			procSerHelper.deshabilitarServeisNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansServObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			progres.setTotalFinal(serveiRepository.countByEntitatId(entitatDto.getId()));

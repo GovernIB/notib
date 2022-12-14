@@ -240,6 +240,17 @@
 	margin-right: 15px;
 	margin-left: 15px;
 }
+.validating-block {
+	font-size: x-small;
+}
+
+
+#entregaPostalCaducada {
+	display: none;
+	/*color:red;*/
+	margin-top:15px;
+}
+
 </style>
 </head>
 <body>
@@ -303,6 +314,7 @@
 	} else {
 		var serveiIdAux = null;
 	}
+	var isPermesComunicacionsSirPropiaEntitat = ${isPermesComunicacionsSirPropiaEntitat};
 	var interessatsTipus = new Array();
 	var interessatTipusOptions = "";
 	var numDocuments = 1;
@@ -484,7 +496,76 @@
 				$(provincia).parent().parent().removeClass('hidden');
 			}
 		});
-		
+
+		// Validacio firma document fisic
+		if (${validaFirmaWebEnabled} == true) {
+			$('input[type="file"]').on('change', (event) => {
+				let file = event.currentTarget;
+				let $file = $(file);
+				if (file.files.length == 0)
+					return;
+
+				let fitxer = file.files[0];
+				let formData = new FormData();
+				formData.append('fitxer', fitxer, fitxer.name);
+				$file.prop("disabled", true);
+
+				let metadadesId = $file.closest(".row").next(".doc-metadades").prop("id");
+				let id = metadadesId.charAt(metadadesId.length - 1);
+
+				$file.closest(".fileinput").next(".validating-block").remove();
+				$('<p class="validating-block text-info"><span class="fa fa-spin fa-circle-o-notch"></span>&nbsp;<spring:message code="notificacio.form.valid.document.validant"/></p>').insertAfter($file.closest(".fileinput"));
+
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "<c:url value='/notificacio/valida/firma'/>",
+					data: formData,
+					processData: false,
+					contentType: false,
+					cache: false,
+					timeout: 600000,
+					success: function (data) {
+
+						console.log("SUCCESS : ", data);
+						$file.prop("disabled", false);
+						$file.closest(".fileinput").next(".validating-block").remove();
+
+						if (data.mediaType == 'application/pdf') {
+							$('#documents\\[' + id + '\\]\\.modoFirma').prop('checked', data.signed);
+						}
+						if (data.error) {
+							$file.closest(".form-group").addClass("has-error");
+							$file.closest(".fileinput").next(".help-block").remove();
+							<%--$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.firma"/></span></p>').insertAfter($file.closest(".fileinput"));--%>
+							$('<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span id="arxiu' + id + '.errors"><spring:message code="notificacio.form.valid.document.error"/> ' + data.errorMsg + '</span></p>').insertAfter($file.closest(".fileinput"));
+						} else {
+							$file.closest(".form-group").removeClass("has-error");
+							$file.closest(".fileinput").next(".help-block").remove();
+
+							if (data.signed) {
+								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.firma.ok"/></p>').insertAfter($file.closest(".fileinput"));
+							} else {
+								$('<p class="validating-block text-success"><span class="fa fa-check"></span>&nbsp;<spring:message code="notificacio.form.valid.document.sense.firma"/></p>').insertAfter($file.closest(".fileinput"));
+							}
+						}
+						// $('documents\\[' + id + '\\]\\.arxiuGestdocId').val(data.arxiuGestdocId);
+						// $('documents\\[' + id + '\\]\\.arxiuNom').val(data.nom);
+						// $('documents\\[' + id + '\\]\\.mediaType').val(data.mediaType);
+						// $('documents\\[' + id + '\\]\\.mida').val(data.mida);
+
+					},
+					error: function (e) {
+
+						console.log("ERROR : ", e);
+						$file.prop("disabled", false);
+
+					}
+				});
+
+			});
+		}
+
 		//Consulta al arxiu de los identificadores CSV o Uuid 
 		//para comprobar si existe el documento y sus metadatos	
 		$(".docArxiu").focusout(function() {
@@ -940,30 +1021,32 @@
 
 		});
 		$(document).on('change', '.interessat', function() {
-			var closest = $(this).closest('.destinatariForm, .personaForm');
-			var llinatge1 = closest.find('.llinatge1');
-			var llinatge2 = closest.find('.llinatge2');
-			var enviamentTipus = $('input#enviamentTipus').val();
-			var nif = closest.find('.nif');
-			var docTipus = closest.find('.docTipus');
-			var nifAlert = closest.find('.alerta-sense-nif');
-			var nifLabel = nif.find('label');
-			var dir3codi = closest.find('.dir3Codi');
-			var nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
-			var noNifLabelText = "<spring:message code='notificacio.form.camp.titular.sense.nif'/>";
-			var email = closest.find('.email');
-			var emailLabel = email.find('label');
-			var emailLabelText = "<spring:message code='notificacio.form.camp.titular.email'/>";
-			var incapacitat = closest.find('.incapacitat');
-			var raoSocial = closest.find('.rao');
-			var index = closest.find(".rowId input").val();
-			var raoSocialDesc = raoSocial.find('input').val();
-			var dir3Desc = closest.find('.codiDir3 input').val();
+			let closest = $(this).closest('.destinatariForm, .personaForm');
+			let llinatge1 = closest.find('.llinatge1');
+			let llinatge2 = closest.find('.llinatge2');
+			let enviamentTipus = $('input#enviamentTipus').val();
+			let nif = closest.find('.nif');
+			let docTipus = closest.find('.docTipus');
+			let nifAlert = closest.find('.alerta-sense-nif');
+			let nifLabel = nif.find('label');
+			let dir3codi = closest.find('.dir3Codi');
+			let nifLabelText = "<spring:message code='notificacio.form.camp.titular.nif'/>";
+			let noNifLabelText = "<spring:message code='notificacio.form.camp.titular.sense.nif'/>";
+			let cifLabelText = "<spring:message code='notificacio.form.camp.titular.cif'/>";
+			let administracioLabelText = "<spring:message code='notificacio.form.camp.titular.administracio'/>";
+			let email = closest.find('.email');
+			let emailLabel = email.find('label');
+			let emailLabelText = "<spring:message code='notificacio.form.camp.titular.email'/>";
+			let incapacitat = closest.find('.incapacitat');
+			let raoSocial = closest.find('.rao');
+			let index = closest.find(".rowId input").val();
+			let raoSocialDesc = raoSocial.find('input').val();
+			let dir3Desc = closest.find('.codiDir3 input').val();
 			let raoSocialInput = closest.find(".raoSocialInput");
 			let nomInput = closest.find(".nomInput");
-			var dir3Label = dir3codi.find('label');
-			var dir3LabelText = "<spring:message code='notificacio.form.camp.titular.dir3codi'/>";
-			console.log($(this));
+			let dir3Label = dir3codi.find('label');
+			let dir3LabelText = "<spring:message code='notificacio.form.camp.titular.dir3codi'/>";
+			// console.log($(this));
 			if ($(this).val() == 'ADMINISTRACIO') {
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
@@ -973,10 +1056,10 @@
 				$(raoSocial).addClass('hidden');
 				$(docTipus).addClass('hidden');
 				if(enviamentTipus == 'COMUNICACIO_SIR'){
-					$(nifLabel).text(nifLabelText);
+					$(nifLabel).text(administracioLabelText);
 					$(nif).addClass('hidden');
 				}else{
-					$(nifLabel).text(nifLabelText + " *");
+					$(nifLabel).text(administracioLabelText + " *");
 					$(nif).removeClass('hidden');
 				}
 				$(emailLabel).text(emailLabelText);
@@ -1009,13 +1092,14 @@
 				$(raoSocialInput).hide();
 				$(nomInput).show();
 			} else {
+				console.log("juridica");
 				$(llinatge1).addClass('hidden');
 				$(llinatge2).addClass('hidden');
 				$(nif).removeClass('hidden');
 				$(nifAlert).hide();
 				$(docTipus).addClass('hidden');
 				$(dir3codi).addClass('hidden');
-				$(nifLabel).text(nifLabelText + " *");
+				$(nifLabel).text(cifLabelText + " *");
 				$(incapacitat).removeClass('hidden');
 				$(raoSocial).removeClass('hidden');
 				$(emailLabel).text(emailLabelText);
@@ -1180,7 +1264,7 @@
 					if (procedimentsComuns.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
 						$.each(procedimentsComuns, function(index, val) {
-							selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+							selProcediments.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
 						});
 						selProcediments.append("</optgroup>");
 					}
@@ -1189,10 +1273,10 @@
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
 						$.each(procedimentsOrgan, function(index, val) {
 							if (isOnlyOneProcedimentOrgan) {
-								selProcediments.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
+								selProcediments.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
 								$("#organGestor").val(val.organGestor).trigger("change.select2");
 							} else {
-								selProcediments.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
+								selProcediments.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}
 						});
 						selProcediments.append("</optgroup>");
@@ -1251,7 +1335,7 @@
 					if (serveisComuns.length > 0) {
 						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
 						$.each(serveisComuns, function(index, val) {
-							selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+							selServeis.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
 						});
 						selServeis.append("</optgroup>");
 					}
@@ -1260,10 +1344,10 @@
 						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.organs'/>'>");
 						$.each(serveisOrgan, function(index, val) {
 							if (isOnlyOneServeiOrgan && !carregaInicial) {
-								selServeis.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
+								selServeis.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
 								$("#organGestor").val(val.organGestor).trigger("change.select2");
 							} else {
-								selServeis.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
+								selServeis.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}
 						});
 						selServeis.append("</optgroup>");
@@ -1340,6 +1424,11 @@
 					}
 
 					viewModel.ambEntregaCIE = data.entregaCieActiva;
+					if (!data.entregaCieVigent) {
+						$("#entregaPostalCaducada").show();
+					} else {
+						$("#entregaPostalCaducada").hide();
+					}
 
 					// TODO: Afegir formats de fulla i sobre
 					// Format fulla
@@ -1469,8 +1558,8 @@
 						textKey="notificacio.form.camp.procediment" 
 						required="${enviamentTipus == 'NOTIFICACIO'}"
 						optionItems="${procediments}" 
-						optionValueAttribute="codi"
-						optionTextAttribute="codi"
+						optionValueAttribute="id"
+						optionTextAttribute="valor"
 						labelSize="2"
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
@@ -1486,8 +1575,8 @@
 							textKey="notificacio.form.camp.servei"
 							required="${enviamentTipus == 'NOTIFICACIO'}"
 							optionItems="${serveis}"
-							optionValueAttribute="codi"
-							optionTextAttribute="codi"
+							optionValueAttribute="id"
+							optionTextAttribute="valor"
 							labelSize="2"
 							emptyOption="true"
 							optionMinimumResultsForSearch="2"
@@ -1716,16 +1805,18 @@
 										<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 									  	<strong><spring:message code="notificacio.form.camp.logitud.info"/></strong>
 									</div>
-									<div class="entrega-activa">
+									<div class="entrega-activa" style="margin-bottom:15px;">
 										<p class="comentari"><spring:message code="notificacio.form.titol.enviaments.metodeEntrega.info"/></p>
 									</div>
 									<div class="entrega-cie-activa">
 										<not:inputCheckbox name="enviaments[${j}].entregaPostal.activa" textKey="notificacio.form.camp.entregapostal.activa" labelSize="4" funcio="mostrarEntregaPostal(this.id)" />
+
 									</div>
 								</div>
 								<!-- ENTREGA POSTAL -->
 								<div id="entregaPostal" class="entregaPostal_${j}" <c:if test="${!enviament.entregaPostal.activa}">style="display:none"</c:if>>
 									<div class="col-md-12">
+										<div id="entregaPostalCaducada" class="alert alert-warning"><spring:message code="notificacio.form.camp.entregapostal.caducada"/></div>
 										<div class="col-md-12">
 											<not:inputSelect name="enviaments[${j}].entregaPostal.domiciliConcretTipus" generalClass="enviamentTipus" textKey="notificacio.form.camp.entregapostal.tipus" required="true"
 															 optionItems="${entregaPostalTipus}" optionValueAttribute="value" optionTextKeyAttribute="text"  labelClass="labelcss" inputClass="inputcss"/>

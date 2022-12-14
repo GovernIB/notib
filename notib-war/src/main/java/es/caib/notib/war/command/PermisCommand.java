@@ -3,22 +3,20 @@
  */
 package es.caib.notib.war.command;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.Size;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.TipusEnumDto;
 import es.caib.notib.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.constraints.Size;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Command per al manteniment de permisos.
@@ -27,6 +25,13 @@ import lombok.Setter;
  */
 @Getter @Setter
 public class PermisCommand {
+
+	public enum EntitatPermis {
+		ORGAN,
+		PROCEDIMENT,
+		SERVEI
+	}
+
 
 	private Long id;
 	@NotEmpty @Size(max=100)
@@ -51,7 +56,9 @@ public class PermisCommand {
 	private boolean selectAll;
 
 	private boolean notificacio;
+	private boolean comunicacio;
 	private boolean comunicacioSir;
+	private boolean comunicacioSenseProcediment;
 
 	public static List<PermisCommand> toPermisCommands(
 			List<PermisDto> dtos) {
@@ -70,6 +77,21 @@ public class PermisCommand {
 				dto,
 				PermisCommand.class);
 		return command;		
+	}
+	public static PermisCommand asCommand(PermisDto dto, EntitatPermis entitatPermis) {
+		PermisCommand command = ConversioTipusHelper.convertir(
+				dto,
+				PermisCommand.class);
+		switch (entitatPermis) {
+			case ORGAN:
+				command.setSelectAll(dto.isRead() && dto.isProcessar() && dto.isAdministration() && dto.isComuns() && dto.isNotificacio() && dto.isComunicacio() && dto.isComunicacioSir() && dto.isComunicacioSenseProcediment());
+				break;
+			case PROCEDIMENT:
+			case SERVEI:
+				command.setSelectAll(dto.isRead() && dto.isProcessar() && dto.isAdministration() && dto.isNotificacio() && dto.isComunicacio() && dto.isComunicacioSir());
+				break;
+		}
+		return command;
 	}
 	public static PermisDto asDto(PermisCommand command) {
 		PermisDto dto = ConversioTipusHelper.convertir(

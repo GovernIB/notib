@@ -33,7 +33,7 @@ public class MonitorIntegracioServiceBean implements MonitorIntegracioService {
 	MonitorIntegracioService delegate;
 
 	@Override
-	@RolesAllowed({"DIS_SUPER"})
+	@RolesAllowed({"NOT_SUPER"})
 	public List<IntegracioDto> integracioFindAll() {
 		return delegate.integracioFindAll();
 	}
@@ -45,10 +45,14 @@ public class MonitorIntegracioServiceBean implements MonitorIntegracioService {
 	}
 	
 	@Override
-	@RolesAllowed({"DIS_SUPER"})
+	@RolesAllowed({"NOT_SUPER"})
 	public Map<String, Integer> countErrors() {
 		return delegate.countErrors();
 	}
-	
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void netejarMonitor() {
+		delegate.netejarMonitor();
+	}
 }

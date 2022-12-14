@@ -1,16 +1,24 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.CodiValorDto;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.api.service.ProcedimentService;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.helper.FiltreHelper.FiltreField;
 import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
@@ -27,13 +35,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class NotificacioListHelper {
 
     @Autowired
     private ProcedimentService procedimentService;
+    @Autowired
+    private PermisosService permisosService;
     @Autowired
     private PaginacioHelper paginacioHelper;
     @Autowired
@@ -56,6 +70,7 @@ public class NotificacioListHelper {
         mapeigPropietatsOrdenacio.put("procediment.nom", new String[] {"procedimentNom"});
         mapeigPropietatsOrdenacio.put("procedimentDesc", new String[] {"procedimentCodi"});
         mapeigPropietatsOrdenacio.put("createdByComplet", new String[] {"createdBy"});
+        mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
     public PaginaDto<NotificacioTableItemDto> complementaNotificacions(
@@ -67,37 +82,50 @@ public class NotificacioListHelper {
             return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
         }
 
-        List<String> codisProcedimentsProcessables = new ArrayList<String>();
-        List<ProcSerSimpleDto> procedimentsProcessables = procedimentService.findProcedimentServeisWithPermis(entitatEntity.getId(),
-                usuariCodi, PermisEnum.PROCESSAR);
-        if (procedimentsProcessables != null)
-            for (ProcSerSimpleDto procediment : procedimentsProcessables) {
-                codisProcedimentsProcessables.add(procediment.getCodi());
+        List<String> codis = new ArrayList<>();
+        List<CodiValorOrganGestorComuDto> procSersAmbPermis = permisosService.getProcSersAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        List<CodiValorDto> organs =  permisosService.getOrgansAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        if (procSersAmbPermis != null) {
+            for (CodiValorOrganGestorComuDto procedimentOrgan : procSersAmbPermis) {
+                codis.add(procedimentOrgan.getCodi());
             }
-        List<ProcSerOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
-        if (procedimentOrgansProcessables != null) {
-            for (ProcSerOrganDto procedimentOrgan : procedimentOrgansProcessables) {
-                codisProcedimentsProcessables.add(procedimentOrgan.getProcSer().getCodi());
+        }
+        if (organs != null && !organs.isEmpty()) {
+            for (CodiValorDto organ : organs) {
+                codis.add(organ.getCodi());
             }
         }
 
-        List<String> codisOrgansProcessables = new ArrayList<String>();
-        List<OrganGestorDto> organsProcessables = organGestorService.findOrgansGestorsWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
-        if (organsProcessables != null)
-            for (OrganGestorDto organ : organsProcessables) {
-            	codisOrgansProcessables.add(organ.getCodi());
-            }
+//        List<ProcSerSimpleDto> procedimentsProcessables = procedimentService.findProcedimentServeisWithPermis(entitatEntity.getId(),
+//                usuariCodi, PermisEnum.PROCESSAR);
+//        if (procedimentsProcessables != null)
+//            for (ProcSerSimpleDto procediment : procedimentsProcessables) {
+//                codisProcedimentsProcessables.add(procediment.getCodi());
+//            }
+//        List<ProcSerOrganDto> procedimentOrgansProcessables = procedimentService.findProcedimentsOrganWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+//        if (procedimentOrgansProcessables != null) {
+//            for (ProcSerOrganDto procedimentOrgan : procedimentOrgansProcessables) {
+//                codisProcedimentsProcessables.add(procedimentOrgan.getProcSer().getCodi());
+//            }
+//        }
+//
+//        List<String> codisOrgansProcessables = new ArrayList<String>();
+//        List<OrganGestorDto> organsProcessables = organGestorService.findOrgansGestorsWithPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+//        if (organsProcessables != null)
+//            for (OrganGestorDto organ : organsProcessables) {
+//            	codisOrgansProcessables.add(organ.getCodi());
+//            }
         
         for (NotificacioTableEntity notificacio : notificacions) {
             boolean permisProcessar = false;
-            if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
-                permisProcessar = codisProcedimentsProcessables.contains(notificacio.getProcedimentCodi());
+             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
+                    permisProcessar = codis.contains(notificacio.getProcedimentCodi()) || codis.contains(notificacio.getOrganCodi());
             }
 
-            // Si no te permís de processar per procediment, mirar si té permís de processar per òrgan gestor
-            if (!permisProcessar && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
-                permisProcessar = codisOrgansProcessables.contains(notificacio.getOrganCodi());
-            }
+//            // Si no te permís de processar per procediment, mirar si té permís de processar per òrgan gestor
+//            if (!permisProcessar && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
+//                permisProcessar = codisOrgansProcessables.contains(notificacio.getOrganCodi());
+//            }
             notificacio.setPermisProcessar(permisProcessar);
             List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
             if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {

@@ -4,7 +4,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
+<%
+    pageContext.setAttribute(
+            "isRolActualAdministradorOrgan",
+            es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+%>
     <title>
         <c:choose>
             <c:when test="${!isModificacio}">
@@ -68,8 +72,8 @@
         }
 
         .th-checkbox {
-            padding-right: 1px !important;
-            max-width: 5px !important;
+            padding-right: 10px !important;
+            max-width: 10px !important;
         }
 
         .th-boto-accions {
@@ -79,6 +83,10 @@
     </style>
 
     <script type="text/javascript">
+
+        function isAdminOrgan() {
+            return ${isRolActualAdministradorOrgan};
+        }
 
         $(document).on("click", "#expandAll", function() {
             $('#arbreOrgans').jstree().open_all(null, 200);
@@ -191,15 +199,25 @@
                                  optionTextAttribute="nom" required="true" emptyOption="true"
                                  textKey="organgestor.form.camp.oficina" placeholderKey="organgestor.form.camp.oficina" optionMinimumResultsForSearch="0"/>
             </c:if>
-            <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
-            <div id="entrega-cie-form" class="flex-column">
-                <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
-                                 optionTextAttribute="text" required="true" emptyOption="true"
-                                 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-                <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
-                                 optionTextAttribute="text" required="true" emptyOption="true"
-                                 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
-            </div>
+            <c:choose>
+                <c:when test="${not empty operadorPostalList && not empty cieList}">
+                    <not:inputCheckbox name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+                </c:when>
+                <c:otherwise>
+                    <not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+<%--                    <spring:message code="organgestor.form.camp.entregacie.no.configurada"></spring:message>--%>
+                </c:otherwise>
+            </c:choose>
+            <c:if test="${not empty operadorPostalList && not empty cieList}">
+                <div id="entrega-cie-form" class="flex-column">
+                    <not:inputSelect generalClass="row" name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id"
+                                     optionTextAttribute="text" required="true" emptyOption="true"
+                                     textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+                    <not:inputSelect generalClass="row" name="cieId" optionItems="${cieList}" optionValueAttribute="id"
+                                     optionTextAttribute="text" required="true" emptyOption="true"
+                                     textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+                </div>
+            </c:if>
         </div>
         <div class="flex-space-around">
 <%--
@@ -210,12 +228,12 @@
             </div>
 --%>
             <div>
-                <a id="procediments" class="btn btn-default"  href="" data-toggle="modal" data-adjust-height="false" data-height="650px">
+                <a id="procediments" class="btn btn-default"  href="" data-toggle="modal" data-maximized="true">
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.procediment"/>
                 </a>
             </div>
             <div>
-                <a id="serveis" class="btn btn-default" href="" data-toggle="modal" data-adjust-height="false" data-height="650px">
+                <a id="serveis" class="btn btn-default" href="" data-toggle="modal" data-maximized="true">
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/>
                 </a>
             </div>
@@ -265,6 +283,12 @@
                             {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
+                    <th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate" class="th-checkbox">
+                        <spring:message code="procediment.permis.columna.comunicacio.arbre"/>
+                        <script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
+                            {{if comunicacio}}<span class="fa fa-check"></span>{{/if}}
+                        </script>
+                    </th>
                     <th data-col-name="administration" data-template="#cellPermisGestioTemplate" class="th-checkbox">
                         <spring:message code="procediment.permis.columna.gestio"/>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
@@ -277,10 +301,10 @@
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="comuns" data-template="#cellPermisComunsTemplate" class="th-checkbox">
+                    <th data-col-name="comunicacioSir" data-template="#comunicacioSirTemplate" class="th-checkbox">
                         <spring:message code="organgestor.permis.columna.coms.sir"/>
-                        <script id="cellPermisComunsTemplate" type="text/x-jsrender">
-                            {{if comuns}}<span class="fa fa-check"></span>{{/if}}
+                        <script id="comunicacioSirTemplate" type="text/x-jsrender">
+                            {{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
                     <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" class="th-checkbox">

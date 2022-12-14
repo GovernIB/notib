@@ -37,14 +37,8 @@ public class PagadorCieServiceBean implements PagadorCieService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public CieDto create(Long entitatId, CieDataDto cie) {
-		return delegate.create(entitatId, cie);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public CieDto update(CieDataDto cie) throws NotFoundException {
-		return delegate.update(cie);
+	public CieDto upsert(Long entitatId, CieDataDto cie) {
+		return delegate.upsert(entitatId, cie);
 	}
 
 	@Override
@@ -76,11 +70,30 @@ public class PagadorCieServiceBean implements PagadorCieService {
 	public List<CieDto> findAll() {
 		return delegate.findAll();
 	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
 		return delegate.findAllIdentificadorText();
 	}
+
+	@Override
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+		return delegate.findPagadorsByEntitat(entitat);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
+		return delegate.findNoCaducatsByEntitat(entitat);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+		return delegate.findNoCaducatsByEntitatAndOrgan(entitat, organCodi, isAdminOrgan);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {

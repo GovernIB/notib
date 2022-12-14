@@ -439,4 +439,7 @@ public interface NotificacioService {
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	boolean reactivarNotificacioAmbErrors(Long notificacioId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
+	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType);
 }

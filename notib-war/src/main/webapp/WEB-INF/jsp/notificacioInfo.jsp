@@ -66,14 +66,16 @@ $(document).ready(function() {
 	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
 			$(td).empty();
-			$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+			let data = rowData["errorDescripcio"];
+			data = data ? data : "";
+			$(td).append('<textarea style="width:100%" rows="10">' + data + '</textarea>');
 	});
 	$tableEvents.on('draw.dt', function(e, settings) {
 		var api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
-			var data = this.data();
-			if (!data.error) {
-			$('td:last-child', this.node()).empty();
+			let data = this.data();
+			if (!data.error || data.errorDescripcio == null) {
+				$('td:last-child', this.node()).empty();
 			}
 		});
 	});
@@ -246,8 +248,21 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.creacio.usuari" /></strong></td>
-							<td>${notificacio.createdBy.nom}
-								(${notificacio.createdBy.codi})</td>
+							<td>
+								<c:choose>
+									<c:when test="${notificacio.usuariWeb}">
+										<span>${notificacio.createdBy.nom} (${notificacio.createdBy.codi})</span>
+									</c:when>
+									<c:otherwise>
+										<div>
+											<strong><spring:message code="notificacio.info.dada.creacio.usuari.app" /></strong><span>${notificacio.createdBy.nom} (${notificacio.createdBy.codi})</span>
+										</div>
+										<div>
+											<strong><spring:message code="notificacio.info.dada.creacio.usuari.usr" /></strong><span>${notificacio.usuariNom} (${notificacio.usuariCodi})</span>
+										</div>
+									</c:otherwise>
+								</c:choose>
+							</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.enviament.data" /></strong></td>

@@ -4,6 +4,7 @@ import es.caib.notib.core.api.dto.*;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
+import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.*;
@@ -11,6 +12,7 @@ import es.caib.notib.war.command.ProcSerCommand;
 import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
@@ -71,10 +73,21 @@ public class ServeiController extends BaseUserController{
 		this.currentFiltre = SERVEIS_FILTRE;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
+		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.core.api.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false")));
 		
 		return "serveiListPage";
+	}
+
+	@RequestMapping(value = "/filtre/codi/{serveiCodi}", method = RequestMethod.GET)
+	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String serveiCodi, Model model) {
+
+		this.currentFiltre = SERVEIS_FILTRE;
+		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		procSerFiltreCommand.setCodi(serveiCodi);
+		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
+		return "redirect:/servei";
 	}
 
 	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
@@ -86,6 +99,7 @@ public class ServeiController extends BaseUserController{
 		this.currentFiltre = SERVEIS_FILTRE_MODAL;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
+		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
@@ -102,8 +116,7 @@ public class ServeiController extends BaseUserController{
 			List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(),
 					organGestorActual.getCodi());
 			for (OrganGestorDto organ: organsDto) {
-				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(),
-						organ.getEstat()));
+				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 		}
 		return organsGestors;
@@ -171,17 +184,18 @@ public class ServeiController extends BaseUserController{
 			HttpServletRequest request,
 			@Valid ProcSerCommand procSerCommand,
 			BindingResult bindingResult,
-			Model model) {		
-		
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelServei(
 					request,
 					procSerCommand.getId(),
 					model);
 			model.addAttribute("errors", bindingResult.getAllErrors());
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 			model.addAttribute("cieList", cieList);
 			return "serveiAdminForm";
 		}
@@ -217,6 +231,8 @@ public class ServeiController extends BaseUserController{
 			HttpServletRequest request, 
 			@PathVariable Long serveiId,
 			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerCommand procSerCommand;
 		ProcSerDto servei = emplenarModelServei(
 				request,
@@ -233,9 +249,9 @@ public class ServeiController extends BaseUserController{
 			procSerCommand = new ProcSerCommand();
 		}
 		model.addAttribute(procSerCommand);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("cieList", cieList);
 		return "serveiAdminForm";
 	}

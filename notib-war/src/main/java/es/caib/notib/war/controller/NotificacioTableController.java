@@ -1,8 +1,9 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.EnviamentEstatGrup;
 import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.missatges.Missatge;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
@@ -16,6 +17,7 @@ import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.GrupService;
 import es.caib.notib.core.api.service.JustificantService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.command.MarcarProcessatCommand;
@@ -34,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -94,6 +97,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private JustificantService justificantService;
     @Autowired
     private NotificacioListHelper notificacioListHelper;
+    @Autowired
+    private PermisosService permisService;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -311,7 +316,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
      */
     @RequestMapping(value = "/procedimentsOrgan", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getProcediments(HttpServletRequest request, Model model) {
+    public List<CodiValorOrganGestorComuDto> getProcediments(HttpServletRequest request, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -326,7 +331,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/serveisOrgan", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getServeis(HttpServletRequest request, Model model) {
+    public List<CodiValorOrganGestorComuDto> getServeis(HttpServletRequest request, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -349,7 +354,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
      */
     @RequestMapping(value = "/procedimentsOrgan/{organGestor}", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
+    public List<CodiValorOrganGestorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -364,7 +369,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/serveisOrgan/{organGestor}", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getServeiByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
+    public List<CodiValorOrganGestorComuDto> getServeiByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -541,20 +546,15 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         return DatatablesHelper.getDatatableResponse(request, notificacioService.historicFindAmbEnviament(entitatActual.getId(), notificacioId, enviamentId));
     }
 
+    @ResponseBody
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/refrescarEstatNotifica", method = RequestMethod.GET)
-    public String refrescarEstatNotifica(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
+    public Missatge refrescarEstatNotifica(HttpServletRequest request, @PathVariable Long notificacioId, @PathVariable Long enviamentId, Model model) {
 
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
         boolean totbe = !enviamentEstat.isNotificaError();
         String msg = totbe ? "notificacio.controller.refrescar.estat.ok" : "notificacio.controller.refrescar.estat.error";
-        if (totbe) {
-            MissatgesHelper.success(request, getMessage(request, msg));
-        } else {
-            MissatgesHelper.error(request, getMessage(request, msg));
-        }
-        emplenarModelEnviamentInfo(notificacioId, enviamentId, "estatNotifica", model, request);
-        return "enviamentInfo";
+        return Missatge.builder().ok(totbe).msg(getMessage(request, msg)).build();
     }
 
     @RequestMapping(value = "/{notificacioId}/documentDescarregar/{documentId}", method = RequestMethod.GET)
@@ -572,11 +572,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void certificacioDescarregar(HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+    public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
 
-        ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        try {
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        } catch (Exception ex) {
+            log.error("Error descarregant la certificacio", ex);
+            EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+            NotificacioEnviamenEstatDto enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+            ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        }
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar", method = RequestMethod.GET)
@@ -900,14 +909,19 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             GrupDto grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);
         }
+        if (!Strings.isNullOrEmpty(notificacio.getNotificaErrorDescripcio())) {
+            notificacio.setNotificaErrorDescripcio(htmlEscape(notificacio.getNotificaErrorDescripcio()));
+        }
         model.addAttribute("pipellaActiva", pipellaActiva);
         model.addAttribute("notificacio", notificacio);
         String text = "es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto.";
         model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, text));
-        model.addAttribute("permisGestio", null);
+        boolean permisGestio = false;
         if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
-            model.addAttribute("permisGestio", procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO));
+            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), notificacio.getUsuariCodi(), PermisEnum.GESTIO);
+            permisGestio = permisGestio || procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO);
         }
+        model.addAttribute("permisGestio", permisGestio);
         model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
     }
 

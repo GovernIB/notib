@@ -40,7 +40,7 @@ public class UsuariEntity implements Serializable {
 	private boolean rebreEmailsNotificacio = true;
 	@Column(name = "rebre_emails_creats")
 	@Builder.Default
-	private boolean rebreEmailsNotificacioCreats = false;
+	private boolean rebreEmailsNotificacioCreats = true;
 	@Column(name = "ultim_rol", length = 40)
 	private String ultimRol;
 	@Column(name = "ultima_entitat")

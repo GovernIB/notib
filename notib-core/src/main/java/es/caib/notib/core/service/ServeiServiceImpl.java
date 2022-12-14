@@ -1,7 +1,15 @@
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDataDto;
@@ -9,15 +17,16 @@ import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
 import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
+import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusObjecte;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.aspect.Audita;
@@ -28,7 +37,6 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.GrupProcSerEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
 import es.caib.notib.core.entity.ServeiEntity;
@@ -36,17 +44,33 @@ import es.caib.notib.core.entity.ServeiFormEntity;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PaginacioHelper;
+import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.notib.core.repository.*;
-import es.caib.notib.core.security.ExtendedPermission;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.ProcSerHelper;
+import es.caib.notib.core.helper.ProcSerSyncHelper;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EntregaCieRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.GrupProcSerRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ServeiFormRepository;
+import es.caib.notib.core.repository.ServeiRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -71,6 +95,8 @@ import java.util.Set;
 @Service
 public class ServeiServiceImpl implements ServeiService{
 
+	@Autowired
+	private PermisosService permisosService;
 	@Resource
 	private ServeiRepository serveiRepository;
 	@Resource
@@ -700,10 +726,10 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
+							filtre.getEstat() == null,
+							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				} else if (isAdministrador) {
@@ -714,10 +740,10 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getNom() == null ? "" : filtre.getNom(),
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
+							filtre.getEstat() == null,
+							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				} else if (organGestorActual != null) { // Administrador d'òrgan
@@ -730,10 +756,10 @@ public class ServeiServiceImpl implements ServeiService{
 							filtre.getOrganGestor() == null || filtre.getOrganGestor().isEmpty(),
 							filtre.getOrganGestor() == null ? "" : filtre.getOrganGestor(),
 							organsFills,
+							filtre.getEstat() == null,
+							filtre.getEstat() == null ? null : ProcedimentEstat.ACTIU.equals(filtre.getEstat()),
 							filtre.isComu(),
 							filtre.isEntregaCieActiva(),
-							filtre.getActiu() == null,
-							filtre.getActiu(),
 							pageable);
 
 				}
@@ -881,23 +907,23 @@ public class ServeiServiceImpl implements ServeiService{
 		}
 	}
 	
-	@Override
-	@Transactional(readOnly = true)
-//	@Cacheable(value = "serveisPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
-	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			List<ProcSerSimpleDto> procedimentsAmbPermis = new ArrayList<>();
-			for (ProcSerSimpleDto procSer : procedimentService.findProcedimentServeisWithPermis(entitatId, usuariCodi, permis)) {
-				if (ProcSerTipusEnum.SERVEI.equals(procSer.getTipus())) {
-					procedimentsAmbPermis.add(procSer);
-				}
-			}
-			return procedimentsAmbPermis;
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	@Override
+//	@Transactional(readOnly = true)
+////	@Cacheable(value = "serveisPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
+//	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//			List<ProcSerSimpleDto> procedimentsAmbPermis = new ArrayList<>();
+//			for (ProcSerSimpleDto procSer : procedimentService.findProcedimentServeisWithPermis(entitatId, usuariCodi, permis)) {
+//				if (ProcSerTipusEnum.SERVEI.equals(procSer.getTipus())) {
+//					procedimentsAmbPermis.add(procSer);
+//				}
+//			}
+//			return procedimentsAmbPermis;
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -918,78 +944,78 @@ public class ServeiServiceImpl implements ServeiService{
 		}
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
-			Long entitatId,
-			String organGestorCodi, 
-			List<String> grups,
-			PermisEnum permis) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-					entitatId, 
-					true, 
-					false, 
-					false);
-			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, organGestorCodi);
-			// 1. Obtenim tots els serveis de l'òrgan gestor
-			List<ServeiEntity> serveis = serveiRepository.findServeisByOrganGestorAndGrup(entitat, organGestor.getId(), grups);
-			
-			// 2. Si tenim permis a sobre de l'òrgan o un dels pares, llavors tenim permís a sobre tots els serveis de l'òrgan
-			List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(entitat.getDir3Codi(), organGestorCodi);
-			permisosHelper.filterGrantedAny(
-					organsGestors,
-					new ObjectIdentifierExtractor<OrganGestorEntity>() {
-						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
-							return organGestor.getId();
-						}
-					},
-					OrganGestorEntity.class,
-					permisos,
-					auth);
-			if (organsGestors.isEmpty()) {
-				// 3. Si no tenim permis sobre òrgan, llavors miram els permisos sobre el servei
-				permisosHelper.filterGrantedAny(
-						serveis,
-						new ObjectIdentifierExtractor<ServeiEntity>() {
-							public Long getObjectIdentifier(ServeiEntity servei) {
-								return servei.getId();
-							}
-						},
-						ProcedimentEntity.class,
-						permisos,
-						auth);
-			}
-			
-			// 4. Serveis comuns
-			List<ServeiEntity> serveisComuns = serveiRepository.findByComuTrue();
-			permisosHelper.filterGrantedAny(
-					serveisComuns,
-					new ObjectIdentifierExtractor<ServeiEntity>() {
-						public Long getObjectIdentifier(ServeiEntity servei) {
-							return servei.getId();
-						}
-					},
-					ProcedimentEntity.class,
-					permisos,
-					auth);
-			serveisComuns.removeAll(serveis);
-			serveis.addAll(serveisComuns);
-			
-			return conversioTipusHelper.convertirList(
-					serveis,
-					ProcSerDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	@Override
+//	@Transactional(readOnly = true)
+//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
+//			Long entitatId,
+//			String organGestorCodi,
+//			List<String> grups,
+//			PermisEnum permis) {
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+//					entitatId,
+//					true,
+//					false,
+//					false);
+//			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+//			OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, organGestorCodi);
+//			// 1. Obtenim tots els serveis de l'òrgan gestor
+//			List<ServeiEntity> serveis = serveiRepository.findServeisByOrganGestorAndGrup(entitat, organGestor.getId(), grups);
+//
+//			// 2. Si tenim permis a sobre de l'òrgan o un dels pares, llavors tenim permís a sobre tots els serveis de l'òrgan
+//			List<OrganGestorEntity> organsGestors = organigramaHelper.getOrgansGestorsParesExistentsByOrgan(entitat.getDir3Codi(), organGestorCodi);
+//			permisosHelper.filterGrantedAny(
+//					organsGestors,
+//					new ObjectIdentifierExtractor<OrganGestorEntity>() {
+//						public Long getObjectIdentifier(OrganGestorEntity organGestor) {
+//							return organGestor.getId();
+//						}
+//					},
+//					OrganGestorEntity.class,
+//					permisos,
+//					auth);
+//			if (organsGestors.isEmpty()) {
+//				// 3. Si no tenim permis sobre òrgan, llavors miram els permisos sobre el servei
+//				permisosHelper.filterGrantedAny(
+//						serveis,
+//						new ObjectIdentifierExtractor<ServeiEntity>() {
+//							public Long getObjectIdentifier(ServeiEntity servei) {
+//								return servei.getId();
+//							}
+//						},
+//						ProcedimentEntity.class,
+//						permisos,
+//						auth);
+//			}
+//
+//			// 4. Serveis comuns
+//			List<ServeiEntity> serveisComuns = serveiRepository.findByComuTrue();
+//			permisosHelper.filterGrantedAny(
+//					serveisComuns,
+//					new ObjectIdentifierExtractor<ServeiEntity>() {
+//						public Long getObjectIdentifier(ServeiEntity servei) {
+//							return servei.getId();
+//						}
+//					},
+//					ProcedimentEntity.class,
+//					permisos,
+//					auth);
+//			serveisComuns.removeAll(serveis);
+//			serveis.addAll(serveisComuns);
+//
+//			return conversioTipusHelper.convertirList(
+//					serveis,
+//					ProcSerDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<CodiValorComuDto> getServeisOrgan(
+	public List<CodiValorOrganGestorComuDto> getServeisOrgan(
 			Long entitatId,
 			String organCodi,
 			Long organFiltre,
@@ -999,8 +1025,7 @@ public class ServeiServiceImpl implements ServeiService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<CodiValorComuDto> serveisOrgan = new ArrayList<>();
-			List<ServeiEntity> serveis = new ArrayList<>();
+			List<CodiValorOrganGestorComuDto> serveis = new ArrayList<>();
 			String organFiltreCodi = null;
 
 			if (organFiltre != null) {
@@ -1010,53 +1035,61 @@ public class ServeiServiceImpl implements ServeiService{
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				serveis = recuperarServeiAmbPermis(entitat, permis, organFiltreCodi);
+				Set<CodiValorOrganGestorComuDto> setServeis = new HashSet<>(recuperarServeiAmbPermis(entitat, permis, organFiltreCodi));
 				Set<ServeiEntity> auxSet = serveiRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
-				auxSet.addAll(serveis);
-				serveis = new ArrayList<>(auxSet);
+				for (ServeiEntity servei: auxSet) {
+					setServeis.add(CodiValorOrganGestorComuDto.builder()
+							.id(servei.getId())
+							.codi(servei.getCodi())
+							.valor(servei.getCodi() + ((servei.getNom() != null && !servei.getNom().isEmpty()) ? " - " + servei.getNom() : ""))
+							.organGestor(servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "")
+							.comu(servei.isComu())
+							.build());
+				}
+				serveis = new ArrayList<>(setServeis);
 			} else {
-
+				List<ServeiEntity> serveisEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {
 					List<ServeiEntity> serveisDisponibles = serveiRepository.findByEntitat(entitat);
 					if (serveisDisponibles != null) {
-						for (ServeiEntity proc : serveisDisponibles) {
-							if (proc.isComu() || (proc.getOrganGestor() != null && organFiltreCodi.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
-								serveis.add(proc);
+						for (ServeiEntity servei : serveisDisponibles) {
+							if (servei.isComu() || (servei.getOrganGestor() != null && organFiltreCodi.equalsIgnoreCase(servei.getOrganGestor().getCodi()))) {
+								serveisEntitat.add(servei);
 							}
 						}
 					}
 				} else {
 					if (RolEnumDto.NOT_SUPER.equals(rol)) {
-						serveis = serveiRepository.findAll();
+						serveisEntitat = serveiRepository.findAll();
 					} else if (RolEnumDto.NOT_ADMIN.equals(rol)) {
-						serveis = serveiRepository.findByEntitat(entitat);
+						serveisEntitat = serveiRepository.findByEntitat(entitat);
 					} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
 						if (organCodi != null) {
 							List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(
 									entitat.getDir3Codi(),
 									organCodi);
-							serveis = serveiRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
+							serveisEntitat = serveiRepository.findByOrganGestorCodiInOrComu(organsFills, entitat);
 						}
 					}
 				}
+				for (ServeiEntity servei: serveisEntitat) {
+					serveis.add(CodiValorOrganGestorComuDto.builder()
+							.id(servei.getId())
+							.codi(servei.getCodi())
+							.valor(servei.getCodi() + ((servei.getNom() != null && !servei.getNom().isEmpty()) ? " - " + servei.getNom() : ""))
+							.organGestor(servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "")
+							.comu(servei.isComu())
+							.build());
+				}
 			}
 
-			Collections.sort(serveis, new Comparator<ServeiEntity>() {
+			Collections.sort(serveis, new Comparator<CodiValorOrganGestorComuDto>() {
 				@Override
-				public int compare(ServeiEntity p1, ServeiEntity p2) {
-					return p1.getNom().compareTo(p2.getNom());
+				public int compare(CodiValorOrganGestorComuDto p1, CodiValorOrganGestorComuDto p2) {
+					return p1.getValor().compareTo(p2.getValor());
 				}
 			});
-
-			for (ServeiEntity servei : serveis) {
-				String nom = servei.getCodi();
-				if (servei.getNom() != null && !servei.getNom().isEmpty()) {
-					nom += " - " + servei.getNom();
-				}
-				serveisOrgan.add(new CodiValorComuDto(servei.getId().toString(), nom, servei.isComu()));
-			}
-
-			return serveisOrgan;
+			return serveis;
 
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1077,35 +1110,40 @@ public class ServeiServiceImpl implements ServeiService{
 					it.remove();
 				}
 			}
-		} else if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)){
-			serveis = recuperarServeiAmbPermis(entitat, PermisEnum.COMUNIACIO_SIR, organCodi);
+			return serveisToCodiValorOrganGestorComuDto(serveis);
 		} else {
-			serveis = recuperarServeiAmbPermis(entitat, PermisEnum.NOTIFICACIO, organCodi);
+			PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+					TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO :
+							PermisEnum.NOTIFICACIO;
+			return recuperarServeiAmbPermis(entitat, permis, organCodi);
 		}
-
-		return serveisToCodiValorOrganGestorComuDto(serveis);
 	}
 
-	@Override
-	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Permission[] permisos = new Permission[]{};
-		if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)){
-			permisos = new Permission[]{
-					ExtendedPermission.COMUNS,
-					ExtendedPermission.COMUNICACIO_SIR
-			};
-		} else {
-			permisos = new Permission[]{
-					ExtendedPermission.COMUNS,
-					ExtendedPermission.NOTIFICACIO
-			};
-		}
-
-		List<OrganGestorEntity> organGestorsAmbPermis = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
-		return organGestorsAmbPermis != null && !organGestorsAmbPermis.isEmpty();
-	}
+//	@Override
+//	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
+//		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		Permission[] permisos = new Permission[]{};
+//		if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)){
+//			permisos = new Permission[]{
+//					ExtendedPermission.COMUNS,
+//					ExtendedPermission.COMUNICACIO_SIR
+//			};
+//		} else if (TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus)) {
+//			permisos = new Permission[]{
+//					ExtendedPermission.COMUNS,
+//					ExtendedPermission.COMUNICACIO
+//			};
+//		} else {
+//			permisos = new Permission[]{
+//					ExtendedPermission.COMUNS,
+//					ExtendedPermission.NOTIFICACIO
+//			};
+//		}
+//
+//		List<OrganGestorEntity> organGestorsAmbPermis = permisosCacheable.findOrgansGestorsWithPermisDirecte(entitat, auth, permisos);
+//		return organGestorsAmbPermis != null && !organGestorsAmbPermis.isEmpty();
+//	}
 
 	private List<CodiValorOrganGestorComuDto> serveisToCodiValorOrganGestorComuDto(List<ServeiEntity> serveis) {
 		List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
@@ -1115,8 +1153,13 @@ public class ServeiServiceImpl implements ServeiService{
 				nom += " - " + servei.getNom();
 			}
 			String organCodi = servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "";
-			response.add(new CodiValorOrganGestorComuDto(servei.getId().toString(), nom, organCodi,
-					servei.isComu()));
+			response.add(CodiValorOrganGestorComuDto.builder()
+					.id(servei.getId())
+					.codi(servei.getCodi())
+					.valor(nom)
+					.organGestor(organCodi)
+					.comu(servei.isComu())
+					.build());
 		}
 		return response;
 	}
@@ -1135,108 +1178,22 @@ public class ServeiServiceImpl implements ServeiService{
 		}
 	}
 
-	private List<ServeiEntity> recuperarServeiAmbPermis(
-			EntitatEntity entitat,
-			PermisEnum permis,
-			String organFiltre) {
-
+	private List<CodiValorOrganGestorComuDto> recuperarServeiAmbPermis(EntitatEntity entitat, PermisEnum permis, String organFiltre) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		List<ProcSerEntity> serveis = serveisCacheable.getProcedimentsWithPermis(
-				auth.getName(),
-				entitat,
-				permisos);
-		List<ProcSerOrganEntity> serveisOrgans = serveisCacheable.getProcedimentOrganWithPermis(
-				auth,
-				entitat,
-				permisos);
-		List<ProcSerEntity> procSerAmbPermis;
-		if (organFiltre != null) {
-			List<ProcSerOrganEntity> serveisOrgansAmbPermis = new ArrayList<>();
-			if(serveisOrgans != null && !serveisOrgans.isEmpty()) {
-
-				List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-				for (ProcSerOrganEntity serveiOrgan: serveisOrgans) {
-					if (organsFills.contains(serveiOrgan.getOrganGestor().getCodi()))
-						serveisOrgansAmbPermis.add(serveiOrgan);
-				}
-			}
-
-			procSerAmbPermis = addServeisOrgan(serveis, serveisOrgansAmbPermis, organFiltre);
-
-			boolean hasComunsPermission = hasPermisServeisComuns(entitat.getDir3Codi(), organFiltre);
-			if (hasComunsPermission && (PermisEnum.NOTIFICACIO.equals(permis) || PermisEnum.COMUNIACIO_SIR.equals(permis))) {
-				List<ServeiEntity> serveisComuns = serveiRepository.findByEntitatAndComuTrue(entitat);
-				for (ServeiEntity servei: serveisComuns) {
-					if (!procSerAmbPermis.contains(servei) && servei.isActiu())
-						procSerAmbPermis.add(servei);
-				}
-			}
-
-		} else {
-
-			Set<ProcSerEntity> setServeis = new HashSet<>();
-			if (serveis != null)
-				setServeis = new HashSet<>(serveis);
-
-			if (serveisOrgans != null && !serveisOrgans.isEmpty()) {
-				for (ProcSerOrganEntity serveiOrgan : serveisOrgans) {
-					setServeis.add(serveiOrgan.getProcSer());
-				}
-			}
-			procSerAmbPermis = new ArrayList<>(setServeis);
+		List<CodiValorOrganGestorComuDto> serveis = permisosService.getServeisAmbPermis(entitat.getId(), auth.getName(), permis);
+		if (organFiltre == null) {
+			return serveis;
 		}
-
-		return filtraServeis(procSerAmbPermis);
-	}
-
-	private List<ServeiEntity> filtraServeis(List<ProcSerEntity> procSerAmbPermis) {
-		List<ServeiEntity> serveisAmbPermis = new ArrayList<>();
-		for (ProcSerEntity procSer : procSerAmbPermis) {
-			if (ProcSerTipusEnum.SERVEI.equals(procSer.getTipus())) {
-				serveisAmbPermis.add((ServeiEntity) procSer);
+		List<CodiValorOrganGestorComuDto> serveisAmbPermis = new ArrayList<>();
+		List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
+		for (CodiValorOrganGestorComuDto servei: serveis) {
+			if (organsFills.contains(servei.getOrganGestor())) {
+				serveisAmbPermis.add(servei);
 			}
 		}
 		return serveisAmbPermis;
 	}
 
-	private boolean hasPermisServeisComuns(String codiEntitat, String codiOrgan) {
-		List<String> organsPares = organGestorCachable.getCodisAncestors(codiEntitat, codiOrgan);
-		for (String codiDir3 : organsPares) {
-			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(codiDir3);
-			if(organGestorEntity != null && permisosHelper.hasPermission(
-					organGestorEntity.getId(),
-					OrganGestorEntity.class,
-					new Permission[]{ExtendedPermission.COMUNS})
-			) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private List<ProcSerEntity> addServeisOrgan(
-			List<ProcSerEntity> serveis,
-			List<ProcSerOrganEntity> serveisOrgans,
-			String organFiltre) {
-
-		Set<ProcSerEntity> setServeis = new HashSet<>();
-		if (organFiltre != null) {
-			if (serveis != null) {
-				for (ProcSerEntity proc : serveis) {
-					if (proc.isComu() || (proc.getOrganGestor() != null && organFiltre.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
-						setServeis.add(proc);
-					}
-				}
-			}
-			if (serveisOrgans != null && !serveisOrgans.isEmpty()) {
-				for (ProcSerOrganEntity serveiOrgan : serveisOrgans) {
-					setServeis.add(serveiOrgan.getProcSer());
-				}
-			}
-		}
-		return new ArrayList<>(setServeis);
-	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -1268,172 +1225,6 @@ public class ServeiServiceImpl implements ServeiService{
 		}
 	}
 	
-//	@Override
-//	@Transactional(readOnly = true)
-//	public boolean hasPermisServei(
-//			Long serveiId,
-//			PermisEnum permis) {
-//		Timer.Context timer = metricsHelper.iniciMetrica();
-//		try {
-//			return entityComprovarHelper.hasPermisProcediment(serveiId, permis);
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-//
-//	@Transactional(readOnly = true)
-//	@Cacheable(value = "serveisOrganPermis", key="#entitatId.toString().concat('-').concat(#usuariCodi).concat('-').concat(#permis.name())")
-//	@Override
-//	public List<ServeiOrganDto> findServeisOrganWithPermis(
-//			Long entitatId,
-//			String usuariCodi,
-//			PermisEnum permis) {
-//		Timer.Context timer = metricsHelper.iniciMetrica();
-//		try {
-//			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-//					entitatId,
-//					true,
-//					false,
-//					false);
-//
-//			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-//
-//			List<ProcSerOrganEntity> serveiOrgansAmbPermis = serveisCacheable.getProcedimentOrganWithPermis(
-//					auth,
-//					entitat,
-//					permisos);
-//
-//			// 2. Convertim els serveis a dto
-//			return conversioTipusHelper.convertirList(
-//					serveiOrgansAmbPermis,
-//					ServeiOrganDto.class);
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(
-			String organGestor, 
-			String entitatCodi,
-			List<ProcSerOrganDto> serveisOrgans) {
-		
-		List<ProcSerOrganDto> serveisOrgansAmbPermis = new ArrayList<>();
-		if(serveisOrgans != null && !serveisOrgans.isEmpty()) {
-
-			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitatCodi, organGestor);
-			for (ProcSerOrganDto serveiOrgan: serveisOrgans) {
-				if (organsFills.contains(serveiOrgan.getOrganGestor().getCodi()))
-					serveisOrgansAmbPermis.add(serveiOrgan);
-			}
-		}
-		return serveisOrgansAmbPermis;
-	}
-	
-	@Transactional(readOnly = true)
-	@Override
-	public List<String> findServeisOrganCodiWithPermisByServei(
-			ProcSerDto servei, 
-			String entitatCodi,
-			List<ProcSerOrganDto> serveisOrgans) {
-		
-		Set<String> organsDisponibles = new HashSet<String>();
-		if(!serveisOrgans.isEmpty()) {
-			for (ProcSerOrganDto serveiOrgan: serveisOrgans) {
-				if (serveiOrgan.getProcSer().equals(servei)) {
-					String organ = serveiOrgan.getOrganGestor().getCodi(); 
-					if (!organsDisponibles.contains(organ))
-						organsDisponibles.addAll(organigramaHelper.getCodisOrgansGestorsFillsByOrgan(
-								entitatCodi, 
-								organ));
-				}
-			}
-		}
-		return new ArrayList<String>(organsDisponibles);
-	}
-	
-	
-//	@Transactional
-//	@Override
-//	public List<PermisDto> permisFind(
-//			Long entitatId,
-//			boolean isAdministrador,
-//			Long serveiId,
-//			String organ,
-//			String organActual,
-//			TipusPermis tipus) {
-//		Timer.Context timer = metricsHelper.iniciMetrica();
-//		try {
-//			logger.debug("Consulta dels permisos del servei ("
-//					+ "entitatId=" + entitatId +  ", "
-//					+ "serveiId=" + serveiId + ", "
-//					+ "tipus=" + tipus + ")");
-//
-//			List<PermisDto> permisos = new ArrayList<PermisDto>();
-//
-//			EntitatEntity entitat = null;
-//			if (entitatId != null && !isAdministrador)
-//				entitat = entityComprovarHelper.comprovarEntitat(
-//						entitatId,
-//						false,
-//						false,
-//						false);
-//			ServeiEntity servei = (ServeiEntity) entityComprovarHelper.comprovarProcediment(
-//					entitat,
-//					serveiId);
-//			boolean adminOrgan = organActual != null;
-//
-//			if (tipus == null) {
-//				permisos = findPermisServei(servei, adminOrgan, organActual);
-//				permisos.addAll(findPermisServeiOrganByServei(serveiId, organActual));
-//			} else if (TipusPermis.PROCEDIMENT.equals(tipus)) {
-//				permisos = findPermisServei(servei, adminOrgan, organActual);
-//			} else {
-//				if (organ == null)
-//					permisos = findPermisServeiOrganByServei(serveiId, organActual);
-//				else
-//					permisos = findPermisServeiOrgan(serveiId, organ, organActual);
-//			}
-//			Collections.sort(permisos, new Comparator<PermisDto>() {
-//				@Override
-//				public int compare(PermisDto p1, PermisDto p2) {
-//					int comp = p1.getNomSencerAmbCodi().compareTo(p2.getNomSencerAmbCodi());
-//					if (comp == 0) {
-//						if (p1.getOrgan() == null && p2.getOrgan() != null)
-//							return 1;
-//						if (p1.getOrgan() != null && p2.getOrgan() == null)
-//							return -1;
-//						if(p1.getOrgan() == null && p2.getOrgan() == null)
-//							return p1.getTipus().compareTo(p2.getTipus());
-//
-//						return p1.getOrgan().compareTo(p2.getOrgan());
-//					}
-//					return comp;
-//				}
-//			});
-//			return permisos;
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
-//
-//	private List<PermisDto> findPermisServei(
-//			ServeiEntity servei,
-//			boolean adminOrgan,
-//			String organ) {
-//		List<PermisDto> permisos = permisosHelper.findPermisos(
-//				servei.getId(),
-//				ProcedimentEntity.class);
-//		boolean isAdministradorOrganAndNoComuOrAdminEntitat = (adminOrgan && !servei.isComu()) || //administrador òrgan i servei no comú
-//				(adminOrgan && servei.isComu() && (servei.getOrganGestor().getCodi().equals(organ))) ||  //administrador òrgan, servei comú però del mateix òrgan
-//				!adminOrgan; //administrador entitat
-//		for (PermisDto permis: permisos)
-//			permis.setPermetEdicio(isAdministradorOrganAndNoComuOrAdminEntitat);
-//		return permisos;
-//	}
-//
 	private List<PermisDto> findPermisServeiOrganByServei(
 			Long serveiId,
 			String organGestor) {

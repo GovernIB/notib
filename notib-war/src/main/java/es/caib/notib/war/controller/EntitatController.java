@@ -110,9 +110,10 @@ public class EntitatController extends BaseController {
 		model.addAttribute(command != null ? command : new EntitatCommand());
 		model.addAttribute("modificant", modificant);
 		model.addAttribute("TipusDocumentEnumDto", TipusDocumentEnumDto.class);
-		List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+		List<IdentificadorTextDto> operadorPostalList = entitat != null ? operadorPostalService.findPagadorsByEntitat(entitat) : operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);
-		List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+		model.addAttribute("entitatNova", entitat != null && entitat.getId() != null);
+		List<IdentificadorTextDto> cieList = entitat != null ? cieService.findPagadorsByEntitat(entitat) : cieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}
@@ -163,6 +164,7 @@ public class EntitatController extends BaseController {
 	public String save(HttpServletRequest request, @Valid EntitatCommand command, BindingResult bindingResult, Model model) throws NotFoundException, IOException {
 
 		if (bindingResult.hasErrors()) {
+
 			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
 			model.addAttribute("operadorPostalList", operadorPostalList);
 			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();

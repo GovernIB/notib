@@ -404,7 +404,13 @@ public class NotificacioServiceBean implements NotificacioService {
 		return delegate.reactivarNotificacioAmbErrors(notificacioId);
 	}
 
-	@SuppressWarnings("rawtypes")
+    @Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
+    public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType) {
+        return delegate.checkIfSignedAttached(contingut, nom, contentType);
+    }
+
+    @SuppressWarnings("rawtypes")
 	@Override
 	public List getNotificacionsDEHPendentsRefrescarCert() {
 		return delegate.getNotificacionsDEHPendentsRefrescarCert();

@@ -10,9 +10,10 @@ import java.util.Date;
 
 @Getter @Setter @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class OperadorPostalDataDto extends AuditoriaDto implements Serializable {
+
 	private Long id;
-	private String nom;
 	@EqualsAndHashCode.Include
+	private String nom;
 	private String organismePagadorCodi;
 	@EqualsAndHashCode.Include
 	private String contracteNum;

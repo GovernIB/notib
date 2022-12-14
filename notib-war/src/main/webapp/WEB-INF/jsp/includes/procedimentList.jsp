@@ -82,9 +82,10 @@ $(document).ready(function() {
 			</div>
 		</c:if>
 		<div class="col-md-2">
-			<not:inputSelect id="actiu" name="actiu" optionItems="${procSerFiltreCommand.estats}" optionValueAttribute="value"
-							 optionTextKeyAttribute="text" emptyOption="true" placeholderKey="notificacio.list.filtre.camp.estat" inline="true"/>
+			<not:inputSelect name="estat" optionItems="${procedimentEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
+							 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
 		</div>
+
 	</div>
 	<div class="row">
 		<div class="col-md-4">
@@ -93,18 +94,20 @@ $(document).ready(function() {
 					<span class="fa fa-globe"></span> <spring:message code="procediment.filter.form.camp.comu"/>
 				</button>
 				<not:inputHidden name="comu"/>
+			</div>
+				<div class="btn-group" role="group">
 				<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${procSerFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
 					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
 				</button>
 				<not:inputHidden name="entregaCieActiva"/>
 			</div>
 		</div>
-		<div class="col-md-2 pull-right">
-			<div class="pull-right">
-				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+			<div class="col-md-2 pull-right">
+				<div class="pull-right">
+					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
+				</div>
 			</div>
-		</div>
 	</div>
 </form:form>
 </c:if>
@@ -125,7 +128,16 @@ $(document).ready(function() {
 		<tr>
 			<th data-col-name="id" data-visible="false" width="4%">#</th>
 			<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
-			<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
+			<th data-col-name="nom" data-template="#cellNom">
+			<spring:message code="procediment.list.columna.nom"/>
+				<script id="cellNom" type="text/x-jsrender">
+					{{if ${isModal}}}
+						<a href="<c:url value='/procediment/filtre/codi/{{:codi}}'/>" target="_blank"> {{:nom}}</a>
+					{{else}}
+						{{:nom}}
+					{{/if}}
+				</script>
+			</th>
 
 			<c:if test="${not simplifiedView}">
 			<th data-col-name="organGestorEstat" data-orderable="false" data-visible="false"></th>

@@ -5,13 +5,13 @@ package es.caib.notib.war.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioDto;
 import es.caib.notib.core.api.dto.IntegracioDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.service.MonitorIntegracioService;
 import es.caib.notib.war.command.IntegracioFiltreCommand;
-import es.caib.notib.war.command.ProcSerFiltreCommand;
 import es.caib.notib.war.helper.DatatablesHelper;
 import es.caib.notib.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.notib.war.helper.EnumHelper;
@@ -57,7 +57,8 @@ public class IntegracioController extends BaseUserController {
 		UNITATS,
 		GESCONADM,
 		PROCEDIMENTS,
-		FIRMASERV
+		FIRMASERV,
+		VALIDASIG
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -128,7 +129,9 @@ public class IntegracioController extends BaseUserController {
 		dto.setPrimera(true);
 		dto.setPosteriors(false);
 		dto.setDarrera(true);
-		accions = accions.subList(inici, inici + paginacio.getPaginaTamany());
+		int fi = inici + paginacio.getPaginaTamany();
+		fi = fi < accions.size() ? fi : inici + (accions.size() - inici);
+		accions = accions.subList(inici, fi);
 		dto.setContingut(accions);
 		return DatatablesHelper.getDatatableResponse(request, dto);
 	}
@@ -146,4 +149,16 @@ public class IntegracioController extends BaseUserController {
 		return "integracioDetall";
 	}
 
+	@RequestMapping(value = "/netejar", method = RequestMethod.GET)
+	public String natejar(HttpServletRequest request, Model model) {
+
+		String redirect = "redirect:../integracio";
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		try {
+			monitorIntegracioService.netejarMonitor();
+			return getAjaxControllerReturnValueSuccess(request, redirect, "integracio.netejar.ok");
+		} catch (Exception ex) {
+			return getAjaxControllerReturnValueError(request, redirect, "integracio.netejar.error");
+		}
+	}
 }

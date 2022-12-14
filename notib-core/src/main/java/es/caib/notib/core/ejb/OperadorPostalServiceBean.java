@@ -37,19 +37,8 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public OperadorPostalDto create(
-			Long entitatId,
-			OperadorPostalDataDto postal) {
-		return delegate.create(
-				entitatId, 
-				postal);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public OperadorPostalDto update(OperadorPostalDataDto postal) throws NotFoundException {
-		return delegate.update(postal);
-	}
+	public OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal) {
+		return delegate.upsert(entitatId, postal);}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
@@ -65,14 +54,8 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
-			Long entitatId, 
-			OperadorPostalFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findAmbFiltrePaginat(
-				entitatId, 
-				filtre, 
-				paginacioParams);
+	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return delegate.findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
@@ -86,6 +69,24 @@ public class OperadorPostalServiceBean implements OperadorPostalService {
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
 		return delegate.findAllIdentificadorText();
 	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+		return null;
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
+		return delegate.findNoCaducatsByEntitat(entitat);
+	}
+
+	@Override
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan) {
+		return delegate.findNoCaducatsByEntitatAndOrgan(entitatId, organCodi, isAdminOrgan);
+	}
+
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<OperadorPostalDto> findAllPaginat(PaginacioParamsDto paginacioParams) {

@@ -14,11 +14,18 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto
 import es.caib.notib.core.api.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerOrganDto;
-import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
-import es.caib.notib.core.api.service.*;
+import es.caib.notib.core.api.service.AplicacioService;
+import es.caib.notib.core.api.service.EntitatService;
+import es.caib.notib.core.api.service.GestioDocumentalService;
+import es.caib.notib.core.api.service.GrupService;
+import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.OrganGestorService;
+import es.caib.notib.core.api.service.PagadorCieFormatFullaService;
+import es.caib.notib.core.api.service.PagadorCieFormatSobreService;
+import es.caib.notib.core.api.service.PermisosService;
+import es.caib.notib.core.api.service.ProcedimentService;
+import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.war.command.DocumentCommand;
 import es.caib.notib.war.command.EntregapostalCommand;
 import es.caib.notib.war.command.EnviamentCommand;
@@ -30,7 +37,6 @@ import es.caib.notib.war.helper.CaducitatHelper;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.EnumHelper;
 import es.caib.notib.war.helper.MissatgesHelper;
-import es.caib.notib.war.helper.PropertiesHelper;
 import es.caib.notib.war.helper.RequestSessionHelper;
 import es.caib.notib.war.helper.RolHelper;
 import lombok.Data;
@@ -44,6 +50,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -53,6 +60,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -62,11 +70,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -105,8 +110,12 @@ public class NotificacioFormController extends BaseUserController {
     private PagadorCieFormatFullaService pagadorCieFormatFullaService;
     @Autowired
     private GestioDocumentalService gestioDocumentalService;
+    @Autowired
+    private PermisosService permisosService;
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+    private TipusEnviamentEnumDto tipusEnviament;
 
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
@@ -156,48 +165,48 @@ public class NotificacioFormController extends BaseUserController {
             notificacioCommand.getDocuments()[i].setValidesa(ValidesaEnum.ORIGINAL);
             notificacioCommand.getDocuments()[i].setTipoDocumental(TipusDocumentalEnum.ALTRES);
         }
+        this.tipusEnviament = tipusEnviament;
         notificacioCommand.setEnviamentTipus(tipusEnviament);
         emplenarModelNotificacio(request, model, notificacioCommand);
 
     }
 
-    @RequestMapping(value = "/procediments", method = RequestMethod.GET)
-    public String formProcediments(HttpServletRequest request, Model model) {
-
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        model.addAttribute("entitat", entitatActual);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-//		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
-
-        Set<ProcSerSimpleDto> procedimentsDisponibles = new HashSet<ProcSerSimpleDto>();
-        List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
-
-        if (RolHelper.isUsuariActualUsuari(request)) {
-//			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
-        	List<ProcSerSimpleDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-        	List<ProcSerSimpleDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerNotificacio);
-        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerComunicacioSir);
-        	
-            model.addAttribute("procediments", procedimentsDisponibles);
-            List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
-            for (ProcSerSimpleDto pro : procedimentsDisponibles) {
-                procedimentsDisponiblesIds.add(pro.getId());
-            }
-            organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
-            model.addAttribute("organsGestors", organsGestorsDisponibles);
-        }
-
-        return "notificacioProcedimentsForm";
-    }
+//    @RequestMapping(value = "/procediments", method = RequestMethod.GET)
+//    public String formProcediments(HttpServletRequest request, Model model) {
+//
+//        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+//        model.addAttribute("entitat", entitatActual);
+//        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+////		List<String> rolsUsuariActual = aplicacioService.findRolsUsuariAmbCodi(usuariActual.getCodi());
+//
+//        Set<ProcSerSimpleDto> procedimentsDisponibles = new HashSet<ProcSerSimpleDto>();
+//        List<OrganGestorDto> organsGestorsDisponibles = new ArrayList<OrganGestorDto>();
+//
+//        if (RolHelper.isUsuariActualUsuari(request)) {
+////			procedimentsDisponibles = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), rolsUsuariActual, PermisEnum.NOTIFICACIO);
+//        	List<ProcSerSimpleDto> procedimentsDisponiblesPerNotificacio = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+//        	List<ProcSerSimpleDto> procedimentsDisponiblesPerComunicacioSir = procedimentService.findProcedimentsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNICACIO_SIR);
+//        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerNotificacio);
+//        	procedimentsDisponibles.addAll(procedimentsDisponiblesPerComunicacioSir);
+//
+//            model.addAttribute("procediments", procedimentsDisponibles);
+//            List<Long> procedimentsDisponiblesIds = new ArrayList<Long>();
+//            for (ProcSerSimpleDto pro : procedimentsDisponibles) {
+//                procedimentsDisponiblesIds.add(pro.getId());
+//            }
+//            organsGestorsDisponibles = organGestorService.findByProcedimentIds(procedimentsDisponiblesIds);
+//            model.addAttribute("organsGestors", organsGestorsDisponibles);
+//        }
+//
+//        return "notificacioProcedimentsForm";
+//    }
 
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
-    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
-                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), enviamentTipus);
+                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
     }
 
     @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
@@ -264,19 +273,14 @@ public class NotificacioFormController extends BaseUserController {
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         ProcSerDto procedimentActual = null;
+        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
 
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
         }
         notificacioCommand.setUsuariCodi(aplicacioService.getUsuariActual().getCodi());
         if (bindingResult.hasErrors()) {
-            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
-            for (ObjectError error: bindingResult.getAllErrors()) {
-                log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
-            }
-            model.addAttribute(notificacioCommand);
-            emplenarModelNotificacio(request, model, notificacioCommand);
+            relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
             return "notificacioForm";
         }
 
@@ -285,9 +289,14 @@ public class NotificacioFormController extends BaseUserController {
         }
         model.addAttribute(new NotificacioFiltreCommand());
         model.addAttribute(new OrganGestorFiltreCommand());
+
         try {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Processant dades del formulari. ");
-            updateDocuments(notificacioCommand);
+            updateDocuments(notificacioCommand, bindingResult);
+            if (bindingResult.hasErrors()) {
+                relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
+                return "notificacioForm";
+            }
             if (notificacioCommand.getId() != null) {
                 notificacioService.update(entitatActual.getId(), notificacioCommand.asDatabaseDto(), RolHelper.isUsuariActualAdministradorEntitat(request));
             } else {
@@ -298,7 +307,8 @@ public class NotificacioFormController extends BaseUserController {
             log.error("[NOT-CONTROLLER] POST notificació desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getFullStackTrace(ex));
             MissatgesHelper.error(request, ex.getMessage());
-            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+            relooadForm(request, notificacioCommand, bindingResult, model, tipusDocumentEnumDto, entitatActual, procedimentActual);
+//            ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
             model.addAttribute("notificacioCommandV2", notificacioCommand);
             return "notificacioForm";
         }
@@ -306,8 +316,18 @@ public class NotificacioFormController extends BaseUserController {
         return "redirect:../notificacio";
     }
 
-    
-    private void updateDocuments(NotificacioCommand notificacioCommand) throws IOException {
+    private void relooadForm(HttpServletRequest request, NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model, List<String> tipusDocumentEnumDto, EntitatDto entitatActual, ProcSerDto procedimentActual) {
+        log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
+        ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
+        for (ObjectError error: bindingResult.getAllErrors()) {
+            log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
+        }
+        model.addAttribute(notificacioCommand);
+        emplenarModelNotificacio(request, model, notificacioCommand);
+    }
+
+
+    private void updateDocuments(NotificacioCommand notificacioCommand, BindingResult bindingResult) throws IOException {
 
         for (int i = 0; i < 5; i++) {
 
@@ -316,11 +336,15 @@ public class NotificacioFormController extends BaseUserController {
                 switch (notificacioCommand.getTipusDocument()[i]) {
                     case ARXIU:
                         if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setArxiuNom(notificacioCommand.getArxiu()[i].getOriginalFilename());
-                            String contingutBase64 = Base64.encodeBase64String(notificacioCommand.getArxiu()[i].getBytes());
+                            byte[] contingut = notificacioCommand.getArxiu()[i].getBytes();
+                            String contentType = notificacioCommand.getArxiu()[i].getContentType();
+                            String nom = notificacioCommand.getArxiu()[i].getOriginalFilename();
+                            notificacioCommand.getDocuments()[i].setArxiuNom(nom);
+                            String contingutBase64 = Base64.encodeBase64String(contingut);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                            notificacioCommand.getDocuments()[i].setMediaType(notificacioCommand.getArxiu()[i].getContentType());
+                            notificacioCommand.getDocuments()[i].setMediaType(contentType);
                             notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+                            validaFirma(nom, contentType, bindingResult, i, contingut);
                         } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
                             byte[] result;
                             if (notificacioCommand.getId() != null) {
@@ -331,6 +355,7 @@ public class NotificacioFormController extends BaseUserController {
 
                             String contingutBase64 = Base64.encodeBase64String(result);
                             notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                            validaFirma(notificacioCommand.getDocuments()[i].getArxiuNom(), notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
                         } else {
                             notificacioCommand.getDocuments()[i] = null;
                         }
@@ -362,6 +387,37 @@ public class NotificacioFormController extends BaseUserController {
                 }
             } else {
                 notificacioCommand.getDocuments()[i] = null;
+            }
+        }
+    }
+
+    @RequestMapping(value = "/valida/firma", method = RequestMethod.POST)
+    @ResponseBody
+    public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
+
+        String nom = fitxer.getOriginalFilename();
+        byte[] content = fitxer.getBytes();
+        String contentType = fitxer.getContentType();
+//        String contingutBase64 = Base64.encodeBase64String(content);
+//        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+        SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
+        return FirmaValidDto.builder()
+//                .arxiuGestdocId(arxiuGestdocId)
+                .nom(nom)
+                .mida(fitxer.getSize())
+                .mediaType(fitxer.getContentType())
+                .signed(signatureInfo.isSigned())
+                .error(signatureInfo.isError())
+                .errorMsg(signatureInfo.getErrorMsg())
+                .build();
+    }
+
+    private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {
+        if (isValidaFirmaWebEnabled()) {
+            SignatureInfoDto signatureInfoDto = notificacioService.checkIfSignedAttached(content, nom, mediaType);
+            if (signatureInfoDto.isError()) {
+                String[] codes = bindingResult.resolveMessageCodes("notificacio.form.valid.document.firma", "arxiu[" + position + "]");
+                bindingResult.addError(new FieldError(bindingResult.getObjectName(), "arxiu[" + position + "]", "", true, codes, null, "La firma del document no és vàlida"));
             }
         }
     }
@@ -442,15 +498,20 @@ public class NotificacioFormController extends BaseUserController {
         }
         dadesProcediment.setComu(procedimentActual.isComu());
         dadesProcediment.setEntregaCieActiva(procedimentActual.isEntregaCieActivaAlgunNivell());
+        dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
-        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
-        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
-                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-            } else {
-        		procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-            }
-            dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
+            PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+                                TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO :
+                                PermisEnum.NOTIFICACIO;
+            dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), usuariActual.getCodi(), permis, procedimentActual));
+//        	List<ProcSerOrganDto> procedimentsOrgansAmbPermis = new ArrayList<ProcSerOrganDto>();
+//        	if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus)) {
+//                procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNICACIO_SIR);
+//            } else {
+//        		procedimentsOrgansAmbPermis = procedimentService.findProcedimentsOrganWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
+//            }
+//            dadesProcediment.setOrgansDisponibles(procedimentService.findProcedimentsOrganCodiWithPermisByProcediment(procedimentActual, entitatActual.getDir3Codi(), procedimentsOrgansAmbPermis));
         }
         return dadesProcediment;
     }
@@ -479,11 +540,12 @@ public class NotificacioFormController extends BaseUserController {
 
     	DocumentDto doc = null;
     	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
-        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
+//        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
     	if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
         }
-    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
+//    	return prepararResposta(validacioIdCsv && formatCsvValid, doc, request);
+    	return prepararResposta(validacioIdCsv, doc, request);
     }
 
     @RequestMapping(value = "/consultaDocumentIMetadadesUuid/consulta", method = RequestMethod.POST, headers="Content-Type=application/json" )
@@ -560,44 +622,46 @@ public class NotificacioFormController extends BaseUserController {
         }
         String referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
         model.addAttribute("referer", referer);
+        model.addAttribute("validaFirmaWebEnabled", isValidaFirmaWebEnabled());
+        model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
     }
 
 
-    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
-
-        // 1-recuperam els òrgans dels procediments disponibles (amb permís)
-        List<String> codisOrgansGestorsProcediments = new ArrayList<>();
-        for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles)
-            codisOrgansGestorsProcediments.add(pro.getOrganGestor());
-
-        // 2-Descartam els organs vigents i els transformam a Dto
-        List<OrganGestorDto> organsGestorsProcediments = new ArrayList<>();
-        if (!codisOrgansGestorsProcediments.isEmpty())
-            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.V);
-
-        // 3-Obtenim els òrgans amb permís de notificació
-        List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
-                entitatActual.getId(),
-                SecurityContextHolder.getContext().getAuthentication().getName(),
-                permis); //PermisEnum.NOTIFICACIO || PermisEnum.COMUNICACIO_SIR);
-
-        // 4-juntam tots els òrgans i ordenam per nom
-        Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
-        setOrgansGestors.addAll(organsGestorsAmbPermis);
-
-        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
-        if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
-            organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
-        }
-
-        Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
-            @Override
-            public int compare(OrganGestorDto p1, OrganGestorDto p2) {
-                return p1.getNom().compareTo(p2.getNom());
-            }
-        });
-        return organsGestors;
-    }
+//    private List<OrganGestorDto> recuperarOrgansPerProcedimentAmbPermis(EntitatDto entitatActual, List<CodiValorOrganGestorComuDto> procedimentsDisponibles, PermisEnum permis) {
+//
+//        // 1-recuperam els òrgans dels procediments disponibles (amb permís)
+//        List<String> codisOrgansGestorsProcediments = new ArrayList<>();
+//        for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles)
+//            codisOrgansGestorsProcediments.add(pro.getOrganGestor());
+//
+//        // 2-Descartam els organs vigents i els transformam a Dto
+//        List<OrganGestorDto> organsGestorsProcediments = new ArrayList<>();
+//        if (!codisOrgansGestorsProcediments.isEmpty())
+//            organsGestorsProcediments = organGestorService.findByCodisAndEstat(codisOrgansGestorsProcediments, OrganGestorEstatEnum.V);
+//
+//        // 3-Obtenim els òrgans amb permís de notificació
+//        List<OrganGestorDto> organsGestorsAmbPermis = organGestorService.findOrgansGestorsWithPermis(
+//                entitatActual.getId(),
+//                SecurityContextHolder.getContext().getAuthentication().getName(),
+//                permis); //PermisEnum.NOTIFICACIO || PermisEnum.COMUNICACIO_SIR);
+//
+//        // 4-juntam tots els òrgans i ordenam per nom
+//        Set<OrganGestorDto> setOrgansGestors = new HashSet<OrganGestorDto>(organsGestorsProcediments);
+//        setOrgansGestors.addAll(organsGestorsAmbPermis);
+//
+//        List<OrganGestorDto> organsGestors = new ArrayList<OrganGestorDto>(setOrgansGestors);
+//        if (!PropertiesHelper.getProperties().getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes", false)) {
+//            organsGestors.remove(organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi()));
+//        }
+//
+//        Collections.sort(organsGestors, new Comparator<OrganGestorDto>() {
+//            @Override
+//            public int compare(OrganGestorDto p1, OrganGestorDto p2) {
+//                return p1.getNom().compareTo(p2.getNom());
+//            }
+//        });
+//        return organsGestors;
+//    }
 
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
                                     BindingResult bindingResult, List<String> tipusDocumentEnumDto, Model model) {
@@ -677,10 +741,17 @@ public class NotificacioFormController extends BaseUserController {
         if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
             organFiltreProcediments = getOrganGestorActual(request).getCodi();
         }
-        List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organFiltreProcediments,
-                                                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
-        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(entitatActual.getId(), organFiltreProcediments,
-                                                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
+        List<CodiValorOrganGestorComuDto> procedimentsDisponibles = procedimentService.getProcedimentsOrganNotificables(
+                entitatActual.getId(),
+                organFiltreProcediments,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+                tipusEnviament);
+        List<CodiValorOrganGestorComuDto> serveisDisponibles = serveiService.getServeisOrganNotificables(
+                entitatActual.getId(),
+                organFiltreProcediments,
+                RolEnumDto.valueOf(RolHelper.getRolActual(request)),
+                tipusEnviament);
+
         List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
@@ -693,15 +764,17 @@ public class NotificacioFormController extends BaseUserController {
             organsGestors = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 
         } else { // Rol usuari o altres
-            PermisEnum permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNIACIO_SIR : PermisEnum.NOTIFICACIO;
+            PermisEnum permis = tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO_SIR) ? PermisEnum.COMUNICACIO_SIR :
+                                tipusEnviament.equals(TipusEnviamentEnumDto.COMUNICACIO) ? PermisEnum.COMUNICACIO :
+                                PermisEnum.NOTIFICACIO;
 //            organsGestors = recuperarOrgansPerProcedimentAmbPermis(entitatActual, procSerDisponibles, tipus);
-            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
+//            codisValor = organGestorService.getOrgansAmbPermis(entitatActual.getId(), permis);
+            codisValor = permisosService.getOrgansAmbPermis(entitatActual.getId(), SecurityContextHolder.getContext().getAuthentication().getName(), permis);
         }
 
         if (procSerDisponibles.isEmpty() && !procedimentService.hasProcedimentsComunsAndNotificacioPermission(entitatActual.getId(), tipusEnviament)) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
-
         if (organsGestors != null) {
             for (OrganGestorDto o : organsGestors) {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
@@ -752,6 +825,10 @@ public class NotificacioFormController extends BaseUserController {
         return RolHelper.isUsuariActualAdministrador(request);
     }
 
+    private boolean isValidaFirmaWebEnabled() {
+        return Boolean.parseBoolean(aplicacioService.propertyGetByEntitat("es.caib.notib.plugins.validatesignature.enable.web", "true"));
+    }
+
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
@@ -770,6 +847,7 @@ public class NotificacioFormController extends BaseUserController {
         private List<CieFormatSobreDto> formatsSobre = new ArrayList<CieFormatSobreDto>();
         private List<CieFormatFullaDto> formatsFulla = new ArrayList<CieFormatFullaDto>();
         private boolean comu;
+        private boolean entregaCieVigent;
         private boolean entregaCieActiva;
 
         private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");

@@ -30,20 +30,7 @@ public interface OperadorPostalService {
 	 * @return	El pagador postal creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	OperadorPostalDto create(
-			Long entitatId,
-			OperadorPostalDataDto postal);
-
-	/**
-	 * Actualitza la informació d'un pagador postal.
-	 * 
-	 * @param postal	
-	 * 			Pagador postal a modificar amb els nous valors
-	 * @return
-	 * @throws NotFoundException
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	OperadorPostalDto update(OperadorPostalDataDto postal) throws NotFoundException;
+	OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal);
 
 	/**
 	 * Esborra el pagador postal amb el mateix id que l'especificat.
@@ -94,6 +81,15 @@ public interface OperadorPostalService {
 
 	@PreAuthorize("hasRole('tothom')")
 	List<IdentificadorTextDto> findAllIdentificadorText();
+
+	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitatId);
+
+	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitatId, String organCodi, boolean isAdminOrgan);
 
 	/**
 	 * Llistat amb els pagadors postal d'una entitat.

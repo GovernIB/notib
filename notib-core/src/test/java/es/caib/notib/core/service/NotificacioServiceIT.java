@@ -94,13 +94,11 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		configureMockGestioDocumentalPlugin();
 
 		EntitatEntity entitatEntity = entitatRepository.findByCodi("ENTITAT_TESTS");
-		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "CIE NOM", new Date(0), entitatEntity).build());
-		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
-				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
-				null).build());
+//		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "CIE NOM", new Date(0), entitatEntity).build());
+//		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511", "", "pccNum_" + 0, new Date(0), "ccFac_" + 0, null).build());
 
 		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
-		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
+//		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
 		procedimentCreator.addObject("procedimentSensePermis", ProcedimentItemTest.getRandomProcedimentSensePermis());
 
 		notificacioCreator.addObject("notificacio", NotificacioItemTest.getRandomInstance());

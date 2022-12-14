@@ -14,8 +14,10 @@ import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.CreacioSemaforDto;
 import es.caib.notib.core.helper.EnviamentHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
@@ -41,7 +43,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import static java.util.Calendar.DAY_OF_MONTH;
 
 /**
  * Implementació del servei de gestió de notificacions.
@@ -75,6 +81,10 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -330,7 +340,24 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
     }
 
-    private void esborrarTemporals(String dir) throws Exception {
+	@Override
+	public void monitorIntegracionsEliminarAntics() {
+
+		logger.debug("Execució tasca periòdica: Natejar monitor integracions");
+		String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES);
+		int d = 3;
+		try {
+			d = Integer.parseInt(dies);
+		} catch (Exception ex) {
+			logger.error("La propietat no retorna un número -> " + dies);
+		}
+		Calendar c = Calendar.getInstance();
+		c.add(DAY_OF_MONTH, -d);
+		Date llindar = c.getTime();
+		integracioHelper.eliminarAntics(llindar);
+	}
+
+	private void esborrarTemporals(String dir) throws Exception {
 
 		if (Strings.isNullOrEmpty(dir)) {
 			return;

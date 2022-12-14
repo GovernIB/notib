@@ -30,6 +30,7 @@ import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.entity.*;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
@@ -76,7 +77,9 @@ import java.util.Set;
 @Slf4j
 @Service
 public class NotificacioServiceImpl implements NotificacioService {
-	
+
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -512,13 +515,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 				// Procediments accessibles per qualsevol òrgan gestor
-				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, permisos);
+				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
 
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, permisos);
+				codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
-				codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatActual, permisos);
+				codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatActual.getId(), auth.getName(), PermisEnum.CONSULTA);
 
 			} else if (isAdminOrgan && entitatActual != null) {
 				codisProcedimentsDisponibles = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
@@ -1150,7 +1153,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
-			if (!isAdministrador && !hasPermisNotificacio(notificacioEntity)) {
+			if (!isAdministrador && !permisosService.hasNotificacioPermis(notificacioId, notificacioEntity.getEntitat().getId(), notificacioEntity.getUsuariCodi(), PermisEnum.PROCESSAR)) {
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}
 
@@ -1176,7 +1179,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	 * @param notificacio Notificació a comprovar
 	 * @return boleà indicant si l'usuari té el permís
 	 */
-	private boolean hasPermisNotificacio(NotificacioEntity notificacio) {
+	private boolean hasPermisProcessar(NotificacioEntity notificacio) {
 		boolean hasPermis = false;
 		ProcSerEntity procedimentNotificacio = notificacio.getProcediment();
 		if (procedimentNotificacio != null) {
@@ -1204,6 +1207,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 		return hasPermis;
 	}
+
 	@Transactional
 	@Override
 	public boolean reactivarConsulta(Long notificacioId) {
@@ -1549,7 +1553,26 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return false;
 	}
 
-	@Override
+    @Override
+    public SignatureInfoDto checkIfSignedAttached(byte[] contingut, String nom, String contentType) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+//		if (configHelper.getAsBoolean("es.caib.notib.firma.detectar.attached.validate.signature", true)) {
+			return pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(
+					contingut,
+					nom,
+					contentType);
+//		} else {
+//			return pluginHelper.detectSignedAttachedUsingPdfReader(
+//					contingut,
+//					contentType);
+//		}
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+    }
+
+    @Override
 	public void refrescarEnviamentsExpirats() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {

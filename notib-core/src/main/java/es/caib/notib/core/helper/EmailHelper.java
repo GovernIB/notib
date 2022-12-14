@@ -25,7 +25,8 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public abstract class EmailHelper<T> {
-    private static final String PREFIX_NOTIB = "[NOTIB]";
+
+
 
     @Resource
     protected CacheHelper cacheHelper;
@@ -33,6 +34,8 @@ public abstract class EmailHelper<T> {
     protected UsuariRepository usuariRepository;
     @Autowired
     protected ConfigHelper configHelper;
+    @Autowired
+    protected MessageHelper messageHelper;
     @Resource
     protected JavaMailSender mailSender;
 
@@ -68,7 +71,7 @@ public abstract class EmailHelper<T> {
         helper = new MimeMessageHelper(missatge, true);
         helper.setTo(emailDestinatari);
         helper.setFrom(getRemitent());
-        helper.setSubject(PREFIX_NOTIB + " " + getMailSubject());
+        helper.setSubject(configHelper.getPrefix() + " " + getMailSubject());
 
         //Html text
         helper.setText(getMailPlainTextBody(item), getMailHtmlBody(item));

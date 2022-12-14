@@ -732,3 +732,12 @@ function loadOrgans($selector, organsGestors, missatgeObsolets){
 	};
 	$selector.select2(select2Options);
 }
+
+function loadPagadorPostal($selector, pagadors, missatgeObsolets){
+
+	let formatState = organ => !organ.icona ? organ.text
+		: $("<span title='" + missatgeObsolets + "'>" + organ.text + " <span class='fa fa-warning text-danger'></span></span>");
+	$selector.empty();
+	$selector.select2({ data: pagadors, templateResult: formatState, templateSelection: formatState, minimumResultsForSearch: Infinity});
+	$selector.change();
+}

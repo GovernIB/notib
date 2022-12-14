@@ -3,7 +3,17 @@
  */
 package es.caib.notib.core.ejb;
 
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.Arbre;
+import es.caib.notib.core.api.dto.CodiValorEstatDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.LlibreDto;
+import es.caib.notib.core.api.dto.OficinaDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.dto.organisme.OrganGestorFiltreDto;
@@ -11,8 +21,6 @@ import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.core.api.dto.organisme.PrediccioSincronitzacio;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OrganGestorService;
-import es.caib.notib.plugin.unitat.CodiValor;
-import es.caib.notib.plugin.unitat.NodeDir3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -193,17 +201,17 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		return delegate.getLlibreOrganisme(entitatId, organGestorDir3Codi);
 	}
 
-	@Override
-	@RolesAllowed({"tothom"})
-	public List<OrganGestorDto> findOrgansGestorsWithPermis(
-			Long entitatId, 
-			String usuariCodi,
-			PermisEnum permis) {
-		return delegate.findOrgansGestorsWithPermis(
-				entitatId, 
-				usuariCodi,
-				permis);
-	}
+//	@Override
+//	@RolesAllowed({"tothom"})
+//	public List<OrganGestorDto> findOrgansGestorsWithPermis(
+//			Long entitatId,
+//			String usuariCodi,
+//			PermisEnum permis) {
+//		return delegate.findOrgansGestorsWithPermis(
+//				entitatId,
+//				usuariCodi,
+//				permis);
+//	}
 
     @Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
@@ -221,8 +229,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres) {
-		return delegate.generarArbreOrgans(entitat, filtres);
+	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres, boolean isAdminOrgan, OrganGestorDto organActual) {
+		return delegate.generarArbreOrgans(entitat, filtres, isAdminOrgan, organActual);
 	}
 
 	@Override
@@ -245,9 +253,15 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis) {
-		return delegate.getOrgansAmbPermis(entitatId, permis);
+	public boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis) {
+		return delegate.hasPermisOrgan(entitatId, organCodi, permis);
 	}
+
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis) {
+//		return delegate.getOrgansAmbPermis(entitatId, permis);
+//	}
 
 	@Override
 	public void setServicesForSynctest(Object procSerSyncHelper, Object pluginHelper) {

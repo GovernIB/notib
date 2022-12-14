@@ -168,11 +168,11 @@ public class ServeiServiceBean implements ServeiService {
 		return delegate.findServeis(entitatId, grups);
 	}
 	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-		return delegate.findServeisWithPermis(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+//	public List<ProcSerSimpleDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+//		return delegate.findServeisWithPermis(entitatId, usuariCodi, permis);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
@@ -326,23 +326,23 @@ public class ServeiServiceBean implements ServeiService {
 		return delegate.findServeisByOrganGestor(organGestorCodi);
 	}
 
-	@Override
-	@RolesAllowed({"tothom"})
-	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
-			Long entitatId,
-			String organGestorCodi, 
-			List<String> grups,
-			PermisEnum permis) {
-		return delegate.findServeisByOrganGestorWithPermis(
-				entitatId, 
-				organGestorCodi, 
-				grups, 
-				permis);
-	}
+//	@Override
+//	@RolesAllowed({"tothom"})
+//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
+//			Long entitatId,
+//			String organGestorCodi,
+//			List<String> grups,
+//			PermisEnum permis) {
+//		return delegate.findServeisByOrganGestorWithPermis(
+//				entitatId,
+//				organGestorCodi,
+//				grups,
+//				permis);
+//	}
 
     @Override
     @RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<CodiValorComuDto> getServeisOrgan(
+    public List<CodiValorOrganGestorComuDto> getServeisOrgan(
 			Long entitatId,
 			String organCodi,
 			Long organFiltre,
@@ -365,11 +365,11 @@ public class ServeiServiceBean implements ServeiService {
 				enviamentTipus);
 	}
 
-	@Override
-	@RolesAllowed({"tothom"})
-	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
-		return delegate.hasServeisComunsAndNotificacioPermission(entitatId, enviamentTipus);
-	}
+//	@Override
+//	@RolesAllowed({"tothom"})
+//	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
+//		return delegate.hasServeisComunsAndNotificacioPermission(entitatId, enviamentTipus);
+//	}
 
 	@Override
 	public boolean actualitzarServei(String codiSia, EntitatDto entitat) {
@@ -399,22 +399,22 @@ public class ServeiServiceBean implements ServeiService {
 //		return delegate.findServeisOrganWithPermis(entitatId, usuariCodi, permis);
 //	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(
-			String organId,
-			String entitatCodi,
-			List<ProcSerOrganDto> serveisOrgans) {
-		return delegate.findServeisOrganWithPermisByOrgan(organId, entitatCodi, serveisOrgans);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(
+//			String organId,
+//			String entitatCodi,
+//			List<ProcSerOrganDto> serveisOrgans) {
+//		return delegate.findServeisOrganWithPermisByOrgan(organId, entitatCodi, serveisOrgans);
+//	}
 
-	@Override
-	public List<String> findServeisOrganCodiWithPermisByServei(
-			ProcSerDto servei,
-			String entitatCodi,
-			List<ProcSerOrganDto> serveisOrgans) {
-		return delegate.findServeisOrganCodiWithPermisByServei(servei, entitatCodi, serveisOrgans);
-	}
+//	@Override
+//	public List<String> findServeisOrganCodiWithPermisByServei(
+//			ProcSerDto servei,
+//			String entitatCodi,
+//			List<ProcSerOrganDto> serveisOrgans) {
+//		return delegate.findServeisOrganCodiWithPermisByServei(servei, entitatCodi, serveisOrgans);
+//	}
 	
 	@Override
 	@RolesAllowed({"tothom"})

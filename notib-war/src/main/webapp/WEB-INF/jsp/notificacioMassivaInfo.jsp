@@ -176,7 +176,15 @@ $(document).ready(function() {
 						<td>${notInfo.codiDir3UnidadRemisora}</td>
 						<td>${notInfo.concepto}</td>
 						<td>${notInfo.prioridadServicio}</td>
-						<td>${notInfo.nombre} ${notInfo.apellidos} - ${notInfo.cifNif}</td>
+						<td>${notInfo.nombre} ${notInfo.apellidos}
+						<c:choose>
+							<c:when test="${notInfo.cifNif}">
+								- ${notInfo.cifNif}</td>
+							</c:when>
+							<c:otherwise>
+								- <spring:message code="notificacio.massiva.info.resum.interesat.sense.nif"/></td>
+							</c:otherwise>
+						</c:choose>
 <%--						<td>${notInfo.origen}</td>--%>
 						<td>${notInfo.errores}</td>
 						<td>${notInfo.errorsExecucio}</td>

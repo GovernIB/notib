@@ -3,6 +3,8 @@
  */
 package es.caib.notib.core.api.dto;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 
 /**
@@ -15,6 +17,7 @@ import java.io.Serializable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 public enum NotificacioRegistreEstatEnumDto implements Serializable {
 	VALID(1, "V", "#c1bcbc"),
 	RESERVA(2, "R", "#c1bcbc"),
@@ -40,20 +43,4 @@ public enum NotificacioRegistreEstatEnumDto implements Serializable {
 		this.budget = budget;
 		this.color = color;
     }
-	
-	public int getNumVal() {
-		return numVal;
-	}
-
-	public String getBudget() {
-		return budget;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public Long getLongVal() {
-		return Long.parseLong(numVal.toString());
-	}
 }

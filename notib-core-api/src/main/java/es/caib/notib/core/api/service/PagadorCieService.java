@@ -30,20 +30,7 @@ public interface PagadorCieService {
 	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	CieDto create(
-			Long entitatId,
-			CieDataDto cie);
-
-	/**
-	 * Actualitza la informació d'un pagador cie.
-	 * 
-	 * @param cie	
-	 * 			Pagador cie a modificar amb els nous valors
-	 * @return
-	 * @throws NotFoundException
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	CieDto update(CieDataDto cie) throws NotFoundException;
+	CieDto upsert(Long entitatId, CieDataDto cie);
 
 	/**
 	 * Esborra el pagador cie amb el mateix id que l'especificat.
@@ -93,9 +80,18 @@ public interface PagadorCieService {
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
 	List<CieDto> findAll();
 
+	@PreAuthorize("hasRole('tothom')")
 	List<IdentificadorTextDto> findAllIdentificadorText();
 
-	/**
+	@PreAuthorize("hasRole('tothom')")
+	List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat);
+
+	@PreAuthorize("hasRole('tothom')")
+    List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat);
+
+    List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan);
+
+    /**
 	 * Llistat amb els pagadors cie d'una entitat.
 	 *
 	 * @return La llista dels pagadors postals.

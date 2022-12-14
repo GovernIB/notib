@@ -1,0 +1,61 @@
+databaseChangeLog:
+    - property:
+        dbms: oracle
+        name: type.pk
+        value: number(19,0)
+    - property:
+        dbms: postgresql
+        name: type.pk
+        value: SERIAL
+    - property:
+        name: varcharUnit
+        value: CHAR
+        dbms: oracle
+    - property:
+        name: varcharUnit
+        value: ''
+        dbms: postgresql
+    - property:
+        name: booleanTrue
+        value: 1
+        dbms: oracle
+    - property:
+        name: booleanTrue
+        value: true
+        dbms: postgresql
+    - property:
+          name: booleanFalse
+          value: 0
+          dbms: oracle
+    - property:
+          name: booleanFalse
+          value: false
+          dbms: postgresql
+    - changeSet:
+        id: 1665140886759-3
+        author: limit
+        changes:
+            - sql : "
+                    INSERT INTO NOT_CONFIG_TYPE (CODE, VALUE) VALUES ('VALSIG_CLASS', 'org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin,es.caib.notib.plugin.valsig.ValidacioFirmesPluginMock');
+                    
+                    INSERT INTO NOT_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (1, 'FIRMA', 'VALIDATE_SIGNATURE', 'Configuració del plugin validació de firmes' );
+                    
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) values ('es.caib.notib.plugin.validatesignature.class','org.fundaciobit.plugins.validatesignature.afirmacxf.AfirmaCxfValidateSignaturePlugin','Classe del plugin','VALIDATE_SIGNATURE',0,${booleanFalse},'VALSIG_CLASS',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) values ('es.caib.notib.plugins.validatesignature.afirmacxf.endpoint',null,'Endpoint de AfirmaCxf','VALIDATE_SIGNATURE',1,${booleanTrue},'TEXT',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) values ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.username',null,'Usuari de AfirmaCxf','VALIDATE_SIGNATURE',2,${booleanTrue},'TEXT',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) values ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.password',null,'Password de AfirmaCxf','VALIDATE_SIGNATURE',3,${booleanTrue},'PASSWORD',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) values ('es.caib.notib.plugins.validatesignature.afirmacxf.applicationID','CAIBDEV2.RIPEA','ID de l’aplicació','VALIDATE_SIGNATURE',4,${booleanFalse},'TEXT',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.ignoreservercertificates', 'true', 'Ignorar els certificats', 'VALIDATE_SIGNATURE',5,${booleanFalse},'BOOL',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.TransformersTemplatesPath', null, 'Path dels transformers', 'VALIDATE_SIGNATURE',6,${booleanTrue},'TEXT',${booleanTrue});
+                    
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.ks.path', null, 'Path del magatzem de claus amb el certificat per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE',7,${booleanTrue},'TEXT',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.ks.type', null, 'Tipus de magatzem de claus per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE',8,${booleanTrue},'TEXT',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.ks.password', null, 'Password del magatzem de claus per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE',9,${booleanTrue},'PASSWORD',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.ks.cert.alias', null, 'Alies del certificat a emprar del magatzem de claus per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE',10,${booleanTrue},'TEXT',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.afirmacxf.authorization.ks.cert.password', null, 'Password del certificat del magatzem de claus per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE',11,${booleanTrue},'PASSWORD',${booleanTrue});
+                    
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.enable.web', 'true', 'Habilitar validació de signatura de documents en peticions via WEB','VALIDATE_SIGNATURE',12,${booleanFalse},'BOOL',${booleanTrue});
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.plugins.validatesignature.enable.rest', 'true', 'Habilitar validació de signatura de documents en peticions via REST','VALIDATE_SIGNATURE',13,${booleanFalse},'BOOL',${booleanTrue});
+                    
+                    UPDATE NOT_PROCESSOS_INICIALS SET INIT = ${booleanTrue} WHERE codi = 'PROPIETATS_CONFIG_ENTITATS';
+                    "

@@ -82,25 +82,25 @@
 			$('#modal-details').modal();
 		});
 
-		let codi = "${codiActual}";
-		if (codi === "CALLBACK") {
-			console.log("show");
-			console.log($("#missatges-integracions_filter"));
-			$("#missatges-integracions_filter").show();
-		} else {
-			console.log("hide");
-			$("#missatges-integracions_filter").hide();
-		}
+		<%--let codi = "${codiActual}";--%>
+		<%--if (codi === "CALLBACK") {--%>
+		<%--	console.log("show");--%>
+		<%--	console.log($("#missatges-integracions_filter"));--%>
+		<%--	$("#missatges-integracions_filter").show();--%>
+		<%--} else {--%>
+		<%--	console.log("hide");--%>
+		<%--	$("#missatges-integracions_filter").hide();--%>
+		<%--}--%>
 
 
-		$(".pestanya").click(() => {
-			let codi = "${codiActual}";
-			if (codi === "CALLBACK") {
-				$("#missatges-integracions_filter").show();
-			} else {
-				$("#missatges-integracions_filter").hide();
-			}
-		});
+		<%--$(".pestanya").click(() => {--%>
+		<%--	let codi = "${codiActual}";--%>
+		<%--	if (codi === "CALLBACK") {--%>
+		<%--		$("#missatges-integracions_filter").show();--%>
+		<%--	} else {--%>
+		<%--		$("#missatges-integracions_filter").hide();--%>
+		<%--	}--%>
+		<%--});--%>
 	});
 </script>
 
@@ -135,15 +135,16 @@
 		</c:forEach>
 	</ul>
 	<br/>
-<script id="botonsTemplate" type="text/x-jsrender">
-
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<p style="text-align:right"><a class="btn btn-default" href="<c:url value="/integracio/netejar"/>"><span class="fa fa-trash"></span>&nbsp;<spring:message code="integracio.netejar"/></a></p>
 	</script>
-	<table id="missatges-integracions" data-toggle="datatable" data-filter="#filtre" data-url="<c:url value="/integracio/datatable"/>"
-			<c:if test="${codiActual == 'CALLBACK'}">
-			   data-search-enabled="true"
-			   data-info-type="search"
-			</c:if>
-		   data-page-length="250" class="table table-striped table-bordered" style="width:100%"
+	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>"
+<%--		   data-filter="#filtre"--%>
+<%--			<c:if test="${codiActual == 'CALLBACK'}">--%>
+<%--			   data-search-enabled="true"--%>
+<%--			   data-info-type="search"--%>
+<%--			</c:if>--%>
+		   class="table table-striped table-bordered" style="width:100%"
 		   data-botons-template="#botonsTemplate">
 		<thead>
 			<tr>

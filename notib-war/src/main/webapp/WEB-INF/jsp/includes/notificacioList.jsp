@@ -124,7 +124,7 @@
     var organsGestors = [];
     organsGestors.push({id:"", text:"", estat:"V"});
     <c:forEach items="${organsGestorsPermisLectura}" var="organGestor">
-    organsGestors.push({id:"${organGestor.codi}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
+    organsGestors.push({id:"${organGestor.id}", text:"${organGestor.valor}", estat:"${organGestor.estat}"});
     </c:forEach>
 
     var notificacioEstats = [];
@@ -412,14 +412,14 @@
                     if (procedimentsComuns.length > 0) {
                         selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
                         $.each(procedimentsComuns, function(index, val) {
-                            selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                            selProcediments.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
                         });
                         selProcediments.append("</optgroup>");
                     }
                     if (procedimentsOrgan.length > 0) {
                         selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
                         $.each(procedimentsOrgan, function(index, val) {
-                            selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                            selProcediments.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
                         });
                         selProcediments.append("</optgroup>");
                     }
@@ -466,14 +466,14 @@
                     if (serveisComuns.length > 0) {
                         selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
                         $.each(serveisComuns, function(index, val) {
-                            selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                            selServeis.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
                         });
                         selServeis.append("</optgroup>");
                     }
                     if (serveisOrgan.length > 0) {
                         selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.organs'/>'>");
                         $.each(serveisOrgan, function(index, val) {
-                            selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+                            selServeis.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
                         });
                         selServeis.append("</optgroup>");
                     }

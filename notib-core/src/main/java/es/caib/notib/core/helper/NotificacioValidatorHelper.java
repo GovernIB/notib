@@ -136,17 +136,20 @@ public class NotificacioValidatorHelper {
 					if (enviament.getTitular().getInteressatTipus() == null) {
 						errors.add(messageHelper.getMessage("error.validacio.interessat.tipus.titular.enviament.no.null"));
 					}
-					if (enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
-						if (NifHelper.isvalid(enviament.getTitular().getNif())) {
+					if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
+							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
+
+						String nif = enviament.getTitular().getNif();
+						if (NifHelper.isvalid(nif)) {
 							senseNif = false;
 							switch (enviament.getTitular().getInteressatTipus()) {
 								case FISICA:
-									if (!NifHelper.isValidNifNie(enviament.getTitular().getNif())) {
+									if (!NifHelper.isValidNifNie(nif)) {
 										errors.add(messageHelper.getMessage("error.validacio.nif.titular.tipus.document.no.valid.persona.fisica"));
 									}
 									break;
 								case JURIDICA:
-									if (!NifHelper.isValidCif(enviament.getTitular().getNif())) {
+									if (!NifHelper.isValidCif(nif)) {
 										errors.add(messageHelper.getMessage("error.validacio.nif.titular.tipus.document.invalid.persona.juridica"));
 									}
 									break;
@@ -158,10 +161,11 @@ public class NotificacioValidatorHelper {
 						}
 					}
 					// - Email
-					if (enviament.getTitular().getEmail() != null && enviament.getTitular().getEmail().length() > 160) {
+					String email = enviament.getTitular().getEmail();
+					if (email != null && email.length() > 160) {
 						errors.add(messageHelper.getMessage("error.validacio.email.titular.longitud.max"));
 					}
-					if (enviament.getTitular().getEmail() != null && !isEmailValid(enviament.getTitular().getEmail())) {
+					if (email != null && (!EmailHelper.isEmailValid(email) || !isEmailValid(email))) {
 						errors.add(messageHelper.getMessage("error.validacio.email.titular.format.invalid"));
 					}
 					// - Telèfon
@@ -237,7 +241,8 @@ public class NotificacioValidatorHelper {
 				// Destinataris.
 				// De momento se trata cada línea como 1 notificación con 1 envío y 1 titular
 
-				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO && senseNif) {
+				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO
+						&& !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 					errors.add(messageHelper.getMessage("error.validacio.nif.informat.interessats"));
 				}
 
@@ -276,15 +281,15 @@ public class NotificacioValidatorHelper {
 			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
 				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
 			}
-		} else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null)
-				&& notificacio.getOrganGestorCodi() == null){
-			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.null.comunicacio.administracio.sense.procediment"));
 		}
-		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO && comunicacioSenseAdministracio) {
-			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
-				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
-			}
-		}
+//		else if ((notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) && notificacio.getOrganGestorCodi() == null){
+//			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.null.comunicacio.administracio.sense.procediment"));
+//		}
+//		if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO && comunicacioSenseAdministracio) {
+//			if (notificacio.getProcediment() == null || notificacio.getProcediment().getCodi() == null) {
+//				errors.add(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
+//			}
+//		}
 		if (!organigramaByEntitat.containsKey(notificacio.getOrganGestorCodi())) {
 			errors.add(messageHelper.getMessage("error.validacio.organ.gestor.no.organ.entitat"));
 		}

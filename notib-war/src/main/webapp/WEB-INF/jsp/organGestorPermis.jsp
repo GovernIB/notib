@@ -37,10 +37,18 @@ pageContext.setAttribute(
 			return ${isRolActualAdministradorOrgan};
 		}
 	</script>
-	<style type="text/css">
-		td.organ-admin {
-			background-color: #feeec5;
-		}
+	<style>
+		td.organ-admin {background-color: #feeec5;}
+		table {table-layout:fixed;}
+		th {height:120px;}
+		th:first-child {width: 60px !important;}
+		td {overflow:hidden; text-overflow: ellipsis;}
+		td:last-child {text-align: right; overflow: visible;}
+		#taulaDades th {writing-mode:vertical-rl;}
+		.writing-horitzontal {writing-mode: horizontal-tb !important;}
+		.nom-principal {width: 50% !important;}
+		.th-checkbox {padding-right: 1px !important; max-width: 5px !important;}
+		.th-boto-accions {width: 100px !important;}
 	</style>
 </head>
 <body>
@@ -57,55 +65,67 @@ pageContext.setAttribute(
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)" width="120px"><spring:message code="procediment.permis.columna.tipus" /></th>
-				<th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
-				<th data-col-name="read" data-template="#cellPermisReadTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.consulta"/>
-					<script id="cellPermisReadTemplate" type="text/x-jsrender">
-						{{if read}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="processar" data-template="#cellPermisProcessarTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.processar"/>
-					<script id="cellPermisProcessarTemplate" type="text/x-jsrender">
-						{{if processar}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="administration" data-template="#cellPermisGestioTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.gestio"/>
-					<script id="cellPermisGestioTemplate" type="text/x-jsrender">
-						{{if administration}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="comuns" data-template="#cellPermisComunsTemplate" width="120px">
-					<spring:message code="organgestor.permis.columna.comuns"/>
-					<script id="cellPermisComunsTemplate" type="text/x-jsrender">
-						{{if comuns}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.notificacio"/>
-					<script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
-						{{if notificacio}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="comunicacioSir" data-template="#cellPermisComunicacioSirTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.comunicacio.sir"/>
-					<script id="cellPermisComunicacioSirTemplate" type="text/x-jsrender">
-						{{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-				</th>
-				<th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" width="120px">
+				<th data-col-name="tipus" class="writing-horitzontal" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus" /></th>
+				<th data-col-name="nomSencerAmbCodi" class="writing-horitzontal nom-principal"><spring:message code="procediment.permis.columna.principal"/></th>
+				<th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" class="th-checkbox">
 					<spring:message code="procediment.permis.columna.administrador"/>
 					<script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
 						{{if administrador}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="100px">
+				<th data-col-name="read" data-template="#cellPermisReadTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.consulta"/>
+					<script id="cellPermisReadTemplate" type="text/x-jsrender">
+						{{if read}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="processar" data-template="#cellPermisProcessarTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.processar"/>
+					<script id="cellPermisProcessarTemplate" type="text/x-jsrender">
+						{{if processar}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="administration" data-template="#cellPermisGestioTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.gestio"/>
+					<script id="cellPermisGestioTemplate" type="text/x-jsrender">
+						{{if administration}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="comuns" data-template="#cellPermisComunsTemplate" class="th-checkbox">
+					<spring:message code="organgestor.permis.columna.comuns"/>
+					<script id="cellPermisComunsTemplate" type="text/x-jsrender">
+						{{if comuns}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.notificacio"/>
+					<script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
+						{{if notificacio}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.comunicacio"/>
+					<script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
+						{{if comunicacio}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="comunicacioSir" data-template="#cellPermisComunicacioSirTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.comunicacio.sir"/>
+					<script id="cellPermisComunicacioSirTemplate" type="text/x-jsrender">
+						{{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="comunicacioSenseProcediment" data-template="#cellPermisComunicacioSenseProcedimentTemplate" class="th-checkbox">
+					<spring:message code="procediment.permis.columna.comunicacio.sense.procediment"/>
+					<script id="cellPermisComunicacioSenseProcedimentTemplate" type="text/x-jsrender">
+						{{if comunicacioSenseProcediment}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" class="th-boto-accions">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
+							<ul class="dropdown-menu dropdown-menu-right">
 								{^{if ~hlpIsAdminOrgan() && !administrador}}
 									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								{{else !~hlpIsAdminOrgan()}}		

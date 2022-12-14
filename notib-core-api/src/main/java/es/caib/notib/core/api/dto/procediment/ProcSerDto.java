@@ -15,6 +15,7 @@ public class ProcSerDto extends ProcSerDataDto {
 	private boolean usuariActualNotificacio;
 	private boolean usuariActualAdministration;
 
+	private boolean isEntregaCieVigent;
 	private boolean entregaCieActivaAlgunNivell;
 
 	public String getOrganGestorDesc() {

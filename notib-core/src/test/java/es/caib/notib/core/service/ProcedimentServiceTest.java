@@ -149,8 +149,9 @@ public class ProcedimentServiceTest {
 //		Mockito.when(procedimentFormRepository.findAmbEntitatActiva(Mockito.anyListOf(Long.class), Mockito.any(Pageable.class))).thenReturn(procediments);
 //		Mockito.when(procedimentFormRepository.findAmbOrganGestorActualOrComu(Mockito.anyLong(), Mockito.anyListOf(String.class), Mockito.any(Pageable.class))).thenReturn(procediments);
 		Mockito.when(procedimentFormRepository.findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
-				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
-				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class)))
+				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
+				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class),
+				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class)))
 			.thenReturn(procediments);
 //		Mockito.when(procedimentFormRepository.findAmbFiltre(Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), 
 //				Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.any(Pageable.class))).thenReturn(procediments);
@@ -169,8 +170,9 @@ public class ProcedimentServiceTest {
 		assertNotNull(pagina);
 		//verifica que se ha llamado 1 vez a este método
 		Mockito.verify(procedimentFormRepository).findAmbEntitatAndFiltre(Mockito.nullable(Long.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
-				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class), 
-				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class));
+				Mockito.nullable(Boolean.class), Mockito.nullable(String.class), Mockito.nullable(Boolean.class), Mockito.nullable(String.class),
+				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class),
+				Mockito.nullable(Boolean.class), Mockito.nullable(Boolean.class), Mockito.nullable(Pageable.class));
 	}
 	
 	// TODO: Falta generar más casos de test para admin d'organ y para superusuari con sus listas de permisos, etc. También sin filtre.

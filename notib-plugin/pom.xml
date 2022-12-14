@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>1.1.21</version>
+		<version>1.1.22</version>
 	</parent>
 	<artifactId>notib-plugin</artifactId>
 	<dependencies>
@@ -43,6 +43,11 @@
 			<artifactId>apifirmasimple-api</artifactId>
 			<version>1.0.3</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.fundaciobit.pluginsib.validatesignature</groupId>
+			<artifactId>pluginsib-validatesignature-api</artifactId>
+			<version>2.0.6</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<artifactId>apifirmasimple-api</artifactId>-->

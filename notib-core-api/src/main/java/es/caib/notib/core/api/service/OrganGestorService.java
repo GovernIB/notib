@@ -194,11 +194,11 @@ public interface OrganGestorService {
 	 *
 	 * @return Llistat dels òrgans gestors sobre els que l'usuari té el permís
 	 */
-	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
-	List<OrganGestorDto> findOrgansGestorsWithPermis(
-			Long entitatId, 
-			String usuariCodi,
-			PermisEnum permis);
+//	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
+//	List<OrganGestorDto> findOrgansGestorsWithPermis(
+//			Long entitatId,
+//			String usuariCodi,
+//			PermisEnum permis);
 
 	@PreAuthorize("hasRole('tothom') or hasRole('NOT_ADMIN')")
     public List<CodiValorEstatDto> getOrgansGestorsDisponiblesConsulta(
@@ -211,7 +211,7 @@ public interface OrganGestorService {
 	 *  Obte el llistat d'organs en format d'arbre
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres);
+	Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres, boolean isAdminOrgan, OrganGestorDto organActual);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 	List<OrganGestorDto> getOrgansAsList(EntitatDto entitat);
@@ -223,7 +223,10 @@ public interface OrganGestorService {
 	OrganGestorDto getOrganNou(String codiSia);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis);
+	boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis);
+
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis);
 
 
 	// For testing:

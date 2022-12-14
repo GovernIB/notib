@@ -1,13 +1,21 @@
 package es.caib.notib.core.api.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
-@Getter @AllArgsConstructor @ToString(includeFieldNames = true)
+@Getter @ToString(includeFieldNames = true)
 public class AccioParam {
 
 	String codi;
 	String valor;
-	
+
+	public AccioParam(String codi, String valor) {
+		this.codi = codi;
+		setValor(valor);
+	}
+
+	public void setValor(String valor) {
+		valor = valor != null && valor.getBytes().length > 1000 ? valor.substring(0, 997) + "..." : valor;
+		this.valor = valor;
+	}
 }

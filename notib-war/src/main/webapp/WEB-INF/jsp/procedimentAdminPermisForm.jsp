@@ -20,9 +20,11 @@
 	<title>${titol}</title>
 	<link href="<c:url value="/webjars/select2/4.0.5/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/css/iosCheckbox.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/iosCheckbox.js"/>"></script>
 	<not:modalHead/>
 <script>
 
@@ -51,7 +53,7 @@
 			$("#principal").val($("#principal").val().trim().toLowerCase());
 		}
 	}
-	
+
 	$(document).ready(function() {
 		$("#modal-botons button[type='submit']").on('click', function() {
 			$("form#permisCommand *:disabled").attr('readonly', 'readonly');
@@ -68,12 +70,12 @@
 		$("div.permisosInput :checkbox").on('change', function() {
 			var totsSeleccionats = true;
 			$("div.permisosInput :checkbox").each(function() {
-				  if(!$(this).prop('checked'))
-					  totsSeleccionats = false;
+				if(!$(this).prop('checked'))
+					totsSeleccionats = false;
 			});
 			$("#selectAll").prop('checked', totsSeleccionats);
 		});
-		
+
 		$("#principal").on('change', function() {
 			resetErrors();
 			
@@ -92,6 +94,9 @@
 </script>
 <style>
 	.permisosInput {margin-left: 45px}
+	.check-label {display: flex; align-items: center;}
+	.check-label>span {font-size: 24px; padding-right: 15px; width: 50px; color: #888;}
+	.checkbox-primary {text-align: right; padding-right: 30px;}
 </style>
 
 
@@ -118,13 +123,65 @@
 				emptyOption="false"/>
 		</c:if>
 
-		<not:inputCheckbox name="selectAll" textKey="procediment.permis.form.camp.all"/>
+		<div class="row" style="margin-right: 0px; margin-left: 0px;">
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="selectAll"><span class="fa fa-toggle-on"></span> <spring:message code="procediment.permis.form.camp.all"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="selectAll" cssClass="span12" id="selectAll" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="permisosInput">
-			<not:inputCheckbox name="read" textKey="procediment.permis.form.camp.consulta"/>
-			<not:inputCheckbox name="processar" textKey="procediment.permis.form.camp.processar"/>
-			<not:inputCheckbox name="administration" textKey="procediment.permis.form.camp.gestio"/>
-			<not:inputCheckbox name="notificacio" textKey="procediment.permis.form.camp.notificacio"/>
-			<not:inputCheckbox name="comunicacioSir" textKey="procediment.permis.form.camp.comunicacio.sir"/>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="read"><span class="fa fa-search"></span> <spring:message code="procediment.permis.form.camp.consulta"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="read" cssClass="span12" id="read" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="processar"><span class="fa fa-check-square-o"></span> <spring:message code="procediment.permis.form.camp.processar"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="processar" cssClass="span12" id="processar" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administration"><span class="fa fa-cog"></span> <spring:message code="procediment.permis.form.camp.gestio"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="administration" cssClass="span12" id="administration" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="notificacio"><span class="fa fa-gavel"></span> <spring:message code="procediment.permis.form.camp.notificacio"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="notificacio" cssClass="span12" id="notificacio" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacio"><span class="fa fa-envelope-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="comunicacio" cssClass="span12" id="comunicacio" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-envelope"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sir"/></label>
+				<div class="controls col-xs-2">
+					<div class="checkbox checkbox-primary">
+						<label class="form-switch"><form:checkbox path="comunicacioSir" cssClass="span12" id="comunicacioSir" autocomplete="off"/><i></i></label>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>

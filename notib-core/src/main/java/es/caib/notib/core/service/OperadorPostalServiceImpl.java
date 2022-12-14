@@ -1,10 +1,12 @@
 package es.caib.notib.core.service;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IdentificadorTextDto;
 import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalDto;
 import es.caib.notib.core.api.dto.cie.OperadorPostalFiltreDto;
@@ -12,19 +14,24 @@ import es.caib.notib.core.api.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.OperadorPostalService;
+import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.*;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorPostalRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +49,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Resource
 	private PagadorPostalRepository pagadorPostalReposity;
 	@Resource
+	private OrganGestorRepository organGestorRepository;
+	@Resource
 	private PaginacioHelper paginacioHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
@@ -49,68 +58,37 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private PermisosService permisosService;
 	
 	@Override
 	@Transactional
-	public OperadorPostalDto create(
-			Long entitatId,
-			OperadorPostalDataDto postal) {
+	public OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Creant un nou pagador postal ("
-					+ "pagador=" + postal + ")");
-			
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
-			
+			logger.debug("Creant un nou pagador postal (pagador=" + postal + ")");
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			OrganGestorEntity organGestor = null;
-			if (postal.getOrganGestorId() != null) {
-				organGestor = entityComprovarHelper.comprovarOrganGestor(
-						entitat,
-						postal.getOrganGestorId());
+			if (!Strings.isNullOrEmpty(postal.getOrganismePagadorCodi())) {
+				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, postal.getOrganismePagadorCodi());
 			}
-
-			PagadorPostalEntity pagadorPostalEntity = pagadorPostalReposity.save(
-					PagadorPostalEntity.builder(
-							postal.getOrganismePagadorCodi(),
-							postal.getNom(),
-							postal.getContracteNum(),
-							postal.getContracteDataVig(),
-							postal.getFacturacioClientCodi(),
-							entitat)
-							.organGestor(organGestor).build());
-			
-			return conversioTipusHelper.convertir(
-					pagadorPostalEntity, 
-					OperadorPostalDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	@Transactional
-	public OperadorPostalDto update(OperadorPostalDataDto postal) throws NotFoundException {
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			logger.debug("Actualitzant pagador postal ("
-					+ "pagador=" + postal + ")");
-					
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorPostal i que es administrador de l'organ indicat
-
-			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(postal.getId());
-
-			pagadorPostalEntity.update(
-							postal.getOrganismePagadorCodi(),
-							postal.getContracteNum(),
-							postal.getContracteDataVig(),
-							postal.getFacturacioClientCodi());
-			
-			pagadorPostalReposity.save(pagadorPostalEntity);
-			
-			return conversioTipusHelper.convertir(
-					pagadorPostalEntity, 
-					OperadorPostalDto.class);
+			PagadorPostalEntity pagador;
+			if (postal.getId() == null) {
+				pagador = PagadorPostalEntity.builder().contracteNum(postal.getContracteNum()).nom(postal.getNom()).contracteDataVig(postal.getContracteDataVig())
+						.facturacioClientCodi(postal.getFacturacioClientCodi()).entitat(entitat).organGestor(organGestor).build();
+			} else {
+				logger.debug("Actualitzant pagador postal (pagador=" + postal + ")");
+				pagador = entityComprovarHelper.comprovarPagadorPostal(postal.getId());
+				if (organGestor != null) {
+					pagador.setOrganGestor(organGestor);
+				}
+				pagador.setContracteNum(postal.getContracteNum());
+				pagador.setContracteDataVig(postal.getContracteDataVig());
+				pagador.setFacturacioClientCodi(pagador.getFacturacioClientCodi());
+			}
+ 			PagadorPostalEntity pagadorPostalEntity = pagadorPostalReposity.save(pagador);
+			return conversioTipusHelper.convertir(pagadorPostalEntity, OperadorPostalDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -140,9 +118,9 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
-			
+
 			return conversioTipusHelper.convertir(
-					pagadorPostalEntity, 
+					pagadorPostalEntity,
 					OperadorPostalDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -151,15 +129,11 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre,
-																	  PaginacioParamsDto paginacioParams) {
+	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			entityComprovarHelper.comprovarPermisos(
-					null,
-					true,
-					true,
-					true);
+			entityComprovarHelper.comprovarPermisos(null, true, true, true);
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
 			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
@@ -168,12 +142,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	
 			List<String> organsFills = null;
 			if (filtre.getOrganGestorId() != null) {
-				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(
-						entitat, 
-						filtre.getOrganGestorId());
-				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(
-						entitat.getDir3Codi(), 
-						organGestor.getCodi());
+				OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, filtre.getOrganGestorId());
+				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
 				
 				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitatWithOrgan(
 						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
@@ -183,7 +153,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 						organsFills,
 						entitat,
 						pageable);
-			}else {
+			} else {
 				pageOpearadorsPostals = pagadorPostalReposity.findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
 						filtre.getOrganismePagador() == null || filtre.getOrganismePagador().isEmpty(),
 						filtre.getOrganismePagador() != null ? filtre.getOrganismePagador() : "",
@@ -192,10 +162,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 						entitat,
 						pageable);
 			}
-			
-			return paginacioHelper.toPaginaDto(
-					pageOpearadorsPostals,
-					OperadorPostalTableItemDto.class);
+			return paginacioHelper.toPaginaDto(pageOpearadorsPostals, OperadorPostalTableItemDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -232,11 +199,88 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 					true,
 					false);
 			return conversioTipusHelper.convertirList(
-					pagadorPostalReposity.findAll(),
+					pagadorPostalReposity.findByContracteDataVigGreaterThanEqual(new Date()),
 					IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
+
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<IdentificadorTextDto> pagadors = findNoCaducatsByEntitat(entitat);
+		PagadorPostalEntity pagador = pagadorPostalReposity.obtenirPagadorsEntitat(e);
+		if (pagador == null) {
+			return pagadors;
+		}
+		IdentificadorTextDto i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
+		if (!pagadors.contains(i)) {
+			i.setIcona("fa fa-warning text-danger");
+			pagadors.add(0, i);
+		}
+		return pagadors;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			logger.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			List<PagadorPostalEntity> pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+			if (!e.getDir3Codi().equals(organCodi)) {
+				List<PagadorPostalEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				pagadors.addAll(pagadorsPare);
+			}
+			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			List<PagadorPostalEntity> p = new ArrayList<>();
+			for (PagadorPostalEntity pagador : pagadors) {
+				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
+					continue;
+				}
+				p.add(pagador);
+			}
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private List<PagadorPostalEntity> findOperadorsPare(EntitatDto entitat, String codi) {
+
+
+		List<PagadorPostalEntity> operadors = new ArrayList<>();
+		OrganGestorEntity o = organGestorRepository.findByCodi(codi);
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
+			operadors = findOperadorsPare(entitat, o.getCodiPare());
+		}
+		p.addAll(operadors);
+		return p;
 	}
 
 	@Override

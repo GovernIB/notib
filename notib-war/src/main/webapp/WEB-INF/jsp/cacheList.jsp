@@ -15,7 +15,11 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<script id="botonsTemplate" type="text/x-jsrender"></script>
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<p style="text-align:right">
+			<a class="btn btn-warning" href="<c:url value="/cache/all/buidar"/>" data-toggle="ajax" data-confirm="<spring:message code="cache.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="cache.all.boto.esborrar"/></a>
+		</p>
+	</script>
 	<table
 		data-toggle="datatable"
 		data-url="<c:url value="/cache/datatable"/>"

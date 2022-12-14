@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1665140886760-1
+      author: limit
+      changes:
+        - sql : "INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.codi.entorn', 'NOTIB','Codi de l''entorn on s''executa NOTIB', 'GENERAL', 0, 0, 'TEXT')"

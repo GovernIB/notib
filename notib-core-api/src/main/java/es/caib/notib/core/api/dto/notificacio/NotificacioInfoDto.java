@@ -50,6 +50,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private String serveiTipus;
 	private List<EnviamentInfoDto> enviaments = new ArrayList<>();
 	private String usuariCodi;
+	private String usuariNom;
 	private String motiu;
 	private String numExpedient;
 
@@ -100,6 +101,10 @@ public class NotificacioInfoDto extends AuditoriaDto {
 
 	public void setEstat(NotificacioEstatEnumDto estat) {
 		this.estat = NotificacioEstatEnumDto.ENVIADA.equals(estat) && isComunicacioSir() ? NotificacioEstatEnumDto.ENVIAT_SIR : estat;
+	}
+
+	public boolean isUsuariWeb() {
+		return TipusUsuariEnumDto.INTERFICIE_WEB.equals(tipusUsuari);
 	}
 
 	@Override
