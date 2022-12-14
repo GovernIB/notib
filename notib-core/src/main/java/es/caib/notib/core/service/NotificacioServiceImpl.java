@@ -1259,14 +1259,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	// SCHEDULLED METHODS
 	////////////////////////////////////////////////////////////////
 	
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsRegistrar() {
+	public List<Long> getNotificacionsPendentsRegistrar() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getRegistreEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(
+			List<Long> pendents = notificacioRepository.findByNotificaEstatPendent(
 					pluginHelper.getRegistreReintentsMaxProperty(),
 					new PageRequest(0, maxPendents));
 			return pendents;
@@ -1275,14 +1274,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsEnviar() {
+	public List<Long> getNotificacionsPendentsEnviar() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistradaAmbReintentsDisponibles(
+			List<Long> pendents = notificacioRepository.findByNotificaEstatRegistradaAmbReintentsDisponibles(
 					pluginHelper.getNotificaReintentsMaxProperty(), 
 					new PageRequest(0, maxPendents));
 			return pendents;
@@ -1296,7 +1294,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public void notificacioEnviar(Long notificacioId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-		NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
 
 			// 3 possibles casuístiques
@@ -1319,14 +1317,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsRefrescarEstat() {
+	public List<Long> getNotificacionsPendentsRefrescarEstat() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
+			List<Long> pendents = notificacioEnviamentRepository.findByNotificaRefresc(
 					pluginHelper.getConsultaReintentsMaxProperty(),
 					new PageRequest(0, maxPendents));
 			return pendents;
@@ -1346,14 +1343,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsRefrescarEstatRegistre() {
+	public List<Long> getNotificacionsPendentsRefrescarEstatRegistre() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
+			List<Long> pendents = notificacioEnviamentRepository.findByRegistreRefresc(
 					pluginHelper.getConsultaSirReintentsMaxProperty(),
 					new PageRequest(0, maxPendents));
 			return pendents;
@@ -1618,11 +1614,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@SuppressWarnings("rawtypes")
 	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsDEHPendentsRefrescarCert() {
+	public List<Long> getNotificacionsDEHPendentsRefrescarCert() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getEnviamentDEHActualitzacioCertProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByDEHAndEstatFinal(
+			List<Long> pendents = notificacioEnviamentRepository.findByDEHAndEstatFinal(
 					pluginHelper.getConsultaReintentsDEHMaxProperty(),
 					new PageRequest(0, maxPendents));
 			return pendents;
@@ -1631,14 +1627,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsCIEPendentsRefrescarCert() {
+	public List<Long> getNotificacionsCIEPendentsRefrescarCert() {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			int maxPendents = getEnviamentCIEActualitzacioCertProcessarMaxProperty();
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByCIEAndEstatFinal(
+			List<Long> pendents = notificacioEnviamentRepository.findByCIEAndEstatFinal(
 					pluginHelper.getConsultaReintentsCIEMaxProperty(),
 					new PageRequest(0, maxPendents));
 			return pendents;

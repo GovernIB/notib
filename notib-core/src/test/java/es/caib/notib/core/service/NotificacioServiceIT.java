@@ -20,8 +20,6 @@ import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.entity.cie.EntregaPostalEntity;
-import es.caib.notib.core.entity.cie.PagadorCieEntity;
-import es.caib.notib.core.entity.cie.PagadorPostalEntity;
 import es.caib.notib.core.helper.PermisosHelper;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EnviamentTableRepository;
@@ -48,8 +46,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -522,7 +518,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 		NotificacioEntity notEditada = notificacioRepository.findOne(notificacioError.getId());
 		assertEquals(0, notEditada.getNotificaEnviamentIntent());
 
-		List pendents = notificacioService.getNotificacionsPendentsEnviar();
+//		List pendents = notificacioService.getNotificacionsPendentsEnviar();
 
 	}
 
