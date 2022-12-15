@@ -14,8 +14,6 @@ public class RegistrarThread implements Runnable {
     protected Long notificacio;
     protected NotificacioHelper notificacioHelper;
 
-//    private NotificacioHelper notificacioHelper;
-
     public RegistrarThread(Long notificacio, NotificacioHelper notificacioHelper) {
         this.notificacio = notificacio;
         this.notificacioHelper= notificacioHelper;
@@ -27,7 +25,7 @@ public class RegistrarThread implements Runnable {
         try {
             notificacioHelper.registrarNotificar(notificacio);
         } catch (RegistreNotificaException e) {
-            log.error("Error registrant la notificació amb id " + notificacio);
+            log.error("Error registrant la notificació amb id " + notificacio, e);
             throw new RuntimeException(e);
         }
     }

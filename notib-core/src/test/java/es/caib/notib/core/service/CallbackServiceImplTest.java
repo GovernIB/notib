@@ -11,6 +11,7 @@ import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -92,6 +93,7 @@ public class CallbackServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void whenNotificaRaiseExeption_thenCallMarcarEventNoProcessable() throws Exception {
         // Given
         Mockito.when(
