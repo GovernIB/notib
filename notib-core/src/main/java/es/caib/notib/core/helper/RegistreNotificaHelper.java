@@ -6,7 +6,6 @@ package es.caib.notib.core.helper;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -60,7 +59,7 @@ public class RegistreNotificaHelper {
 	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
 
 		logger.info(" [REG-NOT] Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-		configHelper.setEntitat(conversioTipusHelper.convertir(notificacioEntity.getEntitat(), EntitatDto.class));
+		configHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 		boolean enviarANotifica = false;
 		boolean isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
 		long t0 = System.currentTimeMillis();

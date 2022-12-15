@@ -182,8 +182,8 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	public void setConfigEntitat(EntitatDto entitatDto) {
-		delegate.setConfigEntitat(entitatDto);
+	public void setConfigEntitat(String entitatCodi) {
+		delegate.setConfigEntitat(entitatCodi);
 	}
 
 	@Override

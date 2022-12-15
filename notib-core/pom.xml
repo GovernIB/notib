@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>es.caib.notib</groupId>
 		<artifactId>notib</artifactId>
-		<version>1.1.22</version>
+		<version>1.1.23</version>
 	</parent>
 	<artifactId>notib-core</artifactId>
 	<packaging>ejb</packaging>
@@ -463,6 +463,7 @@
 					<systemPropertyVariables>
 						<es.caib.notib.properties.path>src/test/resources/es/caib/notib/core/test.properties</es.caib.notib.properties.path>
 					</systemPropertyVariables>
+					<argLine>-XX:MaxPermSize=512m</argLine>
 				</configuration>
             </plugin>
 			<plugin>

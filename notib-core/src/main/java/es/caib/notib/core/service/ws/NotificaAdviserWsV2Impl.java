@@ -7,7 +7,6 @@ import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.AccioParam;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaCertificacioArxiuTipusEnumDto;
@@ -192,7 +191,7 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				return enviament;
 			}
 			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(enviament.getNotificacio().getEntitat(), EntitatDto.class));
+				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 			}
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());

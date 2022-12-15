@@ -3,19 +3,16 @@
  */
 package es.caib.notib.war.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import es.caib.notib.core.api.dto.EntitatDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.EntitatService;
 import es.caib.notib.war.helper.ContingutEstaticHelper;
 import es.caib.notib.war.helper.EntitatHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import java.security.Principal;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Interceptor per a gestionar la llista d'entitats a cada pàgina.
@@ -39,7 +36,7 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
 		}
 		EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
 		if (entitatDto != null) {
-			entitatService.setConfigEntitat(entitatDto);
+			entitatService.setConfigEntitat(entitatDto.getCodi());
 		}
 		return true;
 	}

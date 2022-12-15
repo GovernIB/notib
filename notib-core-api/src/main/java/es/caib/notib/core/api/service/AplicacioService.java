@@ -3,7 +3,6 @@
  */
 package es.caib.notib.core.api.service;
 
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
@@ -20,7 +19,7 @@ public interface AplicacioService {
 
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	void actualitzarEntiatThreadLocal(EntitatDto entitat);
+	void actualitzarEntiatThreadLocal(String entitat);
 	/**
 	 * Processa l'autenticació d'un usuari.
 	 * 

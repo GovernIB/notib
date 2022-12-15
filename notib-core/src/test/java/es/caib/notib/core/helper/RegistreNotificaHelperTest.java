@@ -2,7 +2,6 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
 import es.caib.notib.core.entity.EntitatEntity;
@@ -11,7 +10,6 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.plugin.registre.RegistrePluginException;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
-import org.hibernate.mapping.Any;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +59,7 @@ public class RegistreNotificaHelperTest {
 				)
 		).thenReturn(new RespostaConsultaRegistre());
 		Mockito.when(configHelper.getAsBoolean(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
-		Mockito.when(conversioTipusHelper.convertir(Mockito.any(EntitatEntity.class), Mockito.any(Class.class))).thenReturn(new EntitatDto());
+//		Mockito.when(conversioTipusHelper.convertir(Mockito.any(EntitatEntity.class), Mockito.any(Class.class))).thenReturn(new EntitatDto());
 
 	}
 

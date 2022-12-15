@@ -576,7 +576,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 			log.debug(prefix + "Obtenint unitats organitzatives");
 			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-					entitatDto,
+					entitat.getCodi(),
 					entitat.getDir3Codi(),
 					entitat.getDataActualitzacio(),
 					entitat.getDataSincronitzacio());
@@ -726,7 +726,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		try {
 			// Obtenir lista de canvis del servei web
 			List<NodeDir3> unitatsWS = pluginHelper.unitatsOrganitzativesFindByPare(
-					conversioTipusHelper.convertir(entitat, EntitatDto.class),
+					entitat.getCodi(),
 					entitat.getDir3Codi(),
 					entitat.getDataActualitzacio(),
 					entitat.getDataSincronitzacio());
@@ -826,8 +826,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	private PrediccioSincronitzacio predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
 
-		EntitatDto e = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-		List<NodeDir3> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindByPare(e, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+		List<NodeDir3> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 		List<UnitatOrganitzativaDto> vigents = conversioTipusHelper.convertirList(unitatsVigentsWS, UnitatOrganitzativaDto.class);
 		List<String> codis = new ArrayList<>();
 		List<UnitatOrganitzativaDto> noves = new ArrayList<>();
