@@ -112,7 +112,7 @@ pageContext.setAttribute(
 		<c:url value="/userajax/usuaris" var="urlConsultaLlistat"/>
 		<not:inputText name="principal" required="true" textKey="entitat.permis.form.camp.principal" disabled="${not empty permisCommand.id}" placeholderKey="entitat.permis.form.camp.principal"
 			inputMaxLength="${principalSize}" showsize="true"/>
-		<div class="row" style="margin-right: 0px; margin-left: 0px;">
+		<div class="row" style="margin-right: 0px; margin-left: 0px;" title="<spring:message code="procediment.permis.form.camp.administrador.desc"/>">
 			<div class="form-group">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administrador"><span class="fa fa-user-plus"></span> <spring:message code="procediment.permis.form.camp.administrador"/></label>
 				<div class="controls col-xs-2">
@@ -134,7 +134,7 @@ pageContext.setAttribute(
 			</div>
 <%--			<not:inputCheckbox name="selectAll" labelSize="4" textKey="procediment.permis.form.camp.all"/>--%>
 		</div>
-		<div class="permisosInput">
+		<div class="permisosInput" title="<spring:message code="procediment.permis.form.camp.consulta.desc"/>">
 			<div class="form-group">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="read"><span class="fa fa-search"></span> <spring:message code="procediment.permis.form.camp.consulta"/></label>
 				<div class="controls col-xs-2">
@@ -144,7 +144,7 @@ pageContext.setAttribute(
 				</div>
 			</div>
 <%--		<not:inputCheckbox name="read" labelSize="4" textKey="procediment.permis.form.camp.consulta"/>--%>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.form.camp.processar.desc"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="processar"><span class="fa fa-check-square-o"></span> <spring:message code="procediment.permis.form.camp.processar"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -153,7 +153,7 @@ pageContext.setAttribute(
 				</div>
 			</div>
 <%--			not:inputCheckbox name="processar" labelSize="4" textKey="procediment.permis.form.camp.processar"/>--%>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.form.camp.gestio.desc"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administration"><span class="fa fa-cog"></span> <spring:message code="procediment.permis.form.camp.gestio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -162,7 +162,7 @@ pageContext.setAttribute(
 				</div>
 			</div>
 <%--			not:inputCheckbox name="administration" labelSize="4" textKey="procediment.permis.form.camp.gestio"/>--%>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="organgestor.permis.form.camp.comuns.desc"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comuns"><span class="fa fa-globe"></span> <spring:message code="organgestor.permis.form.camp.comuns"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -171,7 +171,7 @@ pageContext.setAttribute(
 				</div>
 			</div>
 <%--			not:inputCheckbox name="comuns" labelSize="4" textKey="organgestor.permis.form.camp.comuns"/>--%>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.form.camp.notificacio.desc"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="notificacio"><span class="fa fa-gavel"></span> <spring:message code="procediment.permis.form.camp.notificacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -180,7 +180,7 @@ pageContext.setAttribute(
 				</div>
 			</div>
 <%--			not:inputCheckbox name="notificacio" labelSize="4" textKey="procediment.permis.form.camp.notificacio"/>--%>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.form.camp.comunicacio.desc"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacio"><span class="fa fa-envelope-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -188,7 +188,7 @@ pageContext.setAttribute(
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.form.camp.comunicacio.sir.desc"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-envelope"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sir"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -196,8 +196,8 @@ pageContext.setAttribute(
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-paper-plane-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/></label>
+			<div class="form-group" title="<spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment.desc"/>">
+				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSenseProcediment"><span class="fa fa-paper-plane-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
 						<label class="form-switch"><form:checkbox path="comunicacioSenseProcediment" cssClass="span12" id="comunicacioSenseProcediment" autocomplete="off"/><i></i></label>

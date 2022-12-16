@@ -57,6 +57,8 @@
 
         #permisos th {
             writing-mode:vertical-lr;
+            text-orientation: upright;
+
         }
 
         .writing-horitzontal {
@@ -68,7 +70,7 @@
         /*}*/
 
         .nom-principal {
-            width: 40% !important;
+            width: 35% !important;
         }
 
         .th-checkbox {
@@ -78,6 +80,10 @@
 
         .th-boto-accions {
             width: 6% !important;
+        }
+
+        .padding-icon {
+            padding-right: 10px;
         }
 
     </style>
@@ -265,52 +271,76 @@
                             <span title="{{:nomSencerAmbCodi}}">{{:nomSencerAmbCodi}}</span>
                         </script>
                     </th>
-                    <th data-col-name="read" data-template="#cellPermisReadTemplate" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.consulta"/>
+                    <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.administrador"/> - <spring:message code="procediment.permis.form.camp.administrador.desc"/>">
+                        <span class="fa fa-user-plus padding-icon"></span>
+                        <%--                        <spring:message code="procediment.permis.columna.administrador.curt"/>--%>
+                        <script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
+                            {{if administrador}}<span class="fa fa-check"></span>{{/if}}
+                        </script>
+                    </th>
+                    <th data-col-name="read" data-template="#cellPermisReadTemplate"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.consulta"/> - <spring:message code="procediment.permis.form.camp.consulta.desc"/>">
+                        <span class="fa fa-search padding-icon"></span>
+<%--                        <spring:message code="procediment.permis.columna.consulta"/>--%>
                         <script id="cellPermisReadTemplate" type="text/x-jsrender">
                             {{if read}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="processar" data-template="#cellPermisProcessarTemplate" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.processar"/>
+                    <th data-col-name="processar" data-template="#cellPermisProcessarTemplate"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.processar"/> - <spring:message code="procediment.permis.form.camp.processar.desc"/>">
+                        <span class="fa fa-check-square-o padding-icon"></span><span>
+<%--                        <spring:message code="procediment.permis.columna.processar"/>--%>
                         <script id="cellPermisProcessarTemplate" type="text/x-jsrender">
                             {{if processar}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.notificacio.arbre"/>
-                        <script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
-                            {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
-                        </script>
-                    </th>
-                    <th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.comunicacio.arbre"/>
-                        <script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
-                            {{if comunicacio}}<span class="fa fa-check"></span>{{/if}}
-                        </script>
-                    </th>
-                    <th data-col-name="administration" data-template="#cellPermisGestioTemplate" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.gestio"/>
+                    <th data-col-name="administration" data-template="#cellPermisGestioTemplate"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.gestio"/> - <spring:message code="procediment.permis.form.camp.gestio.desc"/>">
+                        <span class="fa fa-cog padding-icon"></span>
+<%--                        <spring:message code="procediment.permis.columna.gestio"/>--%>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
                             {{if administration}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="comuns" data-template="#cellPermisComunsTemplate" class="th-checkbox">
-                        <spring:message code="organgestor.permis.columna.comuns.curt"/>
+                    <th data-col-name="comuns" data-template="#cellPermisComunsTemplate"
+                        class="th-checkbox" title="<spring:message code="organgestor.permis.form.camp.comuns"/> - <spring:message code="organgestor.permis.form.camp.comuns.desc"/>">
+                        <span class="fa fa-globe padding-icon"></span>
+<%--                        <spring:message code="organgestor.permis.columna.comuns.curt"/>--%>
                         <script id="cellPermisComunsTemplate" type="text/x-jsrender">
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="comunicacioSir" data-template="#comunicacioSirTemplate" class="th-checkbox">
-                        <spring:message code="organgestor.permis.columna.coms.sir"/>
+                    <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.notificacio"/> - <spring:message code="procediment.permis.form.camp.notificacio.desc"/>">
+                        <span class="fa fa-gavel padding-icon"></span>
+                        <%--                        <spring:message code="procediment.permis.columna.notificacio.arbre"/>--%>
+                        <script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
+                            {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
+                        </script>
+                    </th>
+                    <th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio"/> - <spring:message code="procediment.permis.form.camp.comunicacio.desc"/>">
+                        <span class="fa fa-envelope-o padding-icon"></span>
+                        <%--                        <spring:message code="procediment.permis.columna.comunicacio.arbre"/>--%>
+                        <script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
+                            {{if comunicacio}}<span class="fa fa-check"></span>{{/if}}
+                        </script>
+                    </th>
+                    <th data-col-name="comunicacioSir" data-template="#comunicacioSirTemplate"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sir"/> - <spring:message code="procediment.permis.form.camp.comunicacio.sir.desc"/>">
+                        <span class="fa fa-envelope padding-icon"></span>
+<%--                        <spring:message code="organgestor.permis.columna.coms.sir"/>--%>
                         <script id="comunicacioSirTemplate" type="text/x-jsrender">
                             {{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" class="th-checkbox">
-                        <spring:message code="procediment.permis.columna.administrador.curt"/>
-                        <script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
-                            {{if administrador}}<span class="fa fa-check"></span>{{/if}}
+                    <th data-col-name="comunicacioSenseProcediment" data-template="#cellComunicacioSenseProcediment" data-class="organ-admin"
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/> - <spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment.desc"/>">
+                        <span class="fa fa-paper-plane-o padding-icon"></span>
+                        <%--                        <spring:message code="procediment.permis.columna.administrador.curt"/>--%>
+                        <script id="cellComunicacioSenseProcediment" type="text/x-jsrender">
+                            {{if comunicacioSenseProcediment}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
                     <th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" data-class="overflow-visible" class="th-boto-accions">
