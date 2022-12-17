@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.DocumentTipusEnumDto;
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
@@ -229,8 +230,21 @@ public class NotificacioFormController extends BaseUserController {
             @RequestParam(value = "provincia", required = false) Long provincia,
             @RequestParam(value = "municipi", required = false) String municipi,
             Model model) {
-        return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
 
+        boolean codiNull = Strings.isNullOrEmpty(codi);
+        boolean denominacioNull = Strings.isNullOrEmpty(denominacio);
+        boolean comunitatNull = comunitatAutonoma == null;
+        if (comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+            return new ArrayList<>();
+        }
+        try {
+            return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
+        } catch (Exception ex) {
+            log.error("Error obtinguent les unitats codi " + codi + " denominacio: " + denominacio + ", nivellAdministracio: " + nivellAdministracio +
+                    ", comunitatAutonoma: " + comunitatAutonoma + ", provincia: " + provincia + ", municipi: " + municipi, ex);
+//            return new ArrayList<>();
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     @RequestMapping(value = "/administracions/codi/{codi}", method = RequestMethod.GET)
