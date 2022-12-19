@@ -3,7 +3,7 @@
 > - Versió Estable: __notib-1.1.21__ (tag [NOTIB 1.1.21.9](https://github.com/GovernIB/notib/releases/tag/v1.1.21.9))
 > - Versió Desenvolupament: __notib-1.1.22__ (branca [notib-dev](https://github.com/GovernIB/notib/tree/notib-dev))  
 >  
-> - Versió actual del client REST: __1.1.21__ ([notib-client-1.1.21.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.21/notib-client-intf-1.1.21.jar), [notib-client-intf-1.1.21.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.21/notib-client-intf-1.1.21.jar))  
+> - Versió actual del client REST: __1.1.21__ ([notib-client-1.1.21.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client/1.1.21/notib-client-1.1.21.jar), [notib-client-intf-1.1.21.jar](https://github.com/GovernIB/maven/raw/gh-pages/maven/es/caib/notib/notib-client-intf/1.1.21/notib-client-intf-1.1.21.jar))  
 >  
 >   - Ús amb maven:  
 > ```
