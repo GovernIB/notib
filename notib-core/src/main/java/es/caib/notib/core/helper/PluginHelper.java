@@ -64,7 +64,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.OficinaSIR;
+import es.caib.notib.plugin.unitat.OficinaSir;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -435,7 +435,7 @@ public class PluginHelper {
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", unitatCodi));
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
+			List<OficinaSir> oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
 			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
@@ -456,7 +456,7 @@ public class PluginHelper {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
 			}
 			info.setCodiEntitat(entitat.getCodi());
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(codiDir3Entitat);
+			List<OficinaSir> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesEntitat(codiDir3Entitat);
 			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
@@ -1005,7 +1005,7 @@ public class PluginHelper {
 			info.setCodiEntitat(entitat.getCodi());
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				logger.info("Obtenir l'organigrama per entitat SOAP");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(codiDir3Entitat, null, null);
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat, null, null);
 			} else {
 				logger.info("Obtenir l'organigrama per entitat REST");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);

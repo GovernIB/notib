@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1671453604619-1
+      author: limit
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: NOT_OFI_PK
+                  name: CODI
+                  type: varchar(16 ${varcharUnit})
+              - column:
+                  name: nom
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  constraints:
+                    nullable: false
+                  name: sir
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: actiu
+                  type: BOOLEAN
+              - column:
+                  name: organ_codi
+                  type: varchar(16 ${varcharUnit})
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+            tableName: NOT_OFICINA
+        - sql:
+            "ALTER TABLE NOT_OFICINA ADD CONSTRAINT NOT_OFI_ORGAN_FK FOREIGN KEY (organ_codi) REFERENCES NOT_ORGAN_GESTOR(CODI);
+            ALTER TABLE NOT_OFICINA ADD CONSTRAINT NOT_OFI_ENTITAT_FK FOREIGN KEY (entitat_id) REFERENCES NOT_ENTITAT(ID);
+            GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_OFICINA TO WWW_NOTIB;"
