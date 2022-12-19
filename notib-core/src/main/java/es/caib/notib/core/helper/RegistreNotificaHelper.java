@@ -105,9 +105,7 @@ public class RegistreNotificaHelper {
 				}
 
 				// Registre NO SIR
-//				boolean ok =
-				crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, enviarANotifica, isComunicacio, isSirActivat(), info, t0, enviament);
-//				enviarANotifica = enviarANotifica && ok;
+				crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, isComunicacio, isSirActivat(), info, t0, enviament);
 
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(msg + elapsedTime + " ms");
@@ -130,9 +128,14 @@ public class RegistreNotificaHelper {
 		return enviarANotifica;
 	}
 
-	private boolean crearAssentamentRegistralPerNotificacio(NotificacioEntity notificacioEntity, String dir3Codi, boolean enviarANotifica,
-															boolean isComunicacio, boolean isSirActivat, IntegracioInfo info, long t0,
-															NotificacioEnviamentEntity enviament) throws RegistrePluginException {
+	private void crearAssentamentRegistralPerNotificacio(
+			NotificacioEntity notificacioEntity,
+			String dir3Codi,
+			boolean isComunicacio,
+			boolean isSirActivat,
+			IntegracioInfo info,
+			long t0,
+			NotificacioEnviamentEntity enviament) throws RegistrePluginException {
 
 		//Crea assentament registral + Notific@
 		logger.info(" >>> Nou assentament registral...");
@@ -162,10 +165,8 @@ public class RegistreNotificaHelper {
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
-			enviarANotifica = true;
 		}
 		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
-		return enviarANotifica;
 	}
 
 	private void crearAssentamentRegistralEnviamentComunicacioSIR(NotificacioEntity notificacioEntity, String dir3Codi, boolean totsAdministracio,
