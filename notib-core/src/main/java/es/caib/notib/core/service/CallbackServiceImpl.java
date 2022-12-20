@@ -43,50 +43,60 @@ public class CallbackServiceImpl implements CallbackService {
     private MetricsHelper metricsHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+
 	@Override
 	public void processarPendents() {
+
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
-			if (isTasquesActivesProperty() && isCallbackPendentsActiu()) {
-				logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
-				int maxPendents = getEventsProcessarMaxProperty(); 
-				Pageable page = new PageRequest(
-						0,
-						maxPendents);
-				List<Long> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
-				if (pendentsIds.size() > 0) {
-					logger.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
-					int errors = 0;
-					ExecutorService executorService = Executors.newFixedThreadPool(pendentsIds.size());
-					List<Future<Boolean>> futurs = new ArrayList<>();
-					for (Long eventId: pendentsIds) {
-						logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
-						try {
-							if (Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD))) {
-//								CallbackProcessarPendentsThread thread = new CallbackProcessarPendentsThread(eventId, callbackHelper);
-//								Future<Boolean> futur = executorService.submit(thread);
-//								futurs.add(futur);
+			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
+				logger.debug("[Callback] Enviament callbacks deshabilitat. ");
+			}
+			logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
+			int maxPendents = getEventsProcessarMaxProperty();
+			Pageable page = new PageRequest(0, maxPendents);
+			List<Long> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
+			if (pendentsIds.isEmpty()) {
+				logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
+			}
+			logger.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
+			int errors = 0;
+			ExecutorService executorService = Executors.newFixedThreadPool(pendentsIds.size());
+			List<Future<Boolean>> futurs = new ArrayList<>();
+			CallbackProcessarPendentsThread thread;
+			Future<Boolean> futur;
+			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
+			for (Long eventId: pendentsIds) {
+				logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
+				try {
+					if (multiThread) {
+						thread = new CallbackProcessarPendentsThread(eventId, callbackHelper);
+						futur = executorService.submit(thread);
+						futurs.add(futur);
 //								if (!futur.isDone()) {
 //									errors++;
 //								}
-							} else {
-								if(!callbackHelper.notifica(eventId)) {
-									errors++;
-								}
-							}
-						} catch (Exception e) {
+					} else {
+						if(!callbackHelper.notifica(eventId)) {
 							errors++;
-							logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
-							callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
 						}
 					}
-					logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
-				} else {
-					logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
+				} catch (Exception e) {
+					errors++;
+					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
+					callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
 				}
-			} else {
-				logger.debug("[Callback] Enviament callbacks deshabilitat. ");
 			}
+			for (Future<Boolean> f : futurs) {
+				try {
+					Boolean err = f.get();
+					errors = err ? errors + 1 : errors;
+				} catch (Exception ex) {
+					errors++;
+				}
+			}
+			logger.info("[Callback] Fi de les notificacions pendents cap a les aplicacions: " + pendentsIds.size() + ", " + errors + " errors");
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
