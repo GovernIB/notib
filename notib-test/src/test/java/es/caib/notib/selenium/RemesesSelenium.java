@@ -31,28 +31,28 @@ public class RemesesSelenium extends NotibSelenium {
 
     private void filtrar() {
 
-        Select tipus = new Select(driver.findElement(By.id("enviamentTipus")));
+        var tipus = new Select(driver.findElement(By.id("enviamentTipus")));
         tipus.selectByIndex(2);
-        WebElement concepte = driver.findElement(By.id("concepte"));
+        var concepte = driver.findElement(By.id("concepte"));
         concepte.sendKeys("test");
-        Select estat = new Select(driver.findElement(By.id("estat")));
+        var estat = new Select(driver.findElement(By.id("estat")));
         estat.selectByIndex(9);
-        Select organ = new Select(driver.findElement(By.id("organGestor")));
+        var organ = new Select(driver.findElement(By.id("organGestor")));
         organ.selectByValue("18445"); // organ amb codi A04035942
-        WebElement button = driver.findElement(By.name("accio"));
+        var button = driver.findElement(By.name("accio"));
         button.click();
     }
 
     private String detallTaula() {
 
         esperar();
-        List<WebElement> files = driver.findElements(By.tagName("tr"));
+        var files = driver.findElements(By.tagName("tr"));
         int size = files.size()- 1;
-        Random r = new Random();
-        int inici = 1;
-        int fi = size;
-        int resultat = r.nextInt(fi-inici) + inici;
-        WebElement fila = files.get(resultat);
+        var r = new Random();
+        var inici = 1;
+        var fi = size;
+        var resultat = r.nextInt(fi-inici) + inici;
+        var fila = files.get(resultat);
         fila.click();
         return fila.getAttribute("id").split("_")[1];
     }
@@ -60,8 +60,8 @@ public class RemesesSelenium extends NotibSelenium {
     private void tancar(String id) {
 
         get(urlBase + "/modal/notificacio/" + id + "/info");
-        List<WebElement> cancelar = driver.findElements(By.tagName("a"));
-        WebElement a = cancelar.get(cancelar.size()-1);
+        var cancelar = driver.findElements(By.tagName("a"));
+        var a = cancelar.get(cancelar.size()-1);
         esperar();
         a.click();
     }

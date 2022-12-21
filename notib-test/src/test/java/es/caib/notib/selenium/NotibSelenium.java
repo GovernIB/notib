@@ -39,7 +39,7 @@ public class NotibSelenium {
 
 	void natejarFiltres(String id) {
 
-		WebElement boto = driver.findElement(By.id(id));
+		var boto = driver.findElement(By.id(id));
 		esperar();
 		boto.click();
 	}

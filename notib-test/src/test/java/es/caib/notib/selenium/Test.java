@@ -8,16 +8,16 @@ public class Test {
 
     public static void main(String [] args) throws Exception {
 
-        WebDriver driver = new ChromeDriver();
+        var driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
         try {
-            LoginSelenium ls = new LoginSelenium(driver);
+            var ls = new LoginSelenium(driver);
             ls.login();
             while(true) {
 
-                RemesesSelenium ns = new RemesesSelenium(driver);
+                var ns = new RemesesSelenium(driver);
                 ns.test();
-                EnviamentsSelenium es = new EnviamentsSelenium(driver);
+                var es = new EnviamentsSelenium(driver);
                 es.test();
             }
         }  finally {
