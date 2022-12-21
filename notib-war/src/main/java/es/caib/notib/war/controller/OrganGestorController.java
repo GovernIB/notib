@@ -196,24 +196,24 @@ public class OrganGestorController extends BaseUserController{
 			return new ProgresActualitzacioDto();
 		}
 
-		if (progresActualitzacio.getFase() == 2) {
+		if (progresActualitzacio.getFase() == 3) {
 //			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
 			ProgresActualitzacioDto progresProc = procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
 			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
 				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
-				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 18 / 100));
+				progresAcumulat.setProgres(45 + (progresProc.getProgres() * 18 / 100));
 				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 				progresAcumulat.getInfo().addAll(progresProc.getInfo());
 //				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
 				return progresAcumulat;
 			}
 		}
-		if (progresActualitzacio.getFase() == 3) {
+		if (progresActualitzacio.getFase() == 4) {
 //			ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
 			ProgresActualitzacioDto progresSer = serveiService.getProgresActualitzacio(entitat.getDir3Codi());
 			if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
 				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
-				progresAcumulat.setProgres(45 + (progresSer.getProgres() * 18 / 100));
+				progresAcumulat.setProgres(63 + (progresSer.getProgres() * 18 / 100));
 				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 				progresAcumulat.getInfo().addAll(progresSer.getInfo());
 //				logger.info("Progres actualització organs gestors fase 3: {}", progresAcumulat.getProgres());
@@ -308,11 +308,11 @@ public class OrganGestorController extends BaseUserController{
 //		}
 //	}
 
-	@RequestMapping(value = "/sync/oficines")
-	public String syncOficinesSIR(HttpServletRequest request, Model model) {
+	@RequestMapping(value = "/sync/oficines/{lloc}")
+	public String syncOficinesSIR(HttpServletRequest request, @PathVariable String lloc, Model model) {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		String redirect = "redirect:../../organgestor";
+		String redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
 		try {
 			organGestorService.syncOficinesSIR(entitat.getId());
 			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.list.boto.actualitzar.oficines.ok");

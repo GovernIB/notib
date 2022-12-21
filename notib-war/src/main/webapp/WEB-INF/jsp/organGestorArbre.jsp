@@ -209,7 +209,7 @@
             <div class="col-md-7">
                 <div style="padding-bottom: 10px; text-align: right">
                     <c:if test="${setOficina}">
-                        <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines"
+                        <a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/ARBRE"
                                 data-refresh-pagina="true" data-maximized="false">
                                 <span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
                         </a>

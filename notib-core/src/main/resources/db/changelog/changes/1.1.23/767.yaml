@@ -18,8 +18,8 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: NOT_OFI_PK
-                  name: CODI
-                  type: varchar(16 ${varcharUnit})
+                  name: codi
+                  type: varchar(64 ${varcharUnit})
               - column:
                   name: nom
                   type: varchar(1024 ${varcharUnit})

@@ -13,6 +13,7 @@ import es.caib.notib.core.api.dto.NotificacioAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentAuditDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
 import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.TipusDocumentDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.dto.cie.CieDto;
@@ -46,6 +47,7 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.OficinaEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
@@ -391,6 +393,12 @@ public class ConversioTipusHelper {
 						})
 				.byDefault()
 				.register();
+
+		mapperFactory.classMap(OficinaEntity.class, OficinaDto.class).
+				field("organGestor.codi", "organCodi").
+				byDefault().
+				register();;
+
 		defineConverters();
 	}
 

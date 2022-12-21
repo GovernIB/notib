@@ -195,4 +195,10 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"and og.estat != es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum.V ")
 	List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
 
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (og.oficina is null or og.oficina not in (select codi from OficinaEntity))")
+    List<OrganGestorEntity> findByEntitatAndOficinaInexistent(@Param("entitat") EntitatEntity entitat);
 }
