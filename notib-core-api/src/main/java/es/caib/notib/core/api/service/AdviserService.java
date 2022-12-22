@@ -1,10 +1,6 @@
 package es.caib.notib.core.api.service;
 
-import es.caib.notib.core.api.dto.EnviamentAdviser;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.Holder;
-import java.math.BigInteger;
+import es.caib.notib.core.api.dto.adviser.EnviamentAdviser;
 
 public interface AdviserService {
 
