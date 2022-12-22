@@ -5,6 +5,7 @@ import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.NotificacioHelper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.util.concurrent.Callable;
 
@@ -30,7 +31,9 @@ public class CallbackProcessarPendentsThread implements Callable<Boolean> {
         } catch (Exception e) {
             error = true;
             log.error("Error registrant la notificació amb id " + eventId, e);
-            throw new RuntimeException(e);
+            log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
+            callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
+            return error;
         }
     }
 }
