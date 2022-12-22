@@ -6,8 +6,6 @@ package es.caib.notib.plugin.unitat;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
 
-import java.net.MalformedURLException;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +32,10 @@ public interface UnitatsOrganitzativesPlugin {
 	 */
 	public Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException;
 	
-	public Map<String, NodeDir3> organigramaPerEntitatWs(
+	public Map<String, NodeDir3> organigramaPerEntitat(
 			String pareCodi,
-			Timestamp fechaActualizacion,
-			Timestamp fechaSincronizacion) throws SistemaExternException;
+			Date fechaActualizacion,
+			Date fechaSincronizacion) throws SistemaExternException;
 
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donada
@@ -76,7 +74,7 @@ public interface UnitatsOrganitzativesPlugin {
 	public NodeDir3 findAmbCodi(
 			String pareCodi,
 			Date dataActualitzacio,
-			Date dataSincronitzacio) throws MalformedURLException;
+			Date dataSincronitzacio) throws SistemaExternException;
 
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donat un codi d'entitat.
@@ -246,17 +244,17 @@ public interface UnitatsOrganitzativesPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar les oficines SIR
 	 */
-	public List<OficinaSIR> oficinesSIRUnitat(
+	public List<OficinaSir> oficinesSIRUnitat(
 			String unitat, 
 			Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException;
 
 	/**
-	 * @return recupera el llistat de les oficines SIR d'una entitat
+	 * @return recupera el llistat de les oficines d'una entitat
 	 * 
 	 * @param entitat
 	 * 			Codi de la entitat
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar les oficines SIR
 	 */
-	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException;
+	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException;
 }

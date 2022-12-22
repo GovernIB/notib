@@ -471,7 +471,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat, entitat.getDir3Codi(), null, null);
+			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
 			List<String> codiOrgansGda = new ArrayList<>();
 			for (NodeDir3 unitat: unitatsWs) {
 				codiOrgansGda.add(unitat.getCodi());

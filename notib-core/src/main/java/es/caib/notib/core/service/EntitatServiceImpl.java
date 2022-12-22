@@ -574,8 +574,8 @@ public class EntitatServiceImpl implements EntitatService {
 	}
 
 	@Override
-	public void setConfigEntitat(EntitatDto entitatDto) {
-		ConfigHelper.setEntitat(entitatDto);
+	public void setConfigEntitat(String entitatCodi) {
+		ConfigHelper.setEntitatCodi(entitatCodi);
 	}
 
 	@Override

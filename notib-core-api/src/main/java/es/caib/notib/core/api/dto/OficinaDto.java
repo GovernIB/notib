@@ -15,6 +15,8 @@ public class OficinaDto implements Serializable{
 
 	private String codi;
 	private String nom;
+	private String organCodi;
+	private boolean sir;
 
 	private static final long serialVersionUID = -3831959843313056718L;
 	

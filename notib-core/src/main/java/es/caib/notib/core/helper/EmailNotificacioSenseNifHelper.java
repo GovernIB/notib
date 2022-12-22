@@ -2,7 +2,6 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.core.api.dto.ArxiuDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -156,11 +155,11 @@ public class EmailNotificacioSenseNifHelper {
 		log.info("Enviant correu enviament comunicació (Id= {}) a {}", enviament.getId(), email);
 
 		if (configHelper.getEntitatActualCodi() == null) {
-			configHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+			configHelper.setEntitatCodi(entitat.getCodi());
 		}
 		DocumentEntity document = enviament.getNotificacio().getDocument();
 		ArxiuDto arxiu = documentHelper.documentToArxiuDto(document.getArxiuNom(), document);
-		configHelper.setEntitat(null);
+		configHelper.setEntitatCodi(null);
 		List<Attachment> attachments = new ArrayList<>(Arrays.asList(new Attachment(arxiu.getNom(), arxiu.getContingut())));
 		String htmlBody = getComunicacioMailHtmlBody(enviament);
 		String textBody = getComunicacioMailPlainTextBody(enviament);

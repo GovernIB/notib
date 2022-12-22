@@ -6,7 +6,6 @@ package es.caib.notib.core.helper;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
@@ -60,7 +59,7 @@ public class RegistreNotificaHelper {
 	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
 
 		logger.info(" [REG-NOT] Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-		configHelper.setEntitat(conversioTipusHelper.convertir(notificacioEntity.getEntitat(), EntitatDto.class));
+		configHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 		boolean enviarANotifica = false;
 		boolean isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
 		long t0 = System.currentTimeMillis();
@@ -81,7 +80,20 @@ public class RegistreNotificaHelper {
 				continue;
 			}
 			try {
+				AccioParam accio;
+				String msg = "";
+				if (isSirActivat()) {
+					accio = new AccioParam("Procés descripció: ", " [REG-NOT] " + notificacioEntity.getEnviamentTipus() + ": nou assentament registral + Notifica de la notificació: " + notificacioEntity.getId());
+					msg = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals per notificació [Id: " + notificacioEntity.getId() + "]: ";
+				} else {
+					//### ASSENTAMENT REGISTRE NORMAL + NOTIFIC@
+					logger.info(" [REG-NOT] Assentament sortida (registre) + Notifica");
+					accio = new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral normal de la notificació: " + notificacioEntity.getId());
+					msg = " [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: ";
+				}
+				info.getParams().add(accio);
 
+				// Registre SIR
 				if (isSirActivat() && isComunicacio && totsAdministracio) {
 					logger.info(" [REG-NOT] Realitzant nou assentament registral per SIR");
 					info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral per SIR"));
@@ -91,21 +103,10 @@ public class RegistreNotificaHelper {
 							notificacioEntity.getId() + ", encId: " + enviament.getId()+ "]: " + elapsedTime + " ms");
 					continue;
 				}
-				AccioParam accio;
-				String msg = "";
-				if (isSirActivat()) {
-					accio = new AccioParam("Procés descripció: ", " [REG-NOT] " + notificacioEntity.getEnviamentTipus()
-							+ ": nou assentament registral + Notifica de la notificació: " + notificacioEntity.getId());
-					msg = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals per notificació [Id: " + notificacioEntity.getId() + "]: ";
-				} else {
-					//### ASSENTAMENT REGISTRE NORMAL + NOTIFIC@
-					logger.info(" [REG-NOT] Assentament sortida (registre) + Notifica");
-					accio = new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral normal de la notificació: " + notificacioEntity.getId());
-					msg = " [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: ";
-				}
-				info.getParams().add(accio);
-				boolean ok = crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, enviarANotifica, isComunicacio, isSirActivat(), info, t0, enviament);
-				enviarANotifica = enviarANotifica && ok;
+
+				// Registre NO SIR
+				crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, isComunicacio, isSirActivat(), info, t0, enviament);
+
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(msg + elapsedTime + " ms");
 				logger.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
@@ -116,6 +117,7 @@ public class RegistreNotificaHelper {
 				throw new RegistreNotificaException(ex.getMessage(), ex);
 			}
 		}
+
 		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
 			boolean isSir = notificacioEntity.isComunicacioSir();
 			notificacioEntity.updateEstat(isSir ? NotificacioEstatEnumDto.ENVIADA : NotificacioEstatEnumDto.REGISTRADA);
@@ -126,9 +128,14 @@ public class RegistreNotificaHelper {
 		return enviarANotifica;
 	}
 
-	private boolean crearAssentamentRegistralPerNotificacio(NotificacioEntity notificacioEntity, String dir3Codi, boolean enviarANotifica,
-															boolean isComunicacio, boolean isSirActivat, IntegracioInfo info, long t0,
-															NotificacioEnviamentEntity enviament) throws RegistrePluginException {
+	private void crearAssentamentRegistralPerNotificacio(
+			NotificacioEntity notificacioEntity,
+			String dir3Codi,
+			boolean isComunicacio,
+			boolean isSirActivat,
+			IntegracioInfo info,
+			long t0,
+			NotificacioEnviamentEntity enviament) throws RegistrePluginException {
 
 		//Crea assentament registral + Notific@
 		logger.info(" >>> Nou assentament registral...");
@@ -158,10 +165,8 @@ public class RegistreNotificaHelper {
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
-			enviarANotifica = true;
 		}
 		auditNotificacioHelper.updateRegistreNouEnviament(notificacioEntity, pluginHelper.getRegistreReintentsPeriodeProperty());
-		return enviarANotifica;
 	}
 
 	private void crearAssentamentRegistralEnviamentComunicacioSIR(NotificacioEntity notificacioEntity, String dir3Codi, boolean totsAdministracio,

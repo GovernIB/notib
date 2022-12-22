@@ -3,7 +3,6 @@ package es.caib.notib.core.helper;
 import com.google.common.base.Strings;
 import es.caib.notib.core.api.dto.AvisNivellEnumDto;
 import es.caib.notib.core.api.dto.CodiValorDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
@@ -257,7 +256,7 @@ public class OrganGestorHelper {
 		calendar.add(Calendar.YEAR, 1);
 
 		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-				conversioTipusHelper.convertir(entitat, EntitatDto.class),
+				entitat.getCodi(),
 				entitat.getDir3Codi(),
 				entitat.getDataActualitzacio(),
 				entitat.getDataSincronitzacio());

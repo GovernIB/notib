@@ -3,19 +3,16 @@
  */
 package es.caib.notib.core.ejb;
 
-import java.util.List;
+import es.caib.notib.core.api.dto.ExcepcioLogDto;
+import es.caib.notib.core.api.dto.UsuariDto;
+import es.caib.notib.core.api.service.AplicacioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import es.caib.notib.core.api.dto.EntitatDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.notib.core.api.dto.ExcepcioLogDto;
-import es.caib.notib.core.api.dto.UsuariDto;
-import es.caib.notib.core.api.service.AplicacioService;
+import java.util.List;
 
 /**
  * Implementació de AplicacioService com a EJB que empra una clase
@@ -32,8 +29,8 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
-	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		delegate.actualitzarEntiatThreadLocal(entitat);
+	public void actualitzarEntiatThreadLocal(String entitatCodi) {
+		delegate.actualitzarEntiatThreadLocal(entitatCodi);
 	}
 
 	@Override

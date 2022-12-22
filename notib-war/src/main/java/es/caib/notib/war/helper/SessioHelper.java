@@ -49,7 +49,7 @@ public class SessioHelper {
 		session.setAttribute("dadesUsuariActual", usuari);
 		// Assegurem que l'entitat i rol actual s'hagin carregat correctament
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request, aplicacioService, entitatService);
-		aplicacioService.actualitzarEntiatThreadLocal(entitat);
+		aplicacioService.actualitzarEntiatThreadLocal(entitat.getCodi());
 		RolHelper.getRolActual(request, aplicacioService);
         localeResolver.setLocale(request, response, StringUtils.parseLocaleString((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI)));
 	}

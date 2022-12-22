@@ -784,8 +784,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 //		private String uuid;
 		private StringField creadaPer;
 
-		private boolean nomesSenseErrors = false;
-		private boolean nomesAmbErrors = false;
+		private boolean nomesSenseErrors;
+		private boolean nomesAmbErrors;
 		private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
 		private StringField referenciaNotificacio;
 
