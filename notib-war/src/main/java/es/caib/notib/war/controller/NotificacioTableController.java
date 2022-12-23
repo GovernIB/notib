@@ -256,52 +256,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
                 }
             }
 
-//            if (item.getNTramitacio() > 0 ){
-//                estat += "<div style=\"font-size: 11px; " + boxShadow + EnviamentEstatGrup.TRAMITACIO.getColor() + padding + "\">" +
-//                        item.getNTramitacio() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.TRAMITACIO)
-//                        + "</div>";
-//            }
-//            if (item.getNCompareixenca() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.PENDENT_COMPAREIXENCA.getColor() + padding + "\">" +
-//                        item.getNCompareixenca() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.PENDENT_COMPAREIXENCA)
-//                        + "</div>";
-//            }
-//            if (item.getNLlegida() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.LLEGIDA.getColor() + padding + "\">" +
-//                        item.getNLlegida() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.LLEGIDA)
-//                        + "</div>";
-//            }
-//            if (item.getNRebutjada() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.REBUTJADA.getColor() + padding + "\">" +
-//                        item.getNRebutjada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.REBUTJADA)
-//                        + "</div>";;
-//            }
-//            if (item.getNExpirada() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.EXPIRADA.getColor() + padding + "\">" +
-//                        item.getNExpirada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.EXPIRADA)
-//                        + "</div>";
-//            }
-//            if (item.getNAnulada() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ANULADA.getColor() + padding + "\">" +
-//                        item.getNAnulada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.ANULADA)
-//                        + "</div>";
-//            }
-//            if (item.getNError() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ERROR.getColor() + padding + "\">" +
-//                        item.getNError() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.ERROR)
-//                        + "</div>";
-//            }
-//            if (item.getNFinalitzada() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ESTAT_FICTICI.getColor() + padding + "\">" +
-//                        item.getNFinalitzada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.FINALITZADA)
-//                        + "</div>";
-//            }
-//            if (item.getNProcessada() > 0 ){
-//                estat += "<div style=\"" + boxShadow + EnviamentEstatGrup.ESTAT_FICTICI.getColor() + padding + "\">" +
-//                        item.getNProcessada() + " " + getMessage(request, "enviament.grup." + EnviamentEstatGrup.PROCESSADA)
-//                        + "</div>";
-//            }
-
             item.setEstatString(estat);
         }
     }

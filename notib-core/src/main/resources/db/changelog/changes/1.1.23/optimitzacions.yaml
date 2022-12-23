@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1671453604619-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: not_notificacio_table
+            name: titular
+            type: varchar(256)
+  - sql: "INSERT INTO NOT_PROCESSOS_INICIALS (CODI, INIT, ID) VALUES ('ACTUALITZAR_NOT_NOTIFICACIO_TABLE', 1, 3);"

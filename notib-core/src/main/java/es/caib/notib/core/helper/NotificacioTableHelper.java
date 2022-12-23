@@ -8,8 +8,10 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -34,11 +37,33 @@ public class NotificacioTableHelper {
     @Resource
     private MessageHelper messageHelper;
 
+    public void actualitzarTaula() {
+
+        List<NotificacioTableEntity> nots = notificacioTableViewRepository.findAll();
+        String titular;
+        for (NotificacioTableEntity not : nots) {
+            titular = "";
+            for (NotificacioEnviamentEntity e : not.getNotificacio().getEnviaments() ) {
+                titular += e.getTitular().getNom() + " " + e.getTitular().getLlinatge1() + " " + e.getTitular().getLlinatge2() + " " + e.getTitular().getNif() + " ";
+            }
+            not.setTitular(titular);
+            notificacioTableViewRepository.save(not);
+        }
+    }
+
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
-        log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
 
+        log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
+            String titular = "";
+            PersonaEntity t;
+            Set<NotificacioEnviamentEntity> envs = notificacio.getEnviaments();
+            for(NotificacioEnviamentEntity e : envs) {
+                t = e.getTitular();
+                titular += t.getNif() + " " + t.getNom() + " " + t.getLlinatge1() + " " + t.getLlinatge2() + " ";
+            }
+
             NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                     .notificacio(notificacio)
                     .entitat(notificacio.getEntitat())
@@ -69,8 +94,8 @@ public class NotificacioTableHelper {
                     .notificacioMassiva(notificacio.getNotificacioMassivaEntity())
                     .enviadaDate(getEnviadaDate(notificacio))
                     .referencia(notificacio.getReferencia())
+                    .titular(titular)
                     .build();
-
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
             log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);

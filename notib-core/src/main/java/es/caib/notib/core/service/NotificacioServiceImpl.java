@@ -570,6 +570,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioListHelper.NotificacioFiltre filtreNetejat = notificacioListHelper.getFiltre(filtre);
 
 				if (isUsuari) {
+					long start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,
 							filtreNetejat.getEntitatId().isNull(),
@@ -615,7 +616,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
-
+						long elapsedTime = System.nanoTime() - start;
+						log.info("rol usuari filtrat: "  + elapsedTime);
 				} else if (isUsuariEntitat || isSuperAdmin) {
 					Long entitatFiltre;
 					if (isUsuariEntitat){
