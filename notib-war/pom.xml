@@ -5,7 +5,7 @@
   	<parent>
     	<groupId>es.caib.notib</groupId>
     	<artifactId>notib</artifactId>
-    	<version>1.1.22</version>
+    	<version>1.1.23</version>
  	</parent>
  	<artifactId>notib-war</artifactId>
  	<packaging>war</packaging>
@@ -402,6 +402,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.1.2</version>
 						<executions>
 							<execution>
 								<id>unpack dependencies</id>

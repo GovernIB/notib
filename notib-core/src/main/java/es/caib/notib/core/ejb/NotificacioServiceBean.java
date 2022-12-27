@@ -227,13 +227,12 @@ public class NotificacioServiceBean implements NotificacioService {
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List getNotificacionsPendentsRegistrar() {
+	public List<Long> getNotificacionsPendentsRegistrar() {
 		return delegate.getNotificacionsPendentsRegistrar();
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getNotificacionsPendentsEnviar() {
+	public List<Long> getNotificacionsPendentsEnviar() {
 		return delegate.getNotificacionsPendentsEnviar();
 	}
 
@@ -242,9 +241,8 @@ public class NotificacioServiceBean implements NotificacioService {
 		delegate.notificacioEnviar(notificacioId);		
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getNotificacionsPendentsRefrescarEstat() {
+	public List<Long> getNotificacionsPendentsRefrescarEstat() {
 		return delegate.getNotificacionsPendentsRefrescarEstat();
 	}
 	
@@ -253,9 +251,8 @@ public class NotificacioServiceBean implements NotificacioService {
 		delegate.enviamentRefrescarEstat(notificacioId);		
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	public List getNotificacionsPendentsRefrescarEstatRegistre() {
+	public List<Long> getNotificacionsPendentsRefrescarEstatRegistre() {
 		return delegate.getNotificacionsPendentsRefrescarEstatRegistre();
 	}
 
@@ -412,13 +409,13 @@ public class NotificacioServiceBean implements NotificacioService {
 
     @SuppressWarnings("rawtypes")
 	@Override
-	public List getNotificacionsDEHPendentsRefrescarCert() {
+	public List<Long> getNotificacionsDEHPendentsRefrescarCert() {
 		return delegate.getNotificacionsDEHPendentsRefrescarCert();
 	}
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List getNotificacionsCIEPendentsRefrescarCert() {
+	public List<Long> getNotificacionsCIEPendentsRefrescarCert() {
 		return delegate.getNotificacionsCIEPendentsRefrescarCert();
 	}
 

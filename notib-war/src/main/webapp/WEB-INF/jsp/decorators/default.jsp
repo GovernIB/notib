@@ -338,6 +338,7 @@ body {
 								</c:when>
 
 								<c:when test="${isRolActualUsuari}">
+									<c:if test="${permisNotificacioMenu || permisComunicacioMenu || permisComunicacioSirMenu}">
 									<div class="btn-group">
 										<div class="btn-group">
 											<button id="m_env" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
@@ -356,6 +357,7 @@ body {
 											</ul>
 										</div>
 									</div>
+									</c:if>
 									<div class="btn-group">
 										<button id="m_massiu" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
 										<ul class="dropdown-menu">

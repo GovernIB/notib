@@ -186,7 +186,8 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			NotificacioEntity notificacio,
 			Collection<Long> id);
 	
-	@Query(	"  from	NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"  from	NotificacioEnviamentEntity " +
 			" where	(notificaEstatFinal = false " +
 			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT " +
 			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
@@ -198,42 +199,45 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		and notificaCertificacioData is null)" +
 			"   and notificaIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findByNotificaRefresc(
+	List<Long> findByNotificaRefresc(
 			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 	
-	@Query(	"  from	NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"  from	NotificacioEnviamentEntity " +
 			" where	registreEstatFinal = false " +
 			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT " +
 			"   and registreEstat != es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto.REBUTJAT " +
 			"   and notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIAT_SIR " +
 			"   and sirConsultaIntent < :maxReintents " +
 			" order by sirConsultaData asc nulls first")
-	List<NotificacioEnviamentEntity> findByRegistreRefresc(
+	List<Long> findByRegistreRefresc(
 			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 	
 	
 	// Recupera enviaments amb DEH finalitzats sense certificació
-	@Query(	"from NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and dehNif is not null" +
 			"	and dehCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findByDEHAndEstatFinal(
+	List<Long> findByDEHAndEstatFinal(
 			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 	
 	// Recupera enviaments a CIE finalitzats sense certificació
-	@Query(	"from NotificacioEnviamentEntity " +
+	@Query(	"select id " +
+			"from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and entregaPostal is not null" +
 			"	and entregaPostal.domiciliCodiPostal is not null" +
 			"	and cieCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findByCIEAndEstatFinal(
+	List<Long> findByCIEAndEstatFinal(
 			@Param("maxReintents")Integer maxReintents,
 			Pageable pageable);
 

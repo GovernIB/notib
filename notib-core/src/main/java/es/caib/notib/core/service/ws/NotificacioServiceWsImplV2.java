@@ -14,7 +14,6 @@ import com.google.common.base.Strings;
 import es.caib.notib.client.domini.*;
 import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.DocumentDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
@@ -58,7 +57,7 @@ import es.caib.notib.core.helper.CacheHelper;
 import es.caib.notib.core.helper.CaducitatHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.CreacioSemaforDto;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -232,7 +231,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			logger.debug(">> [ALTA] emisorDir3Codi: " + emisorDir3Codi);
 			EntitatEntity entitat = entitatRepository.findByDir3Codi(emisorDir3Codi);
 			if (entitat != null) {
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				ConfigHelper.setEntitatCodi(entitat.getCodi());
 				info.setCodiEntitat(entitat.getCodi());
 			}
 			logger.debug(">> [ALTA] entitat: " + (entitat == null ? "null": (entitat.getCodi() + " - " + entitat.getNom())));
@@ -517,12 +516,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
-					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+					synchronized(SemaforNotificacio.agafar(notificacioGuardada.getId())) {
 						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
 						if (notificar) {
 							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 						}
 					}
+					SemaforNotificacio.alliberar(notificacioGuardada.getId());
 				} else {
 					inicialitzaCallbacks(notificacioGuardada);
 				}
@@ -559,7 +559,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				ConfigHelper.setEntitatCodi(entitat.getCodi());
 				info.setCodiEntitat(entitat.getCodi());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
 				ProcSerEntity procediment = procSerRepository.findByEntitatAndCodiProcediment(entitat, permisConsulta.getProcedimentCodi());
@@ -655,7 +655,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					return resposta;
 				}
 
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
+				ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 				info.setCodiEntitat(notificacio.getEntitat().getCodi());
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				switch (notificacio.getEstat()) {
@@ -789,7 +789,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 					info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 				}
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(enviament.getNotificacio().getEntitat(), EntitatDto.class));
+				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 				integracioHelper.addAplicacioAccioParam(info, enviament.getNotificacio().getEntitat().getId());
 				//Es canosulta l'estat periòdicament, no es necessita realitzar una consulta actica a Notifica
 				// Si Notib no utilitza el servei Adviser de @Notifica, i ja ha estat enviat a @Notifica
@@ -995,7 +995,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 					integracioHelper.addAccioError(info, "No existeix cap notificació amb l'identificador especificat");
 					return resposta;
 				}
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
+				ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 				integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 				info.setCodiEntitat(notificacio.getEntitat().getCodi());
 				//Dades registre i consutla justificant
@@ -1141,7 +1141,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 						"[NOTIFICACIO/COMUNICACIO] Hi ha hagut un error consultant la notificació: " + ex.getMessage(),
 						ex);
 			}
-			ConfigHelper.setEntitat(conversioTipusHelper.convertir(notificacio.getEntitat(), EntitatDto.class));
+			ConfigHelper.setEntitatCodi(notificacio.getEntitat().getCodi());
 			info.setCodiEntitat(notificacio.getEntitat().getCodi());
 			integracioHelper.addAplicacioAccioParam(info, notificacio.getEntitat().getId());
 			ProgresDescarregaDto progres = justificantService.consultaProgresGeneracioJustificant(identificador);
@@ -1455,22 +1455,20 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 				document.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(doc.getMetadades().getEstatElaboracio())));
 				document.setTipoDocumental(TipusDocumentalEnum.valorAsEnum(doc.getMetadades().getTipusDocumental().toString()));
 				document.setModoFirma(pluginHelper.getModeFirma(doc, doc.getContingut().getArxiuNom()) == 1 ? Boolean.TRUE : Boolean.FALSE);
+				// Recuperar csv
+				Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
+				if (metadadesAddicionals != null) {
+					if (metadadesAddicionals.containsKey("csv"))
+						document.setCsv((String) metadadesAddicionals.get("csv"));
+					else if (metadadesAddicionals.containsKey("eni:csv"))
+						document.setCsv((String) metadadesAddicionals.get("eni:csv"));
+				}
 			} else {
 				document.setOrigen(origen);
 				document.setValidesa(validesa);
 				document.setTipoDocumental(tipoDocumental);
 				document.setModoFirma(modoFirma);
 			}
-
-			// Recuperar csv
-			Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
-			if (metadadesAddicionals != null) {
-				if (metadadesAddicionals.containsKey("csv"))
-					document.setCsv((String) metadadesAddicionals.get("csv"));
-				else if (metadadesAddicionals.containsKey("eni:csv"))
-					document.setCsv((String) metadadesAddicionals.get("eni:csv"));
-			}
-
 		} else if (documentV2.getCsv() != null) {
 			String arxiuCsv = documentV2.getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);

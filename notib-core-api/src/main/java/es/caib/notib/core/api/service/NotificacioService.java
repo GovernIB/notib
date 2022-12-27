@@ -345,18 +345,12 @@ public interface NotificacioService {
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
 
-	@SuppressWarnings("rawtypes")
-	List getNotificacionsPendentsRegistrar();
-	@SuppressWarnings("rawtypes")
-	List getNotificacionsPendentsEnviar();
-	@SuppressWarnings("rawtypes")
-	List getNotificacionsPendentsRefrescarEstat();
-	@SuppressWarnings("rawtypes")
-	List getNotificacionsDEHPendentsRefrescarCert();
-	@SuppressWarnings("rawtypes")
-	List getNotificacionsCIEPendentsRefrescarCert();
-	@SuppressWarnings("rawtypes")
-	List getNotificacionsPendentsRefrescarEstatRegistre();
+	List<Long> getNotificacionsPendentsRegistrar();
+	List<Long> getNotificacionsPendentsEnviar();
+	List<Long> getNotificacionsPendentsRefrescarEstat();
+	List<Long> getNotificacionsDEHPendentsRefrescarCert();
+	List<Long> getNotificacionsCIEPendentsRefrescarCert();
+	List<Long> getNotificacionsPendentsRefrescarEstatRegistre();
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(

@@ -8,8 +8,6 @@ import es.caib.notib.plugin.SistemaExternException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,10 +45,10 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 
 	@Override
-	public Map<String, NodeDir3> organigramaPerEntitatWs(
+	public Map<String, NodeDir3> organigramaPerEntitat(
 			String pareCodi,
-			Timestamp fechaActualizacion,
-			Timestamp fechaSincronizacion) throws SistemaExternException {
+			Date fechaActualizacion,
+			Date fechaSincronizacion) throws SistemaExternException {
 		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
 		return organigrama;
 	}
@@ -61,7 +59,7 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 
 	@Override
-	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
+	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		return null;
 	}
 
@@ -136,14 +134,14 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 	
 	@Override
-	public List<OficinaSIR> oficinesSIRUnitat(
+	public List<OficinaSir> oficinesSIRUnitat(
 			String unitat,
 			Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 		return null;
 	}
 	
 	@Override
-	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException {
+	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
 		return null;
 	}
 

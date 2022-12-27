@@ -18,8 +18,11 @@ import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.cie.PagadorCieEntity;
-import es.caib.notib.core.entity.cie.PagadorPostalEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.EntityComprovarHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.OrganigramaHelper;
+import es.caib.notib.core.helper.PaginacioHelper;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.PagadorCieRepository;
 import org.slf4j.Logger;
@@ -286,8 +289,10 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
 			List<PagadorCieEntity> pagadors = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
-			List<PagadorCieEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
-			pagadors.addAll(pagadorsPare);
+			if (!e.getDir3Codi().equals(organCodi)) {
+				List<PagadorCieEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				pagadors.addAll(pagadorsPare);
+			}
 			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorCieEntity> p = new ArrayList<>();
 			for (PagadorCieEntity pagador : pagadors) {

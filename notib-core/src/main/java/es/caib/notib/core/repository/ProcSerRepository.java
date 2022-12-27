@@ -55,7 +55,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 //            @Param("entitat") EntitatEntity entitat,
 //            @Param("grups") List<String> grups);
 
-	@Query("select count(pro) " +
+	@Query("select count(pro.id) " +
 			"from " +
 			"	ProcSerEntity pro " +
 			"where " +
@@ -118,7 +118,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("isTipusNull") boolean isTipusNull,
 			@Param("tipus") ProcSerTipusEnum tipus);
 
-	@Query("select count(pro) " +
+	@Query("select count(pro.id) " +
 			"from " +
 			"	ProcSerEntity pro " +
 			"where " +
@@ -254,7 +254,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 //
 //	List<ProcedimentEntity> findByOrganGestorId(Long organGestorId);
 
-	@Query(	"select count(pro) " +
+	@Query(	"select count(pro.id) " +
 			" from ProcSerEntity pro " +
 			"where (pro.organGestor.codi in (:organsCodis) " +
 			"  and pro.entitat = :entitat " +
@@ -309,9 +309,10 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("isTipusNull") boolean isTipusNull,
 			@Param("tipus") ProcSerTipusEnum tipus);
 
-	@Query(	"select count(pro) " +
+	@Query(	"select count(pro.id) " +
 			" from ProcSerEntity pro " +
-			"where (pro.organGestor.codi in (:organsCodis) " +
+			" left outer join pro.organGestor og " +
+			"where (og.codi in (:organsCodis) " +
 			"  and pro.entitat = :entitat " +
 			"  and pro.requireDirectPermission = false" +
 			"  and pro.actiu = true " +
@@ -360,7 +361,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("entitatActual") EntitatEntity entitat,
 			@Param("codiProcediment") String codiProcediment);
 
-	@Query(	"select count(p) " +
+	@Query(	"select count(p.id) " +
 			"from ProcSerEntity p " +
 			"where p.entitat = :entitat " +
 			"  and p.requireDirectPermission = false " +
@@ -398,7 +399,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("tipus") ProcSerTipusEnum tipus
 	);
 
-	@Query(	"select count(p) " +
+	@Query(	"select count(p.id) " +
 			"from ProcSerEntity p " +
 			"where p.entitat = :entitat " +
 			"  and p.requireDirectPermission = false " +

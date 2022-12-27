@@ -1264,7 +1264,7 @@
 					if (procedimentsComuns.length > 0) {
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.comuns'/>'>");
 						$.each(procedimentsComuns, function(index, val) {
-							selProcediments.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+							selProcediments.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
 						});
 						selProcediments.append("</optgroup>");
 					}
@@ -1273,10 +1273,10 @@
 						selProcediments.append("<optgroup label='<spring:message code='notificacio.form.camp.procediment.organs'/>'>");
 						$.each(procedimentsOrgan, function(index, val) {
 							if (isOnlyOneProcedimentOrgan) {
-								selProcediments.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
+								selProcediments.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
 								$("#organGestor").val(val.organGestor).trigger("change.select2");
 							} else {
-								selProcediments.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
+								selProcediments.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}
 						});
 						selProcediments.append("</optgroup>");
@@ -1335,7 +1335,7 @@
 					if (serveisComuns.length > 0) {
 						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.comuns'/>'>");
 						$.each(serveisComuns, function(index, val) {
-							selServeis.append("<option value=\"" + val.codi + "\">" + val.valor + "</option>");
+							selServeis.append("<option value=\"" + val.id + "\">" + val.valor + "</option>");
 						});
 						selServeis.append("</optgroup>");
 					}
@@ -1344,10 +1344,10 @@
 						selServeis.append("<optgroup label='<spring:message code='notificacio.form.camp.servei.organs'/>'>");
 						$.each(serveisOrgan, function(index, val) {
 							if (isOnlyOneServeiOrgan && !carregaInicial) {
-								selServeis.append("<option value='" + val.codi + "' selected>" + val.valor + "</option>");
+								selServeis.append("<option value='" + val.id + "' selected>" + val.valor + "</option>");
 								$("#organGestor").val(val.organGestor).trigger("change.select2");
 							} else {
-								selServeis.append("<option value='" + val.codi + "'>" + val.valor + "</option>");
+								selServeis.append("<option value='" + val.id + "'>" + val.valor + "</option>");
 							}
 						});
 						selServeis.append("</optgroup>");
@@ -1558,8 +1558,8 @@
 						textKey="notificacio.form.camp.procediment" 
 						required="${enviamentTipus == 'NOTIFICACIO'}"
 						optionItems="${procediments}" 
-						optionValueAttribute="codi"
-						optionTextAttribute="codi"
+						optionValueAttribute="id"
+						optionTextAttribute="valor"
 						labelSize="2"
 						emptyOption="true"
 						optionMinimumResultsForSearch="2"
@@ -1575,8 +1575,8 @@
 							textKey="notificacio.form.camp.servei"
 							required="${enviamentTipus == 'NOTIFICACIO'}"
 							optionItems="${serveis}"
-							optionValueAttribute="codi"
-							optionTextAttribute="codi"
+							optionValueAttribute="id"
+							optionTextAttribute="valor"
 							labelSize="2"
 							emptyOption="true"
 							optionMinimumResultsForSearch="2"

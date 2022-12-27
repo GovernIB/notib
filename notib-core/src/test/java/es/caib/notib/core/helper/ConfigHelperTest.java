@@ -2,7 +2,6 @@ package es.caib.notib.core.helper;
 
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.config.ConfigDto;
-import es.caib.notib.core.api.exception.NotDefinedConfigException;
 import es.caib.notib.core.entity.config.ConfigEntity;
 import es.caib.notib.core.entity.config.ConfigGroupEntity;
 import es.caib.notib.core.repository.config.ConfigGroupRepository;
@@ -36,14 +35,11 @@ public class ConfigHelperTest {
     private final String configKey = ".propietat.de.test";
     private final String valorGlobal = "valor_global";
     private final String valorEntitat = "valor_entitat";
-    private EntitatDto entitatEntity;
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
 
     @Before
     public void setUp() throws Exception {
-        entitatEntity = new EntitatDto();
-        entitatEntity.setCodi(entitatCodi);
-        ConfigHelper.setEntitat(entitatEntity);
+        ConfigHelper.setEntitatCodi(entitatCodi);
         Mockito.when(configRepository.findOne(Mockito.eq("PROPERTY_KEY"))).thenReturn(new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE"));
         Mockito.when(configRepository.findOne(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(new ConfigEntity(ConfigDto.prefix + configKey, "valor_global"));
         Mockito.when(configRepository.findOne(Mockito.eq(ConfigDto.prefix + "." + entitatCodi + configKey))).thenReturn(new ConfigEntity(ConfigDto.prefix + "." + entitatCodi + configKey, "valor_entitat"));

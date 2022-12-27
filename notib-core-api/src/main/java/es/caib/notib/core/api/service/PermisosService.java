@@ -75,5 +75,8 @@ public interface PermisosService {
 
     @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
     boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis);
+
+    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+    void evictGetOrgansAmbPermis();
 }
 

@@ -111,9 +111,7 @@ public class EnviamentServiceImplTest extends BaseServiceTest {
 
         procedimentCreate.setPermisos(permisosProcediment);
 
-        EntitatDto entitat = new EntitatDto();
-        entitat.setCodi("test");
-        ConfigHelper.setEntitat(entitat);
+        ConfigHelper.setEntitatCodi("test");
 
         System.setProperty("es.caib.notib.plugin.gesdoc.filesystem.base.dir", "/home/bgalmes/dades/notib-fs/");
     }

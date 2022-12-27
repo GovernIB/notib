@@ -1,5 +1,6 @@
 package es.caib.notib.war.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.DocumentTipusEnumDto;
 import es.caib.notib.client.domini.IdiomaEnumDto;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
@@ -115,6 +116,8 @@ public class NotificacioFormController extends BaseUserController {
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
+    private TipusEnviamentEnumDto tipusEnviament;
+
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
         initForm(request, model, TipusEnviamentEnumDto.NOTIFICACIO);
@@ -163,6 +166,7 @@ public class NotificacioFormController extends BaseUserController {
             notificacioCommand.getDocuments()[i].setValidesa(ValidesaEnum.ORIGINAL);
             notificacioCommand.getDocuments()[i].setTipoDocumental(TipusDocumentalEnum.ALTRES);
         }
+        this.tipusEnviament = tipusEnviament;
         notificacioCommand.setEnviamentTipus(tipusEnviament);
         emplenarModelNotificacio(request, model, notificacioCommand);
 
@@ -201,10 +205,9 @@ public class NotificacioFormController extends BaseUserController {
     @RequestMapping(value = "/organ/{organId}/procediments", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
-    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
         EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
         return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId,
-                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), enviamentTipus);
+                                                                    RolEnumDto.valueOf(RolHelper.getRolActual(request)), tipusEnviament);
     }
 
     @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
@@ -227,8 +230,21 @@ public class NotificacioFormController extends BaseUserController {
             @RequestParam(value = "provincia", required = false) Long provincia,
             @RequestParam(value = "municipi", required = false) String municipi,
             Model model) {
-        return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
 
+        boolean codiNull = Strings.isNullOrEmpty(codi);
+        boolean denominacioNull = Strings.isNullOrEmpty(denominacio);
+        boolean comunitatNull = comunitatAutonoma == null;
+        if (comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+            return new ArrayList<>();
+        }
+        try {
+            return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
+        } catch (Exception ex) {
+            log.error("Error obtinguent les unitats codi " + codi + " denominacio: " + denominacio + ", nivellAdministracio: " + nivellAdministracio +
+                    ", comunitatAutonoma: " + comunitatAutonoma + ", provincia: " + provincia + ", municipi: " + municipi, ex);
+//            return new ArrayList<>();
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     @RequestMapping(value = "/administracions/codi/{codi}", method = RequestMethod.GET)

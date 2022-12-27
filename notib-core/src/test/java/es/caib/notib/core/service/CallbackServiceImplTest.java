@@ -11,6 +11,7 @@ import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -93,22 +94,17 @@ public class CallbackServiceImplTest {
 
     @Test
     public void whenNotificaRaiseExeption_thenCallMarcarEventNoProcessable() throws Exception {
+
         // Given
-        Mockito.when(
-                callbackHelper.notifica(Mockito.eq(1L))
-        ).thenThrow(Exception.class);
-        Mockito.when(
-                callbackHelper.notifica(Mockito.eq(2L))
-        ).thenThrow(Exception.class);
+        Mockito.when(callbackHelper.notifica(Mockito.eq(1L))).thenThrow(Exception.class);
+        Mockito.when(callbackHelper.notifica(Mockito.eq(2L))).thenThrow(Exception.class);
 
         // When
         callbackService.processarPendents();
 
         // Then
-        Mockito.verify(callbackHelper, Mockito.times(2)).marcarEventNoProcessable(
-                Mockito.any(Long.class),
-                Mockito.nullable(String.class),
-                Mockito.nullable(String.class)
+        Mockito.verify(callbackHelper, Mockito.times(2))
+                .marcarEventNoProcessable(Mockito.any(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class)
         );
 
     }

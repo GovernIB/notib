@@ -5,14 +5,12 @@ import es.caib.notib.core.api.dto.CodiValorDto;
 import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
-import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerDto;
 import es.caib.notib.core.api.service.PermisosService;
 import es.caib.notib.core.cacheable.OrganGestorCachable;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
-import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
@@ -29,6 +27,7 @@ import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.security.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
@@ -142,6 +141,12 @@ public class PermisosServiceImpl implements PermisosService {
             throw ex;
         }
     }
+
+    @Override
+    @CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
+    public void evictGetOrgansAmbPermis() {
+    }
+
 
     @Override
     public boolean hasUsrPermisOrgan(Long entitatId, String usr, String organCodi, PermisEnum permis) {
@@ -445,13 +450,13 @@ public class PermisosServiceImpl implements PermisosService {
     public class ProcSerPermisOrganCountCommand implements Command<Long, String> {
         @Override
         public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.countProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList);
+            return procSerRepository.countProcedimentsAccesiblesPerOrganGestor(entitat, subList, grups);
         }
     }
     public class ProcSerActiusPermisOrganCountCommand implements Command<Long, String> {
         @Override
         public Long execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.countProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList);
+            return procSerRepository.countProcedimentsActiusAccesiblesPerOrganGestor(entitat, subList, grups);
         }
     }
 
@@ -502,7 +507,7 @@ public class PermisosServiceImpl implements PermisosService {
         // Agrupam els procediments
         Set<ProcSerEntity> procSers = new HashSet<>(procSerAmbPermisOrgan);
         procSers.addAll(procSerAmbPermisProcedimentOrgan);
-        procSers.addAll(procSerAmbPermisDirecte);
+//        procSers.addAll(procSerAmbPermisDirecte);
 
         // Afegim els òrgans dels procediments al conjunt d'òrgans
         for(ProcSerEntity procSer: procSers) {
@@ -512,7 +517,14 @@ public class PermisosServiceImpl implements PermisosService {
         }
 
         // Afegim els òrgans fills
-        return getOrgansAfegintFills(entitat, organs, permis);
+        List<CodiValorDto> o =  getOrgansAfegintFills(entitat, organs, permis);
+
+        // Afegir procediments amb permis directe
+        for (ProcSerEntity e : procSerAmbPermisDirecte) {
+            o.add(CodiValorDto.builder().codi(e.getOrganGestor().getCodi()).valor(e.getOrganGestor().getCodi() + " - " + e.getOrganGestor().getNom()).build());
+        }
+        Set<CodiValorDto> organsFinals = new HashSet<>(o);
+        return new ArrayList<>(organsFinals);
     }
 
 
@@ -783,13 +795,13 @@ public class PermisosServiceImpl implements PermisosService {
     public class ProcedimentsPermisOrganCommand implements Command<List<ProcSerEntity>, String> {
         @Override
         public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus);
+            return procSerRepository.findProcedimentsAccesiblesPerOrganGestor(entitat, subList, grups, tipus == null, tipus);
         }
     }
     public class ProcedimentsActiusPermisOrganCommand implements Command<List<ProcSerEntity>, String> {
         @Override
         public List<ProcSerEntity> execute(EntitatEntity entitat, List<String> grups, List<String> subList, ProcSerTipusEnum tipus) {
-            return procSerRepository.findProcedimentsActiusAccesiblesPerOrganGestor(entitat, grups, subList, tipus == null, tipus);
+            return procSerRepository.findProcedimentsActiusAccesiblesPerOrganGestor(entitat, subList, grups, tipus == null, tipus);
         }
     }
 
@@ -797,7 +809,8 @@ public class PermisosServiceImpl implements PermisosService {
         List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
         for (ProcSerEntity procSer : procSers) {
             response.add(CodiValorOrganGestorComuDto.builder()
-                    .codi(procSer.getId().toString())
+                    .id(procSer.getId())
+                    .codi(procSer.getCodi())
                     .valor(procSer.getCodi() + ((procSer.getNom() != null && !procSer.getNom().isEmpty()) ? " - " + procSer.getNom() : ""))
                     .organGestor(procSer.getOrganGestor() != null ? procSer.getOrganGestor().getCodi() : "")
                     .comu(procSer.isComu())

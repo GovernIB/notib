@@ -7,16 +7,19 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.ExcepcioLogDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.cacheable.PermisosCacheable;
 import es.caib.notib.core.cacheable.ProcSerCacheable;
-import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.UsuariEntity;
-import es.caib.notib.core.helper.*;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.ExcepcioLogHelper;
+import es.caib.notib.core.helper.MessageHelper;
+import es.caib.notib.core.helper.MetricsHelper;
 import es.caib.notib.core.repository.UsuariRepository;
 import es.caib.notib.core.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
@@ -63,8 +66,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private MessageHelper messageHelper;
 
 	@Override
-	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		configHelper.setEntitat(entitat);
+	public void actualitzarEntiatThreadLocal(String entitatCodi) {
+		configHelper.setEntitatCodi(entitatCodi);
 	}
 
 	@Transactional

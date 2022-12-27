@@ -47,4 +47,6 @@ public class PropertiesConstants {
     public static final String MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES = "es.caib.notib.monitor.integracions.eliminar.anterior.dies";
 
     public static final String CODI_ENTORN = "es.caib.notib.codi.entorn";
+
+    public static final String SCHEDULLED_MULTITHREAD = "es.caib.notib.multithread";
 }

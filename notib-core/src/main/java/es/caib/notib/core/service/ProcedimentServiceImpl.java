@@ -471,7 +471,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			ProgresActualitzacioProcSer progres = new ProgresActualitzacioProcSer();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat, entitat.getDir3Codi(), null, null);
+			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
 			List<String> codiOrgansGda = new ArrayList<>();
 			for (NodeDir3 unitat: unitatsWs) {
 				codiOrgansGda.add(unitat.getCodi());
@@ -1095,7 +1095,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				Set<ProcedimentEntity> auxSet = procedimentRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
 				for (ProcedimentEntity procediment: auxSet) {
 					setProcediments.add(CodiValorOrganGestorComuDto.builder()
-							.codi(procediment.getId().toString())
+							.id(procediment.getId())
+							.codi(procediment.getCodi())
 							.valor(procediment.getCodi() + ((procediment.getNom() != null && !procediment.getNom().isEmpty()) ? " - " + procediment.getNom() : ""))
 							.organGestor(procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "")
 							.comu(procediment.isComu())
@@ -1129,7 +1130,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 				for (ProcedimentEntity procediment: procedimentsEntitat) {
 					procediments.add(CodiValorOrganGestorComuDto.builder()
-							.codi(procediment.getId().toString())
+							.id(procediment.getId())
+							.codi(procediment.getCodi())
 							.valor(procediment.getCodi() + ((procediment.getNom() != null && !procediment.getNom().isEmpty()) ? " - " + procediment.getNom() : ""))
 							.organGestor(procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "")
 							.comu(procediment.isComu())
@@ -1195,8 +1197,13 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				nom += " - " + procediment.getNom();
 			}
 			String organCodi = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "";
-			response.add(new CodiValorOrganGestorComuDto(procediment.getId().toString(), nom, organCodi,
-					procediment.isComu()));
+			response.add(CodiValorOrganGestorComuDto.builder()
+					.id(procediment.getId())
+					.codi(procediment.getCodi())
+					.valor(nom)
+					.organGestor(organCodi)
+					.comu(procediment.isComu())
+					.build());
 		}
 		return response;
 	}
@@ -1224,15 +1231,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 		List<CodiValorOrganGestorComuDto> procedimentsAmbPermis = new ArrayList<>();
 		List<String> organsFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organFiltre);
-		List<ProcedimentEntity> procs = new ArrayList<>();
-		for (String organ : organsFills) {
-			OrganGestorEntity o = organGestorRepository.findByCodi(organ);
-			procs = procedimentRepository.findByOrganGestor(o);
-			for (ProcedimentEntity p : procs) {
-				String valor = p.getCodi() + ((p.getNom() != null && !p.getNom().isEmpty()) ? " - " + p.getNom() : "");
-				procedimentsAmbPermis.add(CodiValorOrganGestorComuDto.builder().codi(p.getId().toString()).comu(p.isComu()).valor(valor).organGestor(organ).build());
-			}
-		}
 		for (CodiValorOrganGestorComuDto procediment: procediments) {
 			if (organsFills.contains(procediment.getOrganGestor()) || procediment.isComu()) {
 				procedimentsAmbPermis.add(procediment);
@@ -1508,6 +1506,8 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			} else {
 				permisosHelper.updatePermis(id, ProcedimentEntity.class, permis);
 			}
+			permisosService.evictGetOrgansAmbPermis();
+			cacheHelper.evictFindOrgansGestorWithPermis();
 			cacheHelper.evictFindProcedimentServeisWithPermis();
 			cacheHelper.evictFindProcedimentsOrganWithPermis();
 			if (organGestor != null && !Strings.isNullOrEmpty(organGestor.getCodi())) {

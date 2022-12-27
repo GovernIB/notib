@@ -1,7 +1,20 @@
 package es.caib.notib.core.service.ws;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EntregaDeh;
+import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
+import es.caib.notib.client.domini.Enviament;
+import es.caib.notib.client.domini.EnviamentReferencia;
+import es.caib.notib.client.domini.EnviamentTipusEnum;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.NotificacioEstatEnum;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Persona;
+import es.caib.notib.client.domini.RespostaAlta;
 import es.caib.notib.core.api.dto.GrupDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.LlibreDto;
@@ -21,9 +34,31 @@ import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import es.caib.notib.core.entity.ProcedimentEntity;
-import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.helper.AuditEnviamentHelper;
+import es.caib.notib.core.helper.AuditNotificacioHelper;
+import es.caib.notib.core.helper.CacheHelper;
+import es.caib.notib.core.helper.ConfigHelper;
+import es.caib.notib.core.helper.ConversioTipusHelper;
+import es.caib.notib.core.helper.IntegracioHelper;
+import es.caib.notib.core.helper.MessageHelper;
+import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificaHelper;
+import es.caib.notib.core.helper.NotificacioHelper;
+import es.caib.notib.core.helper.PermisosHelper;
+import es.caib.notib.core.helper.PluginHelper;
+import es.caib.notib.core.helper.RegistreNotificaHelper;
+import es.caib.notib.core.repository.AplicacioRepository;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -257,6 +292,8 @@ public class NotificacioServiceWsV2Test {
 				null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
 		
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
+
+		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
 		
 		// When	
 		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
@@ -293,6 +330,7 @@ public class NotificacioServiceWsV2Test {
 		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
 //		Mockito.when(organGestorCachable.findOrganigramaByEntitat(Mockito.anyString())).thenReturn(new HashMap<String, OrganismeDto>());
 		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
+		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 
 		// Then
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
@@ -348,6 +386,7 @@ public class NotificacioServiceWsV2Test {
 		PersonaEntity personaEntity = PersonaEntity.builder().email("sandreu@limit.es").llinatge1("Andreu").llinatge2("Nadal").nif("00000000T").nom("Siòn").telefon("666010101").build();
 		OrganGestorDto organ = new OrganGestorDto();
 		organ.setSir(true);
+		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
 		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
 
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
@@ -371,6 +410,7 @@ public class NotificacioServiceWsV2Test {
 		Mockito.when(notificacioHelper.getNotificaErrorEvent(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioEventEntity);
 //		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
 		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
+		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 
 		// Then
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);

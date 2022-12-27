@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class NotificacioHelper {
 	@Autowired
 	private MessageHelper messageHelper;
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 		log.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
 		List<RegistreIdDto> registresIdDto = new ArrayList<>();
@@ -95,30 +96,32 @@ public class NotificacioHelper {
 
 		long startTime = System.nanoTime();
 		double elapsedTime;
-		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+		synchronized(SemaforNotificacio.agafar(notificacioId)) {
 			log.info("Comprovant estat actual notificació (id: " + notificacio.getId() + ")...");
 			NotificacioEstatEnumDto estatActual = notificacio.getEstat();
 			log.info("Estat notificació [Id:" + notificacio.getId() + ", Estat: "+ estatActual + "]");
 
 			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
+
+				// Registrar la notificació
 				long startTime2 = System.nanoTime();
 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
 				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
 				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
-				RegistreIdDto registreIdDto = new RegistreIdDto();
-				registreIdDto.setNumero(notificacio.getRegistreNumero());
-				registreIdDto.setData(notificacio.getRegistreData());
-				registreIdDto.setNumeroRegistreFormat(notificacio.getRegistreNumeroFormatat());
-				registresIdDto.add(registreIdDto);
+
+				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+					registresIdDto.add(RegistreIdDto.builder()
+//							.numero(enviament.getRegistreNumero)
+							.data(enviament.getRegistreData())
+							.numeroRegistreFormat(enviament.getRegistreNumeroFormatat())
+							.build());
+				}
+
 				if (notificar){
-					
-					registreIdDto.setNumero(notificacio.getRegistreNumero());
-					registreIdDto.setData(notificacio.getRegistreData());
-					registreIdDto.setNumeroRegistreFormat(notificacio.getRegistreNumeroFormatat());
-					registresIdDto.add(registreIdDto);
 
 					startTime2 = System.nanoTime();
 
+					// Enviar la notificació
 					List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
 					// 3 possibles casuístiques
 					// 1. Tots els enviaments a Notifica
@@ -141,6 +144,7 @@ public class NotificacioHelper {
 				}
 			}
 		}
+		SemaforNotificacio.alliberar(notificacioId);
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 		log.info(" [REG] Fi registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
@@ -201,12 +205,13 @@ public class NotificacioHelper {
 
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+			synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
 				if (notificar) {
 					notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				}
 			}
+			SemaforNotificacio.alliberar(notificacioEntity.getId());
 		}
 		return notificacioEntity;
 	}

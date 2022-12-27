@@ -138,16 +138,17 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"    where env.notificaEstat = :notificaEstat" +
 			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
-			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
+			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) " +
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
-			"and (:isTitularNull = true or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where " +
-			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) " +
+			"and (:isTitularNull = true or lower(ntf.titular) like '%' || lower(:titular) || '%') " +
+//			"and (:isTitularNull = true or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where " +
+//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
+//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +

@@ -4,7 +4,9 @@ import es.caib.notib.core.api.dto.LlibreDto;
 import es.caib.notib.core.api.dto.OficinaDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorDto;
 import es.caib.notib.core.api.dto.organisme.OrganismeDto;
+import es.caib.notib.core.entity.OficinaEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
+import es.caib.notib.core.repository.OficinaRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.plugin.registre.AutoritzacioRegiWeb3Enum;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -38,6 +40,8 @@ public class CacheHelper {
 
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private OficinaRepository oficinaRepository;
 //	@Resource
 //	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
@@ -105,7 +109,21 @@ public class CacheHelper {
 	
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
 	public List<OficinaDto> getOficinesSIRUnitat(Map<String, OrganismeDto> arbreUnitats, String codiDir3Organ) {
-		return pluginHelper.oficinesSIRUnitat(codiDir3Organ, arbreUnitats);
+		List<OficinaEntity> oficines = new ArrayList<>();
+		String organ = codiDir3Organ;
+		while (organ != null && !organ.isEmpty()) {
+			oficines.addAll(oficinaRepository.findByOrganGestorCodiAndSirIsTrue(organ));
+			organ = arbreUnitats.get(organ) != null ? arbreUnitats.get(organ).getPare() : null;
+		}
+		return conversioTipusHelper.convertirList(oficines, OficinaDto.class);
+//		return pluginHelper.oficinesSIRUnitat(codiDir3Organ, arbreUnitats);
+	}
+
+	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
+	public List<OficinaDto> getOficinesSIREntitat(String codiDir3Entitat) {
+		List<OficinaEntity> oficines = oficinaRepository.findByEntitat_Dir3CodiAndSirIsTrue(codiDir3Entitat);
+		return conversioTipusHelper.convertirList(oficines, OficinaDto.class);
+//		return pluginHelper.oficinesEntitat(codiDir3Entitat);
 	}
 
 	@Cacheable(value = "unitatPerCodi", key="#codi")
@@ -116,12 +134,7 @@ public class CacheHelper {
 		}
 		return null;
 	}
-	
-	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
-	public List<OficinaDto> getOficinesSIREntitat(String codiDir3Entitat) {
-		return pluginHelper.oficinesSIREntitat(codiDir3Entitat);
-	}
-	
+
 	@Cacheable(value = "organigramaOriginal", key="#entitatDir3Codi")
 	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
 
@@ -206,24 +219,22 @@ public class CacheHelper {
 	}
 
 	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu"}, allEntries = true)
-	public void evictFindProcedimentServeisWithPermis() {
-	}
+	public void evictFindProcedimentServeisWithPermis() {}
 	
 	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis"}, allEntries = true)
-	public void evictFindProcedimentsOrganWithPermis() {
-	}
+	public void evictFindProcedimentsOrganWithPermis() {}
 	
 	@CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
-	public void evictFindOrgansGestorWithPermis() {
-	}
+	public void evictFindOrgansGestorWithPermis() {}
 
 	@CacheEvict(value = "unitatPerCodi", allEntries = true)
-	public void evictUnitatPerCodi() {
-	}
+	public void evictUnitatPerCodi() {}
 
 	@CacheEvict(value = "findUsuarisAmbPermis", key="#procedimentId.concat('-').concat(#codiOrgan)")
-	public void evictFindUsuarisAmbPermis(String procedimentId, String codiOrgan) {
-	}
+	public void evictFindUsuarisAmbPermis(String procedimentId, String codiOrgan) {}
+
+	@CacheEvict(value = {"oficinesSIREntitat", "oficinesSIRUnitat"}, allEntries = true)
+	public void evictCercaOficines() {};
 
 	public void clearCache(String cacheName) {
 		cacheManager.getCache(cacheName).clear();

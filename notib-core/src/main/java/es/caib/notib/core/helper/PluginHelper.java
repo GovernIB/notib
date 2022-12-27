@@ -12,7 +12,6 @@ import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.AnexoWsDto;
 import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.DatosInteresadoWsDto;
-import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.FitxerDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
@@ -65,7 +64,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.OficinaSIR;
+import es.caib.notib.plugin.unitat.OficinaSir;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -436,7 +435,7 @@ public class PluginHelper {
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", unitatCodi));
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
+			List<OficinaSir> oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
 			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
@@ -447,7 +446,7 @@ public class PluginHelper {
 		}
 	}
 	
-	public List<OficinaDto> oficinesSIREntitat(String codiDir3Entitat) throws SistemaExternException {
+	public List<OficinaDto> oficinesEntitat(String codiDir3Entitat) throws SistemaExternException {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", codiDir3Entitat));
@@ -457,7 +456,7 @@ public class PluginHelper {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
 			}
 			info.setCodiEntitat(entitat.getCodi());
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(codiDir3Entitat);
+			List<OficinaSir> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesEntitat(codiDir3Entitat);
 			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
@@ -1001,12 +1000,12 @@ public class PluginHelper {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
 			}
 			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
-				configHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				configHelper.setEntitatCodi(entitat.getCodi());
 			}
 			info.setCodiEntitat(entitat.getCodi());
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				logger.info("Obtenir l'organigrama per entitat SOAP");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(codiDir3Entitat, null, null);
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat, null, null);
 			} else {
 				logger.info("Obtenir l'organigrama per entitat REST");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);
@@ -1025,7 +1024,7 @@ public class PluginHelper {
 		return organigrama;
 	}
 
-	public List<NodeDir3> unitatsOrganitzativesFindByPare(EntitatDto entitat, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
+	public List<NodeDir3> unitatsOrganitzativesFindByPare(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 
 		IntegracioInfo info = new IntegracioInfo(
 				IntegracioHelper.INTCODI_UNITATS,
@@ -1035,8 +1034,8 @@ public class PluginHelper {
 				new AccioParam("fechaActualizacion", dataActualitzacio == null ? null : dataActualitzacio.toString()),
 				new AccioParam("fechaSincronizacion", dataSincronitzacio == null ? null : dataSincronitzacio.toString()));
 		try {
-			configHelper.setEntitat(entitat);
-			info.setCodiEntitat(entitat.getCodi());
+			configHelper.setEntitatCodi(entitatCodi);
+			info.setCodiEntitat(entitatCodi);
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
 				String errorMissatge = messageManager.getMessage("organgestor.actualitzacio.sense.canvis");
