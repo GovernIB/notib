@@ -57,8 +57,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                     case PROPIETATS_CONFIG_ENTITATS:
                         configService.crearPropietatsConfigPerEntitats();
                         break;
-                    case ACTUALITZAR_NOT_NOTIFICACIO_TABLE:
-                        notificacioTableHelper.actualitzarTaula();
+//                    case ACTUALITZAR_NOT_NOTIFICACIO_TABLE:
+//                        notificacioTableHelper.actualitzarTaula();
                     default:
                         log.error("Procés inicial no definit");
                         break;

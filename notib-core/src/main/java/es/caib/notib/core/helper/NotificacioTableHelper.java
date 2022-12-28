@@ -14,6 +14,7 @@ import es.caib.notib.core.repository.NotificacioMassivaRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,32 +38,36 @@ public class NotificacioTableHelper {
     @Resource
     private MessageHelper messageHelper;
 
-    public void actualitzarTaula() {
-
-        List<NotificacioTableEntity> nots = notificacioTableViewRepository.findAll();
-        String titular;
-        for (NotificacioTableEntity not : nots) {
-            titular = "";
-            for (NotificacioEnviamentEntity e : not.getNotificacio().getEnviaments() ) {
-                titular += e.getTitular().getNom() + " " + e.getTitular().getLlinatge1() + " " + e.getTitular().getLlinatge2() + " " + e.getTitular().getNif() + " ";
-            }
-            not.setTitular(titular);
-            notificacioTableViewRepository.save(not);
-        }
-    }
-
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
 
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
+
+            // Camps calcaulats a partir de valors dels enviaments
             String titular = "";
-            PersonaEntity t;
-            Set<NotificacioEnviamentEntity> envs = notificacio.getEnviaments();
-            for(NotificacioEnviamentEntity e : envs) {
-                t = e.getTitular();
-                titular += t.getNif() + " " + t.getNom() + " " + t.getLlinatge1() + " " + t.getLlinatge2() + " ";
+            String notificaIds = "";
+            Integer estatMask = 0;
+
+            for(NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                if (e.getTitular() != null) {
+                    titular += e.getTitular().getNomFormatted() + ", ";
+                }
+                if (e.getNotificaIdentificador() != null) {
+                    notificaIds += e.getNotificaIdentificador() + ", ";
+                }
+                if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name())) {
+                    NotificacioEstatEnumDto eventEstat = NotificacioEstatEnumDto.valueOf(e.getNotificaEstat().name());
+                    if ((estatMask & eventEstat.getMask()) == 0) {
+                        estatMask += eventEstat.getMask();
+                    }
+                }
             }
+            if (titular.length() > 2)
+                titular = titular.substring(0, titular.length() - 2);
+            if (notificaIds.length() > 2)
+                notificaIds = notificaIds.substring(0, notificaIds.length() - 2);
+
 
             NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                     .notificacio(notificacio)
@@ -95,6 +100,8 @@ public class NotificacioTableHelper {
                     .enviadaDate(getEnviadaDate(notificacio))
                     .referencia(notificacio.getReferencia())
                     .titular(titular)
+                    .notificaIds(notificaIds)
+                    .estatMask(estatMask)
                     .build();
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
@@ -309,4 +316,5 @@ public class NotificacioTableHelper {
                 (notificacioEstat.equals(NotificacioEstatEnumDto.PENDENT) && !hasRegistreIntents) ||
                 (notificacioEstat.equals(NotificacioEstatEnumDto.REGISTRADA) && !hasNotificaIntents));
     }
+
 }

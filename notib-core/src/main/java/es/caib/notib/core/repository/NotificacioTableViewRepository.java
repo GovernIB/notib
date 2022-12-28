@@ -132,23 +132,17 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where env.notificaEstat = :notificaEstat" +
-			"    ) > 0 ) " +
+			"and (:isEstatNull = true or bitand(ntf.estat, :estatMask) <> 0) " +
+//			"and (:isEstatNull = true or ntf.estat = :estat or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where env.notificaEstat = :notificaEstat" +
+//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) " +
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
-			"and (:isTitularNull = true or lower(ntf.titular) like '%' || lower(:titular) || '%') " +
-//			"and (:isTitularNull = true or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where " +
-//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-//			"    ) > 0) " +
+			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%')) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
@@ -156,13 +150,10 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
 			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
 			") " +
-			"and (:isIdentificadorNull = true or " +
-			"		(ntf.id in (select env.notificacio.id" +
-			"				from NotificacioEnviamentEntity env" +
-			"				where lower(env.notificaIdentificador) like concat('%', lower(:identificador), '%')))) " +
+			"and (:isIdentificadorNull = true or lower(ntf.notificaIds) like concat('%', lower(:identificador), '%'))" +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
-			"and (:isReferenciaNull = true or lower(ntf.referencia) like '%' || lower(:referencia) || '%')")
+			"and (:isReferenciaNull = true or lower(ntf.referencia) like concat('%', lower(:referencia), '%'))")
 	Page<NotificacioTableEntity> findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("isEntitatIdNull") boolean isEntitatIdNull,
@@ -179,8 +170,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") EnviamentEstat notificaEstat,
+			@Param("estatMask") Integer estatMask,
+//			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.dialect;
 
+import org.hibernate.Hibernate;
 import org.hibernate.dialect.Oracle10gDialect;
 
 /**
@@ -19,4 +20,8 @@ public class NotibOracleDialect extends Oracle10gDialect {
 		return TableNameSequenceGenerator.class;
 	}
 
+	public NotibOracleDialect() {
+		super();
+		registerFunction("bitand", new OracleBitwiseAndSQLFunction("bitand", Hibernate.INTEGER));
+	}
 }

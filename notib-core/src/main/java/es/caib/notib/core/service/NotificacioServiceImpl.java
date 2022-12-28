@@ -587,9 +587,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getConcepte().isNull(),
 							filtreNetejat.getConcepte().isNull() ? "" : filtreNetejat.getConcepte().getField(),
 							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().getField(),
-							!filtreNetejat.getEstat().isNull() ?
-									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+							filtreNetejat.getEstat().isNull() ? filtreNetejat.getEstat().getField().getMask() : null,
+//							!filtreNetejat.getEstat().isNull() ?
+//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
