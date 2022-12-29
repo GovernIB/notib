@@ -123,7 +123,8 @@ public class ConversioTipusHelper {
 						new CustomMapper<NotificacioEntity, NotificacioInfoDto>() {
 							public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
 								DadesUsuari d = cacheHelper.findUsuariAmbCodi(a.getUsuariCodi());
-								b.setUsuariNom(d.getNomSencer());
+								if (d != null)
+									b.setUsuariNom(d.getNomSencer());
 							}
 						})
 				.byDefault().register();
