@@ -570,6 +570,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioListHelper.NotificacioFiltre filtreNetejat = notificacioListHelper.getFiltre(filtre);
 
 				if (isUsuari) {
+					long start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,
 							filtreNetejat.getEntitatId().isNull(),
@@ -586,9 +587,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getConcepte().isNull(),
 							filtreNetejat.getConcepte().isNull() ? "" : filtreNetejat.getConcepte().getField(),
 							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().getField(),
-							!filtreNetejat.getEstat().isNull() ?
-									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+							filtreNetejat.getEstat().isNull() ? filtreNetejat.getEstat().getField().getMask() : null,
+//							!filtreNetejat.getEstat().isNull() ?
+//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
@@ -615,7 +616,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
-
+						long elapsedTime = System.nanoTime() - start;
+						log.info("rol usuari filtrat: "  + elapsedTime);
 				} else if (isUsuariEntitat || isSuperAdmin) {
 					Long entitatFiltre;
 					if (isUsuariEntitat){

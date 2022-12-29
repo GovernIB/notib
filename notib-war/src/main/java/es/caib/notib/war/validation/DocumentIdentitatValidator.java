@@ -53,7 +53,7 @@ public class DocumentIdentitatValidator implements ConstraintValidator<DocumentI
 		if (!niePattern.matcher(nie).matches()) {
 			return false;
 		}
-		String nums = nie.substring(1, 8);
+		String nums = (char)(nie.charAt(0) - 40) + nie.substring(1, 8);
 		String lletra = nie.substring(8);
 		return lletra.equals(lletraNif(new Integer(nums).intValue()));
 	}

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.core.dialect;
 
+import org.hibernate.Hibernate;
 import org.hibernate.dialect.PostgreSQLDialect;
 
 /**
@@ -19,4 +20,8 @@ public class NotibPostgreSQLDialect extends PostgreSQLDialect {
 		return TableNameSequenceGenerator.class;
 	}
 
+	public NotibPostgreSQLDialect() {
+		super();
+		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", Hibernate.INTEGER));
+	}
 }

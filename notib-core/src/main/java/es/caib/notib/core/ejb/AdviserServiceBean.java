@@ -1,6 +1,6 @@
 package es.caib.notib.core.ejb;
 
-import es.caib.notib.core.api.dto.EnviamentAdviser;
+import es.caib.notib.core.api.dto.adviser.EnviamentAdviser;
 import es.caib.notib.core.api.service.AdviserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;

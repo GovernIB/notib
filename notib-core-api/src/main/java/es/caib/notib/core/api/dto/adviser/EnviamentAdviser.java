@@ -1,13 +1,9 @@
-package es.caib.notib.core.api.dto;
+package es.caib.notib.core.api.dto.adviser;
 
-import es.caib.notib.core.api.dto.adviser.Acuse;
-import es.caib.notib.core.api.dto.adviser.Opciones;
-import es.caib.notib.core.api.dto.adviser.Receptor;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.Holder;
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -16,7 +12,7 @@ import java.math.BigInteger;
 public class EnviamentAdviser implements Serializable {
 
     private String organismoEmisor;
-    private Holder<String> hIdentificador;
+    private String hIdentificador;
     private BigInteger tipoEntrega;
     private BigInteger modoNotificacion;
     private String estado;
@@ -25,8 +21,8 @@ public class EnviamentAdviser implements Serializable {
     private Acuse acusePDF;
     private Acuse acuseXML;
     private Opciones opcionesSincronizarEnvio;
-    private Holder<String> codigoRespuesta;
-    private Holder<String> descripcionRespuesta;
-    private Holder<Opciones> opcionesResultadoSincronizarEnvio;
+    private String codigoRespuesta;
+    private String descripcionRespuesta;
+    private Opciones opcionesResultadoSincronizarEnvio;
 
 }

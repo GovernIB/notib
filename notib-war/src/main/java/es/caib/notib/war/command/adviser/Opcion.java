@@ -1,10 +1,12 @@
 
-package es.caib.notib.core.api.dto.adviser;
+package es.caib.notib.war.command.adviser;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
 
@@ -13,9 +15,10 @@ import javax.xml.bind.annotation.XmlValue;
 @Setter
 public class Opcion {
 
-    @XmlValue
+//    @XmlValue
     protected String value;
-    @XmlAttribute(name = "tipo", required = true)
+//    @XmlAttribute(name = "tipo", required = true)
+    @NotNull
     protected String tipo;
 
 }

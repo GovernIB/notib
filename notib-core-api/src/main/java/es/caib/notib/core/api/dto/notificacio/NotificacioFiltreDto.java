@@ -39,9 +39,7 @@ public class NotificacioFiltreDto implements Serializable {
 	private boolean nomesAmbErrors;
 
 	public boolean isEmpty() {
-		if (entitatId != null) {
-			return false;
-		}
+
 		if (comunicacioTipus != null) {
 			return false;
 		}

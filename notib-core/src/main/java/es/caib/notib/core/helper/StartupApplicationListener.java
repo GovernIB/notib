@@ -33,6 +33,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
+    @Autowired
+    private NotificacioTableHelper notificacioTableHelper;
 
     public static int counter = 0;
 
@@ -55,6 +57,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                     case PROPIETATS_CONFIG_ENTITATS:
                         configService.crearPropietatsConfigPerEntitats();
                         break;
+//                    case ACTUALITZAR_NOT_NOTIFICACIO_TABLE:
+//                        notificacioTableHelper.actualitzarTaula();
                     default:
                         log.error("Procés inicial no definit");
                         break;
