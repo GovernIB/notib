@@ -8,10 +8,8 @@ import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
-import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioMassivaRepository;
-import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
@@ -24,7 +22,6 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -49,25 +46,16 @@ public class NotificacioTableHelper {
             String notificaIds = "";
             Integer estatMask = 0;
 
-            for(NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
-                if (e.getTitular() != null) {
-                    titular += e.getTitular().getNomFormatted() + ", ";
-                }
-                if (e.getNotificaIdentificador() != null) {
-                    notificaIds += e.getNotificaIdentificador() + ", ";
-                }
-                if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name())) {
-                    NotificacioEstatEnumDto eventEstat = NotificacioEstatEnumDto.valueOf(e.getNotificaEstat().name());
-                    if ((estatMask & eventEstat.getMask()) == 0) {
-                        estatMask += eventEstat.getMask();
+            if (notificacio.getEnviaments() != null) {
+                for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                    if (e.getTitular() != null) {
+                        titular += e.getTitular().getNomFormatted() + ", ";
                     }
+                    estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
                 }
+                if (titular.length() > 2)
+                    titular = titular.substring(0, titular.length() - 2);
             }
-            if (titular.length() > 2)
-                titular = titular.substring(0, titular.length() - 2);
-            if (notificaIds.length() > 2)
-                notificaIds = notificaIds.substring(0, notificaIds.length() - 2);
-
 
             NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                     .notificacio(notificacio)
@@ -150,6 +138,32 @@ public class NotificacioTableHelper {
                 tableViewItem.setErrorLastEvent(isErrorLastEvent(notificacio, lastEvent));
             }
 
+            // Camps calcaulats a partir de valors dels enviaments
+            String titular = "";
+            String notificaIds = "";
+            Integer estatMask = 0;
+
+            if (notificacio.getEnviaments() != null) {
+                for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                    if (e.getTitular() != null) {
+                        titular += e.getTitular().getNomFormatted() + ", ";
+                    }
+                    if (e.getNotificaIdentificador() != null) {
+                        notificaIds += e.getNotificaIdentificador() + ", ";
+                    }
+                    if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, e.getNotificaEstat().name())) {
+                        NotificacioEstatEnumDto eventEstat = NotificacioEstatEnumDto.valueOf(e.getNotificaEstat().name());
+                        if ((estatMask & eventEstat.getMask()) == 0) {
+                            estatMask += eventEstat.getMask();
+                        }
+                    }
+                }
+                if (titular.length() > 2)
+                    titular = titular.substring(0, titular.length() - 2);
+                if (notificaIds.length() > 2)
+                    notificaIds = notificaIds.substring(0, notificaIds.length() - 2);
+            }
+
             tableViewItem.setEnviamentTipus(notificacio.getEnviamentTipus());
             tableViewItem.setNumExpedient(notificacio.getNumExpedient());
             tableViewItem.setConcepte(notificacio.getConcepte());
@@ -167,6 +181,9 @@ public class NotificacioTableHelper {
             tableViewItem.setOrganEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null);
             tableViewItem.setRegistreEnviamentIntent(notificacio.getRegistreEnviamentIntent());
             tableViewItem.setEnviadaDate(getEnviadaDate(notificacio));
+            tableViewItem.setTitular(titular);
+            tableViewItem.setNotificaIds(notificaIds);
+            tableViewItem.setEstatMask(estatMask);
 
             notificacioTableViewRepository.saveAndFlush(tableViewItem);
 

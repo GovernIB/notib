@@ -32,6 +32,7 @@ public enum NotificacioEstatEnumDto implements Serializable {
 	
 	NotificacioEstatEnumDto(int numVal, int mask) {
         this.numVal = numVal;
+		this.mask = mask;
     }
 	
 	public int getNumVal() {

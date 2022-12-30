@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
@@ -132,12 +131,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (ntf.grupCodi = null or (ntf.grupCodi in (:grupsProcedimentCodisNotib))) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or bitand(ntf.estat, :estatMask) <> 0) " +
-//			"and (:isEstatNull = true or ntf.estat = :estat or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where env.notificaEstat = :notificaEstat" +
-//			"    ) > 0 ) " +
+			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) " +
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
