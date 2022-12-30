@@ -107,8 +107,8 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 				language,
 				filtreCertificats,
 				username,
-				administrationID,
-				policyInfoSignature);
+				administrationID);
+//				policyInfoSignature);
 		File source = new File(sourcePath);
 		String fileName = source.getName();
 		String location = properties.getProperty(PROPERTIES_BASE + "location", "Palma");
@@ -157,7 +157,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 				new FileInfoSignature[] { fileInfo });
 		// Signa el document
 		String timestampUrlBase = null;
-		SignaturesSet signaturesSetResponse = plugin.signDocuments(signaturesSetRequest, timestampUrlBase);
+		SignaturesSet signaturesSetResponse = plugin.signDocuments(signaturesSetRequest, timestampUrlBase, null);
 		StatusSignaturesSet signaturesSetStatus = signaturesSetResponse.getStatusSignaturesSet();
 		if (signaturesSetStatus.getStatus() != StatusSignaturesSet.STATUS_FINAL_OK) {
 			// Error en el procés de firma

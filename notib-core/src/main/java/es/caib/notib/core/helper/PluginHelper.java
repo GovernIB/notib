@@ -1841,16 +1841,10 @@ public class PluginHelper {
 
 
 	// Validació de firmes
-	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(
-			byte[] documentContingut,
-			String nom,
-			String firmaContentType) {
-		IntegracioInfo info = new IntegracioInfo(
-				IntegracioHelper.INTCODI_VALIDASIG,
-				"Enviament notificació a registre (SIR activat)",
-				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				new AccioParam("Nom del document", nom),
-				new AccioParam("ContentType", firmaContentType));
+	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(byte[] documentContingut, String nom, String firmaContentType) {
+
+		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_VALIDASIG, "Validació firmes de document", IntegracioAccioTipusEnumDto.ENVIAMENT,
+				new AccioParam("Nom del document", nom), new AccioParam("ContentType", firmaContentType));
 		try {
 			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
 			validationRequest.setSignatureData(documentContingut);
