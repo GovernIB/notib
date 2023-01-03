@@ -3,18 +3,6 @@
  */
 package es.caib.notib.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import es.caib.notib.core.api.dto.EntitatDto;
 import es.caib.notib.core.api.dto.UsuariDto;
 import es.caib.notib.core.api.service.AplicacioService;
@@ -22,6 +10,28 @@ import es.caib.notib.war.helper.AjaxHelper;
 import es.caib.notib.war.helper.EntitatHelper;
 import es.caib.notib.war.helper.ModalHelper;
 import es.caib.notib.war.helper.RolHelper;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Controlador amb utilitats per a l'aplicació NOTIB.
@@ -94,6 +104,58 @@ public class NotibController {
 			HttpServletRequest request,
 			Model model) {
 		return "redirect:/api/rest";
+	}
+
+	@RequestMapping(value = "/log/download", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Resource> logDownload(
+			HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		return getLogFile(request, response, null);
+	}
+
+	@RequestMapping(value = "/log/download/{dia}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Resource> logDownload(
+			HttpServletRequest request,
+			@PathVariable String dia,
+			HttpServletResponse response) throws Exception {
+
+		return getLogFile(request, response, dia);
+	}
+
+	private ResponseEntity getLogFile(HttpServletRequest request, HttpServletResponse response, String dia) throws IOException {
+		String thisPath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+		if (thisPath.startsWith("file:")) {
+			thisPath = thisPath.substring(5);
+		}
+		Path rootPath = Paths.get(thisPath).getParent().getParent().getParent();
+		String logPath = aplicacioService.propertyGet("es.caib.notib.log.path", Paths.get(rootPath.toString(), "log", "server.log").toString());
+		if (dia != null) {
+			logPath = logPath.substring(0, logPath.length() - 4) + "." + dia + logPath.substring(logPath.length() - 4);
+		}
+		File logFile = new File(logPath);
+
+		boolean logExist = logFile.exists();
+
+		String fileName = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+		String contentType = "text/plain";
+
+		response.setHeader("Pragma", "no-cache");
+		response.setHeader("Expires", "0");
+		response.setHeader("Cache-Control", "");
+
+		if (logExist && request.isUserInRole("ROLE_ADMIN")) {
+			fileName = "server." + (dia != null ? dia : fileName) + ".log";
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+			return new ResponseEntity(new FileSystemResource(logFile), HttpStatus.OK);
+		} else {
+			fileName = "no." + (dia != null ? dia : fileName) + ".log";
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+			response.getOutputStream().write(new byte[0]);
+			return null;
+		}
 	}
 
 	public static class ErrorObject {

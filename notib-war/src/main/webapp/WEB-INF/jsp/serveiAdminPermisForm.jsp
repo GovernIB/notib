@@ -95,6 +95,7 @@
 	.check-label {display: flex; align-items: center;}
 	.check-label>span {font-size: 24px; padding-right: 15px; width: 50px; color: #888;}
 	.checkbox-primary {text-align: right; padding-right: 30px;}
+	.control-label, .controls { cursor: pointer;}
 </style>
 
 
@@ -122,7 +123,7 @@
 		</c:if>
 
 		<div class="row" style="margin-right: 0px; margin-left: 0px;">
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.all.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="selectAll"><span class="fa fa-toggle-on"></span> <spring:message code="procediment.permis.form.camp.all"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -132,7 +133,7 @@
 			</div>
 		</div>
 		<div class="permisosInput">
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.consulta.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="read"><span class="fa fa-search"></span> <spring:message code="procediment.permis.form.camp.consulta"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -140,7 +141,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.processar.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="processar"><span class="fa fa-check-square-o"></span> <spring:message code="procediment.permis.form.camp.processar"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -148,7 +149,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.gestio.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="administration"><span class="fa fa-cog"></span> <spring:message code="procediment.permis.form.camp.gestio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -156,7 +157,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.notificacio.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="notificacio"><span class="fa fa-gavel"></span> <spring:message code="procediment.permis.form.camp.notificacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -164,7 +165,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.comunicacio.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacio"><span class="fa fa-envelope-o"></span> <spring:message code="procediment.permis.form.camp.comunicacio"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">
@@ -172,7 +173,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" title="<spring:message code="procediment.permis.comunicacio.sir.info"/>">
 				<label class="control-label col-xs-6 col-xs-offset-4 check-label" for="comunicacioSir"><span class="fa fa-envelope"></span> <spring:message code="procediment.permis.form.camp.comunicacio.sir"/></label>
 				<div class="controls col-xs-2">
 					<div class="checkbox checkbox-primary">

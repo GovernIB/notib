@@ -272,7 +272,7 @@
                         </script>
                     </th>
                     <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.administrador"/> - <spring:message code="organ.permis.administrador.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.administrador"/>: &#10;<spring:message code="organ.permis.administrador.info"/>">
                         <span class="fa fa-user-plus padding-icon"></span>
                         <%--                        <spring:message code="procediment.permis.columna.administrador.curt"/>--%>
                         <script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
@@ -280,7 +280,7 @@
                         </script>
                     </th>
                     <th data-col-name="read" data-template="#cellPermisReadTemplate"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.consulta"/> - <spring:message code="organ.permis.consulta.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.consulta"/>: &#10;<spring:message code="organ.permis.consulta.info"/>">
                         <span class="fa fa-search padding-icon"></span>
 <%--                        <spring:message code="procediment.permis.columna.consulta"/>--%>
                         <script id="cellPermisReadTemplate" type="text/x-jsrender">
@@ -288,7 +288,7 @@
                         </script>
                     </th>
                     <th data-col-name="processar" data-template="#cellPermisProcessarTemplate"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.processar"/> - <spring:message code="organ.permis.processar.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.processar"/>: &#10;<spring:message code="organ.permis.processar.info"/>">
                         <span class="fa fa-check-square-o padding-icon"></span><span>
 <%--                        <spring:message code="procediment.permis.columna.processar"/>--%>
                         <script id="cellPermisProcessarTemplate" type="text/x-jsrender">
@@ -296,7 +296,7 @@
                         </script>
                     </th>
                     <th data-col-name="administration" data-template="#cellPermisGestioTemplate"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.gestio"/> - <spring:message code="organ.permis.gestio.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.gestio"/>: &#10;<spring:message code="organ.permis.gestio.info"/>">
                         <span class="fa fa-cog padding-icon"></span>
 <%--                        <spring:message code="procediment.permis.columna.gestio"/>--%>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
@@ -304,7 +304,7 @@
                         </script>
                     </th>
                     <th data-col-name="comuns" data-template="#cellPermisComunsTemplate"
-                        class="th-checkbox" title="<spring:message code="organgestor.permis.form.camp.comuns"/> - <spring:message code="organ.permis.comuns.info"/>">
+                        class="th-checkbox" title="<spring:message code="organgestor.permis.form.camp.comuns"/>: &#10;<spring:message code="organ.permis.comuns.info"/>">
                         <span class="fa fa-globe padding-icon"></span>
 <%--                        <spring:message code="organgestor.permis.columna.comuns.curt"/>--%>
                         <script id="cellPermisComunsTemplate" type="text/x-jsrender">
@@ -312,7 +312,7 @@
                         </script>
                     </th>
                     <th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.notificacio"/> - <spring:message code="organ.permis.notificacio.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.notificacio"/>: &#10;<spring:message code="organ.permis.notificacio.info"/>">
                         <span class="fa fa-gavel padding-icon"></span>
                         <%--                        <spring:message code="procediment.permis.columna.notificacio.arbre"/>--%>
                         <script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
@@ -320,7 +320,7 @@
                         </script>
                     </th>
                     <th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio"/> - <spring:message code="organ.permis.comunicacio.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio"/>: &#10;<spring:message code="organ.permis.comunicacio.info"/>">
                         <span class="fa fa-envelope-o padding-icon"></span>
                         <%--                        <spring:message code="procediment.permis.columna.comunicacio.arbre"/>--%>
                         <script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
@@ -328,7 +328,7 @@
                         </script>
                     </th>
                     <th data-col-name="comunicacioSir" data-template="#comunicacioSirTemplate"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sir"/> - <spring:message code="organ.permis.comunicacio.sir.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sir"/>: &#10;<spring:message code="organ.permis.comunicacio.sir.info"/>">
                         <span class="fa fa-envelope padding-icon"></span>
 <%--                        <spring:message code="organgestor.permis.columna.coms.sir"/>--%>
                         <script id="comunicacioSirTemplate" type="text/x-jsrender">
@@ -336,7 +336,7 @@
                         </script>
                     </th>
                     <th data-col-name="comunicacioSenseProcediment" data-template="#cellComunicacioSenseProcediment" data-class="organ-admin"
-                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/> - <spring:message code="organ.permis.comunicacio.sense.proc.info"/>">
+                        class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/>: &#10;<spring:message code="organ.permis.comunicacio.sense.proc.info"/>">
                         <span class="fa fa-paper-plane-o padding-icon"></span>
                         <%--                        <spring:message code="procediment.permis.columna.administrador.curt"/>--%>
                         <script id="cellComunicacioSenseProcediment" type="text/x-jsrender">
