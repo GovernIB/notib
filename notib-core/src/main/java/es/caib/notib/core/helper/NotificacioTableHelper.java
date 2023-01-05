@@ -51,11 +51,11 @@ public class NotificacioTableHelper {
                     if (e.getTitular() != null) {
                         titular += e.getTitular().getNomFormatted() + ", ";
                     }
-                    estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
                 }
                 if (titular.length() > 2)
                     titular = titular.substring(0, titular.length() - 2);
             }
+            estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
 
             NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder()
                     .notificacio(notificacio)
