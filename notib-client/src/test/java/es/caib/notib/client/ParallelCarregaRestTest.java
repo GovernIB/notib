@@ -35,9 +35,12 @@ import java.util.Random;
 
 public class ParallelCarregaRestTest {
 
-    private static final String URL = "https://dev.caib.es/notib";
-    private static final String USERNAME = "$ripea_notib";
-    private static final String PASSWORD = "ripea_notib";
+//    private static final String URL = "https://dev.caib.es/notib";
+    private static final String URL = "http://localhost:8280/notib";
+//    private static final String USERNAME = "$ripea_notib";
+    private static final String USERNAME = "admin";
+//    private static final String PASSWORD = "ripea_notib";
+    private static final String PASSWORD = "admin";
 
     private static Map<Integer, String> notificacions = new HashMap<>();
     private static Map<Integer, String> enviaments = new HashMap<>();
@@ -46,29 +49,18 @@ public class ParallelCarregaRestTest {
     private static final Random random = new Random();
 
     public static String getNotificacio() {
-        if (notificacionsCount < 50)
-            return enviaments.get(notificacionsCount);
-        return enviaments.get(random.nextInt(50));
+//        return notificacionsCount < 50 ? enviaments.get(notificacionsCount) : enviaments.get(random.nextInt(50));
+        return notificacionsCount < 50 ? notificacions.get(notificacionsCount) : notificacions.get(random.nextInt(50));
     }
     public static void setNotificacio(String referencia) {
-        if (notificacionsCount < 50) {
-            notificacions.put(notificacionsCount++, referencia);
-        } else {
-            notificacions.put(random.nextInt(50), referencia);
-        }
+        notificacions.put(notificacionsCount < 50 ? notificacionsCount++ : random.nextInt(50), referencia);
     }
 
     public static String getEnviament() {
-        if (enviamentsCount < 50)
-            return enviaments.get(enviamentsCount);
-        return enviaments.get(random.nextInt(50));
+        return enviamentsCount < 50 ? enviaments.get(enviamentsCount) : enviaments.get(random.nextInt(50));
     }
     public static void setEnviament(String referencia) {
-        if (enviamentsCount < 50) {
-            enviaments.put(enviamentsCount++, referencia);
-        } else {
-            enviaments.put(random.nextInt(50), referencia);
-        }
+        enviaments.put(enviamentsCount < 50 ? enviamentsCount++ : random.nextInt(50), referencia);
     }
 
 
@@ -90,7 +82,6 @@ public class ParallelCarregaRestTest {
         private static final String csv = "f0cf70121eaa28506dc3f3981546a997991e568d07efff7775f2ab7ce3ec0977";
         private static Long counter = 0L;
         private static String arxiuContingut;
-
         private NotificacioRestClientV2 client;
 
         @Synchronized
@@ -99,8 +90,8 @@ public class ParallelCarregaRestTest {
         }
 
         @BeforeClass
-        public void classSetUp() throws Exception {
-            arxiuContingut = Base64.encodeBase64String(IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/notib/client/notificacio_adjunt.pdf")));
+        public static void classSetUp() throws Exception {
+            arxiuContingut = Base64.encodeBase64String(IOUtils.toByteArray(ParallelCreacioTest.class.getResourceAsStream("/es/caib/notib/client/notificacio_adjunt.pdf")));
         }
 
         @Before
@@ -109,230 +100,291 @@ public class ParallelCarregaRestTest {
             String keystorePath = ClientRestTest.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
             System.setProperty("javax.net.ssl.trustStore", keystorePath);
             System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
-
-            client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD);
+            client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
         }
 
         @Test
         public void testCarga0() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
                                 Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 0");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
+                infoNot.setIdentificador(id);
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga1() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 1");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga2() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 2");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga3() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build()},
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build()},
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build()}}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 3");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga4() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.COMUNICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
                                 Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 4");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga5() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.COMUNICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 5");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga6() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.COMUNICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 6");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga7() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.COMUNICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
                                     Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 7");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga8() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
                                     Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 8");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         @Test
         public void testCarga9() {
+
             InfoNot infoNot = InfoNot.builder()
                     .identificador(String.format("%1$10s", getCounter().toString()).replace(' ', '0'))
                     .entitatDir3Codi("A04003003")
-                    .organDir3Codi("")
-                    .procedimentCodi("")
+                    .organDir3Codi("A04035965")
+                    .procedimentCodi("874510")
                     .enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
                     .usuariCodi("e18225486x")
-                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
+//                    .docUuid("8c01b36f-4dd6-46fd-b0a3-5a3f0581d2b9")
                     .destinataris(Arrays.asList(new Persona[][]{
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Andreu").llinatge1("Adrover").llinatge2("Amoros").nif("11111111H").telefon("611111111").email("usuari1@limit.es").build(),
                                 Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Bernat").llinatge1("Berga").llinatge2("Balcells").nif("22222222J").telefon("622222222").email("usuari2@limit.es").build() },
                             {   Persona.builder().interessatTipus(InteressatTipusEnumDto.FISICA).nom("Colau").llinatge1("Cladera").llinatge2("Cerda").nif("33333333P").telefon("633333333").email("usuari3@limit.es").build() }}))
                     .build();
-            
+
+            String id;
+            int index;
             for (int i = 0; i < 250000; i++) {
                 System.out.println("Execució 9");
+                id = infoNot.getIdentificador();
+                index = id.lastIndexOf("_");
+                id = (index != -1 ? id.substring(0, index) : id) + "_" + i;
                 notifica(infoNot);
             }
         }
 
         private void notifica(InfoNot infoNot) {
+
             try {
                 Long ti = System.currentTimeMillis();
                 System.out.println(infoNot.getIdentificador() + ".");
                 NotificacioV2 notificacio = generarNotificacio(infoNot);
-                System.out.println(">>> Peitició de la notificació: " + notificacio.getConcepte());
+                System.out.println(">>> Petició de la notificació: " + notificacio.getConcepte());
                 RespostaAltaV2 respostaAlta = client.alta(notificacio);
                 if (respostaAlta.isError()) {
                     System.out.println(">>> Reposta amb error: " + respostaAlta.getErrorDescripcio());

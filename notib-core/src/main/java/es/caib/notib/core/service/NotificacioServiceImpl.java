@@ -551,15 +551,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
 				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
-					notificacions = notificacioTableViewRepository.findByEntitatActual(
-							entitatActual,
-							pageable);
+					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
 				//Consulta totes les notificacions de les entitats actives
 				} else if (isSuperAdmin) {
 					List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
-					notificacions = notificacioTableViewRepository.findByEntitatActiva(
-							entitatsActiva,
-							pageable);
+					notificacions = notificacioTableViewRepository.findByEntitatActiva(entitatsActiva, pageable);
 				} else if (isAdminOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(

@@ -8,5 +8,5 @@ package es.caib.notib.core.api.dto.notificacio;
 public enum TipusEnviamentEnumDto {
     NOTIFICACIO,
     COMUNICACIO,
-    COMUNICACIO_SIR
+    COMUNICACIO_SIR,
 }

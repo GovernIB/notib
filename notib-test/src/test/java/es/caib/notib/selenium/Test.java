@@ -8,21 +8,33 @@ public class Test {
 
     public static void main(String [] args) throws Exception {
 
-        var driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
-        try {
-            var ls = new LoginSelenium(driver);
-            ls.login();
-            while(true) {
+        Thread t;
+        for (int i = 0; i<1;i++) {
 
-                var ns = new RemesesSelenium(driver);
-                ns.test();
-                var es = new EnviamentsSelenium(driver);
-                es.test();
-            }
-        }  finally {
-            Thread.sleep(1000000);
-            driver.quit();
+            t = new Thread(() -> {
+                var driver = new ChromeDriver();
+                driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
+                try {
+                    var ls = new LoginSelenium(driver);
+                    ls.login();
+                    while (true) {
+                        var ns = new RemesesSelenium(driver);
+                        ns.test();
+                        var es = new EnviamentsSelenium(driver);
+                        es.test();
+                    }
+                } catch (Exception ex) {
+                    System.out.println("Exception: " + ex);
+                } finally {
+                    try {
+                        Thread.sleep(1000000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    driver.quit();
+                }
+            });
+            t.start();
         }
     }
 }
