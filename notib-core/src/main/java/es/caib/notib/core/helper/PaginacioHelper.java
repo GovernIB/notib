@@ -150,9 +150,8 @@ public class PaginacioHelper {
 		return dto;
 	}
 
-	public <T> PaginaDto<T> toPaginaDto(
-			List<?> llista,
-			Class<T> targetType) {
+	public <T> PaginaDto<T> toPaginaDto(List<?> llista, Class<T> targetType) {
+
 		PaginaDto<T> dto = new PaginaDto<T>();
 		dto.setNumero(0);
 		dto.setTamany(llista.size());
@@ -162,12 +161,8 @@ public class PaginacioHelper {
 		dto.setPrimera(true);
 		dto.setPosteriors(false);
 		dto.setDarrera(true);
-		if (targetType != null) {
-			dto.setContingut(
-					conversioTipusHelper.convertirList(
-							llista,
-							targetType));
-		}
+		dto.setContingut(targetType != null && !targetType.equals(llista.get(0).getClass()) ?
+			conversioTipusHelper.convertirList(llista, targetType) : (List<T>) llista);
 		return dto;
 	}
 
