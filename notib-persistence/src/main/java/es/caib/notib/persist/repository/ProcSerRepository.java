@@ -1,5 +1,6 @@
 package es.caib.notib.persist.repository;
 
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.ProcSerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -116,7 +117,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query("select count(pro) " +
 			"from " +
@@ -162,7 +163,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 //	@Query( "select distinct pro " +
 //			"from ProcedimentEntity pro " +
@@ -309,7 +310,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query(	"select count(pro) " +
 			" from ProcSerEntity pro " +
@@ -349,7 +350,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	ProcSerEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 
@@ -416,8 +417,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus
-	);
+			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query(	"select count(p) " +
 			"from ProcSerEntity p " +
@@ -457,7 +457,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("isTipusNull") boolean isTipusNull,
-			@Param("tipus") String tipus
+			@Param("tipus") ProcSerTipusEnum tipus
 	);
 
     List<ProcSerEntity> findByOrganGestorId(Long organId);

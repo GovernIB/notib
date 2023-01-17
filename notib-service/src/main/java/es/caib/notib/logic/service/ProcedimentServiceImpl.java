@@ -1011,51 +1011,6 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		}
 		return procedimentsAmbPermis;
 	}
-//
-//	private List<ProcSerCacheDto> filtraProcediments(List<ProcSerCacheDto> procSerAmbPermis) {
-//
-//		List<ProcSerCacheDto> procedimentsAmbPermis = new ArrayList<>();
-//		for (var procSer : procSerAmbPermis) {
-//			if (ProcSerTipusEnum.PROCEDIMENT.equals(procSer.getTipus())) {
-//				procedimentsAmbPermis.add(procSer);
-//			}
-//		}
-//		return procedimentsAmbPermis;
-//	}
-//
-//	private boolean hasPermisProcedimentsComuns(String codiEntitat, String codiOrgan) {
-//
-//		List<String> organsPares = organGestorCachable.getCodisAncestors(codiEntitat, codiOrgan);
-//		for (String codiDir3 : organsPares) {
-//			OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(codiDir3);
-//			Permission [] permission = new Permission[]{ExtendedPermission.COMUNS};
-//			if (organGestorEntity != null && permisosHelper.hasPermission(organGestorEntity.getId(), OrganGestorEntity.class, permission)) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//
-//	private List<ProcSerCacheDto> addProcedimentsOrgan(List<ProcSerCacheDto> procediments, List<ProcSerOrganCacheDto> procedimentsOrgans, String organFiltre) {
-//
-//		Set<ProcSerCacheDto> setProcediments = new HashSet<>();
-//		if (organFiltre == null) {
-//			return new ArrayList<>();
-//		}
-//		if (procediments != null) {
-//			for (var proc : procediments) {
-//				if (proc.isComu() || (proc.getOrganGestor() != null && organFiltre.equalsIgnoreCase(proc.getOrganGestor().getCodi()))) {
-//					setProcediments.add(proc);
-//				}
-//			}
-//		}
-//		if (procedimentsOrgans != null && !procedimentsOrgans.isEmpty()) {
-//			for (var procedimentOrgan : procedimentsOrgans) {
-//				setProcediments.add(procedimentOrgan.getProcSer());
-//			}
-//		}
-//		return new ArrayList<>(setProcediments);
-//	}
 
 	@Override
 	@Transactional(readOnly = true)
