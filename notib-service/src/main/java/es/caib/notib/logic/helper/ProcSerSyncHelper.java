@@ -111,7 +111,7 @@ public class ProcSerSyncHelper {
 //			List<ProcSerDto> procedimentsGda = obtenirProcediments(entitatDto, progres, totalElementsCons);
 			progres.setProcedimentsObtinguts(procedimentsGda);
 			processarProcediments(entitat, procedimentsGda, progres, avisosProcedimentsOrgans);
-			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(),progres);
+			procSerHelper.deshabilitarProcedimentsNoActius(procedimentsGda, entitat.getCodi(), progres);
 //			eliminarOrgansProcObsoletsNoUtilitzats(organsGestorsModificats, progres);
 
 			progres.setTotalFinal(procedimentRepository.countByEntitatId(entitatDto.getId()));
