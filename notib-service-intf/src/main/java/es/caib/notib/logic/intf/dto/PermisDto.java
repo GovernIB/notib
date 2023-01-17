@@ -40,6 +40,7 @@ public class PermisDto implements Serializable {
 	private boolean comuns;
 	
 	private boolean notificacio;
+	private boolean comunicacio;
 	private boolean comunicacioSir;
 	
 	// Booleà per a indicar si en cas de procediment comú, 
@@ -47,24 +48,20 @@ public class PermisDto implements Serializable {
 	private boolean permetEdicio;
 	
 	public String getOrganCodiNom() {
-		if (organ != null && organNom != null)
-			return organ + " - " + organNom;
-
-		return organ;
+		return organ != null && organNom != null ? organ + " - " + organNom : organ;
 	}
 
 	public void revocaPermisos() {
+
 		this.read = false;
 		this.write= false;
 		this.create= false;
 		this.delete= false;
 		this.administration= false;
-		
 		this.usuari= false;
 		this.administrador= false;
 		this.administradorEntitat= false;
 		this.aplicacio= false;
-		
 		this.processar= false;
 		this.notificacio= false;
 	}

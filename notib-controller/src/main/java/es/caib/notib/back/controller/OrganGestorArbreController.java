@@ -64,18 +64,18 @@ public class OrganGestorArbreController extends BaseUserController {
     public String get(HttpServletRequest request, Model model) {
 
         try {
-            EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-            OrganGestorFiltreCommand filtres = controller.getFiltreCommand(request);
+            var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            var filtres = controller.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
-            Arbre<OrganGestorDto> arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
+            var arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             model.addAttribute("isFiltre", "true".equals(filtres.getIsFiltre()));
             omplirModel(model, entitat, null);
         } catch (Exception ex) {
             log.error("Error generant l'arbre d'òrgans", ex);
-            String msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {
+            var msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {
                     "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
                             "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
                             "\t\t\t</button>\n" +
@@ -98,9 +98,9 @@ public class OrganGestorArbreController extends BaseUserController {
     @RequestMapping(method = RequestMethod.POST, value="/guardar")
     public String guardarOrgan(HttpServletRequest request, @Valid OrganGestorCommand command, BindingResult bindingResult, Model model) {
 
-        EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-        OrganGestorDto organ = OrganGestorCommand.asDto(command);
-        String msg = "";
+        var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+        var organ = OrganGestorCommand.asDto(command);
+        var msg = "";
         if (bindingResult.hasErrors()) {
             omplirModel(model, entitat, organ);
             msg = "organgestor.arbre.error.guardar";
@@ -108,9 +108,9 @@ public class OrganGestorArbreController extends BaseUserController {
         }
         organ.setLlibreNom(command.getLlibre() != null ? organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()).getNomLlarg() : null);
         if (command.getOficina() != null) {
-            List<OficinaDto> oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),true);
+            var oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),true);
             String oficinaNom = null;
-            for (OficinaDto oficina : oficines) {
+            for (var oficina : oficines) {
                 if (oficina.getCodi().equals(organ.getCodi())) {
                     oficinaNom = oficina.getNom();
                 }
@@ -121,50 +121,24 @@ public class OrganGestorArbreController extends BaseUserController {
             msg = "organgestor.controller.update.nom.ok";
             organService.update(organ);
         }
-//        else {
-//            msg = "organgestor.controller.creat.ok";
-//            organService.create(organ);
-//        }
+
         return getAjaxControllerReturnValueSuccess(request, "redirect:./", msg);
     }
-
-//    @ResponseBody
-//    @RequestMapping(value = "/{organGestorCodi}/delete", method = RequestMethod.GET)
-//    public Resposta delete(HttpServletRequest request, @PathVariable String organGestorCodi) {
-//
-//        Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
-//        try {
-//            EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-//            OrganGestorDto organ = organService.findByCodi(entitat.getId(), organGestorCodi);
-//            if (organ == null) {
-//                return Resposta.builder().msg(MessageHelper.getInstance().getMessage("organgestor.controller.esborrat.ko", null, locale)).error(true).build();
-//            }
-//            if (organService.organGestorEnUs(organ.getId())) {
-//                return Resposta.builder().msg(MessageHelper.getInstance().getMessage("organgestor.controller.esborrat.us", null, locale)).error(true).build();
-//            }
-//            organService.delete(entitat.getId(), organ.getId());
-//            return Resposta.builder().msg(MessageHelper.getInstance().getMessage("organgestor.controller.esborrat.ok", null, locale)).build();
-//        } catch (Exception e) {
-//            logger.error(String.format("Excepció intentant esborrar l'òrgan gestor %s:", organGestorCodi), e);
-//            return Resposta.builder().msg(MessageHelper.getInstance().getMessage("organgestor.controller.esborrat.ko ", null, locale)).error(true).build();
-//        }
-//    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/organgestor/{codiSia}")
     public String getOrgan(HttpServletRequest request, @PathVariable("codiSia") String codiSia, Model model) {
 
         try {
             model.addAttribute("desactivarAvisos", true);
-            EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-            OrganGestorDto o = organService.findByCodi(entitat.getId(), codiSia);
-            //o = o == null ? organService.getOrganNou(codiSia) : o;
+            var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            var o = organService.findByCodi(entitat.getId(), codiSia);
             if (o == null) {
                 throw new NotFoundException(codiSia, OrganGestorDto.class);
             }
             o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
             omplirModel(model, entitat, o);
         } catch (Exception ex) {
-            String msg = getMessage(request, "organgestor.detall.error", new Object[] {
+            var msg = getMessage(request, "organgestor.detall.error", new Object[] {
                     "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
                             "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
                             "\t\t\t</button>\n" +
@@ -192,8 +166,8 @@ public class OrganGestorArbreController extends BaseUserController {
         model.addAttribute("operadorPostalList", operadorPostalList);
         var cieList = cieService.findNoCaducatsByEntitat(entitat);
         model.addAttribute("cieList", cieList);
-        var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
         if (!entitat.isOficinaEntitat()) {
+            var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
             model.addAttribute("oficinesEntitat", oficinesEntitat);
         }
         if (organ == null) {
