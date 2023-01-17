@@ -312,7 +312,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
      */
     @RequestMapping(value = "/procedimentsOrgan", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getProcediments(HttpServletRequest request, Model model) {
+    public List<CodiValorOrganGestorComuDto> getProcediments(HttpServletRequest request, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -327,7 +327,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/serveisOrgan", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getServeis(HttpServletRequest request, Model model) {
+    public List<CodiValorOrganGestorComuDto> getServeis(HttpServletRequest request, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -350,7 +350,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
      */
     @RequestMapping(value = "/procedimentsOrgan/{organGestor}", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
+    public List<CodiValorOrganGestorComuDto> getProcedimentByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;
@@ -365,7 +365,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/serveisOrgan/{organGestor}", method = RequestMethod.GET)
     @ResponseBody
-    public List<CodiValorComuDto> getServeiByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
+    public List<CodiValorOrganGestorComuDto> getServeiByOrganGestor(HttpServletRequest request, @PathVariable Long organGestor, Model model) {
 
         Long entitatId = EntitatHelper.getEntitatActual(request).getId();
         String organCodi = null;

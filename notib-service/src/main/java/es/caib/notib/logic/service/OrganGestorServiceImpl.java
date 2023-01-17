@@ -24,6 +24,7 @@ import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.ArbreNode;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
+import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -48,6 +49,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganCacheDto;
 import es.caib.notib.logic.intf.exception.NoPermisosException;
 import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
@@ -94,6 +96,8 @@ import java.util.stream.Collectors;
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService{
 
+	@Autowired
+	private PermisosService permisosService;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
 	@Resource
@@ -1360,20 +1364,20 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 	
-	@Override
-	@Transactional(readOnly = true)
-	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
-			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-			return conversioTipusHelper.convertirList(permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos), OrganGestorDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
+//	@Override
+//	@Transactional(readOnly = true)
+//	public List<OrganGestorDto> findOrgansGestorsWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+//
+//		Timer.Context timer = metricsHelper.iniciMetrica();
+//		try {
+//			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false);
+//			Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+//			return conversioTipusHelper.convertirList(permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos), OrganGestorDto.class);
+//		} finally {
+//			metricsHelper.fiMetrica(timer);
+//		}
+//	}
 
     @Override
 	@Transactional(readOnly = true)
@@ -1514,81 +1518,81 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		return organs != null && !organs.isEmpty() ? organs.get(0) : new OrganGestorDto();
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis) {
-
-		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitatId);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		var procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entity, permisos);
-		var procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entity, permisos);
-		var organsAmbPermisComu = organGestorHelper.findOrgansGestorsWithPermis(auth, entity, new Permission[]{ExtendedPermission.COMUNS});
-		var organs = new ArrayList<OrganGestorCacheDto>();
-		List<String> codis = new ArrayList<>();
-		for (OrganGestorEntity organ: organsAmbPermisComu) {
-			codis.add(organ.getCodi());
-		}
-		for (var p : procediments) {
-			if (!organs.contains(p.getOrganGestor())) {
-				organs.add(p.getOrganGestor());
-				codis.add(p.getOrganGestor().getCodi());
-			}
-		}
-		for (var p : procedimentsOrgans) {
-			if (!organs.contains(p.getOrganGestor())) {
-				organs.add(p.getOrganGestor());
-				codis.add(p.getOrganGestor().getCodi());
-			}
-		}
-		// Afegim els òrgans fills
-		CodiValorDto organCodiValor;
-		Set<CodiValorDto> resposta = new HashSet<>();
-		List<String> codiFills;
-		OrganGestorEntity organFill;
-		boolean entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
-		boolean isOficinaOrganSir = !entity.isOficinaEntitat() && PermisEnum.COMUNIACIO_SIR.equals(permis);
-		for(var organ: organs) {
-
-			boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
-			if ((entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) && !excloure) {
-				organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
-				resposta.add(organCodiValor);
-			}
-			//buscar fills
-			codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entity.getDir3Codi(), organ.getCodi());
-			for (String fill : codiFills) {
-				if (codis.contains(fill)) {
-					continue;
-				}
-				organFill = organGestorRepository.findByCodi(fill);
-				if (organFill != null) {
-					boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
-					if (!excloureFill) {
-						organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
-						resposta.add(organCodiValor);
-					}
-				}
-			}
-		}
-		List<CodiValorDto> organsAmbPermis = new ArrayList<>(resposta);
-		if (!organsAmbPermis.isEmpty()) {
-			Collections.sort(organsAmbPermis, new Comparator<CodiValorDto>() {
-				@Override
-				public int compare(CodiValorDto p1, CodiValorDto p2) {
-					return p1.getCodi().compareTo(p2.getCodi());
-				}
-			});
-		}
-		return organsAmbPermis;
-	/*
-		2.- Obtenir òrgans amb permís
-		3.- Obtenir procediments comuns (procedimentOrgan)
-				-> Obtenir òrgan de procediment-organ
-		4.- Unificar òrgans i ordenar-los per codi ascendent (primer el més pròxim a l'arrel)
-		5.- Afegir fills (abasn d'afegir el seguent organ mirar si no està ja afegit així retallem branca)
-	*/
-	}
+//	@Override
+//	@Transactional(readOnly = true)
+//	public List<CodiValorDto> getOrgansAmbPermis(Long entitatId, PermisEnum permis) {
+//
+//		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitatId);
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
+//		var procediments = procedimentsCacheable.getProcedimentsWithPermis(auth.getName(), entity, permisos);
+//		var procedimentsOrgans = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entity, permisos);
+//		var organsAmbPermisComu = organGestorHelper.findOrgansGestorsWithPermis(auth, entity, new Permission[]{ExtendedPermission.COMUNS});
+//		var organs = new ArrayList<OrganGestorCacheDto>();
+//		List<String> codis = new ArrayList<>();
+//		for (OrganGestorEntity organ: organsAmbPermisComu) {
+//			codis.add(organ.getCodi());
+//		}
+//		for (var p : procediments) {
+//			if (!organs.contains(p.getOrganGestor())) {
+//				organs.add(p.getOrganGestor());
+//				codis.add(p.getOrganGestor().getCodi());
+//			}
+//		}
+//		for (var p : procedimentsOrgans) {
+//			if (!organs.contains(p.getOrganGestor())) {
+//				organs.add(p.getOrganGestor());
+//				codis.add(p.getOrganGestor().getCodi());
+//			}
+//		}
+//		// Afegim els òrgans fills
+//		CodiValorDto organCodiValor;
+//		Set<CodiValorDto> resposta = new HashSet<>();
+//		List<String> codiFills;
+//		OrganGestorEntity organFill;
+//		boolean entitatPermesa = configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes");
+//		boolean isOficinaOrganSir = !entity.isOficinaEntitat() && PermisEnum.COMUNIACIO_SIR.equals(permis);
+//		for(var organ: organs) {
+//
+//			boolean excloure = isOficinaOrganSir && Strings.isNullOrEmpty(organ.getOficina());
+//			if ((entitatPermesa || !organ.getCodi().equals(entity.getDir3Codi())) && !excloure) {
+//				organCodiValor = CodiValorDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).build();
+//				resposta.add(organCodiValor);
+//			}
+//			//buscar fills
+//			codiFills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entity.getDir3Codi(), organ.getCodi());
+//			for (String fill : codiFills) {
+//				if (codis.contains(fill)) {
+//					continue;
+//				}
+//				organFill = organGestorRepository.findByCodi(fill);
+//				if (organFill != null) {
+//					boolean excloureFill = isOficinaOrganSir && Strings.isNullOrEmpty(organFill.getOficina());
+//					if (!excloureFill) {
+//						organCodiValor = CodiValorDto.builder().codi(organFill.getCodi()).valor(organFill.getCodi() + " - " + organFill.getNom()).build();
+//						resposta.add(organCodiValor);
+//					}
+//				}
+//			}
+//		}
+//		List<CodiValorDto> organsAmbPermis = new ArrayList<>(resposta);
+//		if (!organsAmbPermis.isEmpty()) {
+//			Collections.sort(organsAmbPermis, new Comparator<CodiValorDto>() {
+//				@Override
+//				public int compare(CodiValorDto p1, CodiValorDto p2) {
+//					return p1.getCodi().compareTo(p2.getCodi());
+//				}
+//			});
+//		}
+//		return organsAmbPermis;
+//	/*
+//		2.- Obtenir òrgans amb permís
+//		3.- Obtenir procediments comuns (procedimentOrgan)
+//				-> Obtenir òrgan de procediment-organ
+//		4.- Unificar òrgans i ordenar-los per codi ascendent (primer el més pròxim a l'arrel)
+//		5.- Afegir fills (abasn d'afegir el seguent organ mirar si no està ja afegit així retallem branca)
+//	*/
+//	}
 
 //	private List<OrganGestorEntity> generarFills(String entiatDir3Codi, OrganGestorEntity o) {
 //		List<String> fills = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(entiatDir3Codi, o.getCodi());
@@ -1661,43 +1665,34 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 	}
 
-	private List<OrganGestorCacheDto> recuperarOrgansPerProcedimentAmbPermis(String usuari, EntitatEntity entitat, PermisEnum permis) {
+	private List<OrganGestorEntity> recuperarOrgansPerProcedimentAmbPermis(String usuari, EntitatEntity entitat, PermisEnum permis) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Permission[] permisos = entityComprovarHelper.getPermissionsFromName(permis);
-		var procedimentsDisponibles = procedimentsCacheable.getProcedimentsWithPermis(usuari, entitat, permisos);
-		var procedimentsOrgansDisponibles = procedimentsCacheable.getProcedimentOrganWithPermis(auth, entitat, permisos);
-		procedimentsDisponibles = mergeProcedimentsWithProcedimentsOrgans(procedimentsDisponibles, procedimentsOrgansDisponibles);
-		List<OrganGestorCacheDto> organsGestorsProcediments = new ArrayList<>();
+		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
+		List<OrganGestorEntity> organsGestorsProcediments = new ArrayList<>();
 		List<Long> procedimentsDisponiblesIds = new ArrayList<>();
-		for (ProcSerCacheDto pro : procedimentsDisponibles) {
+		List<CodiValorOrganGestorComuDto> procedimentsDisponibles = permisosService.getProcedimentsAmbPermis(entitat.getId(), usuari, permis);
+		for (CodiValorOrganGestorComuDto pro : procedimentsDisponibles) {
 			procedimentsDisponiblesIds.add(pro.getId());
 		}
-		// 1-recuperam els òrgans dels procediments disponibles (amb permís)
-		if (!procedimentsDisponiblesIds.isEmpty()) {
-			var organsDisponibles = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
-			if (organsDisponibles != null) {
-				organsGestorsProcediments = organsDisponibles.stream().map(ProcSerCacheable::toOrganGestorCacheDto).collect(Collectors.toList());
-			}
-		}
-		// 2-recuperam els òrgans amb permís
+		if (!procedimentsDisponiblesIds.isEmpty())
+			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
 
-		var organsAmbPermis = organGestorHelper.getOrgansGestorsWithPermis(usuari, auth, entitat, permisos);
-		List<OrganGestorCacheDto> organsGestorsAmbPermis = new ArrayList<>();
-		if (organsAmbPermis != null) {
-			organsGestorsAmbPermis = organsAmbPermis.stream().map(ProcSerCacheable::toOrganGestorCacheDto).collect(Collectors.toList());
+		// 2-recuperam els òrgans amb permís
+		List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<>();
+		List<String> organsCodis = new ArrayList<>();
+		List<CodiValorDto> organsAmbPermisDirecte = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, permis);
+		for (CodiValorDto org : organsAmbPermisDirecte) {
+			organsCodis.add(org.getCodi());
 		}
+		if (!organsCodis.isEmpty())
+			organsGestorsAmbPermis = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), organsCodis);
+
 		// 3-juntam tots els òrgans i ordenam per nom
-		List<OrganGestorCacheDto> organsGestors;
-		Set<OrganGestorCacheDto> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
+		List<OrganGestorEntity> organsGestors;
+		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
 		setOrgansGestors.addAll(organsGestorsAmbPermis);
-		if (procedimentsOrgansDisponibles != null) {
-			for (var procedimentOrgan : procedimentsOrgansDisponibles) {
-				setOrgansGestors.add(procedimentOrgan.getOrganGestor());
-			}
-		}
 		organsGestors = new ArrayList<>(setOrgansGestors);
-		if (!configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
+		if (!configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
 			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
 		}
 		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty()) {

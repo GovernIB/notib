@@ -59,4 +59,15 @@
 	<cache alias="procsersPermisMenu" uses-template="default"/>
 	<cache alias="procedimentsOrganPermis" uses-template="default"/>
 	<cache alias="organigramaPlugin" uses-template="default"><expiry><ttl unit="seconds">604800</ttl></expiry></cache>
+
+	<cache alias="procsersPermisNotificacioMenu" uses-template="default"/>
+	<cache alias="procsersPermisComunicacioMenu" uses-template="default" />
+	<cache alias="procsersPermisComunicacioSirMenu" uses-template="default" />
+	<cache alias="procserAmbPermis" uses-template="default" />
+	<cache alias="procedimentsAmbPermis" uses-template="default" />
+	<cache alias="serveisAmbPermis" uses-template="default" />
+	<cache alias="organsAmbPermis" uses-template="default" />
+	<cache alias="organsPermisPerProcedimentComu" uses-template="default" />
+	<cache alias="procedimentEntitiessOrganPermis" uses-template="default" />
+	<cache alias="organsEntitiesPermis" uses-template="default" />
 </config>

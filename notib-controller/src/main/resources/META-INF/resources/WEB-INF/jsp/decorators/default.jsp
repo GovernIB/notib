@@ -6,61 +6,24 @@
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
 
 <%
-	pageContext.setAttribute(
-			"sessionEntitats",
-			es.caib.notib.back.helper.EntitatHelper.findEntitatsAccessibles(request));
-	pageContext.setAttribute(
-			"entitatActual",
-			es.caib.notib.back.helper.EntitatHelper.getEntitatActual(request));
-	pageContext.setAttribute(
-			"requestParameterCanviEntitat",
-			es.caib.notib.back.helper.EntitatHelper.getRequestParameterCanviEntitat());
-	pageContext.setAttribute(
-			"rolActual",
-			es.caib.notib.back.helper.RolHelper.getRolActual(request));
-	pageContext.setAttribute(
-			"rolsUsuariActual",
-			es.caib.notib.back.helper.RolHelper.getRolsUsuariActual(request));
-	pageContext.setAttribute(
-			"isRolActualAdministrador",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
-	pageContext.setAttribute(
-			"isRolActualAdministradorEntitat",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(request),
-			PageContext.REQUEST_SCOPE);
-	pageContext.setAttribute(
-			"isRolActualUsuari",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(request));
-	pageContext.setAttribute(
-			"isRolActualAdministradorOrgan",
-			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
-	pageContext.setAttribute(
-			"requestParameterCanviRol",
-			es.caib.notib.back.helper.RolHelper.getRequestParameterCanviRol());
-	pageContext.setAttribute(
-			"permisNotificacioComunicacioMenu",
-			request.getAttribute("permisNotificacioComunicacioMenu"));
-	pageContext.setAttribute(
-			"permisComunicacioSirMenu",
-			request.getAttribute("permisComunicacioSirMenu"));
-	pageContext.setAttribute(
-			"sessionOrgans",
-			es.caib.notib.back.helper.OrganGestorHelper.getOrgansGestorsUsuariActual(request));
-	pageContext.setAttribute(
-			"organActual",
-			es.caib.notib.back.helper.OrganGestorHelper.getOrganGestorUsuariActual(request));
-	pageContext.setAttribute(
-			"requestParameterCanviOrgan",
-			es.caib.notib.back.helper.OrganGestorHelper.getRequestParameterCanviOrgan());
-	pageContext.setAttribute(
-			"avisos",
-			es.caib.notib.back.helper.AvisHelper.getAvisos(request));
-	pageContext.setAttribute(
-			"organsProcNoSincronitzats",
-			es.caib.notib.back.helper.OrganGestorHelper.getOrgansProcNoSincronitzats(request));
-	pageContext.setAttribute(
-			"organsServNoSincronitzats",
-			es.caib.notib.back.helper.OrganGestorHelper.getOrgansServNoSincronitzats(request));
+	pageContext.setAttribute("sessionEntitats", es.caib.notib.back.helper.EntitatHelper.findEntitatsAccessibles(request));
+	pageContext.setAttribute("entitatActual", es.caib.notib.back.helper.EntitatHelper.getEntitatActual(request));
+	pageContext.setAttribute("requestParameterCanviEntitat", es.caib.notib.back.helper.EntitatHelper.getRequestParameterCanviEntitat());
+	pageContext.setAttribute("rolActual", es.caib.notib.back.helper.RolHelper.getRolActual(request));
+	pageContext.setAttribute("rolsUsuariActual", es.caib.notib.back.helper.RolHelper.getRolsUsuariActual(request));
+	pageContext.setAttribute("isRolActualAdministrador", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministrador(request));
+	pageContext.setAttribute("isRolActualAdministradorEntitat", es.caib.notib.back.helper.RolHelper.isUsuariActualAdministradorEntitat(request), PageContext.REQUEST_SCOPE);pageContext.setAttribute("isRolActualUsuari", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuari(request));
+	pageContext.setAttribute("isRolActualAdministradorOrgan", es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+	pageContext.setAttribute("requestParameterCanviRol", es.caib.notib.back.helper.RolHelper.getRequestParameterCanviRol());
+	pageContext.setAttribute("permisNotificacioMenu", request.getAttribute("permisNotificacioMenu"));
+	pageContext.setAttribute("permisComunicacioMenu", request.getAttribute("permisComunicacioMenu"));
+	pageContext.setAttribute("permisComunicacioSirMenu", request.getAttribute("permisComunicacioSirMenu"));
+	pageContext.setAttribute("sessionOrgans", es.caib.notib.back.helper.OrganGestorHelper.getOrgansGestorsUsuariActual(request));
+	pageContext.setAttribute("organActual", es.caib.notib.back.helper.OrganGestorHelper.getOrganGestorUsuariActual(request));
+	pageContext.setAttribute("requestParameterCanviOrgan", es.caib.notib.back.helper.OrganGestorHelper.getRequestParameterCanviOrgan());
+	pageContext.setAttribute("avisos", es.caib.notib.back.helper.AvisHelper.getAvisos(request));
+	pageContext.setAttribute("organsProcNoSincronitzats", es.caib.notib.back.helper.OrganGestorHelper.getOrgansProcNoSincronitzats(request));
+	pageContext.setAttribute("organsServNoSincronitzats", es.caib.notib.back.helper.OrganGestorHelper.getOrgansServNoSincronitzats(request));
 	
 //	pageContext.setAttribute(
 //			"versioMajorActual",
@@ -342,8 +305,10 @@ body {
 												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
 											</button>
 											<ul class="dropdown-menu">
-												<c:if test="${permisNotificacioComunicacioMenu}">
+												<c:if test="${permisNotificacioMenu}">
 													<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+												</c:if>
+												<c:if test="${permisComunicacioMenu}">
 													<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
 												</c:if>
 												<c:if test="${permisComunicacioSirMenu}">

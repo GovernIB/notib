@@ -375,9 +375,11 @@ public class EnviamentServiceImpl implements EnviamentService {
 				var auth = SecurityContextHolder.getContext().getAuthentication();
 				var permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 				// Procediments accessibles per qualsevol òrgan gestor
-				var codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, permisos);
+				var codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA);
+
 				// Òrgans gestors dels que es poden consultar tots els procediments que no requereixen permís directe
-				var codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, permisos);
+				var codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA);
+
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
 				var codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatEntity, permisos);
 

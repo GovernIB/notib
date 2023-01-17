@@ -139,15 +139,13 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 			@Param("entitatActiva") List<EntitatEntity> entitatActiva,
 			Pageable paginacio);
 	
-	List<ProcedimentEntity> findByEntitat(
-			EntitatEntity entitat);
+	List<ProcedimentEntity> findByEntitat(EntitatEntity entitat);
+
+	List<ProcedimentEntity> findByEntitatAndActiuTrue(EntitatEntity entitat);
 	
-	List<ProcedimentEntity> findByEntitatOrderByNomAsc(
-			EntitatEntity entitat);
-	
-	Page<ProcedimentEntity> findByEntitat(
-			EntitatEntity entitat,
-			Pageable paginacio);
+	List<ProcedimentEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+
+	Page<ProcedimentEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 
 
 	@Query(	"from " +

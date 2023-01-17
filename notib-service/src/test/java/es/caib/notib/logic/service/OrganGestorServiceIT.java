@@ -164,33 +164,33 @@ public class OrganGestorServiceIT extends BaseServiceTestV2 {
 				trobat);
 	}
 
-	@Test
-	public void whenFindOrgansGestorsWithPermisConsulta_thenReturnAllOrgansWithPermis()
-	{
-		currentTestDescription = "whenFindOrgansGestorsWithPermisConsulta_thenReturnAllOrgansWithPermis Organ Gestor";
-		authenticationTest.autenticarUsuari("user");
-		EntitatDto entitatCreada = database.getEntitat();
-		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(
-				entitatCreada.getId(),
-				"user",
-				PermisEnum.CONSULTA);
-		// Hi ha 3 organs gestors a la base de dades, només 2 amb permís de consulta
-		assertEquals(2, organs.size());
-	}
-
-	@Test
-	public void whenFindOrgansGestorsWithPermisNotificacio_thenReturnOrgansWithPermisAndVigents()
-	{
-		currentTestDescription = "whenFindOrgansGestorsWithPermisNotificacio_thenReturnOrgansWithPermisAndVigents Organ Gestor";
-		authenticationTest.autenticarUsuari("user");
-		EntitatDto entitatCreada = database.getEntitat();
-		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(
-				entitatCreada.getId(),
-				"user",
-				PermisEnum.NOTIFICACIO);
-		// Hi ha 3 organs gestors a la base de dades, 2 amb permís de consulta, dels quals només 1 es vigent
-		assertEquals(1, organs.size());
-	}
+//	@Test
+//	public void whenFindOrgansGestorsWithPermisConsulta_thenReturnAllOrgansWithPermis()
+//	{
+//		currentTestDescription = "whenFindOrgansGestorsWithPermisConsulta_thenReturnAllOrgansWithPermis Organ Gestor";
+//		authenticationTest.autenticarUsuari("user");
+//		EntitatDto entitatCreada = database.getEntitat();
+//		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(
+//				entitatCreada.getId(),
+//				"user",
+//				PermisEnum.CONSULTA);
+//		// Hi ha 3 organs gestors a la base de dades, només 2 amb permís de consulta
+//		assertEquals(2, organs.size());
+//	}
+//
+//	@Test
+//	public void whenFindOrgansGestorsWithPermisNotificacio_thenReturnOrgansWithPermisAndVigents()
+//	{
+//		currentTestDescription = "whenFindOrgansGestorsWithPermisNotificacio_thenReturnOrgansWithPermisAndVigents Organ Gestor";
+//		authenticationTest.autenticarUsuari("user");
+//		EntitatDto entitatCreada = database.getEntitat();
+//		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(
+//				entitatCreada.getId(),
+//				"user",
+//				PermisEnum.NOTIFICACIO);
+//		// Hi ha 3 organs gestors a la base de dades, 2 amb permís de consulta, dels quals només 1 es vigent
+//		assertEquals(1, organs.size());
+//	}
 
 //	@Test(expected = AccessDeniedException.class)
 //	public void errorSiAccesSuperCreate() {

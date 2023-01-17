@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.ehcache.core.Ehcache;
 import org.ehcache.sizeof.SizeOf;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,17 +39,11 @@ public class CacheHelper {
 
 	@Resource
 	private OrganGestorRepository organGestorRepository;
-//	@Resource
-//	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
-//	@Resource
-//	private PermisosHelper permisosHelper;
-
 	private PluginHelper pluginHelper;
 	@Resource
 	private CacheManager cacheManager;
-
 	public static String appVersion;
 
 	@Autowired
@@ -59,50 +52,33 @@ public class CacheHelper {
 	}
 
 	@Cacheable(value = "usuariAmbCodi", key="#usuariCodi")
-	public DadesUsuari findUsuariAmbCodi(
-			String usuariCodi) {
-		return pluginHelper.dadesUsuariConsultarAmbCodi(
-				usuariCodi);
+	public DadesUsuari findUsuariAmbCodi(String usuariCodi) {
+		return pluginHelper.dadesUsuariConsultarAmbCodi(usuariCodi);
 	}
 
 	@Cacheable(value = "rolsAmbCodi", key="#usuariCodi")
-	public List<String> findRolsUsuariAmbCodi(
-			String usuariCodi) {
-		return pluginHelper.consultarRolsAmbCodi(
-				usuariCodi);
+	public List<String> findRolsUsuariAmbCodi(String usuariCodi) {
+		return pluginHelper.consultarRolsAmbCodi(usuariCodi);
 	}
 
 	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
-	public String findDenominacioOrganisme(
-			String codiDir3) {
+	public String findDenominacioOrganisme(String codiDir3) {
 		return pluginHelper.getDenominacio(codiDir3);
 	}
 	
 	@Cacheable(value = "findOficinesEntitat", key="#codiDir3")
-	public List<OficinaDto> llistarOficinesEntitat(
-			String codiDir3) {
-		return pluginHelper.llistarOficines(
-				codiDir3, 
-				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+	public List<OficinaDto> llistarOficinesEntitat(String codiDir3) {
+		return pluginHelper.llistarOficines(codiDir3, AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 	}
 	
 	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
-	public List<LlibreDto> llistarLlibresOficina(
-			String codiDir3Entitat,
-			String codiDir3Oficina) {
-		return pluginHelper.llistarLlibres(
-				codiDir3Entitat, 
-				codiDir3Oficina, 
-				AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+	public List<LlibreDto> llistarLlibresOficina(String codiDir3Entitat, String codiDir3Oficina) {
+		return pluginHelper.llistarLlibres(codiDir3Entitat, codiDir3Oficina, AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 	}
 	
 	@Cacheable(value = "findLlibreOrganisme", key="#codiDir3Organ")
-	public LlibreDto getLlibreOrganGestor(
-			String codiDir3Entitat,
-			String codiDir3Organ) {
-		return pluginHelper.llistarLlibreOrganisme(
-				codiDir3Entitat,
-				codiDir3Organ);
+	public LlibreDto getLlibreOrganGestor(String codiDir3Entitat, String codiDir3Organ) {
+		return pluginHelper.llistarLlibreOrganisme(codiDir3Entitat, codiDir3Organ);
 	}
 	
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
@@ -112,11 +88,9 @@ public class CacheHelper {
 
 	@Cacheable(value = "unitatPerCodi", key="#codi")
 	public OrganGestorDto unitatPerCodi(String codi) {
-		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codi);
-		if (organs != null && !organs.isEmpty()) {
-			return organs.get(0);
-		}
-		return null;
+
+		var organs = pluginHelper.unitatsPerCodi(codi);
+		return organs != null && !organs.isEmpty() ? organs.get(0) : null;
 	}
 	
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
@@ -128,20 +102,20 @@ public class CacheHelper {
 	public Map<String, OrganismeDto> findOrganigramaNodeByEntitat(final String entitatDir3Codi) {
 
 		Map<String, OrganismeDto> organigrama = new HashMap<>();
-		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
+		var organs = organGestorRepository.findByEntitatDir3Codi(entitatDir3Codi);
 		if (organs == null || organs.isEmpty()) {
 			return organigrama;
 		}
-
-		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitatDir3Codi);
-		HashMap<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
+		var arrel = organGestorRepository.findByCodi(entitatDir3Codi);
+		var organsMap = organsToMap(organs);
 		organToOrganigrama(arrel, organsMap, organigrama);
 		return organigrama;
 	}
 
 	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
+
 		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
-		for (OrganGestorEntity organ: organs) {
+		for (var organ: organs) {
 //			if (OrganGestorEstatEnum.V.equals(organ.getEstat()) || OrganGestorEstatEnum.T.equals(organ.getEstat())) {    // Unitats Vigents o Transitòries
 
 				if (organsMap.containsKey(organ.getCodiPare())) {
@@ -158,7 +132,8 @@ public class CacheHelper {
 	}
 
 	private void organToOrganigrama(final OrganGestorEntity organ, final HashMap<String, List<OrganGestorEntity>> organsMap, Map<String, OrganismeDto> organigrama) {
-		List<OrganGestorEntity> fills = organsMap.get(organ.getCodi());
+
+		var fills = organsMap.get(organ.getCodi());
 		List<String> codisFills = null;
 		if (fills != null && !fills.isEmpty()) {
 			codisFills = new ArrayList<>();
@@ -166,26 +141,22 @@ public class CacheHelper {
 				codisFills.add(fill.getCodi());
 			}
 		}
-		organigrama.put(
-				organ.getCodi(),
-				OrganismeDto.builder()
-						.codi(organ.getCodi())
-						.nom(organ.getNom())
-						.pare(organ.getCodiPare())
-						.fills(codisFills)
-						.build());
+		var organisme = OrganismeDto.builder().codi(organ.getCodi()).nom(organ.getNom()).pare(organ.getCodiPare()).fills(codisFills).build();
+		organigrama.put(organ.getCodi(), organisme);
 
-		if (fills != null)
-			for (OrganGestorEntity fill : fills)
-				organToOrganigrama(fill, organsMap, organigrama);
+		if (fills == null) {
+			return;
+		}
+		for (OrganGestorEntity fill : fills) {
+			organToOrganigrama(fill, organsMap, organigrama);
+		}
 	}
 
 	@Cacheable(value = "llistarNivellsAdministracions")
 	public List<CodiValor> llistarNivellsAdministracions() {
 		return pluginHelper.llistarNivellsAdministracions();
 	}
-	
-	
+
 	@Cacheable(value = "llistarComunitatsAutonomes")
 	public List<CodiValor> llistarComunitatsAutonomes() {
 		return pluginHelper.llistarComunitatsAutonomes();
@@ -200,22 +171,20 @@ public class CacheHelper {
 	public List<CodiValor> llistarLocalitats(String codiProvincia) {
 		return pluginHelper.llistarLocalitats(codiProvincia);
 	}
-	
-	
-	
+
 	public Collection<String> getAllCaches() {
 		return cacheManager.getCacheNames(); 
 	}
 
-	@CacheEvict(value = {"procsersPermis", "procedimentEntitiesPermis", "procsersPermisMenu", "procedimentEntitiesPermisMenu"}, allEntries = true)
+	@CacheEvict(value = {"procserAmbPermis", "procedimentsAmbPermis", "serveisAmbPermis", "procsersPermisNotificacioMenu", "procsersPermisComunicacioMenu", "procsersPermisComunicacioSirMenu"}, allEntries = true)
 	public void evictFindProcedimentServeisWithPermis() {
 	}
-	
-	@CacheEvict(value = {"procedimentsOrganPermis", "procedimentEntitiessOrganPermis"}, allEntries = true)
+
+	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procedimentEntitiessOrganPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
-	
-	@CacheEvict(value = {"organsPermis", "organsEntitiesPermis"}, allEntries = true)
+
+	@CacheEvict(value = {"organsAmbPermis", "organsEntitiesPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 
@@ -239,20 +208,21 @@ public class CacheHelper {
 
 	public long getCacheSize(String cacheName)
 	{
-		Cache cache = cacheManager.getCache(cacheName);
-		Object nativeCache = cache.getNativeCache();
+		var cache = cacheManager.getCache(cacheName);
+		var nativeCache = cache.getNativeCache();
 		if (nativeCache instanceof Ehcache) {
 //			Ehcache ehCache = (Ehcache) nativeCache;
 //			return ehCache.getStatistics().getLocalHeapSizeInBytes();
-			SizeOf sizeOf = SizeOf.newInstance();
+			var sizeOf = SizeOf.newInstance();
 			return sizeOf.deepSizeOf(cache);
 		}
 		return 0L;
 	}
 
 	public long getTotalEhCacheSize() {
-		long totalSize = 0L;
-		for (String cacheName : cacheManager.getCacheNames()) {
+
+		var totalSize = 0L;
+		for (var cacheName : cacheManager.getCacheNames()) {
 			totalSize = getCacheSize(cacheName);
 		}
 		return totalSize;

@@ -182,23 +182,23 @@ public interface ServeiService {
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //	List<ServeiOrganDto> findServeisOrganWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
-	/**
-	 * Selecciona tots els serveis als que l'organ indicat té accés
-	 *
-	 * @param organId
-	 * @param entitatCodi
-	 * @param serveisOrgans
-	 *
-	 * @return
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
-
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
-
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
+//	/**
+//	 * Selecciona tots els serveis als que l'organ indicat té accés
+//	 *
+//	 * @param organId
+//	 * @param entitatCodi
+//	 * @param serveisOrgans
+//	 *
+//	 * @return
+//	 */
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(String organId, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
+//
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public List<String> findServeisOrganCodiWithPermisByServei(ProcSerDto servei, String entitatCodi, List<ProcSerOrganDto> serveisOrgans);
+//
+//	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis);
 
 //	/**
 //	 * Recupera els tipus d'assumpte d'una entitat.
@@ -355,11 +355,11 @@ public interface ServeiService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN')")
 	public List<ProcSerDto> findServeisByOrganGestor(String organGestorCodi);
 
-	@PreAuthorize("hasRole('tothom')")
-	public List<ProcSerDto> findServeisByOrganGestorWithPermis(Long entitatId, String organGestorCodi, List<String> grups, PermisEnum permis);
+//	@PreAuthorize("hasRole('tothom')")
+//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(Long entitatId, String organGestorCodi, List<String> grups, PermisEnum permis);
 
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
-	List<CodiValorComuDto> getServeisOrgan(Long entitatId, String organCodi, Long organFiltre, RolEnumDto rol, PermisEnum permis);
+	List<CodiValorOrganGestorComuDto> getServeisOrgan(Long entitatId, String organCodi, Long organFiltre, RolEnumDto rol, PermisEnum permis);
 
 	/**
 	 * Obté un llistat de tots els serveis notificables d'un organ gestor concret
@@ -375,14 +375,14 @@ public interface ServeiService {
 	@PreAuthorize("hasRole('tothom')")
 	List<CodiValorOrganGestorComuDto> getServeisOrganNotificables(Long entitatId, String organCodi, RolEnumDto rol, TipusEnviamentEnumDto enviamentTipus);
 
-	/**
-	 * Consulta si l'usuari té permís de notificació a tots els serveis comuns per a algún òrgan gestor.
-	 *
-	 * @param entitatId Identificador de l'entitat actual
-	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
-	 * @return boleà indicant si es te permis de serveis comuns a algun òrgan
-	 */
-	boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus);
+//	/**
+//	 * Consulta si l'usuari té permís de notificació a tots els serveis comuns per a algún òrgan gestor.
+//	 *
+//	 * @param entitatId Identificador de l'entitat actual
+//	 * @param enviamentTipus Indica si es tracta d'una notificació/comunicació normal o comunicació SIR
+//	 * @return boleà indicant si es te permis de serveis comuns a algun òrgan
+//	 */
+//	boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus);
 
 	/**
 	 * Actualitza el servei indicat amb la informació del servei actual

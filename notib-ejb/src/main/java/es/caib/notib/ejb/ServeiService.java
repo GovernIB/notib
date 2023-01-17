@@ -349,7 +349,7 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 
     @Override
     @RolesAllowed({"NOT_ADMIN", "tothom"})
-    public List<CodiValorComuDto> getServeisOrgan(
+    public List<CodiValorOrganGestorComuDto> getServeisOrgan(
 			Long entitatId,
 			String organCodi,
 			Long organFiltre,

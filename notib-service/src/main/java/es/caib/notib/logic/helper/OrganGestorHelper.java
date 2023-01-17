@@ -5,13 +5,13 @@ import es.caib.notib.logic.intf.dto.AvisNivellEnumDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
-import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.TipusTransicioEnumDto;
-import es.caib.notib.logic.cacheable.PermisosCacheable;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.AvisEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
@@ -21,8 +21,6 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.ProcSerOrganRepository;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.acls.model.Permission;
@@ -31,7 +29,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +46,9 @@ import java.util.Set;
 @Slf4j
 @Component
 public class OrganGestorHelper {
+
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -67,8 +67,6 @@ public class OrganGestorHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private PermisosCacheable permisosCacheable;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -99,28 +97,28 @@ public class OrganGestorHelper {
 		return organsDisponibles;
 	}
 
-	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
+	public List<String> findCodiOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, PermisEnum permis) {
 
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
+		var organs = permisosService.getOrgansAmbPermis(entitat.getId(), auth.getName(), permis);
 		List<String> codis = new ArrayList<>();
-		for (OrganGestorEntity organGestorDto : organs) {
-			codis.add(organGestorDto.getCodi());
+		for (var organ : organs) {
+			codis.add(organ.getCodi());
 		}
 		return codis;
 	}
 
-	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
-
-		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
-		if (organs.isEmpty()) {
-			return new ArrayList<>();
-		}
-		Set<String> codisOrgansAmbDescendents = new HashSet<>();
-		for (OrganGestorEntity organGestorEntity : organs) {
-			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
-		}
-		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
-	}
+//	public List<OrganGestorEntity> findOrgansGestorsWithPermis(Authentication auth, EntitatEntity entitat, Permission[] permisos) {
+//
+//		List<OrganGestorEntity> organs = permisosCacheable.findOrgansGestorsWithPermis(entitat, auth, permisos);
+//		if (organs.isEmpty()) {
+//			return new ArrayList<>();
+//		}
+//		Set<String> codisOrgansAmbDescendents = new HashSet<>();
+//		for (OrganGestorEntity organGestorEntity : organs) {
+//			codisOrgansAmbDescendents.addAll(organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestorEntity.getCodi()));
+//		}
+//		return organGestorRepository.findByCodiIn(new ArrayList<>(codisOrgansAmbDescendents));
+//	}
 
 	public List<OrganGestorEntity> findOrganismesEntitatAmbPermis(EntitatEntity entitat, Permission[] permisos) {
 
@@ -223,8 +221,6 @@ public class OrganGestorHelper {
 //		}
 //		return denominacio;
 //	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
 
@@ -394,7 +390,7 @@ public class OrganGestorHelper {
 				organGestorRepository.delete(organObsolet);
 				progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.borrat", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
 			} catch (Exception ex) {
-				logger.error("No ha estat possible esborrar l'òrgan gestor.", ex);
+				log.error("No ha estat possible esborrar l'òrgan gestor.", ex);
 				progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.eliminar.error", new Object[] {organObsolet.getCodi() + " - " + organObsolet.getNom()}));
 			}
 		}
