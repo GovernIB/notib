@@ -61,20 +61,20 @@ public class CacheHelper {
 		return pluginHelper.consultarRolsAmbCodi(usuariCodi);
 	}
 
-	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
-	public String findDenominacioOrganisme(String codiDir3) {
-		return pluginHelper.getDenominacio(codiDir3);
-	}
+//	@Cacheable(value = "denominacioOrganisme", key="#codiDir3")
+//	public String findDenominacioOrganisme(String codiDir3) {
+//		return pluginHelper.getDenominacio(codiDir3);
+//	}
 	
 	@Cacheable(value = "findOficinesEntitat", key="#codiDir3")
 	public List<OficinaDto> llistarOficinesEntitat(String codiDir3) {
 		return pluginHelper.llistarOficines(codiDir3, AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
 	}
-	
-	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
-	public List<LlibreDto> llistarLlibresOficina(String codiDir3Entitat, String codiDir3Oficina) {
-		return pluginHelper.llistarLlibres(codiDir3Entitat, codiDir3Oficina, AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
-	}
+
+//	@Cacheable(value = "findLlibresOficina", key="#codiDir3Oficina")
+//	public List<LlibreDto> llistarLlibresOficina(String codiDir3Entitat, String codiDir3Oficina) {
+//		return pluginHelper.llistarLlibres(codiDir3Entitat, codiDir3Oficina, AutoritzacioRegiWeb3Enum.REGISTRE_SORTIDA);
+//	}
 	
 	@Cacheable(value = "findLlibreOrganisme", key="#codiDir3Organ")
 	public LlibreDto getLlibreOrganGestor(String codiDir3Entitat, String codiDir3Organ) {
@@ -180,11 +180,11 @@ public class CacheHelper {
 	public void evictFindProcedimentServeisWithPermis() {
 	}
 
-	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procedimentEntitiessOrganPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsPermisPerProcedimentComu", "procserOrgansCodisAmbPermis"}, allEntries = true)
 	public void evictFindProcedimentsOrganWithPermis() {
 	}
 
-	@CacheEvict(value = {"organsAmbPermis", "organsEntitiesPermis"}, allEntries = true)
+	@CacheEvict(value = {"organsAmbPermis"}, allEntries = true)
 	public void evictFindOrgansGestorWithPermis() {
 	}
 

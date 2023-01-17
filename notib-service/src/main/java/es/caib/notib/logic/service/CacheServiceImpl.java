@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -40,14 +39,15 @@ public class CacheServiceImpl implements CacheService {
 	@Override
 	public PaginaDto<CacheDto> getAllCaches() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Recuperant el llistat de les caches disponibles");
-			List<CacheDto> caches = new ArrayList<CacheDto>();	
-			Collection<String> cachesValues = cacheHelper.getAllCaches();
-			for (String cacheValue : cachesValues) {
+			List<CacheDto> caches = new ArrayList<>();
+			var cachesValues = cacheHelper.getAllCaches();
+			CacheDto cache;
+			for (var cacheValue : cachesValues) {
 //				if (!cacheValue.equals("aclCache")) {
-					CacheDto cache = new CacheDto();
+					 cache = new CacheDto();
 					cache.setCodi(cacheValue);
 					cache.setDescripcio(messageHelper.getMessage("es.caib.notib.ehcache." + cacheValue));
 					cache.setLocalHeapSize(cacheHelper.getCacheSize(cacheValue));
@@ -63,10 +63,21 @@ public class CacheServiceImpl implements CacheService {
 	@Override
 	public void removeCache(String value) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Esborrant la cache (value=" + value + ")");
 			cacheHelper.clearCache(value);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Override
+	public void removeAllCaches() {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Esborrant totes les caches");
+			cacheHelper.clearAllCaches();
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

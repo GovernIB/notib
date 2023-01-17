@@ -23,7 +23,7 @@ public interface CacheService {
 	 * @return una llista amb els codis de les caches
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public PaginaDto<CacheDto> getAllCaches();
+	PaginaDto<CacheDto> getAllCaches();
 
 	/**
 	 * Esborra una cache donat el seu codi (value)
@@ -32,6 +32,12 @@ public interface CacheService {
 	 * 
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	public void removeCache(String value);
+	void removeCache(String value);
+
+	/**
+	 * Esborra totes les caches
+	 */
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void removeAllCaches();
 	
 }

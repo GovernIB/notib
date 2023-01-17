@@ -30,4 +30,10 @@ public class CacheService extends AbstractService<es.caib.notib.logic.intf.servi
 		getDelegateService().removeCache(value);
 	}
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void removeAllCaches() {
+		getDelegateService().removeAllCaches();
+	}
+
 }

@@ -45,6 +45,7 @@ import es.caib.notib.logic.intf.rest.consulta.Transmissio;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.ColumnesEntity;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -110,6 +111,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class EnviamentServiceImpl implements EnviamentService {
 
+	@Autowired
+	private PermisosService permisosService;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -381,7 +384,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				var codisOrgansGestorsDisponibles = organGestorHelper.findCodiOrgansGestorsWithPermis(auth, entitatEntity, PermisEnum.CONSULTA);
 
 				// Procediments comuns que es poden consultar per a òrgans gestors concrets
-				var codisProcedimentsOrgans = procedimentHelper.findCodiProcedimentsOrganWithPermis(auth, entitatEntity, permisos);
+				var codisProcedimentsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitatEntity.getId(), auth.getName(), PermisEnum.CONSULTA);
 
 				var esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 				var esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
