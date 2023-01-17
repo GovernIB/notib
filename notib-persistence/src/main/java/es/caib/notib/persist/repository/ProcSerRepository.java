@@ -54,6 +54,27 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 //            @Param("entitat") EntitatEntity entitat,
 //            @Param("grups") List<String> grups);
 
+	@Query("select count(pro) " +
+			"from " +
+			"	ProcSerEntity pro " +
+			"where " +
+			"		pro.entitat = :entitat " +
+			"	and pro.id in (:ids)" +
+			"  	and (pro.agrupar = false " +
+			"  		or (pro.agrupar = true " +
+			"  			and pro in (select distinct gp.procSer " +
+			"						from GrupProcSerEntity gp " +
+			"						left outer join gp.grup g " +
+			"						where g.entitat = :entitat " +
+			"		  					  and g.codi in (:grups))" +
+			"			) " +
+			"		) " +
+			"order by pro.nom asc")
+	Long countProcedimentsByEntitatAndGrupAndIds(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups,
+			@Param("ids") List<Long> ids);
+
 	@Query("from " +
 			"	ProcSerEntity pro " +
 			"where " +
@@ -73,6 +94,48 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
             @Param("entitat") EntitatEntity entitat,
             @Param("grups") List<String> grups,
             @Param("ids") List<Long> ids);
+	@Query("select count(pro) " +
+			"from " +
+			"	ProcSerEntity pro " +
+			"where " +
+			"		pro.entitat = :entitat " +
+			"	and pro.actiu = true " +
+			"	and pro.id in (:ids)" +
+			"  	and (pro.agrupar = false " +
+			"  		or (pro.agrupar = true " +
+			"  			and pro in (select distinct gp.procSer " +
+			"						from GrupProcSerEntity gp " +
+			"						left outer join gp.grup g " +
+			"						where g.entitat = :entitat " +
+			"		  					  and g.codi in (:grups))" +
+			"			) " +
+			"		) " +
+			"order by pro.nom asc")
+	Long countProcedimentsActiusByEntitatAndGrupAndIds(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups,
+			@Param("ids") List<Long> ids);
+
+	@Query("from " +
+			"	ProcSerEntity pro " +
+			"where " +
+			"		pro.entitat = :entitat " +
+			"	and pro.actiu = true " +
+			"	and pro.id in (:ids)" +
+			"  	and (pro.agrupar = false " +
+			"  		or (pro.agrupar = true " +
+			"  			and pro in (select distinct gp.procSer " +
+			"						from GrupProcSerEntity gp " +
+			"						left outer join gp.grup g " +
+			"						where g.entitat = :entitat " +
+			"		  					  and g.codi in (:grups))" +
+			"			) " +
+			"		) " +
+			"order by pro.nom asc")
+	List<ProcSerEntity> findProcedimentsActiusByEntitatAndGrupAndIds(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("grups") List<String> grups,
+			@Param("ids") List<Long> ids);
 
 //	@Query( "select distinct pro " +
 //			"from ProcedimentEntity pro " +

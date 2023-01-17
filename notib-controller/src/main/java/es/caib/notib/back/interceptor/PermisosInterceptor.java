@@ -5,6 +5,7 @@ package es.caib.notib.back.interceptor;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import es.caib.notib.back.helper.OrganGestorHelper;
@@ -33,13 +34,14 @@ public class PermisosInterceptor implements AsyncHandlerInterceptor {
 	@Autowired @Lazy
 	private OrganGestorService organGestorService;
 	@Autowired @Lazy
+	private PermisosService permisosService;
+	@Autowired @Lazy
 	private AplicacioService aplicacioService;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		
-		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(request, procedimentService, organGestorService, aplicacioService);
 
+		PermisosHelper.comprovarPermisosProcedimentsUsuariActual(request, permisosService, aplicacioService);
 		if (RolHelper.isUsuariActualAdministradorEntitat(request) || RolHelper.isUsuariActualUsuariAdministradorOrgan(request)) {
 			OrganGestorHelper.setOrgansProcedimentsNoSincronitzats(request, procedimentService);
 			OrganGestorHelper.setOrgansServeisNoSincronitzats(request, serveiService);

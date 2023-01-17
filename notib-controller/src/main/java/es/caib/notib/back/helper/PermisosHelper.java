@@ -9,6 +9,7 @@ import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,30 +23,27 @@ import java.util.Map;
  */
 public class PermisosHelper {
 
-	
-	public static void comprovarPermisosProcedimentsUsuariActual(HttpServletRequest request, ProcedimentService procedimentService
-																, OrganGestorService organGestorService, AplicacioService aplicacioService) {
-		
+
+	public static void comprovarPermisosProcedimentsUsuariActual(HttpServletRequest request, PermisosService permisosService, AplicacioService aplicacioService) {
+
 		if (!RolHelper.isUsuariActualUsuari(request)) {
 			return;
 		}
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		var entitatActual = EntitatHelper.getEntitatActual(request);
+		var usuariActual = aplicacioService.getUsuariActual();
 
 		if (entitatActual == null || usuariActual == null || !RolHelper.isUsuariActualUsuari(request)) {
 			return;
 		}
-		List<ProcSerCacheDto> procedimentsDisponibles = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.NOTIFICACIO);
-		List<ProcSerCacheDto> procedimentsSIR = procedimentService.findProcedimentServeisWithPermisMenu(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-		List<OrganGestorDto> organs = organGestorService.findOrgansGestorsWithPermis(entitatActual.getId(), usuariActual.getCodi(), PermisEnum.COMUNIACIO_SIR);
-		request.setAttribute("permisNotificacioComunicacioMenu", !procedimentsDisponibles.isEmpty());
-		request.setAttribute("permisComunicacioSirMenu", !organs.isEmpty() || !procedimentsSIR.isEmpty());
+		request.setAttribute("permisNotificacioMenu", permisosService.hasPermisNotificacio(entitatActual.getId(), usuariActual.getCodi()));
+		request.setAttribute("permisComunicacioMenu", permisosService.hasPermisComunicacio(entitatActual.getId(), usuariActual.getCodi()));
+		request.setAttribute("permisComunicacioSirMenu", permisosService.hasPermisComunicacioSir(entitatActual.getId(), usuariActual.getCodi()));
 	}
 	
 	public static void comprovarPermisosEntitatsUsuariActual(HttpServletRequest request, EntitatService entitatService) {
 
 		//Comprovar si té permisos sobre alguna entitat
-		Map<RolEnumDto, Boolean> permisos = entitatService.getPermisosEntitatsUsuariActual();
+		var permisos = entitatService.getPermisosEntitatsUsuariActual();
 		request.setAttribute("permisUsuariEntitat", permisos.get(RolEnumDto.tothom));
 		request.setAttribute("permisAdminEntitat", permisos.get(RolEnumDto.NOT_ADMIN));
 		request.setAttribute("permisAplicacioEntitat", permisos.get(RolEnumDto.NOT_APL));
