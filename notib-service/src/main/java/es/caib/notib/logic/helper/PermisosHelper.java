@@ -402,16 +402,16 @@ public class PermisosHelper {
 		List<PermisDto> resposta = new ArrayList<PermisDto>();
 		Map<String, PermisDto> permisosUsuari = new HashMap<String, PermisDto>();
 		Map<String, PermisDto> permisosRol = new HashMap<String, PermisDto>();
-		for (AccessControlEntry ace: acl.getEntries()) {
+		for (var ace: acl.getEntries()) {
 			PermisDto permis = null;
 			if (ace.getSid() instanceof PrincipalSid) {
-				String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
+				var principal = ((PrincipalSid)ace.getSid()).getPrincipal();
 				permis = permisosUsuari.get(principal);
 				if (permis == null) {
 					permis = new PermisDto();
 					permis.setId((Long)ace.getId());
 					permis.setPrincipal(principal);
-					DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+					var usuari = cacheHelper.findUsuariAmbCodi(principal);
 					if(usuari != null) {
 						permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
 					}else {
@@ -422,7 +422,7 @@ public class PermisosHelper {
 					permisosUsuari.put(principal, permis);
 				}
 			} else if (ace.getSid() instanceof GrantedAuthoritySid) {
-				String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
+				var grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
 				permis = permisosRol.get(grantedAuthority);
 				if (permis == null) {
 					permis = new PermisDto();
@@ -472,8 +472,14 @@ public class PermisosHelper {
 			if (ExtendedPermission.NOTIFICACIO.equals(ace.getPermission())) {
 				permis.setNotificacio(true);
 			}
+			if (ExtendedPermission.COMUNICACIO.equals(ace.getPermission())) {
+				permis.setComunicacio(true);
+			}
 			if (ExtendedPermission.COMUNICACIO_SIR.equals(ace.getPermission())) {
 				permis.setComunicacioSir(true);
+			}
+			if (ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT.equals(ace.getPermission())) {
+				permis.setComunicacioSenseProcediment(true);
 			}
 		}
 		resposta.addAll(permisosUsuari.values());

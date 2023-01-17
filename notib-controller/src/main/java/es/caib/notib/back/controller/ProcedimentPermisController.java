@@ -96,22 +96,22 @@ public class ProcedimentPermisController extends BaseUserController{
 
 	private String getPermis(HttpServletRequest request, Long procedimentId, Long permisId, Model model, TipusPermis tipus, String organ, PaginacioParamsDto paginacioParams) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		ProcSerDto procediment = procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var procediment = procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId);
 		model.addAttribute("procediment", procediment);
 		PermisDto permis = null;
 		if (permisId != null) {
-			String codi = organGestorActual != null ? organGestorActual.getCodi() : null;
-			List<PermisDto> permisos = procedimentService.permisFind(entitatActual.getId(), isAdministrador(request), procedimentId, organ, codi, tipus, paginacioParams);
-			for (PermisDto p: permisos) {
+			var codi = organGestorActual != null ? organGestorActual.getCodi() : null;
+			var permisos = procedimentService.permisFind(entitatActual.getId(), isAdministrador(request), procedimentId, organ, codi, tipus, paginacioParams);
+			for (var p: permisos) {
 				if (p.getId().equals(permisId)) {
 					permis = p;
 					break;
 				}
 			}
 		}
-		model.addAttribute(permis != null ? PermisCommand.asCommand(permis) : new PermisCommand());
+		model.addAttribute(permis != null ? PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.PROCEDIMENT) : new PermisCommand());
 		if (procediment.isComu()) {
 			model.addAttribute("organs", getOrganismes(request));
 		}

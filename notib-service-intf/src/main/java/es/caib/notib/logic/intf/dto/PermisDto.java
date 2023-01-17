@@ -42,6 +42,7 @@ public class PermisDto implements Serializable {
 	private boolean notificacio;
 	private boolean comunicacio;
 	private boolean comunicacioSir;
+	private boolean comunicacioSenseProcediment;
 	
 	// Booleà per a indicar si en cas de procediment comú, 
 	// l'usuari administrador d'òrgan pot editar el permís

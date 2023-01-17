@@ -110,13 +110,13 @@ public class OrganGestorPermisController extends BaseUserController{
 	@RequestMapping(value = "/{organGestorId}/permis/{permisId}", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long organGestorId, @PathVariable Long permisId, Model model) throws ValidationException {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("organGestor", organGestorService.findById(entitatActual.getId(), organGestorId));
 		PermisDto permis = null;
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (permisId != null) {
-			List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, null);
-			for (PermisDto p: permisos) {
+			var permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, null);
+			for (var p: permisos) {
 				if (p.getId().equals(permisId)) {
 					permis = p;
 					break;
@@ -126,7 +126,7 @@ public class OrganGestorPermisController extends BaseUserController{
 		if (isAdminOrgan && permis != null && permis.isAdministrador()) {
 			throw new ValidationException("Un administrador d'òrgan no pot gestionar el permís d'admministrador d'òrgans gestors");
 		}
-		model.addAttribute(permis != null ? PermisCommand.asCommand(permis) : new PermisCommand());
+		model.addAttribute(permis != null ? PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.ORGAN) : new PermisCommand());
 		return "organGestorPermisForm";
 	}
 	

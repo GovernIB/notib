@@ -112,7 +112,7 @@ public class ServeiPermisController extends BaseUserController{
 				}
 			}
 		}
-		model.addAttribute(permis != null ? PermisCommand.asCommand(permis) : new PermisCommand());
+		model.addAttribute(permis != null ? PermisCommand.asCommand(permis, PermisCommand.EntitatPermis.SERVEI) : new PermisCommand());
 		if (servei.isComu()) {
 			model.addAttribute("organs", getOrganismes(request));
 		}

@@ -1,6 +1,7 @@
 package es.caib.notib.logic.cacheable;
 
 import es.caib.notib.logic.intf.dto.EntitatDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
@@ -264,20 +265,17 @@ public class PermisosCacheable {
     private CacheManager cacheManager;
 
     public void clearAuthenticationPermissionsCaches(Authentication auth) {
-        Permission[] permisos = new Permission[] {ExtendedPermission.USUARI,
-                ExtendedPermission.APLICACIO,
-                ExtendedPermission.ADMINISTRADORENTITAT};
 
-        List<Long> entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class,
-                permisos);
+        var permisos = new Permission[] {ExtendedPermission.USUARI, ExtendedPermission.APLICACIO, ExtendedPermission.ADMINISTRADORENTITAT};
+        var entitatsIds = permisosHelper.getObjectsIdsWithPermission(EntitatEntity.class, permisos);
         if (entitatsIds != null && !entitatsIds.isEmpty()) {
-            List<EntitatEntity> entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
+            var entitatsAccessibles = entitatRepository.findByIds(entitatsIds);
             if (entitatsAccessibles != null) {
                 for (EntitatEntity entitatEntity : entitatsAccessibles) {
                     String cacheKeyPrefix = entitatEntity.getId().toString().concat("-").concat(auth.getName()).concat("-");
-                    cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.READ.getPattern()));
-                    cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.NOTIFICACIO.getPattern()));
-                    cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(ExtendedPermission.ADMINISTRADOR.getPattern()));
+                    for (var permis: PermisEnum.values()) {
+                        cacheManager.getCache("organsPermis").evict(cacheKeyPrefix.concat(permis.name()));
+                    }
                 }
             }
         }

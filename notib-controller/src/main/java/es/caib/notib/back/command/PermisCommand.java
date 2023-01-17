@@ -30,6 +30,13 @@ import lombok.Setter;
 @Getter @Setter
 public class PermisCommand {
 
+	public enum EntitatPermis {
+		ORGAN,
+		PROCEDIMENT,
+		SERVEI
+	}
+
+
 	private Long id;
 	@NotEmpty
 	@Size(max=100)
@@ -56,6 +63,7 @@ public class PermisCommand {
 	private boolean notificacio;
 	private boolean comunicacio;
 	private boolean comunicacioSir;
+	private boolean comunicacioSenseProcediment;
 
 	public static List<PermisCommand> toPermisCommands(List<PermisDto> dtos) {
 
@@ -66,8 +74,19 @@ public class PermisCommand {
 		return commands;
 	}
 
-	public static PermisCommand asCommand(PermisDto dto) {
-		return ConversioTipusHelper.convertir(dto, PermisCommand.class);
+	public static PermisCommand asCommand(PermisDto dto, EntitatPermis entitatPermis) {
+
+		PermisCommand command = ConversioTipusHelper.convertir(dto, PermisCommand.class);
+		switch (entitatPermis) {
+			case ORGAN:
+				command.setSelectAll(dto.isRead() && dto.isProcessar() && dto.isAdministration() && dto.isComuns() && dto.isNotificacio() && dto.isComunicacio() && dto.isComunicacioSir() && dto.isComunicacioSenseProcediment());
+				break;
+			case PROCEDIMENT:
+			case SERVEI:
+				command.setSelectAll(dto.isRead() && dto.isProcessar() && dto.isAdministration() && dto.isNotificacio() && dto.isComunicacio() && dto.isComunicacioSir());
+				break;
+		}
+		return command;
 	}
 
 	public static PermisDto asDto(PermisCommand command) {

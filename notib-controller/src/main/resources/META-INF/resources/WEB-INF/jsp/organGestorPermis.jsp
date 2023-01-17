@@ -37,75 +37,104 @@ pageContext.setAttribute(
 			return ${isRolActualAdministradorOrgan};
 		}
 	</script>
-	<style type="text/css">
-		td.organ-admin {
-			background-color: #feeec5;
-		}
+	<style>
+		td.organ-admin {background-color: #feeec5;}
+		table {table-layout:fixed;}
+		th {height:120px;}
+		th:first-child {width: 60px !important;}
+		td {overflow:hidden; text-overflow: ellipsis;}
+		td:last-child {text-align: right; overflow: visible;}
+		#taulaDades th {writing-mode:vertical-rl;}
+		.writing-horitzontal {writing-mode: horizontal-tb !important;}
+		.nom-principal {width: 50% !important;}
+		.th-checkbox {padding-right: 1px !important; max-width: 5px !important;}
+		.th-boto-accions {width: 100px !important;}
 	</style>
 </head>
 <body>
-	<table 
-		id="taulaDades" 
-		data-toggle="datatable" 
-		data-url="<c:url value="/organgestor/${organGestor.id}/permis/datatable"/>" 
-		data-search-enabled="false" 
-		data-paging-enabled="false" 
-		data-default-order="1" 
-		data-default-dir="asc" 
-		data-botons-template="#tableButtonsTemplate" 
-		class="table table-striped table-bordered" 
+<table
+		id="taulaDades"
+		data-toggle="datatable"
+		data-url="<c:url value="/organgestor/${organGestor.id}/permis/datatable"/>"
+		data-search-enabled="false"
+		data-paging-enabled="false"
+		data-default-order="1"
+		data-default-dir="asc"
+		data-botons-template="#tableButtonsTemplate"
+		class="table table-striped table-bordered"
 		style="width:100%">
-		<thead>
-			<tr>
-				<th data-col-name="tipus" data-renderer="enum(TipusEnumDto)" width="120px"><spring:message code="procediment.permis.columna.tipus" /></th>
-				<th data-col-name="nomSencerAmbCodi"><spring:message code="procediment.permis.columna.principal"/></th>
-				<th data-col-name="read" data-template="#cellPermisReadTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.consulta"/>
-					<script id="cellPermisReadTemplate" type="text/x-jsrender">
+	<thead>
+	<tr>
+		<th data-col-name="tipus" class="writing-horitzontal" data-renderer="enum(TipusEnumDto)"><spring:message code="procediment.permis.columna.tipus" /></th>
+		<th data-col-name="nomSencerAmbCodi" class="writing-horitzontal nom-principal"><spring:message code="procediment.permis.columna.principal"/></th>
+		<th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.administrador"/>: &#10;<spring:message code="organ.permis.administrador.info"/>">
+			<span class="fa fa-user-plus padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.administrador"/>--%>
+			<script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
+						{{if administrador}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+		</th>
+		<th data-col-name="read" data-template="#cellPermisReadTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.consulta"/>: &#10;<spring:message code="organ.permis.consulta.info"/>">
+			<span class="fa fa-search padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.consulta"/>--%>
+			<script id="cellPermisReadTemplate" type="text/x-jsrender">
 						{{if read}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="processar" data-template="#cellPermisProcessarTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.processar"/>
+		</th>
+		<th data-col-name="processar" data-template="#cellPermisProcessarTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.processar"/>: &#10;<spring:message code="organ.permis.processar.info"/>">
+			<span class="fa fa-check-square-o padding-icon"></span><span>
+<%--					<spring:message code="procediment.permis.columna.processar"/>--%>
 					<script id="cellPermisProcessarTemplate" type="text/x-jsrender">
 						{{if processar}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="administration" data-template="#cellPermisGestioTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.gestio"/>
-					<script id="cellPermisGestioTemplate" type="text/x-jsrender">
+		</th>
+		<th data-col-name="administration" data-template="#cellPermisGestioTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.gestio"/>: &#10;<spring:message code="organ.permis.gestio.info"/>">
+			<span class="fa fa-cog padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.gestio"/>--%>
+			<script id="cellPermisGestioTemplate" type="text/x-jsrender">
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="comuns" data-template="#cellPermisComunsTemplate" width="120px">
-					<spring:message code="organgestor.permis.columna.comuns"/>
-					<script id="cellPermisComunsTemplate" type="text/x-jsrender">
+		</th>
+		<th data-col-name="comuns" data-template="#cellPermisComunsTemplate" class="th-checkbox" title="<spring:message code="organgestor.permis.form.camp.comuns"/>: &#10;<spring:message code="organ.permis.comuns.info"/>">
+			<span class="fa fa-globe padding-icon"></span>
+			<%--					<spring:message code="organgestor.permis.columna.comuns"/>--%>
+			<script id="cellPermisComunsTemplate" type="text/x-jsrender">
 						{{if comuns}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.notificacio"/>
-					<script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
+		</th>
+		<th data-col-name="notificacio" data-template="#cellPermisNotificacioTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.notificacio"/>: &#10;<spring:message code="organ.permis.notificacio.info"/>">
+			<span class="fa fa-gavel padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.notificacio"/>--%>
+			<script id="cellPermisNotificacioTemplate" type="text/x-jsrender">
 						{{if notificacio}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="comunicacioSir" data-template="#cellPermisComunicacioSirTemplate" width="120px">
-					<spring:message code="procediment.permis.columna.comunicacio.sir"/>
-					<script id="cellPermisComunicacioSirTemplate" type="text/x-jsrender">
+		</th>
+		<th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio"/>: &#10;<spring:message code="organ.permis.comunicacio.info"/>">
+			<span class="fa fa-envelope-o padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.comunicacio"/>--%>
+			<script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
+						{{if comunicacio}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+		</th>
+		<th data-col-name="comunicacioSir" data-template="#cellPermisComunicacioSirTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sir"/>: &#10;<spring:message code="organ.permis.comunicacio.sir.info"/>">
+			<span class="fa fa-envelope padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.comunicacio.sir"/>--%>
+			<script id="cellPermisComunicacioSirTemplate" type="text/x-jsrender">
 						{{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" width="120px">
-					<spring:message code="procediment.permis.columna.administrador"/>
-					<script id="cellPermisAdministradorTemplate" type="text/x-jsrender">
-						{{if administrador}}<span class="fa fa-check"></span>{{/if}}
+		</th>
+		<th data-col-name="comunicacioSenseProcediment" data-template="#cellPermisComunicacioSenseProcedimentTemplate" class="th-checkbox" title="<spring:message code="procediment.permis.form.camp.comunicacio.sense.procediment"/>: &#10;<spring:message code="organ.permis.comunicacio.sense.proc.info"/>">
+			<span class="fa fa-paper-plane-o padding-icon"></span>
+			<%--					<spring:message code="procediment.permis.columna.comunicacio.sense.procediment"/>--%>
+			<script id="cellPermisComunicacioSenseProcedimentTemplate" type="text/x-jsrender">
+						{{if comunicacioSenseProcediment}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="100px">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
+		</th>
+		<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" class="th-boto-accions">
+			<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-							<ul class="dropdown-menu">
+							<ul class="dropdown-menu dropdown-menu-right">
 								{^{if ~hlpIsAdminOrgan() && !administrador}}
 									<li><a href="../../organgestor/${organGestor.id}/permis/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								{{else !~hlpIsAdminOrgan()}}		
@@ -115,14 +144,14 @@ pageContext.setAttribute(
 							</ul>
 						</div>
 					</script>
-				</th>
-			</tr>
-		</thead>
-	</table>
-	<script id="tableButtonsTemplate" type="text/x-jsrender">
+		</th>
+	</tr>
+	</thead>
+</table>
+<script id="tableButtonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right"><a class="btn btn-default" href="../../organgestor/${organGestor.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="procediment.permis.boto.nou.permis"/></a></p>
 	</script>
-	<a href="<c:url value="/organgestor?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
-	<div class="clearfix"></div>
+<a href="<c:url value="/organgestor?mantenirPaginacio=true"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+<div class="clearfix"></div>
 </body>
 </html>

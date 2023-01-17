@@ -8,7 +8,7 @@
 <%
 	pageContext.setAttribute(
 			"isRolActualAdministradorOrgan",
-			es.caib.notib.war.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
+			es.caib.notib.back.helper.RolHelper.isUsuariActualUsuariAdministradorOrgan(request));
 %>
 
 <c:choose>
