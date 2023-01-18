@@ -3,6 +3,7 @@ package es.caib.notib.back.controller;
 import com.google.common.base.Strings;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.logic.intf.dto.*;
+import es.caib.notib.logic.intf.dto.cie.Operadors;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -185,23 +186,16 @@ public class ProcedimentController extends BaseUserController{
 		}
 		return getModalControllerReturnValueSuccess(request, url, msg);
 	}
-	
-	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
-	public String formGet(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
-		var entitat = getEntitatActualComprovantPermisos(request);
-		var procSerCommand = new ProcSerCommand();
-		var procediment = emplenarModelProcediment(request, procedimentId, model);
-		if (procediment != null) {
-			procSerCommand = ProcSerCommand.asCommand(procediment);
-			procSerCommand.setEntitatId(procediment.getEntitat().getId());
-		}
-		model.addAttribute(procSerCommand);
-		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
-		model.addAttribute("operadorPostalList", operadorPostalList);
-		var cieList = cieService.findNoCaducatsByEntitat(entitat);
-		model.addAttribute("cieList", cieList);
-		return "procedimentAdminForm";
+	@ResponseBody
+	@RequestMapping(value = "/operadors/{organ}", method = RequestMethod.GET)
+	public Operadors getOperadors(HttpServletRequest request, @PathVariable String organ) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		List<IdentificadorTextDto> postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		List<IdentificadorTextDto> cie = cieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
@@ -218,6 +212,24 @@ public class ProcedimentController extends BaseUserController{
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(request, url, "procediment.controller.esborrat.ko", e);
 		}
+	}
+
+	@RequestMapping(value = "/{procedimentId}", method = RequestMethod.GET)
+	public String formGet(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
+
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var procSerCommand = new ProcSerCommand();
+		var procediment = emplenarModelProcediment(request, procedimentId, model);
+		if (procediment != null) {
+			procSerCommand = ProcSerCommand.asCommand(procediment);
+			procSerCommand.setEntitatId(procediment.getEntitat().getId());
+		}
+		model.addAttribute(procSerCommand);
+		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
+		model.addAttribute("operadorPostalList", operadorPostalList);
+		var cieList = cieService.findNoCaducatsByEntitat(entitat);
+		model.addAttribute("cieList", cieList);
+		return "procedimentAdminForm";
 	}
 
 	@RequestMapping(value = "/{procedimentId}/enable", method = RequestMethod.GET)

@@ -97,13 +97,13 @@ $(document).ready(function() {
 				<button id="btn-entregaCieActiva" title="" class="btn btn-default <c:if test="${procSerFiltreCommand.entregaCieActiva}">active</c:if>" data-toggle="button">
 					<span class="fa fa-envelope"></span> <spring:message code="organgestor.list.columna.cie"/>
 				</button>
-				<not:inputHidden name="entregaCieActiva"/>
 			</div>
-			<div class="col-md-2 pull-right">
-				<div class="pull-right">
-					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
-				</div>
+				<not:inputHidden name="entregaCieActiva"/>
+		</div>
+		<div class="col-md-2 pull-right">
+			<div class="pull-right">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
 	</div>

@@ -191,6 +191,21 @@ $(document).ready(function() {
 		$('#entrega-cie-form').hide();
 	}
 
+	$("#selOrganismes").change(() => {
+		let organSelect = document.getElementById('selOrganismes');
+		let organ = organSelect.options[organSelect.selectedIndex].value;
+		let entitatId = $('#entitatId').val();
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/procediment/operadors/"/>" + organ,
+			success: data => {
+				loadPagadorPostal($("#operadorPostalId"), data.operadorsPostal, "<spring:message code='operador.postal.obsolet'/>")
+				loadPagadorPostal($("#cieId"), data.operadorsCie, "<spring:message code='operador.postal.obsolet'/>")
+			},
+			error: () => console.log("error obtenint els codis d'assumpte...")
+		});
+	});
+
 	// CANVIS EN EL FORMULARI SEGONS SI EL PROCEDIMENT ES CREAT ES COMÚ O NO
 	$('#comu').change(function() {
 		if (this.checked) {

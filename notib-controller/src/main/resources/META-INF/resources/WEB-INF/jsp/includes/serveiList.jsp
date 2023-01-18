@@ -90,11 +90,11 @@ $(document).ready(function() {
 				</button>
 				<not:inputHidden name="entregaCieActiva"/>
 			</div>
-			<div class="col-md-2 pull-right">
-				<div class="pull-right">
-					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
-					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
-				</div>
+		</div>
+		<div class="col-md-2 pull-right">
+			<div class="pull-right">
+				<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
+				<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 			</div>
 		</div>
 	</div>
