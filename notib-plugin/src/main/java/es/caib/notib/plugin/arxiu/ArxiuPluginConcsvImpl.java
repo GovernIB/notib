@@ -233,7 +233,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (!url.endsWith("/")) {
 				url += "/";
 			}
-			url += "metadata/uuid/";
+			url += "metadata/";
 
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
