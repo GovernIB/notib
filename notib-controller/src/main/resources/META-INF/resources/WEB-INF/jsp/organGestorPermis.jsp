@@ -40,7 +40,7 @@ pageContext.setAttribute(
 	<style>
 		td.organ-admin {background-color: #feeec5;}
 		table {table-layout:fixed;}
-		th {height:120px;}
+		/*th {height:120px;}*/
 		th:first-child {width: 60px !important;}
 		td {overflow:hidden; text-overflow: ellipsis;}
 		td:last-child {text-align: right; overflow: visible;}
