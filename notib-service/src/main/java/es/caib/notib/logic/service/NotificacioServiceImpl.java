@@ -1066,7 +1066,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
-			if (!isAdministrador && !hasPermisNotificacio(notificacioEntity)) {
+			var permisProcessar = permisosService.hasNotificacioPermis(notificacioId, notificacioEntity.getEntitat().getId(), notificacioEntity.getUsuariCodi(), PermisEnum.PROCESSAR);
+			if (!isAdministrador && !permisProcessar) {
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
@@ -1089,7 +1090,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	 * @param notificacio Notificació a comprovar
 	 * @return boleà indicant si l'usuari té el permís
 	 */
-	private boolean hasPermisNotificacio(NotificacioEntity notificacio) {
+	private boolean hasPermisProcessar(NotificacioEntity notificacio) {
 
 		boolean hasPermis = false;
 		ProcSerEntity procedimentNotificacio = notificacio.getProcediment();
@@ -1111,6 +1112,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 		return hasPermis;
 	}
+
 	@Transactional
 	@Override
 	public boolean reactivarConsulta(Long notificacioId) {

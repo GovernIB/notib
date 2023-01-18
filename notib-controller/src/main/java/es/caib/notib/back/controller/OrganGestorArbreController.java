@@ -1,5 +1,6 @@
 package es.caib.notib.back.controller;
 
+import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
@@ -68,7 +69,9 @@ public class OrganGestorArbreController extends BaseUserController {
             var filtres = controller.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
-            var arbre = organService.generarArbreOrgans(entitat, filtres.asDto());
+            boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            var organ = getOrganGestorActual(request);
+            var arbre = organService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             model.addAttribute("isFiltre", "true".equals(filtres.getIsFiltre()));
@@ -131,6 +134,10 @@ public class OrganGestorArbreController extends BaseUserController {
         try {
             model.addAttribute("desactivarAvisos", true);
             var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codiSia);
+            model.addAttribute("operadorPostalList", operadorPostalList);
+            var cieList = cieService.findNoCaducatsByEntitat(entitat);
+            model.addAttribute("cieList", cieList);
             var o = organService.findByCodi(entitat.getId(), codiSia);
             if (o == null) {
                 throw new NotFoundException(codiSia, OrganGestorDto.class);
@@ -162,10 +169,6 @@ public class OrganGestorArbreController extends BaseUserController {
         model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
         model.addAttribute("setOficina", !entitat.isOficinaEntitat());
         model.addAttribute("isModificacio", organ != null && organ.getId() != null);
-        var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
-        model.addAttribute("operadorPostalList", operadorPostalList);
-        var cieList = cieService.findNoCaducatsByEntitat(entitat);
-        model.addAttribute("cieList", cieList);
         if (!entitat.isOficinaEntitat()) {
             var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
             model.addAttribute("oficinesEntitat", oficinesEntitat);

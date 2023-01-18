@@ -81,6 +81,7 @@ public class NotificacioListHelper {
         mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
+
     public PaginaDto<NotificacioTableItemDto> complementaNotificacions(EntitatEntity entitatEntity, String usuariCodi, Page<NotificacioTableEntity> notificacions, String ... locale) {
 
         if (notificacions == null) {

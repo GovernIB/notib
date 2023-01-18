@@ -273,7 +273,6 @@ public class PermisosServiceImpl implements PermisosService {
     @Transactional
     public boolean hasNotificacioPermis(Long notId, Long entitat, String usuari, PermisEnum permis) {
 
-        NotificacioEntity not = notificacioRepository.findById(notId);
         List<String> codis = new ArrayList<>();
         List<CodiValorOrganGestorComuDto> procSersAmbPermis = getProcSersAmbPermis(entitat, usuari, permis);
         List<CodiValorDto> organs =  getOrgansAmbPermis(entitat, usuari, permis);
@@ -287,6 +286,11 @@ public class PermisosServiceImpl implements PermisosService {
                 codis.add(organ.getCodi());
             }
         }
+        var optional = notificacioRepository.findById(notId);
+        if (optional == null || optional.isEmpty()) {
+            return false;
+        }
+        var not = optional.get();
         return not.getProcediment().getCodi() != null
                 && (PermisEnum.PROCESSAR.equals(permis) ? NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) : true)
                 && (codis.contains(not.getProcediment().getCodi()) || codis.contains(not.getOrganGestor().getCodi()));

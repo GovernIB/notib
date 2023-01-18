@@ -29,6 +29,7 @@ import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.JustificantService;
 import es.caib.notib.logic.intf.service.NotificacioService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.ServeiService;
 import lombok.extern.slf4j.Slf4j;
@@ -95,6 +96,8 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private JustificantService justificantService;
     @Autowired
     private NotificacioBackHelper notificacioBackHelper;
+    @Autowired
+    private PermisosService permisService;
 
     public NotificacioTableController() {
         super.sessionAttributeSeleccio = SESSION_ATTRIBUTE_SELECCIO;
@@ -901,9 +904,12 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         String text = "es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto.";
         model.addAttribute("eventTipus", EnumHelper.getOptionsForEnum(NotificacioEventTipusEnumDto.class, text));
         model.addAttribute("permisGestio", null);
+        boolean permisGestio = false;
         if (notificacio != null && notificacio.getProcediment() != null && !notificacio.getProcedimentCodiNotib().isEmpty()) {
-            model.addAttribute("permisGestio", procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO));
+            permisGestio = permisService.hasNotificacioPermis(notificacioId, entitatActual.getId(), notificacio.getUsuariCodi(), PermisEnum.GESTIO);
+            permisGestio = permisGestio || procedimentService.hasPermisProcediment(notificacio.getProcediment().getId(), PermisEnum.GESTIO);
         }
+        model.addAttribute("permisGestio", permisGestio);
         model.addAttribute("permisAdmin", request.isUserInRole("NOT_ADMIN"));
     }
 

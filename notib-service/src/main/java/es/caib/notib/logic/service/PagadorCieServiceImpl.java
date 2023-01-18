@@ -199,12 +199,12 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els pagadors postals");
-			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
-			List<PagadorPostalEntity> p = pagadorCieReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			var p = pagadorCieReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

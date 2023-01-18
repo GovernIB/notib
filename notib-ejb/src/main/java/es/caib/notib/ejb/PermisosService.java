@@ -92,5 +92,4 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	public void evictGetOrgansAmbPermis() {
 
 	}
-
 }

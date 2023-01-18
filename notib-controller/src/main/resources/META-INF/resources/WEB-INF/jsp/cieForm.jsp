@@ -65,8 +65,7 @@
 		<form:hidden path="id"/>
 		<div class="row">
 			<div class="col-md-2">
-				<not:inputSelect name="organismePagadorCodi"
-								 textKey="operadorpostal.form.camp.organismePagador" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>
+				<not:inputSelect name="organismePagadorCodi" required="true" textKey="operadorpostal.form.camp.organismePagador" inline="false" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 			<div class="col-md-2">
 				<not:inputText name="nom" textKey="cie.form.camp.centreImpressio"/>

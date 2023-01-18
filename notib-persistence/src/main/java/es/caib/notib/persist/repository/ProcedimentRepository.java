@@ -1,6 +1,7 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.ProcedimentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -128,6 +129,9 @@ public interface ProcedimentRepository extends JpaRepository<ProcedimentEntity, 
 //	ProcedimentEntity findById(Long procedimentId);
 	
 	ProcedimentEntity findByCodi(String codi);
+
+	@Query("from ProcedimentEntity p where p.organGestor = :organGestor and p.actiu = true")
+	List<ProcedimentEntity> findByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 	
 	ProcedimentEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
