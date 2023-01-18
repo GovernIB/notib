@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
+import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,8 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private IntegracioHelper integracioHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private MonitorIntegracioRepository monitorRepository;
 	
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
@@ -76,4 +79,17 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
+
+	@Transactional
+	@Override
+	public void netejarMonitor() {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			monitorRepository.deleteAll();
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 }

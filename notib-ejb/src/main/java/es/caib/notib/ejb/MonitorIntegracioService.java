@@ -39,6 +39,10 @@ public class MonitorIntegracioService extends AbstractService<es.caib.notib.logi
 	public Map<String, Integer> countErrors() {
 		return getDelegateService().countErrors();
 	}
-	
 
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public void netejarMonitor() {
+		getDelegateService().netejarMonitor();
+	}
 }

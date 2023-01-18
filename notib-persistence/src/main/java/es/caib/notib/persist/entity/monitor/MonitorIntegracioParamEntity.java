@@ -8,6 +8,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -25,7 +26,7 @@ import javax.persistence.Table;
 @EntityListeners(AuditingEntityListener.class)
 public class MonitorIntegracioParamEntity extends AbstractPersistable<Long> {
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "mon_int_id")
     @ForeignKey(name = "NOT_MONINTPARAM_MONINT_FK")
     private MonitorIntegracioEntity monitorIntegracio;

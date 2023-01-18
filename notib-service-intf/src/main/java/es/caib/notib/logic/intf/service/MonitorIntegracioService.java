@@ -45,5 +45,6 @@ public interface MonitorIntegracioService {
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	Map<String, Integer> countErrors();
 
-
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	void netejarMonitor();
 }
