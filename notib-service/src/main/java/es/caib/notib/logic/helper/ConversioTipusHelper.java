@@ -179,6 +179,7 @@ public class ConversioTipusHelper {
 				field("notificacio.referencia", "referenciaNotificacio").
 				field("notificacio.id", "notificacioId").
 				field("csv_uuid", "csvUuid").
+				customize(new EnviamentTableItemMapper()).
 				byDefault().
 				register();
 
@@ -526,6 +527,54 @@ public class ConversioTipusHelper {
 			} else {
 				notificacioEnviamentDto.setEnviant(false);
 			}
+		}
+	}
+
+	public class EnviamentTableItemMapper extends CustomMapper<EnviamentTableEntity, NotEnviamentTableItemDto> {
+		@Override
+		public void mapAtoB(
+				EnviamentTableEntity enviamentTableEntity,
+				NotEnviamentTableItemDto notEnviamentTableItemDto,
+				MappingContext context) {
+			if (enviamentTableEntity.getDestinataris() != null && !enviamentTableEntity.getDestinataris().isEmpty()) {
+				String[] destinataris = enviamentTableEntity.getDestinataris().split("<br>");
+				if (destinataris.length > 0 && !destinataris[0].isEmpty() && destinataris[0].contains(" - ")) {
+					String destinatarisFormat = "";
+					for(String destinatari: destinataris) {
+						destinatarisFormat += getNomLlinatgeNif(destinatari) + "<br>";
+					}
+					if (destinatarisFormat.length() > 4)
+						destinatarisFormat = destinatarisFormat.substring(0, destinatarisFormat.length() - 4);
+					enviamentTableEntity.setDestinataris(destinatarisFormat);
+					notEnviamentTableItemDto.setDestinataris(destinatarisFormat);
+				}
+			}
+		}
+
+		private String getNomLlinatgeNif(String destinatari) {
+			int idxSeparador = destinatari.indexOf(" - ");
+			String destinatariFormat = destinatari;
+			if (idxSeparador != -1) {
+				String nif = null;
+				if (idxSeparador > 0)
+					nif = destinatari.substring(0, idxSeparador);
+				if (destinatari.length() < idxSeparador + 4)
+					return nif;
+				String llinatgeNom = destinatari.substring(idxSeparador + 3, destinatari.length() - 1);
+				String nomLlinatge = llinatgeNom;
+				if (llinatgeNom.contains(", ")) {
+					idxSeparador = llinatgeNom.indexOf(", ");
+					if (idxSeparador != -1) {
+						if (idxSeparador == 0) {
+							nomLlinatge = llinatgeNom.substring(2);
+						} else {
+							nomLlinatge = llinatgeNom.substring(idxSeparador + 2) + " " + llinatgeNom.substring(0, idxSeparador);
+						}
+					}
+				}
+				destinatariFormat = nomLlinatge + (nif != null ? " (" + nif + ")" : "");
+			}
+			return destinatariFormat;
 		}
 	}
 

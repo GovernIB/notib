@@ -138,10 +138,14 @@ public class EnviamentTableHelper {
     ////
 
     private String getEnviamentDestinataris(NotificacioEnviamentEntity enviament) {
-        List<PersonaEntity> destinataris = enviament.getDestinataris();
-        StringBuilder destinatarisNomLlinatges = new StringBuilder();
-        for(PersonaEntity destinatari: destinataris) {
+
+        var destinataris = enviament.getDestinataris();
+        var destinatarisNomLlinatges = new StringBuilder();
+        for(var destinatari: destinataris) {
             destinatarisNomLlinatges.append(destinatari.asDto().getNomFormatted()).append("<br>");
+        }
+        if (destinatarisNomLlinatges.length() > 0) {
+            destinatarisNomLlinatges.delete(destinatarisNomLlinatges.length() - 4, destinatarisNomLlinatges.length());
         }
         return destinatarisNomLlinatges.toString();
     }
