@@ -39,6 +39,7 @@ import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -48,6 +49,7 @@ import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -64,6 +66,8 @@ import java.util.Set;
 public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 
 	public ConversioTipusHelper() {
@@ -93,9 +97,14 @@ public class ConversioTipusHelper {
 //			register();
 		mapperFactory.classMap(NotificacioEntity.class, NotificacioInfoDto.class).
 				field("organGestor.codi", "organGestorCodi").
-				field("organGestor.nom", "organGestorNom").
-				byDefault().
-				register();
+				field("organGestor.nom", "organGestorNom")
+				.customize(
+				new CustomMapper<NotificacioEntity, NotificacioInfoDto>() {
+					public void mapAtoB(NotificacioEntity a, NotificacioInfoDto b, MappingContext context) {
+						DadesUsuari d = cacheHelper.findUsuariAmbCodi(a.getUsuariCodi());
+						b.setUsuariNom(d.getNomSencer());
+					}
+				}).byDefault().register();
 
 		mapperFactory.classMap(EntregaPostalEntity.class, EntregaPostalDto.class).
 				field("domiciliViaTipus", "viaTipus").

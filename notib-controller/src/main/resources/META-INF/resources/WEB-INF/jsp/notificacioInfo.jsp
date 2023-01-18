@@ -242,8 +242,21 @@ $(document).ready(function() {
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.creacio.usuari" /></strong></td>
-							<td>${notificacio.createdBy.nom}
-								(${notificacio.createdBy.codi})</td>
+							<td>
+								<c:choose>
+									<c:when test="${notificacio.usuariWeb}">
+										<span>${notificacio.createdBy.nom} (${notificacio.createdBy.codi})</span>
+									</c:when>
+									<c:otherwise>
+										<div>
+											<strong><spring:message code="notificacio.info.dada.creacio.usuari.app" /></strong><span>${notificacio.createdBy.nom} (${notificacio.createdBy.codi})</span>
+										</div>
+										<div>
+											<strong><spring:message code="notificacio.info.dada.creacio.usuari.usr" /></strong><span>${notificacio.usuariNom} (${notificacio.usuariCodi})</span>
+										</div>
+									</c:otherwise>
+								</c:choose>
+							</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="notificacio.info.dada.enviament.data" /></strong></td>
