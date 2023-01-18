@@ -72,8 +72,8 @@
         }
 
         .th-checkbox {
-            padding-right: 1px !important;
-            max-width: 5px !important;
+            padding-right: 10px !important;
+            max-width: 10px !important;
         }
 
         .th-boto-accions {
@@ -273,6 +273,12 @@
                             {{if notificacio}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
+                    <th data-col-name="comunicacio" data-template="#cellPermisComunicacioTemplate" class="th-checkbox">
+                        <spring:message code="procediment.permis.columna.comunicacio.arbre"/>
+                        <script id="cellPermisComunicacioTemplate" type="text/x-jsrender">
+                            {{if comunicacio}}<span class="fa fa-check"></span>{{/if}}
+                        </script>
+                    </th>
                     <th data-col-name="administration" data-template="#cellPermisGestioTemplate" class="th-checkbox">
                         <spring:message code="procediment.permis.columna.gestio"/>
                         <script id="cellPermisGestioTemplate" type="text/x-jsrender">
@@ -285,10 +291,10 @@
                             {{if comuns}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
-                    <th data-col-name="comuns" data-template="#cellPermisComunsTemplate" class="th-checkbox">
+                    <th data-col-name="comunicacioSir" data-template="#comunicacioSirTemplate" class="th-checkbox">
                         <spring:message code="organgestor.permis.columna.coms.sir"/>
-                        <script id="cellPermisComunsTemplate" type="text/x-jsrender">
-                            {{if comuns}}<span class="fa fa-check"></span>{{/if}}
+                        <script id="comunicacioSirTemplate" type="text/x-jsrender">
+                            {{if comunicacioSir}}<span class="fa fa-check"></span>{{/if}}
                         </script>
                     </th>
                     <th data-col-name="administrador" data-template="#cellPermisAdministradorTemplate" data-class="organ-admin" class="th-checkbox">
