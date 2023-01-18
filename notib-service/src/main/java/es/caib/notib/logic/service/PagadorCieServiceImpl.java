@@ -229,8 +229,10 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
 			List<PagadorCieEntity> pagadors = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
-			List<PagadorCieEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
-			pagadors.addAll(pagadorsPare);
+			if (!e.getDir3Codi().equals(organCodi)) {
+				List<PagadorCieEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				pagadors.addAll(pagadorsPare);
+			}
 			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorCieEntity> p = new ArrayList<>();
 			for (PagadorCieEntity pagador : pagadors) {

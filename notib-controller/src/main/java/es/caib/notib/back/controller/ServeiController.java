@@ -81,6 +81,16 @@ public class ServeiController extends BaseUserController{
 		return "serveiListPage";
 	}
 
+	@RequestMapping(value = "/filtre/codi/{serveiCodi}", method = RequestMethod.GET)
+	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String serveiCodi, Model model) {
+
+		this.currentFiltre = SERVEIS_FILTRE;
+		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		procSerFiltreCommand.setCodi(serveiCodi);
+		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
+		return "redirect:/servei";
+	}
+
 	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
 	public String getByOrganGestor(HttpServletRequest request, @PathVariable String organCodi, Model model) {
 
@@ -89,6 +99,7 @@ public class ServeiController extends BaseUserController{
 		this.currentFiltre = SERVEIS_FILTRE_MODAL;
 		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
+		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
@@ -105,7 +116,7 @@ public class ServeiController extends BaseUserController{
 		List<CodiValorEstatDto> organsGestors = new ArrayList<>();
 		List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
 		for (OrganGestorDto organ: organsDto) {
-			organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
+			organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 		}
 		return organsGestors;
 	}

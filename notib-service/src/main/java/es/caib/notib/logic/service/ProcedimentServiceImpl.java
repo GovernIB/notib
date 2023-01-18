@@ -979,9 +979,24 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 		return organGestorsAmbPermis != null && !organGestorsAmbPermis.isEmpty();
 	}
 
-	private List<CodiValorOrganGestorComuDto> procedimentsToCodiValorOrganGestorComuDto(List<ProcSerCacheDto> procediments) {
-		return procediments.stream().map(p -> new CodiValorOrganGestorComuDto(p.getId().toString(), getProcedimentCodiNom(p.getCodi(), p.getNom()), getOrganCodi(p), p.isComu())).collect(Collectors.toList());
-	}
+	private List<CodiValorOrganGestorComuDto> procedimentsToCodiValorOrganGestorComuDto(List<ProcedimentEntity> procediments) {
+
+		List<CodiValorOrganGestorComuDto> response = new ArrayList<>();
+		for (ProcedimentEntity procediment : procediments) {
+			String nom = procediment.getCodi();
+			if (procediment.getNom() != null && !procediment.getNom().isEmpty()) {
+				nom += " - " + procediment.getNom();
+			}
+			String organCodi = procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "";
+			response.add(CodiValorOrganGestorComuDto.builder()
+					.id(procediment.getId())
+					.codi(procediment.getCodi())
+					.valor(nom)
+					.organGestor(organCodi)
+					.comu(procediment.isComu())
+					.build());
+		}
+		return response;	}
 	private String getOrganCodi(ProcSerCacheDto procediment) {
 		return procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "";
 	}

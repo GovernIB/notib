@@ -332,7 +332,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			List<CodiValorEstatDto> organsGestors = new ArrayList<CodiValorEstatDto>();
 			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
 			for (OrganGestorEntity organ: organs) {
-				organsGestors.add(new CodiValorEstatDto(organ.getCodi(), organ.getCodi() + " - " + organ.getNom(), organ.getEstat()));
+				organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 			}
 			return organsGestors;
 		} finally {
@@ -1393,30 +1393,47 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
+			List<CodiValorEstatDto> organsGestors = new ArrayList<>();
+			List<OrganGestorEntity> organsGestorsDisponibles = new ArrayList<>();
+
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<OrganGestorEntity> organsGestorsEntityDisponibles = new ArrayList<>();
+
 			if (RolEnumDto.NOT_SUPER.equals(rol)) {
-				organsGestorsEntityDisponibles = organGestorRepository.findAll();
+				organsGestorsDisponibles = organGestorRepository.findAll();
 			} else if (RolEnumDto.NOT_ADMIN.equals(rol)) {
-				organsGestorsEntityDisponibles = organGestorRepository.findByEntitat(entitat);
+				organsGestorsDisponibles = organGestorRepository.findByEntitat(entitat);
 			} else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organ);
-				organsGestorsEntityDisponibles = organGestorRepository.findByCodiIn(organs);
+				organsGestorsDisponibles = organGestorRepository.findByCodiIn(organs);
+			} else if (RolEnumDto.tothom.equals(rol)) {
+				organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(
+						usuari,
+						entitat,
+						PermisEnum.CONSULTA);
 			}
-			if (organsGestorsEntityDisponibles != null) {
-				Collections.sort(organsGestorsEntityDisponibles, Comparator.comparing(OrganGestorEntity::getNom));
-				return organsGestorsEntityDisponibles.stream().map(o -> new CodiValorEstatDto(o.getId().toString(), getOrganCodiNom(o.getCodi(), o.getNom()), o.getEstat())).collect(Collectors.toList());
-			}
+			Collections.sort(organsGestorsDisponibles, new Comparator<OrganGestorEntity>() {
+				@Override
+				public int compare(OrganGestorEntity p1, OrganGestorEntity p2) {
+					return p1.getNom().compareTo(p2.getNom());
+				}
+			});
 
-			if (RolEnumDto.tothom.equals(rol)) {
-				var organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(usuari, entitat, PermisEnum.CONSULTA);
-				Collections.sort(organsGestorsDisponibles, Comparator.comparing(OrganGestorEntity::getNom));
-				return organsGestorsDisponibles.stream().map(o -> new CodiValorEstatDto(o.getId().toString(), getOrganCodiNom(o.getCodi(), o.getNom()) , o.getEstat())).collect(Collectors.toList());
+			for (OrganGestorEntity organGestor : organsGestorsDisponibles) {
+				String nom = organGestor.getCodi();
+				if (organGestor.getNom() != null && !organGestor.getNom().isEmpty()) {
+					nom += " - " + organGestor.getNom();
+				}
+				organsGestors.add(CodiValorEstatDto.builder()
+						.id(organGestor.getId())
+						.codi(organGestor.getCodi())
+						.valor(nom)
+						.estat(organGestor.getEstat())
+						.build());
 			}
-			//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
-			//		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
-			//		organsGestorsDisponibles.remove(organEntitat);
-        	return new ArrayList<>();
+//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
+//		OrganGestorDto organEntitat = organGestorService.findByCodi(entitatActual.getId(), entitatActual.getDir3Codi());
+//		organsGestorsDisponibles.remove(organEntitat);
+			return organsGestors;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -259,14 +259,22 @@ $(document).ready(function() {
 				</div>
 			</c:if>
 			<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2"/>
-			<div id="entrega-cie-form">
-				<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
-								 optionTextAttribute="text" required="true" emptyOption="true"
-								 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
-				<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
-								 optionTextAttribute="text" required="true" emptyOption="true"
-								 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
-			</div>
+			<c:choose>
+				<c:when test="${not empty operadorPostalList && not empty cieList}">
+					<not:inputCheckbox name="entregaCieActiva" textKey="organgestor.form.camp.entregacie" labelSize="2"/>
+					<div id="entrega-cie-form">
+						<not:inputSelect name="operadorPostalId" optionItems="${operadorPostalList}" optionValueAttribute="id" labelSize="2"
+										 optionTextAttribute="text" required="true" emptyOption="true"
+										 textKey="entitat.form.camp.operadorpostal" placeholderKey="entitat.form.camp.operadorpostal" optionMinimumResultsForSearch="0"/>
+						<not:inputSelect name="cieId" optionItems="${cieList}" optionValueAttribute="id" labelSize="2"
+										 optionTextAttribute="text" required="true" emptyOption="true"
+										 textKey="entitat.form.camp.cie" placeholderKey="entitat.form.camp.cie" optionMinimumResultsForSearch="0"/>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<not:inputCheckbox disabled="true" info="true" messageInfo="organgestor.form.camp.entregacie.no.configurada" name="entregaCieActiva" labelSize="2" generalClass="row" textKey="organgestor.form.camp.entregacie"/>
+				</c:otherwise>
+			</c:choose>
 			<div class="loading-screen" style="text-align: center; width:100%; hight: 80px;">
 				<div class="processing-icon" style="position: relative; top: 40px; text-align: center;">
 					<span class="fa fa-spin fa-circle-o-notch  fa-3x" style="color: burlywood;margin-top: 10px;"></span>

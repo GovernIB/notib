@@ -73,7 +73,7 @@ $(document).ready(function() {
 				<not:inputSelect name="organGestor" placeholderKey="notificacio.list.filtre.camp.organGestor" inline="true" emptyOption="true" optionMinimumResultsForSearch="0"/>
 			</div>
 		</c:if>
-		<div class="col-md-1">
+		<div class="col-md-2">
 			<not:inputSelect name="estat" optionItems="${procedimentEstats}" optionValueAttribute="value" optionTextKeyAttribute="text" inline="true" emptyOption="true"
 							 placeholderKey="organgestor.list.columna.estat" textKey="organgestor.list.columna.estat" required="true" labelSize="0"/>
 		</div>
@@ -117,7 +117,16 @@ $(document).ready(function() {
 		<tr>
 			<th data-col-name="id" data-visible="false" width="4%">#</th>
 			<th data-col-name="codi"><spring:message code="procediment.list.columna.codi"/></th>
-			<th data-col-name="nom"><spring:message code="procediment.list.columna.nom"/></th>
+			<th data-col-name="nom" data-template="#cellNom">
+				<spring:message code="procediment.list.columna.nom"/>
+				<script id="cellNom" type="text/x-jsrender">
+					{{if ${isModal}}}
+						<a href="<c:url value='/servei/filtre/codi/{{:codi}}'/>" target="_blank"> {{:nom}}</a>
+					{{else}}
+						{{:nom}}
+					{{/if}}
+				</script>
+			</th>
 
 			<c:if test="${not simplifiedView}">
 			<th data-col-name="organGestorEstat" data-visible="false"></th>

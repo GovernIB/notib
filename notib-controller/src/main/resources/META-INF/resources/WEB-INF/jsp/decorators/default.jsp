@@ -299,24 +299,27 @@ body {
 								</c:when>
 
 								<c:when test="${isRolActualUsuari}">
-									<div class="btn-group">
+									<c:if test="${permisNotificacioMenu || permisComunicacioMenu || permisComunicacioSirMenu}">
 										<div class="btn-group">
-											<button id="m_env" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
-												<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
-											</button>
-											<ul class="dropdown-menu">
-												<c:if test="${permisNotificacioMenu}">
-													<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
-												</c:if>
-												<c:if test="${permisComunicacioMenu}">
-													<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
-												</c:if>
-												<c:if test="${permisComunicacioSirMenu}">
-													<li><a id="me_sir" href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
-												</c:if>
-											</ul>
+											<div class="btn-group">
+												<button id="m_env" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+													<span class="fa fa-plus"></span>&nbsp;<spring:message code="decorator.menu.alta.enviament"/>&nbsp;<span class="caret caret-white"></span>
+												</button>
+												<ul class="dropdown-menu">
+													<c:if test="${permisNotificacioMenu}">
+														<li><a id="me_notificacio" href="<c:url value="/notificacio/new/notificacio"/>"><spring:message code="decorator.menu.alta.enviament.notificacio"/></a></li>
+													</c:if>
+													<c:if test="${permisComunicacioMenu}">
+														<li><a id="me_comunicacio" href="<c:url value="/notificacio/new/comunicacio"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio"/></a></li>
+													</c:if>
+													<c:if test="${permisComunicacioSirMenu}">
+														<li><a id="me_sir" href="<c:url value="/notificacio/new/comunicacioSIR"/>"><spring:message code="decorator.menu.alta.enviament.comunicacio.sir"/></a></li>
+													</c:if>
+												</ul>
+											</div>
 										</div>
-									</div>
+									</c:if>
+
 									<div class="btn-group">
 										<button id="m_massiu" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.notificacio.massiva"/>&nbsp;<span class="caret caret-white"></span></button>
 										<ul class="dropdown-menu">

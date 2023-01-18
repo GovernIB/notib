@@ -233,12 +233,12 @@
             </div>
 --%>
             <div>
-                <a id="procediments" class="btn btn-default"  href="" data-toggle="modal" data-maximized="true" data-adjust-height="false" data-height="650px">
+                <a id="procediments" class="btn btn-default"  href="" data-toggle="modal" data-maximized="true">
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.procediment"/>
                 </a>
             </div>
             <div>
-                <a id="serveis" class="btn btn-default" href="" data-toggle="modal" data-maximized="true" data-adjust-height="false" data-height="650px">
+                <a id="serveis" class="btn btn-default" href="" data-toggle="modal" data-maximized="true">
                     <span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.servei"/>
                 </a>
             </div>
