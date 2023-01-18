@@ -7,7 +7,8 @@
 		<pattern>/nodeco*</pattern>
 		<pattern>/ws*</pattern>
 		<pattern>/api/services*</pattern>
-		<pattern>/hola*</pattern>
+		<pattern>/log/download</pattern>
+		<pattern>/log/download/*</pattern>
 		<!--pattern>/notificacio/rest*</pattern>
 		<pattern>/test/rest*</pattern-->
 	</excludes>
