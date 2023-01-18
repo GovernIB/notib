@@ -190,7 +190,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 	@SuppressWarnings("unchecked")
 	private Map<String,Object> documentMetadadesUuid(String identificador) {
 		/*
-		 * Les URLs de consulta son les següents:
+		 * Les URLs de consulta de metadades son les següents:
 		 *   https://intranet.caib.es/concsv/rest/metadata/uuid/{IDENTIFICADOR}
 		 *   https://intranet.caib.es/concsv/rest/metadata/{CSV}
 		 * A on:
@@ -202,7 +202,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (!url.endsWith("/")) {
 				url += "/";
 			}
-			url += "rest/metadata/uuid/";
+			url += "metadata/uuid/";
 
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
@@ -233,7 +233,7 @@ public class ArxiuPluginConcsvImpl extends ArxiuPluginCaib implements IArxiuPlug
 			if (!url.endsWith("/")) {
 				url += "/";
 			}
-			url += "rest/metadata/";
+			url += "metadata/uuid/";
 
 			WebResource webResource = getVersioImprimibleClient().
 					resource(url + identificador);
