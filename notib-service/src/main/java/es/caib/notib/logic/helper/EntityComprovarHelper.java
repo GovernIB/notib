@@ -445,6 +445,7 @@ public class EntityComprovarHelper {
 			case COMUNICACIO_SIR: return ExtendedPermission.COMUNICACIO_SIR;
 			case GESTIO: return ExtendedPermission.ADMINISTRATION;
 			case COMUNS: return ExtendedPermission.COMUNS;
+			case ADMIN: return ExtendedPermission.ADMINISTRADOR;
 			default: return null;
 		}
 	}
@@ -455,9 +456,11 @@ public class EntityComprovarHelper {
 			case "CONSULTA": return ExtendedPermission.READ;
 			case "PROCESSAR": return ExtendedPermission.PROCESSAR;
 			case "NOTIFICACIO": return ExtendedPermission.NOTIFICACIO;
+			case "COMUNICACIO": return ExtendedPermission.COMUNICACIO;
 			case "GESTIO": return ExtendedPermission.ADMINISTRATION;
 			case "COMUNICACIO_SIR": return ExtendedPermission.COMUNICACIO_SIR;
 			case "COMUNS": return ExtendedPermission.COMUNS;
+			case "ADMIN": return ExtendedPermission.ADMINISTRADOR;
 			default: return null;
 		}
 	}
@@ -467,8 +470,10 @@ public class EntityComprovarHelper {
 		case CONSULTA: return "READ";
 		case PROCESSAR: return "PROCESSAR";
 		case NOTIFICACIO: return "NOTIFICACIO";
+		case COMUNICACIO: return "COMUNICACIO";
 		case GESTIO: return "ADMINISTRATION";
 		case COMUNICACIO_SIR: return "COMUNIACIO_SIR";
+		case ADMIN: return "ADMINISTRADOR";
 		default: return null;
 		}
 	}

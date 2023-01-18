@@ -17,6 +17,7 @@ import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.logic.helper.*;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private PagadorPostalRepository pagadorPostalReposity;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private PaginacioHelper paginacioHelper;
 	@Resource
@@ -208,7 +211,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
 			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {

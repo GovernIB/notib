@@ -35,6 +35,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
+	List<PagadorPostalEntity> findByEntitatAndOrganismePagadorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);

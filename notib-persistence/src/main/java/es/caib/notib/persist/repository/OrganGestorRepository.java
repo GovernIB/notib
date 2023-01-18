@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -19,6 +20,8 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, Long> {
+
+	Optional<OrganGestorEntity> findById(Long id);
 
 	List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public List<OrganGestorEntity> findByEntitatAndEstat(EntitatEntity entitat, OrganGestorEstatEnum estat);
@@ -33,10 +36,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	List<OrganGestorEntity> findExtingidesByEntitatDir3Codi(@Param("entitatDir3Codi") String entitatDir3Codi);
 
 	@Modifying
-	@Query( " update " +
-			"    OrganGestorEntity og " +
-			" set " +
-			"     og.estat = :estat")
+	@Query("update OrganGestorEntity og  set og.estat = :estat")
 	void updateAllStatus(@Param("estat") OrganGestorEstatEnum estat);
 
 	@Query("select count(og) " +

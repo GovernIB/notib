@@ -96,6 +96,12 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 //	public boolean organGestorEnUs(Long organId) {
 //		return getDelegateService().organGestorEnUs(organId);
 //	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public boolean organGestorEnUs(Long organId) {
+		return getDelegateService().organGestorEnUs(organId);
+	}
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN"})
@@ -213,8 +219,8 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres) {
-		return getDelegateService().generarArbreOrgans(entitat, filtres);
+	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres, boolean isAdminOrgan, OrganGestorDto organActual) {
+		return getDelegateService().generarArbreOrgans(entitat, filtres, isAdminOrgan, organActual);
 	}
 
 	@Override
@@ -233,6 +239,12 @@ public class OrganGestorService extends AbstractService<es.caib.notib.logic.intf
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public OrganGestorDto getOrganNou(String codiSia) {
 		return getDelegateService().getOrganNou(codiSia);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis) {
+		return getDelegateService().hasPermisOrgan(entitatId, organCodi, permis);
 	}
 
 //	@Override

@@ -128,6 +128,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private ProcSerSyncHelper procSerSyncHelper;
+	@Resource
+	private NotificacioRepository notificacioRepository;
+	@Resource
+	private ProcSerRepository procSerRepository;
 	@Autowired
 	private OrganGestorCachable organGestorCachable;
 	@Resource
@@ -145,8 +149,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Resource
 	private IntegracioHelper integracioHelper;
 
-	List<OrganGestorDto> sotredOrgans = new ArrayList<>();
-
+	private List<OrganGestorDto> sotredOrgans = new ArrayList<>();
+	private List<String> codisAmbPermis = new ArrayList<>();
+	private boolean isAdminOrgan;
+	private OrganGestorDto organActual;
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<String, ProgresActualitzacioDto>();
 
 	@Getter
@@ -293,9 +299,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findAll() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<OrganGestorEntity> organs = organGestorRepository.findAll();
+			var organs = organGestorRepository.findAll();
 			return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -305,13 +311,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Override
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> findByEntitat(Long entitatId) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
-			return conversioTipusHelper.convertirList(
-					organs, 
-					OrganGestorDto.class);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var organs = organGestorRepository.findByEntitat(entitat);
+			return conversioTipusHelper.convertirList(organs, OrganGestorDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1405,7 +1410,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 			if (RolEnumDto.tothom.equals(rol)) {
 				var organsGestorsDisponibles = recuperarOrgansPerProcedimentAmbPermis(usuari, entitat, PermisEnum.CONSULTA);
-				Collections.sort(organsGestorsDisponibles, Comparator.comparing(OrganGestorCacheDto::getNom));
+				Collections.sort(organsGestorsDisponibles, Comparator.comparing(OrganGestorEntity::getNom));
 				return organsGestorsDisponibles.stream().map(o -> new CodiValorEstatDto(o.getId().toString(), getOrganCodiNom(o.getCodi(), o.getNom()) , o.getEstat())).collect(Collectors.toList());
 			}
 			//		// Eliminam l'òrgan gestor entitat  --> Per ara el mantenim, ja que hi ha notificacions realitzades a l'entitat
@@ -1443,7 +1448,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres) {
+	public Arbre<OrganGestorDto> generarArbreOrgans(EntitatDto entitat, OrganGestorFiltreDto filtres, boolean isAdminOrgan, OrganGestorDto organActual) {
+
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -1454,9 +1460,15 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 			sotredOrgans = findByEntitat(entitat.getId());
 			organsList = new ArrayList<>();
-			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(entitat.getDir3Codi()), OrganGestorDto.class));
+			this.isAdminOrgan = isAdminOrgan;
+			this.organActual = organActual;
+			String codiArrel = isAdminOrgan ? organActual.getCodi() : entitat.getDir3Codi();
+			if (isAdminOrgan) {
+				addCodisOrgansAmbPermis(entitat);
+			}
+			ArbreNode<OrganGestorDto> arrel = new ArbreNode<>(null, conversioTipusHelper.convertir(organs.get(codiArrel), OrganGestorDto.class));
 			arbre.setArrel(arrel);
-			arrel.setFills(generarFillsArbre(organs, arrel, entitat.getDir3Codi(), filtres));
+			arrel.setFills(generarFillsArbre(organs, arrel, codiArrel, filtres));
 			if (!Strings.isNullOrEmpty(filtres.getCodiPare())) {
 				filtres.filtrarOrganPare(arbre.getArrel());
 			}
@@ -1477,17 +1489,18 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (organ == null) {
 			return nodes;
 		}
-		OrganGestorDto organExsitent = buscarOrgan(organ.getCodi());
-		OrganGestorDto o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
+		OrganGestorDto organExistent = buscarOrgan(organ.getCodi());
+		OrganGestorDto o = organExistent != null ? organExistent : conversioTipusHelper.convertir(organ, OrganGestorDto.class);
 		organsList.add(o);
 		List<String> fills = organ.getFills();
 		if (fills == null || fills.isEmpty()) {
 			return nodes;
 		}
+
 		for (String fill: fills) {
 			OrganismeDto node = organs.get(fill);
-			organExsitent = buscarOrgan(node.getCodi());
-			o = organExsitent != null ? organExsitent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
+			organExistent = buscarOrgan(node.getCodi());
+			o = organExistent != null ? organExistent : conversioTipusHelper.convertir(node, OrganGestorDto.class);
 			ArbreNode<OrganGestorDto> actual = new ArbreNode<>(pare, o);
 			boolean ok = filtres.filtresOk(o);
 			if (!filtres.isEmpty() && ok) {
@@ -1498,9 +1511,31 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			if (nets != null && nets.isEmpty() && !ok) {
 				continue;
 			}
+			if (isAdminOrgan && !checkPermisOrgan(actual)) {
+				continue;
+			}
 			nodes.add(actual);
 		}
+
 		return nodes;
+	}
+
+	private boolean checkPermisOrgan(ArbreNode<OrganGestorDto>  node) {
+
+		if (node.getFills().isEmpty()) {
+			return codisAmbPermis.contains(node.dades.getCodi());
+		}
+
+		var ok = false;
+		var fills = node.getFills();
+		for (var fill : fills) {
+			ok = codisAmbPermis.contains(fill.getDades().getCodi()) || checkPermisOrgan(fill);
+		}
+		return ok;
+	}
+
+	private void addCodisOrgansAmbPermis(EntitatDto entitat) {
+		codisAmbPermis = organigramaHelper.getCodisOrgansGestorsFillsByOrgan(entitat.getDir3Codi(), organActual.getCodi());
 	}
 
 	private OrganGestorDto buscarOrgan(String codi) {
@@ -1520,6 +1555,25 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<OrganGestorDto> organs = pluginHelper.unitatsPerCodi(codiSia);
 		return organs != null && !organs.isEmpty() ? organs.get(0) : new OrganGestorDto();
 	}
+
+	@Override
+	public boolean hasPermisOrgan(Long entitatId, String organCodi, PermisEnum permis) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			String user = SecurityContextHolder.getContext().getAuthentication().getName();
+			List<CodiValorDto> codis = permisosService.getOrgansAmbPermis(entitatId, user, permis);
+			for (CodiValorDto c : codis) {
+				if (c.equals(organCodi)) {
+					return true;
+				}
+			}
+			return false;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
 
 //	@Override
 //	@Transactional(readOnly = true)

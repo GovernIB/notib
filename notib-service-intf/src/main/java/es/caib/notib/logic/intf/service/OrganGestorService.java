@@ -82,6 +82,9 @@ public interface OrganGestorService {
 
 //	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
 //	public boolean organGestorEnUs(Long organId);
+
+	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+	boolean organGestorEnUs(Long organId);
 	
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	public List<OrganGestorDto> findAll();
