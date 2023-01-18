@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -20,9 +21,11 @@ import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
+import es.caib.notib.logic.intf.service.PermisosService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -60,6 +63,8 @@ public class OrganGestorArbreController extends BaseUserController {
     private PagadorCieService cieService;
     @Autowired
     private AplicacioService aplicacioService;
+    @Autowired
+    private PermisosService permisosService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -129,23 +134,26 @@ public class OrganGestorArbreController extends BaseUserController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/organgestor/{codiSia}")
-    public String getOrgan(HttpServletRequest request, @PathVariable("codiSia") String codiSia, Model model) {
+    public String getOrgan(HttpServletRequest request, @PathVariable("codi") String codi, Model model) {
 
         try {
             model.addAttribute("desactivarAvisos", true);
-            var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-            var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codiSia);
+            EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
-            var cieList = cieService.findNoCaducatsByEntitat(entitat);
+            List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("cieList", cieList);
-            var o = organService.findByCodi(entitat.getId(), codiSia);
-            if (o == null) {
-                throw new NotFoundException(codiSia, OrganGestorDto.class);
+            OrganGestorDto o = organService.findByCodi(entitat.getId(), codi);
+            String usr = SecurityContextHolder.getContext().getAuthentication().getName();
+            //o = o == null ? organService.getOrganNou(codiSia) : o;
+            if (o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, codi, PermisEnum.ADMIN))) {
+                throw new NotFoundException(codi, OrganGestorDto.class);
             }
-            o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
+            o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
             omplirModel(model, entitat, o);
         } catch (Exception ex) {
-            var msg = getMessage(request, "organgestor.detall.error", new Object[] {
+            String msg = getMessage(request, "organgestor.detall.error", new Object[] {
                     "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
                             "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
                             "\t\t\t</button>\n" +

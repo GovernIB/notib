@@ -120,7 +120,7 @@ public class PagadorCieServiceTest extends BaseServiceTestV2 {
 	public void errorSiAccesAplCreate() {
 
 		authenticationTest.autenticarUsuari("apl");
-		pagadorCieService.create(1L, createPagadorCie);
+		pagadorCieService.upsert(1L, createPagadorCie);
 	}
 	
 //	@Test(expected = AccessDeniedException.class)

@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalFiltreDto;
@@ -13,6 +14,7 @@ import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
@@ -22,6 +24,7 @@ import es.caib.notib.persist.repository.PagadorPostalRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +58,8 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private PermisosService permisosService;
 
 	@Override
 	@Transactional
@@ -221,18 +226,27 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi) {
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
 			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
-
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
-			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
-			List<PagadorPostalEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
-			p.addAll(pagadorsPare);
+			List<PagadorPostalEntity> pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+			if (!e.getDir3Codi().equals(organCodi)) {
+				List<PagadorPostalEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				pagadors.addAll(pagadorsPare);
+			}
+			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			List<PagadorPostalEntity> p = new ArrayList<>();
+			for (PagadorPostalEntity pagador : pagadors) {
+				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
+					continue;
+				}
+				p.add(pagador);
+			}
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

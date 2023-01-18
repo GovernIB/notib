@@ -25,6 +25,8 @@ public interface PagadorCieRepository extends JpaRepository<PagadorCieEntity, Lo
 
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
 
+	List<PagadorCieEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
+
 	@Query("SELECT n.entregaCie.cie FROM EntitatEntity n where n = :entitat")
 	PagadorCieEntity obtenirPagadorsEntitat(@Param("entitat") EntitatEntity entitat);
 

@@ -6,6 +6,7 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFiltreDto;
@@ -13,19 +14,23 @@ import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.PagadorCieService;
+import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorCieEntity;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
+import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorCieRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,11 +52,15 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	@Resource
 	private PaginacioHelper paginacioHelper;
 	@Resource
+	private OrganGestorRepository organGestorRepository;
+	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
+	@Resource
+	private PermisosService permisosService;
 
 	@Override
 	@Transactional
@@ -207,6 +216,47 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			log.debug("Consulta de tots els pagadors postals");
+			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
+//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
+			List<PagadorCieEntity> pagadors = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+			List<PagadorCieEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+			pagadors.addAll(pagadorsPare);
+			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			List<PagadorCieEntity> p = new ArrayList<>();
+			for (PagadorCieEntity pagador : pagadors) {
+				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
+					continue;
+				}
+				p.add(pagador);
+			}
+
+			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	private List<PagadorCieEntity> findOperadorsPare(EntitatDto entitat, String codi) {
+
+		List<PagadorCieEntity> operadors = new ArrayList<>();
+		OrganGestorEntity o = organGestorRepository.findByCodi(codi);
+		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		List<PagadorCieEntity> p = pagadorCieReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) ) {
+			operadors = findOperadorsPare(entitat, o.getCodiPare());
+		}
+		p.addAll(operadors);
+		return p;
 	}
 
 	@Override

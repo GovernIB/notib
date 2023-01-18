@@ -75,6 +75,12 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 	}
 
 	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
+	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
+		return getDelegateService().findNoCaducatsByEntitatAndOrgan(entitat, organCodi, isAdminOrgan);
+	}
+
+	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public PaginaDto<CieDto> findAllPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAllPaginat(paginacioParams);
