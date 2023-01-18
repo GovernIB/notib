@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1668153867375-2
+      author: limit
+      changes:
+        - sql: "UPDATE NOT_PAGADOR_POSTAL  SET ORGAN_GESTOR = (SELECT nog.id FROM NOT_ORGAN_GESTOR nog WHERE DIR3_CODI IS NOT NULL AND DIR3_CODI = codi) WHERE ORGAN_GESTOR IS null;
+              ALTER TABLE not_pagador_postal DROP COLUMN dir3_codi;"

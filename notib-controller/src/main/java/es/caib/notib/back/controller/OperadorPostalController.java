@@ -89,21 +89,16 @@ public class OperadorPostalController extends BaseUserController{
 	@RequestMapping(value = "/newOrModify", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid OperadorPostalCommand operadorPostalCommand, BindingResult bindingResult, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+			var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 			model.addAttribute("organsGestors", organsGestors);
 			return "operadorPostalForm";
 		}
-		String url = "redirect:pagadorsPostals";
-		String msg = operadorPostalCommand.getId() != null ?  "operadorpostal.controller.modificat.ok" : "operadorpostal.controller.creat.ok";
-		if (operadorPostalCommand.getId() != null) {
-			operadorPostalService.update(operadorPostalCommand.asDto());
-			return getModalControllerReturnValueSuccess(request, url, msg);
-		}
-		OperadorPostalDataDto dto = operadorPostalCommand.asDto();
-		operadorPostalService.create(entitatActual.getId(), dto);
-		return getModalControllerReturnValueSuccess(request, url, msg);
+		var msg = operadorPostalCommand.getId() != null ? "operadorpostal.controller.modificat.ok" : "operadorpostal.controller.creat.ok";
+		var dto = operadorPostalCommand.asDto();
+		operadorPostalService.upsert(entitatActual.getId(), dto);
+		return getModalControllerReturnValueSuccess(request, "redirect:pagadorsPostals", msg);
 	}
 	
 	@RequestMapping(value = "/{operadorPostalId}", method = RequestMethod.GET)

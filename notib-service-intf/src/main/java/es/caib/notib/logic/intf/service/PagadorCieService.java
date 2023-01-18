@@ -23,35 +23,19 @@ public interface PagadorCieService {
 
 	/**
 	 * Crea un nou pagador cie.
-	 * @param entitatId	
-	 * 				Informació de l'entitat actual.
-	 * @param cie
-	 * 				Informació del pagador cie a crear
+	 * @param entitatId Informació de l'entitat actual.
+	 * @param cie Informació del pagador cie a crear
 	 * @return	El pagador cie creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	CieDto create(Long entitatId, CieDataDto cie);
-
-	/**
-	 * Actualitza la informació d'un pagador cie.
-	 * 
-	 * @param cie	
-	 * 			Pagador cie a modificar amb els nous valors
-	 * @return
-	 * @throws NotFoundException
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	CieDto update(CieDataDto cie) throws NotFoundException;
+	CieDto upsert(Long entitatId, CieDataDto cie);
 
 	/**
 	 * Esborra el pagador cie amb el mateix id que l'especificat.
 	 * 
-	 * @param id
-	 *            Atribut id del pagador cie a esborrar.
+	 * @param id Atribut id del pagador cie a esborrar.
 	 * @return El pagador cie esborrat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws NotFoundException 
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	CieDto delete(Long id) throws NotFoundException;
@@ -59,8 +43,7 @@ public interface PagadorCieService {
 	/**
 	 * Consulta un pagador cie donat el seu codi.
 	 * 
-	 * @param id
-	 *            Codi del procediment a trobar.
+	 * @param id Codi del procediment a trobar.
 	 * @return El pagador cie amb el codi especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
@@ -69,12 +52,9 @@ public interface PagadorCieService {
 	/**
 	 * Consulta de pagadors cie segons els paràmetres del filtre.
 	 * 
-	 * @param entitatId
-	 * 				Informació de l'entitat actual.
-	 * @param filtre
-	 *            	Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            	Paràmetres per a dur a terme la paginació del resultats.
+	 * @param entitatId Informació de l'entitat actual.
+	 * @param filtre Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER')")
@@ -111,8 +91,7 @@ public interface PagadorCieService {
 	/**
 	 * Llistat amb tots els pagadros cie paginats.
 	 * 
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors cie.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")

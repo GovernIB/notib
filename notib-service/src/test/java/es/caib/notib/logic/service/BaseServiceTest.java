@@ -256,14 +256,14 @@ public class BaseServiceTest {
 					id = entitatCreada.getId();
 				} else if(element instanceof OperadorPostalDto) {
 					autenticarUsuari("admin");
-					OperadorPostalDto entitatCreada = operadorPostalService.create(
+					OperadorPostalDto entitatCreada = operadorPostalService.upsert(
 							entitatId,
 							(OperadorPostalDto)element);
 					elementsCreats.add(entitatCreada);
 					id = entitatCreada.getId();
 				} else if(element instanceof CieDto) {
 					autenticarUsuari("admin");
-					CieDto entitatCreada = pagadorCieService.create(
+					CieDto entitatCreada = pagadorCieService.upsert(
 							entitatId,
 							(CieDto)element);
 					pagadorCieId = entitatCreada.getId();

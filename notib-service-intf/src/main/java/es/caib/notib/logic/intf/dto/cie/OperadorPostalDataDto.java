@@ -12,8 +12,8 @@ import java.util.Date;
 public class OperadorPostalDataDto extends AuditoriaDto implements Serializable {
 
 	private Long id;
-	private String nom;
 	@EqualsAndHashCode.Include
+	private String nom;
 	private String organismePagadorCodi;
 	@EqualsAndHashCode.Include
 	private String contracteNum;

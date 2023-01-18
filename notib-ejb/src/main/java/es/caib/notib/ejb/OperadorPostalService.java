@@ -29,19 +29,8 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public OperadorPostalDto create(
-			Long entitatId,
-			OperadorPostalDataDto postal) {
-		return getDelegateService().create(
-				entitatId, 
-				postal);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public OperadorPostalDto update(OperadorPostalDataDto postal) throws NotFoundException {
-		return getDelegateService().update(postal);
-	}
+	public OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal) {
+		return getDelegateService().upsert(entitatId, postal);}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
@@ -57,14 +46,8 @@ public class OperadorPostalService extends AbstractService<es.caib.notib.logic.i
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(
-			Long entitatId, 
-			OperadorPostalFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findAmbFiltrePaginat(
-				entitatId, 
-				filtre, 
-				paginacioParams);
+	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override

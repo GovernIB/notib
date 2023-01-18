@@ -98,13 +98,13 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 		entitatCreate = EntitatItemTest.getRandomInstance();
 
-		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "", new Date(0), null).build());
-		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
-				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
-				null).build());
+//		PagadorCieEntity cie = cieRepository.save(PagadorCieEntity.builder("A04013511", "", new Date(0), null).build());
+//		PagadorPostalEntity operadorPostal = operadorPostalRepository.save(PagadorPostalEntity.builder("A04013511",
+//				"", "pccNum_" + 0, new Date(0), "ccFac_" + 0,
+//				null).build());
 
 		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
-		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
+//		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
 
 		notificacioCreator.addObject("notificacio", notificacioCreator.getRandomInstance());
 		notificacioCreator.addRelated("notificacio", "procediment", procedimentCreator);

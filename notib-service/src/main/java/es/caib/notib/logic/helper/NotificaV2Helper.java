@@ -592,7 +592,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					EntregaCieEntity entregaCieEntity = procedimentNotificacio.getEntregaCie();
 					if (entregaCieEntity.getOperadorPostal() != null) {
 						OrganismoPagadorPostal pagadorPostal = new OrganismoPagadorPostal();
-						pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganismePagadorCodi());
+						pagadorPostal.setCodigoDIR3Postal(entregaCieEntity.getOperadorPostal().getOrganGestor().getCodi());
 						pagadorPostal.setCodClienteFacturacionPostal(entregaCieEntity.getOperadorPostal().getFacturacioClientCodi());
 						pagadorPostal.setNumContratoPostal(entregaCieEntity.getOperadorPostal().getContracteNum());
 						pagadorPostal.setFechaVigenciaPostal(toXmlGregorianCalendar(entregaCieEntity.getOperadorPostal().getContracteDataVig()));
@@ -600,7 +600,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					}
 					if (entregaCieEntity.getCie() != null) {
 						OrganismoPagadorCIE pagadorCie = new OrganismoPagadorCIE();
-						pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganismePagadorCodi());
+						pagadorCie.setCodigoDIR3CIE(entregaCieEntity.getCie().getOrganGestor().getCodi());
 						pagadorCie.setFechaVigenciaCIE(toXmlGregorianCalendar(entregaCieEntity.getCie().getContracteDataVig()));
 						entregaPostal.setOrganismoPagadorCIE(pagadorCie);
 					}

@@ -275,30 +275,22 @@ public class ConversioTipusHelper {
 			.customize(
 				new CustomMapper<PagadorCieEntity, CieTableItemDto>() {
 					public void mapAtoB(PagadorCieEntity a, CieTableItemDto b, MappingContext context) {
-						if (a.getOrganismePagador() == null) {
-							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - ORGAN GESTOR NO TROBAT");
-						} else {
-							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - " + a.getOrganismePagador().getNom());
-						}
+						b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
 					}
 				})
 			.byDefault()
 			.register();
 
-		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalDto.class).
-			field("entitat.id", "entitatId").
-			byDefault().
-			register();
+		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalDto.class)
+				.field("entitat.id", "entitatId")
+				.field("organGestor.codi", "organismePagadorCodi").byDefault().register();
 
 		mapperFactory.classMap(PagadorPostalEntity.class, OperadorPostalTableItemDto.class)
 			.customize(
 				new CustomMapper<PagadorPostalEntity, OperadorPostalTableItemDto>() {
 					public void mapAtoB(PagadorPostalEntity a, OperadorPostalTableItemDto b, MappingContext context) {
-						if (a.getOrganismePagador() == null) {
-							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - ORGAN GESTOR NO TROBAT");
-						} else {
-							b.setOrganismePagador(a.getOrganismePagadorCodi() + " - " + a.getOrganismePagador().getNom());
-						}
+						b.setOrganismePagador(a.getOrganGestor() != null ? a.getOrganGestor().getCodi() + " - " + a.getOrganGestor().getNom() : "ORGAN GESTOR NO TROBAT");
+
 					}
 				})
 			.byDefault()

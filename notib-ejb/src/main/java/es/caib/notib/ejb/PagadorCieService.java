@@ -29,14 +29,8 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public CieDto create(Long entitatId, CieDataDto cie) {
-		return getDelegateService().create(entitatId, cie);
-	}
-
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public CieDto update(CieDataDto cie) throws NotFoundException {
-		return getDelegateService().update(cie);
+	public CieDto upsert(Long entitatId, CieDataDto cie) {
+		return getDelegateService().upsert(entitatId, cie);
 	}
 
 	@Override
@@ -53,14 +47,8 @@ public class PagadorCieService extends AbstractService<es.caib.notib.logic.intf.
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(
-			Long entitatId, 
-			CieFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findAmbFiltrePaginat(
-				entitatId, 
-				filtre, 
-				paginacioParams);
+	public PaginaDto<CieTableItemDto> findAmbFiltrePaginat(Long entitatId, CieFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override

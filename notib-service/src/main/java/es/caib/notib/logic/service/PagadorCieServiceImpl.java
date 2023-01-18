@@ -1,6 +1,7 @@
 package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
@@ -51,35 +52,32 @@ public class PagadorCieServiceImpl implements PagadorCieService{
 	private OrganigramaHelper organigramaHelper;
 	@Resource
 	private MetricsHelper metricsHelper;
-	
+
 	@Override
 	@Transactional
-	public CieDto create(Long entitatId, CieDataDto cie) {
+	public CieDto upsert(Long entitatId, CieDataDto cie) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Creant un nou pagador cie (pagador=" + cie + ")");
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			PagadorCieEntity p = PagadorCieEntity.builder(cie.getOrganismePagadorCodi(), cie.getNom(), cie.getContracteDataVig(), entitat).build();
+			OrganGestorEntity organGestor = null;
+
+			if (!Strings.isNullOrEmpty(cie.getOrganismePagadorCodi())) {
+				organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, cie.getOrganismePagadorCodi());
+			}
+			PagadorCieEntity p;
+			if (cie.getId() == null) {
+				p = PagadorCieEntity.builder().organGestor(organGestor).nom(cie.getNom()).contracteDataVig(cie.getContracteDataVig()).entitat(entitat).build();
+			} else {
+				log.debug("Actualitzant pagador cie (pagador=" + cie + ")");
+				p = entityComprovarHelper.comprovarPagadorCie(cie.getId());
+				if (organGestor != null) {
+					p.setOrganGestor(organGestor);
+				}
+				p.setContracteDataVig(cie.getContracteDataVig());
+			}
 			PagadorCieEntity pagadorCieEntity = pagadorCieReposity.save(p);
-			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
-		} finally {
-			metricsHelper.fiMetrica(timer);
-		}
-	}
-
-	@Override
-	@Transactional
-	public CieDto update(CieDataDto cie) throws NotFoundException {
-
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		try {
-			log.debug("Actualitzant pagador cie (pagador=" + cie + ")");
-			//TODO: Si es tothom comprovar que és administrador d'Organ i que indica Organ al pagadorCIE i que es administrador de l'organ indicat
-			PagadorCieEntity pagadorCieEntity = entityComprovarHelper.comprovarPagadorCie(cie.getId());
-			pagadorCieEntity.update(cie.getOrganismePagadorCodi(), cie.getContracteDataVig());
-			pagadorCieReposity.save(pagadorCieEntity);
 			return conversioTipusHelper.convertir(pagadorCieEntity, CieDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);

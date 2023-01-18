@@ -51,8 +51,12 @@ import es.caib.notib.logic.intf.exception.SistemaExternException;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.GrupEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
+import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.cie.EntregaCieEntity;
+import es.caib.notib.persist.entity.cie.PagadorCieEntity;
+import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.persist.repository.AvisRepository;
 import es.caib.notib.persist.repository.EntregaCieRepository;
 import es.caib.notib.persist.repository.GrupRepository;
@@ -246,45 +250,44 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			metricsHelper.fiMetrica(timer);
 		}
 	}
-	
-//	@Override
-//	@Transactional(readOnly = true)
-//	public boolean organGestorEnUs(Long organId) {
-//
-//		Timer.Context timer = metricsHelper.iniciMetrica();
-//		try {
-//			//Compravacions en ús
-//			OrganGestorEntity organGestor = organGestorRepository.findById(organId).orElse(null);
-//			if (organGestor == null) {
-//				return true; // No en ús pq no existeix!!
-//			}
-//			if (OrganGestorEstatEnum.V.equals(organGestor.getEstat())) {
-//				return true;
-//			}
-//			if (notificacioRepository.countByOrganGestor(organGestor) > 0) {
-//				return true;
-//			}
-//			List<ProcSerEntity> procedimentsOrganGestor = procSerRepository.findByOrganGestorId(organId);
-//			if (procedimentsOrganGestor != null && !procedimentsOrganGestor.isEmpty()) {
-//				return true;
-//			}
-//			List<GrupEntity> grupsByOrganGestor = grupReposity.findByOrganGestorId(organId);
-//			if (grupsByOrganGestor != null && !grupsByOrganGestor.isEmpty()) {
-//				return true;
-//			}
-//			List<PagadorCieEntity> pagCiesByOrganGestor = pagadorCieReposity.findByOrganGestorId(organId);
-//			if (pagCiesByOrganGestor != null && !pagCiesByOrganGestor.isEmpty()) {
-//				return true;
-//			}
-//			List<PagadorPostalEntity> pagPostalByOrganGestor = pagadorPostalReposity.findByOrganGestorId(organId);
-//			if (pagPostalByOrganGestor != null && !pagPostalByOrganGestor.isEmpty()) {
-//				return true;
-//			}
-//			return false;
-//		} finally {
-//			metricsHelper.fiMetrica(timer);
-//		}
-//	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean organGestorEnUs(Long organId) {
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			//Compravacions en ús
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
+			if (organGestor == null)
+				return true; // No en ús pq no existeix!!
+
+			if (OrganGestorEstatEnum.V.equals(organGestor.getEstat()))
+				return true;
+
+			if (notificacioRepository.countByOrganGestor(organGestor) > 0)
+				return true;
+
+			List<ProcSerEntity> procedimentsOrganGestor = procSerRepository.findByOrganGestorId(organId);
+			if (procedimentsOrganGestor != null && !procedimentsOrganGestor.isEmpty())
+				return true;
+
+			List<GrupEntity> grupsByOrganGestor = grupReposity.findByOrganGestorId(organId);
+			if (grupsByOrganGestor != null && !grupsByOrganGestor.isEmpty())
+				return true;
+
+			List<PagadorCieEntity> pagCiesByOrganGestor = pagadorCieReposity.findByOrganGestor(organGestor);
+			if (pagCiesByOrganGestor != null && !pagCiesByOrganGestor.isEmpty())
+				return true;
+
+			List<PagadorPostalEntity> pagPostalByOrganGestor = pagadorPostalReposity.findByOrganGestorId(organId);
+			if (pagPostalByOrganGestor != null && !pagPostalByOrganGestor.isEmpty())
+				return true;
+
+			return false;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
 	
 	@Override
 	@Transactional(readOnly = true)

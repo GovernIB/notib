@@ -22,35 +22,19 @@ import java.util.List;
 public interface OperadorPostalService {
 
 	/**
-	 * Crea un nou pagador postal.
-	 * @param entitatId	
-	 * 				Informació de l'entitat actual.
-	 * @param postal
-	 * 				Informació del pagador postal a crear
+	 * Crea un nou pagador postal. @param entitatId Informació de l'entitat actual.
+	 * @param postal Informació del pagador postal a crear
 	 * @return	El pagador postal creat
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	OperadorPostalDto create(Long entitatId, OperadorPostalDataDto postal);
-
-	/**
-	 * Actualitza la informació d'un pagador postal.
-	 * 
-	 * @param postal	
-	 * 			Pagador postal a modificar amb els nous valors
-	 * @return
-	 * @throws NotFoundException
-	 */
-	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	OperadorPostalDto update(OperadorPostalDataDto postal) throws NotFoundException;
+	OperadorPostalDto upsert(Long entitatId, OperadorPostalDataDto postal);
 
 	/**
 	 * Esborra el pagador postal amb el mateix id que l'especificat.
 	 * 
-	 * @param id
-	 *            Atribut id del pagador postal a esborrar.
+	 * @param id Atribut id del pagador postal a esborrar.
 	 * @return El pagador postal esborrat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	OperadorPostalDto delete(Long id) throws NotFoundException;
@@ -58,8 +42,7 @@ public interface OperadorPostalService {
 	/**
 	 * Consulta un pagador postal donat el seu codi.
 	 * 
-	 * @param id
-	 *            Codi del procediment a trobar.
+	 * @param id Codi del procediment a trobar.
 	 * @return El pagador postal amb el codi especificat o null si no s'ha trobat.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom') or hasRole('NOT_APL')")
@@ -68,12 +51,9 @@ public interface OperadorPostalService {
 	/**
 	 * Consulta de pagadors postal segons els paràmetres del filtre.
 	 * 
-	 * @param entitatId
-	 * 				Informació de l'entitat actual.
-	 * @param filtre
-	 *            	Paràmetres per a filtrar els resultats.
-	 * @param paginacioParams
-	 *            	Paràmetres per a dur a terme la paginació del resultats.
+	 * @param entitatId Informació de l'entitat actual.
+	 * @param filtre Paràmetres per a filtrar els resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina amb els pagadors postals.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
@@ -113,8 +93,7 @@ public interface OperadorPostalService {
 	/**
 	 * Llistat amb tots els pagadros postals paginats.
 	 * 
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @param paginacioParams Paràmetres per a dur a terme la paginació del resultats.
 	 * @return La pàgina de pagadors postals.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")

@@ -1,6 +1,7 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEntity, Long> {
 
-	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
+//	PagadorPostalEntity findByOrganismePagadorCodi(String organismePagador);
 	List<PagadorPostalEntity> findByEntitat(EntitatEntity entitat);
 
 	@Query("SELECT n.entregaCie.operadorPostal FROM EntitatEntity n where n = :entitat")
@@ -34,13 +35,15 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	List<PagadorPostalEntity> findByContracteDataVigGreaterThanEqual(Date llindar);
 
 	List<PagadorPostalEntity> findByEntitatAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, Date llindar);
+	List<PagadorPostalEntity> findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(EntitatEntity entitat, OrganGestorEntity organ, Date llindar);
+
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
 
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and b.entitat = :entitat")
 	Page<PagadorPostalEntity> findByCodiDir3AndNumContacteNotNullFiltrePaginatAndEntitat(
@@ -54,7 +57,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	@Query(	"from " +
 			"    PagadorPostalEntity b " +
 			"where " +
-			"	 (:esNullFiltreOrganismePagador = true or lower(b.organismePagadorCodi) like lower('%'||:organismePagadorCodi||'%')) " +
+			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
 			"and (b.organGestor.codi in (:organsGestors)) " +
 			"and b.entitat = :entitat")
