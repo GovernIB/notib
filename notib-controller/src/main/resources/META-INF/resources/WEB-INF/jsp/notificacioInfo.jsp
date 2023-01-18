@@ -56,22 +56,24 @@ $(function() {
     });
 });
 
-var eventTipus = [];
+let eventTipus = [];
 <c:forEach var="tipus" items="${eventTipus}">
 eventTipus["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
-var notificacioApp = "${notificacio.tipusUsuari == 'APLICACIO'}";
+let notificacioApp = "${notificacio.tipusUsuari == 'APLICACIO'}";
 $(document).ready(function() {
 	let $tableEvents = $('#table-events');
 	$tableEvents.on('rowinfo.dataTable', function(e, td, rowData) {
 
-			$(td).empty();
-			$(td).append('<textarea style="width:100%" rows="10">' + rowData['errorDescripcio'] + '</textarea>');
+		$(td).empty();
+		let data = rowData["errorDescripcio"];
+		data = data ? data : "";
+		$(td).append('<textarea style="width:100%" rows="10">' + data + '</textarea>');
 	});
 	$tableEvents.on('draw.dt', function(e, settings) {
-		var api = new $.fn.dataTable.Api(settings);
+		let api = new $.fn.dataTable.Api(settings);
 		api.rows().every(function(rowIdx, tableLoop, rowLoop) {
-			var data = this.data();
+			let data = this.data();
 			if (!data.error || data.errorDescripcio == null) {
 			$('td:last-child', this.node()).empty();
 			}
