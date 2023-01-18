@@ -30,6 +30,7 @@ import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.entity.*;
 import es.caib.notib.persist.repository.*;
 import es.caib.notib.plugin.registre.RespostaJustificantRecepcio;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import lombok.Builder;
@@ -1799,6 +1800,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		} 
 		if (notificacio.getUsuariCodi().length() > 64) {
 			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.codi.longitud.max"));
+		}
+		DadesUsuari dades = cacheHelper.findUsuariAmbCodi(notificacio.getUsuariCodi());
+		if (dades == null || Strings.isNullOrEmpty(dades.getCodi())) {
+			return setRespostaError(messageHelper.getMessage("error.validacio.usuari.no.trobat"));
 		}
 		// Número d'expedient
 		if (notificacio.getNumExpedient() != null && notificacio.getNumExpedient().length() > 80) {
