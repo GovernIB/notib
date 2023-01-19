@@ -643,59 +643,57 @@ function loadOrgansGestors(urlCercaUnitats){
     let codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
     let codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
 
-
-    if ((codi == null || codi == "") &&
-        (denominacio == null || denominacio == "") &&
-        (codiComunitat == null || codiComunitat == "")) {
+    if ((codi || denominacio) && !codiComunitat || codiComunitat && !codi && !denominacio || !codi && !denominacio && !codiComunitat) {
         alert(textMessages['notificacio.form.dir3.cercar.noMinimOrgansFiltre']);
         return false;
-    } else {
-        $(".loading-screen").show();
-        $.ajax({
-            type: 'GET',
-            url: urlCercaUnitats + '?codi='+codi.trim()+ '&denominacio=' + denominacio + '&nivellAdministracio=' + nivellAdmin +
-                                    '&comunitatAutonoma=' + codiComunitat + '&provincia=' + codiProvincia + '&municipi=' + codiLocalitat,
-            success: (data) => {
-
-                let list_html = '';
-                $("#resultatsTotal").removeClass('hidden');
-                if (data.length === 0) {
-                    $("#total").text("0");
-                } else {
-                    $.each(data, (i, item) => {
-                        let enviamentTipus = $('input#enviamentTipus').val();
-                        let local = ($('#organigrama').val().indexOf(item.codi) != -1) && !isPermesComunicacionsSirPropiaEntitat;
-                        let clase = (i % 2 == 0 ? 'even' : 'odd');
-                        let socSir = (item.sir ? textMessages['comu.si'] : textMessages['comu.no']);
-                        let comSir = enviamentTipus === 'COMUNICACIO_SIR' && !local && item.sir;
-                        if (enviamentTipus === 'COMUNICACIO_SIR' && !comSir) {
-                            clase += ' unselectable';
-                        }
-                        list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + item.nom + '" data-cif="' + item.cif + '">' +
-                            '<td width="85%">' + item.codi + ' - ' + item.nom + '</td>' +
-                            '<td>' + (socSir) + '</td>' +
-                            '<td>';
-                        if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir) {
-                            list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
-                        } else if (item.sir) {
-                            list_html += '<div style="cursor:pointer; color:#AAA;" title="' + textMessages["notificacio.sir.emprar.valib"] + '"><span  class="fa fa-warning text-danger" ></span> '
-                                + textMessages["notificacio.sir.emprar.valib.text"] + '</div>';
-                        }
-                        list_html += '</td></tr>';
-                    });
-                }
-                $("#rOrgans").html(list_html);
-                $("#total").text(data.length);
-                $(".loading-screen").hide();
-            },
-            error: () => {
-                console.log("error obtenint les administracions...");
-                $(".loading-screen").hide();
-            }
-        });
     }
-};
 
+    $(".loading-screen").show();
+    $.ajax({
+        type: 'GET',
+        url: urlCercaUnitats + '?codi='+codi.trim()+ '&denominacio=' + denominacio + '&nivellAdministracio=' + nivellAdmin +
+            '&comunitatAutonoma=' + codiComunitat + '&provincia=' + codiProvincia + '&municipi=' + codiLocalitat,
+        success: (data) => {
+
+            let list_html = '';
+            $("#resultatsTotal").removeClass('hidden');
+            if (data.length === 0) {
+                $("#total").text("0");
+            } else {
+                $.each(data, (i, item) => {
+                    let enviamentTipus = $('input#enviamentTipus').val();
+                    let local = ($('#organigrama').val().indexOf(item.codi) != -1) && !isPermesComunicacionsSirPropiaEntitat;
+                    let clase = (i % 2 == 0 ? 'even' : 'odd');
+                    let socSir = (item.sir ? textMessages['comu.si'] : textMessages['comu.no']);
+                    let comSir = enviamentTipus === 'COMUNICACIO_SIR' && !local && item.sir;
+                    if (enviamentTipus === 'COMUNICACIO_SIR' && !comSir) {
+                        clase += ' unselectable';
+                    }
+                    list_html += '<tr class="' + clase + '" data-codi="' + item.codi + '" data-denominacio="' + item.nom + '" data-cif="' + item.cif + '">' +
+                        '<td width="85%">' + item.codi + ' - ' + item.nom + '</td>' +
+                        '<td>' + (socSir) + '</td>' +
+                        '<td>';
+                    if (enviamentTipus === 'NOTIFICACIO' || enviamentTipus === 'COMUNICACIO' || comSir) {
+                        list_html += '<button type="button" class="select btn btn-success">' + textMessages['comu.boto.seleccionar'] + '</button>';
+                    } else if (item.sir) {
+                        list_html += '<div style="cursor:pointer; color:#AAA;" title="' + textMessages["notificacio.sir.emprar.valib"] + '"><span  class="fa fa-warning text-danger" ></span> '
+                            + textMessages["notificacio.sir.emprar.valib.text"] + '</div>';
+                    }
+                    list_html += '</td></tr>';
+                });
+            }
+            $("#rOrgans").html(list_html);
+            $("#total").text(data.length);
+            $(".loading-screen").hide();
+        },
+        error: err => {
+            console.log("error obtenint les administracions...");
+            alert(err);
+            $(".loading-screen").hide();
+        }
+    });
+
+};
 
 
 function mostrarEntregaDeh(className) {

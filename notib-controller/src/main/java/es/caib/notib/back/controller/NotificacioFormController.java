@@ -1,5 +1,6 @@
 package es.caib.notib.back.controller;
 
+import com.google.common.base.Strings;
 import es.caib.notib.back.command.DocumentCommand;
 import es.caib.notib.back.command.EntregapostalCommand;
 import es.caib.notib.back.command.EnviamentCommand;
@@ -256,7 +257,19 @@ public class NotificacioFormController extends BaseUserController {
             @RequestParam(value = "municipi", required = false) String municipi,
             Model model) {
 
-        return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
+        var codiNull = Strings.isNullOrEmpty(codi);
+        var denominacioNull = Strings.isNullOrEmpty(denominacio);
+        var comunitatNull = comunitatAutonoma == null;
+        if (comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+            return new ArrayList<>();
+        }
+        try {
+            return notificacioService.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, null, null, provincia, municipi);
+        } catch (Exception ex) {
+            log.error("Error obtinguent les unitats codi " + codi + " denominacio: " + denominacio + ", nivellAdministracio: " + nivellAdministracio +
+                    ", comunitatAutonoma: " + comunitatAutonoma + ", provincia: " + provincia + ", municipi: " + municipi, ex);
+            throw new RuntimeException(ex.getMessage());
+        }
 
     }
 
