@@ -574,11 +574,20 @@ public class NotificacioTableController extends TableAccionsMassivesController {
 
     @RequestMapping(value = "/{notificacioId}/enviament/{enviamentId}/certificacioDescarregar", method = RequestMethod.GET)
     @ResponseBody
-    public void certificacioDescarregar(HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
+    public void certificacioDescarregar(HttpServletRequest request, HttpServletResponse response, @PathVariable Long notificacioId, @PathVariable Long enviamentId) throws IOException {
 
-        ArxiuDto arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
-        response.setHeader("Set-cookie", "fileDownload=true; path=/");
-        writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        try {
+            var arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        } catch (Exception ex) {
+            log.error("Error descarregant la certificacio", ex);
+            var entitatActual = getEntitatActualComprovantPermisos(request);
+            var enviamentEstat = notificacioService.enviamentRefrescarEstat(entitatActual.getId(), enviamentId);
+            var arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
+            response.setHeader("Set-cookie", "fileDownload=true; path=/");
+            writeFileToResponse(arxiu.getNom(), arxiu.getContingut(), response);
+        }
     }
 
     @RequestMapping(value = "/{notificacioId}/enviament/certificacionsDescarregar", method = RequestMethod.GET)
