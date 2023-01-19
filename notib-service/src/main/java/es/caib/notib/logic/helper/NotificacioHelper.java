@@ -97,7 +97,7 @@ public class NotificacioHelper {
 		log.info(" [REG] Inici registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
 		long startTime = System.nanoTime();
 		double elapsedTime;
-		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+		synchronized(SemaforNotificacio.agafar(notificacioId)) {
 			log.info("Comprovant estat actual notificació (id: " + notificacio.getId() + ")...");
 			NotificacioEstatEnumDto estatActual = notificacio.getEstat();
 			log.info("Estat notificació [Id:" + notificacio.getId() + ", Estat: "+ estatActual + "]");
@@ -141,6 +141,7 @@ public class NotificacioHelper {
 				}
 			}
 		}
+		SemaforNotificacio.alliberar(notificacioId);
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 		log.info(" [REG] Fi registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
@@ -190,12 +191,13 @@ public class NotificacioHelper {
 		notificacioEntity.getEnviaments().addAll(enviamentsCreats);
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
-			synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+			synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
 				if (notificar) {
 					notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				}
 			}
+			SemaforNotificacio.alliberar(notificacioEntity.getId());
 		}
 		return notificacioEntity;
 	}

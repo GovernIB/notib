@@ -467,12 +467,13 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 
 				if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 					logger.info(" [ALTA] Enviament SINCRON notificació [Id: " + notificacioGuardada.getId() + ", Estat: " + notificacioGuardada.getEstat() + "]");
-					synchronized(CreacioSemaforDto.getCreacioSemafor()) {
+					synchronized(SemaforNotificacio.agafar(notificacioGuardada.getId())) {
 						boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioGuardada);
 						if (notificar) {
 							notificaHelper.notificacioEnviar(notificacioGuardada.getId());
 						}
 					}
+					SemaforNotificacio.alliberar(notificacioGuardada.getId());
 				} else {
 					inicialitzaCallbacks(notificacioGuardada);
 				}

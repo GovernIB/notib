@@ -2,7 +2,9 @@ package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
+import es.caib.notib.logic.clases.RegistrarThread;
 import es.caib.notib.logic.helper.IntegracioHelper;
+import es.caib.notib.logic.helper.SemaforNotificacio;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.EntitatService;
@@ -10,13 +12,9 @@ import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.SchedulledService;
 import es.caib.notib.logic.intf.service.ServeiService;
-import es.caib.notib.logic.config.SchedulingConfig;
 import es.caib.notib.persist.entity.EntitatEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.CreacioSemaforDto;
 import es.caib.notib.logic.helper.EnviamentHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
@@ -36,10 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.File;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -106,9 +101,12 @@ public class SchedulledServiceImpl implements SchedulledService {
 				return;
 			}
 			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
+			RegistrarThread thread;
 			for (var pendent : pendents) {
-				log.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent +"]");
-				notificacioHelper.registrarNotificar(pendent);
+				thread = new RegistrarThread(pendent, notificacioHelper);
+				thread.run();
+//				log.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent +"]");
+//				notificacioHelper.registrarNotificar(pendent);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -122,7 +120,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
-			if (isSemaforInUse() || !isTasquesActivesProperty() || !isNotificaEnviamentsActiu() || !notificaHelper.isConnexioNotificaDisponible()) {
+//			if (isSemaforInUse() || !isTasquesActivesProperty() || !isNotificaEnviamentsActiu() || !notificaHelper.isConnexioNotificaDisponible()) {
+			if (isTasquesActivesProperty() && isNotificaEnviamentsActiu() && notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
 				return;
 			}
@@ -135,6 +134,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 			log.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents");
 			for (var pendent: pendents) {
 				log.info("[NOT] >>> Realitzant enviament a Notifica de la notificació: [Id: " + pendent + "]");
+				if (SemaforNotificacio.isSemaforInUse(pendent)) {
+					continue;
+				}
 				notificacioService.notificacioEnviar(pendent);
 			}
 		} finally {
@@ -450,12 +452,5 @@ public class SchedulledServiceImpl implements SchedulledService {
 	}
 	private boolean isActualitzacioServeisActiuProperty() {
 		return configHelper.getConfigAsBoolean("es.caib.notib.actualitzacio.serveis.actiu");
-	}
-	private boolean isSemaforInUse() {
-		boolean inUse = true;
-		synchronized(CreacioSemaforDto.getCreacioSemafor()) {
-			inUse = false;
-		}
-		return inUse;
 	}
 }
