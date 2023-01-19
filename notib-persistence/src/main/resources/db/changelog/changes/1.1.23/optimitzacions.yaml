@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1671453604619-1
+      author: limit
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: NOT_TABLE_ENTITAT_INDEX
+            tableName: not_notificacio_table
+        - createIndex:
+            columns:
+              - column:
+                name: ENTITAT_ID
+            indexName: NOT_TABLE_ENV_ENTITAT_INDEX
+            tableName: not_notificacio_env_table
+        - addColumn:
+            tableName: not_notificacio_table
+            columns:
+              - column:
+                  name: titular
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: notifica_ids
+                  type: varchar(1024 ${varcharUnit})
+              - column:
+                  name: estat_mask
+                  type: int
+        - sql: "
+        UPDATE NOT_NOTIFICACIO_TABLE SET TITULAR = (select listagg(NOM || ' ' || LLINATGE1 || ' ' || LLINATGE2 || ' ' || NIF || ' ' || RAO_SOCIAL,', ') WITHIN GROUP (ORDER BY NOTIFICACIO_ENV_ID) FROM NOT_PERSONA P, NOT_NOTIFICACIO_ENV E WHERE P.ID = E.TITULAR_ID AND E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+        UPDATE NOT_NOTIFICACIO_TABLE SET notifica_ids = (select listagg(E.NOTIFICA_ID, ', ') WITHIN GROUP (ORDER BY E.ID) FROM NOT_NOTIFICACIO_ENV E WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+        UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (select SUM(DISTINCT CASE E.NOTIFICA_ESTAT
+              WHEN 15 THEN 1
+              WHEN 23 THEN 2
+              WHEN 24 THEN 4
+              WHEN 22 THEN 8
+              WHEN 25 THEN 16
+              WHEN 10 THEN 32
+              WHEN 14 THEN 64
+              WHEN 20 THEN 128
+              WHEN 27 THEN 256
+              WHEN 28 THEN 512
+              WHEN 29 THEN 1024
+              ELSE 0 END) as MASK
+          FROM NOT_NOTIFICACIO_ENV_TABLE E 
+          WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+          UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (ESTAT_MASK + 2048) WHERE ESTAT = 15 AND registre_env_intent = 0 AND NOTIFICA_ERROR_DATE IS NULL;
+          INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.log.path', null,'Ruta del fitxer de log', 'GENERAL', 12, 1, 'TEXT');
+          "

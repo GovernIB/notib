@@ -47,10 +47,8 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 
 	@Override
-	public Map<String, NodeDir3> organigramaPerEntitatWs(
-			String pareCodi,
-			Timestamp fechaActualizacion,
-			Timestamp fechaSincronizacion) throws SistemaExternException {
+	public Map<String, NodeDir3> organigramaPerEntitat(String pareCodi, Date fechaActualizacion, Date fechaSincronizacion) throws SistemaExternException {
+
 		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
 		return organigrama;
 	}
@@ -136,16 +134,12 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 	
 	@Override
-	public List<OficinaSIR> oficinesSIRUnitat(
-			String unitat,
-			Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
+	public List<OficinaSir> oficinesSIRUnitat(String unitat, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 		return null;
 	}
 	
 	@Override
-	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException {
+	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
 		return null;
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(UnitatsOrganitzativesMock.class);
 }

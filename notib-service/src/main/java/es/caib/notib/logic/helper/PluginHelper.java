@@ -13,7 +13,6 @@ import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DatosInteresadoWsDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
@@ -65,7 +64,6 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.CodiValorPais;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
-import es.caib.notib.plugin.unitat.OficinaSIR;
 import es.caib.notib.plugin.unitat.UnitatsOrganitzativesPlugin;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.notib.plugin.usuari.DadesUsuariPlugin;
@@ -85,15 +83,12 @@ import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -425,16 +420,16 @@ public class PluginHelper {
 	
 	public List<OficinaDto> oficinesSIRUnitat(String unitatCodi, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 		
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una unitat organitzativa",
+		var info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una unitat organitzativa",
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", unitatCodi));
 		info.setCodiEntitat(getCodiEntitatActual());
 		try {
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
-			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
+			var oficinesTF = getUnitatsOrganitzativesPlugin().oficinesSIRUnitat(unitatCodi, arbreUnitats);
+			var oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al llistar les oficines d'una unitat organitzativa";
+			var errorDescripcio = "Error al llistar les oficines d'una unitat organitzativa";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
@@ -442,20 +437,20 @@ public class PluginHelper {
 	
 	public List<OficinaDto> oficinesSIREntitat(String codiDir3Entitat) throws SistemaExternException {
 
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
+		var info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", codiDir3Entitat));
 		try {
-			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+			var entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
 			if (entitat == null) {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat+ "no trobada");
 			}
 			info.setCodiEntitat(entitat.getCodi());
-			List<OficinaSIR> oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesSIREntitat(codiDir3Entitat);
-			List<OficinaDto> oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
+			var oficinesTF = getUnitatsOrganitzativesPlugin().getOficinesEntitat(codiDir3Entitat);
+			var oficinesSIR = conversioTipusHelper.convertirList(oficinesTF, OficinaDto.class);
 			integracioHelper.addAccioOk(info);
 			return oficinesSIR;
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al llistar les oficines SIR d'una entitat";
+			var errorDescripcio = "Error al llistar les oficines SIR d'una entitat";
 			integracioHelper.addAccioError(info, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
@@ -988,7 +983,7 @@ public class PluginHelper {
 			info.setCodiEntitat(entitat.getCodi());
 			if ("SOAP".equalsIgnoreCase(protocol)) {
 				log.info("Obtenir l'organigrama per entitat SOAP");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitatWs(codiDir3Entitat, null, null);
+				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat, null, null);
 			} else {
 				log.info("Obtenir l'organigrama per entitat REST");
 				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);

@@ -3,6 +3,7 @@
  */
 package es.caib.notib.plugin.unitat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -17,16 +18,21 @@ import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.plugin.SistemaExternException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.ws.BindingProvider;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -40,15 +46,15 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
-	
+
 	private static final String SERVEI_CERCA = "/rest/busqueda/";
 	private static final String SERVEI_CATALEG = "/rest/catalogo/";
 	private static final String SERVEI_UNITAT = "/rest/unidad/";
+	private static final String SERVEI_UNITATS = "/rest/unidades/";
 	private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
-	private static final String WS_CATALEG = "ws/Dir3CaibObtenerCatalogos";
-	private static final String WS_UNITATS = "ws/Dir3CaibObtenerUnidades";
-	private static final String WS_OFICINA = "ws/Dir3CaibObtenerOficinas";
+	private static final String SERVEI_OFICINES = "/rest/oficinas/";
 
 	private final Properties properties;
 
@@ -92,18 +98,23 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					nodeToOrganigrama(fill, organigrama);
 		}
 	}
-	
-	@Override
-	public Map<String, NodeDir3> organigramaPerEntitatWs(
-			String pareCodi,
-			Timestamp fechaActualizacion,
-			Timestamp fechaSincronizacion) throws SistemaExternException {
-		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
+
+	public Map<String, NodeDir3> organigramaPerEntitat(String pareCodi, Date fechaActualizacion, Date fechaSincronizacion) throws SistemaExternException {
+
+		Map<String, NodeDir3> organigrama = new HashMap<>();
 		try {
-			List<UnidadTF> arbol = getObtenerUnidadesService().obtenerArbolUnidades(
-					pareCodi,
-					fechaActualizacion,
-					fechaSincronizacion);
+			List<UnidadTF> arbol = new ArrayList<>();
+			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
+					(fechaActualizacion != null ? "&fechaActualizacion=" + fechaActualizacion : "") +
+					(fechaSincronizacion != null ? "&fechaSincronizacion=" + fechaSincronizacion : ""));
+			logger.debug("URL: " + url);
+			byte[] response = getResponse(url);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			if (response != null && response.length > 0) {
+				arbol = mapper.readValue(response, new TypeReference<List<UnidadTF>>() {});
+			}
 
 			for(UnidadTF unidadTF: arbol){
 				if ("V".equals(unidadTF.getCodigoEstadoEntidad()) || "T".equals(unidadTF.getCodigoEstadoEntidad())) {	// Unitats Vigents o Transitòries 
@@ -124,21 +135,25 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			}
 			return organigrama;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar les unitats organitzatives via WS (" +
-					"pareCodi=" + pareCodi + ")",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS (pareCodi=" + pareCodi + ")", ex);
 		}
 	}
 
 	@Override
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
+
 		try {
-			List<NodeDir3> unitats = new ArrayList<NodeDir3>();
-			List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
-					pareCodi,
-					dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
-					dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
+			List<NodeDir3> unitats = new ArrayList<>();
+			List<UnidadTF> unidades = new ArrayList<>();
+			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
+					(dataActualitzacio != null ? "&fechaActualizacion=" + dataActualitzacio : "") +
+					(dataSincronitzacio != null ? "&fechaSincronizacion=" + dataSincronitzacio : ""));
+			byte[] response = getResponse(url);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			if (response != null && response.length > 0) {
+				unidades = mapper.readValue(response, new TypeReference<List<UnidadTF>>() {});
+			}
 
 			if (unidades != null) {
 				for (UnidadTF unidad : unidades) {
@@ -147,18 +162,28 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			}
 			return unitats;
 		} catch (Exception ex) {
-			throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS ("
-					+ "pareCodi=" + pareCodi + ")", ex);
+			throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS (pareCodi=" + pareCodi + ")", ex);
 		}
 	}
 
 	@Override
-	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
-		UnidadTF unidad = getObtenerUnidadesService().obtenerUnidad(
-				pareCodi,
-				dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
-				dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
-		return unidad != null ? toNodeDir3(unidad) : null;
+	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
+
+		try {
+			UnidadTF unidad = null;
+			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerUnidad?codigo=" + pareCodi +
+					(dataActualitzacio != null ? "&fechaActualizacion=" + dataActualitzacio : "") +
+					(dataSincronitzacio != null ? "&fechaSincronizacion=" + dataSincronitzacio : ""));
+			byte[] response = getResponse(url);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			if (response != null && response.length > 0) {
+				unidad = mapper.readValue(response, UnidadTF.class);
+			}
+			return unidad != null ? toNodeDir3(unidad) : null;
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'ha pogut consultar la unitat organitzativa amb codi (pareCodi=" + pareCodi + ")", ex);
+		}
 	}
 
 	private NodeDir3 toNodeDir3(UnidadTF unidadTF) {
@@ -372,26 +397,32 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					ex);
 		}
 	}
-	
+
 	public List<CodiValorPais> paisos() throws SistemaExternException {
-		List<CodiValorPais> paisos = new ArrayList<CodiValorPais>();
+
 		try {
-			List<CatPais> paisosWs = getCatalogosWsWithSecurityApi().obtenerCatPais();
-			
-			for (CatPais catPaisWs : paisosWs) {
+			List<CodiValorPais> paisos = new ArrayList<>();
+			var url = new URL(getServiceUrl() + SERVEI_CATALEG + "paises?estado=V");
+			log.debug("URL: " + url);
+			var httpConnection = (HttpURLConnection)url.openConnection();
+			httpConnection.setRequestMethod("GET");
+			httpConnection.setDoInput(true);
+			httpConnection.setDoOutput(true);
+			var mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			List<CatPais> paisosRest = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, CatPais.class));
+			for (var catPais : paisosRest) {
 				CodiValorPais pais = new CodiValorPais();
-				pais.setAlfa2Pais(catPaisWs.getAlfa2Pais());
-				pais.setAlfa3Pais(catPaisWs.getAlfa3Pais());
-				pais.setCodiPais(catPaisWs.getCodigoPais());
-				pais.setDescripcioPais(catPaisWs.getDescripcionPais());
+				pais.setAlfa2Pais(catPais.getAlfa2Pais());
+				pais.setAlfa3Pais(catPais.getAlfa3Pais());
+				pais.setCodiPais(catPais.getCodigoPais());
+				pais.setDescripcioPais(catPais.getDescripcionPais());
 				paisos.add(pais);
 			}
+			return paisos;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar els paisos via WS",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar els paisos", ex);
 		}
-		return paisos;
 	}
 	
 	@Override
@@ -501,14 +532,14 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	}
 	
 	@Override
-	public List<OficinaSIR> oficinesSIRUnitat(String unitat, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
+	public List<OficinaSir> oficinesSIRUnitat(String unitat, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 
-		List<OficinaSIR> oficinesSIR = new ArrayList<>();
+		List<OficinaSir> oficinesSIR = new ArrayList<>();
 		List<OficinaTF> oficinesWS = new ArrayList<>();
 		try {
 			getOficinesUnitatSuperior(unitat, oficinesWS, arbreUnitats);
 			for (OficinaTF oficinaTF : oficinesWS) {
-				OficinaSIR oficinaSIR = new OficinaSIR();
+				OficinaSir oficinaSIR = new OficinaSir();
 				oficinaSIR.setCodi(oficinaTF.getCodigo());
 				oficinaSIR.setNom(oficinaTF.getDenominacion());
 				oficinesSIR.add(oficinaSIR);
@@ -518,97 +549,103 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 			throw new SistemaExternException("No s'han pogut consultar les oficines SIR via REST (unitat=" + unitat + ")", ex);
 		}
 	}
-	
-	@Override
-	public List<OficinaSIR> getOficinesSIREntitat(String entitat) throws SistemaExternException {
 
-		List<OficinaSIR> oficinesSIR = new ArrayList<OficinaSIR>();
-		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
+	@Override
+	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
+
+		List<OficinaSir> oficines = new ArrayList<>();
+		List<OficinaTF> oficinesWS = new ArrayList<>();
 		try {
-			oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
-			for (OficinaTF oficinaTF : oficinesWS) {
-				OficinaSIR oficinaSIR = new OficinaSIR();
-				oficinaSIR.setCodi(oficinaTF.getCodigo());
-				oficinaSIR.setNom(oficinaTF.getDenominacion());
-				oficinesSIR.add(oficinaSIR);
+			var url = new URL(getServiceUrl() + SERVEI_OFICINES + "obtenerArbolOficinas?codigo=" + entitat);
+			var response = getResponse(url);
+			var mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			if (response != null && response.length > 0) {
+				oficinesWS = mapper.readValue(response, new TypeReference<List<OficinaTF>>() {});
 			}
-			return oficinesSIR;
+
+			for (var oficinaTF : oficinesWS) {
+				oficines.add(OficinaSir.builder()
+						.codi(oficinaTF.getCodigo())
+						.nom(oficinaTF.getDenominacion())
+						.organCodi(oficinaTF.getCodUoResponsable())
+						.sir(oficinaTF.getSirOfi() != null && !oficinaTF.getSirOfi().isEmpty())
+						.build());
+			}
+			return oficines;
 		} catch (Exception ex) {
 			throw new SistemaExternException("No s'han pogut consultar les oficines SIR via REST (entitat=" + entitat + ")", ex);
 		}
 	}
 
-	private void getOficinesUnitatSuperior(String unitat, List<OficinaTF> oficinesWS, Map<String, OrganismeDto> arbreUnitats) throws MalformedURLException {
+
+	private void getOficinesUnitatSuperior(String unitat, List<OficinaTF> oficinesWS, Map<String, OrganismeDto> arbreUnitats) throws SistemaExternException {
 
 		OrganismeDto arbre = arbreUnitats.get(unitat);
-		List<OficinaTF> oficinesUnitatActual = getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(unitat);
+		List<OficinaTF> oficinesUnitatActual = getObtenerOficinasSIRUnidad(unitat);
+
 		if (arbre != null) {
 			String unitatSuperiorCurrentUnitat = arbre.getPare();
 			// Cerca de forma recursiva a l'unitat superior si l'unitat actual no disposa d'una oficina
 			if (oficinesUnitatActual.isEmpty() && unitatSuperiorCurrentUnitat != null) {
 				getOficinesUnitatSuperior(unitatSuperiorCurrentUnitat, oficinesUnitatActual, arbreUnitats);
-			// No cercar més si l'oficina actual és l'oficina arrel
+				// No cercar més si l'oficina actual és l'oficina arrel
 			} else if (oficinesUnitatActual.isEmpty()) {
-				oficinesWS.addAll(getObtenerOficinasSIRUnidad().obtenerOficinasSIRUnidad(arbre.getCodi()));
+				oficinesWS.addAll(getObtenerOficinasSIRUnidad(arbre.getCodi()));
 			}
 		}
 		oficinesWS.addAll(oficinesUnitatActual);
 	}
 
-	private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
-	
-		final String endpoint = getServiceUrl() + WS_UNITATS;
-		final URL wsdl = new URL(endpoint + "?wsdl");
+	private List<OficinaTF> getObtenerOficinasSIRUnidad(String unitat) throws SistemaExternException {
 
-		Dir3CaibObtenerUnidadesWsService service = new Dir3CaibObtenerUnidadesWsService(wsdl);
-		Dir3CaibObtenerUnidadesWs api = service.getDir3CaibObtenerUnidadesWs();
-
-		configAddressUserPassword(getUsernameServiceUrl(), getPasswordServiceUrl(), endpoint, api);
-
-		return api;
+		try {
+			List<OficinaTF> oficines = new ArrayList<>();
+			var url = new URL(getServiceUrl() + SERVEI_OFICINES + "obtenerOficinasSIRUnidad?codigo=" + unitat);
+			var response = getResponse(url);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			if (response != null && response.length > 0) {
+				oficines = mapper.readValue(response, new TypeReference<List<OficinaTF>>() {});
+			}
+			return oficines;
+		} catch (Exception ex) {
+			throw new SistemaExternException("No s'han pogut consultar les oficines SIR per organ (organ=" + unitat + ")", ex);
+		}
 	}
-	
-	public Dir3CaibObtenerCatalogosWs getCatalogosWsWithSecurityApi() throws Exception {
 
-		final String endpoint = getServiceUrl() + WS_CATALEG;
-		final URL wsdl = new URL(endpoint + "?wsdl");
-		
-		Dir3CaibObtenerCatalogosWsService service = new Dir3CaibObtenerCatalogosWsService(wsdl);
-		Dir3CaibObtenerCatalogosWs api = service.getDir3CaibObtenerCatalogosWs();
 
-		configAddressUserPassword(getUsernameServiceUrl(), getPasswordServiceUrl(), endpoint, api);
-		
-		return api;
+	private byte[] getResponse(URL url) throws IOException {
+
+		var httpConnection = (HttpURLConnection) url.openConnection();
+		httpConnection.setRequestMethod("GET");
+		httpConnection.setRequestProperty("Authorization", createBasicAuthHeaderValue());
+		httpConnection.setDoInput(true);
+		httpConnection.setDoOutput(true);
+		var response = IOUtils.toByteArray(httpConnection.getInputStream());
+		return response;
 	}
-	
-	private Dir3CaibObtenerOficinasWs getObtenerOficinasSIRUnidad() throws MalformedURLException {
-		
-		final String endpoint = getServiceUrl() + WS_OFICINA;
-		final URL wsdl = new URL(endpoint + "?wsdl");
 
-		Dir3CaibObtenerOficinasWsService service = new Dir3CaibObtenerOficinasWsService(wsdl);
-		Dir3CaibObtenerOficinasWs api = service.getDir3CaibObtenerOficinasWs();
+	private String createBasicAuthHeaderValue() {
 
-		configAddressUserPassword(getUsernameServiceUrl(), getPasswordServiceUrl(), endpoint, api);
-
-		return api;
+		var auth = getUsernameServiceUrl() + ":" + getPasswordServiceUrl();
+		var encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
+		var authHeaderValue = "Basic " + new String(encodedAuth);
+		return authHeaderValue;
 	}
 	
 	private String getServiceUrl() {
-		String dir3Url = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
-		if (!dir3Url.endsWith("/"))
-			dir3Url = dir3Url + "/";
-		return dir3Url;
+
+		var dir3Url = properties.getProperty("es.caib.notib.plugin.unitats.dir3.url");
+		return !dir3Url.endsWith("/") ? dir3Url + "/" : dir3Url;
 	}
 	
 	private String getUsernameServiceUrl() {
-		String dir3Username = properties.getProperty("es.caib.notib.plugin.unitats.dir3.username");
-		return dir3Username;
+		return properties.getProperty("es.caib.notib.plugin.unitats.dir3.username");
 	}
 	
 	private String getPasswordServiceUrl() {
-		String dir3Password = properties.getProperty("es.caib.notib.plugin.unitats.dir3.password");
-		return dir3Password;
+		return properties.getProperty("es.caib.notib.plugin.unitats.dir3.password");
 	}
 	
 	public static void configAddressUserPassword(
