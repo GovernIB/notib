@@ -103,10 +103,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
 			RegistrarThread thread;
 			for (var pendent : pendents) {
-				thread = new RegistrarThread(pendent, notificacioHelper);
-				thread.run();
-//				log.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent +"]");
-//				notificacioHelper.registrarNotificar(pendent);
+				if (Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD))) {
+					thread = new RegistrarThread(pendent, notificacioHelper);
+					thread.run();
+				} else {
+					log.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
+					notificacioHelper.registrarNotificar(pendent);
+				}
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
