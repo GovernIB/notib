@@ -91,7 +91,7 @@ public class IntegracioHelper {
 		errorsGroupByCodi.put(INTCODI_GESCONADM,countErrors(INTCODI_GESCONADM));
 		errorsGroupByCodi.put(INTCODI_PROCEDIMENT,countErrors(INTCODI_PROCEDIMENT));
 		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_FIRMASERV));
-		errorsGroupByCodi.put(INTCODI_FIRMASERV,countErrors(INTCODI_VALIDASIG));
+		errorsGroupByCodi.put(INTCODI_VALIDASIG,countErrors(INTCODI_VALIDASIG));
 		return errorsGroupByCodi;
 	}
 
