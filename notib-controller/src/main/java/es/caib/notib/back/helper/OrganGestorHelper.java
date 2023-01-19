@@ -32,9 +32,8 @@ public class OrganGestorHelper {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static List<OrganGestorDto> getOrgansGestorsUsuariActual(
-			HttpServletRequest request,
-			OrganGestorService organGestorService) {
+	public static List<OrganGestorDto> getOrgansGestorsUsuariActual(HttpServletRequest request, OrganGestorService organGestorService) {
+
 		List<OrganGestorDto> organsGestorsUsuariActual = null; 
 		if (organGestorService == null) {
 			organsGestorsUsuariActual = (List<OrganGestorDto>)request.getSession().getAttribute(ORGANS_ACCESSIBLES);
@@ -42,9 +41,7 @@ public class OrganGestorHelper {
 			String rolActual = RolHelper.getRolActual(request);
 			if (rolActual != null && RolEnumDto.NOT_ADMIN_ORGAN.name().equals(rolActual)) {
 				organsGestorsUsuariActual = organGestorService.findAccessiblesByUsuariActual();
-				request.getSession().setAttribute(
-						ORGANS_ACCESSIBLES,
-						organsGestorsUsuariActual);
+				request.getSession().setAttribute(ORGANS_ACCESSIBLES, organsGestorsUsuariActual);
 			}
 		}
 		
@@ -52,10 +49,8 @@ public class OrganGestorHelper {
 			String canviOrgan = request.getParameter(REQUEST_PARAMETER_CANVI_ORGAN);
 			if (canviOrgan != null && !canviOrgan.isEmpty()) {
 				setOrganGestorUsuariActual(request, canviOrgan);
-			} else if (request.getSession().getAttribute(ORGAN_ACTUAL) == null && organsGestorsUsuariActual != null && !organsGestorsUsuariActual.isEmpty()) { 
-				request.getSession().setAttribute(
-						ORGAN_ACTUAL,
-						organsGestorsUsuariActual.get(0));
+			} else if (request.getSession().getAttribute(ORGAN_ACTUAL) == null || organsGestorsUsuariActual != null && !organsGestorsUsuariActual.isEmpty()) {
+				request.getSession().setAttribute(ORGAN_ACTUAL, organsGestorsUsuariActual.get(0));
 			}
 		}
 		return organsGestorsUsuariActual;

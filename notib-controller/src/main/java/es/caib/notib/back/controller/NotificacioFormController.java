@@ -142,6 +142,8 @@ public class NotificacioFormController extends BaseUserController {
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
+    private TipusEnviamentEnumDto tipusEnviament;
+
     @RequestMapping(value = "/new/notificacio")
     public String altaNotificacio(HttpServletRequest request, Model model) {
 
@@ -193,6 +195,7 @@ public class NotificacioFormController extends BaseUserController {
             notificacioCommand.getDocuments()[i].setValidesa(ValidesaEnum.ORIGINAL);
             notificacioCommand.getDocuments()[i].setTipoDocumental(TipusDocumentalEnum.ALTRES);
         }
+        this.tipusEnviament = tipusEnviament;
         notificacioCommand.setEnviamentTipus(tipusEnviament);
         emplenarModelNotificacio(request, model, notificacioCommand);
     }
@@ -227,20 +230,19 @@ public class NotificacioFormController extends BaseUserController {
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getProcedimentsOrgan(HttpServletRequest request, @PathVariable String organId) {
 
-    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-        return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, enviamentTipus);
+        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        return procedimentService.getProcedimentsOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, tipusEnviament);
     }
 
     @RequestMapping(value = "/organ/{organId}/serveis", method = RequestMethod.GET)
     @ResponseBody
     public List<CodiValorOrganGestorComuDto> getServeisOrgan(HttpServletRequest request, @PathVariable String organId) {
 
-    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-        return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, enviamentTipus);
+//    	TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
+        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        return serveiService.getServeisOrganNotificables(entitatActual.getId(), organId.equals("-") ? null : organId, rol, tipusEnviament);
     }
 
     @RequestMapping(value = "/cercaUnitats", method = RequestMethod.GET)
