@@ -1161,32 +1161,29 @@ public class NotificacioServiceImpl implements NotificacioService {
 	// SCHEDULLED METHODS
 	////////////////////////////////////////////////////////////////
 	
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsRegistrar() {
+	public List<Long> getNotificacionsPendentsRegistrar() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			int maxPendents = getRegistreEnviamentsProcessarMaxProperty();
-			PageRequest p = PageRequest.of(0, maxPendents);
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatPendent(pluginHelper.getRegistreReintentsMaxProperty(), p);
-			return pendents;
+			var maxPendents = getRegistreEnviamentsProcessarMaxProperty();
+			var p = PageRequest.of(0, maxPendents);
+			return notificacioRepository.findByNotificaEstatPendent(pluginHelper.getRegistreReintentsMaxProperty(), p);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
 	public List getNotificacionsPendentsEnviar() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			int maxPendents = getNotificaEnviamentsProcessarMaxProperty();
-			PageRequest p = PageRequest.of(0, maxPendents);
-			List<NotificacioEntity> pendents = notificacioRepository.findByNotificaEstatRegistradaAmbReintentsDisponibles(pluginHelper.getNotificaReintentsMaxProperty(), p);
-			return pendents;
+			var maxPendents = getNotificaEnviamentsProcessarMaxProperty();
+			var p = PageRequest.of(0, maxPendents);
+			return notificacioRepository.findByNotificaEstatRegistradaAmbReintentsDisponibles(pluginHelper.getNotificaReintentsMaxProperty(), p);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1196,10 +1193,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public void notificacioEnviar(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
-			List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
+			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
 			// 3 possibles casuístiques
 			// 1. Tots els enviaments a Notifica
 			if (enviamentsSenseNifNoEnviats.isEmpty()) {
@@ -1220,17 +1217,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsRefrescarEstat() {
+	public List<Long> getNotificacionsPendentsRefrescarEstat() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			int maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
-			PageRequest p = PageRequest.of(0, maxPendents);
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByNotificaRefresc(pluginHelper.getConsultaReintentsMaxProperty(), p);
-			return pendents;
+			var maxPendents = getEnviamentActualitzacioEstatProcessarMaxProperty();
+			var p = PageRequest.of(0, maxPendents);
+			return notificacioEnviamentRepository.findByNotificaRefresc(pluginHelper.getConsultaReintentsMaxProperty(), p);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1248,17 +1243,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsPendentsRefrescarEstatRegistre() {
+	public List<Long> getNotificacionsPendentsRefrescarEstatRegistre() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			int maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
-			PageRequest p = PageRequest.of(0, maxPendents);
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByRegistreRefresc(pluginHelper.getConsultaSirReintentsMaxProperty(), p);
-			return pendents;
+			var maxPendents = getEnviamentActualitzacioEstatRegistreProcessarMaxProperty();
+			var p = PageRequest.of(0, maxPendents);
+			return notificacioEnviamentRepository.findByRegistreRefresc(pluginHelper.getConsultaSirReintentsMaxProperty(), p);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1498,14 +1491,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@SuppressWarnings("rawtypes")
 	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsDEHPendentsRefrescarCert() {
+	public List<Long> getNotificacionsDEHPendentsRefrescarCert() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			int maxPendents = getEnviamentDEHActualitzacioCertProcessarMaxProperty();
-			PageRequest p = PageRequest.of(0, maxPendents);
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByDEHAndEstatFinal(pluginHelper.getConsultaReintentsDEHMaxProperty(), p);
-			return pendents;
+			var maxPendents = getEnviamentDEHActualitzacioCertProcessarMaxProperty();
+			var p = PageRequest.of(0, maxPendents);
+			return notificacioEnviamentRepository.findByDEHAndEstatFinal(pluginHelper.getConsultaReintentsDEHMaxProperty(), p);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1514,14 +1506,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@SuppressWarnings("rawtypes")
 	@Transactional(readOnly = true)
 	@Override
-	public List getNotificacionsCIEPendentsRefrescarCert() {
+	public List<Long> getNotificacionsCIEPendentsRefrescarCert() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			int maxPendents = getEnviamentCIEActualitzacioCertProcessarMaxProperty();
-			PageRequest p = PageRequest.of(0, maxPendents);
-			List<NotificacioEnviamentEntity> pendents = notificacioEnviamentRepository.findByCIEAndEstatFinal(pluginHelper.getConsultaReintentsCIEMaxProperty(), p);
-			return pendents;
+			var maxPendents = getEnviamentCIEActualitzacioCertProcessarMaxProperty();
+			var p = PageRequest.of(0, maxPendents);
+			return notificacioEnviamentRepository.findByCIEAndEstatFinal(pluginHelper.getConsultaReintentsCIEMaxProperty(), p);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

@@ -92,8 +92,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			NotificacioEstatEnumDto estat,
 			Pageable pageable);
 
-	@Query(
-			"from " +
+	@Query("select id from " +
 			"    NotificacioEntity " +
 			"where " +
 			"    estat = es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.PENDENT " +
@@ -101,12 +100,9 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			//"and registreData is not null " +
 			"order by " +
 			"    notificaEnviamentData ASC")
-	List<NotificacioEntity> findByNotificaEstatPendent(
-			@Param("maxReintents")Integer maxReintents, 
-			Pageable pageable);
+	List<Long> findByNotificaEstatPendent(@Param("maxReintents")Integer maxReintents, Pageable pageable);
 
-	@Query(
-			"from " +
+	@Query("select id from " +
 			"    NotificacioEntity " +
 			"where " +
 			"    estat in (es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.REGISTRADA, " +
@@ -115,9 +111,7 @@ public interface NotificacioRepository extends JpaRepository<NotificacioEntity, 
 			"and notificaEnviamentData is not null " +
 			"order by " +
 			"    notificaEnviamentData ASC")
-	List<NotificacioEntity> findByNotificaEstatRegistradaAmbReintentsDisponibles(
-			@Param("maxReintents")Integer maxReintents, 
-			Pageable pageable);
+	List<Long> findByNotificaEstatRegistradaAmbReintentsDisponibles(@Param("maxReintents")Integer maxReintents, Pageable pageable);
 
 	@Query(
 			"from " +

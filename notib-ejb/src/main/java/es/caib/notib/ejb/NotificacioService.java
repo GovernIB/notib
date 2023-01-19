@@ -183,14 +183,14 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
-	public List getNotificacionsPendentsRegistrar() {
+	public List<Long> getNotificacionsPendentsRegistrar() {
 		return getDelegateService().getNotificacionsPendentsRegistrar();
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
-	public List getNotificacionsPendentsEnviar() {
+	public List<Long> getNotificacionsPendentsEnviar() {
 		return getDelegateService().getNotificacionsPendentsEnviar();
 	}
 
@@ -203,7 +203,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
-	public List getNotificacionsPendentsRefrescarEstat() {
+	public List<Long> getNotificacionsPendentsRefrescarEstat() {
 		return getDelegateService().getNotificacionsPendentsRefrescarEstat();
 	}
 	
@@ -216,7 +216,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
-	public List getNotificacionsPendentsRefrescarEstatRegistre() {
+	public List<Long> getNotificacionsPendentsRefrescarEstatRegistre() {
 		return getDelegateService().getNotificacionsPendentsRefrescarEstatRegistre();
 	}
 
@@ -366,14 +366,14 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
-	public List getNotificacionsDEHPendentsRefrescarCert() {
+	public List<Long> getNotificacionsDEHPendentsRefrescarCert() {
 		return getDelegateService().getNotificacionsDEHPendentsRefrescarCert();
 	}
 	
 	@SuppressWarnings("rawtypes")
 	@Override
 	@PermitAll
-	public List getNotificacionsCIEPendentsRefrescarCert() {
+	public List<Long> getNotificacionsCIEPendentsRefrescarCert() {
 		return getDelegateService().getNotificacionsCIEPendentsRefrescarCert();
 	}
 

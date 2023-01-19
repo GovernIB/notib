@@ -93,21 +93,21 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 	// 1. Enviament de notificacions pendents al registre i notific@
 	////////////////////////////////////////////////////////////////
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void registrarEnviamentsPendents() throws RegistreNotificaException {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.info("[REG] Cercant notificacions pendents de registrar");
-			List pendents = notificacioService.getNotificacionsPendentsRegistrar();
+			var pendents = notificacioService.getNotificacionsPendentsRegistrar();
 			if (pendents == null || pendents.isEmpty()) {
 				log.info("[REG] No hi ha notificacions pendents de registrar");
 				return;
 			}
 			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
-			for (NotificacioEntity pendent : (List<NotificacioEntity>)pendents) {
-				log.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-				notificacioHelper.registrarNotificar(pendent.getId());
+			for (var pendent : pendents) {
+				log.info("[REG] >>> Realitzant registre de la notificació: [Id: " + pendent +"]");
+				notificacioHelper.registrarNotificar(pendent);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -116,26 +116,25 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 	// 2. Enviament de notificacions registrades a Notific@
 	///////////////////////////////////////////////////////
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void notificaEnviamentsRegistrats() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (isSemaforInUse() || !isTasquesActivesProperty() || !isNotificaEnviamentsActiu() || !notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[NOT] L'enviament de notificacions a Notific@ està deshabilitada");
 				return;
 			}
 			log.info("[NOT] Cercant notificacions registrades pendents d'enviar a Notifica");
-			List pendents = notificacioService.getNotificacionsPendentsEnviar();
+			var pendents = notificacioService.getNotificacionsPendentsEnviar();
 			if (pendents == null | pendents.isEmpty()) {
 				log.info("[NOT] No hi ha notificacions pendents d'enviar a Notific@");
 				return;
 			}
 			log.info("[NOT] Realitzant enviaments a Notifica per a " + pendents.size() + " notificacions pendents");
-			for (NotificacioEntity pendent: (List<NotificacioEntity>)pendents) {
-				log.info("[NOT] >>> Realitzant enviament a Notifica de la notificació: [Id: " + pendent.getId() + ", Estat: " + pendent.getEstat() + "]");
-				notificacioService.notificacioEnviar(pendent.getId());
+			for (var pendent: pendents) {
+				log.info("[NOT] >>> Realitzant enviament a Notifica de la notificació: [Id: " + pendent + "]");
+				notificacioService.notificacioEnviar(pendent);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -144,26 +143,25 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 	// 3. Actualització de l'estat dels enviaments amb l'estat de Notific@
 	//////////////////////////////////////////////////////////////////
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void enviamentRefrescarEstatPendents() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (notificaHelper.isAdviserActiu() || !isTasquesActivesProperty() || !isEnviamentActualitzacioEstatActiu() || !notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[EST] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
 				return;
 			}
 			log.info("[EST] Cercant enviaments pendents de refrescar l'estat de Notifica");
-			List pendents = notificacioService.getNotificacionsPendentsRefrescarEstat();
+			var pendents = notificacioService.getNotificacionsPendentsRefrescarEstat();
 			if (pendents == null || pendents.isEmpty()) {
 				log.info("[EST] No hi ha enviaments pendents de refrescar l'estat de Notifica");
 				return;
 			}
 			log.info("[EST] Realitzant refresc de l'estat de Notifica per a " + pendents.size() + " enviaments");
-			for (NotificacioEnviamentEntity pendent: (List<NotificacioEnviamentEntity>)pendents) {
-				log.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]");
-				notificacioService.enviamentRefrescarEstat(pendent.getId());
+			for (var pendent: pendents) {
+				log.info("[EST] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + pendent + "]");
+				notificacioService.enviamentRefrescarEstat(pendent);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -175,25 +173,22 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void enviamentRefrescarEstatEnviatSir() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (!isTasquesActivesProperty() || !isEnviamentActualitzacioEstatRegistreActiu()) {
 				log.info("[SIR] L'actualització de l'estat dels enviaments amb l'estat de Notific@ està deshabilitada");
 				return;
 			}
 			log.info("[SIR] Cercant enviaments pendents de refrescar l'estat enviat SIR");
-			List pendents = notificacioService.getNotificacionsPendentsRefrescarEstatRegistre();
+			var pendents = notificacioService.getNotificacionsPendentsRefrescarEstatRegistre();
 			if (pendents == null || pendents.isEmpty()) {
 				log.info("[SIR] No hi ha enviaments pendents de refrescar l'estat enviats a SIR");
 				return;
 			}
 			log.info("[SIR] Realitzant refresc de l'estat de enviat SIR per a " + pendents.size() + " enviaments");
-			for (NotificacioEnviamentEntity pendent: (List<NotificacioEnviamentEntity>)pendents) {
-//				log.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent.getId() + ", Estat: " + pendent.getNotificaEstat() + "]" + ", i actualitzant les dades a Notib.");
-//				if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
-//					ConfigHelper.setEntitat(conversioTipusHelper.convertir(pendent.getNotificacio().getEntitat(), EntitatDto.class));
-//				}
-				notificacioService.enviamentRefrescarEstatRegistre(pendent.getId());
+			for (var pendent: pendents) {
+				log.info(">>> Consultat l'estat a registre de l'enviament: [Id: " + pendent + "]" + ", i actualitzant les dades a Notib.");
+				notificacioService.enviamentRefrescarEstatRegistre(pendent);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -235,23 +230,23 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void enviamentRefrescarEstatDEH() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (notificaHelper.isAdviserActiu() || !isTasquesActivesProperty() || !isEnviamentActualitzacioCertificacioActiva() || !notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[DEH] L'actualització de la certificació dels enviaments amb l'estat de Notific@ està deshabilitada");
 				return;
 			}
 			log.info("[DEH] Cercant enviaments DEH finalitzats sense certificació...");
-			List pendents = notificacioService.getNotificacionsDEHPendentsRefrescarCert();
+			var pendents = notificacioService.getNotificacionsDEHPendentsRefrescarCert();
 			if (pendents == null && pendents.isEmpty()) {
 				log.info("[DEH] No hi ha enviaments DEH sense certificació");
 				return;
 			}
 			log.info("[DEH] Realitzant refresc de certificació de Notifica per a " + pendents.size() + " enviaments");
-			for (NotificacioEnviamentEntity enviament: (List<NotificacioEnviamentEntity>)pendents) {
-				log.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				enviamentHelper.updateDEHCertNovaConsulta(enviament.getId());
-				notificacioService.enviamentRefrescarEstat(enviament.getId());
+			for (var enviament: pendents) {
+				log.info("[DEH] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
+				enviamentHelper.updateDEHCertNovaConsulta(enviament);
+				notificacioService.enviamentRefrescarEstat(enviament);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -264,23 +259,23 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void enviamentRefrescarEstatCIE() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (notificaHelper.isAdviserActiu() || !isTasquesActivesProperty() || !isEnviamentActualitzacioCertificacioActiva() || !notificaHelper.isConnexioNotificaDisponible()) {
 				log.info("[CIE] L'actualització de la certificació dels enviaments amb l'estat de Notific@ està deshabilitada");
 				return;
 			}
 			log.info("[CIE] Cercant enviaments CIE finalitzats sense certificació...");
-			List pendents = notificacioService.getNotificacionsCIEPendentsRefrescarCert();
+			var pendents = notificacioService.getNotificacionsCIEPendentsRefrescarCert();
 			if (pendents == null || pendents.isEmpty()) {
 				log.info("[CIE] No hi ha enviaments CIE sense certificació");
 				return;
 			}
 			log.info("[CIE] Realitzant refresc de certificació de Notifica per a " + pendents.size() + " enviaments");
-			for (NotificacioEnviamentEntity enviament: (List<NotificacioEnviamentEntity>)pendents) {
-				log.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-				enviamentHelper.updateCIECertNovaConsulta(enviament.getId());
-				notificacioService.enviamentRefrescarEstat(enviament.getId());
+			for (var enviament: pendents) {
+				log.info("[CIE] >>> Consultat l'estat a Notific@ de l'enviament: [Id: " + enviament + "]");
+				enviamentHelper.updateCIECertNovaConsulta(enviament);
+				notificacioService.enviamentRefrescarEstat(enviament);
 			}
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -292,8 +287,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void eliminarDocumentsTemporals() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		String baseDir = getBaseDir(PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
+		var timer = metricsHelper.iniciMetrica();
+		var baseDir = getBaseDir(PluginHelper.GESDOC_AGRUPACIO_TEMPORALS);
 		if (baseDir == null) {
 			log.error("SchedulledService.eliminarDocumentsTemporals -> Error directori base null");
 			return;
@@ -301,6 +296,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 		try {
 			log.info("Eliminant documents temporals del directori " + baseDir);
 			esborrarTemporals(baseDir);
+			//			TODO: Provar d'eliminar els fitxers amb una comanda'
+//			String command = SystemUtils.IS_OS_LINUX ?
+//					"find " + baseDir + " -type f -mindepth 1 -mtime +1 -delete" :
+//					"forfiles /p \"" + baseDir + "\" /s /d -1 /c \"cmd /c del /q @file\"";
+//			Process process = Runtime.getRuntime().exec(command);
+//			process.waitFor();
+//			process.destroy();
 		} catch(Exception ex) {
 			log.error("SchedulledService.eliminarDocumentsTemporals -> Error eliminant els documents temporals del directori " + baseDir);
 		} finally {

@@ -300,17 +300,11 @@ public interface NotificacioService {
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
 
-	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRegistrar();
-	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsEnviar();
-	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstat();
-	@SuppressWarnings("rawtypes")
 	List getNotificacionsDEHPendentsRefrescarCert();
-	@SuppressWarnings("rawtypes")
 	List getNotificacionsCIEPendentsRefrescarCert();
-	@SuppressWarnings("rawtypes")
 	List getNotificacionsPendentsRefrescarEstatRegistre();
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")

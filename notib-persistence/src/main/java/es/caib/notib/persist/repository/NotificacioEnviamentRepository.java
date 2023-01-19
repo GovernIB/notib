@@ -46,15 +46,11 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 //	NotificacioEnviamentEntity findById(Long id);
 	
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.notificacio = :notificacio")
-	List<NotificacioEnviamentEntity> findByNotificacio(
-			@Param("notificacio") NotificacioEntity notificacio);
+	List<NotificacioEnviamentEntity> findByNotificacio(@Param("notificacio") NotificacioEntity notificacio);
 
-	NotificacioEnviamentEntity findByNotificaReferencia(
-			String notificaReferencia);
+	NotificacioEnviamentEntity findByNotificaReferencia(String notificaReferencia);
 
-	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(
-			NotificacioEntity notificacio,
-			String notificaReferencia);
+	NotificacioEnviamentEntity findByNotificacioAndNotificaReferencia(NotificacioEntity notificacio, String notificaReferencia);
 	
 //	@Query(	" from NotificacioEnviamentEntity " +
 //			" where	notificacio = :notificacio " + 
@@ -77,12 +73,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" order by notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentEntity> findEnviamentsPendentsByNotificacioId(@Param("notificacioId") Long notificacioId);
 
-	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(
-			EntitatEntity entitat,
-			String notificaIdentificador);
+	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(EntitatEntity entitat, String notificaIdentificador);
 	
-	NotificacioEnviamentEntity findByNotificaIdentificador(
-			String notificaIdentificador);
+	NotificacioEnviamentEntity findByNotificaIdentificador(String notificaIdentificador);
 	
 	@Query(	" select id from NotificacioEnviamentEntity " +
 			" where	notificaEstat = es.caib.notib.client.domini.EnviamentEstat.EXPIRADA " +
@@ -182,11 +175,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			@Param("notificaIdentificador") String codiNotifica,
 			@Param("notificacio") NotificacioEntity notificacio);
 
-	List<NotificacioEnviamentEntity>findByNotificacioAndIdInOrderByIdAsc (
-			NotificacioEntity notificacio,
-			Collection<Long> id);
+	List<NotificacioEnviamentEntity>findByNotificacioAndIdInOrderByIdAsc(NotificacioEntity notificacio, Collection<Long> id);
 	
-	@Query(	"  from	NotificacioEnviamentEntity " +
+	@Query(	"select id from	NotificacioEnviamentEntity " +
 			" where	(notificaEstatFinal = false " +
 			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT " +
 			"   	and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.REGISTRADA " +
@@ -198,46 +189,36 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			"		and notificaCertificacioData is null)" +
 			"   and notificaIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findByNotificaRefresc(
-			@Param("maxReintents")Integer maxReintents,
-			Pageable pageable);
-	
-	@Query(	"  from	NotificacioEnviamentEntity " +
+	List<Long> findByNotificaRefresc(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+
+	@Query(	" select id from NotificacioEnviamentEntity " +
 			" where	registreEstatFinal = false " +
 			"   and registreEstat != es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT " +
 			"   and registreEstat != es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto.REBUTJAT " +
 			"   and notificaEstat = es.caib.notib.client.domini.EnviamentEstat.ENVIAT_SIR " +
 			"   and sirConsultaIntent < :maxReintents " +
 			" order by sirConsultaData asc nulls first")
-	List<NotificacioEnviamentEntity> findByRegistreRefresc(
-			@Param("maxReintents")Integer maxReintents,
-			Pageable pageable);
-	
-	
+	List<Long> findByRegistreRefresc(@Param("maxReintents")Integer maxReintents, Pageable pageable);
+
 	// Recupera enviaments amb DEH finalitzats sense certificació
-	@Query(	"from NotificacioEnviamentEntity " +
+	@Query(	"select id rom NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and dehNif is not null" +
 			"	and dehCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findByDEHAndEstatFinal(
-			@Param("maxReintents")Integer maxReintents,
-			Pageable pageable);
+	List<Long> findByDEHAndEstatFinal(@Param("maxReintents")Integer maxReintents, Pageable pageable);
 	
 	// Recupera enviaments a CIE finalitzats sense certificació
-	@Query(	"from NotificacioEnviamentEntity " +
+	@Query(	"select id from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and entregaPostal is not null" +
 			"	and entregaPostal.domiciliCodiPostal is not null" +
 			"	and cieCertIntentNum < :maxReintents " +
 			" order by notificaEstatDataActualitzacio asc nulls first")
-	List<NotificacioEnviamentEntity> findByCIEAndEstatFinal(
-			@Param("maxReintents")Integer maxReintents,
-			Pageable pageable);
+	List<Long> findByCIEAndEstatFinal(@Param("maxReintents")Integer maxReintents, Pageable pageable);
 
-	
 	
 	// API CARPETA
 	// --------------------------------------------------------------------------------------------------------------------
