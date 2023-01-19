@@ -550,7 +550,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			// 1. Obtenir canvis a l'organigrama
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.SUBTITOL, messageHelper.getMessage("organgestor.actualitzacio.obtenir.canvis"));
 			log.debug(prefix + "Obtenint unitats organitzatives");
-			var unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+			var unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 			//		progres.incrementOperacionsRealitzades();	// 2%
 			log.debug(prefix + "nombre d'unitats obtingutdes: " + unitatsWs.size());
 			progres.setProgres(2);
@@ -686,8 +686,8 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 	@Transactional(readOnly = true)
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
-		boolean isFirstSincronization = entitat.getDataSincronitzacio() == null;
+		var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false);
+		var isFirstSincronization = entitat.getDataSincronitzacio() == null;
 		List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();
 
 		if (isFirstSincronization) {
@@ -695,12 +695,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		}
 		try {
 			// Obtenir lista de canvis del servei web
-			EntitatDto e = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-			List<NodeDir3> unitatsWS = pluginHelper.unitatsOrganitzativesFindByPare(e, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+			var e = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+			var unitatsWS = pluginHelper.unitatsOrganitzativesFindByPare(e.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
 			// Obtenir els òrgans vigents a la BBDD
-			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganGestorEstatEnum.V);
+			var organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganGestorEstatEnum.V);
 			log.debug("Consulta d'unitats vigents a DB");
-			for(OrganGestorEntity organVigent: organsVigents){
+			for(var organVigent: organsVigents){
 				log.debug(organVigent.toString());
 			}
 			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
@@ -780,13 +780,12 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 
 	private PrediccioSincronitzacio predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
 
-		EntitatDto e = conversioTipusHelper.convertir(entitat, EntitatDto.class);
-		List<NodeDir3> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindByPare(e, entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
-		List<UnitatOrganitzativaDto> vigents = conversioTipusHelper.convertirList(unitatsVigentsWS, UnitatOrganitzativaDto.class);
+		var unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+		var vigents = conversioTipusHelper.convertirList(unitatsVigentsWS, UnitatOrganitzativaDto.class);
 		List<String> codis = new ArrayList<>();
 		List<UnitatOrganitzativaDto> noves = new ArrayList<>();
 		OrganGestorEntity o;
-		for (UnitatOrganitzativaDto u : vigents) {
+		for (var u : vigents) {
 			o = organGestorRepository.findByCodi(u.getCodi());
 			if (o == null) {
 				noves.add(u);
@@ -794,9 +793,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 			}
 			codis.add(u.getCodi());
 		}
-		List<OrganGestorEntity> extingides = calcularExtingides(entitat.getCodi(), codis);
-		List<UnitatOrganitzativaDto> ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
-		List<UnitatOrganitzativaDto> n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
+		var extingides = calcularExtingides(entitat.getCodi(), codis);
+		var ex = conversioTipusHelper.convertirList(extingides, UnitatOrganitzativaDto.class);
+		var n = conversioTipusHelper.convertirList(noves, UnitatOrganitzativaDto.class);
 		return PrediccioSincronitzacio.builder().isFirstSincronization(true).unitatsVigents(vigents).unitatsNew(n).unitatsExtingides(ex).build();
 	}
 

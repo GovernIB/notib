@@ -107,10 +107,8 @@ public class NotificacioHelper {
 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
 				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
 				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
-				RegistreIdDto registreIdDto = new RegistreIdDto();
-				registreIdDto.setNumero(notificacio.getRegistreNumero());
-				registreIdDto.setData(notificacio.getRegistreData());
-				registreIdDto.setNumeroRegistreFormat(notificacio.getRegistreNumeroFormatat());
+				var registreIdDto = RegistreIdDto.builder().numero(notificacio.getRegistreNumero()).data(notificacio.getRegistreData())
+						.numeroRegistreFormat(notificacio.getRegistreNumeroFormatat()).build();
 				registresIdDto.add(registreIdDto);
 
 				if (notificar){

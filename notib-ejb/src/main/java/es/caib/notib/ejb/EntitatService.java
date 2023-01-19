@@ -41,23 +41,19 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
-	public EntitatDto update(
-			EntitatDataDto entitat) {
+	public EntitatDto update(EntitatDataDto entitat) {
 		return getDelegateService().update(entitat);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
-	public EntitatDto updateActiva(
-			Long id,
-			boolean activa) {
+	public EntitatDto updateActiva(Long id, boolean activa) {
 		return getDelegateService().updateActiva(id, activa);
 	}
 
 	@Override
 	@RolesAllowed("NOT_SUPER")
-	public EntitatDto delete(
-			Long id) {
+	public EntitatDto delete(Long id) {
 		return getDelegateService().delete(id);
 	}
 
@@ -189,8 +185,8 @@ public class EntitatService extends AbstractService<es.caib.notib.logic.intf.ser
 
 	@Override
 	@PermitAll
-	public void setConfigEntitat(EntitatDto entitatDto) {
-		getDelegateService().setConfigEntitat(entitatDto);
+	public void setConfigEntitat(String entitatCodi) {
+		getDelegateService().setConfigEntitat(entitatCodi);
 	}
 
 	@Override

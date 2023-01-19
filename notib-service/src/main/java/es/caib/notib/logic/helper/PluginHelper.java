@@ -983,7 +983,7 @@ public class PluginHelper {
 				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
 			}
 			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
-				configHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				configHelper.setEntitatCodi(entitat.getCodi());
 			}
 			info.setCodiEntitat(entitat.getCodi());
 			if ("SOAP".equalsIgnoreCase(protocol)) {
@@ -1007,7 +1007,7 @@ public class PluginHelper {
 		return organigrama;
 	}
 
-	public List<NodeDir3> unitatsOrganitzativesFindByPare(EntitatDto entitat, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
+	public List<NodeDir3> unitatsOrganitzativesFindByPare(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Consulta llista d'unitats donat un pare",
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
@@ -1015,8 +1015,8 @@ public class PluginHelper {
 				new AccioParam("fechaActualizacion", dataActualitzacio == null ? null : dataActualitzacio.toString()),
 				new AccioParam("fechaSincronizacion", dataSincronitzacio == null ? null : dataSincronitzacio.toString()));
 		try {
-			configHelper.setEntitat(entitat);
-			info.setCodiEntitat(entitat.getCodi());
+			configHelper.setEntitatCodi(entitatCodi);
+			info.setCodiEntitat(entitatCodi);
 			List<NodeDir3> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi, dataActualitzacio, dataSincronitzacio);
 			if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
 				String errorMissatge = messageHelper.getMessage("organgestor.actualitzacio.sense.canvis");

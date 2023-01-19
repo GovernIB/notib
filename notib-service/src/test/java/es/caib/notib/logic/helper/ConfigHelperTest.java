@@ -41,9 +41,8 @@ public class ConfigHelperTest {
 
     @Before
     public void setUp() throws Exception {
-        entitatEntity = new EntitatDto();
-        entitatEntity.setCodi(entitatCodi);
-        ConfigHelper.setEntitat(entitatEntity);
+
+        ConfigHelper.setEntitatCodi(entitatCodi);
         Mockito.when(configRepository.findById(Mockito.eq("PROPERTY_KEY"))).thenReturn(Optional.of(new ConfigEntity("PROPERTY_KEY", "PROPERTY_VALUE")));
         Mockito.when(configRepository.findById(Mockito.eq(ConfigDto.prefix + configKey))).thenReturn(Optional.of(new ConfigEntity(ConfigDto.prefix + configKey, "valor_global")));
         Mockito.when(configRepository.findById(Mockito.eq(ConfigDto.prefix + "." + entitatCodi + configKey))).thenReturn(Optional.of(new ConfigEntity(ConfigDto.prefix + "." + entitatCodi + configKey, "valor_entitat")));

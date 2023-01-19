@@ -192,15 +192,14 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 				return enviament;
 			}
 			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
-				ConfigHelper.setEntitat(conversioTipusHelper.convertir(enviament.getNotificacio().getEntitat(), EntitatDto.class));
+				ConfigHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 			}
 			if (enviament.getNotificacio() != null && enviament.getNotificacio().getEntitat() != null) {
 				info.setCodiEntitat(enviament.getNotificacio().getEntitat().getCodi());
 			}
 			if (enviament.isNotificaEstatFinal()) {
 				if (tipoEntrega.equals(BigInteger.valueOf(1L))) { //if datado (1L)
-					logger.warn(
-							"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
+					logger.warn("Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 							"L'enviament amb l'identificador especificat (" + identificador + ") ja es troba en un estat final.");
 					//Crea un nou event builder
 					createEvent = true;

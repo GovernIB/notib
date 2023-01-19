@@ -66,8 +66,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private SchedulingConfig schedulingConfig;
 
 	@Override
-	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		configHelper.setEntitat(entitat);
+	public void actualitzarEntiatThreadLocal(String entitatCodi) {
+		configHelper.setEntitatCodi(entitatCodi);
 	}
 
 	@Transactional

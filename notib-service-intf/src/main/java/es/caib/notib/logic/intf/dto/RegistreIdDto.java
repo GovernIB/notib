@@ -1,5 +1,10 @@
 package es.caib.notib.logic.intf.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
 
@@ -8,6 +13,10 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RegistreIdDto {
 
 	private Integer numero;
@@ -15,38 +24,4 @@ public class RegistreIdDto {
 	private String descripcioError;
 	private String hora;
 	private String numeroRegistreFormat;
-
-	
-	public String getDescripcioError() {
-		return descripcioError;
-	}
-	public void setDescripcioError(String descripcioError) {
-		this.descripcioError = descripcioError;
-	}
-	public Integer getNumero() {
-		return numero;
-	}
-	public void setNumero(Integer numero) {
-		this.numero = numero;
-	}
-	public Date getData() {
-		return data;
-	}
-	public void setData(Date data) {
-		this.data = data;
-	}
-	public String getHora() {
-		return hora;
-	}
-	public void setHora(String hora) {
-		this.hora = hora;
-	}
-	public String getNumeroRegistreFormat() {
-		return numeroRegistreFormat;
-	}
-	public void setNumeroRegistreFormat(
-			String numeroRegistreFormat) {
-		this.numeroRegistreFormat = numeroRegistreFormat;
-	}
-
 }

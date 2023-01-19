@@ -6,7 +6,6 @@ package es.caib.notib.back.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
-import java.security.Principal;
 
 /**
  * Interceptor per a gestionar la llista d'entitats a cada pàgina.
@@ -40,9 +38,9 @@ public class LlistaEntitatsInterceptor implements AsyncHandlerInterceptor {
 			EntitatHelper.findEntitatsAccessibles(request, aplicacioService, entitatService);
 			EntitatHelper.processarCanviEntitats(request, aplicacioService, entitatService);
 		}
-		EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+		var entitatDto = EntitatHelper.getEntitatActual(request);
 		if (entitatDto != null) {
-			entitatService.setConfigEntitat(entitatDto);
+			entitatService.setConfigEntitat(entitatDto.getCodi());
 		}
 		return true;
 	}

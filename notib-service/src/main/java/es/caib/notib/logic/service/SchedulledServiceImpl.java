@@ -203,7 +203,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void actualitzarProcediments() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (!isActualitzacioProcedimentsActiuProperty()) {
 				log.info("[PRO] L'actualització de procedimetns està deshabilitada");
@@ -211,15 +211,15 @@ public class SchedulledServiceImpl implements SchedulledService {
 			}
 			addAdminAuthentication();
 			log.info("[PRO] Cercant entitats per a actualitzar els procediments");
-			List<EntitatDto> entitats = entitatService.findAll();
+			var entitats = entitatService.findAll();
 			if (entitats == null || entitats.isEmpty()) {
 				log.info("[PRO] No hi ha entitats per actualitzar");
 				return;
 			}
 			log.info("[PRO] Realitzant actualització de procediments per a " + entitats.size() + " entitats");
-			for (EntitatDto entitat: entitats) {
+			for (var entitat: entitats) {
 				log.info(">>> Actualitzant procedimetns de la entitat: " + entitat.getNom());
-				ConfigHelper.setEntitat(entitat);
+				ConfigHelper.setEntitatCodi(entitat.getCodi());
 				procedimentService.actualitzaProcediments(entitat);
 			}
 		} finally {

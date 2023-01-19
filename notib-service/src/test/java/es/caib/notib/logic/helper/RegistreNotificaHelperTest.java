@@ -60,7 +60,7 @@ public class RegistreNotificaHelperTest {
 				)
 		).thenReturn(new RespostaConsultaRegistre());
 		Mockito.when(configHelper.getConfigAsBoolean(Mockito.eq("es.caib.notib.emprar.sir"))).thenReturn(true);
-		Mockito.when(conversioTipusHelper.convertir(Mockito.any(EntitatEntity.class), Mockito.any(Class.class))).thenReturn(new EntitatDto());
+//		Mockito.when(conversioTipusHelper.convertir(Mockito.any(EntitatEntity.class), Mockito.any(Class.class))).thenReturn(new EntitatDto());
 
 	}
 

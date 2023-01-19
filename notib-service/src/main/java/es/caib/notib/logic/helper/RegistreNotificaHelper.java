@@ -60,7 +60,7 @@ public class RegistreNotificaHelper {
 	public boolean realitzarProcesRegistrar(NotificacioEntity notificacioEntity) throws RegistreNotificaException {
 
 		log.info(" [REG-NOT] Inici procés registrar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
-		configHelper.setEntitat(conversioTipusHelper.convertir(notificacioEntity.getEntitat(), EntitatDto.class));
+		configHelper.setEntitatCodi(notificacioEntity.getEntitat().getCodi());
 		boolean enviarANotifica = false;
 		boolean isComunicacio = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacioEntity.getEnviamentTipus());
 		long t0 = System.currentTimeMillis();

@@ -246,8 +246,7 @@ public interface EntitatService {
 	 * Afegeix l'entitat que està activada a l'aplicació per poder accedir a les
 	 * seves propietats
 	 */
-	void setConfigEntitat(EntitatDto entitatDto);
-
+	void setConfigEntitat(String entitatCodi);
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void resetActualitzacioOrgans(Long id);

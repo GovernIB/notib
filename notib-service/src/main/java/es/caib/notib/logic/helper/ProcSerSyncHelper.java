@@ -72,7 +72,7 @@ public class ProcSerSyncHelper {
 
 		var info = new IntegracioInfo(IntegracioHelper.INTCODI_PROCEDIMENT, "Actualització de procediments", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 		info.setCodiEntitat(entitatDto.getCodi());
-		ConfigHelper.setEntitat(entitatDto);
+		ConfigHelper.setEntitatCodi(entitatDto.getCodi());
 		log.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 
 		// Comprova si hi ha una altre instància del procés en execució
@@ -264,16 +264,14 @@ public class ProcSerSyncHelper {
 	private List<OrganGestorEntity> processarProcediments(EntitatEntity entitat, List<ProcSerDto> procedimentsGda, ProgresActualitzacioProcSer progres,
 														  Map<String, String[]> avisosProcedimentsOrgans) {
 
-		long startTime = System.nanoTime();
+		var startTime = System.nanoTime();
 		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();
 
 //		TODO: Organigrama de GDA no de BBDD
 //		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
-		EntitatDto entitatDto = new EntitatDto();
-		entitatDto.setCodi(entitat.getCodi());
-		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), null, null);
+		var unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
 		List<String> codiOrgansGda = new ArrayList<>();
-		for (NodeDir3 unitat: unitatsWs) {
+		for (var unitat: unitatsWs) {
 			codiOrgansGda.add(unitat.getCodi());
 		}
 		double elapsedTime = (System.nanoTime() - startTime) / 10e6;
@@ -417,7 +415,7 @@ public class ProcSerSyncHelper {
 
 		var info = new IntegracioInfo(IntegracioHelper.INTCODI_PROCEDIMENT, "Actualització de serveis", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 		info.setCodiEntitat(entitatDto.getCodi());
-		ConfigHelper.setEntitat(entitatDto);
+		ConfigHelper.setEntitatCodi(entitatDto.getCodi());
 		log.debug("[SERVEIS] Inici actualitzar serveis");
 		// Comprova si hi ha una altre instància del procés en execució
 		var progres = ServeiServiceImpl.progresActualitzacioServeis.get(entitatDto.getDir3Codi());
@@ -573,9 +571,7 @@ public class ProcSerSyncHelper {
 		long startTime = System.nanoTime();
 		List<OrganGestorEntity> organsGestorsModificats = new ArrayList<>();
 //		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(entitat.getDir3Codi());
-		EntitatDto entitatDto = new EntitatDto();
-		entitatDto.setCodi(entitat.getCodi());
-		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitatDto, entitat.getDir3Codi(), null, null);
+		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
 		List<String> codiOrgansGda = new ArrayList<>();
 		for (NodeDir3 unitat: unitatsWs) {
 			codiOrgansGda.add(unitat.getCodi());

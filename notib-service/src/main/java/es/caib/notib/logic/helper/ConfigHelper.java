@@ -43,18 +43,19 @@ public class ConfigHelper {
     private ConfigGroupRepository configGroupRepository;
 
 
-    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();
+    private static ThreadLocal<String> entitatCodi = new ThreadLocal<>();
 
-    public static ThreadLocal<EntitatDto> getEntitat() {
-        return entitat;
+    public static ThreadLocal<String> getEntitatCodi() {
+        return entitatCodi;
     }
 
-    public static void setEntitat(EntitatDto entitat) {
-        ConfigHelper.entitat.set(entitat);
+    public static void setEntitatCodi(String entitatCodi) {
+        ConfigHelper.entitatCodi.set(entitatCodi);
     }
 
+    @Transactional(readOnly = true)
     public String getEntitatActualCodi() {
-        return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
+        return entitatCodi.get();
     }
 
     public String getConfigGlobal(String propietatGlobal) {

@@ -391,10 +391,10 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 	public boolean actualitzarProcediment(String codiSia, EntitatDto entitat) {
 
 		try {
-			ProcSerDto proc = pluginHelper.getProcSerByCodiSia(codiSia, false);
+			var proc = pluginHelper.getProcSerByCodiSia(codiSia, false);
 			if (proc == null) {
-				EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
-				ProcedimentEntity procediment = procedimentRepository.findByCodiAndEntitat(codiSia, entity);
+				var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+				var procediment = procedimentRepository.findByCodiAndEntitat(codiSia, entity);
 				if (procediment != null) {
 					procediment.updateActiu(false);
 					procedimentRepository.save(procediment);
@@ -405,12 +405,12 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			var progres = new ProgresActualitzacioProcSer();
 			List<OrganGestorEntity> organsModificats = new ArrayList<>();
 			Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-			List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat, entitat.getDir3Codi(), null, null);
+			var unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), null, null);
 			List<String> codiOrgansGda = new ArrayList<>();
-			for (NodeDir3 unitat: unitatsWs) {
+			for (var unitat: unitatsWs) {
 				codiOrgansGda.add(unitat.getCodi());
 			}
-			EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
+			var entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false);
 			procedimentHelper.actualitzarProcedimentFromGda(progres, proc, entity, codiOrgansGda, true, organsModificats, avisosProcedimentsOrgans);
 
 			if (avisosProcedimentsOrgans.size() > 0) {
@@ -421,11 +421,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 				}
 				procSerSyncHelper.addAvisosSyncProcediments(avisosProcedimentsOrgans, entitat.getId());
 			}
-			boolean eliminarOrgans = procSerSyncHelper.isActualitzacioProcedimentsEliminarOrgansProperty();
+			var eliminarOrgans = procSerSyncHelper.isActualitzacioProcedimentsEliminarOrgansProperty();
 			if (!eliminarOrgans) {
 				return true;
 			}
-			for (OrganGestorEntity organGestorAntic: organsModificats) {
+			for (var organGestorAntic: organsModificats) {
 				//#260 Modificació passar la funcionalitat del for dins un procediment, ja que pel temps de transacció fallava
 				procedimentHelper.eliminarOrganSiNoEstaEnUs(progres,organGestorAntic);
 			}

@@ -224,22 +224,18 @@ public class OrganGestorHelper {
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
 
-		Date ara = new Date();
-		Calendar calendar = Calendar.getInstance();
+		var ara = new Date();
+		var calendar = Calendar.getInstance();
 		calendar.setTime(ara);
 		calendar.add(Calendar.YEAR, 1);
-
-		List<NodeDir3> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(conversioTipusHelper.convertir(entitat, EntitatDto.class),
-										entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
-
-		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
+		var unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getCodi(), entitat.getDir3Codi(), entitat.getDataActualitzacio(), entitat.getDataSincronitzacio());
+		var avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
 		if (avisosSinc != null && !avisosSinc.isEmpty()) {
 			avisRepository.deleteAll(avisosSinc);
 		}
-
 		if (unitatsWs != null && !unitatsWs.isEmpty()) {
-			String msg = "Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.";
-			AvisEntity avis = AvisEntity.getBuilder(ORGAN_NO_SYNC, msg, ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitat.getId()).build();
+			var msg = "Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.";
+			var avis = AvisEntity.getBuilder(ORGAN_NO_SYNC, msg, ara, calendar.getTime(), AvisNivellEnumDto.ERROR, true, entitat.getId()).build();
 			avisRepository.save(avis);
 		}
 	}

@@ -23,8 +23,8 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
-	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		getDelegateService().actualitzarEntiatThreadLocal(entitat);
+	public void actualitzarEntiatThreadLocal(String entitatCodi) {
+		getDelegateService().actualitzarEntiatThreadLocal(entitatCodi);
 	}
 
 	@Override
