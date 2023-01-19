@@ -103,19 +103,21 @@ public class NotificacioHelper {
 			log.info("Estat notificació [Id:" + notificacio.getId() + ", Estat: "+ estatActual + "]");
 
 			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
+				// Registrar la notificació
 				long startTime2 = System.nanoTime();
 				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
 				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
 				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
-				var registreIdDto = RegistreIdDto.builder().numero(notificacio.getRegistreNumero()).data(notificacio.getRegistreData())
-						.numeroRegistreFormat(notificacio.getRegistreNumeroFormatat()).build();
-				registresIdDto.add(registreIdDto);
+				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+					registresIdDto.add(RegistreIdDto.builder()
+//							.numero(enviament.getRegistreNumero)
+							.data(enviament.getRegistreData())
+							.numeroRegistreFormat(enviament.getRegistreNumeroFormatat())
+							.build());
+				}
 
 				if (notificar){
-					registreIdDto.setNumero(notificacio.getRegistreNumero());
-					registreIdDto.setData(notificacio.getRegistreData());
-					registreIdDto.setNumeroRegistreFormat(notificacio.getRegistreNumeroFormatat());
-					registresIdDto.add(registreIdDto);
+					// Enviar la notificació
 					startTime2 = System.nanoTime();
 					List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
 					// 3 possibles casuístiques

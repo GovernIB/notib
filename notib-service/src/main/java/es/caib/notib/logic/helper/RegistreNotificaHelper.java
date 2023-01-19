@@ -81,7 +81,19 @@ public class RegistreNotificaHelper {
 				continue;
 			}
 			try {
-
+				AccioParam accio;
+				String msg = "";
+				if (isSirActivat()) {
+					accio = new AccioParam("Procés descripció: ", " [REG-NOT] " + notificacioEntity.getEnviamentTipus() + ": nou assentament registral + Notifica de la notificació: " + notificacioEntity.getId());
+					msg = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals per notificació [Id: " + notificacioEntity.getId() + "]: ";
+				} else {
+					//### ASSENTAMENT REGISTRE NORMAL + NOTIFIC@
+					log.info(" [REG-NOT] Assentament sortida (registre) + Notifica");
+					accio = new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral normal de la notificació: " + notificacioEntity.getId());
+					msg = " [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: ";
+				}
+				info.getParams().add(accio);
+				// Registre SIR
 				if (isSirActivat() && isComunicacio && totsAdministracio) {
 					log.info(" [REG-NOT] Realitzant nou assentament registral per SIR");
 					info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral per SIR"));
@@ -91,21 +103,12 @@ public class RegistreNotificaHelper {
 							notificacioEntity.getId() + ", encId: " + enviament.getId()+ "]: " + elapsedTime + " ms");
 					continue;
 				}
-				AccioParam accio;
-				String msg = "";
-				if (isSirActivat()) {
-					accio = new AccioParam("Procés descripció: ", " [REG-NOT] " + notificacioEntity.getEnviamentTipus()
-							+ ": nou assentament registral + Notifica de la notificació: " + notificacioEntity.getId());
-					msg = " [TIMER-REG-NOT] (Sir activat) Creació assentament registrals per notificació [Id: " + notificacioEntity.getId() + "]: ";
-				} else {
-					//### ASSENTAMENT REGISTRE NORMAL + NOTIFIC@
-					log.info(" [REG-NOT] Assentament sortida (registre) + Notifica");
-					accio = new AccioParam("Procés descripció: ", " [REG-NOT] Realitzant nou assentament registral normal de la notificació: " + notificacioEntity.getId());
-					msg = " [TIMER-REG-NOT] Creació assentament registrals normal per notificació [Id: " + notificacioEntity.getId() + "]: ";
-				}
-				info.getParams().add(accio);
-				boolean ok = crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, enviarANotifica, isComunicacio, isSirActivat(), info, t0, enviament);
-				enviarANotifica = enviarANotifica && ok;
+
+				// Registre NO SIR
+//				boolean ok =
+				crearAssentamentRegistralPerNotificacio(notificacioEntity, codiDir3, enviarANotifica, isComunicacio, isSirActivat(), info, t0, enviament);
+//				enviarANotifica = enviarANotifica && ok;
+
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				log.info(msg + elapsedTime + " ms");
 				log.info(" [REG-NOT] Fi procés Registrar-Notificar [Id: " + notificacioEntity.getId() + ", Estat: " + notificacioEntity.getEstat() + "]");
