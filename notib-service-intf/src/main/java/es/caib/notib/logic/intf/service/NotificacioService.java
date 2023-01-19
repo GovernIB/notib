@@ -300,12 +300,12 @@ public interface NotificacioService {
 	void enviamentRefrescarEstat(Long notificacioId);
 	void enviamentRefrescarEstatRegistre(Long enviamentId);
 
-	List getNotificacionsPendentsRegistrar();
-	List getNotificacionsPendentsEnviar();
-	List getNotificacionsPendentsRefrescarEstat();
-	List getNotificacionsDEHPendentsRefrescarCert();
-	List getNotificacionsCIEPendentsRefrescarCert();
-	List getNotificacionsPendentsRefrescarEstatRegistre();
+	List<Long> getNotificacionsPendentsRegistrar();
+	List<Long> getNotificacionsPendentsEnviar();
+	List<Long> getNotificacionsPendentsRefrescarEstat();
+	List<Long> getNotificacionsDEHPendentsRefrescarCert();
+	List<Long> getNotificacionsCIEPendentsRefrescarCert();
+	List<Long> getNotificacionsPendentsRefrescarEstatRegistre();
 
 	@PreAuthorize("hasRole('NOT_ADMIN')")
 	PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioDtoFromRequest);

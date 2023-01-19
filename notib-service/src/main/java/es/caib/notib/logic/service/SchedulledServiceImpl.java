@@ -26,6 +26,7 @@ import es.caib.notib.logic.helper.PluginHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
 import es.caib.notib.persist.repository.EntitatRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -295,14 +296,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
 		try {
 			log.info("Eliminant documents temporals del directori " + baseDir);
-			esborrarTemporals(baseDir);
-			//			TODO: Provar d'eliminar els fitxers amb una comanda'
-//			String command = SystemUtils.IS_OS_LINUX ?
-//					"find " + baseDir + " -type f -mindepth 1 -mtime +1 -delete" :
-//					"forfiles /p \"" + baseDir + "\" /s /d -1 /c \"cmd /c del /q @file\"";
-//			Process process = Runtime.getRuntime().exec(command);
-//			process.waitFor();
-//			process.destroy();
+//			esborrarTemporals(baseDir);
+			var command = SystemUtils.IS_OS_LINUX ?
+					"find " + baseDir + " -mindepth 1 -type f -mtime +1 -delete" :
+					"forfiles /p \"" + baseDir + "\" /s /d -1 /c \"cmd /c del /q @file\"";
+			var process = Runtime.getRuntime().exec(command);
+			process.waitFor();
+			process.destroy();
 		} catch(Exception ex) {
 			log.error("SchedulledService.eliminarDocumentsTemporals -> Error eliminant els documents temporals del directori " + baseDir);
 		} finally {
@@ -375,14 +375,14 @@ public class SchedulledServiceImpl implements SchedulledService {
 		if (Strings.isNullOrEmpty(dir)) {
 			return;
 		}
-		Path path = Paths.get(dir);
-		DirectoryStream<Path> files = Files.newDirectoryStream(path);
-		for (Path file : files) {
+		var path = Paths.get(dir);
+		var files = Files.newDirectoryStream(path);
+		for (var file : files) {
 			if (Files.isDirectory(file)) {
 				esborrarTemporals(file.toString());
 			}
-			File f = file.toFile();
-			long periode = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000L);;
+			var f = file.toFile();
+			long periode = System.currentTimeMillis() - (1 * 24 * 60 * 60 * 1000L);
 			if (f.lastModified() < periode) {
 				log.info("Esborrant fitxer " + file);
 				Files.delete(file);
