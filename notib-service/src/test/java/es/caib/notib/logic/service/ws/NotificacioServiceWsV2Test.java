@@ -24,6 +24,7 @@ import es.caib.notib.persist.entity.ProcedimentEntity;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.repository.*;
 import es.caib.notib.plugin.unitat.NodeDir3;
+import es.caib.notib.plugin.usuari.DadesUsuari;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -258,7 +259,8 @@ public class NotificacioServiceWsV2Test {
 				null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
 		
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
-		
+		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
+
 		// When	
 		Mockito.when(entitatRepository.findByDir3Codi(Mockito.anyString())).thenReturn(entitatMock);
 		Mockito.when(aplicacioRepository.findByEntitatIdAndUsuariCodi(Mockito.nullable(Long.class), Mockito.anyString())).thenReturn(aplicacio);
@@ -294,6 +296,7 @@ public class NotificacioServiceWsV2Test {
 		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
 //		Mockito.when(organGestorCachable.findOrganigramaByEntitat(Mockito.anyString())).thenReturn(new HashMap<String, OrganismeDto>());
 		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
+		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 
 		// Then
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
@@ -349,6 +352,7 @@ public class NotificacioServiceWsV2Test {
 		PersonaEntity personaEntity = PersonaEntity.builder().email("sandreu@limit.es").llinatge1("Andreu").llinatge2("Nadal").nif("00000000T").nom("Siòn").telefon("666010101").build();
 		OrganGestorDto organ = new OrganGestorDto();
 		organ.setSir(true);
+		DadesUsuari dadesUsuari = DadesUsuari.builder().codi("codi").nom("Usuari").llinatges("Llinatge1 Llinatge2").nif("12345678Z").email("usuari@limit.es").build();
 		NotificacioEntity notificacioGuardada = NotificacioEntity.getBuilderV2(entitatMock, notificacioId, organGestor, null, null, notificacioId, notificacioId, caducitat, null, caducitat, notificacioId, notificacioId, procediment, notificacioId, notificacioId, null, procedimentOrgan, null, UUID.randomUUID().toString()).build();
 
 		List<NotificacioEnviamentEntity> listaNotificacioGuardada = new ArrayList<NotificacioEnviamentEntity>();
@@ -372,6 +376,7 @@ public class NotificacioServiceWsV2Test {
 		Mockito.when(notificacioHelper.getNotificaErrorEvent(Mockito.any(NotificacioEntity.class))).thenReturn(notificacioEventEntity);
 //		Mockito.doNothing().when(integracioHelper).addAccioOk(Mockito.any(IntegracioInfo.class));
 		Mockito.when(cacheHelper.unitatPerCodi(Mockito.anyString())).thenReturn(organ);
+		Mockito.when(cacheHelper.findUsuariAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 
 		// Then
 		RespostaAlta respostaAlta = notificacioService.alta(notificacio);
