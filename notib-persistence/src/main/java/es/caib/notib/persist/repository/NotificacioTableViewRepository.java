@@ -203,22 +203,24 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"    (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where env.notificaEstat = :notificaEstat" +
-			"    ) > 0 ) " +
+			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
+//			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where env.notificaEstat = :notificaEstat" +
+//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
-			"and (:isTitularNull = true or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where " +
-			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) " +
+			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
+//			"and (:isTitularNull = true or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where " +
+//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
+//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
 			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
@@ -241,8 +243,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") EnviamentEstat notificaEstat,
+			@Param("estatMask") Integer estatMask,
+//			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -284,22 +286,24 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"   or (ntf.organCodi is not null and ntf.organCodi in (:organs))) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env" +
-			"    where env.notificaEstat = :notificaEstat" +
-			"    ) > 0 ) " +
+			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
+//			"and (:isEstatNull = true or ntf.estat = :estat or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env" +
+//			"    where env.notificaEstat = :notificaEstat" +
+//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentCodiNull = true or ntf.procedimentCodi = :procedimentCodi) " +
-			"and (:isTitularNull = true or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where " +
-			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) " +
+			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
+//			"and (:isTitularNull = true or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where " +
+//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
+//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
@@ -324,8 +328,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") EnviamentEstat notificaEstat,
+			@Param("estatMask") Integer estatMask,
+//			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -365,22 +369,24 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
-			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where env.notificaEstat = :notificaEstat" +
-			"    ) > 0 ) " +
+			"and (:isEstatNull = true or bitand(ntf.estatMask, :estatMask) <> 0) " +
+//			"and (:isEstatNull = true or ntf.estat = :estat  or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where env.notificaEstat = :notificaEstat" +
+//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) "+
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +
 			"and (:isProcedimentNull = true or ntf.procedimentCodi = :procedimentCodi) " +
-			"and (:isTitularNull = true or (" +
-			"    select count(env.id) " +
-			"    from ntf.enviaments env " +
-			"    where " +
-			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
-			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
-			"    ) > 0) " +
+			"and (:isTitularNull = true or lower(ntf.titular) like concat('%', lower(:titular), '%'))" +
+//			"and (:isTitularNull = true or (" +
+//			"    select count(env.id) " +
+//			"    from ntf.enviaments env " +
+//			"    where " +
+//			"       lower(concat(env.titular.nom, ' ', env.titular.llinatge1)) like concat('%', lower(:titular), '%') " +
+//			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
+//			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
 			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
@@ -403,8 +409,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isConcepteNull") boolean isConcepteNull,
 			@Param("concepte") String concepte,
 			@Param("isEstatNull") boolean isEstatNull,
-			@Param("estat") NotificacioEstatEnumDto estat,
-			@Param("notificaEstat") EnviamentEstat notificaEstat,
+			@Param("estatMask") Integer estatMask,
+//			@Param("notificaEstat") EnviamentEstat notificaEstat,
 			@Param("isDataIniciNull") boolean isDataIniciNull,
 			@Param("dataInici") Date dataInici,
 			@Param("isDataFiNull") boolean isDataFiNull,
@@ -428,12 +434,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
 			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
-
-//	@Modifying
-//	@Query("update NotificacioTableEntity nt " +
-//			"set nt.organEstat = (SELECT og.estat from OrganGestorEntity og where og.codi = nt.organCodi) " +
-//			"where nt.organCodi is not null")
-//	void updateOrganGestorEstat();
 
 	@Modifying
 	@Query("update NotificacioTableEntity nt " +

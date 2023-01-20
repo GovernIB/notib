@@ -16,6 +16,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
+import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
@@ -52,6 +53,8 @@ import static org.springframework.web.util.HtmlUtils.htmlEscape;
 public class NotificacioListHelper {
 
     @Autowired
+    private EnviamentService enviamentService;
+    @Autowired
     private PermisosService permisosService;
     @Autowired
     private PaginacioHelper paginacioHelper;
@@ -66,12 +69,13 @@ public class NotificacioListHelper {
     @Autowired
     private OrganGestorRepository organGestorRepository;
     @Autowired
+    private OrganGestorService organGestorService;
+    @Autowired
     private NotificacioRepository notificacioRepository;
     @Autowired
     private NotificacioEnviamentRepository enviamentRepository;
 
     public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
-
         Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
         mapeigPropietatsOrdenacio.put("procediment.organGestor", new String[] {"pro.organGestor.codi"});
         mapeigPropietatsOrdenacio.put("organGestorDesc", new String[] {"organCodi"});
@@ -81,15 +85,15 @@ public class NotificacioListHelper {
         mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
-
     public PaginaDto<NotificacioTableItemDto> complementaNotificacions(EntitatEntity entitatEntity, String usuariCodi, Page<NotificacioTableEntity> notificacions, String ... locale) {
 
         if (notificacions == null) {
             return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
         }
+
         List<String> codis = new ArrayList<>();
-        var procSersAmbPermis = permisosService.getProcSersAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
-        var organs =  permisosService.getOrgansAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        List<CodiValorOrganGestorComuDto> procSersAmbPermis = permisosService.getProcSersAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
+        List<CodiValorDto> organs =  permisosService.getOrgansAmbPermis(entitatEntity.getId(), usuariCodi, PermisEnum.PROCESSAR);
         if (procSersAmbPermis != null) {
             for (CodiValorOrganGestorComuDto procedimentOrgan : procSersAmbPermis) {
                 codis.add(procedimentOrgan.getCodi());
@@ -102,8 +106,9 @@ public class NotificacioListHelper {
         }
 
         boolean permisProcessar;
-        var page = paginacioHelper.toPaginaDto(notificacions, NotificacioTableItemDto.class);
-        for (var notificacio : page.getContingut()) {
+        List<NotificacioEnviamentEntity> enviamentsPendents;
+        PaginaDto<NotificacioTableItemDto> page = paginacioHelper.toPaginaDto(notificacions, NotificacioTableItemDto.class);
+        for (NotificacioTableItemDto notificacio : page.getContingut()) {
             permisProcessar = false;
             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
                 permisProcessar = codis.contains(notificacio.getProcedimentCodi()) || codis.contains(notificacio.getOrganCodi());
@@ -157,7 +162,7 @@ public class NotificacioListHelper {
         String notificaEstat = "";
         String registreEstat = "";
         Map<String, Integer>  registres = new HashMap<>();
-        for (var env : enviaments) {
+        for (NotificacioEnviamentEntity env : enviaments) {
             item.updateEstatTipusCount(env.getNotificaEstat());
 //                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
 //                    notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";

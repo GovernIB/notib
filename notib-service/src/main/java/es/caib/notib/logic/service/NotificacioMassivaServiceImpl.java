@@ -314,9 +314,9 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtreNetejat.getConcepte().isNull(),
                 filtreNetejat.getConcepte().getField(),
                 filtreNetejat.getEstat().isNull(),
-                filtreNetejat.getEstat().getField(),
-                !filtreNetejat.getEstat().isNull() ?
-                        EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+                filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
+//                !filtreNetejat.getEstat().isNull() ?
+//                        EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
                 filtreNetejat.getDataInici().isNull(),
                 filtreNetejat.getDataInici().getField(),
                 filtreNetejat.getDataFi().isNull(),

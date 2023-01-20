@@ -73,6 +73,12 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 			" order by notificaEstatDataActualitzacio asc nulls first")
 	List<NotificacioEnviamentEntity> findEnviamentsPendentsByNotificacioId(@Param("notificacioId") Long notificacioId);
 
+	@Query(	"select CASE WHEN count(notificacio.id) > 0 then true else false END from NotificacioEnviamentEntity " +
+			" where	notificacio.id = :notificacioId " +
+			"	and (notificaEstatFinal = false " +
+			"   		and notificaEstat = es.caib.notib.client.domini.EnviamentEstat.NOTIB_PENDENT)")
+	boolean hasEnviamentsPendentsByNotificacioId(@Param("notificacioId") Long notificacioId);
+
 	NotificacioEnviamentEntity findByNotificacioEntitatAndNotificaIdentificador(EntitatEntity entitat, String notificaIdentificador);
 	
 	NotificacioEnviamentEntity findByNotificaIdentificador(String notificaIdentificador);
