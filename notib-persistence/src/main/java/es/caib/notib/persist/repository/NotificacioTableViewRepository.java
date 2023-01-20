@@ -132,11 +132,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isEnviamentTipusNull = true or ntf.enviamentTipus = :enviamentTipus) " +
 			"and (:isConcepteNull = true or lower(ntf.concepte) like concat('%', lower(:concepte), '%')) " +
 			"and (:isEstatNull = true or bitand(ntf.estat, :estatMask) <> 0) " +
-//			"and (:isEstatNull = true or ntf.estat = :estat or (" +
-//			"    select count(env.id) " +
-//			"    from ntf.enviaments env " +
-//			"    where env.notificaEstat = :notificaEstat" +
-//			"    ) > 0 ) " +
 			"and (:isDataIniciNull = true or ntf.createdDate >= :dataInici) " +
 			"and (:isDataFiNull = true or ntf.createdDate <= :dataFi) " +
 			"and (:isOrganCodiNull = true or ntf.organCodi = :organCodi) " +

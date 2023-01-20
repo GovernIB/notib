@@ -482,6 +482,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
+					long start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
 							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
@@ -494,6 +495,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entitatActual,
 							usuariCodi,
 							pageable);
+					long elapsedTime = System.nanoTime() - start;
+					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
 				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
@@ -531,7 +534,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getConcepte().isNull(),
 							filtreNetejat.getConcepte().isNull() ? "" : filtreNetejat.getConcepte().getField(),
 							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().isNull() ? filtreNetejat.getEstat().getField().getMask() : null,
+							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
 //							!filtreNetejat.getEstat().isNull() ?
 //									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
@@ -561,7 +564,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getReferencia().getField(),
 							pageable);
 					long elapsedTime = System.nanoTime() - start;
-					log.info("rol usuari filtrat: "  + elapsedTime);
+					log.info(">>>>>>>>>>>>> Notificacions amb filtre: "  + elapsedTime);
 				} else if (isUsuariEntitat || isSuperAdmin) {
 					var entitatFiltre = isUsuariEntitat ? entitatId :filtreNetejat.getEntitatId().getField();
 					notificacions = notificacioTableViewRepository.findAmbFiltre(
