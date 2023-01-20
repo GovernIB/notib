@@ -33,8 +33,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
-    @Autowired
-    private NotificacioTableHelper notificacioTableHelper;
+//    @Autowired
+//    private NotificacioTableHelper notificacioTableHelper;
 
     public static int counter = 0;
 

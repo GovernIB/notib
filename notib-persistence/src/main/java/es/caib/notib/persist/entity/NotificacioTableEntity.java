@@ -132,8 +132,12 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 	private Date enviadaDate;
 	@Column(name = "referencia", length = 36)
 	protected String referencia;
-	@Column(name = "TITULAR", length = 256)
+	@Column(name = "TITULAR", length = 1024)
 	private String titular;
+	@Column(name = "NOTIFICA_IDS", length = 1024)
+	private String notificaIds;
+	@Column(name = "ESTAT_MASK")
+	private Integer estatMask;
 
 	@Setter
 	@Transient

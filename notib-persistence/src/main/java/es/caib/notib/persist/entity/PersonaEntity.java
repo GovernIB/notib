@@ -176,5 +176,32 @@ public class PersonaEntity extends NotibAuditable<Long> {
 		}
 		return nomSencer;
 	}
+
+	public String getNomFormatted() {
+
+		String llinatges = concatenarLlinatges();
+		String formatted = "";
+		if (raoSocial == null || raoSocial.isEmpty()) {
+			formatted = nom != null ? nom : "";
+			formatted += llinatges != null && !llinatges.isEmpty() ? " " + llinatges : "";
+		} else {
+			formatted += raoSocial;
+		}
+		formatted += nif != null && !nif.isEmpty() ? " (" + nif + ")" : "";
+		return formatted;
+	}
+
+	public String concatenarLlinatges() {
+		if (llinatge1 == null && llinatge2 == null) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append(llinatge1);
+		if (llinatge2 != null && !llinatge2.isEmpty()) {
+			sb.append(" ");
+			sb.append(llinatge2);
+		}
+		return sb.toString();
+	}
 	private static final long serialVersionUID = 4569697366006085907L;
 }

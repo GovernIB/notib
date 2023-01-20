@@ -4,6 +4,7 @@
 package es.caib.notib.persist.dialect;
 
 import es.caib.notib.persist.audit.AbstractAuditableEntity;
+import org.hibernate.Hibernate;
 import org.hibernate.dialect.PostgreSQL9Dialect;
 
 /**
@@ -14,6 +15,11 @@ import org.hibernate.dialect.PostgreSQL9Dialect;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class PostgreSqlCaibDialect extends PostgreSQL9Dialect {
+
+	public PostgreSqlCaibDialect() {
+		super();
+		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", Hibernate.INTEGER));
+	}
 
 	@Override
 	public String getSelectSequenceNextValString(String sequenceName) {

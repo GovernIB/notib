@@ -14,27 +14,33 @@ import java.io.Serializable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum NotificacioEstatEnumDto implements Serializable {
-	PENDENT(0),
-	ENVIADA(1),
-	REGISTRADA(2),
-	FINALITZADA(3),
-	PROCESSADA(4),
-	EXPIRADA(10),
-	NOTIFICADA(14),
-	REBUTJADA(20),
-	ENVIAT_SIR(27),
-	ENVIADA_AMB_ERRORS(28),
-	FINALITZADA_AMB_ERRORS(29),
-	ENVIANT(40);
+
+	PENDENT(0, 1<<0), // 15
+	ENVIADA(1, 1<<1),	// 23
+	REGISTRADA(2, 1<<2),	// 24
+	FINALITZADA(3, 1<<3),	// 22
+	PROCESSADA(4, 1<<4),	// 25
+	EXPIRADA(10, 1<<5),	// 10
+	NOTIFICADA(14, 1<<6),	// 14
+	REBUTJADA(20, 1<<7),	// 20
+	ENVIAT_SIR(27, 1<<8),	// 27
+	ENVIADA_AMB_ERRORS(28, 1<<9),	// 28
+	FINALITZADA_AMB_ERRORS(29, 1<<10),	// 29
+	ENVIANT(40, 1<<11);	//
 
 	private Integer numVal;
-	
-	NotificacioEstatEnumDto(int numVal) {
+	private Integer mask;
+
+	NotificacioEstatEnumDto(int numVal, int mask) {
         this.numVal = numVal;
     }
 	
 	public int getNumVal() {
 		return numVal;
+	}
+
+	public int getMask() {
+		return mask;
 	}
 	
 	public Long getLongVal() {
