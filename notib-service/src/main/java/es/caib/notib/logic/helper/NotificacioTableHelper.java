@@ -8,6 +8,7 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
+import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -32,11 +34,33 @@ public class NotificacioTableHelper {
     @Autowired
     private NotificacioMassivaRepository notificacioMassivaRepository;
 
+    public void actualitzarTaula() {
+
+        List<NotificacioTableEntity> nots = notificacioTableViewRepository.findAll();
+        String titular;
+        for (NotificacioTableEntity not : nots) {
+            titular = "";
+            for (NotificacioEnviamentEntity e : not.getNotificacio().getEnviaments() ) {
+                titular += e.getTitular().getNom() + " " + e.getTitular().getLlinatge1() + " " + e.getTitular().getLlinatge2() + " " + e.getTitular().getNif() + " ";
+            }
+            not.setTitular(titular);
+            notificacioTableViewRepository.save(not);
+        }
+    }
+
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEntity notificacio){
 
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
+            String titular = "";
+            PersonaEntity t;
+            Set<NotificacioEnviamentEntity> envs = notificacio.getEnviaments();
+            for(NotificacioEnviamentEntity e : envs) {
+                t = e.getTitular();
+                titular += t.getNif() + " " + t.getNom() + " " + t.getLlinatge1() + " " + t.getLlinatge2() + " ";
+            }
+
             NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder().notificacio(notificacio).entitat(notificacio.getEntitat())
                     .procedimentCodiNotib(notificacio.getProcedimentCodiNotib()).procedimentOrgan(notificacio.getProcedimentOrgan())
                     .usuariCodi(notificacio.getUsuariCodi()).grupCodi(notificacio.getGrupCodi()).tipusUsuari(notificacio.getTipusUsuari())
@@ -52,6 +76,7 @@ public class NotificacioTableHelper {
                     .organNom(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getNom() : null)
                     .organEstat(notificacio.getOrganGestor() != null ? notificacio.getOrganGestor().getEstat() : null)
                     .isErrorLastEvent(false).notificacioMassiva(notificacio.getNotificacioMassivaEntity()).enviadaDate(getEnviadaDate(notificacio))
+                    .titular(titular)
                     .referencia(notificacio.getReferencia()).build();
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
