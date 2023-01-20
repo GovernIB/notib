@@ -112,4 +112,12 @@
 			id="PermisosService"
 			jndi-name="notib/PermisosServiceBean/local"
 			business-interface="es.caib.notib.logic.intf.service.PermisosService"/>
+	<jee:local-slsb
+			id="AdviserService"
+			jndi-name="notib/AdviserServiceBean/local"
+			business-interface="es.caib.notib.logic.intf.service.AdviserService"/>
+	<jee:local-slsb
+			id="MonitorTasquesService"
+			jndi-name="notib/MonitorTasquesServiceBean/local"
+			business-interface="es.caib.notib.logic.intf.service.MonitorTasquesService"/>
 </beans>
