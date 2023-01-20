@@ -1043,9 +1043,9 @@ public class ServeiServiceImpl implements ServeiService{
 			String organFiltreCodi = null;
 
 			if (organFiltre != null) {
-				OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organFiltre);
-				if (organGestorEntity != null)
-					organFiltreCodi = organGestorEntity.getCodi();
+				var organGestorEntity = organGestorRepository.findById(organFiltre);
+				if (organGestorEntity != null || organGestorEntity.isPresent())
+					organFiltreCodi = organGestorEntity.get().getCodi();
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {

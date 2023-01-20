@@ -6,6 +6,7 @@ package es.caib.notib.persist.dialect;
 import es.caib.notib.persist.audit.AbstractAuditableEntity;
 import org.hibernate.Hibernate;
 import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.hibernate.type.IntegerType;
 
 /**
  * Dialecte de Hibernate per a la base de dades Postgres per a permetre
@@ -18,7 +19,7 @@ public class PostgreSqlCaibDialect extends PostgreSQL9Dialect {
 
 	public PostgreSqlCaibDialect() {
 		super();
-		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", Hibernate.INTEGER));
+		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", IntegerType.INSTANCE));
 	}
 
 	@Override

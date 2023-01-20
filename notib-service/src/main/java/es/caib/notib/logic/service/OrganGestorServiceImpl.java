@@ -273,10 +273,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			//Compravacions en ús
-			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
-			if (organGestor == null)
+			var opt = organGestorRepository.findById(organId);
+			if (opt == null || opt.isEmpty()) {
 				return true; // No en ús pq no existeix!!
-
+			}
+			var organGestor = opt.get();
 			if (OrganGestorEstatEnum.V.equals(organGestor.getEstat()))
 				return true;
 
@@ -1782,7 +1783,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
 		setOrgansGestors.addAll(organsGestorsAmbPermis);
 		organsGestors = new ArrayList<>(setOrgansGestors);
-		if (!configHelper.getAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
+		if (!configHelper.getConfigAsBoolean("es.caib.notib.notifica.dir3.entitat.permes")) {
 			organsGestors.remove(organGestorRepository.findByCodi(entitat.getDir3Codi()));
 		}
 		if (procedimentsDisponibles.isEmpty() && organsGestors.isEmpty()) {

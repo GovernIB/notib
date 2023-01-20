@@ -47,19 +47,12 @@ public class UnitatsOrganitzativesMock implements UnitatsOrganitzativesPlugin {
 	}
 
 	@Override
-	public Map<String, NodeDir3> organigramaPerEntitat(String pareCodi, Date fechaActualizacion, Date fechaSincronizacion) throws SistemaExternException {
-
-		Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
-		return organigrama;
-	}
-
-	@Override
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		return null;
 	}
 
 	@Override
-	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
+	public NodeDir3 findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		return null;
 	}
 

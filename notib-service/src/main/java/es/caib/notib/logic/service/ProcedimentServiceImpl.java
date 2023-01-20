@@ -870,9 +870,9 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			String organFiltreCodi = null;
 
 			if (organFiltre != null) {
-				var organGestorEntity = organGestorRepository.findOne(organFiltre);
-				if (organGestorEntity != null)
-					organFiltreCodi = organGestorEntity.getCodi();
+				var organGestorEntity = organGestorRepository.findById(organFiltre);
+				if (organGestorEntity != null && organGestorEntity.isPresent())
+					organFiltreCodi = organGestorEntity.get().getCodi();
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {

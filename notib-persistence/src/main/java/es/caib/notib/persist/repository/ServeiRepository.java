@@ -1,6 +1,7 @@
 package es.caib.notib.persist.repository;
 
 import es.caib.notib.persist.entity.EntitatEntity;
+import es.caib.notib.persist.entity.ProcSerEntity;
 import es.caib.notib.persist.entity.ServeiEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,10 @@ import java.util.Set;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
+
+
+	@Query("from ProcedimentEntity pro where pro.id = :id")
+	ProcSerEntity findProcSer(@Param("id") Long id);
 
 	@Query(
 			"from ServeiEntity pro " +

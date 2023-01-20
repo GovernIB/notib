@@ -193,6 +193,6 @@ public class PermisosCacheable {
     }
 
     public boolean getGenerarLogsPermisosOrgan() {
-        return configHelper.getAsBoolean("es.caib.notib.permisos.organ.logs");
+        return configHelper.getConfigAsBoolean("es.caib.notib.permisos.organ.logs");
     }
 }

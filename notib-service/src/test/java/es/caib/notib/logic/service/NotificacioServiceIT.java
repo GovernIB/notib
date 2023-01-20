@@ -100,7 +100,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 //				null).build());
 
 		procedimentCreator.addObject("procediment", procedimentCreator.getRandomInstance());
-		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
+//		procedimentCreator.addObject("procedimentCIE", procedimentCreator.getRandomInstanceAmbEntregaCie(cie.getId(), operadorPostal.getId()));
 		procedimentCreator.addObject("procedimentSensePermis", ProcedimentItemTest.getRandomProcedimentSensePermis());
 
 		notificacioCreator.addObject("notificacio", NotificacioItemTest.getRandomInstance());

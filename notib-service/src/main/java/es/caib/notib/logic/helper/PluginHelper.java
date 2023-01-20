@@ -959,48 +959,48 @@ public class PluginHelper {
 //			cacheManager.getCache("organigramaOriginal").evict(entitatcodi);
 //		}
 //	}
-
-	public Map<String, NodeDir3> getOrganigramaPerEntitat(String codiDir3Entitat) throws SistemaExternException {
-
-		log.info("Obtenir l'organigrama per entitat");
-		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir organigrama per entitat",
-				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat));
-
-		String protocol = configHelper.getConfig("es.caib.notib.plugin.unitats.dir3.protocol");
-		Map<String, NodeDir3> organigrama = null;
-		String filenameOrgans = getOrganGestorsFile();
-		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-			filenameOrgans = filenameOrgans + "_" + codiDir3Entitat + ".json";
-		}
-		try {
-			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
-			if (entitat == null) {
-				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
-			}
-			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
-				configHelper.setEntitatCodi(entitat.getCodi());
-			}
-			info.setCodiEntitat(entitat.getCodi());
-			if ("SOAP".equalsIgnoreCase(protocol)) {
-				log.info("Obtenir l'organigrama per entitat SOAP");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat, null, null);
-			} else {
-				log.info("Obtenir l'organigrama per entitat REST");
-				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);
-			}
-			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.writeValue(new File(filenameOrgans), organigrama);
-			}
-			integracioHelper.addAccioOk(info);
-		} catch (Exception ex) {
-			log.info("Error al obtenir l'organigrama per entitat");
-			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
-			integracioHelper.addAccioError(info, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
-		}
-		return organigrama;
-	}
+//
+//	public Map<String, NodeDir3> getOrganigramaPerEntitat(String codiDir3Entitat) throws SistemaExternException {
+//
+//		log.info("Obtenir l'organigrama per entitat");
+//		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS,"Obtenir organigrama per entitat",
+//				IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Codi Dir3 de l'entitat", codiDir3Entitat));
+//
+//		String protocol = configHelper.getConfig("es.caib.notib.plugin.unitats.dir3.protocol");
+//		Map<String, NodeDir3> organigrama = null;
+//		String filenameOrgans = getOrganGestorsFile();
+//		if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
+//			filenameOrgans = filenameOrgans + "_" + codiDir3Entitat + ".json";
+//		}
+//		try {
+//			EntitatEntity entitat = entitatRepository.findByDir3Codi(codiDir3Entitat);
+//			if (entitat == null) {
+//				throw new Exception("Entitat amb codiDir3 " + codiDir3Entitat + "no trobada");
+//			}
+//			if (Strings.isNullOrEmpty(configHelper.getEntitatActualCodi())) {
+//				configHelper.setEntitatCodi(entitat.getCodi());
+//			}
+//			info.setCodiEntitat(entitat.getCodi());
+//			if ("SOAP".equalsIgnoreCase(protocol)) {
+//				log.info("Obtenir l'organigrama per entitat SOAP");
+//				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat, null, null);
+//			} else {
+//				log.info("Obtenir l'organigrama per entitat REST");
+//				organigrama = getUnitatsOrganitzativesPlugin().organigramaPerEntitat(codiDir3Entitat);
+//			}
+//			if (filenameOrgans != null && !filenameOrgans.isEmpty()) {
+//				ObjectMapper mapper = new ObjectMapper();
+//				mapper.writeValue(new File(filenameOrgans), organigrama);
+//			}
+//			integracioHelper.addAccioOk(info);
+//		} catch (Exception ex) {
+//			log.info("Error al obtenir l'organigrama per entitat");
+//			String errorDescripcio = "Error al obtenir l'organigrama per entitat";
+//			integracioHelper.addAccioError(info, errorDescripcio, ex);
+//			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
+//		}
+//		return organigrama;
+//	}
 
 	public List<NodeDir3> unitatsOrganitzativesFindByPare(String entitatCodi, String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) {
 

@@ -89,7 +89,7 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 					ex);
 		}
 	}
-	
+
 	private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {
 		if (unitat.getEstat().startsWith("V") || unitat.getEstat().startsWith("T")) {	// Unitats Vigents o Transitòries 
 			organigrama.put(unitat.getCodi(), unitat);

@@ -175,11 +175,11 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 		return getDelegateService().findServeis(entitatId, grups);
 	}
 	
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
-	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
-		return getDelegateService().findServeisWithPermis(entitatId, usuariCodi, permis);
-	}
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
+//	public List<ProcSerCacheDto> findServeisWithPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
+//		return getDelegateService().findServeisWithPermis(entitatId, usuariCodi, permis);
+//	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom", "NOT_APL"})
@@ -333,19 +333,19 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 		return getDelegateService().findServeisByOrganGestor(organGestorCodi);
 	}
 
-	@Override
-	@RolesAllowed({"tothom"})
-	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
-			Long entitatId,
-			String organGestorCodi, 
-			List<String> grups,
-			PermisEnum permis) {
-		return getDelegateService().findServeisByOrganGestorWithPermis(
-				entitatId, 
-				organGestorCodi, 
-				grups, 
-				permis);
-	}
+//	@Override
+//	@RolesAllowed({"tothom"})
+//	public List<ProcSerDto> findServeisByOrganGestorWithPermis(
+//			Long entitatId,
+//			String organGestorCodi,
+//			List<String> grups,
+//			PermisEnum permis) {
+//		return getDelegateService().findServeisByOrganGestorWithPermis(
+//				entitatId,
+//				organGestorCodi,
+//				grups,
+//				permis);
+//	}
 
     @Override
     @RolesAllowed({"NOT_ADMIN", "tothom"})
@@ -373,11 +373,11 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 				enviamentTipus);
 	}
 
-	@Override
-	@RolesAllowed({"tothom"})
-	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
-		return getDelegateService().hasServeisComunsAndNotificacioPermission(entitatId, enviamentTipus);
-	}
+//	@Override
+//	@RolesAllowed({"tothom"})
+//	public boolean hasServeisComunsAndNotificacioPermission(Long entitatId, TipusEnviamentEnumDto enviamentTipus) {
+//		return getDelegateService().hasServeisComunsAndNotificacioPermission(entitatId, enviamentTipus);
+//	}
 
 	@Override
 	@PermitAll
@@ -410,24 +410,24 @@ public class ServeiService extends AbstractService<es.caib.notib.logic.intf.serv
 //		return getDelegateService().findServeisOrganWithPermis(entitatId, usuariCodi, permis);
 //	}
 
-	@Override
-	@RolesAllowed({"NOT_ADMIN", "tothom"})
-	public List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(
-			String organId,
-			String entitatCodi,
-			List<ProcSerOrganDto> serveisOrgans) {
-		return getDelegateService().findServeisOrganWithPermisByOrgan(organId, entitatCodi, serveisOrgans);
-	}
-
-	@Override
-	@PermitAll
-	public List<String> findServeisOrganCodiWithPermisByServei(
-			ProcSerDto servei,
-			String entitatCodi,
-			List<ProcSerOrganDto> serveisOrgans) {
-		return getDelegateService().findServeisOrganCodiWithPermisByServei(servei, entitatCodi, serveisOrgans);
-	}
-	
+//	@Override
+//	@RolesAllowed({"NOT_ADMIN", "tothom"})
+//	public List<ProcSerOrganDto> findServeisOrganWithPermisByOrgan(
+//			String organId,
+//			String entitatCodi,
+//			List<ProcSerOrganDto> serveisOrgans) {
+//		return getDelegateService().findServeisOrganWithPermisByOrgan(organId, entitatCodi, serveisOrgans);
+//	}
+//
+//	@Override
+//	@PermitAll
+//	public List<String> findServeisOrganCodiWithPermisByServei(
+//			ProcSerDto servei,
+//			String entitatCodi,
+//			List<ProcSerOrganDto> serveisOrgans) {
+//		return getDelegateService().findServeisOrganCodiWithPermisByServei(servei, entitatCodi, serveisOrgans);
+//	}
+//
 	@Override
 	@RolesAllowed({"tothom"})
 	public ProcSerDto findByNom(

@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
@@ -108,6 +109,8 @@ public class NotificacioListHelper {
         boolean permisProcessar;
         List<NotificacioEnviamentEntity> enviamentsPendents;
         PaginaDto<NotificacioTableItemDto> page = paginacioHelper.toPaginaDto(notificacions, NotificacioTableItemDto.class);
+        Optional<NotificacioEntity> not;
+        NotificacioEntity e;
         for (NotificacioTableItemDto notificacio : page.getContingut()) {
             permisProcessar = false;
             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
@@ -121,7 +124,11 @@ public class NotificacioListHelper {
 //            }
             notificacio.setHasEnviamentsPendentsRegistre(notificacioEnviamentRepository.hasEnviamentsPendentsByNotificacioId(notificacio.getId()));
             notificacio.setDocumentId(notificacioRepository.findDOcumentId(notificacio.getId()));
-            NotificacioEntity e = notificacioRepository.findById(notificacio.getId());
+            not = notificacioRepository.findById(notificacio.getId());
+            if (not == null || not.isEmpty()) {
+                continue;
+            }
+            e = not.get();
             List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
             prepararColumnaEstat(notificacio, envs);
 
@@ -204,15 +211,15 @@ public class NotificacioListHelper {
 
     public NotificacioFiltre getFiltre(NotificacioFiltreDto filtreDto) {
 
-        OrganGestorEntity organGestor = null;
+        Optional<OrganGestorEntity> organGestor = null;
         if (filtreDto.getOrganGestor() != null && !filtreDto.getOrganGestor().isEmpty()) {
-            organGestor = organGestorRepository.findOne(Long.parseLong(filtreDto.getOrganGestor()));
+            organGestor = organGestorRepository.findById(Long.parseLong(filtreDto.getOrganGestor()));
         }
         ProcSerEntity procediment = null;
         if (filtreDto.getProcedimentId() != null) {
-            procediment = procedimentRepository.findById(filtreDto.getProcedimentId());
+            procediment = procedimentRepository.findProcSer(filtreDto.getProcedimentId());
         } else if (filtreDto.getServeiId() != null) {
-            procediment = serveiRepository.findById(filtreDto.getServeiId());
+            procediment = serveiRepository.findProcSer(filtreDto.getServeiId());
         }
         NotificacioEstatEnumDto estat = filtreDto.getEstat();
         Boolean hasZeronotificaEnviamentIntent = null;
@@ -237,7 +244,7 @@ public class NotificacioListHelper {
                 .dataInici(new FiltreField<>(FiltreHelper.toIniciDia(filtreDto.getDataInici())))
                 .dataFi(new FiltreField<>(FiltreHelper.toFiDia(filtreDto.getDataFi())))
                 .titular(new StringField(filtreDto.getTitular()))
-                .organGestor(new FiltreField<>(organGestor))
+                .organGestor(new FiltreField<>(organGestor.get()))
                 .procediment(new FiltreField<>(procediment))
                 .tipusUsuari(new FiltreField<>(filtreDto.getTipusUsuari()))
                 .numExpedient(new StringField(filtreDto.getNumExpedient()))

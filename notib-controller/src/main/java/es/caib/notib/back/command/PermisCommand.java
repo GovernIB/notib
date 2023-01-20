@@ -74,6 +74,10 @@ public class PermisCommand {
 		return commands;
 	}
 
+	public static PermisCommand asCommand(PermisDto dto) {
+		return ConversioTipusHelper.convertir(dto, PermisCommand.class);
+	}
+
 	public static PermisCommand asCommand(PermisDto dto, EntitatPermis entitatPermis) {
 
 		PermisCommand command = ConversioTipusHelper.convertir(dto, PermisCommand.class);

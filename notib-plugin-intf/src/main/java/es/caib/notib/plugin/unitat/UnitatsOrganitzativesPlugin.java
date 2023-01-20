@@ -28,8 +28,6 @@ public interface UnitatsOrganitzativesPlugin {
 	 * @throws SistemaExternException Si es produeix un error al consultar les unitats organitzatives.
 	 */
 	Map<String, NodeDir3> organigramaPerEntitat(String codiEntitat) throws SistemaExternException;
-	
-	Map<String, NodeDir3> organigramaPerEntitatWs(String pareCodi, Date fechaActualizacion, Date fechaSincronizacion) throws SistemaExternException;
 
 	/**
 	 * Retorna la llista d'unitats organitzatives filles donada

@@ -195,6 +195,12 @@
             <artifactId>notib-client-intf</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20220924</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>
