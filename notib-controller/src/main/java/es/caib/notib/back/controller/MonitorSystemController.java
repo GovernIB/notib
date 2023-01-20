@@ -3,6 +3,10 @@ package es.caib.notib.back.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.back.helper.MonitorHelper;
+import es.caib.notib.logic.intf.monitor.MonitorTascaEstat;
+import es.caib.notib.logic.intf.monitor.MonitorTascaInfo;
+import es.caib.notib.logic.intf.service.MonitorTasquesService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +18,10 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,10 +37,11 @@ import java.util.Set;
 @RequestMapping("/monitor")
 public class MonitorSystemController extends BaseController {
 
+	@Autowired
+	private MonitorTasquesService monitortasquesService;
+
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		return "monitor";
 	}
 
@@ -108,5 +115,56 @@ public class MonitorSystemController extends BaseController {
 		mjson.put("espera", espera);
 		mjson.put("blockedtime", blockedtime);
 		return mjson;
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/tasques", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, JSONArray> getTasquesJson(HttpServletRequest request) {
+
+		Map<String, JSONArray> tasques = new HashMap<>();
+		JSONArray tasca = new JSONArray();
+		JSONArray estat = new JSONArray();
+		JSONArray iniciExecucio = new JSONArray();
+		JSONArray tempsExecucio = new JSONArray();
+		JSONArray properaExecucio = new JSONArray();
+		JSONArray observacions = new JSONArray();
+		JSONArray identificadors = new JSONArray();
+
+		List<MonitorTascaInfo> monitorTasques = monitortasquesService.findAll();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		for(MonitorTascaInfo monitorTasca : monitorTasques) {
+
+			identificadors.add(monitorTasca.getCodi());
+			tasca.add(getMessage(request, "monitor.tasques.tasca") + ": " + getMessage(request, "monitor.tasques.tasca.codi." + monitorTasca.getCodi()));
+			estat.add(getMessage(request, "monitor.tasques.estat") + ": " + getMessage(request, "monitor.tasques.estat." + monitorTasca.getEstat()));
+
+			String strDataInici = "-";
+			if (monitorTasca.getDataInici() != null) {
+				strDataInici = sdf.format(monitorTasca.getDataInici());
+			}
+			iniciExecucio.add(getMessage(request, "monitor.tasques.darrer.inici") + ": " + strDataInici);
+
+			@SuppressWarnings("unused")
+			String difDataSegons = "-";
+			if (monitorTasca.getDataInici() != null) {
+				long difDatas = System.currentTimeMillis() - monitorTasca.getDataInici().getTime();
+				difDataSegons = ((int) (difDatas / 1000) % 60) + "s";
+			}
+			tempsExecucio.add(getMessage(request, "monitor.tasques.temps.execucio") + ": " + monitorTasca.getTempsExecucio());
+
+			String strProperaExecucio = !MonitorTascaEstat.EN_EXECUCIO.equals(monitorTasca.getEstat()) && monitorTasca.getProperaExecucio() != null
+					? sdf.format(monitorTasca.getProperaExecucio()) : "-";
+			properaExecucio.add(getMessage(request, "monitor.tasques.propera.execucio") + ": " + strProperaExecucio);
+			observacions.add(getMessage(request, "monitor.tasques.observacions") + ": " + monitorTasca.getObservacions());
+		}
+		tasques.put("tasca", tasca);
+		tasques.put("estat", estat);
+		tasques.put("iniciExecucio", iniciExecucio);
+		tasques.put("tempsExecucio", tempsExecucio);
+		tasques.put("properaExecucio", properaExecucio);
+		tasques.put("observacions", observacions);
+		tasques.put("identificadors", identificadors);
+		return tasques;
 	}
 }

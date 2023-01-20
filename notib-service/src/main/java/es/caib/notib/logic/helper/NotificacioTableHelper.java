@@ -55,6 +55,8 @@ public class NotificacioTableHelper {
                     titular = titular.substring(0, titular.length() - 2);
             }
 
+            estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
+
             NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder().notificacio(notificacio).entitat(notificacio.getEntitat())
                     .procedimentCodiNotib(notificacio.getProcedimentCodiNotib()).procedimentOrgan(notificacio.getProcedimentOrgan())
                     .usuariCodi(notificacio.getUsuariCodi()).grupCodi(notificacio.getGrupCodi()).tipusUsuari(notificacio.getTipusUsuari())
