@@ -435,7 +435,7 @@ public class PluginHelper {
 		}
 	}
 	
-	public List<OficinaDto> oficinesSIREntitat(String codiDir3Entitat) throws SistemaExternException {
+	public List<OficinaDto> oficinesEntitat(String codiDir3Entitat) throws SistemaExternException {
 
 		var info = new IntegracioInfo(IntegracioHelper.INTCODI_UNITATS, "Obtenir llista de les oficines SIR d'una entitat",
 												IntegracioAccioTipusEnumDto.ENVIAMENT, new AccioParam("Text de la cerca", codiDir3Entitat));

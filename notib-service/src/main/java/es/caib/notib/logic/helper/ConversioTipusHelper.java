@@ -409,6 +409,11 @@ public class ConversioTipusHelper {
 						})
 				.byDefault()
 				.register();
+
+		mapperFactory.classMap(OficinaEntity.class, OficinaDto.class).
+				field("organGestor.codi", "organCodi").
+				byDefault().
+				register();
 		defineConverters();
 	}
 

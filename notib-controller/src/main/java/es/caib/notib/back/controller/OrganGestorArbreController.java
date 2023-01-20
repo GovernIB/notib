@@ -70,17 +70,26 @@ public class OrganGestorArbreController extends BaseUserController {
     public String get(HttpServletRequest request, Model model) {
 
         try {
+            var ti = System.currentTimeMillis();
             var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
             var filtres = controller.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
             boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
             var organ = getOrganGestorActual(request);
+            Long tf = System.currentTimeMillis();
+            System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T1: " + (tf - ti) + "ms");
+            ti = tf;
             var arbre = organService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);
             model.addAttribute("arbreOrgans", arbre);
             model.addAttribute("filtresEmpty", filtres.isEmpty());
             model.addAttribute("isFiltre", "true".equals(filtres.getIsFiltre()));
+            tf = System.currentTimeMillis();
+            System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2: " + (tf - ti) + "ms");
+            ti = tf;
             omplirModel(model, entitat, null);
+            tf = System.currentTimeMillis();
+            System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T3: " + (tf - ti) + "ms");
         } catch (Exception ex) {
             log.error("Error generant l'arbre d'òrgans", ex);
             var msg = getMessage(request, "organgestor.list.datatable.error", new Object[] {
@@ -168,8 +177,12 @@ public class OrganGestorArbreController extends BaseUserController {
 
     private void omplirModel(Model model, EntitatDto entitat, OrganGestorDto organ) {
 
+        Long ti = System.currentTimeMillis();
         var command = organ != null ? OrganGestorCommand.asCommand(organ) : new OrganGestorCommand();
         command.setEntitatId(entitat.getId());
+        Long tf = System.currentTimeMillis();
+        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.1: " + (tf - ti) + "ms");
+        ti = tf;
         model.addAttribute("organsEntitat", organService.getOrgansAsList());
         model.addAttribute("id", organ != null && organ.getId() != null ? organ.getId() : 0);
         model.addAttribute("organGestorCommand", command);
@@ -177,23 +190,37 @@ public class OrganGestorArbreController extends BaseUserController {
         model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
         model.addAttribute("setOficina", !entitat.isOficinaEntitat());
         model.addAttribute("isModificacio", organ != null && organ.getId() != null);
+        tf = System.currentTimeMillis();
+        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.2: " + (tf - ti) + "ms");
+        ti = tf;
         if (!entitat.isOficinaEntitat()) {
-            var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);
+            var oficinesEntitat = organService.getOficinesSIR(entitat.getId(), entitat.getDir3Codi(),true);    // <-- TODO: El problema està aquí
             model.addAttribute("oficinesEntitat", oficinesEntitat);
         }
         if (organ == null) {
             return;
         }
+        tf = System.currentTimeMillis();
+        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.3: " + (tf - ti) + "ms");
+        ti = tf;
         List<LlibreDto> llibres = new ArrayList<>();
         llibres.add(organService.getLlibreOrganisme(entitat.getId(), organ.getCodi()));
         model.addAttribute("llibres", llibres);
+        tf = System.currentTimeMillis();
+        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.4: " + (tf - ti) + "ms");
+        ti = tf;
         var oficines = organService.getOficinesSIR(entitat.getId(), organ.getCodi(),false);
         model.addAttribute("oficines", oficines);
+        tf = System.currentTimeMillis();
+        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.5: " + (tf - ti) + "ms");
+        ti = tf;
         for(var oficina: oficines) {
             if (oficina.getCodi() != null && oficina.getCodi().equals(entitat.getOficina())) {
                 command.setOficinaNom(oficina.getCodi() + " - " + oficina.getNom());
                 break;
             }
         }
+        tf = System.currentTimeMillis();
+        System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.6: " + (tf - ti) + "ms");
     }
 }

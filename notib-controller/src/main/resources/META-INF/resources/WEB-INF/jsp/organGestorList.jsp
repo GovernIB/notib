@@ -241,7 +241,7 @@
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<p style="text-align:right">
 			<c:if test="${setOficina}">
-				<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines">
+				<a id="organ-boto-update-oficines" class="btn btn-default" href="organgestor/sync/oficines/LLISTA"  onClick="bloquejar()">
 							<span class="fa fa-refresh"></span>&nbsp;<spring:message code="organgestor.list.boto.actualitzar.oficines"/>
 				</a>
 			</c:if>
