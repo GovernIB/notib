@@ -98,6 +98,7 @@
 		.check-label>span {font-size: 24px; padding-right: 15px; width: 50px; color: #888;}
 		.checkbox-primary {text-align: right; padding-right: 30px;}
 		.control-label, .controls { cursor: pointer;}
+
 	</style>
 
 
