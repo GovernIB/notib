@@ -1428,16 +1428,6 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				document.setTipoDocumental(tipoDocumental);
 				document.setModoFirma(modoFirma);
 			}
-
-			// Recuperar csv
-			Map<String, Object> metadadesAddicionals = doc.getMetadades().getMetadadesAddicionals();
-			if (metadadesAddicionals != null) {
-				if (metadadesAddicionals.containsKey("csv"))
-					document.setCsv((String) metadadesAddicionals.get("csv"));
-				else if (metadadesAddicionals.containsKey("eni:csv"))
-					document.setCsv((String) metadadesAddicionals.get("eni:csv"));
-			}
-
 		} else if (documentV2.getCsv() != null) {
 			String arxiuCsv = documentV2.getCsv();
 			logger.debug(">> [ALTA] documentCsv: " + arxiuCsv);
