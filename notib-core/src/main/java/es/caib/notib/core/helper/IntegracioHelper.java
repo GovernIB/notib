@@ -94,17 +94,17 @@ public class IntegracioHelper {
 		return errorsGroupByCodi;
 	}
 
-	@Transactional
-	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
-
-//		return conversio.convertirList(monitorRepository.findAllByCodiOrderByDataDesc(integracioCodi), IntegracioAccioDto.class);
-		return conversio.convertirList(monitorRepository.getByFiltre(
-				integracioCodi,
-				Strings.isNullOrEmpty(filtre.getEntitatCodi()),
-				filtre.getEntitatCodi(),
-				Strings.isNullOrEmpty(filtre.getAplicacio()),
-				filtre.getAplicacio()), IntegracioAccioDto.class);
-	}
+//	@Transactional
+//	public List<IntegracioAccioDto> findAccions(String integracioCodi, IntegracioFiltreDto filtre) {
+//
+////		return conversio.convertirList(monitorRepository.findAllByCodiOrderByDataDesc(integracioCodi), IntegracioAccioDto.class);
+//		return conversio.convertirList(monitorRepository.getByFiltre(
+//				integracioCodi,
+//				Strings.isNullOrEmpty(filtre.getEntitatCodi()),
+//				filtre.getEntitatCodi(),
+//				Strings.isNullOrEmpty(filtre.getAplicacio()),
+//				filtre.getAplicacio()), IntegracioAccioDto.class);
+//	}
 
 	public void addAccioOk(IntegracioInfo info) {
 		addAccioOk(info, true);

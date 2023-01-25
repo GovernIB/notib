@@ -3,15 +3,25 @@
  */
 package es.caib.notib.core.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioDetall;
 import es.caib.notib.core.api.dto.IntegracioFiltreDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.cie.CieTableItemDto;
+import es.caib.notib.core.entity.monitor.MonitorIntegracioEntity;
+import es.caib.notib.core.entity.monitor.MonitorIntegracioParamEntity;
+import es.caib.notib.core.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +58,9 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	private MetricsHelper metricsHelper;
 	@Resource
 	private MonitorIntegracioRepository monitorRepository;
-	
+	@Resource
+	private MonitorIntegracioParamRepository paramRepository;
+
 	@Override
 	public List<IntegracioDto> integracioFindAll() {
 
@@ -62,18 +74,30 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 	}
 
 	@Override
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
+	@Transactional(readOnly = true)
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			logger.debug("Consultant les darreres accions per a la integració ( codi=" + codi + ")");
-			List<IntegracioAccioDto> accions = integracioHelper.findAccions(codi, filtre);
-			int index = 0;
-			for (IntegracioAccioDto accio : accions) {
-				accio.setIndex(Long.valueOf(index));
-				index++;
-			}
-			return accions;
+//			List<IntegracioAccioDto> accions = integracioHelper.findAccions(codi, filtre);
+
+			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacio);
+			Page<MonitorIntegracioEntity> accions = monitorRepository.getByFiltre(
+					codi,
+					Strings.isNullOrEmpty(filtre.getEntitatCodi()),
+					filtre.getEntitatCodi(),
+					Strings.isNullOrEmpty(filtre.getAplicacio()),
+					filtre.getAplicacio(),
+					pageable);
+			return paginacioHelper.toPaginaDto(accions, IntegracioAccioDto.class);
+
+//			int index = 0;
+//			for (IntegracioAccioDto accio : accions) {
+//				accio.setIndex(Long.valueOf(index));
+//				index++;
+//			}
+//			return accions;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -102,6 +126,23 @@ public class MonitorIntegracioServiceImpl implements MonitorIntegracioService {
 		}
 	}
 
+	@Override
+	public IntegracioDetall detallIntegracio(Long id) {
+
+		try {
+			MonitorIntegracioEntity i = monitorRepository.findOne(id);
+			List<MonitorIntegracioParamEntity> a = paramRepository.findByMonitorIntegracio(i);
+			if (a == null) {
+				return IntegracioDetall.builder().descripcio("Error obtinguent el detall de la integració " + id).build();
+			}
+			List<AccioParam> accions = conversioTipusHelper.convertirList(a, AccioParam.class);
+			return IntegracioDetall.builder().data(i.getData()).descripcio(i.getDescripcio()).tipus(i.getTipus()).estat(i.getEstat())
+					.errorDescripcio(i.getErrorDescripcio()).excepcioMessage(i.getExcepcioMessage())
+					.excepcioStacktrace(i.getExcepcioStacktrace()).parametres(accions).build();
+		} catch (Exception ex) {
+			return IntegracioDetall.builder().descripcio("Error obtinguent el detall de la integració " + id).build();
+		}
+	}
 	private static final Logger logger = LoggerFactory.getLogger(MonitorIntegracioServiceImpl.class);
 
 }
