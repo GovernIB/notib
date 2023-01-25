@@ -1,18 +1,5 @@
--- INDEXOS
--- ----------------
-
--- NOT_NOTIFICACIO
-CREATE INDEX not_not_estatrint_idx on NOT_NOTIFICACIO (ESTAT, REGISTRE_ENV_INTENT);
-
--- NOT_NOTIFICACIO_ENV
-CREATE INDEX not_notenv_estat_idx on NOT_NOTIFICACIO_ENV (NOTIFICA_ESTAT);
-CREATE INDEX not_notenv_regpen_idx on NOT_NOTIFICACIO_ENV (REGISTRE_ESTAT_FINAL, NOTIFICA_ESTAT, SIR_CON_INTENT);
-CREATE INDEX not_notenv_estatsrint_idx on NOT_NOTIFICACIO_ENV (NOTIFICA_ESTAT_FINAL, NOTIFICA_ESTAT, NOTIFICA_INTENT_NUM);
-
-
 -- MULTITHREAD CONFIG --
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) values ('es.caib.notib.multithread',0,'Permetre execucions multithread','SCHEDULLED',0,0,'BOOL');
-
 
 -- optimitzacions.yaml
 UPDATE NOT_NOTIFICACIO_TABLE SET TITULAR = (select listagg(NOM || ' ' || LLINATGE1 || ' ' || LLINATGE2 || ' ' || NIF || ' ' || RAO_SOCIAL,', ') WITHIN GROUP (ORDER BY NOTIFICACIO_ENV_ID) FROM NOT_PERSONA P, NOT_NOTIFICACIO_ENV E WHERE P.ID = E.TITULAR_ID AND E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
@@ -22,6 +9,5 @@ UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (ESTAT_MASK + 2048) WHERE ESTAT = 
 
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.log.path', null,'Ruta del fitxer de log', 'GENERAL', 12, 1, 'TEXT');
 
-CREATE INDEX NOT_TABLE_ENTITAT_INDEX ON not_notificacio_table(ENTITAT_ID);
-CREATE INDEX NOT_TABLE_ENV_ENTITAT_INDEX ON not_notificacio_env_table(ENTITAT_ID);
-
+-- 741
+INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
