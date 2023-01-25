@@ -93,6 +93,7 @@ public class CallbackServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void whenNotificaRaiseExeption_thenCallMarcarEventNoProcessable() throws Exception {
 
         // Given

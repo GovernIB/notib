@@ -25,6 +25,7 @@ import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
 import es.caib.notib.core.repository.EntitatRepository;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,13 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
@@ -105,17 +112,31 @@ public class SchedulledServiceImpl implements SchedulledService {
 				return;
 			}
 			logger.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
+//			ExecutorService executorService = Executors.newFixedThreadPool(pendents.size());
 			RegistrarThread thread;
+//			Map<Long, Future<Boolean>> futurs = new HashMap<>();
+//			Future<Boolean> futur;
 			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
 			for (Long pendent : pendents) {
 				if (multiThread) {
 					thread = new RegistrarThread(pendent, notificacioHelper);
 					thread.run();
+//					futur = executorService.submit(thread);
+//					futurs.put(pendent, futur);
 				} else {
 					logger.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
 					notificacioHelper.registrarNotificar(pendent);
 				}
 			}
+//			Set<Long> keys = futurs.keySet();
+//			for (Long key : keys) {
+//				try {
+//					futurs.get(key).get();
+//				} catch (Exception ex) {
+//					logger.error(String.format("[REG] Error registrant la notificacio ", key), ex);
+//				}
+//			}
+
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}

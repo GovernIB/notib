@@ -96,13 +96,27 @@ public class PermisosServiceImpl implements PermisosService {
     public Boolean hasPermisComunicacio(Long entitatId, String usuariCodi) {
 
         try {
-            Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO};
+            Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO, ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT};
             return hasPermis(entitatId, usuariCodi, permisos);
         } catch (Exception ex) {
             log.error("Error comprovant si l'usuari " + usuariCodi + " té permís de comunicació a l'entitat " + entitatId, ex);
             throw ex;
         }
     }
+
+//    @Override
+//    @Cacheable(value = "procsersPermisComunicacioSenseProcedimentMenu", key="#entitatId.toString().concat('-').concat(#usuariCodi)")
+//    @Transactional(readOnly = true)
+//    public Boolean hasPermisComunicacio(Long entitatId, String usuariCodi) {
+//
+//        try {
+//            Permission[] permisos = new Permission[] {ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT};
+//            return hasPermis(entitatId, usuariCodi, permisos);
+//        } catch (Exception ex) {
+//            log.error("Error comprovant si l'usuari " + usuariCodi + " té permís de comunicació sense procedimenta l'entitat " + entitatId, ex);
+//            throw ex;
+//        }
+//    }
 
     // Comprova si un usuari disposa de permisos per realitzar comunicacions SIR sobre algun procediment
     @Override
@@ -559,7 +573,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     private List<OrganGestorEntity> getOrgansAmbPermisComunicacionsSenseProcediment(EntitatEntity entitat, List<String> grups) {
 
-        List<Long> organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(ProcSerOrganEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
+        List<Long> organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
 
         return getListGivenIds(
                 organsAmbPermisIds,

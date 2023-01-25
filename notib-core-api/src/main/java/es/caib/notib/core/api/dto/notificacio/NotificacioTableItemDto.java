@@ -8,7 +8,10 @@ import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -22,7 +25,11 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class NotificacioTableItemDto {
 
 	private Long id;
@@ -62,16 +69,16 @@ public class NotificacioTableItemDto {
 	private Long documentId;
 	private Date envCerData;
 	private String referencia;
-
-	private int nTramitacio;
-	private int nCompareixenca;
-	private int nLlegida;
-	private int nRebutjada;
-	private int nExpirada;
-	private int nAnulada;
-	private int nError;
-	private int nFinalitzada;
-	private int nProcessada;
+//
+//	private int nTramitacio;
+//	private int nCompareixenca;
+//	private int nLlegida;
+//	private int nRebutjada;
+//	private int nExpirada;
+//	private int nAnulada;
+//	private int nError;
+//	private int nFinalitzada;
+//	private int nProcessada;
 
 	private Map<EnviamentEstat, Integer> contadorEstat = new HashMap<>();
 

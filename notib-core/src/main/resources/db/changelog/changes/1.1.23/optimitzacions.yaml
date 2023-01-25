@@ -11,6 +11,18 @@ databaseChangeLog:
       id: 1671453604619-1
       author: limit
       changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: NOT_TABLE_ENTITAT_INDEX
+            tableName: not_notificacio_table
+        - createIndex:
+            columns:
+              - column:
+                  name: ENTITAT_ID
+            indexName: NOT_TABLE_ENV_ENTITAT_INDEX
+            tableName: not_notificacio_env_table
         - addColumn:
             tableName: not_notificacio_table
             columns:
@@ -45,4 +57,3 @@ databaseChangeLog:
           INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.log.path', null,'Ruta del fitxer de log', 'GENERAL', 12, 1, 'TEXT');
           INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
           "
-#  "INSERT INTO NOT_PROCESSOS_INICIALS (CODI, INIT, ID) VALUES ('ACTUALITZAR_NOT_NOTIFICACIO_TABLE', 1, 3);"

@@ -53,8 +53,13 @@
 		
 	</style>
 	<script type="text/javascript">
+		let intervalCadaSegon;
 		$(document).ready(function(){
 			$("button[name=refrescar]").click(function() {
+				let checkValue = $("#chRefrescarTasques").is(":checked");
+				if (checkValue) {
+					clearInterval(intervalCadaSegon);
+				}
 				carregaMonitor();
 			});
 			carregaMonitor();
@@ -66,23 +71,24 @@
 		        dataType: 'json',
 		        async: false,
 		        success: function(data){
-		            var content = "";
+		            let content = "";
 		            content += '<ul class="nav nav-tabs" role="tablist">' +
 		                '<li role="presentation" class="active"><a id="tab_sistema" href="#sistema" aria-controls="home" role="tab" data-toggle="tab"><spring:message code="monitor.sistema"/></a></li>' +
 		                '<li role="presentation"><a id="tab_fils" href="#fils" aria-controls="profile" role="tab" data-toggle="tab"><spring:message code="monitor.fils"/></a></li>' +
-		              '</ul>';
+						'<li role="presentation"><a id="tab_tasques" href="#tasques" aria-controls="profile" role="tab" data-toggle="tab"><spring:message code="monitor.tasques"/></a></li>' +
+					'</ul>';
 		            content += '<div class="tab-content">';
 		            content += '<div role="tabpanel" class="tab-pane active" id="sistema">';
 		            content += '<div class="top-buffer mesures_monitor_sistema">';
-			            content += '<table class="table-monitor-titol table table-striped table-bordered dataTable">';
-			            content += '<thead><tr>';
-			            content += '</thead></tr>';
-			            for (var i = 0; i < data.sistema.length; i++) {
-			            	content += '<tr class="monitor_fila">';
-			            	content += "<td>"+data.sistema[i]+"</td>";
-			            	content += '</tr>';
-			            }
-			            content += '</table>';
+					content += '<table class="table-monitor-titol table table-striped table-bordered dataTable">';
+					content += '<thead><tr>';
+					content += '</thead></tr>';
+					for (let i = 0; i < data.sistema.length; i++) {
+						content += '<tr class="monitor_fila">';
+						content += "<td>"+data.sistema[i]+"</td>";
+						content += '</tr>';
+					}
+					content += '</table>';
 		            content +=  '</div>';
 		            content +=  '</div>';
 
@@ -96,7 +102,7 @@
 			                        '<th class="min_width"><spring:message code="monitor.espera"/></th>' +
 			                        '<th class="min_width"><spring:message code="monitor.blockedtime"/></th>' +
 			                        '</thead></tr>';
-			            for (var i = 0; i < data.hilo.length; i++) {
+			            for (let i = 0; i < data.hilo.length; i++) {
 			                content +=  '<tr class="monitor_fila">' +
 			                            '<td class="monitor_hilo">' + data.hilo[i] + '</td>' +
 			                            '<td class="min_width">' + data.cputime[i] + '</td>' +
@@ -107,19 +113,98 @@
 			            }
 			            content +=  '</table>' +
 		                        '</div>'+
-		                        '</div>'+
+		                        // '</div>'+
 		                        '</div>';
+
+					content += '<div role="tabpanel" class="tab-pane" id="tasques">';
+					content += '<div id="mesures_monitor" class="top-buffer">' +
+							'<table class="table-monitor table table-striped table-bordered dataTable">' +
+							'<thead><tr>' +
+							'<th class=""><spring:message code="monitor.tasques.tasca"/></th>' +
+							'<th class="text-center"><spring:message code="monitor.tasques.estat"/></th>' +
+							'<th class="text-center"><spring:message code="monitor.tasques.darrer.inici"/></th>' +
+							'<th class="text-center"><spring:message code="monitor.tasques.temps.execucio"/></th>' +
+							//'<th class=""><spring:message code="monitor.tasques.fi.execucio"/></th>' +
+							'<th class="text-center"><spring:message code="monitor.tasques.propera.execucio"/></th></tr>' +
+							//'<th class=""><spring:message code="monitor.tasques.observacions"/></th>' +
+							'</thead><tbody id="tbody_monitor">';
+
+
+					content += getTasquesTBody(data.tasca, data.estat, data.iniciExecucio, data.tempsExecucio, data.properaExecucio, data.identificadors);
+					content +=  '</tbody></table>' +
+							'<br><br><hr>' +
+							'<input class="ml-6" id="chRefrescarTasques" type="checkbox" name="refrescarTasquesCadaSegon">' +
+							'<label class="ml-1" for="refrescarTasquesCadaSegon">' +
+							'<spring:message code="monitor.tasques.check.refresh"/></label>' +
+							'<span id="span-refresh-tasques" class="ml-2 fa fa-refresh" style="visibylity-hidden"></span>' +
+							'</div>'+
+							'</div>'+
+					'</div>';
 		           
 		            $("#monitor_contens").html(content);
+					$("#chRefrescarTasques").click(function(){
+						let checkValue = $("#chRefrescarTasques").is(":checked");
+						if (checkValue) {
+							refrescarTasquesCadaSegon();
+						}else {
+							clearInterval(intervalCadaSegon);
+						}
+
+					});
 		        }
 		    })
 		    .fail(function( jqxhr, textStatus, error ) {
-		         var err = textStatus + ', ' + error;
+		         let err = textStatus + ', ' + error;
 		         console.log( "Request Failed: " + err);
 		    })
 	        .always(function() {
 	            $("body").removeClass("loading");
 	        });
+		}
+
+		function carregaTasques() {
+			$("#span-refresh-tasques").addClass('fa-circle-o-notch');
+			$("#span-refresh-tasques").addClass('fa-spin');
+			$.ajax({
+				url: "monitor/tasques",
+				dataType: 'json',
+				async: false,
+				success: function(data){
+					$("#tbody_monitor").empty().html(getTasquesTBody(data.tasca, data.estat, data.iniciExecucio, data.tempsExecucio, data.properaExecucio, data.identificadors));
+				}
+			})
+					.fail(function( jqxhr, textStatus, error ) {
+						var err = textStatus + ', ' + error;
+						console.log( "Request Failed: " + err);
+					})
+					.always(function() {
+						$("body").removeClass("loading");
+						$("#span-refresh-tasques").removeClass('fa-circle-o-notch');
+						$("#span-refresh-tasques").removeClass('fa-spin');
+					});
+		}
+
+		function refrescarTasquesCadaSegon() {
+			intervalCadaSegon = setInterval(() => carregaTasques(), 1000);
+		}
+
+
+		function getTasquesTBody(tasca, estat, iniciExecucio, tempsExecucio, properaExecucio, identificadors) {
+
+			if (!tasca) {
+				return '';
+			}
+			let content = '';
+			for (let i = 0; i < tasca.length; i++) {
+				content +=  '<tr class="monitor_fila">' +
+						'<td id="tasca-' + identificadors[i] + '">' + tasca[i].replace("<spring:message code='monitor.tasques.tasca'/>: ", "") + '</td>' +
+						'<td class="text-center" id="estat-' + identificadors[i] + '">' + estat[i].replace("<spring:message code='monitor.tasques.estat'/>: ", "") + '</td>' +
+						'<td class="text-center" id="inici-execucio-' + identificadors[i] + '">' + iniciExecucio[i].replace("<spring:message code='monitor.tasques.darrer.inici'/>: ", "") + '</td>' +
+						'<td class="text-right" id ="temps-execucio-' + identificadors[i] + '">' + tempsExecucio[i].replace("<spring:message code='monitor.tasques.temps.execucio'/>: ", "") + '</td>' +
+						'<td class="text-center" id="propera-execucio-' + identificadors[i] + '">' + properaExecucio[i].replace("<spring:message code='monitor.tasques.propera.execucio'/>: ", "") + '</td>' +
+						'</tr>';
+			}
+			return content;
 		}
 	</script>
 </head>

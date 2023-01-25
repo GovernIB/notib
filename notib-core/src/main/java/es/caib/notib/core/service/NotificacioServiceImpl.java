@@ -551,15 +551,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
 				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
-					notificacions = notificacioTableViewRepository.findByEntitatActual(
-							entitatActual,
-							pageable);
+					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
 				//Consulta totes les notificacions de les entitats actives
 				} else if (isSuperAdmin) {
 					List<EntitatEntity> entitatsActiva = entitatRepository.findByActiva(true);
-					notificacions = notificacioTableViewRepository.findByEntitatActiva(
-							entitatsActiva,
-							pageable);
+					notificacions = notificacioTableViewRepository.findByEntitatActiva(entitatsActiva, pageable);
 				} else if (isAdminOrgan) {
 					List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatActual.getDir3Codi(), organGestorCodi);
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndEntitat(
@@ -637,9 +633,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getConcepte().isNull(),
 							filtreNetejat.getConcepte().getField(),
 							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().getField(),
-							!filtreNetejat.getEstat().isNull() ?
-									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
+//							!filtreNetejat.getEstat().isNull() ?
+//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
@@ -679,9 +675,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getConcepte().isNull(),
 							filtreNetejat.getConcepte().getField(),
 							filtreNetejat.getEstat().isNull(),
-							filtreNetejat.getEstat().getField(),
-							!filtreNetejat.getEstat().isNull() ?
-									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
+							filtreNetejat.getEstat().isNull() ? 0 : filtreNetejat.getEstat().getField().getMask(),
+//							!filtreNetejat.getEstat().isNull() ?
+//									EnviamentEstat.valueOf(filtreNetejat.getEstat().getField().toString()) : null,
 							filtreNetejat.getDataInici().isNull(),
 							filtreNetejat.getDataInici().getField(),
 							filtreNetejat.getDataFi().isNull(),
@@ -710,18 +706,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
-			List<NotificacioTableItemDto> nots = pag.getContingut();
-			for (int foo = 0; foo < nots.size(); foo++) {
-				NotificacioTableItemDto not = nots.get(foo);
-				NotificacioEntity e = notificacioRepository.findById(not.getId());
-				List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
-				Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
-				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
-				not.setDocumentId(id);
-				not.setEnvCerData(cerData);
-				not.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
-			}
+ 			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
 			return pag;
 		} finally {
 			metricsHelper.fiMetrica(timer);

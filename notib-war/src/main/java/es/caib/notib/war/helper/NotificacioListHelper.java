@@ -94,7 +94,7 @@ public class NotificacioListHelper {
 
 		try {
 			organsDisponibles = organGestorService.getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, NoPermisosException.class))
 				MissatgesHelper.warning(request, messageSource.getMessage(
 						"notificacio.controller.sense.permis.lectura",

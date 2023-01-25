@@ -110,6 +110,7 @@ public class IntegracioHelper {
 		addAccioOk(info, true);
 	}
 
+//	@Transactional
 	public void addAccioOk(IntegracioInfo info, boolean obtenirUsuari) {
 
 		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
@@ -142,6 +143,7 @@ public class IntegracioHelper {
 		addAccioError(info, errorDescripcio, throwable,true);
 	}
 
+//	@Transactional
 	public void addAccioError(IntegracioInfo info, String errorDescripcio, Throwable throwable, boolean obtenirUsuari) {
 
 		MonitorIntegracioEntity accio = MonitorIntegracioEntity.builder()
@@ -164,6 +166,7 @@ public class IntegracioHelper {
 		log.debug("Error d'integracio " + info.getDescripcio() + ": " + errorDescripcio + "(integracioCodi=" + info.getCodi() + ", "
 				+ "parametres=" + info.getParams() + ", tipus=" + info.getTipus() + ", tempsResposta=" + info.getTempsResposta() + ")", throwable);
 	}
+
 
 	private void addAccio(MonitorIntegracioEntity accio, boolean obtenirUsuari) {
 

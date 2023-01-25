@@ -111,7 +111,7 @@
 			<groupId>org.fundaciobit.pluginsib.signatureserver</groupId>
 			<artifactId>pluginsib-signatureserver-api</artifactId>
 			<version>3.0.0</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.fundaciobit.pluginsib.signatureserver</groupId>
 			<artifactId>pluginsib-signatureserver-portafib</artifactId>

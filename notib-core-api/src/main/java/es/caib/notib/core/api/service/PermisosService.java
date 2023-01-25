@@ -36,6 +36,16 @@ public interface PermisosService {
     Boolean hasPermisComunicacio(Long entitatId, String usuariCodi);
 
     /**
+     * Comprova si l'usuari té permís per a realitzar una comunicació  sense procediment en l'entitat
+     *
+     * @param entitatId Identificador de l'entitat
+     * @param usuariCodi Codi de l'usuari
+     * @return {@code true} si l'usuari té permís de comunicació sense procediment en l'entitat. {@code false} en cas contrari
+     */
+//    @PreAuthorize("hasRole('NOT_ADMIN') or hasRole('tothom')")
+//    Boolean hasPermisComunicacioSenseProcediment(Long entitatId, String usuariCodi);
+
+    /**
      * Comprova si l'usuari té permís per a realitzar una comunicació SIR en l'entitat
      *
      * @param entitatId Identificador de l'entitat
