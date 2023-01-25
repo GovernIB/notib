@@ -165,7 +165,7 @@ public class CallbackHelper {
 			auditNotificacioHelper.updateLastCallbackError(notificacio, true);
 			integracioHelper.addAccioError(info, "Error enviant l'avís de canvi d'estat", ex);
 			long elapsedTime = System.nanoTime() - start;
-			log.info("escepcio: "  + elapsedTime);
+			log.info("excepcio: "  + elapsedTime);
 		}
 		long start = System.nanoTime();
 		notificacioEventHelper.addCallbackEvent(notificacio, event, isError);

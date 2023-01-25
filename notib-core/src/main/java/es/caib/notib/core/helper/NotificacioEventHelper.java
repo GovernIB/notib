@@ -11,6 +11,7 @@ import es.caib.notib.core.repository.NotificacioEventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -123,6 +124,7 @@ public class NotificacioEventHelper {
         return event;
     }
 
+//    @Transactional
     public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
 
         log.debug("[Events-CALLBACK_CLIENT] Intentam afegir nou event de callback a client");

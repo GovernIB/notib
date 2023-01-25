@@ -707,17 +707,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
  			PaginaDto<NotificacioTableItemDto> pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
-//			List<NotificacioTableItemDto> nots = pag.getContingut();
-//			for (int foo = 0; foo < nots.size(); foo++) {
-//				NotificacioTableItemDto not = nots.get(foo);
-//				NotificacioEntity e = notificacioRepository.findById(not.getId());
-//				List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
-//				Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
-//				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
-//				not.setDocumentId(id);
-//				not.setEnvCerData(cerData);
-//				not.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
-//			}
 			return pag;
 		} finally {
 			metricsHelper.fiMetrica(timer);

@@ -15,7 +15,7 @@
 	<jee:local-slsb
 			id="grupService"
 			jndi-name="notib/GrupServiceBean/local"
-			business-interface="es.caib.notib.core.api.service.GrupService"/>	
+			business-interface="es.caib.notib.core.api.service.GrupService"/>
 	<jee:local-slsb
 			id="pagadorCieService"
 			jndi-name="notib/PagadorCieServiceBean/local"

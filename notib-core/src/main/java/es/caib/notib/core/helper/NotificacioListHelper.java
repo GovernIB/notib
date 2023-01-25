@@ -9,7 +9,6 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisEnum;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
-import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
@@ -17,7 +16,6 @@ import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.core.api.service.EnviamentService;
 import es.caib.notib.core.api.service.OrganGestorService;
 import es.caib.notib.core.api.service.PermisosService;
-import es.caib.notib.core.api.service.ProcedimentService;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -52,8 +50,6 @@ import static org.springframework.web.util.HtmlUtils.htmlEscape;
 @Component
 public class NotificacioListHelper {
 
-    @Autowired
-    private EnviamentService enviamentService;
     @Autowired
     private PermisosService permisosService;
     @Autowired
@@ -106,23 +102,19 @@ public class NotificacioListHelper {
         }
 
         boolean permisProcessar;
-        List<NotificacioEnviamentEntity> enviamentsPendents;
-        PaginaDto<NotificacioTableItemDto> page = paginacioHelper.toPaginaDto(notificacions, NotificacioTableItemDto.class);
-        for (NotificacioTableItemDto notificacio : page.getContingut()) {
+        List<NotificacioTableItemDto> notificacionsDto = new ArrayList<>();
+        for (NotificacioTableEntity not : notificacions.getContent()) {
+            NotificacioTableItemDto notificacio = crearTableItem(not);
             permisProcessar = false;
             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
                 permisProcessar = codis.contains(notificacio.getProcedimentCodi()) || codis.contains(notificacio.getOrganCodi());
             }
 
             notificacio.setPermisProcessar(permisProcessar);
-//            enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
-//            if (enviamentsPendents != null && !enviamentsPendents.isEmpty()) {
-//                notificacio.setHasEnviamentsPendentsRegistre(true);
-//            }
             notificacio.setHasEnviamentsPendentsRegistre(notificacioEnviamentRepository.hasEnviamentsPendentsByNotificacioId(notificacio.getId()));
-            notificacio.setDocumentId(notificacioRepository.findDOcumentId(notificacio.getId()));
+//            notificacio.setDocumentId(notificacioRepository.findDOcumentId(notificacio.getId()));
             NotificacioEntity e = notificacioRepository.findById(notificacio.getId());
-            List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
+            List<NotificacioEnviamentEntity> envs = e != null ? new ArrayList<>(e.getEnviaments()) : new ArrayList<NotificacioEnviamentEntity>();
             prepararColumnaEstat(notificacio, envs);
 
             Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
@@ -130,8 +122,39 @@ public class NotificacioListHelper {
             notificacio.setDocumentId(id);
             notificacio.setEnvCerData(cerData);
             notificacio.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
+            notificacio.setErrorLastCallback(e != null ? e.isErrorLastCallback() : false);
+            notificacionsDto.add(notificacio);
         }
-        return page;
+        return  paginacioHelper.toPaginaDto(notificacionsDto, notificacions);
+    }
+
+    private NotificacioTableItemDto crearTableItem(NotificacioTableEntity n) {
+            return NotificacioTableItemDto.builder().id(n.getId())
+                .contadorEstat(new HashMap<EnviamentEstat, Integer>())
+                .tipusUsuari(n.getTipusUsuari())
+                .notificaErrorData(n.getNotificaErrorData())
+                .notificaErrorDescripcio(n.getNotificaErrorDescripcio())
+                .enviamentTipus(n.getEnviamentTipus())
+                .numExpedient(n.getNumExpedient())
+                .concepte(n.getConcepte())
+                .estatDate(n.getEstatDate())
+                .estat(n.getEstat())
+                .createdByNom(n.getCreatedBy() != null ? n.getCreatedBy().getNom() : null)
+                .createdByCodi(n.getCreatedBy() != null ? n.getCreatedBy().getCodi()  : null)
+                .createdDate(n.getCreatedDate().toDate())
+                .permisProcessar(n.isPermisProcessar())
+                .comunicacioSir(n.isComunicacioSir())
+                .entitatNom(n.getEntitatNom())
+                .procedimentCodi(n.getProcedimentCodi())
+                .procedimentNom(n.getProcedimentNom())
+                .procedimentTipus(n.getProcedimentTipus())
+                .organCodi(n.getOrganCodi())
+                .organNom(n.getOrganNom())
+                .estatProcessatDate(n.getEstatProcessatDate())
+                .enviadaDate(n.getEnviadaDate())
+                .registreEnviamentIntent(n.getRegistreEnviamentIntent())
+                .referencia(n.getReferencia())
+                .build();
     }
 
     private void prepararColumnaEstat(NotificacioTableItemDto item, List<NotificacioEnviamentEntity> enviaments) {

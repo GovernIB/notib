@@ -573,7 +573,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     private List<OrganGestorEntity> getOrgansAmbPermisComunicacionsSenseProcediment(EntitatEntity entitat, List<String> grups) {
 
-        List<Long> organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(ProcSerOrganEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
+        List<Long> organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
 
         return getListGivenIds(
                 organsAmbPermisIds,

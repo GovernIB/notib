@@ -4,6 +4,7 @@ import com.codahale.metrics.Timer;
 import es.caib.notib.core.api.service.CallbackService;
 import es.caib.notib.core.clases.CallbackProcessarPendentsThread;
 import es.caib.notib.core.clases.RegistrarThread;
+import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.helper.CallbackHelper;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -58,7 +59,7 @@ public class CallbackServiceImpl implements CallbackService {
 			logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
 			Pageable page = new PageRequest(0, maxPendents);
-			List<Long> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
+			List<NotificacioEventEntity> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendent(page);
 			if (pendentsIds.isEmpty()) {
 				logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 			}
@@ -68,25 +69,30 @@ public class CallbackServiceImpl implements CallbackService {
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
 			CallbackProcessarPendentsThread thread;
 			Future<Boolean> futur;
+			Map<Long, Long> nots = new HashMap<>();
 			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-			for (Long eventId: pendentsIds) {
-				logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
+			for (NotificacioEventEntity e: pendentsIds) {
+				if (nots.get(e.getNotificacio().getId()) != null) {
+					continue;
+				}
+				logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + e.getId());
+				nots.put(e.getNotificacio().getId(), e.getId());
 				try {
 					if (multiThread) {
-						thread = new CallbackProcessarPendentsThread(eventId, callbackHelper);
+						thread = new CallbackProcessarPendentsThread(e.getId(), callbackHelper);
 						futur = executorService.submit(thread);
-						futurs.put(eventId, futur);
+						futurs.put(e.getId(), futur);
 						continue;
 					}
 
-					if(!callbackHelper.notifica(eventId)) {
+					if(!callbackHelper.notifica(e.getId())) {
 							errors++;
 					}
 
-				} catch (Exception e) {
+				} catch (Exception ex) {
 					errors++;
-					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
-					callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
+					logger.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", e.getId()), e);
+					callbackHelper.marcarEventNoProcessable(e.getId(), ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
 			Set<Long> keys = futurs.keySet();
