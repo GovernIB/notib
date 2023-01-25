@@ -217,7 +217,7 @@ public class NotificacioListHelper {
 
             for (Map.Entry<EnviamentEstat, Integer> entry : item.getContadorEstat().entrySet()) {
                 estat += "<div style=\"font-size:11px;" + boxShadow + entry.getKey().getColor() + padding + "\">" +
-                        entry.getValue() + " " + messageHelper.getMessage("es.caib.notib.core.api.dto.EnviamentEstat." + entry.getKey())
+                        entry.getValue() + " " + messageHelper.getMessage("es.caib.notib.client.domini.EnviamentEstat." + entry.getKey())
                         + "</div>";
             }
         }

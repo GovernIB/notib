@@ -59,9 +59,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 //	@Query(	" from NotificacioEnviamentEntity " +
 //			" where	notificacio = :notificacio " + 
 //			"	and (notificaEstatFinal = false " + 
-//			"   		and notificaEstat != es.caib.notib.core.api.dto.EnviamentEstat.ENVIADA" +
-//			"   		and notificaEstat != es.caib.notib.core.api.dto.EnviamentEstat.NOTIB_ENVIADA" +
-//			"   		and notificaEstat != es.caib.notib.core.api.dto.EnviamentEstat.ENVIAT_SIR)" +
+//			"   		and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.NOTIB_ENVIADA" +
+//			"   		and notificaEstat != es.caib.notib.client.domini.EnviamentEstat.ENVIAT_SIR)" +
 //			" order by notificaEstatDataActualitzacio asc nulls first")
 	@Query(	" from NotificacioEnviamentEntity " +
 			" where	notificacio = :notificacio " + 
