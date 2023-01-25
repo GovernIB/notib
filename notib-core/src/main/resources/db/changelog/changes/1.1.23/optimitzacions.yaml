@@ -43,5 +43,6 @@ databaseChangeLog:
           WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
           UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (ESTAT_MASK + 2048) WHERE ESTAT = 15 AND registre_env_intent = 0 AND NOTIFICA_ERROR_DATE IS NULL;
           INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.log.path', null,'Ruta del fitxer de log', 'GENERAL', 12, 1, 'TEXT');
+          INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
           "
 #  "INSERT INTO NOT_PROCESSOS_INICIALS (CODI, INIT, ID) VALUES ('ACTUALITZAR_NOT_NOTIFICACIO_TABLE', 1, 3);"
