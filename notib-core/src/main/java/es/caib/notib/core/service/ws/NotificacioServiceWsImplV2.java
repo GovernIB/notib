@@ -559,6 +559,10 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2 {
 			try {
 				
 				EntitatEntity entitat = entitatRepository.findByDir3Codi(permisConsulta.getCodiDir3Entitat());
+				if (entitat == null) {
+					integracioHelper.addAccioError(info, "Error donant permís de consulta: no s'ha especificat un codi Dir3 d'entitat vàlid");
+					throw new RuntimeException("No s'ha pogut assignar el permís a l'usuari: " + permisConsulta.getUsuariCodi() + ". No s'ha especificat un codi Dir3 d'entitat vàlid");
+				}
 				ConfigHelper.setEntitatCodi(entitat.getCodi());
 				info.setCodiEntitat(entitat.getCodi());
 				integracioHelper.addAplicacioAccioParam(info, entitat.getId());
