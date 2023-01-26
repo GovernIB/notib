@@ -74,6 +74,9 @@ public class ProcSerSyncHelper {
 	public void actualitzaProcediments(EntitatDto entitatDto) {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_PROCEDIMENT, "Actualització de procediments", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
+		if (entitatDto == null) {
+			log.error("Error actualitzant els procediments. Entitat null");
+		}
 		info.setCodiEntitat(entitatDto.getCodi());
 		ConfigHelper.setEntitatCodi(entitatDto.getCodi());
 		log.debug("[PROCEDIMENTS] Inici actualitzar procediments");
@@ -427,6 +430,9 @@ public class ProcSerSyncHelper {
 
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_PROCEDIMENT, "Actualització de serveis", IntegracioAccioTipusEnumDto.PROCESSAR, new AccioParam("Codi Dir3 de l'entitat", entitatDto.getDir3Codi()));
 		info.setCodiEntitat(entitatDto.getCodi());
+		if (entitatDto == null) {
+			log.error("Error actualitzant els procediments. Entitat null");
+		}
 		ConfigHelper.setEntitatCodi(entitatDto.getCodi());
 		log.debug("[SERVEIS] Inici actualitzar serveis");
 

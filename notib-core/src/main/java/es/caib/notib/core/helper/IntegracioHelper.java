@@ -13,6 +13,7 @@ import es.caib.notib.core.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.core.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.core.repository.AplicacioRepository;
 import es.caib.notib.core.repository.UsuariRepository;
+import es.caib.notib.core.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.core.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -22,6 +23,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Parameter;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +52,8 @@ public class IntegracioHelper {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private MonitorIntegracioRepository monitorRepository;
+	@Autowired
+	private MonitorIntegracioParamRepository monitorParamRepository;
 	@Autowired
 	private ConversioTipusHelper conversio;
 
@@ -267,11 +275,16 @@ public class IntegracioHelper {
 		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
 	}
 
-	@Transactional
+//	@PersistenceContext
+//	private EntityManager entityManager;
 	public void eliminarAntics(Date llindar) {
 
 		try {
-			monitorRepository.deleteByDataIsBefore(llindar);
+//			Query query = entityManager.createQuery("DELETE FROM MonitorIntegracioEntity m where m.data < :p");
+//			int deletedCount = query.setParameter("p", llindar).executeUpdate();
+			monitorParamRepository.deleteDataBefore(llindar);
+			monitorRepository.flush();
+			monitorRepository.eliminarAntics(llindar);
 		} catch (Exception ex) {
 			log.error("Error esborrant les entrades del monitor d'integracions antigues.", ex);
 		}

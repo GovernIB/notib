@@ -31,11 +31,22 @@ public interface MonitorIntegracioRepository extends JpaRepository<MonitorIntegr
 
     int countByCodiAndEstat(@Param("codi") String codi, @Param("estat")IntegracioAccioEstatEnumDto estat);
 
-    void deleteByDataIsBefore(@Param("llindar") Date llindar);
+
+    List<MonitorIntegracioEntity> findByDataLessThan(@Param("llindar") Date llindar);
+
+    @Modifying
+    @Query("DELETE from MonitorIntegracioEntity m WHERE m.data < :llindar")
+    void eliminarAntics(@Param("llindar") Date llindar);
+
+//    @Modifying
+//    @Query("DELETE from MonitorIntegracioParamEntity mp left outer join mp.monitorIntegracio m WHERE m.data < :llindar")
+//    void eliminarParametresAntics(@Param("llindar") Date llindar);
 
     @Modifying
     void deleteByCodiAndCodiEntitat(@Param("codi") String codi, @Param("codiEntitat") String codiEntitat);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     MonitorIntegracioEntity save(@Param("integracio") MonitorIntegracioEntity integracio);
+
+
 }

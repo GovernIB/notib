@@ -521,7 +521,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                     PeriodicTrigger trigger = new PeriodicTrigger(d, TimeUnit.DAYS);
                     trigger.setFixedRate(true);
-                    trigger.setInitialDelay(calcularDelay());
+//                    trigger.setInitialDelay(calcularDelay());
+//                    trigger.setInitialDelay(1);
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long millis = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(monitorIntegracionsEliminarAntics, millis);
@@ -541,8 +542,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
-        cal.setTimeInMillis(cal.getTimeInMillis() + 2*60*60*1000l);
-        logger.info("EL TIMER S'EXECUTARÀ EL " + new Date(cal.getTimeInMillis()));
+//        cal.setTimeInMillis(cal.getTimeInMillis() + 2*60*60*1000l);
+        logger.info("EL TIMER S'EXECUTARÀ EL " + cal.getTime());
         return cal.getTimeInMillis() - now.getTime();
     }
 

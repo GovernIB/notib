@@ -29,8 +29,8 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
-	public void actualitzarEntiatThreadLocal(String entitatCodi) {
-		delegate.actualitzarEntiatThreadLocal(entitatCodi);
+	public void actualitzarEntitatThreadLocal(String entitatCodi) {
+		delegate.actualitzarEntitatThreadLocal(entitatCodi);
 	}
 
 	@Override

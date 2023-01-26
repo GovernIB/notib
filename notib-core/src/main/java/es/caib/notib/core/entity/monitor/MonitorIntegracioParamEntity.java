@@ -27,7 +27,8 @@ import javax.persistence.Table;
 @EntityListeners(AuditingEntityListener.class)
 public class MonitorIntegracioParamEntity extends AbstractPersistable<Long> {
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "mon_int_id")
     @ForeignKey(name = "NOT_MONINTPARAM_MONINT_FK")
     private MonitorIntegracioEntity monitorIntegracio;

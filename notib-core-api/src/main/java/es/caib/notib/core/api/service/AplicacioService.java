@@ -19,7 +19,7 @@ public interface AplicacioService {
 
 
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
-	void actualitzarEntiatThreadLocal(String entitat);
+	void actualitzarEntitatThreadLocal(String entitat);
 	/**
 	 * Processa l'autenticació d'un usuari.
 	 * 

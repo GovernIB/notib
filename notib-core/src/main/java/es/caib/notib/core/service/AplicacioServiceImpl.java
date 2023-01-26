@@ -66,7 +66,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private MessageHelper messageHelper;
 
 	@Override
-	public void actualitzarEntiatThreadLocal(String entitatCodi) {
+	public void actualitzarEntitatThreadLocal(String entitatCodi) {
 		configHelper.setEntitatCodi(entitatCodi);
 	}
 
