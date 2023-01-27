@@ -380,7 +380,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
 
-		logger.debug("Execució tasca periòdica: Natejar monitor integracions");
+		logger.debug("Execució tasca periòdica: netejar monitor integracions");
 		String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES);
 		int d = 3;
 		try {

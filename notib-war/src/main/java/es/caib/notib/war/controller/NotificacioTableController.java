@@ -859,6 +859,9 @@ public class NotificacioTableController extends TableAccionsMassivesController {
     private void emplenarModelNotificacioInfo(EntitatDto entitatActual, Long notificacioId, HttpServletRequest request, String pipellaActiva, Model model) {
 
         NotificacioInfoDto notificacio = notificacioService.findNotificacioInfo(notificacioId, isAdministrador(request));
+        if (notificacio == null) {
+            return;
+        }
         if (notificacio != null && notificacio.getGrupCodi() != null) {
             GrupDto grup = grupService.findByCodi(notificacio.getGrupCodi(), entitatActual.getId());
             notificacio.setGrup(grup);

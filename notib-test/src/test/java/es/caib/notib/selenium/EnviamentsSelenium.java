@@ -55,7 +55,7 @@ public class EnviamentsSelenium extends  NotibSelenium {
             esperar();
             filtrar();
             modificarColumnes();
-            natejarFiltres("btnNetejar");
+            netejarFiltres("btnNetejar");
         } catch (Exception ex) {
             System.out.println("Selenium error");
             System.out.println(ex);

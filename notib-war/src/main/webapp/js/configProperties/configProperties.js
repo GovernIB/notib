@@ -63,12 +63,12 @@ let mostrarMissatge = (id, data) => {
 
 let getInputValue = elem =>  ($(elem).is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) : $(elem).val());
 
-let guardarPropietat = (configKey, natejar) => {
+let guardarPropietat = (configKey, netejar) => {
 
     let configKeyReplaced = configKey.replaceAll("_",".");
     let spinner = addSpinner(configKey);
     let elem = $("#" + configKey);
-    let value = !natejar ? getInputValue(elem) : null;
+    let value = !netejar ? getInputValue(elem) : null;
     let formData = new FormData();
     formData.append("key", configKeyReplaced);
     formData.append("value", value);

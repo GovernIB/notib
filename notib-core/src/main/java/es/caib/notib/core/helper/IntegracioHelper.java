@@ -21,13 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Parameter;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -275,13 +269,9 @@ public class IntegracioHelper {
 		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
 	}
 
-//	@PersistenceContext
-//	private EntityManager entityManager;
 	public void eliminarAntics(Date llindar) {
 
 		try {
-//			Query query = entityManager.createQuery("DELETE FROM MonitorIntegracioEntity m where m.data < :p");
-//			int deletedCount = query.setParameter("p", llindar).executeUpdate();
 			monitorParamRepository.deleteDataBefore(llindar);
 			monitorRepository.flush();
 			monitorRepository.eliminarAntics(llindar);

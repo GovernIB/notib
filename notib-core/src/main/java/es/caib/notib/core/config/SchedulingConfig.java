@@ -512,17 +512,16 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
 
-                    Long d = 3l;
+                    Long d = 1l;
                     String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
                     try {
                         d = Long.valueOf(dies);
                     } catch (Exception ex) {
                         logger.error("La propietat no retorna un número -> " + dies);
                     }
-                    PeriodicTrigger trigger = new PeriodicTrigger(d, TimeUnit.DAYS);
+                    PeriodicTrigger trigger = new PeriodicTrigger(d*86400000l, TimeUnit.MILLISECONDS);
                     trigger.setFixedRate(true);
-//                    trigger.setInitialDelay(calcularDelay());
-//                    trigger.setInitialDelay(1);
+                    trigger.setInitialDelay(calcularDelay());
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long millis = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(monitorIntegracionsEliminarAntics, millis);
@@ -538,7 +537,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         Calendar cal = Calendar.getInstance();
         Date now = new Date();
         cal.setTime(now);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.HOUR_OF_DAY, 1);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
