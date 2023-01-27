@@ -52,4 +52,5 @@ databaseChangeLog:
           CREATE INDEX not_nottbl_entgrup_idx on NOT_NOTIFICACIO_TABLE (ENTITAT_ID, GRUP_CODI);
           CREATE INDEX not_envtbl_entitat_idx ON NOT_NOTIFICACIO_ENV_TABLE(ENTITAT_ID);
           INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
+          UPDATE NOT_CONFIG SET TYPE_CODE = 'CRON', VALUE = '0 30 1 * * *' WHERE KEY = 'es.caib.notib.monitor.integracions.eliminar.periode';
           "

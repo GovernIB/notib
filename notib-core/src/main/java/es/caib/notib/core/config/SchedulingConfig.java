@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
@@ -413,7 +414,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(24, TimeUnit.HOURS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(86400000l, TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         trigger.setInitialDelay(calcularDelay());
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
@@ -512,17 +513,16 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
 
-                    Long d = 1l;
                     String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
-                    try {
-                        d = Long.valueOf(dies);
-                    } catch (Exception ex) {
-                        logger.error("La propietat no retorna un número -> " + dies);
+                    if (Strings.isNullOrEmpty(dies)) {
+                        dies = "0 30 1 * * *";
                     }
-                    PeriodicTrigger trigger = new PeriodicTrigger(d*86400000l, TimeUnit.MILLISECONDS);
-                    trigger.setFixedRate(true);
-                    trigger.setInitialDelay(calcularDelay());
+                    CronTrigger trigger = new CronTrigger(dies);
                     Date nextExecution = trigger.nextExecutionTime(triggerContext);
+//                    PeriodicTrigger trigger = new PeriodicTrigger(d*86400000l, TimeUnit.MILLISECONDS);
+//                    trigger.setFixedRate(true);
+//                    trigger.setInitialDelay(calcularDelay());
+//                    Date nextExecution = trigger.nextExecutionTime(triggerContext);
                     Long millis = nextExecution.getTime() - System.currentTimeMillis();
                     monitorTasquesService.updateProperaExecucio(monitorIntegracionsEliminarAntics, millis);
                     return nextExecution;
@@ -537,7 +537,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         Calendar cal = Calendar.getInstance();
         Date now = new Date();
         cal.setTime(now);
-        cal.set(Calendar.HOUR_OF_DAY, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
