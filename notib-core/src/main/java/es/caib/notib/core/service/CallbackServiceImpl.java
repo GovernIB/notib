@@ -16,12 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.AsyncResult;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,12 +46,13 @@ public class CallbackServiceImpl implements CallbackService {
 	private ConfigHelper configHelper;
 
 	@Override
+	@Transactional(readOnly = true)
 	public void processarPendents() {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
-				logger.debug("[Callback] Enviament callbacks deshabilitat. ");
+				logger.info("[Callback] Enviament callbacks deshabilitat. ");
 			}
 			logger.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
@@ -63,7 +61,7 @@ public class CallbackServiceImpl implements CallbackService {
 			if (pendentsIds.isEmpty()) {
 				logger.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 			}
-			logger.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
+			logger.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 			int errors = 0;
 			ExecutorService executorService = Executors.newFixedThreadPool(pendentsIds.size());
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
@@ -75,7 +73,7 @@ public class CallbackServiceImpl implements CallbackService {
 				if (nots.get(e.getNotificacio().getId()) != null) {
 					continue;
 				}
-				logger.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + e.getId());
+				logger.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + e.getId());
 				nots.put(e.getNotificacio().getId(), e.getId());
 				try {
 					if (multiThread) {
