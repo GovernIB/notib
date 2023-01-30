@@ -104,4 +104,6 @@ databaseChangeLog:
                     GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT TO WWW_NOTIB;
                     ALTER TABLE NOT_MON_INT_PARAM ADD (CONSTRAINT NOT_MON_INT_PARAM_PK PRIMARY KEY (ID));
                     ALTER TABLE NOT_MON_INT_PARAM ADD CONSTRAINT NOT_MONINTPARAM_MONINT_FK FOREIGN KEY (MON_INT_ID) REFERENCES NOT_MON_INT(ID);
-                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT_PARAM TO WWW_NOTIB;"
+                    GRANT SELECT, UPDATE, INSERT, DELETE ON NOT_MON_INT_PARAM TO WWW_NOTIB;
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.monitor.integracions.eliminar.periode', '3', 'Periode execució en dies de la neteja del monitor integracions', 'GENERAL', 0, 0, 'INT');
+                    INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.monitor.integracions.eliminar.anterior.dies', '3', 'Llindar en dies pel procés de neteja del monitor integracions', 'GENERAL', 0, 0, 'INT');"

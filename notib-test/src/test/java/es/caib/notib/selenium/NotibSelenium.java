@@ -37,7 +37,7 @@ public class NotibSelenium {
 		driver.findElement(By.id("ml_enviament")).click();
 	}
 
-	void natejarFiltres(String id) {
+	void netejarFiltres(String id) {
 
 		var boto = driver.findElement(By.id(id));
 		esperar();

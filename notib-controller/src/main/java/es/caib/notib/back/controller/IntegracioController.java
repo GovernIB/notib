@@ -130,7 +130,7 @@ public class IntegracioController extends BaseUserController {
 
 
 	@RequestMapping(value = "/netejar", method = RequestMethod.GET)
-	public String natejar(HttpServletRequest request, Model model) {
+	public String netejar(HttpServletRequest request, Model model) {
 
 		var redirect = "redirect:../integracio";
 		var entitat = getEntitatActualComprovantPermisos(request);

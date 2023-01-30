@@ -20,7 +20,7 @@ public class RemesesSelenium extends NotibSelenium {
             filtrar();
             String id = detallTaula();
             tancar(id);
-            natejarFiltres("btn-netejar-filtre");
+            netejarFiltres("btn-netejar-filtre");
 
         } catch (Exception ex) {
             System.out.println("Selenium error");
