@@ -14,6 +14,7 @@ import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
 import es.caib.notib.persist.repository.UsuariRepository;
+import es.caib.notib.persist.repository.monitor.MonitorIntegracioParamRepository;
 import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -23,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +49,8 @@ public class IntegracioHelper {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private MonitorIntegracioRepository monitorRepository;
+	@Autowired
+	private MonitorIntegracioParamRepository monitorParamRepository;
 	@Autowired
 	private ConversioTipusHelper conversio;
 
@@ -245,11 +249,12 @@ public class IntegracioHelper {
 		info.getParams().add(new AccioParam("Codi aplicació", aplicacio != null ? aplicacio.getUsuariCodi() : ""));
 	}
 
-	@Transactional
 	public void eliminarAntics(Date llindar) {
 
 		try {
-			monitorRepository.deleteByDataIsBefore(llindar);
+			monitorParamRepository.deleteDataBefore(llindar);
+			monitorRepository.flush();
+			monitorRepository.eliminarAntics(llindar);
 		} catch (Exception ex) {
 			log.error("Error esborrant les entrades del monitor d'integracions antigues.", ex);
 		}

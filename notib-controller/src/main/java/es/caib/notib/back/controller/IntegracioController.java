@@ -5,6 +5,7 @@ package es.caib.notib.back.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
@@ -78,19 +79,25 @@ public class IntegracioController extends BaseUserController {
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
 		List<IntegracioDto> integracions = monitorIntegracioService.integracioFindAll();
-		
+
 		// Consulta el número d'errors per codi d'integracio
-		Map<String, Integer> errors = monitorIntegracioService.countErrors();
-				
-		for (IntegracioDto integracio: integracions) {
-			for (IntegracioEnumDto integracioEnum: IntegracioEnumDto.values()) {
-				if (integracio.getCodi().equals(integracioEnum.name())) {
-					integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class,"integracio.list.pipella." + integracio.getCodi()).getText());
+		try {
+			Map<String, Integer> errors = monitorIntegracioService.countErrors();
+
+			for (IntegracioDto integracio : integracions) {
+				for (IntegracioEnumDto integracioEnum : IntegracioEnumDto.values()) {
+					if (integracio.getCodi().equals(integracioEnum.name())) {
+						integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class, "integracio.list.pipella." + integracio.getCodi()).getText());
+					}
+				}
+				if (errors.containsKey(integracio.getCodi())) {
+					integracio.setNumErrors(errors.get(integracio.getCodi()).intValue());
 				}
 			}
-			if (errors.containsKey(integracio.getCodi())) {
-				integracio.setNumErrors(errors.get(integracio.getCodi()).intValue());
-			}
+		} catch (Exception ex) {
+			String msg = "Error contant el nombre d'integracions amb error";
+			log.error(msg, ex);
+			MissatgesHelper.warning(request, msg);
 		}
 		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
 		model.addAttribute("integracioFiltreCommand", command);
@@ -100,13 +107,6 @@ public class IntegracioController extends BaseUserController {
 		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
 		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		log.info(String.format("[INTEGRACIONS] - Carregant dades de %s", codi));
-//		try {
-//			PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-//			List<IntegracioAccioDto> i = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, command.asDto());
-//			model.addAttribute("data", (new ObjectMapper()).writeValueAsString(i));
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//		}
 		return "integracioList";
 	}
 

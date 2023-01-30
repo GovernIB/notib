@@ -32,6 +32,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.nio.file.Files;
@@ -358,6 +359,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
     }
 
+	@Transactional
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
 
