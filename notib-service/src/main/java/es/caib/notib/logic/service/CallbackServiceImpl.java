@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,12 +46,13 @@ public class CallbackServiceImpl implements CallbackService {
 
 
 	@Override
+	@Transactional(readOnly = true)
 	public void processarPendents() {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
-				log.debug("[Callback] Enviament callbacks deshabilitat. ");
+				log.info("[Callback] Enviament callbacks deshabilitat. ");
 			}
 			log.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
@@ -59,7 +61,7 @@ public class CallbackServiceImpl implements CallbackService {
 			if (pendentsIds.isEmpty()) {
 				log.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 			}
-			log.debug("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
+			log.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 			int errors = 0;
 			ExecutorService executorService = Executors.newFixedThreadPool(pendentsIds.size());
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
@@ -67,7 +69,7 @@ public class CallbackServiceImpl implements CallbackService {
 			Future<Boolean> futur;
 			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
 			for (Long eventId: pendentsIds) {
-				log.debug("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
+				log.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
 				try {
 					if (multiThread) {
 						thread = new CallbackProcessarPendentsThread(eventId, callbackHelper);
