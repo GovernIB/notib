@@ -436,7 +436,7 @@ $(document).ready(function() {
 							<tbody>
 								<tr>
 									<td width="30%"><strong><spring:message code="enviament.info.notifica.estat"/></strong></td>
-									<td><spring:message code="es.caib.notib.logic.intf.dto.EnviamentEstat.${enviament.notificaEstat}"/></td>
+									<td><spring:message code="es.caib.notib.client.domini.EnviamentEstat.${enviament.notificaEstat}"/></td>
 								</tr>
 								<tr>
 									<td><strong><spring:message code="enviament.info.notifica.estat.data"/></strong></td>

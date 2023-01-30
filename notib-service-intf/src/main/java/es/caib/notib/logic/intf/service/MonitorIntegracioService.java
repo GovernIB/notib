@@ -6,7 +6,9 @@ package es.caib.notib.logic.intf.service;
 import java.util.List;
 import java.util.Map;
 
+import es.caib.notib.logic.intf.dto.IntegracioDetall;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
@@ -39,7 +41,7 @@ public interface MonitorIntegracioService {
 	 *             Si no s'ha trobat la integració amb el codi especificat.
 	 */
 	@PreAuthorize("hasRole('NOT_SUPER')")
-	List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) throws NotFoundException;
+	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) throws NotFoundException;
 
 	/** Consulta el número d'errors per integració. */
 	@PreAuthorize("hasRole('NOT_SUPER')")
@@ -47,4 +49,7 @@ public interface MonitorIntegracioService {
 
 	@PreAuthorize("hasRole('NOT_SUPER')")
 	void netejarMonitor();
+
+	@PreAuthorize("hasRole('NOT_SUPER')")
+	IntegracioDetall detallIntegracio(Long id);
 }

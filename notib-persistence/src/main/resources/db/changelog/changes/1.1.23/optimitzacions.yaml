@@ -11,18 +11,6 @@ databaseChangeLog:
       id: 1671453604619-1
       author: limit
       changes:
-        - createIndex:
-            columns:
-              - column:
-                  name: ENTITAT_ID
-            indexName: NOT_TABLE_ENTITAT_INDEX
-            tableName: not_notificacio_table
-        - createIndex:
-            columns:
-              - column:
-                name: ENTITAT_ID
-            indexName: NOT_TABLE_ENV_ENTITAT_INDEX
-            tableName: not_notificacio_env_table
         - addColumn:
             tableName: not_notificacio_table
             columns:
@@ -55,4 +43,14 @@ databaseChangeLog:
           WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
           UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (ESTAT_MASK + 2048) WHERE ESTAT = 15 AND registre_env_intent = 0 AND NOTIFICA_ERROR_DATE IS NULL;
           INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.log.path', null,'Ruta del fitxer de log', 'GENERAL', 12, 1, 'TEXT');
+          INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
+          CREATE INDEX not_not_estatrint_idx on NOT_NOTIFICACIO (ESTAT, REGISTRE_ENV_INTENT);
+          CREATE INDEX not_notenv_estat_idx on NOT_NOTIFICACIO_ENV (NOTIFICA_ESTAT);
+          CREATE INDEX not_notenv_regpen_idx on NOT_NOTIFICACIO_ENV (REGISTRE_ESTAT_FINAL, NOTIFICA_ESTAT, SIR_CON_INTENT);
+          CREATE INDEX not_notenv_estatsrint_idx on NOT_NOTIFICACIO_ENV (NOTIFICA_ESTAT_FINAL, NOTIFICA_ESTAT, NOTIFICA_INTENT_NUM);
+          CREATE INDEX not_nottbl_entitat_idx ON NOT_NOTIFICACIO_TABLE(ENTITAT_ID);
+          CREATE INDEX not_nottbl_entgrup_idx on NOT_NOTIFICACIO_TABLE (ENTITAT_ID, GRUP_CODI);
+          CREATE INDEX not_envtbl_entitat_idx ON NOT_NOTIFICACIO_ENV_TABLE(ENTITAT_ID);
+          INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
+          UPDATE NOT_CONFIG SET TYPE_CODE = 'CRON', VALUE = '0 30 1 * * *' WHERE KEY = 'es.caib.notib.monitor.integracions.eliminar.periode';
           "

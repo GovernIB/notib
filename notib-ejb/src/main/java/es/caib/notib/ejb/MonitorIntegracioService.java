@@ -4,9 +4,12 @@
 package es.caib.notib.ejb;
 
 import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
+import es.caib.notib.logic.intf.dto.IntegracioDetall;
 import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioFiltreDto;
+import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
+import org.springframework.data.domain.Page;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -30,7 +33,7 @@ public class MonitorIntegracioService extends AbstractService<es.caib.notib.logi
 	
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi, PaginacioParamsDto paginacio, IntegracioFiltreDto filtre) {
 		return getDelegateService().integracioFindDarreresAccionsByCodi(codi, paginacio, filtre);
 	}
 	
@@ -44,5 +47,11 @@ public class MonitorIntegracioService extends AbstractService<es.caib.notib.logi
 	@RolesAllowed({"NOT_SUPER"})
 	public void netejarMonitor() {
 		getDelegateService().netejarMonitor();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_SUPER"})
+	public IntegracioDetall detallIntegracio(Long id) {
+		return getDelegateService().detallIntegracio(id);
 	}
 }

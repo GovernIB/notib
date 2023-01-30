@@ -18,7 +18,7 @@
 </head>
 <body>
 <script>
-	var data = ${data};
+	<%--var data = ${data};--%>
 
 	function formate_date(timestamp, converter) {
 		if (converter.indexOf('date') === 0 || converter.indexOf('time') != -1) {
@@ -45,62 +45,52 @@
 		}
 		return dataAmbFormat;
 	}
+
 	$(document).ready(function (){
-		$('#missatges-integracions').on('click', '.integracio-details', function () {
-			let index = $(this).data('index');
-			let details = data[index];
-			$('#integracio-data').html(formate_date(details.data, 'datetime'));
-			$('#integracio-descripcio').html(details.descripcio);
-			$('#integracio-tipus').html(details.tipus);
-			$('#integracio-estat').html(details.estat);
-			if (!details.parametres || details.parametres.length === 0) {
-				$('.integracio-parameters').hide();
-			} else {
-				$('.integracio-parameters').show();
-				var htmlList = "<ul>";
-				details.parametres.forEach(function (param) {
-					htmlList += '<li><strong>' + param.codi + ':</strong> ' + param.valor + '</li>'
-				});
-				htmlList += '</ul>';
-				$('#integracio-parameters-list').html(htmlList);
-			}
-			let isError = details.estat === 'ERROR';
-			if (isError){
-				$('.integracio-error').show();
-				$('#integracio-errorDescripcio').html(details.errorDescripcio);
-				$('#integracio-excepcioMessage').html(details.excepcioMessage);
-				if (details.excepcioStacktrace) {
-					$('#integracio-excepcioStacktrace').html(details.excepcioStacktrace);
-				} else {
-					$('#integracio-excepcioStacktrace').hide();
+
+		$('#missatges-integracions').on('click', '.integracio-details', function() {
+
+			let id = $(this).attr("data-index");
+			$.ajax({
+				type: 'GET',
+				url: "${codiActual}/detall/" + id,
+				success: data => {
+					console.log(data);
+					$('#integracio-data').html(formate_date(data.data, 'datetime'));
+					$('#integracio-descripcio').html(data.descripcio);
+					$('#integracio-tipus').html(data.tipus);
+					$('#integracio-estat').html(data.estat);
+					if (!data.parametres || data.parametres.length === 0) {
+						$('.integracio-parameters').hide();
+					} else {
+						$('.integracio-parameters').show();
+						let htmlList = "<ul>";
+						data.parametres.forEach(function (param) {
+							htmlList += '<li><strong>' + param.codi + ':</strong> ' + param.valor + '</li>'
+						});
+						htmlList += '</ul>';
+						$('#integracio-parameters-list').html(htmlList);
+					}
+					let isError = data.estat === 'ERROR';
+					if (isError) {
+						$('.integracio-error').show();
+						$('#integracio-errorDescripcio').html(data.errorDescripcio);
+						$('#integracio-excepcioMessage').html(data.excepcioMessage);
+						if (data.excepcioStacktrace) {
+							$('#integracio-excepcioStacktrace').html(data.excepcioStacktrace);
+						} else {
+							$('#integracio-excepcioStacktrace').hide();
+						}
+					} else {
+						$('.integracio-error').hide();
+					}
+					$('#modal-details').modal();
+				},
+				error: () => {
+					console.error("Error obtinguent el detall de la integració " + id);
 				}
-
-			}else {
-				$('.integracio-error').hide();
-			}
-
-			$('#modal-details').modal();
+			});
 		});
-
-		<%--let codi = "${codiActual}";--%>
-		<%--if (codi === "CALLBACK") {--%>
-		<%--	console.log("show");--%>
-		<%--	console.log($("#missatges-integracions_filter"));--%>
-		<%--	$("#missatges-integracions_filter").show();--%>
-		<%--} else {--%>
-		<%--	console.log("hide");--%>
-		<%--	$("#missatges-integracions_filter").hide();--%>
-		<%--}--%>
-
-
-		<%--$(".pestanya").click(() => {--%>
-		<%--	let codi = "${codiActual}";--%>
-		<%--	if (codi === "CALLBACK") {--%>
-		<%--		$("#missatges-integracions_filter").show();--%>
-		<%--	} else {--%>
-		<%--		$("#missatges-integracions_filter").hide();--%>
-		<%--	}--%>
-		<%--});--%>
 	});
 </script>
 
@@ -171,9 +161,9 @@
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="index" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<button class="integracio-details" data-index="{{:index}}" class="btn btn-default""><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></button>
+						<button class="integracio-details" data-index="{{:id}}" class="btn btn-default""><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></button>
 					</script>
 				</th>
 			</tr>
