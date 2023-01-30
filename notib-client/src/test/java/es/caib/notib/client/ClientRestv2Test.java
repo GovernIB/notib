@@ -844,13 +844,12 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 	@Test
 	public void consultaJustificantTest() throws DatatypeConfigurationException, IOException, DecoderException {
+
 		// Given
-		DadesConsulta dadesConsulta = new DadesConsulta();
-//		dadesConsulta.setReferencia("2d991961-cb95-46d9-b74c-6472952b296c");
-		dadesConsulta.setReferencia("8154b056-6458-4913-a5dd-248686846c1d");
+		String identificador = "6dff3c2e-a2bd-4774-a1a5-e557843817a7";
 
 		// When
-		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament("2d991961-cb95-46d9-b74c-6472952b296c");
+		RespostaConsultaJustificantEnviament resposta = client.consultaJustificantEnviament(identificador);
 		if (resposta.isError()) {
 			System.out.println(">>> Reposta amb error: " + resposta.getErrorDescripcio());
 		} else {

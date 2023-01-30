@@ -1,5 +1,6 @@
 package es.caib.notib.logic.config;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.MonitorTasquesService;
@@ -420,7 +421,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(24, TimeUnit.HOURS);
+                        PeriodicTrigger trigger = new PeriodicTrigger(86400000l, TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         trigger.setInitialDelay(calcularDelay());
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
@@ -517,15 +518,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
 
-                        Long d = 1l;
                         String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
-                        try {
-                            d = Long.valueOf(dies);
-                        } catch (Exception ex) {
-                            logger.error("La propietat no retorna un número -> " + dies);
+                        if (Strings.isNullOrEmpty(dies)) {
+                            dies = "0 30 1 * * *";
                         }
-                        PeriodicTrigger trigger = new PeriodicTrigger(d*86400000l, TimeUnit.MILLISECONDS);
-                        trigger.setInitialDelay(calcularDelay());
+                        CronTrigger trigger = new CronTrigger(dies);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         Long millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(monitorIntegracionsEliminarAntics, millis);
