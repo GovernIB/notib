@@ -754,7 +754,7 @@ public class PermisosHelper {
 	public void actualitzarPermisosOrgansObsolets(List<NodeDir3> unitatsWs, List<OrganGestorEntity> organsDividits, List<OrganGestorEntity> organsFusionats,
 												  List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
-		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.notib.core.entity.OrganGestorEntity");
+		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.notib.persist.entity.OrganGestorEntity");
 		List<String> organsFusionatsProcessats = new ArrayList<>();
 		int nombreUnitatsTotal = unitatsWs.size();
 		int nombreUnitatsProcessades = 0;

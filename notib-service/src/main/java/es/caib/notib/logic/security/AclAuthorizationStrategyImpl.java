@@ -103,8 +103,8 @@ public class AclAuthorizationStrategyImpl implements AclAuthorizationStrategy {
 
        String tipus = acl.getObjectIdentity().getType();
        
-       if ("es.caib.notib.core.entity.ProcedimentEntity".equals(tipus) ||
-    	   "es.caib.notib.core.entity.OrganGestorEntity".equals(tipus)) {
+       if ("es.caib.notib.persist.entity.ProcedimentEntity".equals(tipus) ||
+    	   "es.caib.notib.persist.entity.OrganGestorEntity".equals(tipus)) {
     	   if (changeType == CHANGE_AUDITING) {
 	           requiredAuthority = this.procedimentGaModifyAuditing;
 	           requiredAuthorityOrgan = this.organGaModifyAuditing;

@@ -68,6 +68,6 @@
 	<cache alias="serveisAmbPermis" uses-template="default" />
 	<cache alias="organsAmbPermis" uses-template="default" />
 	<cache alias="organsPermisPerProcedimentComu" uses-template="default" />
-	<cache alias="procedimentEntitiessOrganPermis" uses-template="default" />
-	<cache alias="organsEntitiesPermis" uses-template="default" />
+<!--	<cache alias="procedimentEntitiessOrganPermis" uses-template="default" />-->
+<!--	<cache alias="organsEntitiesPermis" uses-template="default" />-->
 </config>

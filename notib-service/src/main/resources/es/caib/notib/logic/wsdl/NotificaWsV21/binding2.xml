@@ -5,7 +5,7 @@
     version="2.1">
 
 	<jaxws:bindings node="wsdl:definitions">
-		<jaxws:package name="es.caib.notib.core.wsdl.notificaV2"/>
+		<jaxws:package name="es.caib.notib.logic.wsdl.notificaV2"/>
     </jaxws:bindings>
     
 
