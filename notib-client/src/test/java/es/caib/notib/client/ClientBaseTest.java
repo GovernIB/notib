@@ -32,7 +32,7 @@ public class ClientBaseTest {
 	protected static final String OFICINA = "O00009390";
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
-	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.NACIONAL;
 
 	// LOCAL data
 //	Entitat: A04013511 (DGTIC) ò A04003003 (Govern)
@@ -60,7 +60,7 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setOrganGestor(ambEnviamentPostal ? ORGAN_CODI_CIE : ORGAN_CODI);
@@ -94,8 +94,8 @@ public class ClientBaseTest {
 				titular.setNif("00000000T");
 				titular.setEmail("sandreu@limit.es");
 			}
-			titular.setInteressatTipus(i != 0 ? InteressatTipusEnumDto.FISICA_SENSE_NIF : InteressatTipusEnumDto.FISICA);
-			if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			titular.setInteressatTipus(i != 0 ? InteressatTipus.FISICA_SENSE_NIF : InteressatTipus.FISICA);
+			if (titular.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			}
 			enviament.setTitular(titular);
@@ -106,8 +106,8 @@ public class ClientBaseTest {
 			destinatari.setNif("18225486x");
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
-			destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
-			if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
+			if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				destinatari.setDir3Codi(ORGAN_SIR_CODI);
 			}
 			if (i == 0) {
@@ -115,13 +115,13 @@ public class ClientBaseTest {
 			}
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				if (NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
+				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 					entregaPostal.setLinea1("linea1_" + i);
 					entregaPostal.setLinea2("linea2_" + i);
 				} else {
-					entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-					entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+					entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
+					entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 					entregaPostal.setViaNom("Bas");
 					entregaPostal.setNumeroCasa("25");
 					entregaPostal.setNumeroQualificador("bis");
@@ -229,11 +229,11 @@ public class ClientBaseTest {
 			notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 			boolean comunicacioAdministracio = false;
 			if (iNotificacioId % 2 == 0) {
-				notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+				notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
 				if (iNotificacioId % 3 == 0)
 					comunicacioAdministracio = true;
 			} else {
-				notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+				notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
 			}
 			notificacio.setUsuariCodi(USUARI_CODI);
 //			notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
@@ -296,10 +296,10 @@ public class ClientBaseTest {
 				titular.setTelefon("666010101");
 				titular.setEmail("sandreu@limit.es");
 				if (comunicacioAdministracio) {
-					titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+					titular.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 					titular.setDir3Codi(ENTITAT_DIR3CODI);
 				} else {
-					titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+					titular.setInteressatTipus(InteressatTipus.FISICA);
 				}
 				enviament.setTitular(titular);
 				Persona destinatari = new Persona();
@@ -310,21 +310,21 @@ public class ClientBaseTest {
 				destinatari.setTelefon("666020202");
 				destinatari.setEmail("sandreu@limit.es");
 				if (comunicacioAdministracio) {
-					destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+					destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 					destinatari.setDir3Codi(ENTITAT_DIR3CODI);
 				} else {
-					destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+					destinatari.setInteressatTipus(InteressatTipus.FISICA);
 				}
 				enviament.getDestinataris().add(destinatari);
 				if (ambEnviamentPostal) {
 					EntregaPostal entregaPostal = new EntregaPostal();
-					if (NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
+					if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 						entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 						entregaPostal.setLinea1("linea1_" + h);
 						entregaPostal.setLinea2("linea2_" + h);
 					} else {
-						entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-						entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+						entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
+						entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 						entregaPostal.setViaNom("Bas");
 						entregaPostal.setNumeroCasa("25");
 						entregaPostal.setNumeroQualificador("bis");
@@ -372,11 +372,11 @@ public class ClientBaseTest {
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
 		boolean comunicacioAdministracio = false;
 		if (iNotificacioId % 2 == 0) {
-			notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+			notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
 			if (iNotificacioId % 3 == 0)
 				comunicacioAdministracio = true;
 		} else {
-			notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+			notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
 		}
 		notificacio.setUsuariCodi(USUARI_CODI);
 //			notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
@@ -440,10 +440,10 @@ public class ClientBaseTest {
 			titular.setTelefon("666010101");
 			titular.setEmail("sandreu@limit.es");
 			if (comunicacioAdministracio) {
-				titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+				titular.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 				titular.setDir3Codi(ENTITAT_DIR3CODI);
 			} else {
-				titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+				titular.setInteressatTipus(InteressatTipus.FISICA);
 			}
 			enviament.setTitular(titular);
 			Persona destinatari = new Persona();
@@ -454,21 +454,21 @@ public class ClientBaseTest {
 			destinatari.setTelefon("666020202");
 			destinatari.setEmail("sandreu@limit.es");
 			if (comunicacioAdministracio) {
-				destinatari.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+				destinatari.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 				destinatari.setDir3Codi(ENTITAT_DIR3CODI);
 			} else {
-				destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+				destinatari.setInteressatTipus(InteressatTipus.FISICA);
 			}
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				if (NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
+				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 					entregaPostal.setLinea1("linea1_" + h);
 					entregaPostal.setLinea2("linea2_" + h);
 				} else {
-					entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-					entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+					entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
+					entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 					entregaPostal.setViaNom("Bas");
 					entregaPostal.setNumeroCasa("25");
 					entregaPostal.setNumeroQualificador("bis");
@@ -514,7 +514,7 @@ public class ClientBaseTest {
 			int numDestinataris,
 			int numEnviaments,
 			boolean ambEnviamentPostal,
-			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
+			NotificaDomiciliConcretTipus tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
 			boolean ambEnviamentDEHObligat,
 			boolean ambRetard) throws IOException, DecoderException, DatatypeConfigurationException {
@@ -545,7 +545,7 @@ public class ClientBaseTest {
 			int numDestinataris,
 			int numEnviaments,
 			boolean ambEnviamentPostal,
-			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
+			NotificaDomiciliConcretTipus tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
 			boolean enviamentDEHObligat,
 			boolean ambTipusInteressat) throws IOException, DecoderException, DatatypeConfigurationException {
@@ -553,7 +553,7 @@ public class ClientBaseTest {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
 		notificacio.setUsuariCodi(USUARI_CODI);
 //		notificacio.setComunicacioTipus(ComunicacioTipusEnum.ASINCRON);
 		notificacio.setOrganGestor(ambEnviamentPostal ? ORGAN_CODI_CIE : ORGAN_CODI);
@@ -582,7 +582,7 @@ public class ClientBaseTest {
 			Enviament enviament = new Enviament();
 			Persona titular = new Persona();
 			if (ambTipusInteressat) {
-				titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+				titular.setInteressatTipus(InteressatTipus.FISICA);
 			} else {
 				titular.setInteressatTipus(null);
 			}
@@ -599,7 +599,7 @@ public class ClientBaseTest {
 			for (int k = 0; k < numDestinataris; k++) {
 				Persona destinatari = new Persona();
 				if (ambTipusInteressat) {
-					destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+					destinatari.setInteressatTipus(InteressatTipus.FISICA);
 				} else {
 					destinatari.setInteressatTipus(null);
 				}
@@ -616,13 +616,13 @@ public class ClientBaseTest {
 				enviament.setEntregaPostalActiva(true);
 				EntregaPostal entregaPostal = new EntregaPostal();
 				entregaPostal.setTipus(tipusEnviamentPostal);
-				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
+				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipus.ESTRANGER)) {
 					entregaPostal.setPaisCodi("FR");
 					entregaPostal.setViaNom("Prime Minister's Office, 10 Downing Street");
 					entregaPostal.setPoblacio("London");
 					entregaPostal.setCodiPostal("00000");
 				} else {
-					entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+					entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 					entregaPostal.setViaNom("Bas");
 					entregaPostal.setNumeroCasa("25");
 					entregaPostal.setNumeroQualificador("bis");
@@ -641,7 +641,7 @@ public class ClientBaseTest {
 					entregaPostal.setPaisCodi("ES");
 					entregaPostal.setLinea1("linea1_" + i);
 					entregaPostal.setLinea2("linea2_" + i);
-					if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS))
+					if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipus.APARTAT_CORREUS))
 						entregaPostal.setApartatCorreus("0228");
 				}
 

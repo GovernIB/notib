@@ -61,7 +61,7 @@ public class RestAltaNotificacio {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacio = NotificacioV2.builder()
 			.emisorDir3Codi(ENTITAT_DIR3CODI)
-			.enviamentTipus(EnviamentTipusEnum.COMUNICACIO)
+			.enviamentTipus(EnviamentTipus.COMUNICACIO)
 				.concepte("concepte_" + notificacioId)
 				.descripcio("descripcio_" + notificacioId)
 				.enviamentDataProgramada(null)
@@ -118,8 +118,8 @@ public class RestAltaNotificacio {
 			enviament.setDestinataris(destinataris);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-				entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+				entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
+				entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 				entregaPostal.setViaNom("Bas");
 				entregaPostal.setNumeroCasa("25");
 				entregaPostal.setNumeroQualificador("bis");

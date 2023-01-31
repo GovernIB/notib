@@ -1,7 +1,7 @@
 package es.caib.notib.back.command;
 
-import es.caib.notib.client.domini.DocumentTipusEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.DocumentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.ValidPersona;
@@ -23,7 +23,7 @@ public class PersonaCommand {
 
 	private Long id;
 	private boolean incapacitat;
-	private InteressatTipusEnumDto interessatTipus;
+	private InteressatTipus interessatTipus;
 //	@Size(max=255)
 	private String nom;
 	private String nomInput;
@@ -33,7 +33,7 @@ public class PersonaCommand {
 	private String llinatge1;
 	@Size(max=30)
 	private String llinatge2;
-	private DocumentTipusEnumDto documentTipus;
+	private DocumentTipus documentTipus;
 	@Size(max=9)
 	private String nif;
 	@Size(max=16)

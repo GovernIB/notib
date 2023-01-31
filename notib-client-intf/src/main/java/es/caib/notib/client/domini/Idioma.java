@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum IdiomaEnumDto implements Serializable {
+public enum Idioma implements Serializable {
     CA,
     ES
 }

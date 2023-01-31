@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.helper;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -60,7 +60,7 @@ public class ConversioTipusHelper {
 		.customize(new CustomMapper<PersonaCommand, PersonaDto>() {
             @Override
             public void mapAtoB(PersonaCommand personaCommand, PersonaDto personaDto, MappingContext context) {
-                if (InteressatTipusEnumDto.JURIDICA.equals(personaCommand.getInteressatTipus())) {
+                if (InteressatTipus.JURIDICA.equals(personaCommand.getInteressatTipus())) {
                 	personaDto.setRaoSocial(personaCommand.getNom());
                 	personaDto.setNom(null);
                 }
@@ -73,7 +73,7 @@ public class ConversioTipusHelper {
 		.customize(new CustomMapper<PersonaDto, PersonaCommand>() {
             @Override
             public void mapAtoB(PersonaDto personaDto, PersonaCommand personaCommand, MappingContext context) {
-                if (InteressatTipusEnumDto.JURIDICA.equals(personaDto.getInteressatTipus())) {
+                if (InteressatTipus.JURIDICA.equals(personaDto.getInteressatTipus())) {
                 	personaCommand.setNom(personaDto.getRaoSocial() != null ? personaDto.getRaoSocial() : personaDto.getNomInput());
                 }
             }                   
@@ -185,7 +185,7 @@ public class ConversioTipusHelper {
 							if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
 									notificacioDto.getEnviaments().get(0).getTitular()!= null){
 								PersonaDto titular = notificacioDto.getEnviaments().get(0).getTitular();
-								if (InteressatTipusEnumDto.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
+								if (InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
 									notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
 								}
 							}

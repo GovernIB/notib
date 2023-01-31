@@ -304,7 +304,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 
 		int numDestinataris = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
@@ -334,7 +334,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.ESTRANGER;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
@@ -369,7 +369,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = true;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
@@ -404,7 +404,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = true;
 		boolean ambEnviamentDEHObligat = true;
 		boolean ambRetard = false;
@@ -493,7 +493,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -550,7 +550,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 
@@ -611,7 +611,7 @@ public class ClientRestv2Test extends ClientBaseTest {
 		int numDestinataris = 3;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;

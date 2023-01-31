@@ -1,6 +1,6 @@
 package es.caib.notib.client;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testNotificacioByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -70,7 +70,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testNotificacioByTitularNoVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), !VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), !VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -85,7 +85,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testNotificacioByTitularVisibleEsp() throws Exception {
 
-		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.ES, 0, 10);
+		RespostaConsultaV2 resposta = client.notificacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.ES, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -100,7 +100,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testNotificacioLlegidesByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.notificacionsLlegidesByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.notificacionsLlegidesByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -115,7 +115,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testNotificacioPendentsByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.notificacionsPendentsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.notificacionsPendentsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -130,7 +130,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testComunicacioByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.comunicacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.comunicacionsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -145,7 +145,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testComunicacioLlegidesByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.comunicacionsLlegidesByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.comunicacionsLlegidesByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);
@@ -160,7 +160,7 @@ public class ClientRestCarpetav2Test {
 	@Test
 	public void testComunicacioPendentsByTitularVisibleCat() throws Exception {
 
-		RespostaConsultaV2 resposta = client.comunicacionsPendentsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, IdiomaEnumDto.CA, 0, 10);
+		RespostaConsultaV2 resposta = client.comunicacionsPendentsByTitular(DNI_TITULAR, sdf.parse(DATA_INICI), sdf.parse(DATA_FI), VISIBLE, Idioma.CA, 0, 10);
 		assertNotNull(resposta);
 
 		assertTrue("No s'han trobat resultats", resposta.getNumeroElementsTotals() > 0);

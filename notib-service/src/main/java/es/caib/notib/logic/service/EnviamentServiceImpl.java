@@ -3,7 +3,7 @@ package es.caib.notib.logic.service;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.consulta.DocumentConsultaV2;
 import es.caib.notib.client.domini.consulta.GenericInfo;
 import es.caib.notib.client.domini.consulta.PersonaConsultaV2;
@@ -73,8 +73,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -1298,7 +1296,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		persona.setNom(dto.getNom());
 		if (dto.getInteressatTipus() != null) {
 			persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
-			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus())) {
+			if (!InteressatTipus.FISICA.equals(dto.getInteressatTipus())) {
 				persona.setNom(dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty() ? dto.getRaoSocial() : dto.getNom());
 			}
 		}
@@ -1561,9 +1559,9 @@ public class EnviamentServiceImpl implements EnviamentService {
 
 		private PersonaConsultaV2 toPersona(PersonaEntity personaEntity) {
 
-			InteressatTipusEnumDto tipus = personaEntity.getInteressatTipus();
+			InteressatTipus tipus = personaEntity.getInteressatTipus();
 			String nom = personaEntity.getNom();
-			if (!InteressatTipusEnumDto.FISICA.equals(tipus)) {
+			if (!InteressatTipus.FISICA.equals(tipus)) {
 				if (personaEntity.getRaoSocial() != null && !personaEntity.getRaoSocial().isEmpty()) {
 					nom = personaEntity.getRaoSocial();
 				}

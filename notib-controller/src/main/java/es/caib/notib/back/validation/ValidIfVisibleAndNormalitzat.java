@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.validation;
 
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -30,7 +30,7 @@ public @interface ValidIfVisibleAndNormalitzat {
 	String fieldValueVisble();
 	
 	String fieldName();
-	NotificaDomiciliConcretTipusEnumDto fieldValue();
+	NotificaDomiciliConcretTipus fieldValue();
 	String dependFieldName();
 	String dependFieldNameSecond();
 

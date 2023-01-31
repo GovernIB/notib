@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.dto;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,13 +22,13 @@ public class ApiConsulta {
     private Integer mida;
     private Date dataInicial;
     private Date dataFinal;
-    private IdiomaEnumDto idioma;
+    private Idioma idioma;
     private Boolean visibleCarpeta;
 
     public void setDniTitular(String dniTitular) {
         this.dniTitular = dniTitular != null ? dniTitular.toUpperCase() : null;
     }
-    public IdiomaEnumDto getIdioma() {
-        return idioma != null ? idioma : IdiomaEnumDto.CA;
+    public Idioma getIdioma() {
+        return idioma != null ? idioma : Idioma.CA;
     }
 }

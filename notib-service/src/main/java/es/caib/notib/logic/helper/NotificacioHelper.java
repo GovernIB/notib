@@ -1,7 +1,7 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.Enviament;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -313,7 +313,7 @@ public class NotificacioHelper {
 	private boolean isAllEnviamentsAAdministracio(NotificacioDatabaseDto notificacio) {
 
 		for(NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
 		}

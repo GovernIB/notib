@@ -256,7 +256,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 
 	// CONSULTA
 
-	public RespostaConsultaV2 comunicacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+	public RespostaConsultaV2 comunicacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular;
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
@@ -266,7 +266,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	public RespostaConsultaV2 notificacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+	public RespostaConsultaV2 notificacionsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular;
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
@@ -276,7 +276,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	public RespostaConsultaV2 comunicacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+	public RespostaConsultaV2 comunicacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/pendents";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
@@ -286,7 +286,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	public RespostaConsultaV2 notificacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+	public RespostaConsultaV2 notificacionsPendentsByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/pendents";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
@@ -296,7 +296,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	public RespostaConsultaV2 comunicacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+	public RespostaConsultaV2 comunicacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/comunicacions/" + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
@@ -306,7 +306,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	public RespostaConsultaV2 notificacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida) {
+	public RespostaConsultaV2 notificacionsLlegidesByTitular(String dniTitular, Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida) {
 		try {
 			String urlAmbMetode = baseUrl + CONSULTAV2_SERVICE_PATH + "/notificacions/" + dniTitular + "/llegides";
 			String json = getConsultaJsonString(dataInicial, dataFinal, visibleCarpeta, lang, pagina, mida, urlAmbMetode);
@@ -316,7 +316,7 @@ public class NotificacioRestClientV2 extends NotificacioBaseRestClient {
 		}
 	}
 
-	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, IdiomaEnumDto lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
+	private String getConsultaJsonString(Date dataInicial, Date dataFinal, Boolean visibleCarpeta, Idioma lang, Integer pagina, Integer mida, String urlAmbMetode) throws Exception {
 		Client jerseyClient = generarClient(urlAmbMetode);
 		String json = jerseyClient.
 				resource(urlAmbMetode).

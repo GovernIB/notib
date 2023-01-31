@@ -1,7 +1,7 @@
 package es.caib.notib.persist.entity;
 
-import es.caib.notib.client.domini.DocumentTipusEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.DocumentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.persist.audit.NotibAuditable;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "interessattipus", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private InteressatTipusEnumDto interessatTipus;
+	private InteressatTipus interessatTipus;
 	@Column(name = "incapacitat")
 	private boolean incapacitat;
 	@Column(name = "email", length = 255)
@@ -49,7 +49,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private String llinatge2;
 	@Column(name = "document_tipus", nullable = true)
 	@Enumerated(EnumType.STRING)
-	private DocumentTipusEnumDto documentTipus;
+	private DocumentTipus documentTipus;
 	@Column(name = "nif", length = 9)
 	private String nif;
 	@Column(name = "nom", length = 255)
@@ -66,7 +66,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	private NotificacioEnviamentEntity enviament;
 
 	public void update (
-			InteressatTipusEnumDto interessatTipus,
+			InteressatTipus interessatTipus,
 			String email,
 			String llinatge1,
 			String llinatge2,
@@ -83,7 +83,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 		this.nif = nif;
 		this.nom = nom;
 		this.telefon = telefon;
-		if (interessatTipus != null && interessatTipus.equals(InteressatTipusEnumDto.JURIDICA) && (raoSocial == null || raoSocial.isEmpty()))
+		if (interessatTipus != null && interessatTipus.equals(InteressatTipus.JURIDICA) && (raoSocial == null || raoSocial.isEmpty()))
 			this.raoSocial = nom;
 		else
 			this.raoSocial = raoSocial;
@@ -92,7 +92,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	}
 
 	public static BuilderV2 getBuilderV2(
-			InteressatTipusEnumDto interessatTipus,
+			InteressatTipus interessatTipus,
 			String email,
 			String llinatge1,
 			String llinatge2,
@@ -116,7 +116,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 	public static class BuilderV2 {
 		PersonaEntity built;
 		BuilderV2(
-				InteressatTipusEnumDto interessatTipus,
+				InteressatTipus interessatTipus,
 				String email,
 				String llinatge1,
 				String llinatge2,
@@ -135,7 +135,7 @@ public class PersonaEntity extends NotibAuditable<Long> {
 			built.llinatge2 = llinatge2;
 			built.nif = nif;
 			built.nom = nom;
-			if (interessatTipus != null && interessatTipus.equals(InteressatTipusEnumDto.JURIDICA) && (raoSocial == null || raoSocial.isEmpty()))
+			if (interessatTipus != null && interessatTipus.equals(InteressatTipus.JURIDICA) && (raoSocial == null || raoSocial.isEmpty()))
 				built.raoSocial = nom;
 			else
 				built.raoSocial = raoSocial;

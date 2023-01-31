@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum InteressatTipusEnumDto implements Serializable {
+public enum InteressatTipus implements Serializable {
 
     ADMINISTRACIO(1L),
     FISICA(2L),
@@ -17,14 +17,14 @@ public enum InteressatTipusEnumDto implements Serializable {
 
     private final Long val;
 
-    InteressatTipusEnumDto(Long val) {
+    InteressatTipus(Long val) {
         this.val = val;
     }
     public Long getLongVal() {
         return val;
     }
 
-    public static boolean isAdministracio(InteressatTipusEnumDto interessatTipus) {
+    public static boolean isAdministracio(InteressatTipus interessatTipus) {
         return ADMINISTRACIO.equals(interessatTipus);
     }
 }

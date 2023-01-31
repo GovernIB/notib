@@ -54,7 +54,7 @@ public class NotificacioV2 {
      * Valor per defecte: COMUNICACIO
      * Camp obligatori
      */
-    private EnviamentTipusEnum enviamentTipus;
+    private EnviamentTipus enviamentTipus;
 
     /**
      * Concepte de l’enviament. Si ha d’anar a CIE només s’agafaran els 50 primers caràcters.
@@ -139,7 +139,7 @@ public class NotificacioV2 {
      * Valor per defecte: CA
      * Camp opcional
      */
-    private IdiomaEnumDto idioma;
+    private Idioma idioma;
 
     /**
      * Document que s’envia en la notificació/comunicació

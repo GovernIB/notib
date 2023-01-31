@@ -6,7 +6,7 @@ package es.caib.notib.logic.service;
 import com.codahale.metrics.Timer;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
@@ -28,7 +28,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.exception.ValidationException;
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.*;
@@ -129,8 +128,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
 	private AuditEnviamentHelper auditEnviamentHelper;
-//	@Autowired
-//	private AplicacioService aplicacioService;
 	@Lazy
 	@Resource
 	private CacheHelper cacheHelper;
@@ -420,13 +417,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 			Iterator<NotificacioEnviamentEntity> it = notificacio.getEnviaments().iterator();
 			while (it.hasNext()) {
 				NotificacioEnviamentEntity env = it.next();
-				if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+				if (env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
 						&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
 						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
 					dataEnviament = env.getRegistreData();
 				}
 
-				if (!env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+				if (!env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
 						&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
 						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
 						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {

@@ -3,8 +3,8 @@
  */
 package es.caib.notib.back.command;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -76,7 +76,7 @@ public class NotificacioCommand {
 	private String llibre;
 	private String extracte;
 	private String docFisica;
-	private IdiomaEnumDto idioma;
+	private Idioma idioma;
 	private String tipusAssumpte;
 	@Size(max=80)
 	private String numExpedient;
@@ -115,7 +115,7 @@ public class NotificacioCommand {
 
 	public boolean isComunicacioSIR() {
 		for (EnviamentCommand enviament : enviaments) {
-			if (InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+			if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
 				return true;
 			}
 		}
@@ -139,7 +139,7 @@ public class NotificacioCommand {
 		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
 			boolean aAdministracio = false;
 			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
-				if (InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
+				if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
 					aAdministracio = true;
 					break;
 				}
@@ -201,16 +201,16 @@ public class NotificacioCommand {
 	
 	private void establecerCamposPersona(PersonaDto persona) {
 		if (persona != null) {
-			if (InteressatTipusEnumDto.FISICA.equals(persona.getInteressatTipus())) {
+			if (InteressatTipus.FISICA.equals(persona.getInteressatTipus())) {
 				persona.setDir3Codi(null);
 				persona.setDocumentTipus(null);
-			} else if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
+			} else if (InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
 				persona.setDir3Codi(null);
-			} else if (InteressatTipusEnumDto.JURIDICA.equals(persona.getInteressatTipus())) {
+			} else if (InteressatTipus.JURIDICA.equals(persona.getInteressatTipus())) {
 				persona.setDocumentTipus(null);
 				persona.setLlinatge1(null);
 				persona.setLlinatge2(null);
-			} else if (InteressatTipusEnumDto.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
+			} else if (InteressatTipus.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
 				persona.setDocumentTipus(null);
 				persona.setIncapacitat(Boolean.FALSE);
 				persona.setLlinatge1(null);

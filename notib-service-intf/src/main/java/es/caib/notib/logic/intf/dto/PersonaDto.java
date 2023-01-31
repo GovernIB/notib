@@ -1,7 +1,7 @@
 package es.caib.notib.logic.intf.dto;
 
-import es.caib.notib.client.domini.DocumentTipusEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.DocumentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,14 +19,14 @@ public class PersonaDto implements Serializable{
 
 	private Long id;
 	boolean incapacitat;
-	private InteressatTipusEnumDto interessatTipus;
+	private InteressatTipus interessatTipus;
 	private String nom;
 	private String nomInput;
 	private String llinatge1;
 	private String llinatge2;
 	private String raoSocial;
 	private String raoSocialInput;
-	private DocumentTipusEnumDto documentTipus;
+	private DocumentTipus documentTipus;
 	private String nif;
 	private String telefon;
 	private String email;
@@ -39,7 +39,7 @@ public class PersonaDto implements Serializable{
 
 	public void setRaoSocialInput(String raoSocialInput) {
 		this.raoSocialInput = raoSocialInput;
-		if (InteressatTipusEnumDto.JURIDICA.equals(interessatTipus) || InteressatTipusEnumDto.ADMINISTRACIO.equals(interessatTipus)) {
+		if (InteressatTipus.JURIDICA.equals(interessatTipus) || InteressatTipus.ADMINISTRACIO.equals(interessatTipus)) {
 			this.nom = raoSocialInput;
 		}
 	}

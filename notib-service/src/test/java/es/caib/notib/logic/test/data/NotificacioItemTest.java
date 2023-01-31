@@ -1,8 +1,8 @@
 package es.caib.notib.logic.test.data;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.IdiomaEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
@@ -101,7 +101,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
                 .usuariCodi("admin")
 //				.motiu()
                 .numExpedient("EXPEDIENTEX")
-                .idioma(IdiomaEnumDto.CA)
+                .idioma(Idioma.CA)
                 .document(new DocumentDto())
                 .build();
         notCreated.setDocument(document);
@@ -127,7 +127,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
     public static NotEnviamentDatabaseDto getRandomEnviament(int i){
         NotEnviamentDatabaseDto enviament = new NotEnviamentDatabaseDto();
         PersonaDto titular = PersonaDto.builder()
-                .interessatTipus(InteressatTipusEnumDto.FISICA)
+                .interessatTipus(InteressatTipus.FISICA)
                 .nom("titularNom" + i)
                 .llinatge1("titLlinatge1_" + i)
                 .llinatge2("titLlinatge2_" + i)
@@ -137,7 +137,7 @@ public class NotificacioItemTest extends DatabaseItemTest<NotificacioDatabaseDto
         enviament.setTitular(titular);
         List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
         PersonaDto destinatari = PersonaDto.builder()
-                .interessatTipus(InteressatTipusEnumDto.FISICA)
+                .interessatTipus(InteressatTipus.FISICA)
                 .nom("destinatariNom" + i)
                 .llinatge1("destLlinatge1_" + i)
                 .llinatge2("destLlinatge2_" + i)

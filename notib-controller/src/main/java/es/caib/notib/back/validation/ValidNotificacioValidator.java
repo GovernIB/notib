@@ -2,7 +2,7 @@ package es.caib.notib.back.validation;
 
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -89,10 +89,10 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 			if (notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO || notificacio.getEnviamentTipus() == TipusEnviamentEnumDto.COMUNICACIO_SIR) {
 				if (notificacio.getEnviaments() != null) {
 					for (EnviamentCommand enviament : notificacio.getEnviaments()) {
-						if (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+						if (enviament.getTitular().getInteressatTipus() == InteressatTipus.ADMINISTRACIO) {
 							comunicacioAmbAdministracio = true;
 						}
-						if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.JURIDICA)) {
+						if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) || (enviament.getTitular().getInteressatTipus() == InteressatTipus.JURIDICA)) {
 							comunicacioSenseAdministracio = true;
 						}
 					}
@@ -312,7 +312,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 					if (!notificacio.isComunicacioSIR()) {
 						boolean senseNif = true;
-						if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
+						if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 							if (enviament.getTitular() != null && enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 								senseNif = false;
 							}
@@ -325,7 +325,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 						}
 
-						if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
+						if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 							valid = false;
 							context.buildConstraintViolationWithTemplate(
 											MessageHelper.getInstance().getMessage("notificacio.form.valid.notificacio.sensenif", new Object[]{envCount + 1}, locale))
@@ -334,7 +334,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 						}
 
 						// SI ES UNA PERSONA SENSE NIF I NO TÉ CAP DESTINATARI NI ENVIAMENT PER ENTREGA POSTAL ACTIVA -> EMAIL OBLIGATORI
-						if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+						if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 							if(senseNif && (enviament.getEntregaPostal() == null || !enviament.getEntregaPostal().isActiva()) && Strings.isNullOrEmpty(enviament.getTitular().getEmail())) {
 								// Email obligatori si no té destinataris amb nif o enviament postal
 								valid = false;
@@ -345,7 +345,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 							}
 						}
 
-						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+						if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 							String nif = enviament.getTitular().getNif().toLowerCase();
 							if (nifs.contains(nif)) {
 								valid = false;
@@ -358,7 +358,7 @@ public class ValidNotificacioValidator implements ConstraintValidator<ValidNotif
 					}
 
 					if (enviament.getEntregaDeh() != null && enviament.getEntregaDeh().isActiva()) {
-						if (InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+						if (InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 							valid = false;
 							context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.persona.sense.nif", null, locale))
 									.addNode("enviaments["+envCount+"].entregaDeh.activa").addConstraintViolation();

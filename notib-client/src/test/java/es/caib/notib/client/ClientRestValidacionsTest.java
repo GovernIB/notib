@@ -4,9 +4,9 @@
 package es.caib.notib.client;
 
 import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.EnviamentTipusEnum;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.EnviamentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.NotificacioEstatEnum;
 import es.caib.notib.client.domini.NotificacioV2;
 import es.caib.notib.client.domini.Persona;
@@ -106,7 +106,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1022() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
 		notificacio.setProcedimentCodi(null);
 		notificacio.setOrganGestor(null);
 		enviaNotificacioError(notificacio, "1022");
@@ -389,7 +389,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1123_fisica() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getTitular().setNif("W2460343C"); //CIF
 		enviaNotificacioError(notificacio, "1123");
 	}
@@ -397,7 +397,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1123_juridica() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.JURIDICA);
 		notificacio.getEnviaments().get(0).getTitular().setNif("58848076T"); //NIF o NIE
 		enviaNotificacioError(notificacio, "1123");
 	}
@@ -405,7 +405,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1130() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getTitular().setNom(null);
 		enviaNotificacioError(notificacio, "1130");
 	}
@@ -413,7 +413,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1131() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getTitular().setLlinatge1(null);
 		enviaNotificacioError(notificacio, "1131");
 	}
@@ -421,7 +421,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1132() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getTitular().setNif(null);
 		enviaNotificacioError(notificacio, "1132");
 	}
@@ -429,7 +429,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1140() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.JURIDICA);
 		notificacio.getEnviaments().get(0).getTitular().setNif("F31513518");
 		notificacio.getEnviaments().get(0).getTitular().setRaoSocial(null);
 		notificacio.getEnviaments().get(0).getTitular().setNom(null);
@@ -439,7 +439,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1141() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.JURIDICA);
 		notificacio.getEnviaments().get(0).getTitular().setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
 		notificacio.getEnviaments().get(0).getTitular().setNif(null);
 		enviaNotificacioError(notificacio, "1141");
@@ -448,7 +448,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1150() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setNom(null);
 		enviaNotificacioError(notificacio, "1150");
 	}
@@ -456,7 +456,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1151() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi(null);
 		enviaNotificacioError(notificacio, "1151");
 	}
@@ -464,8 +464,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1152() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("ABCDEFG");
 		enviaNotificacioError(notificacio, "1152");
 	}
@@ -473,8 +473,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1153() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("LA0007752");
 		enviaNotificacioError(notificacio, "1153");
 	}
@@ -482,8 +482,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1154() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A04026906");
 		enviaNotificacioError(notificacio, "1154");
 	}
@@ -499,7 +499,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		destinatari.setNif("18225486x");
 		destinatari.setTelefon("666020202");
 		destinatari.setEmail("sandreu@limit.es");
-		destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		destinatari.setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getDestinataris().add(destinatari);
 		enviaNotificacioError(notificacio, "1160");
 	}
@@ -584,7 +584,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1181_fisica() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("W2460343C"); //CIF
 		enviaNotificacioError(notificacio, "1181");
 	}
@@ -592,7 +592,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1181_juridica() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.JURIDICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("58848076T"); //NIF o NIE
 		enviaNotificacioError(notificacio, "1181");
 	}
@@ -600,7 +600,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1190() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNom(null);
 		enviaNotificacioError(notificacio, "1190");
 	}
@@ -608,7 +608,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1191() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setLlinatge1(null);
 		enviaNotificacioError(notificacio, "1191");
 	}
@@ -616,7 +616,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1192() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.FISICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.FISICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif(null);
 		enviaNotificacioError(notificacio, "1192");
 	}
@@ -624,7 +624,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1200() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.JURIDICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("F31513518");
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial(null);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNom(null);
@@ -634,7 +634,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1201() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.JURIDICA);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif("F31513518");
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setRaoSocial("ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyz");
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif(null);
@@ -644,7 +644,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1210() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNom(null);
 		enviaNotificacioError(notificacio, "1210");
 	}
@@ -652,7 +652,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1211() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi(null);
 		enviaNotificacioError(notificacio, "1211");
 	}
@@ -660,8 +660,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1212() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("ABCDEFG");
 		enviaNotificacioError(notificacio, "1212");
 	}
@@ -669,8 +669,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1213() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("LA0007752");
 		enviaNotificacioError(notificacio, "1213");
 	}
@@ -678,8 +678,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1214() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A04026906");
 		enviaNotificacioError(notificacio, "1214");
 	}
@@ -687,11 +687,11 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1220() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setNif(null);
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A04026906");;
-		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getDestinataris().get(0).setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setNif(null);
 		notificacio.getEnviaments().get(0).getDestinataris().get(0).setDir3Codi("A04026906");;
 		enviaNotificacioError(notificacio, "1220");
@@ -883,7 +883,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1270() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.ESTRANGER);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.ESTRANGER);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setViaNom(null);
 		enviaNotificacioError(notificacio, "1270");
 	}
@@ -891,7 +891,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1271() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.ESTRANGER);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.ESTRANGER);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setPaisCodi(null);
 		enviaNotificacioError(notificacio, "1271");
 	}
@@ -899,7 +899,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1272() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.ESTRANGER);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.ESTRANGER);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setPoblacio(null);
 		enviaNotificacioError(notificacio, "1272");
 	}
@@ -907,7 +907,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1280() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.APARTAT_CORREUS);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setApartatCorreus(null);
 		enviaNotificacioError(notificacio, "1280");
 	}
@@ -915,7 +915,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1281() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.APARTAT_CORREUS);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setApartatCorreus("0228");
 		notificacio.getEnviaments().get(0).getEntregaPostal().setMunicipiCodi(null);
 		enviaNotificacioError(notificacio, "1281");
@@ -924,7 +924,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1282() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.APARTAT_CORREUS);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setApartatCorreus("0228");
 		notificacio.getEnviaments().get(0).getEntregaPostal().setProvincia(null);
 		enviaNotificacioError(notificacio, "1282");
@@ -933,7 +933,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1283() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.APARTAT_CORREUS);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setApartatCorreus("0228");
 		notificacio.getEnviaments().get(0).getEntregaPostal().setPoblacio(null);
 		enviaNotificacioError(notificacio, "1283");
@@ -942,7 +942,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1290() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.SENSE_NORMALITZAR);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setLinea1(null);
 		enviaNotificacioError(notificacio, "1290");
 	}
@@ -950,7 +950,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1291() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 1, true);
-		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR);
+		notificacio.getEnviaments().get(0).getEntregaPostal().setTipus(NotificaDomiciliConcretTipus.SENSE_NORMALITZAR);
 		notificacio.getEnviaments().get(0).getEntregaPostal().setLinea1("asdfasdf");
 		notificacio.getEnviaments().get(0).getEntregaPostal().setLinea2(null);
 		enviaNotificacioError(notificacio, "1291");
@@ -985,7 +985,7 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 		notificacio.setOrganGestor(null);
 		notificacio.setProcedimentCodi("000001");
 		notificacio.getEnviaments().get(0).setEntregaDehActiva(true);
-		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.getEnviaments().get(0).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(0).getTitular().setNif(null);
 		notificacio.getEnviaments().get(0).getTitular().setDir3Codi("A17002943");
 		enviaNotificacioError(notificacio, "1302");
@@ -994,8 +994,8 @@ public class ClientRestValidacionsTest extends ClientBaseTest {
 	@Test
 	public void test1310() throws DatatypeConfigurationException, IOException, DecoderException {
 		NotificacioV2 notificacio = generarNotificacioV2(new Long(System.currentTimeMillis()).toString(), 2, false);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.COMUNICACIO);
-		notificacio.getEnviaments().get(1).getTitular().setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.COMUNICACIO);
+		notificacio.getEnviaments().get(1).getTitular().setInteressatTipus(InteressatTipus.ADMINISTRACIO);
 		notificacio.getEnviaments().get(1).getTitular().setDir3Codi(ORGAN_SIR_CODI);
 		enviaNotificacioError(notificacio, "1310");
 	}

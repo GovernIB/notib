@@ -50,6 +50,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -66,6 +67,7 @@ import java.util.Set;
 public class ConversioTipusHelper {
 
 	private MapperFactory mapperFactory;
+	@Lazy
 	@Autowired
 	private CacheHelper cacheHelper;
 

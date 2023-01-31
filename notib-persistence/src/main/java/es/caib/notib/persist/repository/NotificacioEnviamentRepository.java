@@ -207,7 +207,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<Long> findByRegistreRefresc(@Param("maxReintents")Integer maxReintents, Pageable pageable);
 
 	// Recupera enviaments amb DEH finalitzats sense certificació
-	@Query(	"select id rom NotificacioEnviamentEntity " +
+	@Query(	"select id from NotificacioEnviamentEntity " +
 			" where	notificaEstatFinal = true " + 
 			"	and notificaCertificacioData is null" +
 			"	and dehNif is not null" +

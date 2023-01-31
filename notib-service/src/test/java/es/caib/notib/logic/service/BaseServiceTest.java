@@ -3,7 +3,7 @@
  */
 package es.caib.notib.logic.service;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto.OrdreDireccioDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
@@ -698,7 +698,7 @@ public class BaseServiceTest {
 		for (int i = 0; i < numDestinataris; i++) {
 			NotificacioEnviamentDtoV2 enviament = new NotificacioEnviamentDtoV2();
 			PersonaDto titular = PersonaDto.builder()
-					.interessatTipus(InteressatTipusEnumDto.FISICA)
+					.interessatTipus(InteressatTipus.FISICA)
 					.nom("titularNom" + i)
 					.llinatge1("titLlinatge1_" + i)
 					.llinatge2("titLlinatge2_" + i)
@@ -708,7 +708,7 @@ public class BaseServiceTest {
 			enviament.setTitular(titular);
 			List<PersonaDto> destinataris = new ArrayList<PersonaDto>();
 			PersonaDto destinatari = PersonaDto.builder()
-					.interessatTipus(InteressatTipusEnumDto.FISICA)
+					.interessatTipus(InteressatTipus.FISICA)
 					.nom("destinatariNom" + i)
 					.llinatge1("destLlinatge1_" + i)
 					.llinatge2("destLlinatge2_" + i)

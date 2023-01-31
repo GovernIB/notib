@@ -1,7 +1,7 @@
 package es.caib.notib.logic.intf.dto;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.service.AuditService.TipusOperacio;
 import lombok.Data;
 
@@ -20,7 +20,7 @@ public class NotificacioEnviamentAuditDto {
     private Long notificacioId;
     private Long titularId;
     private String destinataris;
-    private NotificaDomiciliConcretTipusEnumDto domiciliTipus;
+    private NotificaDomiciliConcretTipus domiciliTipus;
     private String domicili;
     private ServeiTipusEnumDto serveiTipus;
     private Integer cie;

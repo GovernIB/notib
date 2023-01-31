@@ -2,7 +2,7 @@ package es.caib.notib.back.validation;
 
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.command.PersonaCommand;
 import es.caib.notib.back.helper.MessageHelper;
@@ -43,7 +43,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 		try {
 			Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
 			// Validació del NIF/NIE/CIF
-			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
+			if (persona.getNif() != null && !persona.getNif().isEmpty() && !InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
 				if (!NifHelper.isvalid(persona.getNif())) {
 					valid = false;
 					context.buildConstraintViolationWithTemplate(
@@ -167,7 +167,7 @@ public class ValidPersonaValidator implements ConstraintValidator<ValidPersona, 
 
 	private boolean validarNom(final PersonaCommand persona, final ConstraintValidatorContext context) {
 		Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
-		boolean isJuridica = InteressatTipusEnumDto.JURIDICA.equals(persona.getInteressatTipus());
+		boolean isJuridica = InteressatTipus.JURIDICA.equals(persona.getInteressatTipus());
 		String msgKey = "";
 		boolean ok = true;
 		Object [] vars = null;

@@ -2,7 +2,7 @@ package es.caib.notib.persist.entity;
 
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioArxiuTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaCertificacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -29,8 +29,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  * Classe del model de dades que representa els enviaments d'una
@@ -503,7 +501,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 		this.notificaIntentData = data;
 		this.sirConsultaData = data;
 
-		this.perEmail = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && // Interessar sense NIF
+		this.perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && // Interessar sense NIF
 				(this.destinataris == null || this.destinataris.isEmpty()) &&							// No té destinataris (els destinataris tenen NIF obligatòriament)
 				this.entregaPostal == null;																// No s'envia per entrega postal
 	}
@@ -562,7 +560,7 @@ public class NotificacioEnviamentEntity extends NotibAuditable<Long> {
 			built.sirConsultaData = data;
 			built.notificaReferencia = referencia;
 
-			built.perEmail = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && 	// Interessar sense NIF
+			built.perEmail = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) && 	// Interessar sense NIF
 					(built.destinataris == null || built.destinataris.isEmpty()) &&								// No té destinataris (els destinataris tenen NIF obligatòriament)
 					built.entregaPostal == null;																// No s'envia per entrega postal
 		}

@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public enum NotificaDomiciliConcretTipusEnumDto implements Serializable {
+public enum NotificaDomiciliConcretTipus implements Serializable {
     NACIONAL,
     ESTRANGER,
     APARTAT_CORREUS,

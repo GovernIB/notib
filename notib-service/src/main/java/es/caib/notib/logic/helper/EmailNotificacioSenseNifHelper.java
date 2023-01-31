@@ -1,8 +1,7 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.ValidationException;
@@ -257,10 +256,10 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
+		Idioma idioma = enviament.getNotificacio().getIdioma();
 		String htmlText = "<div class=\"content\">" +
 				"<br/>" +
-				(IdiomaEnumDto.ES.equals(idioma) ?
+				(Idioma.ES.equals(idioma) ?
 					"<h2>Aviso de nueva notificación</h2>" +
 							"<p>Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
 							getInformacioEnviamentHtml(enviament, false) +
@@ -278,8 +277,8 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
-		String textBody = (IdiomaEnumDto.ES.equals(idioma) ?
+		Idioma idioma = enviament.getNotificacio().getIdioma();
+		String textBody = (Idioma.ES.equals(idioma) ?
 				"AVISO DE PRÓXIMA NOTIFICACIÓN\n" +
 				"\n" +
 				"Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo '" + organ.getNom() + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
@@ -307,10 +306,10 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
+		Idioma idioma = enviament.getNotificacio().getIdioma();
 		String htmlText = "<div class=\"content\">" +
 				"<br/>" +
-				(IdiomaEnumDto.ES.equals(idioma) ?
+				(Idioma.ES.equals(idioma) ?
 					"<h2>Aviso de nueva comunicación</h2>" +
 							"<p>Nos ponemos en contacto con usted para hacerle llegar una nueva comunicación como INTERESADO, procedente del organismo <b>" + organ.getNom() + "</b> (" + entitat.getNom() + ")' con los siguientes datos:</p>" +
 							getInformacioEnviamentHtml(enviament, false) +
@@ -329,8 +328,8 @@ public class EmailNotificacioSenseNifHelper {
 
 		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
 		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		IdiomaEnumDto idioma = enviament.getNotificacio().getIdioma();
-		String textBody = (IdiomaEnumDto.ES.equals(idioma) ?
+		Idioma idioma = enviament.getNotificacio().getIdioma();
+		String textBody = (Idioma.ES.equals(idioma) ?
 				"NOVA COMUNICACIÓ\n" +
 				"\n" +
 				"Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme '" + organ.getNom() + " (" + entitat.getNom() + ")' amb les següents dades: \n" +

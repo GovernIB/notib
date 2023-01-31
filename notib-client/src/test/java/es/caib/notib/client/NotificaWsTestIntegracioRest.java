@@ -106,7 +106,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -174,7 +174,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -204,7 +204,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -268,7 +268,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -331,7 +331,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -368,7 +368,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -408,7 +408,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -470,7 +470,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -507,7 +507,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -569,7 +569,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -633,7 +633,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -695,7 +695,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -758,7 +758,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -822,7 +822,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -884,7 +884,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -950,7 +950,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1014,7 +1014,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1079,7 +1079,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1143,7 +1143,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1209,7 +1209,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1274,7 +1274,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.APARTAT_CORREUS;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1339,7 +1339,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.APARTAT_CORREUS;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1403,7 +1403,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1467,7 +1467,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1; 
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1531,7 +1531,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1595,7 +1595,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1660,7 +1660,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1725,7 +1725,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1795,7 +1795,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = false;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = true;
@@ -1902,7 +1902,7 @@ public class NotificaWsTestIntegracioRest {
 		int numDestinataris = 1;
 		int numEnviaments = 1;
 		boolean ambEnviamentPostal = true;
-		NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+		NotificaDomiciliConcretTipus tipusEnviamentPostal = NotificaDomiciliConcretTipus.NACIONAL;
 		boolean ambEnviamentDEH = false;
 		boolean ambEnviamentDEHObligat = false;
 		boolean ambRetard = false;
@@ -1954,7 +1954,7 @@ public class NotificaWsTestIntegracioRest {
 					int numDestinataris,
 					int numEnviaments,
 					boolean ambEnviamentPostal,
-					NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
+					NotificaDomiciliConcretTipus tipusEnviamentPostal,
 					boolean ambEnviamentDEH,
 					boolean ambEnviamentDEHObligat,
 					boolean ambRetard) throws IOException, DecoderException, DatatypeConfigurationException {
@@ -1989,14 +1989,14 @@ public class NotificaWsTestIntegracioRest {
 			int numDestinataris,
 			int numEnviaments,
 			boolean ambEnviamentPostal,
-			NotificaDomiciliConcretTipusEnumDto tipusEnviamentPostal,
+			NotificaDomiciliConcretTipus tipusEnviamentPostal,
 			boolean ambEnviamentDEH,
 			boolean enviamentDEHObligat,
 			boolean ambTipusInteressat) throws IOException, DecoderException, DatatypeConfigurationException {
 		byte[] arxiuBytes = IOUtils.toByteArray(getContingutNotificacioAdjunt());
 		NotificacioV2 notificacioV2 = new NotificacioV2();
 		notificacioV2.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacioV2.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacioV2.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
 		notificacioV2.setConcepte("concepte_" + notificacioId);
 		notificacioV2.setDescripcio("descripcio_" + notificacioId);
 		notificacioV2.setEnviamentDataProgramada(null);
@@ -2037,7 +2037,7 @@ public class NotificaWsTestIntegracioRest {
 			Enviament enviaments = new Enviament();
 			Persona titular = new Persona();
 			if (ambTipusInteressat) {
-				titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+				titular.setInteressatTipus(InteressatTipus.FISICA);
 			} else {
 				titular.setInteressatTipus(null);
 			}
@@ -2053,7 +2053,7 @@ public class NotificaWsTestIntegracioRest {
 			for (int k = 0; k < numDestinataris; k++) {
 				Persona destinatari = new Persona();
 				if (ambTipusInteressat) {
-					destinatari.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+					destinatari.setInteressatTipus(InteressatTipus.FISICA);
 				} else {
 					destinatari.setInteressatTipus(null);
 				}
@@ -2070,13 +2070,13 @@ public class NotificaWsTestIntegracioRest {
 				enviaments.setEntregaPostalActiva(true);
 				EntregaPostal entregaPostal = new EntregaPostal();
 				entregaPostal.setTipus(tipusEnviamentPostal);
-				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
+				if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipus.ESTRANGER)) {
 					entregaPostal.setPaisCodi("FR");
 					entregaPostal.setViaNom("Prime Minister's Office, 10 Downing Street");
 					entregaPostal.setPoblacio("London");
 					entregaPostal.setCodiPostal("00000");
 				} else {
-					entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+					entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 					entregaPostal.setViaNom("Bas");
 					entregaPostal.setNumeroCasa("25");
 					entregaPostal.setNumeroQualificador("bis");
@@ -2095,7 +2095,7 @@ public class NotificaWsTestIntegracioRest {
 					entregaPostal.setPaisCodi("ES");
 					entregaPostal.setLinea1("linea1_" + i);
 					entregaPostal.setLinea2("linea2_" + i);
-					if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS))
+					if (tipusEnviamentPostal.equals(NotificaDomiciliConcretTipus.APARTAT_CORREUS))
 						entregaPostal.setApartatCorreus("0228");
 				}
 				

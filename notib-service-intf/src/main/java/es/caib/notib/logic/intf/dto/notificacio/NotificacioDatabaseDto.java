@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.dto.notificacio;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
@@ -44,7 +44,7 @@ public class NotificacioDatabaseDto extends AuditoriaDto {
 	private Integer retard;
 	private Date caducitat;
 	private String numExpedient;
-	private IdiomaEnumDto idioma;
+	private Idioma idioma;
 
 	private List<NotEnviamentDatabaseDto> enviaments = new ArrayList<>();
 

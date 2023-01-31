@@ -1,6 +1,6 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
@@ -96,8 +96,8 @@ public class NotificacioValidatorHelper {
 			for (NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
 				//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
 				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.COMUNICACIO) {
-					if ((enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.FISICA) ||
-							(enviament.getTitular().getInteressatTipus() == InteressatTipusEnumDto.JURIDICA)) {
+					if ((enviament.getTitular().getInteressatTipus() == InteressatTipus.FISICA) ||
+							(enviament.getTitular().getInteressatTipus() == InteressatTipus.JURIDICA)) {
 						comunicacioSenseAdministracio = true;
 					}
 				}
@@ -133,7 +133,7 @@ public class NotificacioValidatorHelper {
 					if (enviament.getTitular().getInteressatTipus() == null) {
 						errors.add(messageHelper.getMessage("error.validacio.interessat.tipus.titular.enviament.no.null"));
 					}
-					if (!InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
+					if (!InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())
 							&& enviament.getTitular().getNif() != null && !enviament.getTitular().getNif().isEmpty()) {
 
 						String nif = enviament.getTitular().getNif();
@@ -183,7 +183,7 @@ public class NotificacioValidatorHelper {
 					}
 					//   - Persona física
 					if (enviament.getTitular().getInteressatTipus() != null) {
-						if (enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+						if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.FISICA)) {
 							if (enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
 								errors.add(messageHelper.getMessage("error.validacio.nom.persona.fisica.no.null"));
 							}
@@ -194,7 +194,7 @@ public class NotificacioValidatorHelper {
 								errors.add(messageHelper.getMessage("error.validacio.nif.persona.fisica.titular.enviament.no.null"));
 							}
 							//   - Persona jurídica
-						} else if (enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+						} else if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 							if ((enviament.getTitular().getRaoSocial() == null || enviament.getTitular().getRaoSocial().isEmpty()) &&
 									(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty())) {
 								errors.add(messageHelper.getMessage("error.validacio.rao.social.persona.juridica.titular.enviament.no.null"));
@@ -203,7 +203,7 @@ public class NotificacioValidatorHelper {
 								errors.add(messageHelper.getMessage("error.validacio.nif.persona.juridica.titular.enviament.no.null"));
 							}
 							//   - Administració
-						} else if (enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+						} else if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 							if (enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
 								errors.add(messageHelper.getMessage("error.validacio.nom.administracio.titular.enviament.no.null"));
 							}
@@ -239,7 +239,7 @@ public class NotificacioValidatorHelper {
 				// De momento se trata cada línea como 1 notificación con 1 envío y 1 titular
 
 				if (notificacio.getEnviamentTipus() == NotificaEnviamentTipusEnumDto.NOTIFICACIO
-						&& !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
+						&& !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) && senseNif) {
 					errors.add(messageHelper.getMessage("error.validacio.nif.informat.interessats"));
 				}
 

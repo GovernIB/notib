@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.validation;
 
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.back.helper.MessageHelper;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -23,7 +23,7 @@ public class ValidIfVisibleAndNotEqualValidator implements ConstraintValidator<V
     private String expectedFieldValue;
     private String dependFieldName;
     private String noDependFieldName;
-    private NotificaDomiciliConcretTipusEnumDto noExpectedFieldValue;
+    private NotificaDomiciliConcretTipus noExpectedFieldValue;
 	
 	@Override
 	public void initialize(ValidIfVisibleAndNotEqual annotation) {

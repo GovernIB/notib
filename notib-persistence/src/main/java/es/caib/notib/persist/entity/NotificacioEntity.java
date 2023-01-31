@@ -1,8 +1,8 @@
 package es.caib.notib.persist.entity;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.IdiomaEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
@@ -130,7 +130,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 	protected boolean errorLastCallback;
 
 	@Column(name = "idioma")
-	protected IdiomaEnumDto idioma;
+	protected Idioma idioma;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
@@ -435,7 +435,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			DocumentEntity document4,
 			DocumentEntity document5,
 			ProcSerOrganEntity procedimentOrgan,
-			IdiomaEnumDto idioma) {
+			Idioma idioma) {
 		this.entitat = entitat;
 		this.emisorDir3Codi = emisorDir3Codi;
 		this.organGestor = organGestor;
@@ -482,7 +482,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			String numExpedient,
 			TipusUsuariEnumDto tipusUsuari,
 			ProcSerOrganEntity procedimentOrgan,
-			IdiomaEnumDto idioma,
+			Idioma idioma,
 			String referencia) {
 		return new BuilderV2(
 				entitat,
@@ -527,7 +527,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 				String numExpedient,
 				TipusUsuariEnumDto tipusUsuari,
 				ProcSerOrganEntity procedimentOrgan,
-				IdiomaEnumDto idioma,
+				Idioma idioma,
 				String referencia) {
 			built = new NotificacioEntity();
 			built.entitat = entitat;
@@ -551,7 +551,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 			built.notificaEnviamentData = new Date();
 			built.tipusUsuari = tipusUsuari;
 			built.procedimentOrgan = procedimentOrgan;
-			built.idioma = idioma == null ? IdiomaEnumDto.CA : idioma;
+			built.idioma = idioma == null ? Idioma.CA : idioma;
 			built.referencia = referencia;
 		}
 		public BuilderV2 usuariCodi(String usuariCodi) {
@@ -662,7 +662,7 @@ public class NotificacioEntity extends NotibAuditable<Long> {
 		}
 
 		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
 		}

@@ -1,6 +1,6 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
@@ -20,8 +20,6 @@ import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
-import es.caib.notib.persist.entity.cie.PagadorCieEntity;
-import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
@@ -48,8 +46,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -173,7 +169,7 @@ public class NotificacioServiceIT extends BaseServiceTestV2 {
 
 	private EntregaPostalDto getEntregaPostalDtoRandomData() {
 		return EntregaPostalDto.builder()
-				.domiciliConcretTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL)
+				.domiciliConcretTipus(NotificaDomiciliConcretTipus.NACIONAL)
 				.viaTipus(NotificaDomiciliViaTipusEnumDto.VIA)
 				.viaNom("Via Asima")
 				.numeroCasa("4")

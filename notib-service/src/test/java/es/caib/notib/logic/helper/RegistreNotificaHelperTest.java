@@ -1,8 +1,7 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.persist.entity.EntitatEntity;
@@ -70,7 +69,7 @@ public class RegistreNotificaHelperTest {
 		EntitatEntity entidad = initEntitat();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
 		NotificacioEntity notificacio = initNotificacio(entidad, NotificaEnviamentTipusEnumDto.COMUNICACIO, enviaments);
@@ -105,7 +104,7 @@ public class RegistreNotificaHelperTest {
 		EntitatEntity entidad = initEntitat();
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
 		NotificacioEntity notificacio = initNotificacio(entidad, NotificaEnviamentTipusEnumDto.NOTIFICACIO, enviaments);
@@ -180,7 +179,7 @@ public class RegistreNotificaHelperTest {
 				false)
 				.build();
 	}
-	private PersonaEntity initPersonaAdministracio(InteressatTipusEnumDto interessatTipus) {
+	private PersonaEntity initPersonaAdministracio(InteressatTipus interessatTipus) {
 		return PersonaEntity.builder()
 				.interessatTipus(interessatTipus)
 				.email("sandreu@limit.es")

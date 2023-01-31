@@ -36,14 +36,14 @@ public class Persona {
     @JsonIgnore
     private Long id;
     private boolean incapacitat;
-    private InteressatTipusEnumDto interessatTipus;
+    private InteressatTipus interessatTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String nom;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String llinatge1;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String llinatge2;
-    protected DocumentTipusEnumDto documentTipus;
+    protected DocumentTipus documentTipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     private String nif;
     @JsonDeserialize(using = TrimStringDeserializer.class)

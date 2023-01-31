@@ -9,8 +9,6 @@ import es.caib.notib.persist.entity.AplicacioEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.cie.EntregaPostalEntity;
-import es.caib.notib.persist.entity.cie.PagadorCieEntity;
-import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.logic.helper.NotificaHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.persist.repository.AplicacioRepository;
@@ -179,8 +177,8 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 
 	private EntregaPostal getEntregaPostalDtoRandomData() {
 		return EntregaPostal.builder()
-				.tipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL)
-				.viaTipus(EntregaPostalViaTipusEnum.VIA)
+				.tipus(NotificaDomiciliConcretTipus.NACIONAL)
+				.viaTipus(EntregaPostalVia.VIA)
 				.viaNom("Via Asima")
 				.numeroCasa("4")
 				.provincia("07")
@@ -354,7 +352,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 	public static Enviament getRandomEnviament(int i){
 		Enviament enviament = new Enviament();
 		Persona titular = Persona.builder()
-				.interessatTipus(InteressatTipusEnumDto.FISICA)
+				.interessatTipus(InteressatTipus.FISICA)
 				.nom("titularNom" + i)
 				.llinatge1("titLlinatge1_" + i)
 				.llinatge2("titLlinatge2_" + i)
@@ -364,7 +362,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		enviament.setTitular(titular);
 		List<Persona> destinataris = new ArrayList<>();
 		Persona destinatari = Persona.builder()
-				.interessatTipus(InteressatTipusEnumDto.FISICA)
+				.interessatTipus(InteressatTipus.FISICA)
 				.nom("destinatariNom" + i)
 				.llinatge1("destLlinatge1_" + i)
 				.llinatge2("destLlinatge2_" + i)
@@ -401,7 +399,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 		Date enviamentDataProgramada = new Date(System.currentTimeMillis() + 10 * 24 * 3600 * 1000);
 		NotificacioV2 notCreated = NotificacioV2.builder()
 				.emisorDir3Codi(ConfigTest.ENTITAT_DGTIC_DIR3CODI)
-				.enviamentTipus(EnviamentTipusEnum.NOTIFICACIO)
+				.enviamentTipus(EnviamentTipus.NOTIFICACIO)
 				.enviamentDataProgramada(enviamentDataProgramada)
 				.concepte("Test")
 				.descripcio("Test descripció")
@@ -416,7 +414,7 @@ public class NotificacioServiceWsV2IT extends BaseServiceTestV2 {
 				.usuariCodi("admin")
 //				.motiu()
 				.numExpedient("EXPEDIENTEX")
-				.idioma(IdiomaEnumDto.CA)
+				.idioma(Idioma.CA)
 				.document(new DocumentV2())
 				.build();
 		notCreated.setDocument(document);

@@ -62,9 +62,9 @@ public class EntregaPostal {
     protected String provincia;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     protected String puntKm;
-    protected NotificaDomiciliConcretTipusEnumDto tipus;
+    protected NotificaDomiciliConcretTipus tipus;
     @JsonDeserialize(using = TrimStringDeserializer.class)
     protected String viaNom;
-    protected EntregaPostalViaTipusEnum viaTipus;
+    protected EntregaPostalVia viaTipus;
 
 }

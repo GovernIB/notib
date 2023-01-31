@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.validation;
 
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.back.helper.MessageHelper;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -23,7 +23,7 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
 	private String expectedFieldValueVisible;
 	
 	private String fieldName;
-    private NotificaDomiciliConcretTipusEnumDto expectedFieldValue;
+    private NotificaDomiciliConcretTipus expectedFieldValue;
     private String dependFieldName;
     private String dependFieldNameSecond;
 	

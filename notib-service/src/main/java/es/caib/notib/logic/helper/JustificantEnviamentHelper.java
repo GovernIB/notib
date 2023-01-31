@@ -12,7 +12,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDtoV2;
@@ -390,7 +390,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
      	Chunk dadesTitularNomContentChunk = new Chunk(getNomInteressat(titular), calibri10);
      	createNewTableContent(dadesTitularTable, dadesTitularNomTitleChunk, dadesTitularNomContentChunk);
      	
-     	if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA) || titular.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA_SENSE_NIF)) {
+     	if (titular.getInteressatTipus().equals(InteressatTipus.FISICA) || titular.getInteressatTipus().equals(InteressatTipus.FISICA_SENSE_NIF)) {
 	     	String titularLlintgMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.llinatges");
 	     	Chunk dadesTitularLlintgTitleChunk = new Chunk(titularLlintgMessage, calibri10);
 	     	Chunk dadesTitularLlintgContentChunk = new Chunk(titular.getLlinatges(), calibri10);
@@ -416,7 +416,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 			Chunk dadesTitularEmailContentChunk = new Chunk(titular.getEmail(), calibri10);
 			createNewTableContent(dadesTitularTable, dadesTitularEmailTitleChunk, dadesTitularEmailContentChunk);
 		}
-     	if (titular.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+     	if (titular.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 	     	String titularDir3Message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.titular.dir3");
 	     	Chunk dadesTitularDir3TitleChunk = new Chunk(titularDir3Message, calibri10);
 	     	Chunk dadesTitularDir3ContentChunk = new Chunk(titular.getDir3Codi(), calibri10);
@@ -457,7 +457,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
          	Chunk dadesDestinatariNomContentChunk = new Chunk(getNomInteressat(destinatari), calibri10);
          	createNewTableContent(dadesDestinatariTable, dadesDestinatariNomTitleChunk, dadesDestinatariNomContentChunk);
          	
-         	if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+         	if (destinatari.getInteressatTipus().equals(InteressatTipus.FISICA)) {
 	         	String destinatariLlintgMessage = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.llinatges");
 	         	Chunk dadesDestinatariLlintgTitleChunk = new Chunk(destinatariLlintgMessage, calibri10);
 	         	Chunk dadesDestinatariLlintgContentChunk = new Chunk(destinatari.getLlinatges(), calibri10);
@@ -477,7 +477,7 @@ public class JustificantEnviamentHelper extends JustificantHelper<NotificacioDto
 	         	Chunk dadesDestinatariNifContentChunk = new Chunk(destinatari.getNif(), calibri10);
 	         	createNewTableContent(dadesDestinatariTable, dadesDestinatariNifTitleChunk, dadesDestinatariNifContentChunk);
          	}
-         	if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+         	if (destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 	         	String destinatariDir3Message = "   " + messageHelper.getMessage("es.caib.notib.justificant.enviaments.taula.interessat.destinatari.dir3");
 	         	Chunk dadesDestinatariDir3TitleChunk = new Chunk(destinatariDir3Message, calibri10);
 	         	Chunk dadesDestinatariDir3ContentChunk = new Chunk(destinatari.getDir3Codi(), calibri10);

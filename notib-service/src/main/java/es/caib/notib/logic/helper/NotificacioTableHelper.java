@@ -1,6 +1,6 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
@@ -8,7 +8,6 @@ import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.NotificacioEventRepository;
 import es.caib.notib.persist.repository.NotificacioMassivaRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
@@ -19,11 +18,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -240,12 +237,12 @@ public class NotificacioTableHelper {
                 return null;
             }
             NotificacioEnviamentEntity env = notificacio.getEnviaments().iterator().next();
-            if (env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+            if (env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
                 && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
                 return env.getRegistreData();
             }
 
-            if (!env.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)
+            if (!env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
                     && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.REGISTRADA)
                         || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
                 return notificacio.getNotificaEnviamentNotificaData();

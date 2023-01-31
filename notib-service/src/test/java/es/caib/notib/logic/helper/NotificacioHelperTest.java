@@ -1,6 +1,6 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
@@ -146,7 +146,7 @@ public class NotificacioHelperTest {
                 .enviaments(new ArrayList<NotEnviamentDatabaseDto>())
                 .usuariCodi("admin")
                 .numExpedient("EXPEDIENTEX")
-                .idioma(IdiomaEnumDto.CA)
+                .idioma(Idioma.CA)
                 .document(document)
                 .document2(document2)
                 .document3(document3)

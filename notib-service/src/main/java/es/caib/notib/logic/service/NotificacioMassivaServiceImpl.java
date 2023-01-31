@@ -2,10 +2,9 @@ package es.caib.notib.logic.service;
 
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.DocumentTipusEnumDto;
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.DocumentTipus;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
@@ -816,14 +815,14 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             //Si es persona física o jurídica no tiene sentido
             //Entonces podriamos utilizar este campo para saber si es una administración
             setInteressatTipus(notificacio, titular);
-            boolean senseNif = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(titular.getInteressatTipus());
+            boolean senseNif = InteressatTipus.FISICA_SENSE_NIF.equals(titular.getInteressatTipus());
             enviament.setPerEmail(senseNif);
 
             if (senseNif) {
                 log.error("FISICA SENSE NIF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1111 +****************");
-                DocumentTipusEnumDto tipus = Strings.isNullOrEmpty(linia[12]) ? DocumentTipusEnumDto.ALTRE :
-                        DocumentTipusEnumDto.PASSAPORT.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.PASSAPORT :
-                        DocumentTipusEnumDto.ESTRANGER.name().equals(linia[12].toUpperCase()) ? DocumentTipusEnumDto.ESTRANGER : DocumentTipusEnumDto.ALTRE;
+                DocumentTipus tipus = Strings.isNullOrEmpty(linia[12]) ? DocumentTipus.ALTRE :
+                        DocumentTipus.PASSAPORT.name().equals(linia[12].toUpperCase()) ? DocumentTipus.PASSAPORT :
+                        DocumentTipus.ESTRANGER.name().equals(linia[12].toUpperCase()) ? DocumentTipus.ESTRANGER : DocumentTipus.ALTRE;
                 titular.setDocumentTipus(tipus);
             } else {
                 // Entrega postal
@@ -1058,7 +1057,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 linia[14] != null && !linia[14].isEmpty()) {
 
             enviament.setEntregaPostalActiva(true);
-            EntregaPostalDto entregaPostal = EntregaPostalDto.builder().domiciliConcretTipus(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)
+            EntregaPostalDto entregaPostal = EntregaPostalDto.builder().domiciliConcretTipus(NotificaDomiciliConcretTipus.SENSE_NORMALITZAR)
                     .linea1(linia[12]).linea2(linia[13]).codiPostal(linia[14]).build();
             enviament.setEntregaPostal(entregaPostal);
         } else {
@@ -1087,7 +1086,7 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
     private void setInteressatTipus(NotificacioDatabaseDto notificacio, PersonaDto titular) {
 
         if (Strings.isNullOrEmpty(titular.getNif()) && !Strings.isNullOrEmpty(titular.getEmail())) {
-            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA_SENSE_NIF);
+            titular.setInteressatTipus(InteressatTipus.FISICA_SENSE_NIF);
             return;
         }
         if (Strings.isNullOrEmpty(titular.getNif()) && Strings.isNullOrEmpty(titular.getEmail())) {
@@ -1095,16 +1094,16 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
             return;
         }
         if (NifHelper.isValidCif(titular.getNif())) {
-            titular.setInteressatTipus(InteressatTipusEnumDto.JURIDICA);
+            titular.setInteressatTipus(InteressatTipus.JURIDICA);
             return;
         }
         if (NifHelper.isValidNifNie(titular.getNif())) {
-            titular.setInteressatTipus(InteressatTipusEnumDto.FISICA);
+            titular.setInteressatTipus(InteressatTipus.FISICA);
             return;
         }
         List<OrganGestorDto> lista = pluginHelper.unitatsPerCodi(titular.getNif());
         if (lista != null && lista.size() > 0) {
-            titular.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
+            titular.setInteressatTipus(InteressatTipus.ADMINISTRACIO);
             return;
         }
         notificacio.getErrors().add(messageHelper.getMessage("error.nifcif.no.valid.a") + titular.getNif() + messageHelper.getMessage("error.nifcif.no.valid.b"));

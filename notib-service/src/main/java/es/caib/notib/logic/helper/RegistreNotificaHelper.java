@@ -3,10 +3,9 @@
  */
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
@@ -173,7 +172,7 @@ public class RegistreNotificaHelper {
 		RespostaConsultaRegistre arbResposta;
 		try {
 			boolean generarJustificant =  isGenerarJustificant(true, true, isAnyEnviamentsAAdministracio(notificacioEntity));
-			boolean inclouDocuments = isInclouDocuments(true, true, enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO));
+			boolean inclouDocuments = isInclouDocuments(true, true, enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO));
 			AsientoRegistralBeanDto arb = pluginHelper.notificacioToAsientoRegistralBean( notificacioEntity, enviament, inclouDocuments, true); // Es comunicacio SIR: Este método crearAssentamentRegistralPerEnviament solo se llama para comunicaciones SIR.
 			arbResposta = pluginHelper.crearAsientoRegistral(dir3Codi, arb,2L, notificacioEntity.getId(), String.valueOf(enviament.getId()), generarJustificant);
 		} catch (Exception e) {
@@ -216,7 +215,7 @@ public class RegistreNotificaHelper {
 	private boolean isAllEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
 
 		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
 		}
@@ -226,7 +225,7 @@ public class RegistreNotificaHelper {
 	private boolean isAnyEnviamentsAAdministracio(NotificacioEntity notificacioEntity) {
 
 		for(NotificacioEnviamentEntity enviament : notificacioEntity.getEnviaments()) {
-			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return true;
 			}
 		}

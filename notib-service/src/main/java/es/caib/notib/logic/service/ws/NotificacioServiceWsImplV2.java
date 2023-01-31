@@ -63,7 +63,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static es.caib.notib.client.domini.InteressatTipusEnumDto.FISICA_SENSE_NIF;
+import static es.caib.notib.client.domini.InteressatTipus.FISICA_SENSE_NIF;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 
@@ -770,7 +770,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					resposta.setAdressaPostal(enviament.getEntregaPostal().toString());
 				}
 				boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
-						InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
+						InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 				resposta.setEnviamentSir(esSir);
 
 				// INTERESSAT
@@ -979,7 +979,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					enviament = notificacio.getEnviaments().iterator().next();
 				}
 				boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(notificacio.getEnviamentTipus()) && enviament != null &&
-						InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
+						InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 				resposta.setEnviamentSir(esSir);
 				if (esSir && notificacio.getEnviaments().size() == 1) {
 					resposta.setDataRecepcioSir(enviament.getSirRecepcioData());
@@ -1025,7 +1025,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				resposta.setLlibre(enviament.getNotificacio().getRegistreLlibreNom());
 				// SIR
 				boolean esSir = NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) &&
-						InteressatTipusEnumDto.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
+						InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus());
 				resposta.setEnviamentSir(esSir);
 				if (esSir) {
 					resposta.setDataRecepcioSir(enviament.getSirRecepcioData());
@@ -1218,7 +1218,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		EnviamentReferenciaV2 enviamentReferencia = new EnviamentReferenciaV2();
 		enviamentReferencia.setReferencia(enviamentSaved.getNotificaReferencia());
 		String titularNif = !FISICA_SENSE_NIF.equals(titular.getInteressatTipus()) ?
-							(!InteressatTipusEnumDto.ADMINISTRACIO.equals(titular.getInteressatTipus()) ? titular.getNif().toUpperCase() : titular.getDir3Codi().toUpperCase())
+							(!InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus()) ? titular.getNif().toUpperCase() : titular.getDir3Codi().toUpperCase())
 							: null;
 		enviamentReferencia.setTitularNif(titularNif);
 		enviamentReferencia.setTitularNom(titular.getNom());
@@ -1722,7 +1722,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		boolean comunicacioAmbAdministracio = false;
 		Map<String, OrganismeDto> organigramaByEntitat = null;
 
-		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
+		if (notificacio.getEnviamentTipus() == EnviamentTipus.COMUNICACIO) {
 			organigramaByEntitat = organGestorCachable.findOrganigramaByEntitat(emisorDir3Codi);
 		}
 
@@ -1823,9 +1823,9 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		List<String> nifs = new ArrayList<>();
 		for(Enviament enviament : notificacio.getEnviaments()) {
 			//Si és comunicació a administració i altres mitjans (persona física/jurídica) --> Excepció
-			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
-				comunicacioAmbAdministracio = comunicacioAmbAdministracio || InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
-				comunicacioSenseAdministracio = comunicacioSenseAdministracio || !InteressatTipusEnumDto.isAdministracio(enviament.getTitular().getInteressatTipus());
+			if (notificacio.getEnviamentTipus() == EnviamentTipus.COMUNICACIO) {
+				comunicacioAmbAdministracio = comunicacioAmbAdministracio || InteressatTipus.isAdministracio(enviament.getTitular().getInteressatTipus());
+				comunicacioSenseAdministracio = comunicacioSenseAdministracio || !InteressatTipus.isAdministracio(enviament.getTitular().getInteressatTipus());
 			}
 			boolean senseNif = true;
 			
@@ -1858,7 +1858,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			if(enviament.getTitular().getNif() != null && enviament.getTitular().getNif().length() > 9) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.titular.longitud.max"));
 			}
-			if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+			if (!Strings.isNullOrEmpty(enviament.getTitular().getNif()) && !InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 				String nif = enviament.getTitular().getNif().toLowerCase();
 				if (nifs.contains(nif)) {
 					return setRespostaError(messageHelper.getMessage("notificacio.form.valid.nif.repetit"));
@@ -1911,7 +1911,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				return setRespostaError(messageHelper.getMessage("error.validacio.indicar.destinatari.titular.incapacitat"));
 			}
 			//   - Persona física
-			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+			if(enviament.getTitular().getInteressatTipus().equals(InteressatTipus.FISICA)) {
 				if(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.nom.persona.fisica.no.null"));
 				}
@@ -1936,7 +1936,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					return setRespostaError(messageHelper.getMessage("error.validacio.email.persona.fisica.sense.nif.email.titular.enviament.no.null"));
 				}
 			//   - Persona jurídica
-			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 				if((enviament.getTitular().getRaoSocial() == null || enviament.getTitular().getRaoSocial().isEmpty()) && (enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty())) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.rao.social.persona.juridica.titular.enviament.no.null"));
 				}
@@ -1944,7 +1944,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					return setRespostaError(messageHelper.getMessage("error.validacio.nif.persona.juridica.titular.enviament.no.null"));
 				}
 			//   - Administració
-			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			} else if(enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				if(enviament.getTitular().getNom() == null || enviament.getTitular().getNom().isEmpty()) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.nom.administracio.titular.enviament.no.null"));
 				}
@@ -1959,7 +1959,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 							+ enviament.getTitular().getDir3Codi() +
 							messageHelper.getMessage("error.validacio.dir3codi.invalid.b"));
 				}
-				if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
+				if (notificacio.getEnviamentTipus() == EnviamentTipus.COMUNICACIO) {
 					if (organDir3.getSir() == null || !organDir3.getSir()) {
 						return setRespostaError(
 								messageHelper.getMessage("error.validacio.dir3codi.no.oficina.sir.a")
@@ -2053,7 +2053,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						return setRespostaError(messageHelper.getMessage("error.dir3codi.destinatari.longitud.max"));
 					}
 					
-					if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.FISICA)) {
+					if(destinatari.getInteressatTipus().equals(InteressatTipus.FISICA)) {
 						if(destinatari.getNom() == null || destinatari.getNom().isEmpty()) {
 							return setRespostaError(messageHelper.getMessage("error.nom.persona.fisica.destinataria.enviament.no.null"));
 						}
@@ -2065,14 +2065,14 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						}
 					} else if(destinatari.getInteressatTipus().equals(FISICA_SENSE_NIF)) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.nif.destinatari.invalid.persona.fisica.sense.nif"));
-					} else if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+					} else if(destinatari.getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 						if((destinatari.getRaoSocial() == null || destinatari.getRaoSocial().isEmpty()) && (destinatari.getNom() == null || destinatari.getNom().isEmpty())) {
 							return setRespostaError(messageHelper.getMessage("error.rao.social.persona.juridica.destinataria.enviament.no.null"));
 						}
 						if(destinatari.getNif() == null) {
 							return setRespostaError(messageHelper.getMessage("error.nif.persona.juridica.destinataria.enviament.no.null"));
 						}
-					} else if(destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+					} else if(destinatari.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 						if(destinatari.getNom() == null || destinatari.getNom().isEmpty()) {
 							return setRespostaError(messageHelper.getMessage("error.nom.administracio.desti.enviament.no.null"));
 						}
@@ -2086,7 +2086,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 									+ destinatari.getDir3Codi() +
 									messageHelper.getMessage("error.dir3codi.administracio.desti.enviament.invalid.b"));
 						}
-						if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.COMUNICACIO) {
+						if (notificacio.getEnviamentTipus() == EnviamentTipus.COMUNICACIO) {
 							if (organDir3.getSir() == null || !organDir3.getSir()) {
 								return setRespostaError(
 										messageHelper.getMessage("error.dir3codi.administracio.desti.enviament.no.oficina.sir.a")
@@ -2107,7 +2107,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 					
 				}
 			}
-			if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO && senseNif && !FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
+			if (notificacio.getEnviamentTipus() == EnviamentTipus.NOTIFICACIO && senseNif && !FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus())) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.nif.informat.interessats"));
 			}
 
@@ -2174,7 +2174,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 				if (enviament.getEntregaPostal().getLinea2() != null && enviament.getEntregaPostal().getLinea2().length() > 50) {
 					return setRespostaError(messageHelper.getMessage("error.validacio.linea2.entrega.postal.longitud.max"));
 				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.NACIONAL)) {
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipus.NACIONAL)) {
 					if (enviament.getEntregaPostal().getViaTipus() == null) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.via.tipus.entrega.nacional.normalitzat"));
 					}
@@ -2194,7 +2194,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						return setRespostaError(messageHelper.getMessage("error.validacio.poblacio.codi.no.null.entrega.nacional.normalitzat"));
 					}
 				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.ESTRANGER)) {
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipus.ESTRANGER)) {
 					if (enviament.getEntregaPostal().getViaNom() == null || enviament.getEntregaPostal().getViaNom().isEmpty()) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.via.nom.no.null.entrega.estranger.normalitzat"));
 					}
@@ -2205,7 +2205,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						return setRespostaError(messageHelper.getMessage("error.validacio.poblacio.no.null.entrega.estranger.normalitzat"));
 					}
 				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS)) {
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipus.APARTAT_CORREUS)) {
 					if (enviament.getEntregaPostal().getApartatCorreus() == null || enviament.getEntregaPostal().getApartatCorreus().isEmpty()) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.apartat.correus.no.null.entrega.apartat.correus"));
 					}
@@ -2219,7 +2219,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 						return setRespostaError(messageHelper.getMessage("error.validacio.poblacio.no.null.entrega.apartat.correus"));
 					}
 				}
-				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR)) {
+				if(enviament.getEntregaPostal().getTipus().equals(NotificaDomiciliConcretTipus.SENSE_NORMALITZAR)) {
 					if (enviament.getEntregaPostal().getLinea1() == null || enviament.getEntregaPostal().getLinea1().isEmpty()) {
 						return setRespostaError(messageHelper.getMessage("error.validacio.linea1.entrega.postal.no.null"));
 					}
@@ -2249,7 +2249,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 		}
 		
 		// Procediment
-		if (notificacio.getEnviamentTipus() == EnviamentTipusEnum.NOTIFICACIO ) {
+		if (notificacio.getEnviamentTipus() == EnviamentTipus.NOTIFICACIO ) {
 			if (notificacio.getProcedimentCodi() == null) {
 				return setRespostaError(messageHelper.getMessage("error.validacio.procediment.codi.no.null"));
 			}
@@ -2504,7 +2504,7 @@ public class NotificacioServiceWsImplV2 implements NotificacioServiceWsV2, Notif
 			if (enviament.getDestinataris() == null || enviament.getDestinataris().isEmpty()) {
 				receptor.setNif(enviament.getTitular().getNif());
 				receptor.setNom(enviament.getTitular().getNomSencer());
-			} else if (!InteressatTipusEnumDto.FISICA.equals(enviament.getTitular().getInteressatTipus()) && enviament.getDestinataris().size() == 1) {
+			} else if (!InteressatTipus.FISICA.equals(enviament.getTitular().getInteressatTipus()) && enviament.getDestinataris().size() == 1) {
 				receptor.setNif(enviament.getDestinataris().get(0).getNif());
 				receptor.setNom(enviament.getDestinataris().get(0).getNomSencer());
 			}

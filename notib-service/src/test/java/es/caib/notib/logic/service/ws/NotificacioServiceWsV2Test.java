@@ -38,7 +38,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -72,7 +71,7 @@ public class NotificacioServiceWsV2Test {
 	protected static final String IDIOMA = "ca";
 	protected static final String USUARI_CODI = "e18225486x";
 //	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
-	protected static final NotificaDomiciliConcretTipusEnumDto TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+	protected static final NotificaDomiciliConcretTipus TIPUS_ENTREGA_POSTAL = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;
 
 	
 	@Mock
@@ -427,7 +426,7 @@ public class NotificacioServiceWsV2Test {
 
 		NotificacioV2 notificacio = new NotificacioV2();
 		notificacio.setEmisorDir3Codi(ENTITAT_DIR3CODI);
-		notificacio.setEnviamentTipus(EnviamentTipusEnum.NOTIFICACIO);
+		notificacio.setEnviamentTipus(EnviamentTipus.NOTIFICACIO);
 		notificacio.setProcedimentCodi(IDENTIFICADOR_PROCEDIMENT);
 		notificacio.setUsuariCodi(USUARI_CODI);
 		notificacio.setOrganGestor(ORGAN_CODI);
@@ -452,13 +451,13 @@ public class NotificacioServiceWsV2Test {
 			enviament.getDestinataris().add(destinatari);
 			if (ambEnviamentPostal) {
 				EntregaPostal entregaPostal = new EntregaPostal();
-				if (NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
+				if (NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(TIPUS_ENTREGA_POSTAL)) {
 					entregaPostal.setTipus(TIPUS_ENTREGA_POSTAL);
 					entregaPostal.setLinea1("linea1_" + i);
 					entregaPostal.setLinea2("linea2_" + i);
 				} else {
-					entregaPostal.setTipus(NotificaDomiciliConcretTipusEnumDto.NACIONAL);
-					entregaPostal.setViaTipus(EntregaPostalViaTipusEnum.CALLE);
+					entregaPostal.setTipus(NotificaDomiciliConcretTipus.NACIONAL);
+					entregaPostal.setViaTipus(EntregaPostalVia.CALLE);
 					entregaPostal.setViaNom("Bas");
 					entregaPostal.setNumeroCasa("25");
 					entregaPostal.setNumeroQualificador("bis");
@@ -494,8 +493,8 @@ public class NotificacioServiceWsV2Test {
 
 		Persona persona = Persona.builder().nif(Strings.isNullOrEmpty(nif) ? "00000000T" : nif).nom(nom).llinatge1(llinatge1).llinatge2(llinatge2)
 						.telefon(Strings.isNullOrEmpty(telefon) ? "666010101" : telefon).email(Strings.isNullOrEmpty(email)  ? "test@limit.es" : email)
-						.interessatTipus(InteressatTipusEnumDto.ADMINISTRACIO).build();
-		if (persona.getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+						.interessatTipus(InteressatTipus.ADMINISTRACIO).build();
+		if (persona.getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 			persona.setDir3Codi(ENTITAT_DIR3CODI);
 		}
 		return persona;

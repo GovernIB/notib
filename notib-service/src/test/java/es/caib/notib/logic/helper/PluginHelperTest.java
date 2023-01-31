@@ -1,6 +1,6 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -171,7 +171,7 @@ public class PluginHelperTest {
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -216,7 +216,7 @@ public class PluginHelperTest {
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -261,7 +261,7 @@ public class PluginHelperTest {
     	
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -306,7 +306,7 @@ public class PluginHelperTest {
     	
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -351,7 +351,7 @@ public class PluginHelperTest {
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -396,7 +396,7 @@ public class PluginHelperTest {
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.ADMINISTRACIO)
+				initPersonaAdministracio(InteressatTipus.ADMINISTRACIO)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -441,7 +441,7 @@ public class PluginHelperTest {
 
 		HashSet<NotificacioEnviamentEntity> enviaments = new HashSet<>();
 		NotificacioEnviamentEntity enviament = initEnviament(
-				initPersonaAdministracio(InteressatTipusEnumDto.FISICA)
+				initPersonaAdministracio(InteressatTipus.FISICA)
 		);
 		enviaments.add(enviament);
     	OrganGestorEntity organGestor = initOrganGestor(entidad);
@@ -482,7 +482,7 @@ public class PluginHelperTest {
 		return enviament;
 	}
 	
-	private PersonaEntity initPersonaAdministracio(InteressatTipusEnumDto interessatTipus) {
+	private PersonaEntity initPersonaAdministracio(InteressatTipus interessatTipus) {
 		return PersonaEntity.builder()
 				.interessatTipus(interessatTipus)
 				.email("sandreu@limit.es")

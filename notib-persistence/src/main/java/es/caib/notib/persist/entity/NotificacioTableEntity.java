@@ -3,7 +3,7 @@
  */
 package es.caib.notib.persist.entity;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
@@ -157,7 +157,7 @@ public class NotificacioTableEntity extends NotibAuditable<Long> {
 		}
 
 		for(NotificacioEnviamentEntity enviament : this.getEnviaments()) {
-			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.ADMINISTRACIO)) {
+			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
 		}

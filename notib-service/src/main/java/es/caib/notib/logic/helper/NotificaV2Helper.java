@@ -1,8 +1,8 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.aspect.Audita;
 import es.caib.notib.logic.aspect.UpdateEnviamentTable;
 import es.caib.notib.logic.aspect.UpdateNotificacioTable;
@@ -544,7 +544,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				titular.setApellidos(concatenarLlinatges(enviament.getDestinataris().get(0).getLlinatge1(), enviament.getDestinataris().get(0).getLlinatge2()));
 				titular.setTelefono(enviament.getDestinataris().get(0).getTelefon());
 				titular.setEmail(enviament.getDestinataris().get(0).getEmail());
-				if (enviament.getDestinataris().get(0).getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+				if (enviament.getDestinataris().get(0).getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 					titular.setRazonSocial(enviament.getDestinataris().get(0).getRaoSocial());
 				} else {
 					titular.setNombre(enviament.getDestinataris().get(0).getNom());
@@ -552,11 +552,11 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				titular.setCodigoDestino(enviament.getDestinataris().get(0).getDir3Codi());
 				enviament.getDestinataris().remove(0);
 			} else {
-				titular.setNif(InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getNif());
+				titular.setNif(InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getNif());
 				titular.setApellidos(concatenarLlinatges(enviament.getTitular().getLlinatge1(), enviament.getTitular().getLlinatge2()));
 				titular.setTelefono(enviament.getTitular().getTelefon());
-				titular.setEmail(InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getEmail());
-				if (enviament.getTitular().getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+				titular.setEmail(InteressatTipus.FISICA_SENSE_NIF.equals(enviament.getTitular().getInteressatTipus()) ? null : enviament.getTitular().getEmail());
+				if (enviament.getTitular().getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 					titular.setRazonSocial(enviament.getTitular().getRaoSocial());
 				} else {
 					titular.setNombre(enviament.getTitular().getNom());
@@ -573,7 +573,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 					destinatario.setApellidos(concatenarLlinatges(destinatari.getLlinatge1(), destinatari.getLlinatge2()));
 					destinatario.setTelefono(destinatari.getTelefon());
 					destinatario.setEmail(destinatari.getEmail());
-					if (destinatari.getInteressatTipus().equals(InteressatTipusEnumDto.JURIDICA)) {
+					if (destinatari.getInteressatTipus().equals(InteressatTipus.JURIDICA)) {
 						destinatario.setRazonSocial(destinatari.getRaoSocial());
 					} else {
 						destinatario.setNombre(destinatari.getNom());
@@ -622,7 +622,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 						break;
 					}
 				}
-				if (!NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(entregaPostalEntity.getDomiciliConcretTipus())) {
+				if (!NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(entregaPostalEntity.getDomiciliConcretTipus())) {
 					entregaPostal.setTipoVia(entregaPostalEntity.getDomiciliViaTipus() != null ? entregaPostalEntity.getDomiciliViaTipus().getVal() : null); //viaTipusToString(enviament.getDomiciliViaTipus()));
 					entregaPostal.setNombreVia(entregaPostalEntity.getDomiciliViaNom());
 					entregaPostal.setNumeroCasa(entregaPostalEntity.getDomiciliNumeracioNumero());

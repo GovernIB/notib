@@ -1,13 +1,12 @@
 package es.caib.notib.api.interna.controller;
 
 import es.caib.notib.api.interna.util.CaseInsensitiveEnumEditor;
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.rest.consulta.Arxiu;
-import es.caib.notib.logic.intf.rest.consulta.Resposta;
 import es.caib.notib.logic.intf.service.EnviamentService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,9 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,8 +61,8 @@ public class ConsultaApiRestV2Controller {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
-			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = IdiomaEnumDto.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
-			@RequestParam (value = "lang", required = false) IdiomaEnumDto lang,
+			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
+			@RequestParam (value = "lang", required = false) Idioma lang,
 			@Parameter(name = "pagina", description = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
@@ -74,7 +71,7 @@ public class ConsultaApiRestV2Controller {
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null).basePath(basePath)
-								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
@@ -92,8 +89,8 @@ public class ConsultaApiRestV2Controller {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
-			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = IdiomaEnumDto.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
-			@RequestParam (value = "lang", required = false) IdiomaEnumDto lang,
+			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
+			@RequestParam (value = "lang", required = false) Idioma lang,
 			@Parameter(name = "pagina", description = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
@@ -102,7 +99,7 @@ public class ConsultaApiRestV2Controller {
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null).basePath(basePath)
-								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
@@ -120,8 +117,8 @@ public class ConsultaApiRestV2Controller {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
-			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = IdiomaEnumDto.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
-			@RequestParam (value = "lang", required = false) IdiomaEnumDto lang,
+			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
+			@RequestParam (value = "lang", required = false) Idioma lang,
 			@Parameter(name = "pagina", description = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
@@ -130,7 +127,7 @@ public class ConsultaApiRestV2Controller {
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false).basePath(basePath)
-								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
@@ -148,8 +145,8 @@ public class ConsultaApiRestV2Controller {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
-			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = IdiomaEnumDto.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
-			@RequestParam (value = "lang", required = false) IdiomaEnumDto lang,
+			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
+			@RequestParam (value = "lang", required = false) Idioma lang,
 			@Parameter(name = "pagina", description = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
@@ -158,7 +155,7 @@ public class ConsultaApiRestV2Controller {
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false).basePath(basePath)
-								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
@@ -176,8 +173,8 @@ public class ConsultaApiRestV2Controller {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
-			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = IdiomaEnumDto.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
-			@RequestParam (value = "lang", required = false) IdiomaEnumDto lang,
+			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
+			@RequestParam (value = "lang", required = false) Idioma lang,
 			@Parameter(name = "pagina", description = "Número de pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
@@ -186,7 +183,7 @@ public class ConsultaApiRestV2Controller {
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true).basePath(basePath)
-								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
@@ -204,8 +201,8 @@ public class ConsultaApiRestV2Controller {
 			@RequestParam (value = "dataFinal", required = false) @DateTimeFormat(pattern="dd/MM/yyyy") Date dataFinal,
 			@Parameter(name = "visibleCarpeta", description = "Filtrar per visible a carpeta. Si s'indica el valor si, només es retornaran enviaments amb estats visibles per la carpeta. Si s'indica el valor no, es retornaran tots els enviaments independentment de si els seus estats son visible o no a la carpeta.", content = { @Content(schema = @Schema( implementation = Boolean.class, defaultValue = "si", allowableValues = "[si, no]"))})
 			@RequestParam (value = "visibleCarpeta", required = false) Boolean visibleCarpeta,
-			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = IdiomaEnumDto.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
-			@RequestParam (value = "lang", required = false) IdiomaEnumDto lang,
+			@Parameter(name = "lang", description = "Idioma de les descripcions", content = { @Content(schema = @Schema( implementation = Idioma.class, defaultValue = "ca", allowableValues = "[ca, es]"))})
+			@RequestParam (value = "lang", required = false) Idioma lang,
 			@Parameter(name = "pagina", description = "Número de pàgina a mostrar en la paginació")
 			@RequestParam(value = "pagina", required = false) Integer pagina,
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació")
@@ -214,7 +211,7 @@ public class ConsultaApiRestV2Controller {
 		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
 		String basePath = location.toString();
 		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true).basePath(basePath)
-								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : IdiomaEnumDto.CA)
+								.pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).idioma(lang != null ? lang : Idioma.CA)
 								.visibleCarpeta(visibleCarpeta != null ? visibleCarpeta : true).build();
 		return enviamentService.findEnviamentsV2(consulta);
 	}
@@ -294,7 +291,7 @@ public class ConsultaApiRestV2Controller {
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
-		binder.registerCustomEditor(IdiomaEnumDto.class, new CaseInsensitiveEnumEditor(IdiomaEnumDto.class));
+		binder.registerCustomEditor(Idioma.class, new CaseInsensitiveEnumEditor(Idioma.class));
 		binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor("si", "no", false));
 	}
 }

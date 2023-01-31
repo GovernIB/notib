@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.validation;
 
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -30,7 +30,7 @@ public @interface ValidIfVisibleAndNotEqual {
 	String fieldValue();
 	String dependFieldName();
 	String noDependFieldName();
-	NotificaDomiciliConcretTipusEnumDto noExpectedFieldValue();
+	NotificaDomiciliConcretTipus noExpectedFieldValue();
 	
 	String message() default "Aquest camp és obligatori";
 	Class<?>[] groups() default {};

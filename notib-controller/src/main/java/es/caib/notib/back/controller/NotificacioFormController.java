@@ -12,13 +12,12 @@ import es.caib.notib.back.helper.CaducitatHelper;
 import es.caib.notib.back.helper.EntitatHelper;
 import es.caib.notib.back.helper.EnumHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
-import es.caib.notib.back.helper.PropertiesHelper;
 import es.caib.notib.back.helper.RequestSessionHelper;
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.client.domini.DocumentTipusEnumDto;
-import es.caib.notib.client.domini.IdiomaEnumDto;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.DocumentTipus;
+import es.caib.notib.client.domini.Idioma;
+import es.caib.notib.client.domini.InteressatTipus;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
@@ -48,11 +47,7 @@ import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumD
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganCacheDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.GestioDocumentalService;
@@ -95,11 +90,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Controlador per a la consulta i gestió de notificacions.
@@ -819,20 +811,20 @@ public class NotificacioFormController extends BaseUserController {
         Enum<?>[] interessatsTipus;
         Enum<?>[] interessatsTipusDest;
         if (TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
-            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.ADMINISTRACIO };
+            interessatsTipus = new Enum<?>[]{ InteressatTipus.ADMINISTRACIO };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipus.ADMINISTRACIO };
         } else if (TipusEnviamentEnumDto.COMUNICACIO.equals(tipusEnviament)) {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA, };
-            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.FISICA_SENSE_NIF, InteressatTipus.ADMINISTRACIO, InteressatTipus.JURIDICA, };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.JURIDICA };
         } else {
-            interessatsTipus = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.FISICA_SENSE_NIF, InteressatTipusEnumDto.ADMINISTRACIO, InteressatTipusEnumDto.JURIDICA };
-            interessatsTipusDest = new Enum<?>[]{ InteressatTipusEnumDto.FISICA, InteressatTipusEnumDto.JURIDICA };
+            interessatsTipus = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.FISICA_SENSE_NIF, InteressatTipus.ADMINISTRACIO, InteressatTipus.JURIDICA };
+            interessatsTipusDest = new Enum<?>[]{ InteressatTipus.FISICA, InteressatTipus.JURIDICA };
         }
-        model.addAttribute("interessatTipus", EnumHelper.getOrderedOptionsForEnum(InteressatTipusEnumDto.class,"es.caib.notib.client.domini.interessatTipusEnumDto.", interessatsTipus));
-        model.addAttribute("interessatTipusDest", EnumHelper.getOrderedOptionsForEnum(InteressatTipusEnumDto.class,"es.caib.notib.client.domini.interessatTipusEnumDto.", interessatsTipusDest));
-        model.addAttribute("entregaPostalTipus", EnumHelper.getOptionsForEnum(NotificaDomiciliConcretTipusEnumDto.class,"es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto."));
+        model.addAttribute("interessatTipus", EnumHelper.getOrderedOptionsForEnum(InteressatTipus.class,"es.caib.notib.client.domini.interessatTipusEnumDto.", interessatsTipus));
+        model.addAttribute("interessatTipusDest", EnumHelper.getOrderedOptionsForEnum(InteressatTipus.class,"es.caib.notib.client.domini.interessatTipusEnumDto.", interessatsTipusDest));
+        model.addAttribute("entregaPostalTipus", EnumHelper.getOptionsForEnum(NotificaDomiciliConcretTipus.class,"es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto."));
         model.addAttribute("registreDocumentacioFisica", EnumHelper.getOptionsForEnum(RegistreDocumentacioFisicaEnumDto.class,"es.caib.notib.logic.intf.dto\n.registreDocumentacioFisicaEnumDto."));
-        model.addAttribute("idioma", EnumHelper.getOptionsForEnum(IdiomaEnumDto.class, "es.caib.notib.client.domini.idiomaEnumDto."));
+        model.addAttribute("idioma", EnumHelper.getOptionsForEnum(Idioma.class, "es.caib.notib.client.domini.idiomaEnumDto."));
         model.addAttribute("origens", EnumHelper.getOptionsForEnum(OrigenEnum.class, "es.caib.notib.client.domini.OrigenEnum."));
         Enum<?>[] valideses = TipusEnviamentEnumDto.NOTIFICACIO.equals(tipusEnviament) ? new Enum<?>[]{ValidesaEnum.COPIA_AUTENTICA, ValidesaEnum.ORIGINAL} :
                 new Enum<?>[]{ValidesaEnum.COPIA, ValidesaEnum.COPIA_AUTENTICA, ValidesaEnum.ORIGINAL};
@@ -840,7 +832,7 @@ public class NotificacioFormController extends BaseUserController {
         var tipusDocumentals = EnumHelper.getOptionsForEnum(TipusDocumentalEnum.class,"es.caib.notib.client.domini.notificacio.TipusDocumentalEnum.");
         Collections.sort(tipusDocumentals);
         model.addAttribute("tipusDocumentals", tipusDocumentals);
-        model.addAttribute("documentTipus", EnumHelper.getOptionsForEnum(DocumentTipusEnumDto.class, "es.caib.notib.client.domini\n.DocumentTipusEnum."));
+        model.addAttribute("documentTipus", EnumHelper.getOptionsForEnum(DocumentTipus.class, "es.caib.notib.client.domini\n.DocumentTipusEnum."));
     }
 
     private boolean isAdministrador(HttpServletRequest request) {

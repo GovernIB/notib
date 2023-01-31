@@ -3,7 +3,7 @@
  */
 package es.caib.notib.logic.intf.rest.consulta;
 
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEnviamentDto;
 import es.caib.notib.logic.intf.dto.PersonaDto;
 import lombok.Data;
@@ -93,7 +93,7 @@ public class Comunicacio {
 		persona.setNom(dto.getNom());
 		if (dto.getInteressatTipus() != null) {
 			persona.setTipus(PersonaTipus.valueOf(dto.getInteressatTipus().name()));
-			if (!InteressatTipusEnumDto.FISICA.equals(dto.getInteressatTipus()) && !InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(dto.getInteressatTipus())
+			if (!InteressatTipus.FISICA.equals(dto.getInteressatTipus()) && !InteressatTipus.FISICA_SENSE_NIF.equals(dto.getInteressatTipus())
 				&& dto.getRaoSocial() != null && !dto.getRaoSocial().isEmpty()) {
 				persona.setNom(dto.getRaoSocial());
 			}

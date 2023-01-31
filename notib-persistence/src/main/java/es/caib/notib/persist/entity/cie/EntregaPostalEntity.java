@@ -1,8 +1,8 @@
 package es.caib.notib.persist.entity.cie;
 
 import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.EntregaPostalVia;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipus;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliNumeracioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliTipusEnumDto;
 import es.caib.notib.logic.intf.dto.NotificaDomiciliViaTipusEnumDto;
@@ -42,7 +42,7 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	
 	@Column(name = "dom_con_tipus")
 	@Enumerated(EnumType.ORDINAL)
-	protected NotificaDomiciliConcretTipusEnumDto domiciliConcretTipus;
+	protected NotificaDomiciliConcretTipus domiciliConcretTipus;
 	
 	@Column(name = "dom_via_tipus")
 	@Enumerated(EnumType.ORDINAL)
@@ -130,16 +130,16 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 		if (entregaPostal.getTipus() != null) {
 			switch (entregaPostal.getTipus()) {
 				case APARTAT_CORREUS:
-					domiciliConcretTipus = NotificaDomiciliConcretTipusEnumDto.APARTAT_CORREUS;
+					domiciliConcretTipus = NotificaDomiciliConcretTipus.APARTAT_CORREUS;
 					break;
 				case ESTRANGER:
-					domiciliConcretTipus = NotificaDomiciliConcretTipusEnumDto.ESTRANGER;
+					domiciliConcretTipus = NotificaDomiciliConcretTipus.ESTRANGER;
 					break;
 				case NACIONAL:
-					domiciliConcretTipus = NotificaDomiciliConcretTipusEnumDto.NACIONAL;
+					domiciliConcretTipus = NotificaDomiciliConcretTipus.NACIONAL;
 					break;
 				case SENSE_NORMALITZAR:
-					domiciliConcretTipus = NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR;
+					domiciliConcretTipus = NotificaDomiciliConcretTipus.SENSE_NORMALITZAR;
 					break;
 			}
 		}
@@ -153,7 +153,7 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 			domiciliNumeracioTipus = NotificaDomiciliNumeracioTipusEnumDto.SENSE_NUMERO;
 		}
 		this.domiciliTipus = NotificaDomiciliTipusEnumDto.CONCRETO;
-		if(! NotificaDomiciliConcretTipusEnumDto.SENSE_NORMALITZAR.equals(entregaPostal.getTipus())) {
+		if(! NotificaDomiciliConcretTipus.SENSE_NORMALITZAR.equals(entregaPostal.getTipus())) {
 			this.domiciliViaNom = entregaPostal.getViaNom();
 			this.domiciliNumeracioNumero = entregaPostal.getNumeroCasa();
 			this.domiciliNumeracioQualificador = entregaPostal.getNumeroQualificador();
@@ -180,7 +180,7 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 	}
 
 	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
-			EntregaPostalViaTipusEnum viaTipus) {
+			EntregaPostalVia viaTipus) {
 		if (viaTipus == null) {
 			return null;
 		}

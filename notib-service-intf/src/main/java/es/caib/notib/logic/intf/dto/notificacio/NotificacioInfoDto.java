@@ -1,6 +1,6 @@
 package es.caib.notib.logic.intf.dto.notificacio;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.AuditoriaDto;
 import es.caib.notib.logic.intf.dto.DocumentDto;
 import es.caib.notib.logic.intf.dto.GrupDto;
@@ -57,7 +57,7 @@ public class NotificacioInfoDto extends AuditoriaDto {
 	private boolean eventsCallbackPendent;
 	private boolean errorLastCallback;
 	private TipusUsuariEnumDto tipusUsuari;
-	private IdiomaEnumDto idioma;
+	private Idioma idioma;
 
 	// Documents de la notificació
 	private DocumentDto document;

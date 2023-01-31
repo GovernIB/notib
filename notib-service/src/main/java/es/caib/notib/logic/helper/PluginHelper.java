@@ -1,10 +1,9 @@
 package es.caib.notib.logic.helper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
@@ -1613,19 +1612,19 @@ public class PluginHelper {
 
 		DatosInteresadoWsDto interessatDades = new DatosInteresadoWsDto();
 		if (persona.getInteressatTipus() != null) {
-			Long tipo = InteressatTipusEnumDto.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) ? 2l: persona.getInteressatTipus().getLongVal();
+			Long tipo = InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus()) ? 2l: persona.getInteressatTipus().getLongVal();
 			interessatDades.setTipoInteresado(tipo);
 		}
-		if (persona.getInteressatTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+		if (persona.getInteressatTipus() == InteressatTipus.ADMINISTRACIO) {
 			interessatDades.setDocumento(persona.getDir3Codi() != null ? persona.getDir3Codi().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("O");
-		}  else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA) {
+		}  else if (persona.getInteressatTipus() == InteressatTipus.FISICA) {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			if (isDocumentEstranger(persona.getNif()))
 				interessatDades.setTipoDocumentoIdentificacion("E");
 			else
 				interessatDades.setTipoDocumentoIdentificacion("N");
-		}  else if (persona.getInteressatTipus() == InteressatTipusEnumDto.FISICA_SENSE_NIF) {
+		}  else if (persona.getInteressatTipus() == InteressatTipus.FISICA_SENSE_NIF) {
 			// Pot tenir un document (No NIF), que s'ha desat al camp NIF
 			if (persona.getNif() != null && !persona.getNif().isEmpty()) {
 				interessatDades.setDocumento(persona.getNif());
@@ -1640,7 +1639,7 @@ public class PluginHelper {
 					}
 				}
 			}
-		} else if (persona.getInteressatTipus() == InteressatTipusEnumDto.JURIDICA) {
+		} else if (persona.getInteressatTipus() == InteressatTipus.JURIDICA) {
 			interessatDades.setDocumento(persona.getNif() != null ? persona.getNif().trim() : null);
 			interessatDades.setTipoDocumentoIdentificacion("C");
 		}

@@ -3,7 +3,7 @@
  */
 package es.caib.notib.back.controller;
 
-import es.caib.notib.client.domini.IdiomaEnumDto;
+import es.caib.notib.client.domini.Idioma;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.command.UsuariCommand;
@@ -58,7 +58,7 @@ public class UsuariController extends BaseController {
 
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
-		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(IdiomaEnumDto.class,"usuari.form.camp.idioma.enum."));
+		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 		return "usuariForm";
 	}
 
@@ -75,7 +75,7 @@ public class UsuariController extends BaseController {
 			command.setRols(uc.getRols());
 			command.setNif(uc.getNif());
 			model.addAttribute(command);
-			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(IdiomaEnumDto.class,"usuari.form.camp.idioma.enum."));
+			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 			return "usuariForm";
 		}
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));

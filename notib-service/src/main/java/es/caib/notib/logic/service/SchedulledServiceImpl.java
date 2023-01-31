@@ -26,6 +26,7 @@ import es.caib.notib.persist.repository.EntitatRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,6 +59,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
+	@Lazy
 	@Autowired
 	private NotificacioService notificacioService;
 	@Autowired
@@ -74,12 +76,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private ServeiService serveiService;
 	@Autowired
 	private ConfigHelper configHelper;
-//	@Autowired
-//	private SchedulingConfig schedulingConfig;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 
