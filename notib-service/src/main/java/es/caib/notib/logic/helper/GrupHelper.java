@@ -1,6 +1,5 @@
 package es.caib.notib.logic.helper;
 
-import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 import es.caib.notib.logic.intf.dto.GrupDto;
 import es.caib.notib.persist.entity.GrupEntity;
@@ -11,19 +10,14 @@ import es.caib.notib.persist.entity.GrupEntity;
  */
 @Component
 public class GrupHelper {
-
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
 	
-	public GrupDto toGrupDto(
-			GrupEntity grup) {
+	public GrupDto toGrupDto(GrupEntity grup) {
 		
-		GrupDto dto = new GrupDto();
-		
+		var dto = new GrupDto();
 		dto.setId(grup.getId());
 		dto.setCodi(grup.getCodi());
 		dto.setNom(grup.getNom());
-		
+
 		/*dto.setCreatedBy(
 				conversioTipusHelper.convertir(
 				pagadorPostal.getCreatedBy(),
@@ -34,7 +28,7 @@ public class GrupHelper {
 						pagadorPostal.getLastModifiedBy(),
 						UsuariDto.class));
 		dto.setLastModifiedDate(pagadorPostal.getLastModifiedDate().toDate());*/
-		
+
 		return dto;
 	}
 	

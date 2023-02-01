@@ -1,7 +1,6 @@
 package es.caib.notib.logic.helper;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.exception.NotDefinedConfigException;
 import es.caib.notib.logic.intf.service.ConfigService;
@@ -10,7 +9,6 @@ import es.caib.notib.persist.entity.config.ConfigGroupEntity;
 import es.caib.notib.persist.repository.config.ConfigGroupRepository;
 import es.caib.notib.persist.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.CompositePropertySource;
@@ -66,102 +64,100 @@ public class ConfigHelper {
     }
 
     public String getConfig(String propietatGlobal)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).orElse(null);
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).orElse(null);
     }
 
     public String getConfig(String propietatGlobal, String defaultValue)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).orElse(defaultValue);
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).orElse(defaultValue);
     }
 
     public Long getConfigAsLong(String propietatGlobal)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).map(Long::parseLong).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Long::parseLong).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
 
     public Long getConfigAsLong(String propietatGlobal, Long defaultValue)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).map(Long::parseLong).orElse(defaultValue);
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Long::parseLong).orElse(defaultValue);
     }
 
     public Integer getConfigAsInteger(String propietatGlobal)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).map(Integer::parseInt).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Integer::parseInt).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
 
     public Integer getConfigAsInteger(String propietatGlobal, Integer defaultValue)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).map(Integer::parseInt).orElse(defaultValue);
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Integer::parseInt).orElse(defaultValue);
     }
 
     public Boolean getConfigAsBoolean(String propietatGlobal)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).map(Boolean::parseBoolean).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Boolean::parseBoolean).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
 
     public Boolean getConfigAsBoolean(String propietatGlobal, Boolean defaultValue)  {
-        var entitatCodi  = getEntitatActualCodi();
-        return getPropietat(entitatCodi, propietatGlobal).map(Boolean::parseBoolean).orElse(defaultValue);
+        return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Boolean::parseBoolean).orElse(defaultValue);
     }
 
     public String getPrefix() {
 
-        String prefix = getConfig(PropertiesConstants.CODI_ENTORN);
+        var prefix = getConfig(PropertiesConstants.CODI_ENTORN);
         return "[" + (!Strings.isNullOrEmpty(prefix) ? prefix : "NOTIB") + "]";
     }
 
     private Optional<String> getPropietat(String entitatCodi, String globalKey) {
+
         String propertyValue = null;
         String entitatKey = null;
-
         if (!Strings.isNullOrEmpty(entitatCodi)) {
             entitatKey = crearEntitatKey(entitatCodi, globalKey);
             propertyValue = environment.getProperty(entitatKey);
-            if (!Strings.isNullOrEmpty(propertyValue))
+            if (!Strings.isNullOrEmpty(propertyValue)) {
                 return Optional.of(propertyValue);
+            }
         }
-
         propertyValue = environment.getProperty(globalKey);
-        if (propertyValue != null)
+        if (propertyValue != null) {
             return Optional.of(propertyValue);
-
+        }
         log.error("No s'ha trobat la propietat -> key global: " + globalKey + " key entitat: " + entitatKey);
         return Optional.empty();
     }
 
     @Transactional(readOnly = true)
     public Map<String, String> getGroupProperties(String codeGroup) {
+
         Map<String, String> properties = new HashMap<>();
-        ConfigGroupEntity configGroup = configGroupRepository.findById(codeGroup).orElse(null);
+        var configGroup = configGroupRepository.findById(codeGroup).orElse(null);
         fillGroupProperties(configGroup, properties);
         return properties;
     }
 
     private void fillGroupProperties(ConfigGroupEntity configGroup, Map<String, String> outProperties) {
+
         if (configGroup == null) {
             return;
         }
-        for (ConfigEntity config : configGroup.getConfigs()) {
+        for (var config : configGroup.getConfigs()) {
             outProperties.put(config.getKey(), getConfig(config.getKey()));
         }
 
-        if (configGroup.getInnerConfigs() != null) {
-            for (ConfigGroupEntity child : configGroup.getInnerConfigs()) {
-                fillGroupProperties(child, outProperties);
-            }
+        if (configGroup.getInnerConfigs() == null) {
+            return;
+        }
+        for (var child : configGroup.getInnerConfigs()) {
+            fillGroupProperties(child, outProperties);
         }
     }
 
     @Transactional(readOnly = true)
     public Properties getAllEntityProperties(String entitatCodi) {
-        Properties properties = new Properties();
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
-        for (ConfigEntity config: configs) {
-             String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigByEntitat(entitatCodi, config.getKey()) : getConfig(config.getKey());
-            if (value != null) {
-                properties.put(config.getKey(), value);
+
+        var properties = new Properties();
+        var configs = configRepository.findByEntitatCodiIsNull();
+        String value;
+        for (var config: configs) {
+            value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigByEntitat(entitatCodi, config.getKey()) : getConfig(config.getKey());
+            if (value == null) {
+                continue;
             }
+            properties.put(config.getKey(), value);
         }
         return properties;
     }
@@ -176,14 +172,15 @@ public class ConfigHelper {
 
     public void crearConfigsEntitat(String codiEntitat) {
 
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
-        ConfigDto dto = new ConfigDto();
+        var dto = new ConfigDto();
         dto.setEntitatCodi(codiEntitat);
         ConfigEntity nova;
         List<ConfigEntity> confs = new ArrayList<>();
-        for (ConfigEntity config : configs) {
+        var configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
+        String key;
+        for (var config : configs) {
             dto.setKey(config.getKey());
-            String key = dto.crearEntitatKey();
+            key = dto.crearEntitatKey();
             nova = new ConfigEntity();
             nova.crearConfigNova(key, codiEntitat, config);
             confs.add(nova);
@@ -200,13 +197,13 @@ public class ConfigHelper {
     public String crearEntitatKey(String entitatCodi, String key) {
 
         if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
-            String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
+            var msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
             log.error(msg);
             throw new RuntimeException(msg);
         }
-        String [] split = key.split(ConfigDto.prefix);
+        var split = key.split(ConfigDto.prefix);
         if (split == null) {
-            String msg = "Format no reconegut per la key: " + key;
+            var msg = "Format no reconegut per la key: " + key;
             log.error(msg);
             throw new RuntimeException(msg);
         }
@@ -214,15 +211,15 @@ public class ConfigHelper {
     }
 
     public void reloadDbProperties() {
-        Map<String, Object> propertySource = new HashMap<>();
 
-        List<ConfigEntity> dbProperties = configRepository.findDbProperties();
+        Map<String, Object> propertySource = new HashMap<>();
+        var dbProperties = configRepository.findDbProperties();
         dbProperties.forEach(p -> propertySource.put(p.getKey(), p.getValue()));
         if (environment.getPropertySources().contains(DBAPP_PROPERTIES)) {
             environment.getPropertySources().replace(DBAPP_PROPERTIES, new MapPropertySource(DBAPP_PROPERTIES, propertySource));
-        } else {
-            environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
+            return;
         }
+        environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
     }
 
     public Map<String, Object> getEnvironmentPropertiesMap() {

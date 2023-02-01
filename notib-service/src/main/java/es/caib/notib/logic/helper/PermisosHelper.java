@@ -19,14 +19,12 @@ import es.caib.notib.persist.repository.acl.AclObjectIdentityRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import es.caib.notib.plugin.unitat.NodeDir3;
-import es.caib.notib.plugin.usuari.DadesUsuari;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
-import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.Acl;
 import org.springframework.security.acls.model.AclCache;
 import org.springframework.security.acls.model.MutableAcl;
@@ -35,7 +33,6 @@ import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,8 +99,8 @@ public class PermisosHelper {
 
 	public void filterGrantedAny(Collection<? extends AbstractPersistable<Long>> objects, Class<?> clazz, Permission[] permissions) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		ObjectIdentifierExtractor<AbstractPersistable<Long>> o = new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var o = new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
 			@Override public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {return entitat.getId();
 		}};
 		filterGrantedAny(objects, o, clazz, permissions, auth);
@@ -112,9 +109,10 @@ public class PermisosHelper {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void filterGrantedAny(Collection<?> objects, ObjectIdentifierExtractor objectIdentifierExtractor, Class<?> clazz, Permission[] permissions, Authentication auth) {
 
-		Iterator<?> it = objects.iterator();
+		var it = objects.iterator();
+		Long objectIdentifier;
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
 			if (!isGrantedAny(objectIdentifier, clazz, permissions, auth)) {
 				it.remove();
 			}
@@ -124,9 +122,10 @@ public class PermisosHelper {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean isGrantedAny(Collection<?> objects, ObjectIdentifierExtractor objectIdentifierExtractor, Class<?> clazz, Permission[] permissions, Authentication auth) {
 
-		Iterator<?> it = objects.iterator();
+		var it = objects.iterator();
+		Long objectIdentifier;
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
 			if (isGrantedAny(objectIdentifier, clazz, permissions, auth)) {
 				return true;
 			}
@@ -135,8 +134,8 @@ public class PermisosHelper {
 	}
 	public boolean isGrantedAny(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
 
-		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
-		for (int i = 0; i < granted.length; i++) {
+		var granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
+		for (var i = 0; i < granted.length; i++) {
 			if (granted[i]) {
 				return true;
 			}
@@ -146,8 +145,8 @@ public class PermisosHelper {
 
 	public void filterGrantedAll(Collection<? extends AbstractPersistable<Long>> objects, Class<?> clazz, Permission[] permissions) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		ObjectIdentifierExtractor<AbstractPersistable<Long>> o = new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var o = new ObjectIdentifierExtractor<AbstractPersistable<Long>>() {
 			@Override
 			public Long getObjectIdentifier(AbstractPersistable<Long> entitat) {
 				return entitat.getId();
@@ -159,9 +158,10 @@ public class PermisosHelper {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void filterGrantedAll(Collection<?> objects, ObjectIdentifierExtractor objectIdentifierExtractor, Class<?> clazz, Permission[] permissions, Authentication auth) {
 
-		Iterator<?> it = objects.iterator();
+		var it = objects.iterator();
+		Long objectIdentifier;
 		while (it.hasNext()) {
-			Long objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
 			if (!isGrantedAll(objectIdentifier, clazz, permissions, auth)) {
 				it.remove();
 			}
@@ -170,9 +170,9 @@ public class PermisosHelper {
 
 	public boolean isGrantedAll(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
 
-		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
-		boolean result = true;
-		for (int i = 0; i < granted.length; i++) {
+		var granted = verificarPermisos(objectIdentifier, clazz, permissions, auth);
+		var result = true;
+		for (var i = 0; i < granted.length; i++) {
 			if (!granted[i]) {
 				result = false;
 				break;
@@ -183,16 +183,16 @@ public class PermisosHelper {
 
 	private List<AclSidEntity> getSids(Authentication auth) {
 
-		List<AclSidEntity> sids = new ArrayList<AclSidEntity>();
-		AclSidEntity userSid = aclSidRepository.getUserSid(auth.getName());
+		List<AclSidEntity> sids = new ArrayList<>();
+		var userSid = aclSidRepository.getUserSid(auth.getName());
 		if (userSid != null) {
 			sids.add(userSid);
 		}
-		List<String> rolesNames = new ArrayList<String>();
-		for (GrantedAuthority authority : auth.getAuthorities()) {
+		List<String> rolesNames = new ArrayList<>();
+		for (var authority : auth.getAuthorities()) {
 			rolesNames.add(authority.getAuthority());
 		}
-		for (AclSidEntity aclSid: aclSidRepository.findRolesSid(rolesNames)) {
+		for (var aclSid: aclSidRepository.findRolesSid(rolesNames)) {
 			if (aclSid != null) {
 				sids.add(aclSid);
 			}
@@ -208,7 +208,7 @@ public class PermisosHelper {
 	 * @return Llista dels identificadors dels objectes seleccionats
 	 */
 	public boolean isGrantedAny(Class<?> clazz, Permission[] permissions) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		return isGrantedAny(auth, clazz, permissions);
 	}
 
@@ -222,13 +222,13 @@ public class PermisosHelper {
 	 */
 	public boolean isGrantedAny(Authentication auth, Class<?> clazz, Permission[] permissions) {
 
-		List<AclSidEntity> sids = getSids(auth);
+		var sids = getSids(auth);
 		if (sids.isEmpty()) {
 			return false;
 		}
 		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
 		List<Integer> masks = new ArrayList<>();
-		for (Permission p : permissions){
+		for (var p : permissions){
 			masks.add(p.getMask());
 		}
 		return aclObjectIdentityRepository.hasObjectsWithAnyPermissions(clazz.getName(), sids, masks);
@@ -244,14 +244,14 @@ public class PermisosHelper {
 	 */
 	public List<Long> getObjectsIdsWithPermission(Class<?> clazz, Permission[] permissions) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<AclSidEntity> sids = getSids(auth);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var sids = getSids(auth);
 		if (sids.isEmpty()) {
 			return new ArrayList<>();
 		}
 		// TODO: no estic segur si hauriem de fer un and binari de totes les mascares en lloc de passar una llista de masks
 		List<Integer> masks = new ArrayList<>();
-		for (Permission p : permissions){
+		for (var p : permissions){
 			masks.add(p.getMask());
 		}
 		return aclObjectIdentityRepository.findObjectsIdWithAnyPermissions(clazz.getName(), sids, masks);
@@ -287,8 +287,8 @@ public class PermisosHelper {
 	public List<PermisDto> findPermisos(Long objectIdentifier, Class<?> objectClass) {
 
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			Acl acl = aclService.readAclById(oid);
+			var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			var acl = aclService.readAclById(oid);
 			return findPermisosPerAcl(acl);
 		} catch (NotFoundException nfex) {
 			return new ArrayList<>();
@@ -298,8 +298,8 @@ public class PermisosHelper {
 	public PermisDto findPermis(Long objectIdentifier, Class<?> objectClass, Long permisId) {
 
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			Acl acl = aclService.readAclById(oid);
+			var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			var acl = aclService.readAclById(oid);
 			return findPermisAclById(acl, permisId);
 		} catch (NotFoundException nfex) {
 			return new PermisDto();
@@ -309,8 +309,8 @@ public class PermisosHelper {
 	public boolean hasAnyPermis(Long objectIdentifier, Class<?> objectClass) {
 
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			Acl acl = aclService.readAclById(oid);
+			var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			var acl = aclService.readAclById(oid);
 			return (acl.getEntries() != null && !acl.getEntries().isEmpty());
 		} catch (NotFoundException nfex) {
 			return false;
@@ -319,16 +319,16 @@ public class PermisosHelper {
 
 	public boolean hasPermission(Long objectIdentifier, Class<?> objectClass, Permission[] permissions) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<Sid> sids = new ArrayList<Sid>();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		List<Sid> sids = new ArrayList<>();
 		sids.add(new PrincipalSid(auth.getName()));
-		for (GrantedAuthority ga: auth.getAuthorities()) {
+		for (var ga: auth.getAuthorities()) {
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
 		}
-		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+		var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 		try {
-			Acl acl = aclService.readAclById(oid);
-			List<Permission> ps = Arrays.asList(permissions);
+			var acl = aclService.readAclById(oid);
+			var ps = Arrays.asList(permissions);
 			return acl.isGranted(ps, sids, false);
 		} catch (NotFoundException nfex) {
 			return false;
@@ -338,16 +338,17 @@ public class PermisosHelper {
 	public Map<Long, List<PermisDto>> findPermisos(List<Long> objectIdentifiers, Class<?> objectClass) {
 
 		try {
-			Map<Long, List<PermisDto>> resposta = new HashMap<Long, List<PermisDto>>();
-			List<ObjectIdentity> oids = new ArrayList<ObjectIdentity>();
-			for (Long objectIdentifier: objectIdentifiers) {
-				ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			Map<Long, List<PermisDto>> resposta = new HashMap<>();
+			List<ObjectIdentity> oids = new ArrayList<>();
+			ObjectIdentity oid;
+			for (var objectIdentifier: objectIdentifiers) {
+				oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 				oids.add(oid);
 			}
 			if (!oids.isEmpty()) {
-				Map<ObjectIdentity, Acl> acls = lookupStrategy.readAclsById(oids, null);
-				for (ObjectIdentity oid: acls.keySet()) {
-					resposta.put((Long)oid.getIdentifier(), findPermisosPerAcl(acls.get(oid)));
+				var acls = lookupStrategy.readAclsById(oids, null);
+				for (var oi: acls.keySet()) {
+					resposta.put((Long)oi.getIdentifier(), findPermisosPerAcl(acls.get(oi)));
 				}
 			}
 			return resposta;
@@ -366,10 +367,10 @@ public class PermisosHelper {
 	public void deletePermis(Long objectIdentifier, Class<?> objectClass, Long permisId) {
 
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
-			MutableAcl acl = (MutableAcl)aclService.readAclById(oid);
+			var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			var acl = (MutableAcl)aclService.readAclById(oid);
 			Sid sid = null;
-			for (AccessControlEntry ace: acl.getEntries()) {
+			for (var ace: acl.getEntries()) {
 				if (permisId.equals(ace.getId())) {
 					sid = ace.getSid();
 					assignarPermisos(ace.getSid(), objectClass, objectIdentifier, new Permission[] {}, true);
@@ -386,7 +387,7 @@ public class PermisosHelper {
 	public void deleteAcl(Long objectIdentifier, Class<?> objectClass) {
 
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
+			var oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 			aclService.deleteAcl(oid, true);
 		} catch (NotFoundException nfex) {
 		}
@@ -399,11 +400,12 @@ public class PermisosHelper {
 		if (acl == null) {
 			return new ArrayList<>();
 		}
-		List<PermisDto> resposta = new ArrayList<PermisDto>();
-		Map<String, PermisDto> permisosUsuari = new HashMap<String, PermisDto>();
-		Map<String, PermisDto> permisosRol = new HashMap<String, PermisDto>();
+		List<PermisDto> resposta = new ArrayList<>();
+		Map<String, PermisDto> permisosUsuari = new HashMap<>();
+		Map<String, PermisDto> permisosRol = new HashMap<>();
+		PermisDto permis;
 		for (var ace: acl.getEntries()) {
-			PermisDto permis = null;
+			permis = null;
 			if (ace.getSid() instanceof PrincipalSid) {
 				var principal = ((PrincipalSid)ace.getSid()).getPrincipal();
 				permis = permisosUsuari.get(principal);
@@ -493,13 +495,13 @@ public class PermisosHelper {
 			return null;
 		}
 		PermisDto permis = null;
-		for (AccessControlEntry ace: acl.getEntries()) {
+		for (var ace: acl.getEntries()) {
 			if (ace.getSid() instanceof PrincipalSid && permisId.equals((Long)ace.getId())) {
-				String principal = ((PrincipalSid)ace.getSid()).getPrincipal();
+				var principal = ((PrincipalSid)ace.getSid()).getPrincipal();
 				permis = new PermisDto();
 				permis.setId(permisId);
 				permis.setPrincipal(principal);
-				DadesUsuari usuari = cacheHelper.findUsuariAmbCodi(principal);
+				var usuari = cacheHelper.findUsuariAmbCodi(principal);
 				if(usuari != null) {
 					permis.setNomSencerAmbCodi(usuari.getNomSencerAmbCodi()!=null?usuari.getNomSencerAmbCodi():principal);
 				}else {
@@ -507,7 +509,7 @@ public class PermisosHelper {
 				}
 					permis.setTipus(TipusEnumDto.USUARI);
 			} else if (ace.getSid() instanceof GrantedAuthoritySid && permisId.equals((Long)ace.getId())) {
-				String grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
+				var grantedAuthority = ((GrantedAuthoritySid)ace.getSid()).getGrantedAuthority();
 				permis = new PermisDto();
 				permis.setId((Long)ace.getId());
 				permis.setPrincipal(grantedAuthority);
@@ -572,15 +574,15 @@ public class PermisosHelper {
 		if (netejarAbans) {
 			// Es recorren girats perque cada vegada que s'esborra un ace
 			// es reorganitzen els índexos
-			for (int i = acl.getEntries().size() - 1; i >= 0; i--) {
-				AccessControlEntry ace = acl.getEntries().get(i);
+			for (var i = acl.getEntries().size() - 1; i >= 0; i--) {
+				var ace = acl.getEntries().get(i);
 				if (ace.getSid().equals(sid)) {
 					acl.deleteAce(i);
 				}
 			}
 		}
 		aclService.updateAcl(acl);
-		for (Permission permission: permissions) {
+		for (var permission: permissions) {
 			acl.insertAce(acl.getEntries().size(), permission, sid,true);
 		}
 		aclService.updateAcl(acl);
@@ -590,12 +592,12 @@ public class PermisosHelper {
 
 		ObjectIdentity oid = new ObjectIdentityImpl(objectClass, objectIdentifier);
 		try {
-			MutableAcl acl = (MutableAcl)aclService.readAclById(oid);
-			List<Integer> indexosPerEsborrar = new ArrayList<Integer>();
+			var acl = (MutableAcl)aclService.readAclById(oid);
+			List<Integer> indexosPerEsborrar = new ArrayList<>();
 			int aceIndex = 0;
-			for (AccessControlEntry ace: acl.getEntries()) {
+			for (var ace: acl.getEntries()) {
 				if (ace.getSid().equals(sid)) {
-					for (Permission p: permissions) {
+					for (var p: permissions) {
 						if (p.equals(ace.getPermission())) {
 							indexosPerEsborrar.add(aceIndex);
 						}
@@ -603,7 +605,7 @@ public class PermisosHelper {
 				}
 				aceIndex++;
 			}
-			for (Integer index: indexosPerEsborrar) {
+			for (var index: indexosPerEsborrar) {
 				acl.deleteAce(index);
 			}
 			aclService.updateAcl(acl);
@@ -614,20 +616,20 @@ public class PermisosHelper {
 
 	private boolean[] verificarPermisos(Long objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {
 
-		List<Sid> sids = new ArrayList<Sid>();
+		List<Sid> sids = new ArrayList<>();
 		sids.add(new PrincipalSid(auth.getName()));
-		for (GrantedAuthority ga: auth.getAuthorities()) {
+		for (var ga: auth.getAuthorities()) {
 			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
 		}
-		boolean[] granted = new boolean[permissions.length];
-		for (int i = 0; i < permissions.length; i++) {
+		var granted = new boolean[permissions.length];
+		for (var i = 0; i < permissions.length; i++) {
 			granted[i] = false;
 		}
 		try {
-			ObjectIdentity oid = new ObjectIdentityImpl(clazz, objectIdentifier);
-			Acl acl = aclService.readAclById(oid);
-			List<Permission> ps = new ArrayList<Permission>();
-			for (int i = 0; i < permissions.length; i++) {
+			var oid = new ObjectIdentityImpl(clazz, objectIdentifier);
+			var acl = aclService.readAclById(oid);
+			List<Permission> ps = new ArrayList<>();
+			for (var i = 0; i < permissions.length; i++) {
 				try {
 					ps.add(permissions[i]);
 					granted[i] = acl.isGranted(ps, sids, false);
@@ -640,7 +642,7 @@ public class PermisosHelper {
 
 	private Permission[] getPermissionsFromPermis(PermisDto permis) {
 
-		List<Permission> permissions = new ArrayList<Permission>();
+		List<Permission> permissions = new ArrayList<>();
 //		if (permis.isRead())
 //			permissions.add(ExtendedPermission.READ);
 //		if (permis.isWrite())
@@ -690,8 +692,8 @@ public class PermisosHelper {
 
 	public void revocarPermisosEntity(Long objectIdentifier, Class<?> clazz) {
 
-		List<PermisDto> permisosActuals = findPermisos(objectIdentifier, clazz);
-		for (PermisDto permisDto : permisosActuals) {
+		var permisosActuals = findPermisos(objectIdentifier, clazz);
+		for (var permisDto : permisosActuals) {
 			permisDto.revocaPermisos();
 			updatePermis(objectIdentifier, clazz, permisDto);
 		}
@@ -703,13 +705,13 @@ public class PermisosHelper {
 		if (paginacioParams == null || permisos == null) {
 			return permisos;
 		}
-		final String ordre = paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty() && paginacioParams.getOrdres().get(0).getCamp() != null
+		final var ordre = paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty() && paginacioParams.getOrdres().get(0).getCamp() != null
 				? paginacioParams.getOrdres().get(0).getCamp() : null;
 
 		if (ordre == null) {
 			return permisos;
 		}
-		boolean desc = paginacioParams.getOrdres().get(0).getDireccio().equals(PaginacioParamsDto.OrdreDireccioDto.DESCENDENT);
+		var desc = paginacioParams.getOrdres().get(0).getDireccio().equals(PaginacioParamsDto.OrdreDireccioDto.DESCENDENT);
 		Comparator<PermisDto> comp = null;
 		switch (ordre) {
 			case "tipus":
@@ -754,15 +756,16 @@ public class PermisosHelper {
 	public void actualitzarPermisosOrgansObsolets(List<NodeDir3> unitatsWs, List<OrganGestorEntity> organsDividits, List<OrganGestorEntity> organsFusionats,
 												  List<OrganGestorEntity> organsSubstituits, ProgresActualitzacioDto progres) {
 
-		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.notib.persist.entity.OrganGestorEntity");
+		var classname = aclClassRepository.findByClassname("es.caib.notib.persist.entity.OrganGestorEntity");
 		List<String> organsFusionatsProcessats = new ArrayList<>();
-		int nombreUnitatsTotal = unitatsWs.size();
-		int nombreUnitatsProcessades = 0;
+		var nombreUnitatsTotal = unitatsWs.size();
+		var nombreUnitatsProcessades = 0;
+		OrganGestorEntity organOrigen;
 		// Actualitzam permisos en l'ordre en que ens arriben del Dir3
-		for(NodeDir3 unitat: unitatsWs) {
+		for(var unitat: unitatsWs) {
 			progres.addInfo(ProgresActualitzacioDto.TipusInfo.INFO, messageHelper.getMessage("organgestor.actualitzacio.permisos.unitat", new Object[] {unitat.getCodi()}));
 			progres.setProgres(63 + (nombreUnitatsProcessades++ * 18)/nombreUnitatsTotal);
-			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
+			organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
 				for (OrganGestorEntity organDesti : organOrigen.getNous()) {
 					duplicaPermisos(classname, organOrigen, organDesti);
@@ -771,25 +774,25 @@ public class PermisosHelper {
 			}
 			organOrigen = getOrgan(organsFusionats, unitat.getCodi());
 			if (organOrigen != null && !organsFusionatsProcessats.contains(organOrigen.getCodi())) {
-				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
-				List<OrganGestorEntity> organsOrigen = organDesti.getAntics();
-				for(OrganGestorEntity origen: organsOrigen)
+				var organDesti = organOrigen.getNous().get(0);
+				var organsOrigen = organDesti.getAntics();
+				for(var origen: organsOrigen) {
 					organsFusionatsProcessats.add(origen.getCodi());
+				}
 				duplicaPermisos(classname, organsOrigen, organDesti);
 				continue;
 			}
 			organOrigen = getOrgan(organsSubstituits, unitat.getCodi());
 			if (organOrigen != null) {
-				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
+				var organDesti = organOrigen.getNous().get(0);
 				duplicaPermisos(classname, organOrigen, organDesti);
-				continue;
 			}
 		}
 	}
 
 	private OrganGestorEntity getOrgan(List<OrganGestorEntity> llista, String codi) {
 
-		for (OrganGestorEntity organ: llista) {
+		for (var organ: llista) {
 			if (organ.getCodi().equals(codi)) {
 				return organ;
 			}
@@ -831,8 +834,9 @@ public class PermisosHelper {
 		Set<AclEntryEntity> permisosDesti = new HashSet<>();
 		Set<AclEntryEntity> permisosOrigen = new HashSet<>();
 		AclSidEntity ownerSid = null;
-		for (OrganGestorEntity organOrigen: organsOrigen) {
-			AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organOrigen.getId());
+		AclObjectIdentityEntity objectIdentityAntic;
+		for (var organOrigen: organsOrigen) {
+			objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organOrigen.getId());
 			if (objectIdentityAntic == null) {
 				continue;
 			}
@@ -847,21 +851,22 @@ public class PermisosHelper {
 
 	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Set<AclEntryEntity> permisosOrigen, Set<AclEntryEntity> permisosDesti) {
 
-		AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
+		var objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		if (objectIdentityNou == null) {
 			objectIdentityNou = AclObjectIdentityEntity.builder().classname(classname).objectId(organNou.getId()).ownerSid(ownerSid).build();
 			aclObjectIdentityRepository.save(objectIdentityNou);
 		}
-		for (AclEntryEntity permisAntic : permisosOrigen) {
+		for (var permisAntic : permisosOrigen) {
 			permisosDesti.add(AclEntryEntity.builder().aclObjectIdentity(objectIdentityNou).sid(permisAntic.getSid()).order(permisosDesti.size())
 										.mask(permisAntic.getMask()).granting(permisAntic.getGranting()).build());
 		}
 	}
 
 	public void eliminarPermisosOrgan(OrganGestorEntity organGestor) {
-		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
-		AclObjectIdentityEntity objectIdentity = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organGestor.getId());
-		List<AclEntryEntity> permisos = aclEntryRepository.findByAclObjectIdentity(objectIdentity);
+
+		var classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
+		var objectIdentity = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organGestor.getId());
+		var permisos = aclEntryRepository.findByAclObjectIdentity(objectIdentity);
 		aclEntryRepository.deleteInBatch(permisos);
 	}
 

@@ -30,9 +30,9 @@ public class OrganigramaHelper {
 	
 	public List<OrganismeDto> getOrganismesFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
 
-		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
-		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		List<OrganismeDto> organismes= new ArrayList<OrganismeDto>();
+		var organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
+		var organismes= new ArrayList<OrganismeDto>();
+		var codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
 		organismes.addAll(getOrgansGestorsFills(organigramaEntitat, codiDir3));
 		return organismes;
 	}
@@ -47,8 +47,8 @@ public class OrganigramaHelper {
 
 	public List<String> getCodisOrgansGestorsFillsExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
 
-		List<String> unitatsEntitat = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(codiDir3Entitat, codiDir3Organ);
-		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
+		var unitatsEntitat = organGestorCachable.getCodisOrgansGestorsFillsByOrgan(codiDir3Entitat, codiDir3Organ);
+		var unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
 		unitatsEntitat.retainAll(unitatsExistents);
 		return unitatsEntitat;
 	}
@@ -58,11 +58,11 @@ public class OrganigramaHelper {
 
 	private List<OrganismeDto> getOrgansGestorsFills(Map<String, OrganismeDto> organigrama, String codiDir3) {
 
-		List<OrganismeDto> organismes = new ArrayList<OrganismeDto>();
-		OrganismeDto organisme = organigrama.get(codiDir3);
+		List<OrganismeDto> organismes = new ArrayList<>();
+		var organisme = organigrama.get(codiDir3);
 		organismes.add(organisme);
 		if (organisme != null && organisme.getFills() != null && !organisme.getFills().isEmpty()) {
-			for (String fill: organisme.getFills()) {
+			for (var fill: organisme.getFills()) {
 				organismes.addAll(getOrgansGestorsFills(organigrama, fill));
 			}
 		}
@@ -71,11 +71,11 @@ public class OrganigramaHelper {
 
 	public List<String> getCodisOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
 
-		Map<String, OrganismeDto> organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
-		String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-		List<String> unitatsEntitat = new ArrayList<String>();
+		var organigramaEntitat = organGestorCachable.findOrganigramaByEntitat(codiDir3Entitat);
+		var codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
+		List<String> unitatsEntitat = new ArrayList<>();
 		unitatsEntitat.addAll(getCodisOrgansGestorsPare(organigramaEntitat, codiDir3, codiDir3Entitat));
-		List<String> unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
+		var unitatsExistents = organGestorRepository.findCodisByEntitatDir3(codiDir3Entitat);
 		unitatsEntitat.retainAll(unitatsExistents);
 		return unitatsEntitat;
 	}
@@ -89,13 +89,13 @@ public class OrganigramaHelper {
 	 */
 	public List<OrganGestorEntity> getOrgansGestorsParesExistentsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
 
-		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
+		var unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
 		return !unitatsEntitat.isEmpty() ? organGestorRepository.findByCodiIn(unitatsEntitat) : new ArrayList<OrganGestorEntity>();
 	}
 
 	public List<ProcSerOrganEntity> getProcSerOrgansGestorsParesExistentsByOrgan(Long procedimentId, String codiDir3Entitat, String codiDir3Organ) {
 
-		List<String> unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
+		var unitatsEntitat = getCodisOrgansGestorsParesExistentsByOrgan(codiDir3Entitat, codiDir3Organ);
 		return !unitatsEntitat.isEmpty() ? procSerOrganRepository.findByProcSerIdAndOrganGestorCodiIn(procedimentId, unitatsEntitat) : new ArrayList<ProcSerOrganEntity>();
 	}
 
@@ -112,12 +112,12 @@ public class OrganigramaHelper {
 	 */
 	private List<String> getCodisOrgansGestorsPare(Map<String, OrganismeDto> organigrama, String codiDir3, String codiDir3Entitat) {
 
-		List<String> unitats = new ArrayList<String>();
+		List<String> unitats = new ArrayList<>();
 		unitats.add(codiDir3);
 		if (codiDir3.equals(codiDir3Entitat)) {
 			return unitats;
 		}
-		OrganismeDto organisme = organigrama.get(codiDir3);
+		var organisme = organigrama.get(codiDir3);
 		if (organisme != null && organisme.getPare() != null && !organisme.getPare().equals(codiDir3Entitat)) {
 			unitats.addAll(getCodisOrgansGestorsPare(organigrama, organisme.getPare(), codiDir3Entitat));
 		}

@@ -2,7 +2,6 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.NotificacioService;
-import es.caib.notib.persist.entity.ProcesosInicialsEntity;
 import es.caib.notib.persist.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +75,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private void addCustomAuthentication() {
 
         auth = SecurityContextHolder.getContext().getAuthentication();
-        Principal principal = new Principal() {
+        var principal = new Principal() {
             public String getName() {
                 return "INIT";
             }
@@ -85,7 +84,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
         rols.add(new SimpleGrantedAuthority("NOT_SUPER"));
         rols.add(new SimpleGrantedAuthority("NOT_ADMIN"));
         rols.add(new SimpleGrantedAuthority("tothom"));
-        Authentication authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
+        var authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -108,16 +107,16 @@ public class EntityComprovarHelper {
 			tePermis = true;
 		}
 		if (!tePermis) {
-			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(),
-					comprovarPermisUsuari ? "USUARI" : comprovarPermisAplicacio ? "APLICACIO" : "ADMINISTRADORENTITAT");
+			var permis = comprovarPermisUsuari ? "USUARI" : comprovarPermisAplicacio ? "APLICACIO" : "ADMINISTRADORENTITAT";
+			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), permis);
 		}
 		return entitat;
 	}
 	
 	public void comprovarPermisos(Long entitatId, boolean comprovarSuper, boolean comprovarAdmin, boolean comprovarUser) {
 
-		var auth = SecurityContextHolder.getContext().getAuthentication();
 		var tePermis = !(comprovarSuper || comprovarAdmin || comprovarUser);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarSuper) {
 			for (var ga: auth.getAuthorities()) {
 				if (ga.toString().equals("NOT_SUPER")) {
@@ -221,7 +220,7 @@ public class EntityComprovarHelper {
 			return;
 		}
 
-		boolean hasPermisAdmin = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, auth);
+		var hasPermisAdmin = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADORENTITAT}, auth);
 		if (!hasPermisAdmin) {
 			throw new PermissionDeniedException(entitatId, EntitatEntity.class, auth.getName(), "ADMINISTRADORENTITAT");
 		}
@@ -229,9 +228,9 @@ public class EntityComprovarHelper {
 	
 	public void comprovarPermisosOrganGestor(String organCodiDir3) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		OrganGestorEntity organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
-		Boolean hasPermisAdminOrgan = permisosHelper.isGrantedAny(organGestorEntity.getId(), OrganGestorEntity.class, new Permission[]{ExtendedPermission.ADMINISTRADOR}, auth);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var organGestorEntity = organGestorRepository.findByCodi(organCodiDir3);
+		var hasPermisAdminOrgan = permisosHelper.isGrantedAny(organGestorEntity.getId(), OrganGestorEntity.class, new Permission[]{ExtendedPermission.ADMINISTRADOR}, auth);
 		if (!hasPermisAdminOrgan) {
 			throw new PermissionDeniedException(organGestorEntity.getId(), OrganGestorEntity.class, auth.getName(), "ADMINISTRADOR");
 		}
@@ -270,8 +269,7 @@ public class EntityComprovarHelper {
 											  boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 		
 		var entitatEntity = comprovarEntitat(entitatId);
-		return comprovarProcediment(entitatEntity, procedimentId, comprovarPermisConsulta, comprovarPermisProcessar, comprovarPermisNotificacio,
-				comprovarPermisGestio, comprovarPermisComunicacioSir);
+		return comprovarProcediment(entitatEntity, procedimentId, comprovarPermisConsulta, comprovarPermisProcessar, comprovarPermisNotificacio, comprovarPermisGestio, comprovarPermisComunicacioSir);
 	}
 	
 	public ProcSerEntity comprovarProcediment(EntitatEntity entitat, Long procedimentId, boolean comprovarPermisConsulta, boolean comprovarPermisProcessar,
@@ -308,7 +306,7 @@ public class EntityComprovarHelper {
 												   boolean comprovarPermisProcessar, boolean comprovarPermisNotificacio, boolean comprovarPermisGestio, boolean comprovarPermisComunicacioSir) {
 
 		var procediment = comprovarProcediment(entitat, procedimentId);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (comprovarPermisConsulta) {
 			checkPermisProcedimentOrgan(procedimentOrgan, procediment, auth, PermisEnum.CONSULTA);
 		}
@@ -363,7 +361,7 @@ public class EntityComprovarHelper {
 
 	public boolean hasPermisProcediment(Long procedimentId, PermisEnum permis) {
 
-		ProcSerEntity procediment = procSerRepository.findById(procedimentId).orElseThrow();
+		var procediment = procSerRepository.findById(procedimentId).orElseThrow();
 		return hasPermisProcediment(procediment, permis);
 	}
 
@@ -377,11 +375,11 @@ public class EntityComprovarHelper {
 	 */
 	public boolean hasPermisProcediment(ProcSerEntity procediment, PermisEnum permis) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcSerEntity> procediments = new ArrayList<>();
 		procediments.add(procediment);
 		// 1. Comprovam si el procediment té assignat el permís d'administration
-		Permission[] permisos = getPermissionsFromName(permis);
+		var permisos = getPermissionsFromName(permis);
 		permisosHelper.filterGrantedAny(
 				procediments,
 				new ObjectIdentifierExtractor<ProcSerEntity>() {
@@ -400,7 +398,7 @@ public class EntityComprovarHelper {
 	
 	public boolean hasPermisProcedimentOrgan(Long procedimentOrganId, PermisEnum permis) {
 
-		ProcSerOrganEntity procedimentOrgan = procedimentOrganRepository.findById(procedimentOrganId).orElseThrow();
+		var procedimentOrgan = procedimentOrganRepository.findById(procedimentOrganId).orElseThrow();
 		return hasPermisProcedimentOrgan(procedimentOrgan, permis);
 	}
 	public boolean hasPermisProcedimentOrgan(ProcSerOrganEntity procedimentOrgan, PermisEnum permis) {
@@ -408,10 +406,10 @@ public class EntityComprovarHelper {
 		if (procedimentOrgan == null) {
 			return false;
 		}
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		List<ProcSerOrganEntity> procedimentOrgans = new ArrayList<ProcSerOrganEntity>();
 		procedimentOrgans.add(procedimentOrgan);
-		Permission[] permisos = getPermissionsFromName(permis);
+		var permisos = getPermissionsFromName(permis);
 		permisosHelper.filterGrantedAny(
 				procedimentOrgans,
 				new ObjectIdentifierExtractor<ProcSerOrganEntity>() {
@@ -425,13 +423,13 @@ public class EntityComprovarHelper {
 	
 	public Permission[] getPermissionsFromName(PermisEnum permis) {
 
-		Permission perm = getPermissionFromName(permis);
+		var perm = getPermissionFromName(permis);
 		return perm != null ? new Permission[] {perm} : null;
 	}
 
 	public Permission[] getPermissionsFromName(String permis) {
 
-		Permission perm = getPermissionFromName(permis);
+		var perm = getPermissionFromName(permis);
 		return perm != null ? new Permission[] {perm} : null;
 	}
 	
@@ -495,8 +493,8 @@ public class EntityComprovarHelper {
 
 	public List<EntitatDto> findPermisEntitat(Permission[] permisos) {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<EntitatEntity> entitatsEntity = entitatRepository.findAll();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		var entitatsEntity = entitatRepository.findAll();
 		List<EntitatDto> resposta;
 		permisosHelper.filterGrantedAny(entitatsEntity,
 				new ObjectIdentifierExtractor<EntitatEntity>() {

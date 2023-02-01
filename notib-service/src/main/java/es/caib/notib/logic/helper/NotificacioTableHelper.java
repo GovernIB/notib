@@ -4,7 +4,6 @@ import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
-import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
 import es.caib.notib.persist.entity.NotificacioMassivaEntity;
 import es.caib.notib.persist.entity.NotificacioTableEntity;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -38,11 +36,11 @@ public class NotificacioTableHelper {
         log.info(String.format("[NOTIF-TABLE] Cream el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
             // Camps calcaulats a partir de valors dels enviaments
-            String titular = "";
-            String notificaIds = "";
-            Integer estatMask = 0;
+            var titular = "";
+            var notificaIds = "";
+            var estatMask = 0;
             if (notificacio.getEnviaments() != null) {
-                for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                for (var e : notificacio.getEnviaments()) {
                     if (e.getTitular() != null) {
                         titular += e.getTitular().getNomFormatted() + ", ";
                     }
@@ -54,7 +52,7 @@ public class NotificacioTableHelper {
 
             estatMask = NotificacioEstatEnumDto.ENVIANT.getMask();
 
-            NotificacioTableEntity tableViewItem = NotificacioTableEntity.builder().notificacio(notificacio).entitat(notificacio.getEntitat())
+            var tableViewItem = NotificacioTableEntity.builder().notificacio(notificacio).entitat(notificacio.getEntitat())
                     .procedimentCodiNotib(notificacio.getProcedimentCodiNotib()).procedimentOrgan(notificacio.getProcedimentOrgan())
                     .usuariCodi(notificacio.getUsuariCodi()).grupCodi(notificacio.getGrupCodi()).tipusUsuari(notificacio.getTipusUsuari())
                     .notificaErrorData(null).notificaErrorDescripcio(null).enviamentTipus(notificacio.getEnviamentTipus()).numExpedient(notificacio.getNumExpedient())
@@ -84,14 +82,14 @@ public class NotificacioTableHelper {
 
         log.info(String.format("[NOTIF-TABLE] Actualitzam el registre de la notificacio [Id: %d]", notificacio.getId()));
         try {
-            NotificacioTableEntity tableViewItem = notificacioTableViewRepository.findById(notificacio.getId()).orElse(null);
+            var tableViewItem = notificacioTableViewRepository.findById(notificacio.getId()).orElse(null);
             if (tableViewItem == null) {
                 this.crearRegistre(notificacio);
                 return;
             }
             // Si pertany a una notificació massiva necessitam l'estat actual i error
-            NotificacioEstatEnumDto estatActual = tableViewItem.getEstat();
-            boolean hasErrorActual = tableViewItem.getNotificaErrorData() != null;
+            var estatActual = tableViewItem.getEstat();
+            var hasErrorActual = tableViewItem.getNotificaErrorData() != null;
             tableViewItem.setEntitat(notificacio.getEntitat());
             tableViewItem.setProcedimentCodiNotib(notificacio.getProcedimentCodiNotib());
             tableViewItem.setProcedimentOrgan(notificacio.getProcedimentOrgan());
@@ -103,11 +101,11 @@ public class NotificacioTableHelper {
                 tableViewItem.setNotificaErrorData(null);
                 tableViewItem.setNotificaErrorDescripcio(null);
             } else {
-                NotificacioEventEntity lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+                var lastEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
                 tableViewItem.setNotificaErrorData(lastEvent != null ? lastEvent.getData() : null);
                 if (tableViewItem.getNotificaErrorDescripcio() == null) {
                     // TODO MISSATGE MULTIDIOMA
-                    String desc = notificacio.hasEnviamentsPerEmail() ?
+                    var desc = notificacio.hasEnviamentsPerEmail() ?
                             "S'ha produït algun error en els enviaments. Els errors es poden consultar en cada un dels enviaments."
                             : (lastEvent != null ? lastEvent.getErrorDescripcio() : null);
                     tableViewItem.setNotificaErrorDescripcio(desc);
@@ -116,12 +114,11 @@ public class NotificacioTableHelper {
             }
 
             // Camps calcaulats a partir de valors dels enviaments
-            String titular = "";
-            String notificaIds = "";
-            Integer estatMask = 0;
-
+            var titular = "";
+            var notificaIds = "";
+            var estatMask = 0;
             if (notificacio.getEnviaments() != null) {
-                for (NotificacioEnviamentEntity e : notificacio.getEnviaments()) {
+                for (var e : notificacio.getEnviaments()) {
                     if (e.getTitular() != null) {
                         titular += e.getTitular().getNomFormatted() + ", ";
                     }
@@ -205,7 +202,7 @@ public class NotificacioTableHelper {
                 }
             }
             // No canvia l'estat
-        } else if (!originalHasError && destiHasError) {
+        } if (!originalHasError && destiHasError) {
             // Actialitzar com a processada amb error
             if (isEstatInicial(destiEstat)) {
                 notificacioMassiva.updateToError();
@@ -236,7 +233,7 @@ public class NotificacioTableHelper {
             if (notificacio.getEnviaments() == null || notificacio.getEnviaments().isEmpty()) {
                 return null;
             }
-            NotificacioEnviamentEntity env = notificacio.getEnviaments().iterator().next();
+            var env = notificacio.getEnviaments().iterator().next();
             if (env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
                 && (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT) || !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
                 return env.getRegistreData();
@@ -255,7 +252,7 @@ public class NotificacioTableHelper {
 
     private boolean isErrorLastEvent(NotificacioEntity notificacio, NotificacioEventEntity event) {
 
-        List<NotificacioEventTipusEnumDto> errorsTipus = Arrays.asList(NotificacioEventTipusEnumDto.CALLBACK_CLIENT, NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
+        var errorsTipus = Arrays.asList(NotificacioEventTipusEnumDto.CALLBACK_CLIENT, NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
                 NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT,
                 NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR);
         return event != null && notificacio.isTipusUsuariAplicacio() && event.isError() && errorsTipus.contains(event.getTipus());
@@ -273,9 +270,9 @@ public class NotificacioTableHelper {
      */
     private boolean ignoreNotificaError(NotificacioEntity notificacio) {
 
-        boolean hasNotificaIntents = notificacio.getNotificaEnviamentIntent() != 0;
+        var hasNotificaIntents = notificacio.getNotificaEnviamentIntent() != 0;
 //        boolean hasSirConsultaIntents = false;
-        boolean hasRegistreIntents = notificacio.getRegistreEnviamentIntent() != 0;
+        var hasRegistreIntents = notificacio.getRegistreEnviamentIntent() != 0;
 //        for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
 //            if(!hasNotificaIntents && enviament.getNotificaIntentNum() != 0 ){
 //                hasNotificaIntents = true;
@@ -284,7 +281,7 @@ public class NotificacioTableHelper {
 //                hasSirConsultaIntents = true;
 //            }
 //        }
-        NotificacioEstatEnumDto notificacioEstat = notificacio.getEstat();
+        var notificacioEstat = notificacio.getEstat();
         return !notificacioEstat.equals(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS) &&
                 (notificacioEstat.equals(NotificacioEstatEnumDto.ENVIADA) ||
                 (notificacioEstat.equals(NotificacioEstatEnumDto.PENDENT) && !hasRegistreIntents) ||

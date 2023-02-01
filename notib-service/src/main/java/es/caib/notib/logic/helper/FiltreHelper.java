@@ -22,6 +22,7 @@ public class FiltreHelper {
     }
 
     public static Date toFiDia(Date data) {
+
         if (data != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(data);
@@ -37,6 +38,7 @@ public class FiltreHelper {
     @Getter
     @AllArgsConstructor
     public static class FiltreField<T>{
+
         protected T field;
         private Boolean isNull = null;
 

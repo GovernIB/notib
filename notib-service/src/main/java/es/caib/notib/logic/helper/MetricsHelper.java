@@ -19,6 +19,7 @@ public class MetricsHelper {
 	private ConfigHelper configHelper;
 
 	public Timer.Context iniciMetrica () {
+
 		if (metricRegistry == null) {
 			metricRegistry = new MetricRegistry();
 			metricRegistry.register("jvm.gc", new GarbageCollectorMetricSet());
@@ -26,7 +27,7 @@ public class MetricsHelper {
 			metricRegistry.register("jvm.thread-states", new ThreadStatesGaugeSet());
 			metricRegistry.register("jvm.fd.usage", new FileDescriptorRatioGauge());
 		}
-		Thread currentThread= Thread.currentThread();
+		var currentThread= Thread.currentThread();
 		String clazz = null;
 		String method = null;
 		//El StackTrace de la classe d'on es crida el mètode iniciaMetrica
@@ -35,17 +36,17 @@ public class MetricsHelper {
 			method = Thread.currentThread().getStackTrace()[2].getMethodName();
 		}
 		
-		if (getGenerarMetriques() && clazz != null && method != null) {
-			metricRegistry.counter(MetricRegistry.name(clazz, method + ".count")).inc();
-			final Timer timer = metricRegistry.timer(MetricRegistry.name(clazz, method));
-			final Timer.Context context = timer.time();
-			return context;
+		if (!getGenerarMetriques() || clazz == null || method == null) {
+			return null;
 		}
-		
-		return null;
+		metricRegistry.counter(MetricRegistry.name(clazz, method + ".count")).inc();
+		final var timer = metricRegistry.timer(MetricRegistry.name(clazz, method));
+		final Timer.Context context = timer.time();
+		return context;
 	}
 	
 	public void fiMetrica(Timer.Context timer) {
+
 		if (getGenerarMetriques()) {
 			timer.stop();
 		}

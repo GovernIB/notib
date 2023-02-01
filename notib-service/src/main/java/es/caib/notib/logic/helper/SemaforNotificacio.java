@@ -26,7 +26,7 @@ public class SemaforNotificacio {
     @Synchronized
     public static void alliberar(Long notificacioId) {
 
-        Integer n = semafors.get(notificacioId);
+        var n = semafors.get(notificacioId);
         if (n-1 == 0) {
             semafors.remove(notificacioId);
             return;

@@ -160,7 +160,7 @@ public class ServeiServiceImpl implements ServeiService{
 																	entitat, servei.isAgrupar(), organGestor, servei.getTipusAssumpte(), servei.getTipusAssumpteNom(),
 																	servei.getCodiAssumpte(), servei.getCodiAssumpteNom(), servei.isComu(), servei.isRequireDirectPermission());
 			if (servei.isEntregaCieActiva()) {
-				EntregaCieEntity entregaCie = new EntregaCieEntity(servei.getCieId(), servei.getOperadorPostalId());
+				var entregaCie = new EntregaCieEntity(servei.getCieId(), servei.getOperadorPostalId());
 				serveiEntityBuilder.entregaCie(entregaCieRepository.save(entregaCie));
 			}
 			cacheHelper.evictFindProcedimentServeisWithPermis();

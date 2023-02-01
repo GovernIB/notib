@@ -1,6 +1,5 @@
 package es.caib.notib.logic.helper;
 
-import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +11,7 @@ public class MimeTypeHelper {
     private static final Map<String, String> fileExtensionMap;
 
     static {
-        fileExtensionMap = new HashMap<String, String>();
+        fileExtensionMap = new HashMap<>();
         // MS Office
         fileExtensionMap.put("doc", "application/msword");
         fileExtensionMap.put("dot", "application/msword");
@@ -61,12 +60,13 @@ public class MimeTypeHelper {
     }
 
     public static String getContentTypeByFileName(String fileName) {
+
         // 1. first use java's buildin utils
-        FileNameMap mimeTypes = URLConnection.getFileNameMap();
-        String contentType = mimeTypes.getContentTypeFor(fileName);
+        var mimeTypes = URLConnection.getFileNameMap();
+        var contentType = mimeTypes.getContentTypeFor(fileName);
         // 2. nothing found -> lookup our in extension map to find types like ".doc" or ".docx"
         if (contentType == null || contentType.isEmpty()) {
-            String extension = FilenameUtils.getExtension(fileName);
+            var extension = FilenameUtils.getExtension(fileName);
             contentType = fileExtensionMap.get(extension);
         }
         return contentType;

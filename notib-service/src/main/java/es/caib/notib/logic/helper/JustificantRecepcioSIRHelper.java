@@ -8,7 +8,6 @@ import es.caib.notib.logic.intf.dto.ProgresDescarregaDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.exception.JustificantException;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,45 +25,36 @@ import java.text.SimpleDateFormat;
 @Slf4j
 @Component
 public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioEnviamentEntity> {
-	private final float LIST_SYMBOL_INDENT = 20;
 
+	private final float LIST_SYMBOL_INDENT = 20;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
-
 	private SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
 	public ListItem buildListRow(String text, String description) {
-		Paragraph paragraf = new Paragraph();
+
+		var paragraf = new Paragraph();
 		setParametersBold(paragraf, "[" + text + "] " + description);
 		return new ListItem(paragraf);
 	}
 	@SneakyThrows
-	public byte[] generarJustificant(
-			NotificacioEnviamentEntity enviament,
-			ProgresDescarregaDto progres) throws JustificantException {
-		log.debug("Generant el justificant de recepció SIR de l'enviament [enviamentId=" + enviament.getId() + "]");
-		RespostaConsultaRegistre resposta = pluginHelper.obtenerAsientoRegistral(
-				enviament.getNotificacio().getEntitat().getDir3Codi(),
-				enviament.getRegistreNumeroFormatat(),
-				2L,
-				false);
-		progres.setProgres(30);
+	public byte[] generarJustificant(NotificacioEnviamentEntity enviament, ProgresDescarregaDto progres) throws JustificantException {
 
-		Paragraph paragrafContingut = new Paragraph();
+		log.debug("Generant el justificant de recepció SIR de l'enviament [enviamentId=" + enviament.getId() + "]");
+		var dir3Codi = enviament.getNotificacio().getEntitat().getDir3Codi();
+		var resposta = pluginHelper.obtenerAsientoRegistral(dir3Codi, enviament.getRegistreNumeroFormatat(), 2L, false);
+		progres.setProgres(30);
+		var paragrafContingut = new Paragraph();
 		if (NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT.equals(resposta.getEstat())) {
 			setParametersBold(paragrafContingut, messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat"));
-			List list = new List(false, LIST_SYMBOL_INDENT);
-			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item1"),
-					resposta.getNumeroRegistroDestino()));
-
-			String dataRegistre = resposta.getSirRegistreDestiData() == null ? "" : dt.format(resposta.getSirRegistreDestiData());
+			var list = new List(false, LIST_SYMBOL_INDENT);
+			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item1"), resposta.getNumeroRegistroDestino()));
+			var dataRegistre = resposta.getSirRegistreDestiData() == null ? "" : dt.format(resposta.getSirRegistreDestiData());
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item2"), dataRegistre));
-
-			String nomOficina = resposta.getDecodificacionEntidadRegistralProcesado() + " (" + resposta.getCodigoEntidadRegistralProcesado() + ")";
+			var nomOficina = resposta.getDecodificacionEntidadRegistralProcesado() + " (" + resposta.getCodigoEntidadRegistralProcesado() + ")";
 			list.add(buildListRow(messageHelper.getMessage("es.caib.notib.justificant.sir.llista.acceptat.item3"), nomOficina));
-
 			paragrafContingut.add(list);
 			paragrafContingut.add(Chunk.NEWLINE);
 
@@ -80,22 +70,14 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 
 		} else {
 			throw new JustificantException("No es pot generar un justificant de recepció SIR d'un enviament que no està en un estat final");
-
 		}
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			Document justificant = inicialitzaDocument(out, progres);
 
+		var out = new ByteArrayOutputStream();
+		try {
+			var justificant = inicialitzaDocument(out, progres);
 			progres.setProgres(50);
 			progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, messageHelper.getMessage("es.caib.notib.justificant.proces.generant.titol"));
-			crearTitolAndIntroduccio(
-					justificant,
-					conversioTipusHelper.convertir(
-						enviament.getNotificacio(),
-						NotificacioDtoV2.class
-					),
-					progres);
-
+			crearTitolAndIntroduccio(justificant, conversioTipusHelper.convertir(enviament.getNotificacio(), NotificacioDtoV2.class), progres);
 			progres.setProgres(80);
 			justificant.add(paragrafContingut);
 			justificant.close();
@@ -103,41 +85,37 @@ public class JustificantRecepcioSIRHelper extends JustificantHelper<NotificacioE
 			String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.generant.error", new Object[] {ex.getMessage()});
 			progres.setProgres(100);
 			progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);
-			log.error(
-					errorMessage,
-					ex);
+			log.error(errorMessage, ex);
 		}
 		return out.toByteArray();
 	}
 
 
-	protected void crearTitolAndIntroduccio(
-			Document justificant,
-			NotificacioDtoV2 notificacio,
-			ProgresDescarregaDto progres) throws JustificantException {
+	protected void crearTitolAndIntroduccio(Document justificant, NotificacioDtoV2 notificacio, ProgresDescarregaDto progres) throws JustificantException {
+
 		log.debug("Creant el títol i la introducció del justificant d'enviament de la notificacio [notificacioId=" + notificacio.getId() + "]");
 		try {
 //			## [TAULA QUE CONTÉ TÍTOL I INTRODUCCIÓ]
-			PdfPTable titolIntroduccioTable = new PdfPTable(1);
+			var titolIntroduccioTable = new PdfPTable(1);
 			titolIntroduccioTable.setWidthPercentage(100);
-			PdfPCell titolIntroduccioCell = new PdfPCell();
+			var titolIntroduccioCell = new PdfPCell();
 			titolIntroduccioCell.setBorder(Rectangle.NO_BORDER);
 
 //			## [TITOL JUSTIFICANT]
-			String titolMessage = messageHelper.getMessage("es.caib.notib.justificant.sir.titol");
-			Paragraph justificantTitol = new Paragraph(titolMessage, frutigerTitolBold);
+			var titolMessage = messageHelper.getMessage("es.caib.notib.justificant.sir.titol");
+			var justificantTitol = new Paragraph(titolMessage, frutigerTitolBold);
 			justificantTitol.setAlignment(Element.ALIGN_CENTER);
 			justificantTitol.add(Chunk.NEWLINE);
 			justificantTitol.add(Chunk.NEWLINE);
 
 //			## [INTRODUCCIÓ JUSTIFICANT]
-			String introduccio = messageHelper.getMessage(
+			var introduccio = messageHelper.getMessage(
 					"es.caib.notib.justificant.sir.introduccio",
 					new Object[] {
 							messageHelper.getMessage("es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto." + notificacio.getEnviamentTipus().name()),
 							notificacio.getConcepte(),
 							getDateTimeFormatted(notificacio.getNotificaEnviamentNotificaData() != null ? notificacio.getNotificaEnviamentNotificaData() : notificacio.getNotificaEnviamentData())});
-			Paragraph justificantIntroduccio = new Paragraph();
+			var justificantIntroduccio = new Paragraph();
 			setParametersBold(justificantIntroduccio, introduccio);
 			justificantIntroduccio.add(Chunk.NEWLINE);
 

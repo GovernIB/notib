@@ -6,9 +6,7 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.repository.UsuariRepository;
-import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -92,21 +90,21 @@ public class UsuariHelper {
 
 	public UsuariEntity getUsuariAutenticat() {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth == null) {
 			return null;
 		}
-		UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
+		var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 		if (usuari != null) {
 			return usuari;
 		}
 		log.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-		String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
+		var dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+		var idioma = configHelper.getConfig("es.caib.notib.default.user.language");
 		if (dadesUsuari == null) {
 			throw new NotFoundException(auth.getName(), UsuariEntity.class);
 		}
-		UsuariEntity usr = UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom()).
+		var usr = UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom()).
 								llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build();
 		usuari = usuariRepository.save(usr);
 		return usuari;

@@ -39,6 +39,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.CREATE)
 	public NotificacioEntity desaNotificacio(NotificacioEntity notificacioEntity) {
+
 		notificacioEntity = notificacioRepository.saveAndFlush(notificacioEntity);
 		return notificacioEntity;
 	}
@@ -76,6 +77,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioProcessada(NotificacioEntity notificacio, String motiu) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 		notificacio.updateEstatProcessatDate(new Date());
 		notificacio.updateMotiu(motiu);
@@ -127,8 +129,9 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateRegistreNouEnviament(NotificacioEntity notificacio, int reintentsPeriode) {
+
 		notificacio.updateRegistreNouEnviament(reintentsPeriode);
-		for (NotificacioEnviamentEntity env: notificacio.getEnviaments()) {
+		for (var env: notificacio.getEnviaments()) {
 			enviamentTableHelper.actualitzarRegistre(env);
 		}
 		notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -137,6 +140,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioMixtaEnviadaNotifica(NotificacioEntity notificacio) {
+
 		notificacioEventHelper.clearOldNotificaUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
@@ -144,6 +148,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviada(NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -152,6 +157,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviadaEmail(NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -160,6 +166,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviadaAmbErrors(NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
@@ -167,6 +174,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioFinalitzadaAmbErrors(NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
@@ -174,6 +182,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioReintentaFinalitzadaAmbErrors(NotificacioEntity notificacio) {
+
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 		notificacio.resetIntentsNotificacio();
 		notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -182,6 +191,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioRefreshRegistreNotificacio(NotificacioEntity notificacio) {
+
 		notificacio.refreshRegistre();
 		notificacioRepository.saveAndFlush(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -190,6 +200,7 @@ public class AuditNotificacioHelper {
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.DELETE)
 	public NotificacioEntity deleteNotificacio(NotificacioEntity notificacio) {
+
 		notificacioRepository.delete(notificacio);
 		notificacioRepository.flush();
 		return notificacio;

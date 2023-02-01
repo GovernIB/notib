@@ -38,7 +38,8 @@ public class NotificacioEventHelper {
      * @param notificacio Notificació objectiu
      */
     public void clearOldUselessEvents(NotificacioEntity notificacio) {
-        for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+
+        for (var enviament : notificacio.getEnviaments()) {
             if (enviament.isNotificaError() && enviament.isPerEmail()) {
                 continue;
             }
@@ -48,7 +49,8 @@ public class NotificacioEventHelper {
     }
 
     public void clearOldNotificaUselessEvents(NotificacioEntity notificacio) {
-        for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
+
+        for (var enviament : notificacio.getEnviaments()) {
             if (!enviament.isPerEmail())
                 auditEnviamentHelper.updateErrorNotifica(enviament, enviament.isNotificaError(), null);
         }
@@ -62,22 +64,16 @@ public class NotificacioEventHelper {
         } else {
             deleteByNotificacioAndTipusAndError(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,false );
         }
-        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(
-                NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT,
-                enviament.getNotificacio()).
-                error(isError).
-                enviament(enviament);
+        var eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.REGISTRE_CALLBACK_ESTAT, enviament.getNotificacio()).error(isError).enviament(enviament);
         if (isError) {
             eventBuilder.errorDescripcio(descripcio);
         } else {
             eventBuilder.descripcio(descripcio);
         }
-
         if (enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
             eventBuilder.callbackInicialitza();
         }
-        NotificacioEventEntity event = eventBuilder.build();
-
+        var event = eventBuilder.build();
         notificacio.updateEventAfegir(event);
         enviament.updateNotificaError(isError, isError ? event : null);
         notificacioEventRepository.save(event);
@@ -86,32 +82,27 @@ public class NotificacioEventHelper {
     public void addRegistreConsultaInfoErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String descripcio) {
 
         clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO);
-        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO, notificacio)
-                                    .enviament(enviament).error(true).errorDescripcio(descripcio).build();
+        var event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.REGISTRE_CONSULTA_INFO, notificacio).enviament(enviament).error(true).errorDescripcio(descripcio).build();
         updateNotificacio(notificacio, event);
         notificacioEventRepository.saveAndFlush(event);
         enviament.updateNotificaError(true, event);
     }
 
-    public NotificacioEventEntity addNotificaRegistreEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String errorDescripcio,
-                                                NotificacioErrorTipusEnumDto errorTipus) {
+    public NotificacioEventEntity addNotificaRegistreEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, String errorDescripcio, NotificacioErrorTipusEnumDto errorTipus) {
 
         clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE);
         //Crea un nou event
-        NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE).notificacio(notificacio)
-                                    .error(true).errorTipus(errorTipus).errorDescripcio(errorDescripcio).build();
-
+        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE).notificacio(notificacio).error(true).errorTipus(errorTipus).errorDescripcio(errorDescripcio).build();
         if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
             event.callbackInicialitza();
         }
-
 
         //Actualitza l'event per cada enviament
         if (enviament != null) {
             event.setEnviament(enviament);
             notificacioEventRepository.saveAndFlush(event);
         } else {
-            for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
+            for (var enviamentEntity : notificacio.getEnviaments()) {
                 event.setEnviament(enviamentEntity);
                 notificacioEventRepository.saveAndFlush(event);
                 enviamentEntity.updateNotificaError(true, event);
@@ -124,19 +115,15 @@ public class NotificacioEventHelper {
     public void addCallbackEvent(NotificacioEntity notificacio, NotificacioEventEntity event, boolean isError) {
 
         log.debug("[Events-CALLBACK_CLIENT] Intentam afegir nou event de callback a client");
-        NotificacioEnviamentEntity enviamentEventOld = event.getEnviament();
+        var enviamentEventOld = event.getEnviament();
         // Elimina tots els events de callback anteriors
         deleteByNotificacioAndTipusAndError(notificacio, null, NotificacioEventTipusEnumDto.CALLBACK_CLIENT, isError);
 
         log.trace("[Events-CALLBACK_CLIENT] Cream un nou event de callback a client");
         // Crea una nova entrada a la taula d'events per deixar constància de la notificació a l'aplicació client
-        NotificacioEventEntity.BuilderOld eventBuilder;
-        if (event.getEnviament() != null) {
-            eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_CLIENT, notificacio)
-                        .enviament(event.getEnviament()).descripcio("Callback " + event.getTipus());
-        } else {
-            eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_CLIENT,notificacio).descripcio("Callback " + event.getTipus());
-        }
+        var eventBuilder = event.getEnviament() != null ?
+             NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_CLIENT, notificacio).enviament(event.getEnviament()).descripcio("Callback " + event.getTipus())
+            : NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_CLIENT,notificacio).descripcio("Callback " + event.getTipus());
         if (isError) {
             log.trace("[Events-CALLBACK_CLIENT] Eliminam els events d'error de callback a client innecessaris");
             clearUselessErrors(notificacio, null, NotificacioEventTipusEnumDto.CALLBACK_CLIENT);
@@ -146,7 +133,7 @@ public class NotificacioEventHelper {
      	eventBuilder.enviament(enviamentEventOld);
      		
         log.trace("[Events-CALLBACK_CLIENT] Actualitzam la base de dades");
-        NotificacioEventEntity callbackEvent = eventBuilder.build();
+        var callbackEvent = eventBuilder.build();
         updateNotificacio(notificacio, callbackEvent);
         notificacioEventRepository.saveAndFlush(callbackEvent);
         log.trace("[Events-CALLBACK_CLIENT] Event afegit satisfactoriament.");
@@ -154,15 +141,14 @@ public class NotificacioEventHelper {
 
     public void addCallbackActivarEvent(NotificacioEnviamentEntity enviament) {
 
-        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR, enviament.getNotificacio())
-                                    .enviament(enviament).callbackInicialitza().build();
+        var event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.CALLBACK_ACTIVAR, enviament.getNotificacio()).enviament(enviament).callbackInicialitza().build();
         notificacioEventRepository.saveAndFlush(event);
     }
 
     public void addNotificaConsultaSirErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
 
         deleteByNotificacioAndTipusAndError(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR, true);
-        NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR)
+        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_SIR_ERROR)
                                     .notificacio(notificacio).enviament(enviament).error(true).errorTipus(NotificacioErrorTipusEnumDto.ERROR_REINTENTS_SIR)
                                     .errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a SIR").build();
 
@@ -177,13 +163,12 @@ public class NotificacioEventHelper {
                                             Set<NotificacioEnviamentEntity> enviaments, boolean totsAdministracio) {
 
         //Crea un nou event
-        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, notificacio);
+        var eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_REGISTRE, notificacio);
         if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
             eventBuilder.callbackInicialitza();
         }
-        NotificacioEventEntity event = eventBuilder.build();
-//        log.info(" >>> Canvi estat a REGISTRADA ");
-        for(NotificacioEnviamentEntity enviamentEntity: enviaments) {
+        var event = eventBuilder.build();
+        for(var enviamentEntity: enviaments) {
             auditEnviamentHelper.updateRegistreEnviament(notificacio, enviamentEntity, registreNum, registreData, registreEstat, totsAdministracio, event);
         }
         updateNotificacio(notificacio, event);
@@ -198,13 +183,13 @@ public class NotificacioEventHelper {
      */
     public void addEnviamentNotificaOKEvent(NotificacioEntity notificacio, Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments) {
 
-        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, notificacio);
+        var eventBuilder = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, notificacio);
         if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
             eventBuilder.callbackInicialitza();
         }
         // TODO: Revisar generació d'events amb múltiples enviaments
-        NotificacioEventEntity event = eventBuilder.build();
-        for (NotificacioEnviamentEntity enviament: identificadorsResultatsEnviaments.keySet()) {
+        var event = eventBuilder.build();
+        for (var enviament: identificadorsResultatsEnviaments.keySet()) {
             auditEnviamentHelper.updateEnviamentEnviat(notificacio, event, identificadorsResultatsEnviaments.get(enviament), enviament);
         }
         updateNotificacio(notificacio, event);
@@ -241,7 +226,7 @@ public class NotificacioEventHelper {
         if (errorDescripcio != null){
             clearUselessErrors(notificacio, enviament, eventTipus);
         }
-        NotificacioEventEntity.BuilderOld eventBuilder = NotificacioEventEntity.getBuilder(eventTipus, notificacio).enviament(enviament);
+        var eventBuilder = NotificacioEventEntity.getBuilder(eventTipus, notificacio).enviament(enviament);
         if (descripcio != null) {
             eventBuilder.descripcio(descripcio);
         }
@@ -252,9 +237,8 @@ public class NotificacioEventHelper {
         if (initialitzaCallback && enviament.getNotificacio().getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB)
             eventBuilder.callbackInicialitza();
 
-        NotificacioEventEntity event = eventBuilder.build();
+        var event = eventBuilder.build();
         enviament.updateNotificaError(errorDescripcio != null, errorDescripcio != null ? event : null);
-
         updateNotificacio(notificacio, event);
         notificacioEventRepository.saveAndFlush(event);
         return event;
@@ -267,7 +251,7 @@ public class NotificacioEventHelper {
         } else {
             deleteByNotificacioAndTipusAndError(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO,false);
         }
-        NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
+        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
                                     .notificacio(notificacio).enviament(enviament).error(isError).errorDescripcio(errorDescripcio).build();
 
         updateNotificacio(notificacio, event);
@@ -278,7 +262,7 @@ public class NotificacioEventHelper {
     public void addNotificaConsultaErrorEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
 
         clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR);
-        NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR)
+        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_ERROR)
                                 .notificacio(notificacio).enviament(enviament).error(true)
                                 .errorDescripcio("S'han esgotat els reintents de consulta de canvi d'estat a Notific@")
                                 .errorTipus(NotificacioErrorTipusEnumDto.ERROR_REINTENTS_CONSULTA).build();
@@ -294,14 +278,13 @@ public class NotificacioEventHelper {
                               NotificacioErrorTipusEnumDto errorTipus, boolean notificaError) {
 
         clearUselessErrors(notificacio, null, eventTipus);
-
         //Actualitza l'event per cada enviament
-        for (NotificacioEnviamentEntity enviamentEntity : notificacio.getEnviaments()) {
+        for (var enviamentEntity : notificacio.getEnviaments()) {
             if (enviamentEntity.isPerEmail()) {
                 continue;
             }
             //Crea un nou event
-            NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(eventTipus).notificacio(notificacio).error(true).errorTipus(errorTipus)
+            var event = NotificacioEventEntity.builder().tipus(eventTipus).notificacio(notificacio).error(true).errorTipus(errorTipus)
                                         .errorDescripcio(errorDescripcio).enviament(enviamentEntity).build();
 
             if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
@@ -330,7 +313,7 @@ public class NotificacioEventHelper {
     public void addNotificacioEmailEvent(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, boolean isError, String errorDescripcio) {
 
 //        clearUselessErrors(notificacio, enviament, NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT);
-        NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT).notificacio(notificacio)
+        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT).notificacio(notificacio)
                                     .enviament(enviament).error(isError).errorDescripcio(errorDescripcio)
                                     .errorTipus(isError ? NotificacioErrorTipusEnumDto.ERROR_EMAIL : null).build();
 
@@ -350,7 +333,7 @@ public class NotificacioEventHelper {
     // Afegir event d'enviament correcte a la notificació
     public void addEnviamentEmailOKEvent(NotificacioEntity notificacio) {
 
-        NotificacioEventEntity event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT, notificacio).build();
+        var event = NotificacioEventEntity.getBuilder(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT, notificacio).build();
         if (notificacio.getTipusUsuari() != TipusUsuariEnumDto.INTERFICIE_WEB) {
             event.callbackInicialitza();
         }
@@ -362,8 +345,8 @@ public class NotificacioEventHelper {
     // Afegir event d'error a la notificació
     public void addEnviamentEmailErrorEvent(NotificacioEntity notificacio) {
 
-        String msg = "S'ha produït algun error en l'enviament via email. Els errors es poden consultar en cada un dels enviaments.";
-        NotificacioEventEntity event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT).notificacio(notificacio)
+        var msg = "S'ha produït algun error en l'enviament via email. Els errors es poden consultar en cada un dels enviaments.";
+        var event = NotificacioEventEntity.builder().tipus(NotificacioEventTipusEnumDto.EMAIL_ENVIAMENT).notificacio(notificacio)
                                     .error(true).errorTipus(NotificacioErrorTipusEnumDto.ERROR_EMAIL).errorDescripcio(msg).build();
                                     // TODO ERROR MULTIIDIOMA
                                     // .errorDescripcio(messageHelper.getMessage("error.notificacio.enviaments.email")).build();
@@ -384,14 +367,14 @@ public class NotificacioEventHelper {
                                                      NotificacioEventTipusEnumDto tipus, boolean isError){
 
         if (isError && notificacio.getEvents() != null) {
-            for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+            for (var e: new ArrayList<>(notificacio.getEvents())) {
                 if (e.getTipus().equals(tipus) && e.isError() == isError){
                     preRemoveErrorEvent(e, notificacio, enviament);
                 }
             }
         }
         if (notificacio.getEvents() != null) {
-            for (NotificacioEventEntity e : new ArrayList<>(notificacio.getEvents())) {
+            for (var e : new ArrayList<>(notificacio.getEvents())) {
                 if (tipus.equals(e.getTipus()) && e.isError() == isError) {
                     notificacio.getEvents().remove(e);
                 }
@@ -421,45 +404,49 @@ public class NotificacioEventHelper {
      */
     private void clearUselessErrors(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto errorType) {
 
-        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio, errorType, true);
-        if (events != null && events.size() > 1) {
-            // conservam l'event més antic i eliminam els intermitjos,
-            // si tot va correctament em aquest punt la llista només tendra dos elements.
-            for (int i = 1; i < events.size(); i++) {
-                NotificacioEventEntity event = events.get(i);
-                preRemoveErrorEvent(event, notificacio, enviament);
-                notificacioEventRepository.delete(event);
-            }
-            notificacioEventRepository.flush();
+        var events = notificacioEventRepository.findByNotificacioAndTipusAndErrorOrderByDataDescIdDesc(notificacio, errorType, true);
+        if (events == null || events.size() <= 1) {
+            return;
         }
+        // conservam l'event més antic i eliminam els intermitjos,
+        // si tot va correctament em aquest punt la llista només tendra dos elements.
+        NotificacioEventEntity event;
+        for (var i = 1; i < events.size(); i++) {
+            event = events.get(i);
+            preRemoveErrorEvent(event, notificacio, enviament);
+            notificacioEventRepository.delete(event);
+        }
+        notificacioEventRepository.flush();
     }
 
     private void clearUselessNotificacioErrors(NotificacioEntity notificacio, NotificacioEventTipusEnumDto errorType) {
 
-        List<NotificacioEventEntity> events = notificacioEventRepository.findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(notificacio, errorType, true);
-        if (events != null && events.size() > 1) {
-            // conservam l'event més antic i eliminam els intermitjos,
-            // si tot va correctament em aquest punt la llista només tendra dos elements.
-            for (int i = 1; i < events.size(); i++) {
-                NotificacioEventEntity event = events.get(i);
-                notificacioEventRepository.delete(event);
-            }
-            notificacioEventRepository.flush();
+        var events = notificacioEventRepository.findByNotificacioAndTipusAndErrorAndEnviamentIsNullOrderByDataDescIdDesc(notificacio, errorType, true);
+        if (events == null || events.size() <= 1) {
+            return;
         }
+        // conservam l'event més antic i eliminam els intermitjos,
+        // si tot va correctament em aquest punt la llista només tendra dos elements.
+        for (int i = 1; i < events.size(); i++) {
+            NotificacioEventEntity event = events.get(i);
+            notificacioEventRepository.delete(event);
+        }
+        notificacioEventRepository.flush();
     }
 
     private void clearUselessEnviamentErrors(NotificacioEnviamentEntity enviament, NotificacioEventTipusEnumDto errorType) {
 
-        List<NotificacioEventEntity> events = notificacioEventRepository.findByEnviamentAndTipusAndErrorOrderByDataDescIdDesc(enviament, errorType, true);
-        if (events != null && events.size() > 1) {
-            // conservam l'event més antic i eliminam els intermitjos,
-            // si tot va correctament em aquest punt la llista només tendra dos elements.
-            for (int i = 1; i < events.size(); i++) {
-                NotificacioEventEntity event = events.get(i);
-                notificacioEventRepository.delete(event);
-            }
-            notificacioEventRepository.flush();
+        var events = notificacioEventRepository.findByEnviamentAndTipusAndErrorOrderByDataDescIdDesc(enviament, errorType, true);
+        if (events == null || events.size() <= 1) {
+            return;
         }
+        // conservam l'event més antic i eliminam els intermitjos,
+        // si tot va correctament em aquest punt la llista només tendra dos elements.
+        for (int i = 1; i < events.size(); i++) {
+            NotificacioEventEntity event = events.get(i);
+            notificacioEventRepository.delete(event);
+        }
+        notificacioEventRepository.flush();
     }
 
 }

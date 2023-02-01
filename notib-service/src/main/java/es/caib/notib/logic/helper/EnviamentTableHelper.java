@@ -1,34 +1,27 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.persist.entity.DocumentEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
-import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.PersonaEntity;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
-import es.caib.notib.persist.repository.NotificacioEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Component
 public class EnviamentTableHelper {
+
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
 
-    @Autowired
-    private NotificacioEventRepository notificacioEventRepository;
-
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEnviamentEntity enviament){
-        NotificacioEntity notificacio = enviament.getNotificacio();
-        PersonaEntity titular = enviament.getTitular();
-        DocumentEntity document = notificacio.getDocument();
 
-        EnviamentTableEntity tableViewItem = EnviamentTableEntity.builder()
+        var notificacio = enviament.getNotificacio();
+        var titular = enviament.getTitular();
+        var document = notificacio.getDocument();
+
+        var tableViewItem = EnviamentTableEntity.builder()
                 .enviament(enviament)
                 .notificacio(notificacio)
                 .entitat(notificacio.getEntitat())
@@ -77,15 +70,16 @@ public class EnviamentTableHelper {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void actualitzarRegistre(NotificacioEnviamentEntity enviament){
-        EnviamentTableEntity tableViewItem = enviamentTableRepository.findById(enviament.getId()).orElse(null);
+
+        var tableViewItem = enviamentTableRepository.findById(enviament.getId()).orElse(null);
         if (tableViewItem == null) {
             this.crearRegistre(enviament);
             return;
         }
 
-        PersonaEntity titular = enviament.getTitular();
-        NotificacioEntity notificacio = enviament.getNotificacio();
-        DocumentEntity document = notificacio.getDocument();
+        var titular = enviament.getTitular();
+        var notificacio = enviament.getNotificacio();
+        var document = notificacio.getDocument();
 
         tableViewItem.setEnviament(enviament);
         tableViewItem.setNotificacio(notificacio);

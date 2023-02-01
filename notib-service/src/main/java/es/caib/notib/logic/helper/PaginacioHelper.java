@@ -54,18 +54,20 @@ public class PaginacioHelper {
 		if (ordres == null) {
 			return null;
 		}
-		for (OrdreDto ordre: ordres) {
-			Direction direccio = OrdreDireccioDto.DESCENDENT.equals(ordre.getDireccio()) ? Sort.Direction.DESC : Sort.Direction.ASC;
+		Direction direccio;
+		String[] mapeig;
+		for (var ordre: ordres) {
+			direccio = OrdreDireccioDto.DESCENDENT.equals(ordre.getDireccio()) ? Sort.Direction.DESC : Sort.Direction.ASC;
 			if (mapeigPropietatsOrdenacio == null) {
 				orders.add(new Order(direccio, ordre.getCamp()));
 				continue;
 			}
-			String[] mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
+			mapeig = mapeigPropietatsOrdenacio.get(ordre.getCamp());
 			if (mapeig == null) {
 				orders.add(new Order(direccio, ordre.getCamp()));
 				continue;
 			}
-			for (String prop: mapeig) {
+			for (var prop: mapeig) {
 				orders.add(new Order(direccio, prop));
 			}
 		}
@@ -77,7 +79,7 @@ public class PaginacioHelper {
 
 	public <T> PaginaDto<T> toPaginaDto(Page<?> page, List<?> llista, Class<T> targetType) {
 
-		PaginaDto<T> dto = new PaginaDto<T>();
+		var dto = new PaginaDto<T>();
 		dto.setNumero(page.getNumber());
 		dto.setTamany(page.getSize());
 		dto.setTotal(page.getTotalPages());
@@ -99,7 +101,7 @@ public class PaginacioHelper {
 	@SuppressWarnings("unchecked")
 	public <S, T> PaginaDto<T> toPaginaDto(Page<S> page, Class<T> targetType, Converter<S, T> converter) {
 
-		PaginaDto<T> dto = new PaginaDto<T>();
+		var dto = new PaginaDto<T>();
 		dto.setNumero(page.getNumber());
 		dto.setTamany(page.getSize());
 		dto.setTotal(page.getTotalPages());
@@ -109,8 +111,8 @@ public class PaginacioHelper {
 		dto.setPosteriors(page.hasNext());
 		dto.setDarrera(page.isLast());
 		if (page.hasContent() && converter != null) {
-			List<T> contingut = new ArrayList<T>();
-			for (S element: page.getContent()) {
+			List<T> contingut = new ArrayList<>();
+			for (var element : page.getContent()) {
 				contingut.add(converter.convert(element));
 			}
 			dto.setContingut(contingut);
@@ -124,7 +126,7 @@ public class PaginacioHelper {
 
 	public <T> PaginaDto<T> toPaginaDto(List<?> llista, Class<T> targetType) {
 
-		PaginaDto<T> dto = new PaginaDto<T>();
+		var dto = new PaginaDto<T>();
 		dto.setNumero(0);
 		dto.setTamany(llista.size());
 		dto.setTotal(1);
@@ -140,7 +142,7 @@ public class PaginacioHelper {
 
 	public <T> PaginaDto<T> getPaginaDtoBuida(Class<T> targetType) {
 
-		PaginaDto<T> dto = new PaginaDto<T>();
+		var dto = new PaginaDto<T>();
 		dto.setNumero(0);
 		dto.setTamany(0);
 		dto.setTotal(1);

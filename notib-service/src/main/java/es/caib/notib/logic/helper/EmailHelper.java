@@ -13,9 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -51,27 +49,22 @@ public abstract class EmailHelper<T> {
 //        }
 //        return resposta;
 //    }
-    protected void sendEmailNotificacio(
-            String emailDestinatari, T item) throws MessagingException {
+    protected void sendEmailNotificacio(String emailDestinatari, T item) throws MessagingException {
         sendEmailNotificacio(emailDestinatari, item ,null);
     }
-    protected void sendEmailNotificacio(
-            String emailDestinatari, T item, List<Attachment> files) throws MessagingException {
-        log.debug("Enviament correu notificació");
+    protected void sendEmailNotificacio(String emailDestinatari, T item, List<Attachment> files) throws MessagingException {
 
-        MimeMessage missatge = mailSender.createMimeMessage();
+        log.debug("Enviament correu notificació");
+        var missatge = mailSender.createMimeMessage();
         missatge.setHeader("Content-Type", "text/html charset=UTF-8");
-        MimeMessageHelper helper;
-        helper = new MimeMessageHelper(missatge, true);
+        var helper = new MimeMessageHelper(missatge, true);
         helper.setTo(emailDestinatari);
         helper.setFrom(getRemitent());
         helper.setSubject(configHelper.getPrefix() + " " + getMailSubject());
-
         //Html text
         helper.setText(getMailPlainTextBody(item), getMailHtmlBody(item));
-
         if (files != null) {
-            for (Attachment attach: files) {
+            for (var attach: files) {
                 helper.addAttachment(attach.filename, new ByteArrayResource(attach.content));
             }
         }
@@ -85,8 +78,7 @@ public abstract class EmailHelper<T> {
             return false;
         }
         try {
-            Matcher matcher = EMAIL_REGEX.matcher(email);
-            return matcher.find();
+            return EMAIL_REGEX.matcher(email).find();
         } catch (Exception e) {
             return false;
         }

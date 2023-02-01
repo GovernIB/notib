@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.EntregaPostal;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
@@ -27,7 +28,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
 import es.caib.notib.logic.intf.dto.organisme.UnitatOrganitzativaDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerOrganDto;
-import es.caib.notib.persist.audit.NotibAuditable;
 import es.caib.notib.persist.entity.*;
 import es.caib.notib.persist.entity.auditoria.NotificacioAudit;
 import es.caib.notib.persist.entity.auditoria.NotificacioEnviamentAudit;
@@ -45,7 +45,6 @@ import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 import org.joda.time.DateTime;
@@ -73,6 +72,7 @@ public class ConversioTipusHelper {
 
 
 	public ConversioTipusHelper() {
+
 		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DateTime, Date>() {
@@ -422,32 +422,26 @@ public class ConversioTipusHelper {
 	}
 
 	private void defineConverters(){
-		ConverterFactory converterFactory = mapperFactory.getConverterFactory();
+
+		var converterFactory = mapperFactory.getConverterFactory();
 		converterFactory.registerConverter(new StringToOrganGestorEstatEnum());
 	}
 
 	public <T> T convertir(Object source, Class<T> targetType) {
-		if (source == null)
-			return null;
-		return getMapperFacade().map(source, targetType);
+		return source != null ? getMapperFacade().map(source, targetType) : null;
 	}
+
 	public <T> List<T> convertirList(List<?> items, Class<T> targetType) {
-		if (items == null)
-			return null;
-		return getMapperFacade().mapAsList(items, targetType);
+		return items != null ? getMapperFacade().mapAsList(items, targetType) : null;
 	}
 	public <T> Set<T> convertirSet(Set<?> items, Class<T> targetType) {
-		if (items == null)
-			return null;
-		return getMapperFacade().mapAsSet(items, targetType);
+		return items != null ? getMapperFacade().mapAsSet(items, targetType) : null;
 	}
 
 	public class UsuariEntitytoMapper extends CustomMapper<UsuariEntity, UsuariDto> {
 		@Override
-		public void mapAtoB(
-				UsuariEntity usuariEntity, 
-				UsuariDto usuariDto, 
-				MappingContext context) {
+		public void mapAtoB(UsuariEntity usuariEntity, UsuariDto usuariDto, MappingContext context) {
+
 			if (usuariEntity.getNomSencer() != null && !usuariEntity.getNomSencer().isEmpty() && usuariEntity.getNomSencer().trim().length() > 0) {
 				usuariDto.setNom(usuariEntity.getNomSencer());
 			} else if (usuariEntity.getLlinatges() != null && !usuariEntity.getLlinatges().isEmpty() && usuariEntity.getLlinatges().trim().length() > 0) {
@@ -461,7 +455,7 @@ public class ConversioTipusHelper {
 		public void mapAtoB(EntitatEntity entitatEntity, EntitatDto entitatDto, MappingContext context) {
 
 			if (entitatEntity.getTipusDocDefault() != null) {
-				TipusDocumentDto tipusDocumentDto = new TipusDocumentDto();
+				var tipusDocumentDto = new TipusDocumentDto();
 				tipusDocumentDto.setEntitat(entitatEntity.getId());
 				tipusDocumentDto.setTipusDocEnum(entitatEntity.getTipusDocDefault());
 				entitatDto.setTipusDocDefault(tipusDocumentDto);
@@ -476,17 +470,16 @@ public class ConversioTipusHelper {
 	
 	public class NotificacioEnviamentEntitytoMapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDto> {
 		@Override
-		public void mapAtoB(
-				NotificacioEnviamentEntity notificacioEnviamentEntity, 
-				NotificacioEnviamentDto notificacioEnviamentDto, 
-				MappingContext context) {
-			if (notificacioEnviamentEntity.isNotificaError()) {
-				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
-				if (event != null) {
-					notificacioEnviamentDto.setNotificaErrorData(event.getData());
-					notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
-				}
+		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, NotificacioEnviamentDto notificacioEnviamentDto, MappingContext context) {
+			if (!notificacioEnviamentEntity.isNotificaError()) {
+				return;
 			}
+			var event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+			if (event == null) {
+				return;
+			}
+			notificacioEnviamentDto.setNotificaErrorData(event.getData());
+			notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
 		}
 	}
 
@@ -499,7 +492,7 @@ public class ConversioTipusHelper {
 			if (!entity.isNotificaError()) {
 				return;
 			}
-			NotificacioEventEntity event = entity.getNotificacioErrorEvent();
+			var event = entity.getNotificacioErrorEvent();
 			if (event == null) {
 				return;
 			}
@@ -509,80 +502,77 @@ public class ConversioTipusHelper {
 	}
 	public class NotificacioEnviamentEntitytoInfoMapper extends CustomMapper<NotificacioEnviamentEntity, EnviamentInfoDto> {
 		@Override
-		public void mapAtoB(
-				NotificacioEnviamentEntity notificacioEnviamentEntity,
-				EnviamentInfoDto notificacioEnviamentDto,
-				MappingContext context) {
-			if (notificacioEnviamentEntity.isNotificaError()) {
-				NotificacioEventEntity event = notificacioEnviamentEntity.getNotificacioErrorEvent();
-				if (event != null) {
-					notificacioEnviamentDto.setNotificacioErrorData(event.getData());
-					notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
-				}
+		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, EnviamentInfoDto notificacioEnviamentDto, MappingContext context) {
+
+			if (!notificacioEnviamentEntity.isNotificaError()) {
+				return;
 			}
+			var event = notificacioEnviamentEntity.getNotificacioErrorEvent();
+			if (event == null) {
+				return;
+			}
+			notificacioEnviamentDto.setNotificacioErrorData(event.getData());
+			notificacioEnviamentDto.setNotificacioErrorDescripcio(event.getErrorDescripcio());
 		}
 	}
 	public class NotificacioEnviamentEntitytoDtoV2Mapper extends CustomMapper<NotificacioEnviamentEntity, NotificacioEnviamentDtoV2> {
 		@Override
-		public void mapAtoB(
-				NotificacioEnviamentEntity notificacioEnviamentEntity,
-				NotificacioEnviamentDtoV2 notificacioEnviamentDto,
-				MappingContext context) {
-			NotificacioEventEntity errorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent();
-			NotificacioEntity notificacio = notificacioEnviamentEntity.getNotificacio();
-			if (errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 &&
-					notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)) {
-				notificacioEnviamentDto.setEnviant(true);
-			} else {
-				notificacioEnviamentDto.setEnviant(false);
-			}
+		public void mapAtoB(NotificacioEnviamentEntity notificacioEnviamentEntity, NotificacioEnviamentDtoV2 notificacioEnviamentDto, MappingContext context) {
+
+			var errorEvent = notificacioEnviamentEntity.getNotificacioErrorEvent();
+			var notificacio = notificacioEnviamentEntity.getNotificacio();
+			var enviant = errorEvent == null && notificacio.getRegistreEnviamentIntent() == 0 && notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT);
+			notificacioEnviamentDto.setEnviant(enviant);
 		}
 	}
 
 	public class EnviamentTableItemMapper extends CustomMapper<EnviamentTableEntity, NotEnviamentTableItemDto> {
 		@Override
-		public void mapAtoB(
-				EnviamentTableEntity enviamentTableEntity,
-				NotEnviamentTableItemDto notEnviamentTableItemDto,
-				MappingContext context) {
-			if (enviamentTableEntity.getDestinataris() != null && !enviamentTableEntity.getDestinataris().isEmpty()) {
-				String[] destinataris = enviamentTableEntity.getDestinataris().split("<br>");
-				if (destinataris.length > 0 && !destinataris[0].isEmpty() && destinataris[0].contains(" - ")) {
-					String destinatarisFormat = "";
-					for(String destinatari: destinataris) {
-						destinatarisFormat += getNomLlinatgeNif(destinatari) + "<br>";
-					}
-					if (destinatarisFormat.length() > 4)
-						destinatarisFormat = destinatarisFormat.substring(0, destinatarisFormat.length() - 4);
-					enviamentTableEntity.setDestinataris(destinatarisFormat);
-					notEnviamentTableItemDto.setDestinataris(destinatarisFormat);
-				}
+		public void mapAtoB(EnviamentTableEntity enviamentTableEntity, NotEnviamentTableItemDto notEnviamentTableItemDto, MappingContext context) {
+
+			if (Strings.isNullOrEmpty(enviamentTableEntity.getDestinataris())) {
+				return;
 			}
+			var destinataris = enviamentTableEntity.getDestinataris().split("<br>");
+			if (destinataris.length == 0 || destinataris[0].isEmpty() || !destinataris[0].contains(" - ")) {
+				return;
+			}
+			var destinatarisFormat = "";
+			for(var destinatari: destinataris) {
+				destinatarisFormat += getNomLlinatgeNif(destinatari) + "<br>";
+			}
+			if (destinatarisFormat.length() > 4) {
+				destinatarisFormat = destinatarisFormat.substring(0, destinatarisFormat.length() - 4);
+			}
+			enviamentTableEntity.setDestinataris(destinatarisFormat);
+			notEnviamentTableItemDto.setDestinataris(destinatarisFormat);
+
 		}
 
 		private String getNomLlinatgeNif(String destinatari) {
-			int idxSeparador = destinatari.indexOf(" - ");
-			String destinatariFormat = destinatari;
-			if (idxSeparador != -1) {
-				String nif = null;
-				if (idxSeparador > 0)
-					nif = destinatari.substring(0, idxSeparador);
-				if (destinatari.length() < idxSeparador + 4)
-					return nif;
-				String llinatgeNom = destinatari.substring(idxSeparador + 3, destinatari.length() - 1);
-				String nomLlinatge = llinatgeNom;
-				if (llinatgeNom.contains(", ")) {
-					idxSeparador = llinatgeNom.indexOf(", ");
-					if (idxSeparador != -1) {
-						if (idxSeparador == 0) {
-							nomLlinatge = llinatgeNom.substring(2);
-						} else {
-							nomLlinatge = llinatgeNom.substring(idxSeparador + 2) + " " + llinatgeNom.substring(0, idxSeparador);
-						}
-					}
-				}
-				destinatariFormat = nomLlinatge + (nif != null ? " (" + nif + ")" : "");
+
+			var idxSeparador = destinatari.indexOf(" - ");
+			if (idxSeparador == -1) {
+				return destinatari;
 			}
+			var destinatariFormat = destinatari;
+			String nif = null;
+			if (idxSeparador > 0) {
+				nif = destinatari.substring(0, idxSeparador);
+			}
+			if (destinatari.length() < idxSeparador + 4) {
+				return nif;
+			}
+			var llinatgeNom = destinatari.substring(idxSeparador + 3, destinatari.length() - 1);
+			var nomLlinatge = llinatgeNom;
+			if (llinatgeNom.contains(", ")) {
+				idxSeparador = llinatgeNom.indexOf(", ");
+				if (idxSeparador != -1) {
+					nomLlinatge = idxSeparador == 0 ? llinatgeNom.substring(2)
+								: llinatgeNom.substring(idxSeparador + 2) + " " + llinatgeNom.substring(0, idxSeparador);
+				}
+			}
+			destinatariFormat = nomLlinatge + (nif != null ? " (" + nif + ")" : "");
 			return destinatariFormat;
 		}
 	}

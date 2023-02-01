@@ -90,8 +90,9 @@ public class CacheHelper {
 
 	@Cacheable(value = "oficinesSIRUnitat", key="#codiDir3Organ")
 	public List<OficinaDto> getOficinesSIRUnitat(Map<String, OrganismeDto> arbreUnitats, String codiDir3Organ) {
+
 		List<OficinaEntity> oficines = new ArrayList<>();
-		String organ = codiDir3Organ;
+		var organ = codiDir3Organ;
 		while (organ != null && !organ.isEmpty()) {
 			oficines.addAll(oficinaRepository.findByOrganGestorCodiAndSirIsTrue(organ));
 			organ = arbreUnitats.get(organ) != null ? arbreUnitats.get(organ).getPare() : null;
@@ -102,7 +103,8 @@ public class CacheHelper {
 
 	@Cacheable(value = "oficinesSIREntitat", key="#codiDir3Entitat")
 	public List<OficinaDto> getOficinesSIREntitat(String codiDir3Entitat) {
-		List<OficinaEntity> oficines = oficinaRepository.findByEntitat_Dir3CodiAndSirIsTrue(codiDir3Entitat);
+
+		var oficines = oficinaRepository.findByEntitat_Dir3CodiAndSirIsTrue(codiDir3Entitat);
 		return conversioTipusHelper.convertirList(oficines, OficinaDto.class);
 //		return pluginHelper.oficinesEntitat(codiDir3Entitat);
 	}
@@ -133,15 +135,14 @@ public class CacheHelper {
 		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
 		for (var organ: organs) {
 //			if (OrganGestorEstatEnum.V.equals(organ.getEstat()) || OrganGestorEstatEnum.T.equals(organ.getEstat())) {    // Unitats Vigents o Transitòries
-
-				if (organsMap.containsKey(organ.getCodiPare())) {
-					List<OrganGestorEntity> fills = organsMap.get(organ.getCodiPare());
-					fills.add(organ);
-				} else {
-					List<OrganGestorEntity> fills = new ArrayList<>();
-					fills.add(organ);
-					organsMap.put(organ.getCodiPare(), fills);
-				}
+			if (organsMap.containsKey(organ.getCodiPare())) {
+				var fills = organsMap.get(organ.getCodiPare());
+				fills.add(organ);
+			} else {
+				List<OrganGestorEntity> fills = new ArrayList<>();
+				fills.add(organ);
+				organsMap.put(organ.getCodiPare(), fills);
+			}
 //			}
 		}
 		return organsMap;
@@ -153,17 +154,16 @@ public class CacheHelper {
 		List<String> codisFills = null;
 		if (fills != null && !fills.isEmpty()) {
 			codisFills = new ArrayList<>();
-			for (OrganGestorEntity fill: fills) {
+			for (var fill: fills) {
 				codisFills.add(fill.getCodi());
 			}
 		}
 		var organisme = OrganismeDto.builder().codi(organ.getCodi()).nom(organ.getNom()).pare(organ.getCodiPare()).fills(codisFills).build();
 		organigrama.put(organ.getCodi(), organisme);
-
 		if (fills == null) {
 			return;
 		}
-		for (OrganGestorEntity fill : fills) {
+		for (var fill : fills) {
 			organToOrganigrama(fill, organsMap, organigrama);
 		}
 	}
@@ -215,7 +215,8 @@ public class CacheHelper {
 	}
 
 	public void clearAllCaches() {
-		for(String cacheName : cacheManager.getCacheNames()) {
+
+		for(var cacheName : cacheManager.getCacheNames()) {
 			clearCache(cacheName);
 		}
 	}

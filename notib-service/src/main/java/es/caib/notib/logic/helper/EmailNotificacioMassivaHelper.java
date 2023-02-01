@@ -19,19 +19,14 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 	@Resource
 	private MessageHelper messageHelper;
 
-	public String sendMail(
-			@NonNull NotificacioMassivaEntity item,
-		   	@NonNull String email,
-		   	@NonNull byte[] fileResumContent,
-		   	@NonNull byte[] fileErrorsContent) throws Exception {
+	public String sendMail(@NonNull NotificacioMassivaEntity item, @NonNull String email, @NonNull byte[] fileResumContent, @NonNull byte[] fileErrorsContent) throws Exception {
+
 		String resposta = null;
 		try {
 			email = email.replaceAll("\\s+","");
-
-			sendEmailNotificacio(email, item, Arrays.asList(new Attachment("resum.csv", fileResumContent),
-					new Attachment("errors.csv", fileErrorsContent)));
+			sendEmailNotificacio(email, item, Arrays.asList(new Attachment("resum.csv", fileResumContent), new Attachment("errors.csv", fileErrorsContent)));
 		} catch (Exception ex) {
-			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
+			var errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
 			log.error(errorDescripció);
 			resposta = errorDescripció;
 		}
@@ -39,7 +34,8 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 	}
 	@Override
 	protected String getMailHtmlBody(NotificacioMassivaEntity item) {
-		String htmlText = "";
+
+		var htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
 				"<html>"+
 				"<head>"+
@@ -137,7 +133,8 @@ public class EmailNotificacioMassivaHelper extends EmailHelper<NotificacioMassiv
 
 	@Override
 	protected String getMailPlainTextBody(NotificacioMassivaEntity item) {
-		String appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
+
+		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		return 	"\t" + messageHelper.getMessage("notificacio.massiva.email.body") +
 				"\t\t\t\t" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer1") + "\n" +
 				"\t\t\t\t" + messageHelper.getMessage("notificacio.massiva.email.body.fitxer2") + "\n" +

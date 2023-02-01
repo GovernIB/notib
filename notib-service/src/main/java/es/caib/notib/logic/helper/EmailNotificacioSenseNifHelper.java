@@ -1,18 +1,14 @@
 package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.AuditService;
 import es.caib.notib.logic.aspect.Audita;
 import es.caib.notib.logic.aspect.UpdateNotificacioTable;
-import es.caib.notib.persist.entity.DocumentEntity;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEnviamentEntity;
-import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.logic.helper.EmailHelper.Attachment;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -69,9 +64,8 @@ public class EmailNotificacioSenseNifHelper {
 	@Audita(entityType = AuditService.TipusEntitat.NOTIFICACIO, operationType = AuditService.TipusOperacio.UPDATE)
 	public NotificacioEntity notificacioEnviarEmail(List<NotificacioEnviamentEntity> enviamentsSenseNif, boolean totsEmail) {
 
-		NotificacioEntity notificacio = notificacioRepository.findById(enviamentsSenseNif.get(0).getNotificacio().getId()).orElseThrow();
+		var notificacio = notificacioRepository.findById(enviamentsSenseNif.get(0).getNotificacio().getId()).orElseThrow();
 		log.info(" [NOT] Inici enviament notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-
 		if (totsEmail) {
 			notificacio.updateNotificaNouEnviament(pluginHelper.getNotificaReintentsPeriodeProperty());
 			notificacio.updateNotificaEnviamentData();
@@ -79,14 +73,14 @@ public class EmailNotificacioSenseNifHelper {
 
 		if (totsEmail && !NotificacioEstatEnumDto.REGISTRADA.equals(notificacio.getEstat()) && !NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 			log.error(" [NOT] la notificació no té l'estat REGISTRADA o ENVIADA_AMB_ERRORS.");
-			throw new ValidationException(notificacio.getId(), NotificacioEntity.class,
-					"La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
+			var msg = "La notificació no te l'estat " + NotificacioEstatEnumDto.REGISTRADA + " o " + NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS;
+			throw new ValidationException(notificacio.getId(), NotificacioEntity.class, msg);
 		}
 
-
-		boolean hasErrors = false;
-		for (NotificacioEnviamentEntity enviament : enviamentsSenseNif) {
-			String error = sendEmailInfoEnviamentSenseNif(enviament);
+		var hasErrors = false;
+		String error;
+		for (var enviament : enviamentsSenseNif) {
+			error = sendEmailInfoEnviamentSenseNif(enviament);
 			notificacioEventHelper.addNotificacioEmailEvent(notificacio, enviament,error != null, error);
 			hasErrors = hasErrors || error != null;
 		}
@@ -100,44 +94,40 @@ public class EmailNotificacioSenseNifHelper {
 		}
 
 		// Estat de la notificació
-		boolean notificacioMixta = notificacio.hasEnviamentsNotifica();
-		boolean totsElsEnviamentsEnviats = !notificacio.hasEnviamentsNoEnviats();
-
+		var notificacioMixta = notificacio.hasEnviamentsNotifica();
+		var totsElsEnviamentsEnviats = !notificacio.hasEnviamentsNoEnviats();
 		if (totsElsEnviamentsEnviats) {
 			if (notificacioMixta) {
 				auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 			} else {
 				auditNotificacioHelper.updateNotificacioEnviadaEmail(notificacio);
 			}
-		} else {
-			if (notificacio.hasEnviamentsEnviats()) {
-				boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
-				// Si tots els enviaments son via email, o tots els enviats a notifica s'han finalitzat --> la marcam com a Finalitzada amb errors
-				if (fiReintents && (!notificacioMixta || notificacio.allEnviamentsNotificaFinalitzats())) {
-					auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
-				} else {
-					auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
-				}
+			return notificacio;
+		}
+		if (notificacio.hasEnviamentsEnviats()) {
+			var fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
+			// Si tots els enviaments son via email, o tots els enviats a notifica s'han finalitzat --> la marcam com a Finalitzada amb errors
+			if (fiReintents && (!notificacioMixta || notificacio.allEnviamentsNotificaFinalitzats())) {
+				auditNotificacioHelper.updateNotificacioFinalitzadaAmbErrors(notificacio);
+			} else {
+				auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
 			}
 		}
-
 		return notificacio;
 	}
 
 	public String sendEmailInfoEnviamentSenseNif(NotificacioEnviamentEntity enviament) {
-		String resposta = null;
+
+		String resposta;
 		try {
-			String email = enviament.getTitular().getEmail();
+			var email = enviament.getTitular().getEmail();
 			if (email == null || email.isEmpty()) {
-				String errorDescripció = "L'interessat no té correu electrònic per a enviar-li la comunicació.";
+				var errorDescripció = "L'interessat no té correu electrònic per a enviar-li la comunicació.";
 				log.error(errorDescripció);
 				return errorDescripció;
 			}
-			if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(enviament.getNotificacio().getEnviamentTipus())) {
-				resposta = sendEmailInfoEnviamentNotificacioSenseNif(enviament);
-			} else {
-				resposta = sendEmailInfoEnviamentComunicacioSenseNif(enviament);
-			}
+			resposta = NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(enviament.getNotificacio().getEnviamentTipus()) ?
+						sendEmailInfoEnviamentNotificacioSenseNif(enviament) : sendEmailInfoEnviamentComunicacioSenseNif(enviament);
 
 		} catch (Exception ex) {
 			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
@@ -149,65 +139,52 @@ public class EmailNotificacioSenseNifHelper {
 
 	public String sendEmailInfoEnviamentComunicacioSenseNif(NotificacioEnviamentEntity enviament) throws Exception {
 
-		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
-		String email = enviament.getTitular().getEmail();
+		var entitat = enviament.getNotificacio().getEntitat();
+		var email = enviament.getTitular().getEmail();
 		log.info("Enviant correu enviament comunicació (Id= {}) a {}", enviament.getId(), email);
 
 		if (configHelper.getEntitatActualCodi() == null) {
 			configHelper.setEntitatCodi(entitat.getCodi());
 		}
-		DocumentEntity document = enviament.getNotificacio().getDocument();
-		ArxiuDto arxiu = documentHelper.documentToArxiuDto(document.getArxiuNom(), document);
+		var document = enviament.getNotificacio().getDocument();
+		var arxiu = documentHelper.documentToArxiuDto(document.getArxiuNom(), document);
 		configHelper.setEntitatCodi(null);
 		List<Attachment> attachments = new ArrayList<>(Arrays.asList(new Attachment(arxiu.getNom(), arxiu.getContingut())));
-		String htmlBody = getComunicacioMailHtmlBody(enviament);
-		String textBody = getComunicacioMailPlainTextBody(enviament);
-		String subject = "Nova comunicació / Nueva comunicación";
+		var htmlBody = getComunicacioMailHtmlBody(enviament);
+		var textBody = getComunicacioMailPlainTextBody(enviament);
+		var subject = "Nova comunicació / Nueva comunicación";
 		sendEmail(email, subject, htmlBody, textBody, entitat.getNom(), attachments, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
 		return null;
 	}
 
 	public String sendEmailInfoEnviamentNotificacioSenseNif(NotificacioEnviamentEntity enviament) throws Exception {
-		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
-		String email = enviament.getTitular().getEmail();
-		log.info("Enviant correu enviament notificació (Id= {}) a {}", enviament.getId(), email);
-		String htmlBody = getNotificacioMailHtmlBody(enviament);
-		String textBody = getNotificacioMailPlainTextBody(enviament);
-		sendEmail(
-				enviament.getTitular().getEmail(),
-				"Avís de nova notificació / Aviso de nueva notificación",
-				htmlBody,
-				textBody,
-				entitat.getNom(),
-				null,
-				entitat.getLogoCapBytes(),
-				entitat.getLogoPeuBytes());
 
+		var entitat = enviament.getNotificacio().getEntitat();
+		var email = enviament.getTitular().getEmail();
+		log.info("Enviant correu enviament notificació (Id= {}) a {}", enviament.getId(), email);
+		var htmlBody = getNotificacioMailHtmlBody(enviament);
+		var textBody = getNotificacioMailPlainTextBody(enviament);
+		var subject = "Avís de nova notificació / Aviso de nueva notificación";
+		sendEmail(enviament.getTitular().getEmail(), subject, htmlBody, textBody, entitat.getNom(), null, entitat.getLogoCapBytes(), entitat.getLogoPeuBytes());
 		return null;
 	}
 
-	private void sendEmail(
-			String emailDestinatari,
-			String subject,
-			String htmlBody,
-			String textBody,
-			String entitatNom,
-			List<Attachment> attatchments,
-			byte[] logoEntitat,
-			byte[] logoPeu) throws MessagingException, IOException {
-		MimeMessage missatge = mailSender.createMimeMessage();
+	private void sendEmail(String emailDestinatari, String subject, String htmlBody, String textBody, String entitatNom, List<Attachment> attatchments,
+						   byte[] logoEntitat, byte[] logoPeu) throws MessagingException, IOException {
+
+		var missatge = mailSender.createMimeMessage();
 //		MimeMessage missatge = mailSender.createMimeMessage();
 		missatge.setHeader("Content-Type", "text/html charset=UTF-8");
-		MimeMessageHelper helper = new MimeMessageHelper(missatge, true, StandardCharsets.UTF_8.name());
+		var helper = new MimeMessageHelper(missatge, true, StandardCharsets.UTF_8.name());
 		helper.setTo(emailDestinatari);
 		helper.setFrom(getRemitent());
 		helper.setSubject(configHelper.getPrefix() + " " + subject);
 		// Contingut del missatge
-		boolean teLogoPeu = (logoPeu != null && logoPeu.length > 0) || getPeuLogo() != null;
+		var teLogoPeu = (logoPeu != null && logoPeu.length > 0) || getPeuLogo() != null;
 		helper.setText(textBody, getHeader() + htmlBody + getFooter(entitatNom, teLogoPeu));
 		// Documents adjunts
 		if (attatchments != null) {
-			for (Attachment attachment: attatchments) {
+			for (var attachment: attatchments) {
 				helper.addAttachment(attachment.filename, new ByteArrayResource(attachment.content));
 			}
 		}
@@ -217,7 +194,7 @@ public class EmailNotificacioSenseNifHelper {
 		if (logoEntitat != null && logoEntitat.length > 0) {
 			helper.addInline("logo-entitat", new ByteArrayResource(logoEntitat), getImageByteArrayMimeType(logoEntitat));
 		} else {
-			String pathLogoEntitat = getCapsaleraLogoEntitat();
+			var pathLogoEntitat = getCapsaleraLogoEntitat();
 			if (pathLogoEntitat == null) {
 				logoEntitat = IOUtils.toByteArray(getCapsaleraDefaultLogoEntitat());
 				helper.addInline("logo-entitat", new ByteArrayResource(logoEntitat), getImageByteArrayMimeType(logoEntitat));
@@ -226,25 +203,25 @@ public class EmailNotificacioSenseNifHelper {
 			}
 		}
 		// Logo Notib
-		byte[] logoNotib = IOUtils.toByteArray(getCapsaleraLogoNotib());
+		var logoNotib = IOUtils.toByteArray(getCapsaleraLogoNotib());
 		helper.addInline("logo-notib", new ByteArrayResource(logoNotib), getImageByteArrayMimeType(logoNotib));
 		// Logo peu
 		if (logoPeu != null && logoPeu.length > 0) {
 			helper.addInline("logo-peu", new ByteArrayResource(logoPeu), getImageByteArrayMimeType(logoPeu));
 		} else {
-			String peuLogo = getPeuLogo();
+			var peuLogo = getPeuLogo();
 			if (peuLogo != null) {
 				helper.addInline("logo-peu", new File(getPeuLogo()));
 			}
 		}
-
 //		if ("test@limit.es".equals(emailDestinatari))
 		mailSender.send(missatge);
 	}
 
 	private String getImageByteArrayMimeType(byte[] bytes) throws IOException {
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-		String mimeType = URLConnection.guessContentTypeFromStream(byteArrayInputStream);
+
+		var byteArrayInputStream = new ByteArrayInputStream(bytes);
+		var mimeType = URLConnection.guessContentTypeFromStream(byteArrayInputStream);
 		if (mimeType == null) {
 			mimeType = "image/x-png";
 		}
@@ -254,10 +231,10 @@ public class EmailNotificacioSenseNifHelper {
 
 	private String getNotificacioMailHtmlBody(NotificacioEnviamentEntity enviament) {
 
-		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
-		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		Idioma idioma = enviament.getNotificacio().getIdioma();
-		String htmlText = "<div class=\"content\">" +
+		var entitat = enviament.getNotificacio().getEntitat();
+		var organ = enviament.getNotificacio().getOrganGestor();
+		var idioma = enviament.getNotificacio().getIdioma();
+		var htmlText = "<div class=\"content\">" +
 				"<br/>" +
 				(Idioma.ES.equals(idioma) ?
 					"<h2>Aviso de nueva notificación</h2>" +
@@ -275,10 +252,10 @@ public class EmailNotificacioSenseNifHelper {
 	}
 	private String getNotificacioMailPlainTextBody(NotificacioEnviamentEntity enviament) {
 
-		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
-		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		Idioma idioma = enviament.getNotificacio().getIdioma();
-		String textBody = (Idioma.ES.equals(idioma) ?
+		var entitat = enviament.getNotificacio().getEntitat();
+		var organ = enviament.getNotificacio().getOrganGestor();
+		var idioma = enviament.getNotificacio().getIdioma();
+		var textBody = (Idioma.ES.equals(idioma) ?
 				"AVISO DE PRÓXIMA NOTIFICACIÓN\n" +
 				"\n" +
 				"Le informamos que en breve recibirá una nueva notificación como INTERESADO, procedente del organismo '" + organ.getNom() + " (" + entitat.getNom() + ")' con los siguientes datos: \n" +
@@ -304,10 +281,10 @@ public class EmailNotificacioSenseNifHelper {
 
 	private String getComunicacioMailHtmlBody(NotificacioEnviamentEntity enviament) {
 
-		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
-		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		Idioma idioma = enviament.getNotificacio().getIdioma();
-		String htmlText = "<div class=\"content\">" +
+		var entitat = enviament.getNotificacio().getEntitat();
+		var organ = enviament.getNotificacio().getOrganGestor();
+		var idioma = enviament.getNotificacio().getIdioma();
+		var htmlText = "<div class=\"content\">" +
 				"<br/>" +
 				(Idioma.ES.equals(idioma) ?
 					"<h2>Aviso de nueva comunicación</h2>" +
@@ -326,10 +303,10 @@ public class EmailNotificacioSenseNifHelper {
 
 	private String getComunicacioMailPlainTextBody(NotificacioEnviamentEntity enviament) {
 
-		EntitatEntity entitat = enviament.getNotificacio().getEntitat();
-		OrganGestorEntity organ = enviament.getNotificacio().getOrganGestor();
-		Idioma idioma = enviament.getNotificacio().getIdioma();
-		String textBody = (Idioma.ES.equals(idioma) ?
+		var entitat = enviament.getNotificacio().getEntitat();
+		var organ = enviament.getNotificacio().getOrganGestor();
+		var idioma = enviament.getNotificacio().getIdioma();
+		var textBody = (Idioma.ES.equals(idioma) ?
 				"NOVA COMUNICACIÓ\n" +
 				"\n" +
 				"Ens posam en contacte amb vosté per fer-li arribar una nova comunicació com a INTERESSAT, procedent de l'organisme '" + organ.getNom() + " (" + entitat.getNom() + ")' amb les següents dades: \n" +
@@ -354,7 +331,8 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private String getHeader() {
-		String header = "<!DOCTYPE html>"+
+
+		var header = "<!DOCTYPE html>"+
 				"<html>"+
 				"<head>" +
 				"<meta charset='UTF-8'>"+
@@ -428,22 +406,20 @@ public class EmailNotificacioSenseNifHelper {
 	}
 
 	private String getFooter(String entitatNon, boolean tePeuLogo) {
-		String footer = "<div class=\"footer\">" +
-				"	<div class=\"left-footer\">Notib - " + entitatNon + "</div>";
+
+		var footer = "<div class=\"footer\"><div class=\"left-footer\">Notib - " + entitatNon + "</div>";
 		if (tePeuLogo) {
 			footer += "	<div class=\"right-footer\"><img src=\"cid:logo-peu\" height=\"60\"></div>";
 		}
-		footer += "</div>" +
-				"</body>"+
-				"</html>";
+		footer += "</div></body></html>";
 		return footer;
 	}
 
 	private String getInformacioEnviamentPlainText(NotificacioEnviamentEntity enviament, boolean catala) {
 
-		String desc = enviament.getNotificacio().getDescripcio();
+		var desc = enviament.getNotificacio().getDescripcio();
 		desc = desc != null ? desc : catala ? "Sense informació adicional" : "Sin información adicional";
-		String procedimentNom = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getNom() : "";
+		var procedimentNom = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getNom() : "";
 		return catala ?  "\t- Destinatari: " + enviament.getTitular().getNomSencer() + "\n" +
 				"\t- Identificador: " + enviament.getNotificaReferencia() + "\n" +
 				"\t- Procediment: " + procedimentNom + "\n" +
@@ -459,9 +435,9 @@ public class EmailNotificacioSenseNifHelper {
 
 	private String getInformacioEnviamentHtml(NotificacioEnviamentEntity enviament, boolean catala) {
 
-		String desc = enviament.getNotificacio().getDescripcio();
+		var desc = enviament.getNotificacio().getDescripcio();
 		desc = desc != null ? desc : catala ? "Sense informació adicional" : "Sin información adicional";
-		String procedimentNom = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getNom() : "";
+		var procedimentNom = enviament.getNotificacio().getProcediment() != null ? enviament.getNotificacio().getProcediment().getNom() : "";
 		return  catala ?
 			"<ul>" +
 				"<li><span class='info-titol'>Destinatari:</span><span class='info-desc'>" + enviament.getTitular().getNomSencer() + "</span></li>" +

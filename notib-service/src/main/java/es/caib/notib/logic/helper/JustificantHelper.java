@@ -48,67 +48,59 @@ public abstract class JustificantHelper<T> {
     }
 
     protected void setParametersBold(Paragraph paragraph, String content) {
-        Chunk cacacter = new Chunk();
-        for (int i = 0; i < content.length(); i++) {
+
+        var cacacter = new Chunk();
+        for (var i = 0; i < content.length(); i++) {
             if (content.charAt(i) == '[') {
                 while (content.charAt(i + 1) != ']') {
                     cacacter = new Chunk(String.valueOf(content.charAt(i + 1)), calibri10Bold);
                     paragraph.add(cacacter);
                     i++;
-                    continue;
                 }
-            } else {
-                if (content.charAt(i) != '[' && content.charAt(i) != ']') {
-                    cacacter = new Chunk(String.valueOf(content.charAt(i)), calibri10);
-                    paragraph.add(cacacter);
-                }
+                continue;
+            }
+            if (content.charAt(i) != '[' && content.charAt(i) != ']') {
+                cacacter = new Chunk(String.valueOf(content.charAt(i)), calibri10);
+                paragraph.add(cacacter);
             }
         }
     }
 
     protected String getDateTimeFormatted(Date date)  {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        long now = date.getTime();
+
+        var formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        var now = date.getTime();
         return formatter.format(now);
     }
 
-    protected Document inicialitzaDocument(
-            ByteArrayOutputStream out,
-            ProgresDescarregaDto progres) throws DocumentException, JustificantException {
+    protected Document inicialitzaDocument(ByteArrayOutputStream out, ProgresDescarregaDto progres) throws DocumentException, JustificantException {
+
         log.debug("Inicialitzant el document per la generació del justificant d'enviament");
 //		## [Event per crear el header]
-        HeaderPageEvent headerEvent = new HeaderPageEvent(progres);
+        var headerEvent = new HeaderPageEvent(progres);
 //		## [Event per crear el footer]
-        FooterPageEvent footerEvent = new FooterPageEvent(progres);
-
-        Document justificant = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
-        PdfWriter writer = PdfWriter.getInstance(justificant, out);
+        var footerEvent = new FooterPageEvent(progres);
+        var justificant = new Document(PageSize.A4, 36, 36, 35 + headerEvent.getTableHeight(), 36);
+        var writer = PdfWriter.getInstance(justificant, out);
 //		writer.setViewerPreferences(PdfWriter.ALLOW_PRINTING);
-
         writer.setPageEvent(headerEvent);
         writer.setPageEvent(footerEvent);
-
         justificant.open();
         justificant.addAuthor("Notib");
         justificant.addCreationDate();
         justificant.addCreator("iText library");
-
         return justificant;
     }
     protected class FooterPageEvent extends PdfPageEventHelper {
         private PdfPTable footer;
 
         public void onEndPage(PdfWriter writer, Document justificant) {
-            footer.writeSelectedRows(
-                    0,
-                    -1,
-                    36,
-                    80,
-                    writer.getDirectContent());
+            footer.writeSelectedRows(0, -1, 36, 80, writer.getDirectContent());
         }
 
         protected FooterPageEvent(ProgresDescarregaDto progres) throws JustificantException {
-            String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer");
+
+            var accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer");
             log.debug(accioDescripcio);
             progres.setProgres(25);
             progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, accioDescripcio);
@@ -116,38 +108,35 @@ public abstract class JustificantHelper<T> {
                 footer = new PdfPTable(2);
                 footer.setTotalWidth(523);
                 footer.setLockedWidth(true);
-
-                PdfPCell cellTitolPeu = new PdfPCell();
+                var cellTitolPeu = new PdfPCell();
                 if (getPeuTitol() != null) {
 //					## [PEU - TÍTOL]
-                    Paragraph peuTitol = new Paragraph(getPeuTitol(), frutiger9);
+                    var peuTitol = new Paragraph(getPeuTitol(), frutiger9);
                     peuTitol.setAlignment(Element.ALIGN_LEFT);
-
-
                     cellTitolPeu.addElement(peuTitol);
                     cellTitolPeu.setVerticalAlignment(Element.ALIGN_MIDDLE);
                     cellTitolPeu.setBorder(Rectangle.NO_BORDER);
                 }
                 footer.addCell(cellTitolPeu);
 
-                PdfPCell cellDireccio = new PdfPCell();
+                var cellDireccio = new PdfPCell();
                 if (getNifDireccio() != null) {
 //					## [DIRECCIO - NIF]
-                    Paragraph direccioNif = new Paragraph(getNifDireccio(), frutiger8);
+                    var direccioNif = new Paragraph(getNifDireccio(), frutiger8);
                     direccioNif.setAlignment(Element.ALIGN_RIGHT);
                     direccioNif.setLeading(0, (float) 1.25);
                     cellDireccio.addElement(direccioNif);
                 }
                 if (getCodiDireccio() != null) {
 //					## [DIRECCIO - CODIDIR3]
-                    Paragraph direccioCodi = new Paragraph(getCodiDireccio(), frutiger8);
+                    var direccioCodi = new Paragraph(getCodiDireccio(), frutiger8);
                     direccioCodi.setAlignment(Element.ALIGN_RIGHT);
                     direccioCodi.setLeading(0, (float) 1.25);
                     cellDireccio.addElement(direccioCodi);
                 }
                 if (getDireccio() != null) {
 //					## [DIRECCIO - CARRER]
-                    Paragraph direccio = new Paragraph(getDireccio(), frutiger8);
+                    var direccio = new Paragraph(getDireccio(), frutiger8);
                     direccio.setAlignment(Element.ALIGN_RIGHT);
                     direccio.setLeading(0, (float) 1.25);
                     cellDireccio.addElement(direccio);
@@ -156,18 +145,17 @@ public abstract class JustificantHelper<T> {
 //					## [DIRECCIO - EMAIL]
                     Chunk direccioEmailChunk = new Chunk(getEmailDireccio(), frutiger8);
                     direccioEmailChunk.setUnderline(1.5f, -1);
-                    Paragraph direccioEmail = new Paragraph(direccioEmailChunk);
+                    var direccioEmail = new Paragraph(direccioEmailChunk);
                     direccioEmail.setAlignment(Element.ALIGN_RIGHT);
                     direccioEmail.setLeading(0, (float) 1.25);
                     cellDireccio.addElement(direccioEmail);
                 }
-
                 cellDireccio.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 cellDireccio.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 cellDireccio.setBorder(Rectangle.NO_BORDER);
                 footer.addCell(cellDireccio);
             } catch (Exception ex) {
-                String errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer.error");
+                var errorMessage = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.footer.error");
                 progres.setProgres(100);
                 progres.addInfo(ProgresDescarregaDto.TipusInfo.ERROR, errorMessage);
                 log.error(errorMessage, ex);
@@ -204,16 +192,14 @@ public abstract class JustificantHelper<T> {
         }
 
         public void onEndPage(PdfWriter writer, Document justificant) {
-            header.writeSelectedRows(
-                    0,
-                    -1,
-                    justificant.left(),
-                    750 + ((justificant.topMargin() + tableHeight) / 2),
-                    writer.getDirectContent());
+
+            var yPos = 750 + ((justificant.topMargin() + tableHeight) / 2);
+            header.writeSelectedRows(0, -1, justificant.left(), yPos, writer.getDirectContent());
         }
 
         protected HeaderPageEvent(ProgresDescarregaDto progres) throws JustificantException {
-            String accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header");
+
+            var accioDescripcio = messageHelper.getMessage("es.caib.notib.justificant.proces.iniciant.header");
             log.debug(accioDescripcio);
             progres.setProgres(15);
             progres.addInfo(ProgresDescarregaDto.TipusInfo.INFO, accioDescripcio);
@@ -232,7 +218,7 @@ public abstract class JustificantHelper<T> {
                 }
                 if (logoCapsalera != null) {
                     logoCapsalera.scaleToFit(120f, 50f);
-                    PdfPCell cellLogo = new PdfPCell(logoCapsalera);
+                    var cellLogo = new PdfPCell(logoCapsalera);
                     cellLogo.setHorizontalAlignment(Element.ALIGN_LEFT);
                     cellLogo.setBorder(Rectangle.NO_BORDER);
                     header.addCell(cellLogo);
@@ -250,7 +236,7 @@ public abstract class JustificantHelper<T> {
 //				## [PEU - LOGO]
                 logoPeu.setScaleToFitHeight(true);
                 logoPeu.scaleToFit(100, 80);
-                PdfPCell cellLogo = new PdfPCell(logoPeu);
+                var cellLogo = new PdfPCell(logoPeu);
                 cellLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 cellLogo.setBorder(Rectangle.NO_BORDER);
                 header.addCell(cellLogo);
@@ -280,8 +266,6 @@ public abstract class JustificantHelper<T> {
     }
 
     private String getNotBlankProperty(String property) {
-        if (property == null || property.trim().isEmpty())
-            return null;
-        return property.trim();
+        return property != null && !property.trim().isEmpty() ? property.trim() : null;
     }
 }

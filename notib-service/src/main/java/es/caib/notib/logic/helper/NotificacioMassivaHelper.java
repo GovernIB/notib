@@ -1,13 +1,10 @@
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.repository.NotificacioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * Helper per a notificacions massives
@@ -24,8 +21,8 @@ public class NotificacioMassivaHelper {
 	@Transactional
 	public void posposarNotificacions(Long notificacioMassivaId) {
 
-		List<NotificacioEntity> notificacions = notificacioRepository.findByNotificacioMassivaEntityId(notificacioMassivaId);
-		for (NotificacioEntity notificacio: notificacions) {
+		var notificacions = notificacioRepository.findByNotificacioMassivaEntityId(notificacioMassivaId);
+		for (var notificacio: notificacions) {
 			// postposam el temps 8 hores
 			notificacio.decreaseRegistreEnviamentPrioritat(8*60*60);
 		}
@@ -39,8 +36,8 @@ public class NotificacioMassivaHelper {
 	@Transactional
 	public void reactivarNotificacions(Long notificacioMassivaId) {
 
-		List<NotificacioEntity> notificacions = notificacioRepository.findByNotificacioMassivaEntityId(notificacioMassivaId);
-		for (NotificacioEntity notificacio: notificacions) {
+		var notificacions = notificacioRepository.findByNotificacioMassivaEntityId(notificacioMassivaId);
+		for (var notificacio: notificacions) {
 			notificacio.restablirPrioritat();
 		}
 	}

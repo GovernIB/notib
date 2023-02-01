@@ -20,14 +20,15 @@ public class PersonaHelper {
 
     public PersonaEntity create(Persona persona, boolean incapacitat) {
 
-        PersonaEntity p = PersonaEntity.getBuilderV2(persona.getInteressatTipus(), persona.getEmail(), persona.getLlinatge1(), persona.getLlinatge2(), persona.getNif(),
+        var p = PersonaEntity.getBuilderV2(persona.getInteressatTipus(), persona.getEmail(), persona.getLlinatge1(), persona.getLlinatge2(), persona.getNif(),
                             persona.getNom(), persona.getTelefon(), persona.getRaoSocial(), persona.getDir3Codi()).incapacitat(incapacitat).build();
         p.setDocumentTipus(persona.getDocumentTipus());
         return personaRepository.saveAndFlush(p);
     }
 
     public PersonaEntity update(Persona persona, boolean incapacitat) {
-        PersonaEntity personaEntity = personaRepository.findById(persona.getId()).orElseThrow();
+
+        var personaEntity = personaRepository.findById(persona.getId()).orElseThrow();
         personaEntity.update(persona.getInteressatTipus(), persona.getEmail(), persona.getLlinatge1(), persona.getLlinatge2(), persona.getNif(), persona.getNom(),
                 persona.getTelefon(), persona.getRaoSocial(), persona.getDir3Codi(), incapacitat);
         return personaEntity;

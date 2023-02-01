@@ -27,24 +27,24 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 	public String prepararEnvioEmailNotificacio(NotificacioEntity notificacio) throws Exception {
 
 		try {
-			List<UsuariDto> destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
+			var destinataris = obtenirCodiDestinatarisPerProcediment(notificacio);
 			if (destinataris == null || destinataris.isEmpty()) {
 				log.info(String.format("La notificació (Id= %d) no té candidats per a enviar el correu electrònic", notificacio.getId()));
 				return null;
 			}
-			for (UsuariDto usuariDto : destinataris) {
+			for (var usuariDto : destinataris) {
 				if (usuariDto.getEmail() == null || usuariDto.getEmail().isEmpty()) {
 					log.error("usuari sense email. Codi: " + usuariDto.getCodi());
 					continue;
 				}
-				String email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
+				var email = !Strings.isNullOrEmpty(usuariDto.getEmailAlt()) ? usuariDto.getEmailAlt() : usuariDto.getEmail();
 				email = email.replaceAll("\\s+","");
 				log.info(String.format("Enviant correu notificació (Id= %d) a %s", notificacio.getId(), email));
 				sendEmailNotificacio(email, notificacio);
 			}
 			return null;
 		} catch (Exception ex) {
-			String errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
+			var errorDescripció = "No s'ha pogut avisar per correu electrònic: " + ex;
 			log.error(errorDescripció);
 			return errorDescripció;
 		}
@@ -55,17 +55,18 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		List<UsuariDto> destinataris = new ArrayList<>();
 //		ProcSerEntity proc = notificacio.getProcediment();
 
-		Set<String> usuaris = procSerHelper.findUsuaris(notificacio);
-		for (String usuari: usuaris) {
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
+		var usuaris = procSerHelper.findUsuaris(notificacio);
+		DadesUsuari dadesUsuari;
+		for (var usuari: usuaris) {
+			dadesUsuari = cacheHelper.findUsuariAmbCodi(usuari);
 			if (dadesUsuari == null || Strings.isNullOrEmpty(dadesUsuari.getEmail())) {
 				continue;
 			}
-			UsuariEntity user = usuariRepository.findById(usuari).orElse(null);
+			var user = usuariRepository.findById(usuari).orElse(null);
 			if (user == null || (user.isRebreEmailsNotificacio() && (!user.isRebreEmailsNotificacioCreats()
 				|| user.isRebreEmailsNotificacioCreats() && usuari.equals(notificacio.getCreatedBy().get().getCodi())))) {
 
-				UsuariDto u = new UsuariDto();
+				var u = new UsuariDto();
 				u.setCodi(usuari);
 				u.setEmail((user != null && !Strings.isNullOrEmpty(user.getEmailAlt())) ? user.getEmailAlt() : dadesUsuari.getEmail());
 				destinataris.add(u);
@@ -76,8 +77,9 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 
 	@Override
 	protected String getMailHtmlBody(NotificacioEntity notificacio) {
-		String appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
-		String htmlText = "";
+
+		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
+		var htmlText = "";
 		htmlText += "<!DOCTYPE html>"+
 				"<html>"+
 				"<head>"+
@@ -202,7 +204,8 @@ public class EmailNotificacioHelper extends EmailHelper<NotificacioEntity> {
 		return htmlText;
 	}
 	protected String getMailPlainTextBody(NotificacioEntity notificacio) {
-		String appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
+
+		var appBaseUrl = configHelper.getConfig("es.caib.notib.app.base.url");
 		return
 				messageHelper.getMessage("notificacio.email.notificacio")+
 						"\t\t\t\t"+ Objects.toString(notificacio.getId(), "")+"\n"+

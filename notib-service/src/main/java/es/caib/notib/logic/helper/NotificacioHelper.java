@@ -3,7 +3,6 @@ package es.caib.notib.logic.helper;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.DocumentDto;
@@ -93,33 +92,29 @@ public class NotificacioHelper {
 
 		log.info("Intentant registrar la notificació pendent (notificacioId=" + notificacioId + ")");
 		List<RegistreIdDto> registresIdDto = new ArrayList<>();
-		NotificacioEntity notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
+		var notificacio = notificacioRepository.findById(notificacioId).orElseThrow();
 		log.info(" [REG] Inici registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
-		long startTime = System.nanoTime();
+		var startTime = System.nanoTime();
 		double elapsedTime;
 		synchronized(SemaforNotificacio.agafar(notificacioId)) {
 			log.info("Comprovant estat actual notificació (id: " + notificacio.getId() + ")...");
-			NotificacioEstatEnumDto estatActual = notificacio.getEstat();
+			var estatActual = notificacio.getEstat();
 			log.info("Estat notificació [Id:" + notificacio.getId() + ", Estat: "+ estatActual + "]");
 
 			if (estatActual.equals(NotificacioEstatEnumDto.PENDENT)) {
 				// Registrar la notificació
-				long startTime2 = System.nanoTime();
-				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
+				var startTime2 = System.nanoTime();
+				var notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacio);
 				elapsedTime = (System.nanoTime() - startTime2) / 10e6;
 				log.info(" [TIMER-REG] Realitzar procés registrar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 				for (NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
-					registresIdDto.add(RegistreIdDto.builder()
-//							.numero(enviament.getRegistreNumero)
-							.data(enviament.getRegistreData())
-							.numeroRegistreFormat(enviament.getRegistreNumeroFormatat())
-							.build());
+					registresIdDto.add(RegistreIdDto.builder().data(enviament.getRegistreData()).numeroRegistreFormat(enviament.getRegistreNumeroFormatat()).build());
 				}
 
 				if (notificar){
 					// Enviar la notificació
 					startTime2 = System.nanoTime();
-					List<NotificacioEnviamentEntity> enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
+					var enviamentsSenseNifNoEnviats = notificacio.getEnviamentsPerEmailNoEnviats();
 					// 3 possibles casuístiques
 					// 1. Tots els enviaments a Notifica
 					if (enviamentsSenseNifNoEnviats.isEmpty()) {
@@ -135,7 +130,6 @@ public class NotificacioHelper {
 						// Fa falta enviar els restants per email
 						emailNotificacioSenseNifHelper.notificacioEnviarEmail(enviamentsSenseNifNoEnviats, false);
 					}
-
 					elapsedTime = (System.nanoTime() - startTime2) / 10e6;
 					log.info(" [TIMER-REG] Notificació enviar [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 				}
@@ -152,14 +146,14 @@ public class NotificacioHelper {
 
 		log.trace("Alta Notificació web - Preparam enviaments");
 		List<Enviament> enviaments = new ArrayList<>();
-		for(NotEnviamentDatabaseDto enviament: enviamentsDto) {
+		for(var enviament: enviamentsDto) {
 			if (enviament.getEntregaPostal() != null && (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty())) {
 				enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
 			}
 			enviaments.add(conversioTipusHelper.convertir(enviament, Enviament.class));
 		}
 		List<NotificacioEnviamentEntity> enviamentsCreats = new ArrayList<NotificacioEnviamentEntity>();
-		for (Enviament enviament: enviaments) {
+		for (var enviament: enviaments) {
 			log.trace("Alta Notificació web - Alta enviament id={}", enviament.getId());
 			if (enviament.getTitular() != null) {
 				ServeiTipusEnumDto serveiTipus = null;
@@ -173,10 +167,10 @@ public class NotificacioHelper {
 							break;
 					}
 				}
-				PersonaEntity titular = personaHelper.create(enviament.getTitular(),enviament.getTitular().isIncapacitat());
+				var titular = personaHelper.create(enviament.getTitular(),enviament.getTitular().isIncapacitat());
 				List<PersonaEntity> destinataris = new ArrayList<PersonaEntity>();
 				if (enviament.getDestinataris() != null) {
-					for(Persona persona: enviament.getDestinataris()) {
+					for(var persona: enviament.getDestinataris()) {
 						if ((persona.getNif() != null && !persona.getNif().isEmpty()) ||
 								(persona.getDir3Codi() != null && !persona.getDir3Codi().isEmpty())) {
 							PersonaEntity destinatari = personaHelper.create(persona, false);
@@ -192,7 +186,7 @@ public class NotificacioHelper {
 		// Comprovar on s'ha d'enviar ara
 		if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 			synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
-				boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
+				var notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
 				if (notificar) {
 					notificaHelper.notificacioEnviar(notificacioEntity.getId());
 				}
@@ -205,7 +199,7 @@ public class NotificacioHelper {
 	public NotificacioEntity saveNotificacio(EntitatEntity entitat, NotificacioDatabaseDto notificacio, boolean checkProcedimentPermissions,
 											 NotificacioMassivaEntity notificacioMassivaEntity, Map<String, Long> documentsProcessatsMassiu) {
 
-		NotificacioHelper.NotificacioData notData = buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, notificacioMassivaEntity, documentsProcessatsMassiu);
+		var notData = buildNotificacioData(entitat, notificacio, checkProcedimentPermissions, notificacioMassivaEntity, documentsProcessatsMassiu);
 		// Dades generals de la notificació
 		return saveNotificacio(notData);
 	}
@@ -297,11 +291,11 @@ public class NotificacioHelper {
 			grupNotificacio = grupRepository.findById(notificacio.getGrup().getId()).orElse(null);
 		}
 		log.trace("Processam documents");
-		DocumentEntity documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
-		DocumentEntity document2Entity = getDocumentEntity(notificacio.getDocument2(), null);
-		DocumentEntity document3Entity = getDocumentEntity(notificacio.getDocument3(), null);
-		DocumentEntity document4Entity = getDocumentEntity(notificacio.getDocument4(), null);
-		DocumentEntity document5Entity = getDocumentEntity(notificacio.getDocument5(), null);
+		var documentEntity = getDocumentEntity(notificacio.getDocument(), documentsProcessatsMassiu);
+		var document2Entity = getDocumentEntity(notificacio.getDocument2(), null);
+		var document3Entity = getDocumentEntity(notificacio.getDocument3(), null);
+		var document4Entity = getDocumentEntity(notificacio.getDocument4(), null);
+		var document5Entity = getDocumentEntity(notificacio.getDocument5(), null);
 		if (documentEntity == null) {
 			throw new NoDocumentException(messageHelper.getMessage("error.alta.remesa.sense.document"));
 		}
@@ -312,7 +306,7 @@ public class NotificacioHelper {
 
 	private boolean isAllEnviamentsAAdministracio(NotificacioDatabaseDto notificacio) {
 
-		for(NotEnviamentDatabaseDto enviament : notificacio.getEnviaments()) {
+		for(var enviament : notificacio.getEnviaments()) {
 			if(!enviament.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)) {
 				return false;
 			}
@@ -342,8 +336,8 @@ public class NotificacioHelper {
 					( documentsProcessatsMassiu.containsKey(document.getUuid()) && // alta massiu web
 					documentsProcessatsMassiu.get(document.getUuid()) == null) ) {
 
-				DocumentDto doc = new DocumentDto();
-				String arxiuUuid = document.getUuid();
+				var doc = new DocumentDto();
+				var arxiuUuid = document.getUuid();
 				if (pluginHelper.isArxiuPluginDisponible()) {
 					Document documentArxiu = null;
 					try {
@@ -359,7 +353,7 @@ public class NotificacioHelper {
 					doc.setMida(documentArxiu.getContingut().getTamany());
 					//Metadades
 					if (recuperarMetadadesArxiu(documentArxiu, document)) {
-						DocumentMetadades metadades = documentArxiu.getMetadades();
+						var metadades = documentArxiu.getMetadades();
 						doc.setOrigen(OrigenEnum.valorAsEnum(metadades.getOrigen().ordinal()));
 						doc.setValidesa(ValidesaEnum.valorAsEnum(pluginHelper.estatElaboracioToValidesa(metadades.getEstatElaboracio())));
 						if (metadades.getTipusDocumental() != null) {
@@ -380,7 +374,7 @@ public class NotificacioHelper {
 					}
 					document = doc;
 					// Recuperar csv
-					Map<String, Object> metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
+					var metadadesAddicionals = documentArxiu.getMetadades().getMetadadesAddicionals();
 					if (metadadesAddicionals != null) {
 						if (metadadesAddicionals.containsKey("csv")) {
 							document.setCsv((String) metadadesAddicionals.get("csv"));
@@ -400,8 +394,9 @@ public class NotificacioHelper {
 					!documentsProcessatsMassiu.containsKey(document.getCsv()) ||
 					( documentsProcessatsMassiu.containsKey(document.getCsv()) && // alta massiu web
 					documentsProcessatsMassiu.get(document.getCsv()) == null) ) {
-				DocumentDto doc = new DocumentDto();
-				String arxiuCsv = document.getCsv();
+
+				var doc = new DocumentDto();
+				var arxiuCsv = document.getCsv();
 				if (pluginHelper.isArxiuPluginDisponible()) {
 					Document documentArxiu = null;
 					try {
@@ -475,10 +470,11 @@ public class NotificacioHelper {
 	}
 	
 	private Boolean recuperarMetadadesArxiu (Document documentArxiu, DocumentDto document){
+
 		if (documentArxiu == null) {
 			throw new NoDocumentException("No s'ha pogut obtenir el document de l'arxiu.");
 		}
-		DocumentMetadades metadades = documentArxiu.getMetadades();
+		var metadades = documentArxiu.getMetadades();
 		if (metadades == null || metadades.getOrigen() == null || metadades.getEstatElaboracio() == null
 				|| (metadades.getTipusDocumental() == null  && metadades.getTipusDocumentalAddicional() == null) || documentArxiu.getContingut().getArxiuNom() == null) {
 
@@ -491,7 +487,6 @@ public class NotificacioHelper {
 	}
 
 	public NotificacioEventEntity getNotificaErrorEvent(NotificacioEntity notificacio) {
-
 		return !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIADA) ? notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId()) : null;
 	}
 

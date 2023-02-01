@@ -17,14 +17,12 @@ import javax.management.MalformedObjectNameException;
 import javax.naming.NamingException;
 import javax.xml.namespace.QName;
 
-import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
@@ -43,15 +41,15 @@ public class WsClientHelper<T> {
 							boolean disableCxfChunking, Class<T> clazz, Handler<?>... handlers)
 							throws MalformedURLException, InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 
-		URL url = wsdlResourceUrl;
+		var url = wsdlResourceUrl;
 		if (url == null) {
 			url = !endpoint.endsWith("?wsdl") ? new URL(endpoint + "?wsdl") : new URL(endpoint);
 		}
-		Service service = Service.create(url, qname);
+		var service = Service.create(url, qname);
 		T servicePort = service.getPort(clazz);
-		BindingProvider bindingProvider = (BindingProvider)servicePort;
+		var bindingProvider = (BindingProvider)servicePort;
 		// Configura l'adreça del servei
-		String endpointAddress = !endpoint.endsWith("?wsdl") ? endpoint : endpoint.substring(0, endpoint.length() - "?wsdl".length());
+		var endpointAddress = !endpoint.endsWith("?wsdl") ? endpoint : endpoint.substring(0, endpoint.length() - "?wsdl".length());
 		bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpointAddress);
 		// Configura l'autenticació si és necessària
 		if (username != null && !username.isEmpty()) {
@@ -60,7 +58,7 @@ public class WsClientHelper<T> {
 		}
 		// Configura el log de les peticions
 		@SuppressWarnings("rawtypes")
-		List<Handler> handlerChain = new ArrayList<Handler>();
+		List<Handler> handlerChain = new ArrayList<>();
 		if (logMissatgesActiu) {
 			System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
 			System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
@@ -69,7 +67,7 @@ public class WsClientHelper<T> {
 			// handlerChain.add(new SOAPLoggingHandler(clazz));
 		}
 		// Configura handlers addicionals
-		for (int i = 0; i < handlers.length; i++) {
+		for (var i = 0; i < handlers.length; i++) {
 			if (handlers[i] != null) {
 				handlerChain.add(handlers[i]);
 			}
@@ -83,9 +81,9 @@ public class WsClientHelper<T> {
 			try {
 				// Verifica si CXF es troba disponible
 				Class.forName("org.apache.cxf.endpoint.Client");
-				Client client = ClientProxy.getClient(servicePort);
-				HTTPConduit http = (HTTPConduit) client.getConduit();
-				HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+				var client = ClientProxy.getClient(servicePort);
+				var http = (HTTPConduit) client.getConduit();
+				var httpClientPolicy = new HTTPClientPolicy();
 				httpClientPolicy.setAllowChunking(false);
 				http.setClient(httpClientPolicy);
 			} catch( ClassNotFoundException e ) {
@@ -135,8 +133,9 @@ public class WsClientHelper<T> {
 		public void close(MessageContext messageContext) {
 		}
 		private void logXml(SOAPMessageContext messageContext) {
-			StringBuilder sb = new StringBuilder();
-			Boolean outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+
+			var sb = new StringBuilder();
+			var outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 			sb.append(outboundProperty.booleanValue() ? "Missarge sortint: " : "Missarge entrant: ");
 			/*@SuppressWarnings("unchecked")
 			Map<String, List<String>> requestHeaders = (Map<String, List<String>>)context.get(MessageContext.HTTP_REQUEST_HEADERS);
@@ -144,15 +143,14 @@ public class WsClientHelper<T> {
                 requestHeaders = new HashMap<String, List<String>>();
                 context.put(MessageContext.HTTP_REQUEST_HEADERS, requestHeaders);
             }*/
-			SOAPMessage message = messageContext.getMessage();
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			var message = messageContext.getMessage();
+			var baos = new ByteArrayOutputStream();
 			try {
 				message.writeTo(baos);
 				sb.append(baos.toString());
 			} catch (Exception ex) {
 				sb.append("Error al imprimir el missatge XML: " + ex.getMessage());
 			}
-			//System.out.println(sb.toString());
 			LOGGER.debug(sb.toString());
 		}
 	}
