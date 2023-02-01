@@ -14,9 +14,10 @@ import java.util.zip.ZipInputStream;
 public class ZipFileUtils {
 
     public static List<String> readZipFileNames (byte [] fitxer) {
-        List<String> names = new ArrayList<String>();
+
+        List<String> names = new ArrayList<>();
         try {
-            ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
+            var zip = new ZipInputStream(new ByteArrayInputStream(fitxer));
             ZipEntry entrada;
             try {
             	entrada = zip.getNextEntry();
@@ -30,14 +31,15 @@ public class ZipFileUtils {
                 entrada = zip.getNextEntry();
             }
             zip.close();
+            return names;
         } catch (Exception e) {
             log.debug("S'ha produït un error a l'llegir el fitxer ZIP per obtenir els noms dels fitxers.", e);
             return null;
         }
-        return names;
     }
 
     public static byte [] readZipFile (byte [] fitxer, String fileName) {
+
         ByteArrayOutputStream baos;
         byte arxiuBytes[] = null;
         try {
@@ -53,7 +55,7 @@ public class ZipFileUtils {
                 if (fileName.equalsIgnoreCase(entrada.getName())) {
                     baos = new ByteArrayOutputStream();
                     int leido;
-                    byte [] buffer = new byte[1024];
+                    var buffer = new byte[1024];
                     while ( 0 < (leido=zip.read(buffer))){
                         baos.write(buffer,0,leido);
 

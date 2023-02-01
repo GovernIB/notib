@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
-
 /**
  * Advice AspectJ que intercepta les excepcions llençades des dels
  * services.
@@ -33,9 +31,9 @@ public class AuditAdvice {
 	@AfterReturning(pointcut = "@annotation(Audita)", returning = "entitat")
 	public void audita(JoinPoint joinPoint, Object entitat) throws NoSuchMethodException, SecurityException {
 
-		final String methodName = joinPoint.getSignature().getName();
-		final MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
-	    Method method = methodSignature.getMethod();
+		final var methodName = joinPoint.getSignature().getName();
+		final var methodSignature = (MethodSignature)joinPoint.getSignature();
+	    var method = methodSignature.getMethod();
 	    if (method.getDeclaringClass().isInterface()) {
 	        method = joinPoint.getTarget().getClass().getDeclaredMethod(methodName, method.getParameterTypes());    
 	    }

@@ -22,42 +22,37 @@ import java.util.Map;
 public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
 
     private static final DeferredLog log = new DeferredLog();
-
     public static final String DBAPP_PROPERTIES = "es.caib.notib.db.properties";
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 
         Map<String, Object> propertySource = new HashMap<>();
-
         try {
             log.info("Obtenint dataSource per a carregar les propietats de la BBDD...");
-            JndiDataSourceLookup lookup = new JndiDataSourceLookup();
-            String datasourceJndi = environment.getProperty("spring.datasource.jndi-name", "java:jboss/datasources/notibDS");
-            DataSource dataSource = lookup.getDataSource(datasourceJndi);
+            var lookup = new JndiDataSourceLookup();
+            var datasourceJndi = environment.getProperty("spring.datasource.jndi-name", "java:jboss/datasources/notibDS");
+            var dataSource = lookup.getDataSource(datasourceJndi);
             log.info("... Datasource carregat correctament.");
 
             log.info("Carregant les propietats...");
-            Connection connection = dataSource.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT key, value FROM not_config WHERE jboss_property = 0");
-            ResultSet resultSet = preparedStatement.executeQuery();
-
+            var connection = dataSource.getConnection();
+            var preparedStatement = connection.prepareStatement("SELECT key, value FROM not_config WHERE jboss_property = 0");
+            var resultSet = preparedStatement.executeQuery();
+            String clau, valor;
             while(resultSet.next()) {
-                String clau = resultSet.getString("key");
-                String valor = resultSet.getString("value");
+                clau = resultSet.getString("key");
+                valor = resultSet.getString("value");
                 propertySource.put(clau, valor);
                 log.info("   ... carregada la propietat: " + clau + "=" + valor);
             }
-
             resultSet.close();
             preparedStatement.close();
             connection.close();
             log.info("... Finalitzada la càrega de propietats");
-
             log.info("Afegint les propietats carregades de base de dades al entorn...");
             environment.getPropertySources().addFirst(new MapPropertySource(DBAPP_PROPERTIES, propertySource));
             log.info("...Propietats afegides");
-
         } catch (Throwable ex) {
             log.error("No s'han pogut carregar les propietats de la BBDD", ex);
         }

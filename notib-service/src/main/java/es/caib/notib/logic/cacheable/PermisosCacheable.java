@@ -4,19 +4,16 @@ import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
-import es.caib.notib.logic.helper.OrganigramaHelper;
 import es.caib.notib.logic.helper.PermisosHelper;
 import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.logic.intf.acl.ExtendedPermission;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,7 +21,6 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -60,7 +56,7 @@ public class PermisosCacheable {
         var hasPermisAplicacioEntitat = permisosHelper.isGrantedAny(auth, EntitatEntity.class, new Permission[] {ExtendedPermission.APLICACIO});
         var hasPermisAdminOrgan = permisosHelper.isGrantedAny(auth, OrganGestorEntity.class, new Permission[] {ExtendedPermission.ADMINISTRADOR});
 
-        Map<RolEnumDto, Boolean> hasPermisos = new HashMap<RolEnumDto, Boolean>();
+        Map<RolEnumDto, Boolean> hasPermisos = new HashMap<>();
         hasPermisos.put(RolEnumDto.tothom, hasPermisUsuariEntitat);
         hasPermisos.put(RolEnumDto.NOT_ADMIN, hasPermisAdminEntitat);
         hasPermisos.put(RolEnumDto.NOT_APL, hasPermisAplicacioEntitat);
@@ -94,8 +90,8 @@ public class PermisosCacheable {
             var permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
             var organGestorsIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
             // Consulta totes les entitats dels organs gestors amb permisos
-            List<Long> entitats = entitatRepository.findByOrganGestorsIds(organGestorsIds);
-            List<EntitatDto> resposta = conversioTipusHelper.convertirList(entitatRepository.findByIds(entitats), EntitatDto.class);
+            var entitats = entitatRepository.findByOrganGestorsIds(organGestorsIds);
+            var resposta = conversioTipusHelper.convertirList(entitatRepository.findByIds(entitats), EntitatDto.class);
             for(var dto : resposta) {
                 dto.setUsuariActualAdministradorOrgan(true);
                 dto.setUsuariActualAdministradorEntitat(true);
@@ -109,7 +105,7 @@ public class PermisosCacheable {
         var resposta = !entitatsDisponibles.isEmpty() ? conversioTipusHelper.convertirList(entitatsDisponibles, EntitatDto.class) : new ArrayList<EntitatDto>();
 
         permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
-        List<Long> organGestorsAmbPermisos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
+        var organGestorsAmbPermisos = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, permisos);
         for(var dto : resposta) {
             dto.setUsuariActualAdministradorEntitat(false);
             if (!organGestorsAmbPermisos.isEmpty()) {
@@ -122,7 +118,7 @@ public class PermisosCacheable {
     @Cacheable(value = "organsGestorsUsuari", key="#auth.name")
     public List<OrganGestorDto> findOrgansGestorsAccessiblesUsuari(Authentication auth) {
 
-        List<OrganGestorEntity> organsGestors = organGestorRepository.findAll();
+        var organsGestors = organGestorRepository.findAll();
         Permission[] permisos = new Permission[] {ExtendedPermission.ADMINISTRADOR};
         permisosHelper.filterGrantedAny(organsGestors,
                 new PermisosHelper.ObjectIdentifierExtractor<OrganGestorEntity>() {

@@ -1,6 +1,6 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.clases.CallbackProcessarPendentsThread;
+import es.caib.notib.logic.threads.CallbackProcessarPendentsThread;
 import es.caib.notib.logic.helper.PropertiesConstants;
 import es.caib.notib.logic.intf.service.CallbackService;
 import es.caib.notib.logic.helper.CallbackHelper;

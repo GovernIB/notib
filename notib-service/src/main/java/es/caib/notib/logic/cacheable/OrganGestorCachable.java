@@ -35,13 +35,11 @@ public class OrganGestorCachable {
 
     @Cacheable(value = "codisOrgansFills", key="#codiDir3Entitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisOrgansGestorsFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
-        Map<String, OrganismeDto> organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
 
-        String codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
-
-        List<String> unitatsEntitat = new ArrayList<String>();
+       var organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
+        var codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
+        List<String> unitatsEntitat = new ArrayList<>();
         unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3));
-
         return unitatsEntitat;
     }
 
@@ -56,12 +54,12 @@ public class OrganGestorCachable {
      */
     @Cacheable(value = "organCodisAncestors", key="#codiDir3Entitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisAncestors(String codiDir3Entitat, String codiDir3Organ) {
-        Map<String, OrganismeDto> organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
-        OrganismeDto currentNode = organigramaEntitat.get(codiDir3Organ);
+
+        var organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
+        var currentNode = organigramaEntitat.get(codiDir3Organ);
         if (currentNode == null) { // organ obsolet
             return new ArrayList<>();
         }
-
         List<String> pares = new ArrayList<>();
         while(currentNode != null && !currentNode.getCodi().equals(currentNode.getPare())) {
             pares.add(currentNode.getCodi());
@@ -72,11 +70,12 @@ public class OrganGestorCachable {
 
     @Cacheable(value = "organismes", key="#entitatcodi")
     public List<OrganismeDto> findOrganismesByEntitat(String entitatcodi) {
-        List<OrganismeDto> organismes = new ArrayList<>();
-        Map<String, OrganismeDto> organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
-        if (organigramaDir3 == null || organigramaDir3.isEmpty())
-            return organismes;
 
+        List<OrganismeDto> organismes = new ArrayList<>();
+        var organigramaDir3 = cacheHelper.findOrganigramaNodeByEntitat(entitatcodi);
+        if (organigramaDir3 == null || organigramaDir3.isEmpty()) {
+            return organismes;
+        }
         organismes = new ArrayList<>(organigramaDir3.values());
         Collections.sort(organismes, new Comparator<OrganismeDto>() {
             @Override
@@ -87,14 +86,13 @@ public class OrganGestorCachable {
         return organismes;
     }
 
-    private List<String> getCodisOrgansGestorsFills(
-            Map<String, OrganismeDto> organigrama,
-            String codiDir3) {
+    private List<String> getCodisOrgansGestorsFills(Map<String, OrganismeDto> organigrama, String codiDir3) {
+
         List<String> unitats = new ArrayList<String>();
         unitats.add(codiDir3);
-        OrganismeDto organisme = organigrama.get(codiDir3);
+        var organisme = organigrama.get(codiDir3);
         if (organisme != null && organisme.getFills() != null && !organisme.getFills().isEmpty()) {
-            for (String fill: organisme.getFills()) {
+            for (var fill: organisme.getFills()) {
                 unitats.addAll(getCodisOrgansGestorsFills(organigrama, fill));
             }
         }

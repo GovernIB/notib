@@ -17,19 +17,20 @@ import java.util.List;
 public class CSVReader {
 
     public static List<String[]> readFile(byte[] fitxer) {
+
         List<String[]> linies = new ArrayList<>();
-        ICsvListReader listReader = null;
+        ICsvListReader listReader;
         try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(fitxer);
-            String detectedCharset = UniversalDetector.detectCharset(bais);
+            var bais = new ByteArrayInputStream(fitxer);
+            var detectedCharset = UniversalDetector.detectCharset(bais);
             if(detectedCharset == null) {
                 detectedCharset = "UTF-8";
             }
-            Reader reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
+            var reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
             listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
             List<String> linia;
-            int index = 0;
-            while( (linia = listReader.read()) != null ) {
+            var index = 0;
+            while ((linia = listReader.read()) != null ) {
                 if (index > 0) {
                     linies.add(linia.toArray(new String[]{}));
                 }
@@ -38,21 +39,22 @@ public class CSVReader {
             if( listReader != null ) {
                 listReader.close();
             }
+            return linies;
         } catch (IOException e) {
             log.debug("S'ha produït un error a l'llegir el fitxer CSV.", e);
             return null;
         }
-        return linies;
     }
     public static List<String> readHeader(byte[] fitxer) {
-        ICsvListReader listReader = null;
+
+        ICsvListReader listReader;
         try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(fitxer);
-            String detectedCharset = UniversalDetector.detectCharset(bais);
+            var bais = new ByteArrayInputStream(fitxer);
+            var detectedCharset = UniversalDetector.detectCharset(bais);
             if(detectedCharset == null) {
                 detectedCharset = "UTF-8";
             }
-            Reader reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
+            var reader = new InputStreamReader( new ByteArrayInputStream(fitxer), detectedCharset);
             listReader = new CsvListReader(reader, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
             List<String> res = listReader.read();
             listReader.close();

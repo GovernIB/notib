@@ -2,19 +2,14 @@ package es.caib.notib.logic.config;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.service.CallbackService;
-import es.caib.notib.logic.intf.service.ConfigService;
 import es.caib.notib.logic.intf.service.MonitorTasquesService;
 import es.caib.notib.logic.intf.service.SchedulledService;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.PropertiesConstants;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
@@ -32,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @EnableAsync
 @EnableScheduling
+@Slf4j
 public class SchedulingConfig implements SchedulingConfigurer {
 
     @Autowired
@@ -49,6 +45,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private ScheduledTaskRegistrar taskRegistrar;
 
     public void restartSchedulledTasks() {
+
         if (taskRegistrar != null) {
             taskRegistrar.destroy();
             taskRegistrar.afterPropertiesSet();
@@ -58,10 +55,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+
     	taskRegistrar.setScheduler(taskScheduler);
         this.taskRegistrar = taskRegistrar;
-
-//        registerSchedulledTasks();
     }
 
     private void registerSchedulledTasks() {
@@ -86,17 +82,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long registrarEnviamentsPendentsInitialDelayLong = 0L;
+                        var registrarEnviamentsPendentsInitialDelayLong = 0L;
                         if (primeraVez[0]) {
                         	registrarEnviamentsPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.REGISTRAR_ENVIAMENTS_PENDENTS_INITIAL_DELAY, 300000L);
                         	primeraVez[0] = false;
                         }
                         trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(registrarEnviamentsPendents, millis);
                         return nextExecution;
                     }
@@ -125,17 +122,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long notificaEnviamentsRegistratsInitialDelayLong = 0L;
+                        var notificaEnviamentsRegistratsInitialDelayLong = 0L;
                         if (primeraVez[1]) {
                         	notificaEnviamentsRegistratsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.NOTIFICA_ENVIAMENTS_REGISTRATS_INITIAL_DELAY, 330000L);
                         	primeraVez[1] = false;
                         }
                         trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(notificaEnviamentsRegistrats, millis);
                         return nextExecution;
                     }
@@ -164,17 +162,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+                        var enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
                         if (primeraVez[2]) {
                         	enviamentRefrescarEstatPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_PENDENTS_INITIAL_DELAY, 360000L);
                         	primeraVez[2] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatPendents, millis);
                         return nextExecution;
                     }
@@ -203,17 +202,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
+                        var enviamentRefrescarEstatEnviatSirInitialDelayLong = 0L;
                         if (primeraVez[3]) {
                         	enviamentRefrescarEstatEnviatSirInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_REFRESCAR_ESTAT_ENVIAT_SIR_INITIAL_DELAY, 390000L);
                         	primeraVez[3] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatEnviatSirInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatEnviatSir, millis);
                         return nextExecution;
                     }
@@ -242,9 +242,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON, "0 0 1 * * *"));
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+
+                        var trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS_CRON, "0 0 1 * * *"));
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(actualitzarProcediments, millis);
                         return nextExecution;
                     }
@@ -273,9 +274,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON, "0 30 1 * * *"));
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+
+                        var trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.REFRESCAR_NOTIFICACIONS_EXPIRADES_CRON, "0 30 1 * * *"));
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(refrescarNotificacionsExpirades, millis);
                         return nextExecution;
                     }
@@ -304,17 +306,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long processarPendentsInitialDelayLong = 0L;
+                        var processarPendentsInitialDelayLong = 0L;
                         if (primeraVez[4]) {
                         	processarPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.PROCESSAR_PENDENTS_INITIAL_DELAY, 420000L);
                         	primeraVez[4] = false;
                         }
                         trigger.setInitialDelay(processarPendentsInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(processarPendents, millis);
                         return nextExecution;
                     }
@@ -343,17 +346,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
+                        var enviamentRefrescarCertPendentsInitialDelayLong = 0L;
                         if (primeraVez[5]) {
                         	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_DEH_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY, 450000L);
                         	primeraVez[5] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatDEH, millis);
                         return nextExecution;
                     }
@@ -382,17 +386,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_RATE, 300000L), TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        Long enviamentRefrescarCertPendentsInitialDelayLong = 0L;
+                        var enviamentRefrescarCertPendentsInitialDelayLong = 0L;
                         if (primeraVez[6]) {
                         	enviamentRefrescarCertPendentsInitialDelayLong = configHelper.getConfigAsLong(PropertiesConstants.ENVIAMENT_CIE_REFRESCAR_CERT_PENDENTS_INITIAL_DELAY, 480000L);
                         	primeraVez[6] = false;
                         }
                         trigger.setInitialDelay(enviamentRefrescarCertPendentsInitialDelayLong);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(enviamentRefrescarEstatCIE, millis);
                         return nextExecution;
                     }
@@ -421,11 +426,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(86400000l, TimeUnit.MILLISECONDS);
+
+                        var trigger = new PeriodicTrigger(86400000l, TimeUnit.MILLISECONDS);
                         trigger.setFixedRate(true);
                         trigger.setInitialDelay(calcularDelay());
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(eliminarDocumentsTemporals, millis);
                         return nextExecution;
                     }
@@ -454,9 +460,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_SERVEIS_CRON, "0 0 2 * * *"));
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+
+                        var trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ACTUALITZAR_SERVEIS_CRON, "0 0 2 * * *"));
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(actualitzarServeis, millis);
                         return nextExecution;
                     }
@@ -485,10 +492,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        String cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA, "0 30 2 * * *");
-                        CronTrigger trigger = new CronTrigger(cron);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+
+                        var cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA, "0 30 2 * * *");
+                        var trigger = new CronTrigger(cron);
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(consultaCanvisOrganigrama, millis);
                         return nextExecution;
                     }
@@ -518,13 +526,13 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
 
-                        String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
+                        var dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_PERIODE_EXECUCIO);
                         if (Strings.isNullOrEmpty(dies)) {
                             dies = "0 30 1 * * *";
                         }
-                        CronTrigger trigger = new CronTrigger(dies);
-                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
-                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        var trigger = new CronTrigger(dies);
+                        var nextExecution = trigger.nextExecutionTime(triggerContext);
+                        var millis = nextExecution.getTime() - System.currentTimeMillis();
                         monitorTasquesService.updateProperaExecucio(monitorIntegracionsEliminarAntics, millis);
                         return nextExecution;
                     }
@@ -536,17 +544,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     private long calcularDelay() {
 
-        Calendar cal = Calendar.getInstance();
-        Date now = new Date();
+        var cal = Calendar.getInstance();
+        var now = new Date();
         cal.setTime(now);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
-//        cal.setTimeInMillis(cal.getTimeInMillis() + 2*60*60*1000l);
-        logger.info("EL TIMER S'EXECUTARÀ EL " + cal.getTime());
+        log.info("EL TIMER S'EXECUTARÀ EL " + cal.getTime());
         return cal.getTimeInMillis() - now.getTime();
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
 }

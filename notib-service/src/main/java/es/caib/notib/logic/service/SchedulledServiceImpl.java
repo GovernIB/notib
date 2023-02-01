@@ -1,20 +1,16 @@
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
-import es.caib.notib.logic.clases.RegistrarThread;
+import es.caib.notib.logic.threads.RegistrarThread;
 import es.caib.notib.logic.helper.IntegracioHelper;
 import es.caib.notib.logic.helper.SemaforNotificacio;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.logic.intf.service.SchedulledService;
 import es.caib.notib.logic.intf.service.ServeiService;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.logic.helper.ConversioTipusHelper;
 import es.caib.notib.logic.helper.EnviamentHelper;
 import es.caib.notib.logic.helper.MetricsHelper;
 import es.caib.notib.logic.helper.NotificaHelper;
@@ -28,7 +24,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +36,6 @@ import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static java.util.Calendar.DAY_OF_MONTH;

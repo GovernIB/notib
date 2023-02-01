@@ -1,9 +1,7 @@
 package es.caib.notib.logic.config;
 
-import ch.qos.logback.core.util.JNDIUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
@@ -20,14 +18,16 @@ public class EmailConfig {
 
     @Bean
     public JavaMailSender getMailSender() throws NamingException {
-        JavaMailSender mailSender = new JavaMailSenderImpl();
+
+        var mailSender = new JavaMailSenderImpl();
         ((JavaMailSenderImpl)mailSender).setSession(getMailSession());
         return mailSender;
     }
 
     private Session getMailSession() throws NamingException {
-        Context initCtx = new InitialContext();
-        Context envCtx = (Context) initCtx.lookup("java:comp/env");
+
+        var initCtx = new InitialContext();
+        var envCtx = (Context) initCtx.lookup("java:comp/env");
         return (Session) envCtx.lookup(emailJndiName);
     }
 }

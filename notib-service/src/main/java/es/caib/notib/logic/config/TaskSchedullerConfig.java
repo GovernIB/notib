@@ -10,7 +10,8 @@ public class TaskSchedullerConfig {
 
     @Bean
     public TaskScheduler taskScheduler(){
-        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+
+        var threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
         threadPoolTaskScheduler.setPoolSize(10);
         threadPoolTaskScheduler.setThreadNamePrefix("notib-scheduled-task-pool");
         return threadPoolTaskScheduler;

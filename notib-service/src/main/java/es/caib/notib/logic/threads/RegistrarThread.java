@@ -1,4 +1,4 @@
-package es.caib.notib.logic.clases;
+package es.caib.notib.logic.threads;
 
 import es.caib.notib.logic.helper.NotificacioHelper;
 import es.caib.notib.logic.intf.exception.RegistreNotificaException;
