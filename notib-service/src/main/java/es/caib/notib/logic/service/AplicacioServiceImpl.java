@@ -3,12 +3,10 @@
  */
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.config.SchedulingConfig;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.ExcepcioLogDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
@@ -20,16 +18,12 @@ import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.repository.UsuariRepository;
 import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +32,7 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Service
 public class AplicacioServiceImpl implements AplicacioService {
 
@@ -74,28 +69,23 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void processarAutenticacioUsuari() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			logger.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
-			UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElse(null);
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			log.debug("Processant autenticació (usuariCodi=" + auth.getName() + ")");
+			var usuari = usuariRepository.findById(auth.getName()).orElse(null);
 			DadesUsuari dadesUsuari;
+			log.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
+			dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
+			if (dadesUsuari == null) {
+				throw new NotFoundException(auth.getName(), DadesUsuari.class);
+			}
 			if (usuari == null) {
-				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				String idioma = configHelper.getConfig("es.caib.notib.default.user.language");
-				if (dadesUsuari == null) {
-					throw new NotFoundException(auth.getName(), DadesUsuari.class);
-				}
-				usuari = usuariRepository.save(UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom())
+				var idioma = configHelper.getConfig("es.caib.notib.default.user.language");
+				usuariRepository.save(UsuariEntity.getBuilder(dadesUsuari.getCodi(), dadesUsuari.getEmail(), idioma).nom(dadesUsuari.getNom())
 						.llinatges(dadesUsuari.getLlinatges()).nomSencer(dadesUsuari.getNomSencer()).build());
 
 			} else {
-				logger.debug("Consultant plugin de dades d'usuari (usuariCodi=" + auth.getName() + ")");
-				dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
-				if (dadesUsuari == null) {
-					throw new NotFoundException(auth.getName(), DadesUsuari.class);
-				}
 				if (dadesUsuari.getNomSencer() != null) {
 					usuari.update(dadesUsuari.getNomSencer(), dadesUsuari.getEmail());
 				} else {
@@ -104,7 +94,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 			}
 			permisosCacheable.clearAuthenticationPermissionsCaches(auth);
 			procedimentsCacheable.clearAuthenticationProcedimentsCaches(auth);
-
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -114,10 +103,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant configuració de usuari actual");
-			UsuariEntity usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
+			log.debug("Actualitzant configuració de usuari actual");
+			var usuari = usuariRepository.findById(dto.getCodi()).orElseThrow();
 			usuari.update(UsuariEntity.hiddenBuilder().rebreEmailsNotificacio(dto.getRebreEmailsNotificacio()).emailAlt(dto.getEmailAlt())
 					.rebreEmailsNotificacioCreats(dto.getRebreEmailsNotificacioCreats()).idioma(dto.getIdioma()).build());
 			return toUsuariDtoAmbRols(usuari);
@@ -130,13 +119,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void updateRolUsuariActual(String rol) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant úlrim rol de usuari actual");
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElseThrow();
+			log.debug("Actualitzant úlrim rol de usuari actual");
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			var usuari = usuariRepository.findById(auth.getName()).orElseThrow();
 			usuari.updateUltimRol(rol);
-//			return toUsuariDtoAmbRols(usuari);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -145,11 +133,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Transactional
 	@Override
 	public void updateEntitatUsuariActual(Long entitat) {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Actualitzant úlrim rol de usuari actual");
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuari = usuariRepository.findById(auth.getName()).orElseThrow();
+			log.debug("Actualitzant úlrim rol de usuari actual");
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			var usuari = usuariRepository.findById(auth.getName()).orElseThrow();
 			usuari.updateUltimaEntitat(entitat);
 //			return toUsuariDtoAmbRols(usuari);
 		} finally {
@@ -161,10 +149,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public UsuariDto getUsuariActual() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			logger.debug("Obtenint usuari actual");
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			log.debug("Obtenint usuari actual");
 			return auth != null ? toUsuariDtoAmbRols(usuariRepository.findById(auth.getName()).orElse(null)) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -175,9 +163,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<String> findRolsUsuariAmbCodi(String codi) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Obtenint els rols de l'usuari amb codi (codi=" + codi + ")");
+			log.debug("Obtenint els rols de l'usuari amb codi (codi=" + codi + ")");
 			return cacheHelper.findRolsUsuariAmbCodi(codi);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -188,10 +176,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<String> findRolsUsuariActual() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Obtenint els rols de l'usuari actual");
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			log.debug("Obtenint els rols de l'usuari actual");
+			var auth = SecurityContextHolder.getContext().getAuthentication();
 			return cacheHelper.findRolsUsuariAmbCodi(auth.getName());
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -202,9 +190,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public UsuariDto findUsuariAmbCodi(String codi) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
+			log.debug("Obtenint usuari amb codi (codi=" + codi + ")");
 			return conversioTipusHelper.convertir(usuariRepository.findById(codi).orElse(null), UsuariDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -215,9 +203,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<UsuariDto> findUsuariAmbText(String text) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant usuaris amb text (text=" + text + ")");
+			log.debug("Consultant usuaris amb text (text=" + text + ")");
 			return conversioTipusHelper.convertirList(usuariRepository.findByText(text), UsuariDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -227,9 +215,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public void excepcioSave(Throwable exception) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Emmagatzemant excepció (exception=" + exception + ")");
+			log.debug("Emmagatzemant excepció (exception=" + exception + ")");
 			excepcioLogHelper.addExcepcio(exception);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -239,9 +227,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public ExcepcioLogDto excepcioFindOne(Long index) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta d'una excepció (index=" + index + ")");
+			log.debug("Consulta d'una excepció (index=" + index + ")");
 			return excepcioLogHelper.findAll().get(index.intValue());
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -251,9 +239,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<ExcepcioLogDto> excepcioFindAll() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta de les excepcions disponibles");
+			log.debug("Consulta de les excepcions disponibles");
 			return excepcioLogHelper.findAll();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -263,9 +251,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.info("Consulta dels rols definits a les ACLs");
+			log.info("Consulta dels rols definits a les ACLs");
 			return aclSidRepository.findSidByPrincipalFalse();
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -275,7 +263,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyGetByEntitat(String property, String defaultValue) {
 
-		String value = configHelper.getConfig(property);
+		var value = configHelper.getConfig(property);
 		return Strings.isNullOrEmpty(value) ? defaultValue : value;
 	}
 
@@ -287,9 +275,9 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyGet(String property) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta del valor de la property (property=" + property + ")");
+			log.debug("Consulta del valor de la property (property=" + property + ")");
 			return configHelper.getConfig(property);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -299,10 +287,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String propertyGet(String property, String defaultValue) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consulta del valor de la property (property=" + property + ", default=" + defaultValue + ")");
-			String propertyValue = configHelper.getConfig(property);
+			log.debug("Consulta del valor de la property (property=" + property + ", default=" + defaultValue + ")");
+			var propertyValue = configHelper.getConfig(property);
 			return propertyValue == null || propertyValue.trim().isEmpty() ? defaultValue : propertyValue;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -312,15 +300,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public String getMetrics() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			logger.debug("Consultant les mètriques de l'aplicació");
+			log.debug("Consultant les mètriques de l'aplicació");
 			try {
-				ObjectMapper mapper = new ObjectMapper();
+				var mapper = new ObjectMapper();
 				mapper.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS,false));
 				return mapper.writeValueAsString(metricsHelper.getMetricRegistry());
 			} catch (Exception ex) {
-				logger.error("Error al generar les mètriques de l'aplicació", ex);
+				log.error("Error al generar les mètriques de l'aplicació", ex);
 				return "ERR";
 			}
 		} finally {
@@ -342,14 +330,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 		if (usuari == null) {
 			return null;
 		}
-		UsuariDto dto = conversioTipusHelper.convertir(usuari, UsuariDto.class);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		var dto = conversioTipusHelper.convertir(usuari, UsuariDto.class);
+		var auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth.getAuthorities() == null) {
 			return dto;
 		}
-		String[] rols = new String[auth.getAuthorities().size()];
+		var rols = new String[auth.getAuthorities().size()];
 		int index = 0;
-		for (GrantedAuthority grantedAuthority: auth.getAuthorities()) {
+		for (var grantedAuthority: auth.getAuthorities()) {
 			rols[index++] = grantedAuthority.getAuthority();
 		}
 		dto.setRols(rols);
@@ -369,7 +357,5 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void propagateDbProperties() {
 		configHelper.reloadDbProperties();
 	}
-
-    private static final Logger logger = LoggerFactory.getLogger(AplicacioServiceImpl.class);
 
 }

@@ -3,7 +3,6 @@
  */
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import es.caib.notib.logic.intf.dto.CacheDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.service.CacheService;
@@ -99,11 +98,13 @@ public class CacheServiceImpl implements CacheService {
 				@Override
 				public int compare(CacheDto c1, CacheDto c2) {
 					Integer c1Pos = ordreCaches.get(c1.getCodi());
-					if (c1Pos == null)
+					if (c1Pos == null) {
 						c1Pos = 1000;
+					}
 					Integer c2Pos = ordreCaches.get(c2.getCodi());
-					if (c2Pos == null)
+					if (c2Pos == null) {
 						c2Pos = 1001;
+					}
 					return c1Pos.compareTo(c2Pos);
 				}
 			});
@@ -127,7 +128,8 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public void removeAllCaches() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Esborrant totes les caches");
 			cacheHelper.clearAllCaches();

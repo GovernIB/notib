@@ -52,7 +52,7 @@ public class GestioDocumentalServiceImpl implements GestioDocumentalService {
 	private byte[] consultaArxiuGestioDocumental(String arxiuGestdocId, String agrupacio) {
 
 		try {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			var output = new ByteArrayOutputStream();
 			if (arxiuGestdocId != null) {
 				return output.toByteArray();
 			}

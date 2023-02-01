@@ -3,19 +3,16 @@
  */
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import es.caib.notib.client.domini.Enviament;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.client.domini.OrigenEnum;
-import es.caib.notib.client.domini.Persona;
 import es.caib.notib.client.domini.TipusDocumentalEnum;
 import es.caib.notib.client.domini.ValidesaEnum;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioCertificacioDto.TipusActInfo;
 import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
-import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDatabaseDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
@@ -31,8 +28,6 @@ import es.caib.notib.logic.intf.exception.ValidationException;
 import es.caib.notib.logic.intf.service.NotificacioService;
 import es.caib.notib.logic.intf.service.PermisosService;
 import es.caib.notib.persist.entity.*;
-import es.caib.notib.persist.entity.auditoria.NotificacioAudit;
-import es.caib.notib.persist.entity.cie.EntregaCieEntity;
 import es.caib.notib.logic.helper.*;
 import es.caib.notib.persist.repository.*;
 import es.caib.notib.persist.repository.auditoria.NotificacioAuditRepository;
@@ -46,9 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +54,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -155,8 +146,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private EmailNotificacioSenseNifHelper emailNotificacioSenseNifHelper;
-	@Autowired
-	private ProcessosInicialsRepository processosInicialsRepository;
 
 	public static Map<String, ProgresActualitzacioCertificacioDto> progresActualitzacioExpirades = new HashMap<>();
 
@@ -164,12 +153,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioDatabaseDto create(Long entitatId, NotificacioDatabaseDto notificacio) throws RegistreNotificaException {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false);
 			// Dades generals de la notificació
-			NotificacioEntity notificacioEntity = notificacioHelper.saveNotificacio(notData);
+			var notificacioEntity = notificacioHelper.saveNotificacio(notData);
 			notificacioHelper.altaEnviamentsWeb(entitat, notificacioEntity, notificacio.getEnviaments());
 			return conversioTipusHelper.convertir(notificacioEntity, NotificacioDatabaseDto.class);
 		} finally {
@@ -181,17 +170,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public void delete(Long entitatId, Long notificacioId) throws NotFoundException {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarEntitat(entitatId,false,true,true,false);
 			
 			log.debug("Esborrant la notificació (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = notificacioRepository.findById(notificacioId)
+			var notificacio = notificacioRepository.findById(notificacioId)
 					.orElseThrow(() -> new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat"));
-//			if (notificacio == null) {
-//				throw new NotFoundException(notificacioId, NotificacioEntity.class, "No s'ha trobat cap notificació amb l'id especificat");
-//			}
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
+
+			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacioId);
 //			### Esborrar la notificació
 			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot esborrar");
@@ -200,8 +187,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			notificacioEventRepository.deleteByNotificacio(notificacio);
 
 //				## El titular s'ha d'esborrar de forma individual
-			for (NotificacioEnviamentEntity enviament : notificacio.getEnviaments()) {
-				PersonaEntity titular = enviament.getTitular();
+			PersonaEntity titular;
+			for (var enviament : notificacio.getEnviaments()) {
+				titular = enviament.getTitular();
 				if (HibernateHelper.isProxy(titular)) {
 					titular = HibernateHelper.deproxy(titular);
 				}
@@ -220,15 +208,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioDatabaseDto update(Long entitatId, NotificacioDatabaseDto notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
-			List<NotificacioEnviamentEntity> enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, true, false);
+			var enviamentsPendents = notificacioEnviamentRepository.findEnviamentsPendentsByNotificacioId(notificacio.getId());
 			if (enviamentsPendents == null || enviamentsPendents.isEmpty()) {
 				throw new ValidationException("Aquesta notificació està enviada i no es pot modificar");
 			}
-			NotificacioEntity notificacioEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
-			NotificacioHelper.NotificacioData notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false); //!isAdministradorEntitat);
+			var notificacioEntity = notificacioRepository.findById(notificacio.getId()).orElseThrow();
+			var notData = notificacioHelper.buildNotificacioData(entitat, notificacio, false); //!isAdministradorEntitat);
 			// Actualitzar notificació existent
 			auditNotificacioHelper.updateNotificacio(notificacioEntity, notData);
 			// Esbo
@@ -244,11 +232,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (notificacioEntity.getDocument5() != null && notificacio.getDocument5() == null) {
 				documentRepository.delete(notData.getDocument5Entity());
 			}
-			List<Enviament> enviaments = new ArrayList<Enviament>();
-			List<Long> enviamentsIds = new ArrayList<Long>();
-			List<Long> destinatarisIds = new ArrayList<Long>();
-			List<NotificacioEnviamentEntity> nousEnviaments = new ArrayList<NotificacioEnviamentEntity>();
-			for(NotEnviamentDatabaseDto enviament: notificacio.getEnviaments()) {
+			List<Enviament> enviaments = new ArrayList<>();
+			List<Long> enviamentsIds = new ArrayList<>();
+			List<Long> destinatarisIds = new ArrayList<>();
+			List<NotificacioEnviamentEntity> nousEnviaments = new ArrayList<>();
+			for(var enviament: notificacio.getEnviaments()) {
 				if (enviament.getEntregaPostal() != null) {
 					if (enviament.getEntregaPostal().getCodiPostal() == null || enviament.getEntregaPostal().getCodiPostal().isEmpty()) {
 						enviament.getEntregaPostal().setCodiPostal(enviament.getEntregaPostal().getCodiPostalNorm());
@@ -262,8 +250,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 			// Creació o edició enviament existent
-			for (Enviament enviament: enviaments) {
-				ServeiTipusEnumDto serveiTipus = null;
+			ServeiTipusEnumDto serveiTipus;
+			PersonaEntity titular;
+			List<PersonaEntity> nousDestinataris;
+			for (var enviament: enviaments) {
+				serveiTipus = null;
 				if (enviament.getServeiTipus() != null) {
 					switch (enviament.getServeiTipus()) {
 					case NORMAL:
@@ -274,18 +265,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 						break;
 					}
 				}
-				PersonaEntity titular = enviament.getTitular().getId() != null ? personaHelper.update(enviament.getTitular(),  enviament.getTitular().isIncapacitat())
+				titular = enviament.getTitular().getId() != null ? personaHelper.update(enviament.getTitular(),  enviament.getTitular().isIncapacitat())
 										: personaHelper.create(enviament.getTitular(), enviament.getTitular().isIncapacitat());
-				List<PersonaEntity> nousDestinataris = new ArrayList<PersonaEntity>();
+				nousDestinataris = new ArrayList<>();
 //					### Crear o editar destinataris enviament existent
 				if (enviament.getDestinataris() != null) {
-					for(Persona destinatari: enviament.getDestinataris()) {
+					for(var destinatari: enviament.getDestinataris()) {
 						if ((destinatari.getNif() != null && !destinatari.getNif().isEmpty()) || (destinatari.getDir3Codi() != null && !destinatari.getDir3Codi().isEmpty())) {
 							if (destinatari.getId() != null) {
 								destinatarisIds.add(destinatari.getId());
 								personaHelper.update(destinatari, false);
 							} else {
-								PersonaEntity destinatariEntity = personaHelper.create(destinatari, false);
+								var destinatariEntity = personaHelper.create(destinatari, false);
 								nousDestinataris.add(destinatariEntity);
 								destinatarisIds.add(destinatariEntity.getId());
 							}
@@ -295,18 +286,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 //					### Actualitzar les dades d'un enviament existent o crear un de nou
 				if (enviament.getId() != null) {
-					NotificacioEnviamentEntity enviamentEntity = auditEnviamentHelper.updateEnviament(entitat, notificacioEntity, enviament, serveiTipus, titular);
+					var enviamentEntity = auditEnviamentHelper.updateEnviament(entitat, notificacioEntity, enviament, serveiTipus, titular);
 					enviamentEntity.getDestinataris().addAll(nousDestinataris);
 				} else {
-					NotificacioEnviamentEntity nouEnviament = auditEnviamentHelper.desaEnviament(entitat, notificacioEntity, enviament, serveiTipus, titular, nousDestinataris);
+					var nouEnviament = auditEnviamentHelper.desaEnviament(entitat, notificacioEntity, enviament, serveiTipus, titular, nousDestinataris);
 					nousEnviaments.add(nouEnviament);
 					enviamentsIds.add(nouEnviament.getId());
 				}
 			}
 			notificacioEntity.getEnviaments().addAll(nousEnviaments);
 //			### Enviaments esborrats
-			Set<NotificacioEnviamentEntity> enviamentsDisponibles = new HashSet<NotificacioEnviamentEntity>(notificacioEntity.getEnviaments());
-			for (NotificacioEnviamentEntity enviament: enviamentsDisponibles) {
+			Set<NotificacioEnviamentEntity> enviamentsDisponibles = new HashSet<>(notificacioEntity.getEnviaments());
+			for (var enviament: enviamentsDisponibles) {
 				if (HibernateHelper.isProxy(enviament)) { //en cas d'haver modificat l'enviament
 					enviament = HibernateHelper.deproxy(enviament);
 				}
@@ -315,8 +306,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 					auditEnviamentHelper.deleteEnviament(enviament);
 				}
 //				### Destinataris esborrats
-				List<PersonaEntity> destinatarisDisponibles = new ArrayList<PersonaEntity>(enviament.getDestinataris());
-				for (PersonaEntity destinatari : destinatarisDisponibles) {
+				List<PersonaEntity> destinatarisDisponibles = new ArrayList<>(enviament.getDestinataris());
+				for (var destinatari : destinatarisDisponibles) {
 					if (HibernateHelper.isProxy(destinatari)) { //en cas d'haver modificat l'interessat
 						destinatari = HibernateHelper.deproxy(destinatari);
 					}
@@ -330,7 +321,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 //			### Realitzar el procés de registre i notific@
 			if (NotificacioComunicacioTipusEnumDto.SINCRON.equals(pluginHelper.getNotibTipusComunicacioDefecte())) {
 				synchronized(SemaforNotificacio.agafar(notificacioEntity.getId())) {
-					boolean notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
+					var notificar = registreNotificaHelper.realitzarProcesRegistrar(notificacioEntity);
 					if (notificar) {
 						notificaHelper.notificacioEnviar(notificacioEntity.getId());
 					}
@@ -347,15 +338,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioDtoV2 findAmbId(Long id, boolean isAdministrador) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de la notificacio amb id (id=" + id + ")");
-			NotificacioEntity notificacio = notificacioRepository.findById(id).orElse(null);
+			var notificacio = notificacioRepository.findById(id).orElse(null);
 			if(notificacio == null) {
 				return null;
 			}
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
-			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
 			return conversioTipusHelper.convertir(notificacio, NotificacioDtoV2.class);
@@ -368,34 +359,34 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public NotificacioInfoDto findNotificacioInfo(Long id, boolean isAdministrador) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de la notificacio amb id (id=" + id + ")");
-			NotificacioEntity notificacio = notificacioRepository.findById(id).orElse(null);
+			var notificacio = notificacioRepository.findById(id).orElse(null);
 			if (notificacio == null) {
 				return null;
 			}
-			List<NotificacioEnviamentEntity> enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
+			var enviamentsPendentsNotifica = notificacioEnviamentRepository.findEnviamentsPendentsNotificaByNotificacio(notificacio);
 			notificacio.setHasEnviamentsPendents(enviamentsPendentsNotifica != null && !enviamentsPendentsNotifica.isEmpty());
 
 			// Emplena els atributs registreLlibreNom i registreOficinaNom
 			pluginHelper.addOficinaAndLlibreRegistre(notificacio);
-			NotificacioInfoDto dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
-			List<Long> pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
+			var dto = conversioTipusHelper.convertir(notificacio, NotificacioInfoDto.class);
+			var pendents = notificacioEventRepository.findEventsAmbCallbackPendentByNotificacioId(notificacio.getId());
 			dto.setEventsCallbackPendent(notificacio.isTipusUsuariAplicacio() && pendents != null && !pendents.isEmpty());
 
 			// Emplena dades del procediment
-			ProcSerEntity procedimentEntity = notificacio.getProcediment();
+			var procedimentEntity = notificacio.getProcediment();
 			if (procedimentEntity != null && procedimentEntity.isEntregaCieActivaAlgunNivell()) {
-				EntregaCieEntity entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
+				var entregaCieEntity = procedimentEntity.getEntregaCieEfectiva();
 				dto.setOperadorPostal(conversioTipusHelper.convertir(entregaCieEntity.getOperadorPostal(), OperadorPostalDataDto.class));
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
-			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findById(id).orElseThrow();
+			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElseThrow();
 			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
 			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
-			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+			var lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
 			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
@@ -414,9 +405,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 			}
 
 			Date dataEnviament = null;
-			Iterator<NotificacioEnviamentEntity> it = notificacio.getEnviaments().iterator();
+			var it = notificacio.getEnviaments().iterator();
 			while (it.hasNext()) {
-				NotificacioEnviamentEntity env = it.next();
+				var env = it.next();
 				if (env.getTitular().getInteressatTipus().equals(InteressatTipus.ADMINISTRACIO)
 						&& (!notificacio.getEstat().equals(NotificacioEstatEnumDto.PENDENT)
 						|| !notificacio.getEstat().equals(NotificacioEstatEnumDto.ENVIANT))) {
@@ -446,21 +437,21 @@ public class NotificacioServiceImpl implements NotificacioService {
 																   PaginacioParamsDto paginacioParams) {
 
 		log.info("Consulta taula de remeses ...");
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			var isUsuari = RolEnumDto.tothom.equals(rol);
 			var isUsuariEntitat = RolEnumDto.NOT_ADMIN.equals(rol);
 			var isSuperAdmin = RolEnumDto.NOT_SUPER.equals(rol);
 			var isAdminOrgan = RolEnumDto.NOT_ADMIN_ORGAN.equals(rol);
-			EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
+			var entitatActual = entityComprovarHelper.comprovarEntitat(entitatId,false, isUsuariEntitat,false);
 			Page<NotificacioTableEntity> notificacions = null;
-			Pageable pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
+			var pageable = notificacioListHelper.getMappeigPropietats(paginacioParams);
 			List<String> codisProcedimentsDisponibles = new ArrayList<>();
 			List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
 			List<String> codisProcedimentsOrgans = new ArrayList<>();
 			if (isUsuari && entitatActual != null) {
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				Permission[] permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
+				var auth = SecurityContextHolder.getContext().getAuthentication();
+				var permisos = entityComprovarHelper.getPermissionsFromName(PermisEnum.CONSULTA);
 				// Procediments accessibles per qualsevol òrgan gestor
 				codisProcedimentsDisponibles = procedimentHelper.findCodiProcedimentsWithPermis(auth, entitatActual, PermisEnum.CONSULTA);
 
@@ -481,7 +472,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
-					long start = System.nanoTime();
+					var start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
 							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
@@ -494,7 +485,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entitatActual,
 							usuariCodi,
 							pageable);
-					long elapsedTime = System.nanoTime() - start;
+					var elapsedTime = System.nanoTime() - start;
 					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
 				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
@@ -515,7 +506,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			} else {
 				var filtreNetejat = notificacioListHelper.getFiltre(filtre);
 				if (isUsuari) {
-					long start = System.nanoTime();
+					var start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,
 							filtreNetejat.getEntitatId().isNull(),
@@ -562,7 +553,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
-					long elapsedTime = System.nanoTime() - start;
+					var elapsedTime = System.nanoTime() - start;
 					log.info(">>>>>>>>>>>>> Notificacions amb filtre: "  + elapsedTime);
 				} else if (isUsuariEntitat || isSuperAdmin) {
 					var entitatFiltre = isUsuariEntitat ? entitatId :filtreNetejat.getEntitatId().getField();
@@ -647,19 +638,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				}
 			}
 
-			var pag = notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
-//			List<NotificacioTableItemDto> nots = pag.getContingut();
-//			for (int foo = 0; foo < nots.size(); foo++) {
-//				NotificacioTableItemDto not = nots.get(foo);
-//				NotificacioEntity e = notificacioRepository.findById(not.getId());
-//				List<NotificacioEnviamentEntity> envs = enviamentRepository.findByNotificacio(e);
-//				Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
-//				Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
-//				not.setDocumentId(id);
-//				not.setEnvCerData(cerData);
-//				not.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
-//			}
-			return pag;
+			return notificacioListHelper.complementaNotificacions(entitatActual, usuariCodi, notificacions);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -669,12 +648,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<Long> findIdsAmbFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioFiltreDto filtre) {
 
-		PaginacioParamsDto paginacioParamsDto = new PaginacioParamsDto();
+		var paginacioParamsDto = new PaginacioParamsDto();
 		paginacioParamsDto.setPaginaNum(0);
 		paginacioParamsDto.setPaginaTamany(notificacioEnviamentRepository.findAll().size());
-		PaginaDto<NotificacioTableItemDto> pagina = findAmbFiltrePaginat(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacioParamsDto);
+		var pagina = findAmbFiltrePaginat(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacioParamsDto);
 		List<Long> idsNotificacions = new ArrayList<>();
-		for (NotificacioTableItemDto notificacio: pagina.getContingut()) {
+		for (var notificacio: pagina.getContingut()) {
 			idsNotificacions.add(notificacio.getId());
 		}
 		return idsNotificacions;
@@ -684,13 +663,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public PaginaDto<NotificacioDto> findWithCallbackError(NotificacioErrorCallbackFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-		Page<NotificacioEntity> page = null;
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		Page<NotificacioEntity> page;
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (filtre == null || filtre.isEmpty()) {
 				page = notificacioRepository.findNotificacioLastEventAmbError(paginacioHelper.toSpringDataPageable(paginacioParams));
 			} else {
-				Date dataInici = filtre.getDataInici();
+				var dataInici = filtre.getDataInici();
 				if (dataInici != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataInici);
@@ -700,7 +679,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 					cal.set(Calendar.MILLISECOND, 0);
 					dataInici = cal.getTime();
 				}
-				Date dataFi = filtre.getDataFi();
+				var dataFi = filtre.getDataFi();
 				if (dataFi != null) {
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(dataFi);
@@ -746,9 +725,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<CodiValorDto> llistarNivellsAdministracions() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			List<CodiValor> codiValor = new ArrayList<>();
 			try {
 				codiValor = cacheHelper.llistarNivellsAdministracions();
 			} catch (Exception ex) {
@@ -764,9 +743,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<CodiValorDto> llistarComunitatsAutonomes() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			List<CodiValor> codiValor = new ArrayList<>();
 			try {
 				codiValor = cacheHelper.llistarComunitatsAutonomes();
 			} catch (Exception ex) {
@@ -782,7 +761,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<PaisosDto> llistarPaisos() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			List<CodiValorPais> codiValorPais = new ArrayList<>();
 			try {
@@ -800,9 +779,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			List<CodiValor> codiValor = new ArrayList<>();
 			try {
 				codiValor = pluginHelper.llistarProvincies();
 			} catch (Exception ex) {
@@ -818,9 +797,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<ProvinciesDto> llistarProvincies(String codiCA) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			List<CodiValor> codiValor = new ArrayList<>();
 			try {
 				codiValor = cacheHelper.llistarProvincies(codiCA);
 			} catch (Exception ex) {
@@ -836,9 +815,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<LocalitatsDto> llistarLocalitats(String codiProvincia) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			List<CodiValor> codiValor = new ArrayList<CodiValor>();
+			List<CodiValor> codiValor = new ArrayList<>();
 			try {
 				codiValor = cacheHelper.llistarLocalitats(codiProvincia);
 			} catch (Exception ex) {
@@ -855,7 +834,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public List<OrganGestorDto> cercaUnitats(String codi, String denominacio, Long nivellAdministracio, Long comunitatAutonoma, Boolean ambOficines,
 											 Boolean esUnitatArrel, Long provincia, String municipi) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			return pluginHelper.cercaUnitats(codi, denominacio, nivellAdministracio, comunitatAutonoma, ambOficines, esUnitatArrel, provincia, municipi);
 		} finally {
@@ -867,7 +846,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> unitatsPerCodi(String codi) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			return pluginHelper.unitatsPerCodi(codi);
 		} finally {
@@ -879,7 +858,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<OrganGestorDto> unitatsPerDenominacio(String denominacio) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			return pluginHelper.unitatsPerDenominacio(denominacio);
 		} finally {
@@ -891,7 +870,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbNotificacio(Long entitatId, Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels events de la notificació (notificacioId=" + notificacioId + ")");
 			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrderByDataAsc(notificacioId), NotificacioEventDto.class);
@@ -904,10 +883,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<NotificacioAuditDto> historicFindAmbNotificacio(Long entitatId, Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels històrics de la notificació (notificacioId=" + notificacioId + ")");
-			List<NotificacioAudit> historic = notificacioAuditRepository.findByNotificacioIdOrderByCreatedDateAsc(notificacioId);
+			var historic = notificacioAuditRepository.findByNotificacioIdOrderByCreatedDateAsc(notificacioId);
 			return conversioTipusHelper.convertirList(historic, NotificacioAuditDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -918,9 +897,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public NotificacioEventDto findUltimEventCallbackByNotificacio(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEventEntity event = notificacioEventRepository.findUltimEventByNotificacioId(notificacioId);
+			var event = notificacioEventRepository.findUltimEventByNotificacioId(notificacioId);
 			return event != null ? conversioTipusHelper.convertir(event, NotificacioEventDto.class) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -931,9 +910,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public NotificacioEventDto findUltimEventRegistreByNotificacio(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEventEntity event = notificacioEventRepository.findUltimEventRegistreByNotificacioId(notificacioId);
+			var event = notificacioEventRepository.findUltimEventRegistreByNotificacioId(notificacioId);
 			return event != null ? conversioTipusHelper.convertir(event, NotificacioEventDto.class) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -944,10 +923,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<NotificacioEventDto> eventFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
-			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEventRepository.findByNotificacioIdOrEnviamentIdOrderByDataAsc(notificacioId, enviamentId), NotificacioEventDto.class);
 		} finally {
@@ -959,10 +938,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public List<NotificacioEnviamentAuditDto> historicFindAmbEnviament(Long entitatId, Long notificacioId, Long enviamentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta dels events associats a un destinatari (notificacioId=" + notificacioId + ", enviamentId=" + enviamentId + ")");
-			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			entityComprovarHelper.comprovarPermisos(enviament.getNotificacio().getId(), true, true, true);
 			return conversioTipusHelper.convertirList(notificacioEnviamentAuditRepository.findByEnviamentIdOrderByCreatedDateAsc(enviamentId), NotificacioEnviamentAuditDto.class);
 		} finally {
@@ -974,11 +953,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public ArxiuDto getDocumentArxiu(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			String nomDocumentDefault = "document";
-			NotificacioEntity entity = notificacioRepository.findById(notificacioId).orElseThrow();
-			DocumentEntity document = entity.getDocument();
+			var nomDocumentDefault = "document";
+			var entity = notificacioRepository.findById(notificacioId).orElseThrow();
+			var document = entity.getDocument();
 			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -989,11 +968,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public ArxiuDto getDocumentArxiu(Long notificacioId, Long documentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			String nomDocumentDefault = "document";
-			DocumentEntity document = documentRepository.findById(documentId).orElse(null);
-//			DocumentEntity document = documentRepository.findByNotificacioIdAndId(notificacioId, documentId);
+			var nomDocumentDefault = "document";
+			var document = documentRepository.findById(documentId).orElse(null);
 			return documentHelper.documentToArxiuDto(nomDocumentDefault, document);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1004,10 +982,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional(readOnly = true)
 	public ArxiuDto enviamentGetCertificacioArxiu(Long enviamentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
+			var output = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
 			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
 		} finally {
@@ -1019,10 +997,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean enviar(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Intentant enviament de la notificació pendent (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = notificaHelper.notificacioEnviar(notificacioId);
+			var notificacio = notificaHelper.notificacioEnviar(notificacioId);
 			return (notificacio != null && NotificacioEstatEnumDto.ENVIADA.equals(notificacio.getEstat()));
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -1033,7 +1011,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			return notificacioHelper.registrarNotificar(notificacioId);
 		} finally {
@@ -1045,13 +1023,12 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Transactional
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Refrescant l'estat de la notificació de Notific@ (enviamentId=" + enviamentId + ")");
-			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
-//			enviament.setNotificacio(notificacioRepository.findById(enviament.getNotificacio().getId()));
+			var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();
 			notificaHelper.enviamentRefrescarEstat(enviament.getId());
-			NotificacioEnviamenEstatDto estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
+			var estatDto = conversioTipusHelper.convertir(enviament, NotificacioEnviamenEstatDto.class);
 			estatCalcularCampsAddicionals(enviament, estatDto);
 			return estatDto;
 		} finally {
@@ -1063,11 +1040,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public String marcarComProcessada(Long notificacioId, String motiu, boolean isAdministrador) throws Exception {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Refrescant l'estat de la notificació a PROCESSAT (notificacioId=" + notificacioId + ")");
 			String resposta = null;
-			NotificacioEntity notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacioEntity = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			if (!NotificacioEstatEnumDto.FINALITZADA.equals(notificacioEntity.getEstat())) {
 				throw new Exception("La notificació no es pot marcar com a processada, no esta en estat finalitzada.");
 			}
@@ -1076,7 +1053,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 				throw new Exception("La notificació no es pot marcar com a processada, l'usuari no té els permisos requerits.");
 			}
 			notificacioEntity = auditNotificacioHelper.updateNotificacioProcessada(notificacioEntity, motiu);
-			UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
+			var usuari = usuariHelper.getUsuariAutenticat();
 			if(usuari != null && notificacioEntity.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
 //				if(!usuari.isRebreEmailsNotificacioCreats() || usuari.getCodi() == notificacioEntity.getCreatedBy().getCodi()) {
 					resposta = emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacioEntity);
@@ -1097,8 +1074,8 @@ public class NotificacioServiceImpl implements NotificacioService {
 	 */
 	private boolean hasPermisProcessar(NotificacioEntity notificacio) {
 
-		boolean hasPermis = false;
-		ProcSerEntity procedimentNotificacio = notificacio.getProcediment();
+		var hasPermis = false;
+		var procedimentNotificacio = notificacio.getProcediment();
 		if (procedimentNotificacio != null) {
 			hasPermis = entityComprovarHelper.hasPermisProcediment(
 					notificacio.getProcediment().getId(),
@@ -1122,12 +1099,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean reactivarConsulta(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
-	//			List<NotificacioEnviamentEntity> enviamentsEntity = notificacioEnviamentRepository.findByNotificacio(notificacio);
-			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			for(var enviament: notificacio.getEnviaments()) {
 				auditEnviamentHelper.resetConsultaNotifica(enviament);
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -1145,11 +1121,11 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean reactivarSir(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Reactivant consultes d'estat de SIR (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
-			for(NotificacioEnviamentEntity enviament: notificacio.getEnviaments()) {
+			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			for(var enviament: notificacio.getEnviaments()) {
 				auditEnviamentHelper.resetConsultaSir(enviament);
 			}
 			notificacioTableHelper.actualitzarRegistre(notificacio);
@@ -1240,7 +1216,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public void enviamentRefrescarEstat(Long enviamentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			notificaHelper.enviamentRefrescarEstat(enviamentId);
 		} finally {
@@ -1266,7 +1242,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public void enviamentRefrescarEstatRegistre(Long enviamentId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			registreHelper.enviamentRefrescarEstatRegistre(enviamentId);
 		} finally {
@@ -1278,16 +1254,16 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public PaginaDto<NotificacioDto> findNotificacionsAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-		Page<NotificacioEntity> page = null;
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		Page<NotificacioEntity> page;
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (filtre == null || filtre.isEmpty()) {
-				Pageable params = paginacioHelper.toSpringDataPageable(paginacioParams);
+				var params = paginacioHelper.toSpringDataPageable(paginacioParams);
 				page = notificacioRepository.findByNotificaEstatPendentSenseReintentsDisponibles(entitatId, pluginHelper.getRegistreReintentsMaxProperty(), params);
 			} else {
-				Date dataInici = filtre.getDataInici();
+				var dataInici = filtre.getDataInici();
 				if (dataInici != null) {
-					Calendar cal = Calendar.getInstance();
+					var cal = Calendar.getInstance();
 					cal.setTime(dataInici);
 					cal.set(Calendar.HOUR, 0);
 					cal.set(Calendar.MINUTE, 0);
@@ -1295,9 +1271,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					cal.set(Calendar.MILLISECOND, 0);
 					dataInici = cal.getTime();
 				}
-				Date dataFi = filtre.getDataFi();
+				var dataFi = filtre.getDataFi();
 				if (dataFi != null) {
-					Calendar cal = Calendar.getInstance();
+					var cal = Calendar.getInstance();
 					cal.setTime(dataFi);
 					cal.set(Calendar.HOUR, 23);
 					cal.set(Calendar.MINUTE, 59);
@@ -1336,15 +1312,15 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public List<Long> findNotificacionsIdAmbErrorRegistre(Long entitatId, NotificacioRegistreErrorFiltreDto filtre) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
-		List<Long> ids = null;
+		var timer = metricsHelper.iniciMetrica();
+		List<Long> ids;
 		try {
 			if (filtre == null || filtre.isEmpty()) {
 				ids = notificacioRepository.findIdsByNotificaEstatPendentSenseReintentsDisponibles(entitatId, pluginHelper.getRegistreReintentsMaxProperty());
 			} else {
-				Date dataInici = filtre.getDataInici();
+				var dataInici = filtre.getDataInici();
 				if (dataInici != null) {
-					Calendar cal = Calendar.getInstance();
+					var cal = Calendar.getInstance();
 					cal.setTime(dataInici);
 					cal.set(Calendar.HOUR, 0);
 					cal.set(Calendar.MINUTE, 0);
@@ -1352,9 +1328,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 					cal.set(Calendar.MILLISECOND, 0);
 					dataInici = cal.getTime();
 				}
-				Date dataFi = filtre.getDataFi();
+				var dataFi = filtre.getDataFi();
 				if (dataFi != null) {
-					Calendar cal = Calendar.getInstance();
+					var cal = Calendar.getInstance();
 					cal.setTime(dataFi);
 					cal.set(Calendar.HOUR, 0);
 					cal.set(Calendar.MINUTE, 0);
@@ -1390,10 +1366,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public void reactivarRegistre(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Reactivant registre de la notificació (notificacioId=" + notificacioId + ")");
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			auditNotificacioHelper.updateNotificacioRefreshRegistreNotificacio(notificacio);
 		} catch (Exception e) {
 			log.debug("Error reactivant consultes d'estat de la notificació (notificacioId=" + notificacioId + ")", e);
@@ -1406,9 +1382,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean reenviarNotificacioAmbErrors(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 				notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 				notificacioEnviar(notificacioId);
@@ -1426,9 +1402,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public boolean reactivarNotificacioAmbErrors(Long notificacioId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			NotificacioEntity notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
+			var notificacio = entityComprovarHelper.comprovarNotificacio(null, notificacioId);
 			if (NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(notificacio.getEstat())) {
 				auditNotificacioHelper.updateNotificacioReintentaFinalitzadaAmbErrors(notificacio);
 				return true;
@@ -1454,13 +1430,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	@Override
 	public void refrescarEnviamentsExpirats() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			
 			log.debug("S'ha iniciat els procés d'actualització dels enviaments expirats");
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			String username = auth == null ? "schedulled" : auth.getName();
-			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(username);
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			var username = auth == null ? "schedulled" : auth.getName();
+			var progres = progresActualitzacioExpirades.get(username);
 			if (progres != null) {
 				progres.addInfo(TipusActInfo.ERROR, "Existeix un altre procés en progrés...");
 				return;
@@ -1470,7 +1446,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			enviamentHelper.refrescarEnviamentsExpirats(progres);
 			progres.setProgres(100);
 			progres.setFinished(true);
-//			progresActualitzacioExpirades.remove(username);
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
@@ -1479,11 +1454,10 @@ public class NotificacioServiceImpl implements NotificacioService {
 	@Override
 	public ProgresActualitzacioCertificacioDto actualitzacioEnviamentsEstat() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			ProgresActualitzacioCertificacioDto progres = progresActualitzacioExpirades.get(auth.getName());
-//			if (progres != null && progres.getProgres() != null &&  progres.getProgres() >= 100) {
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			var progres = progresActualitzacioExpirades.get(auth.getName());
 			if (progres != null && progres.isFinished()) {
 				progresActualitzacioExpirades.remove(auth.getName());
 			}
@@ -1583,27 +1557,30 @@ public class NotificacioServiceImpl implements NotificacioService {
 	public void actualitzarReferencies() {
 
 		try {
-			List<Long> ids = notificacioRepository.findIdsSenseReferencia();
+			var ids = notificacioRepository.findIdsSenseReferencia();
 			int size = ids != null ? ids.size() : 0;
 
 			// Obtenim el xifrador
-			Cipher cipher = Cipher.getInstance("RC4");
-			SecretKeySpec rc4Key = new SecretKeySpec(configHelper.getConfig("es.caib.notib.notifica.clau.xifrat.ids").getBytes(),"RC4");
+			var cipher = Cipher.getInstance("RC4");
+			var rc4Key = new SecretKeySpec(configHelper.getConfig("es.caib.notib.notifica.clau.xifrat.ids").getBytes(),"RC4");
 			cipher.init(Cipher.ENCRYPT_MODE, rc4Key);
 
 			log.info("Actualitzant not_notificacions");
-			for (int foo = 0; foo < size; foo++) {
-				Long notId = ids.get(foo);
-				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(notId.longValue()))));
+			Long notId;
+			String referencia;
+			for (var foo = 0; foo < size; foo++) {
+				notId = ids.get(foo);
+				referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(notId.longValue()))));
 				notificacioRepository.updateReferencia(notId, referencia);
 			}
 
 			log.info("Actualitzant not_notificacio_env");
 			ids = enviamentRepository.findIdsSenseReferencia();
 			size = ids != null ? ids.size() : 0;
+			Long id;
 			for (int foo = 0; foo < size; foo++) {
-				Long id = ids.get(foo);
-				String referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(id.longValue()))));
+				id = ids.get(foo);
+				referencia = new String(Base64.encodeBase64(cipher.doFinal(longToBytes(id.longValue()))));
 				enviamentRepository.updateReferencia(id, referencia);
 			}
 			//Taules auxiliar de notificacions
@@ -1621,7 +1598,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 	private byte[] longToBytes(long l) {
 
 		byte[] result = new byte[Long.SIZE / Byte.SIZE];
-		for (int i = 7; i >= 0; i--) {
+		for (var i = 7; i >= 0; i--) {
 			result[i] = (byte)(l & 0xFF);
 			l >>= 8;
 		}
@@ -1630,7 +1607,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 
 	public DocumentDto consultaDocumentIMetadades(String identificador, Boolean esUuid) {
 		
-		Document documentArxiu = new Document();
+		var documentArxiu = new Document();
 		try {
 			documentArxiu =  esUuid ? pluginHelper.arxiuDocumentConsultar(identificador, null, true, true)
 							: pluginHelper.arxiuDocumentConsultar(identificador, null, true, false);
@@ -1639,7 +1616,7 @@ public class NotificacioServiceImpl implements NotificacioService {
 			return null;
 			
 		}
-		DocumentDto documentDto = new DocumentDto();
+		var documentDto = new DocumentDto();
 		if (documentArxiu != null) {
 			documentDto.setCsv(identificador);
 			if (documentArxiu.getMetadades() != null) {

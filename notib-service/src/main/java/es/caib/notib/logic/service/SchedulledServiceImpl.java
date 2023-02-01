@@ -101,7 +101,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 			}
 			log.info("[REG] Realitzant registre per a " + pendents.size() + " notificacions pendents");
 			RegistrarThread thread;
-			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
+			var multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
 			for (var pendent : pendents) {
 				if (multiThread) {
 					thread = new RegistrarThread(pendent, notificacioHelper);
@@ -319,7 +319,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	/////////////////////////////////////////////////////////////////////////
 	@Override
 	public void actualitzarServeis() {
-		Timer.Context timer = metricsHelper.iniciMetrica();
+
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.info("[SER] Actualitzant serveis...");
 			if (!isActualitzacioServeisActiuProperty()) {
@@ -328,13 +329,13 @@ public class SchedulledServiceImpl implements SchedulledService {
 			}
 			addAdminAuthentication();
 			log.info("[SER] Cercant entitats per a actualitzar els serveis");
-			List<EntitatDto> entitats = entitatService.findAll();
+			var entitats = entitatService.findAll();
 			if (entitats == null || entitats.isEmpty()) {
 				log.info("[SER] No hi ha entitats per actualitzar");
 				return;
 			}
 			log.info("[SER] Realitzant actualització de serveis per a " + entitats.size() + " entitats");
-			for (EntitatDto entitat: entitats) {
+			for (var entitat: entitats) {
 				log.info(">>> Actualitzant serveis de la entitat: " + entitat.getNom());
 				serveiService.actualitzaServeis(entitat);
 			}
@@ -351,8 +352,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 		if (configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA) == null) {// Tasca en segon pla no configurada
 			return;
 		}
-		List<EntitatEntity> entitats = entitatRepository.findAll();
-		for(EntitatEntity entitat: entitats) {
+		var entitats = entitatRepository.findAll();
+		for(var entitat: entitats) {
 			organGestorHelper.consultaCanvisOrganigrama(entitat);
 		}
     }
@@ -362,16 +363,16 @@ public class SchedulledServiceImpl implements SchedulledService {
 	public void monitorIntegracionsEliminarAntics() {
 
 		log.debug("Execució tasca periòdica: netejar monitor integracions");
-		String dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES);
+		var dies = configHelper.getConfig(PropertiesConstants.MONITOR_INTEGRACIONS_ELIMINAR_ANTERIORS_DIES);
 		int d = 3;
 		try {
 			d = Integer.parseInt(dies);
 		} catch (Exception ex) {
 			log.error("La propietat no retorna un número -> " + dies);
 		}
-		Calendar c = Calendar.getInstance();
+		var c = Calendar.getInstance();
 		c.add(DAY_OF_MONTH, -d);
-		Date llindar = c.getTime();
+		var llindar = c.getTime();
 		integracioHelper.eliminarAntics(llindar);
 	}
 
@@ -399,7 +400,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private String getBaseDir(String agrupacio) {
 
 		// TODO: Això es global o per entitat???!!!
-		String baseDir = configHelper.getConfig("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
+		var baseDir = configHelper.getConfig("es.caib.notib.plugin.gesdoc.filesystem.base.dir");
 		if (baseDir == null) {
 			return null;
 		}
@@ -411,7 +412,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	@Override
 	public void refrescarNotificacionsExpirades() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.info("[EXPIRATS] Refrescant notificacions expirades");
 			addAdminAuthentication();
@@ -423,7 +424,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 	
 	private void addAdminAuthentication() {
 
-		Principal principal = new Principal() {
+		var principal = new Principal() {
 			public String getName() {
 				return "SCHEDULLER";
 			}
@@ -431,7 +432,7 @@ public class SchedulledServiceImpl implements SchedulledService {
 		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority("NOT_SUPER"));
 		authorities.add(new SimpleGrantedAuthority("NOT_ADMIN"));
-		Authentication auth = new UsernamePasswordAuthenticationToken(principal , "N/A", authorities);
+		var auth = new UsernamePasswordAuthenticationToken(principal , "N/A", authorities);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 	}
 

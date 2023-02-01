@@ -39,7 +39,7 @@ public class AvisServiceImpl implements AvisService {
 	public AvisDto create(AvisDto avis) {
 
 		log.debug("Creant una nova avis (avis=" + avis + ")");
-		AvisEntity entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
+		var entity = AvisEntity.getBuilder(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell(),
 							avis.getAvisAdministrador(), avis.getEntitatId()).build();
 		return conversioTipusHelper.convertir(avisRepository.save(entity), AvisDto.class);
 	}
@@ -49,7 +49,7 @@ public class AvisServiceImpl implements AvisService {
 	public AvisDto update(AvisDto avis) {
 
 		log.debug("Actualitzant avis existent (avis=" + avis + ")");
-		AvisEntity avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
+		var avisEntity = avisRepository.findById(avis.getId()).orElseThrow();
 		avisEntity.update(avis.getAssumpte(), avis.getMissatge(), avis.getDataInici(), avis.getDataFinal(), avis.getAvisNivell());
 		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 	}
@@ -59,7 +59,7 @@ public class AvisServiceImpl implements AvisService {
 	public AvisDto updateActiva(Long id, boolean activa) {
 
 		log.debug("Actualitzant propietat activa d'una avis existent (id=" + id + ", activa=" + activa + ")");
-		AvisEntity avisEntity = avisRepository.findById(id).orElseThrow();
+		var avisEntity = avisRepository.findById(id).orElseThrow();
 		avisEntity.updateActiva(activa);
 		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 	}
@@ -69,7 +69,7 @@ public class AvisServiceImpl implements AvisService {
 	public AvisDto delete(Long id) {
 
 		log.debug("Esborrant avis (id=" + id +  ")");
-		AvisEntity avisEntity = avisRepository.findById(id).orElseThrow();
+		var avisEntity = avisRepository.findById(id).orElseThrow();
 		avisRepository.delete(avisEntity);
 		return conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 	}
@@ -79,7 +79,7 @@ public class AvisServiceImpl implements AvisService {
 	public AvisDto findById(Long id) {
 
 		log.debug("Consulta de l'avis (id=" + id + ")");
-		AvisEntity avisEntity = avisRepository.findById(id).orElse(null);
+		var avisEntity = avisRepository.findById(id).orElse(null);
 		AvisDto dto = conversioTipusHelper.convertir(avisEntity, AvisDto.class);
 		return dto;
 	}

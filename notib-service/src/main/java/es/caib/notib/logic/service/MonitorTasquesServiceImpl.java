@@ -21,7 +21,7 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
     @Override
     public MonitorTascaInfo addTasca(String codiTasca) {
 
-        MonitorTascaInfo monitorTascaInfo = new MonitorTascaInfo();
+        var monitorTascaInfo = new MonitorTascaInfo();
         monitorTascaInfo.setCodi(codiTasca);
         monitorTascaInfo.setEstat(MonitorTascaEstat.EN_ESPERA);
         MonitorTasquesServiceImpl.tasques.put(codiTasca, monitorTascaInfo);
@@ -35,7 +35,7 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 
     private void updateEstat(String codi, MonitorTascaEstat estat) {
 
-        MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
         monitorTascaInfo.setEstat(estat);
         MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
 
@@ -43,16 +43,16 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
 
     private void updateDataInici(String codi) {
 
-        Date dataInici = updateData(0L);
-        MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+        var dataInici = updateData(0L);
+        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
         monitorTascaInfo.setDataInici(dataInici);
         MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
     }
 
     private void updateDataFi(String codi, boolean iniciant) {
 
-        Date dataFi = updateData(0L);
-        MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+        var dataFi = updateData(0L);
+        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
         monitorTascaInfo.setDataFi(iniciant ? null : dataFi);
         MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
     }
@@ -60,8 +60,8 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
     @Override
     public void updateProperaExecucio(String codi, Long plusValue) {
 
-        Date dataProperaExecucio = updateData(plusValue);
-        MonitorTascaInfo monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
+        var dataProperaExecucio = updateData(plusValue);
+        var monitorTascaInfo = MonitorTasquesServiceImpl.tasques.get(codi);
         monitorTascaInfo.setProperaExecucio(dataProperaExecucio);
         MonitorTasquesServiceImpl.tasques.put(codi, monitorTascaInfo);
     }
@@ -74,7 +74,7 @@ public class MonitorTasquesServiceImpl implements MonitorTasquesService {
     public List<MonitorTascaInfo> findAll() {
 
         List<MonitorTascaInfo> monitorTasques = new ArrayList<>();
-        for(Map.Entry<String, MonitorTascaInfo> tasca : MonitorTasquesServiceImpl.tasques.entrySet()) {
+        for(var tasca : MonitorTasquesServiceImpl.tasques.entrySet()) {
             monitorTasques.add(tasca.getValue());
         }
         return monitorTasques;

@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import es.caib.notib.logic.clases.CallbackProcessarPendentsThread;
 import es.caib.notib.logic.helper.PropertiesConstants;
 import es.caib.notib.logic.intf.service.CallbackService;
@@ -12,16 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -49,26 +43,27 @@ public class CallbackServiceImpl implements CallbackService {
 	@Transactional(readOnly = true)
 	public void processarPendents() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			if (!isTasquesActivesProperty() || !isCallbackPendentsActiu()) {
 				log.info("[Callback] Enviament callbacks deshabilitat. ");
 			}
 			log.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
-			Pageable page = PageRequest.of(0, maxPendents);
-			List<Long> pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
+			var page = PageRequest.of(0, maxPendents);
+			var pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
 			if (pendentsIds.isEmpty()) {
 				log.info("[Callback] No hi ha notificacions pendents d'enviar. ");
+				return;
 			}
 			log.info("[Callback] Inici de les notificacions pendents cap a les aplicacions.");
 			int errors = 0;
-			ExecutorService executorService = Executors.newFixedThreadPool(pendentsIds.size());
+			var executorService = Executors.newFixedThreadPool(pendentsIds.size());
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
 			CallbackProcessarPendentsThread thread;
 			Future<Boolean> futur;
-			boolean multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-			for (Long eventId: pendentsIds) {
+			var multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
+			for (var eventId: pendentsIds) {
 				log.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
 				try {
 					if (multiThread) {
@@ -88,10 +83,11 @@ public class CallbackServiceImpl implements CallbackService {
 					callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
 				}
 			}
-			Set<Long> keys = futurs.keySet();
-			for (Long key : keys) {
+			var keys = futurs.keySet();
+			boolean err;
+			for (var key : keys) {
 				try {
-					Boolean err = futurs.get(key).get();
+					err = futurs.get(key).get();
 					errors = err ? errors + 1 : errors;
 				} catch (Exception ex) {
 					errors++;

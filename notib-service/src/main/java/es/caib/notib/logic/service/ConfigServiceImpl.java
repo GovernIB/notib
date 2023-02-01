@@ -4,9 +4,7 @@ import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
 import es.caib.notib.logic.intf.service.ConfigService;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.config.ConfigEntity;
-import es.caib.notib.persist.entity.config.ConfigGroupEntity;
 import es.caib.notib.logic.helper.CacheHelper;
 import es.caib.notib.logic.helper.ConfigHelper;
 import es.caib.notib.logic.helper.ConversioTipusHelper;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
@@ -84,14 +81,16 @@ public class ConfigServiceImpl implements ConfigService {
     public List<String> syncFromJBossProperties() {
 
         log.info("Sincronitzant les propietats amb JBoss");
-        Properties properties = configHelper.getEnvironmentProperties();
+        var properties = configHelper.getEnvironmentProperties();
         List<String> editedProperties = new ArrayList<>();
         List<String> propertiesList = new ArrayList<>(properties.stringPropertyNames());
         Collections.sort(propertiesList);
-        for (String key : propertiesList) {
-            String value = properties.getProperty(key);
+        String value;
+        ConfigEntity configEntity;
+        for (var key : propertiesList) {
+            value = properties.getProperty(key);
             log.info(key + " : " + value);
-            ConfigEntity configEntity = configRepository.findById(key).orElse(null);
+            configEntity = configRepository.findById(key).orElse(null);
             if (configEntity != null) {
                 configEntity.update(value);
                 editedProperties.add(configEntity.getKey());
@@ -110,7 +109,7 @@ public class ConfigServiceImpl implements ConfigService {
             log.error("Entitat config key buida o no conté el prefix. Key: " + key);
             return new ArrayList<>();
         }
-        String [] split = key.split(ConfigDto.prefix);
+        var split = key.split(ConfigDto.prefix);
         if (split == null || split.length != 2) {
             log.error("Entitat config key no trobada. Key: " + key);
             return new ArrayList<>();
@@ -122,11 +121,11 @@ public class ConfigServiceImpl implements ConfigService {
     @Transactional
     public void crearPropietatsConfigPerEntitats() {
 
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
-        List<EntitatEntity> entitats = entitatRepository.findAll();
+        var configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
+        var entitats = entitatRepository.findAll();
         ConfigEntity nova;
-        for (ConfigEntity config : configs) {
-            for (EntitatEntity entitat : entitats) {
+        for (var config : configs) {
+            for (var entitat : entitats) {
                 String key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
                 if (configRepository.findByKey(key) != null ) {
                     continue;
@@ -142,8 +141,8 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public void actualitzarPropietatsJBossBdd() {
 
-        List<ConfigEntity> configs = configRepository.findJBossConfigurables();
-        for(ConfigEntity config : configs) {
+        var configs = configRepository.findJBossConfigurables();
+        for(var config : configs) {
             String property = configHelper.getConfigGlobal(config.getKey());
             config.setValue(property);
             configRepository.save(config);
@@ -156,7 +155,8 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {
-        for (ConfigDto config: cGroup.getConfigs()) {
+
+        for (var config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){
                 config.setValue("*****");
             } else if (config.isJbossProperty()) {
@@ -166,7 +166,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
 
         if (cGroup.getInnerConfigs() != null && !cGroup.getInnerConfigs().isEmpty()) {
-            for (ConfigGroupDto child : cGroup.getInnerConfigs()) {
+            for (var child : cGroup.getInnerConfigs()) {
                 processPropertyValues(child);
             }
         }

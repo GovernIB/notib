@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
@@ -15,7 +14,6 @@ import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.OrganGestorEntity;
 import es.caib.notib.persist.entity.cie.PagadorPostalEntity;
 import es.caib.notib.logic.helper.*;
@@ -23,7 +21,6 @@ import es.caib.notib.persist.repository.OrganGestorRepository;
 import es.caib.notib.persist.repository.PagadorPostalRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,7 +95,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional
 	public OperadorPostalDto delete(Long id) throws NotFoundException {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			//TODO: Si es tothom comprovar que és administrador d'Organ i que l'usuari es administrador de l'Organ associat al pagadorPostal a eliminar.
 			PagadorPostalEntity pagadorPostalEntity = entityComprovarHelper.comprovarPagadorPostal(id);
@@ -126,15 +123,15 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public PaginaDto<OperadorPostalTableItemDto> findAmbFiltrePaginat(Long entitatId, OperadorPostalFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			entityComprovarHelper.comprovarPermisos(null, true, true, true);
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
+			Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<>();
 			mapeigPropietatsOrdenacio.put("organismePagador", new String[] {"organismePagadorCodi"});
 			var pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 			Page<PagadorPostalEntity> pageOpearadorsPostals;
-			List<String> organsFills = null;
+			List<String> organsFills;
 			if (filtre.getOrganGestorId() != null) {
 				var organGestor = entityComprovarHelper.comprovarOrganGestor(entitat, filtre.getOrganGestorId());
 				organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
@@ -165,7 +162,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public List<OperadorPostalDto> findAll() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			entityComprovarHelper.comprovarPermisos(null, true, true, false);
@@ -179,7 +176,7 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findAllIdentificadorText() {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els pagadors postals");
 			entityComprovarHelper.comprovarPermisos(null, true, true, false);
@@ -194,13 +191,13 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findPagadorsByEntitat(EntitatDto entitat) {
 
-		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		List<IdentificadorTextDto> pagadors = findNoCaducatsByEntitat(entitat);
-		PagadorPostalEntity pagador = pagadorPostalReposity.obtenirPagadorsEntitat(e);
+		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var pagadors = findNoCaducatsByEntitat(entitat);
+		var pagador = pagadorPostalReposity.obtenirPagadorsEntitat(e);
 		if (pagador == null) {
 			return pagadors;
 		}
-		IdentificadorTextDto i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
+		var i = conversioTipusHelper.convertir(pagador, IdentificadorTextDto.class);
 		if (!pagadors.contains(i)) {
 			i.setIcona("fa fa-warning text-danger");
 			pagadors.add(0, i);
@@ -212,12 +209,11 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitat(EntitatDto entitat) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els pagadors postals");
-			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-//			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
-			List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
+			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			var p = pagadorPostalReposity.findByEntitatAndContracteDataVigGreaterThanEqual(e, new Date());
 			return conversioTipusHelper.convertirList(p, IdentificadorTextDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -228,20 +224,20 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public List<IdentificadorTextDto> findNoCaducatsByEntitatAndOrgan(EntitatDto entitat, String organCodi, boolean isAdminOrgan) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta de tots els pagadors postals");
-			EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-			OrganGestorEntity o = organGestorRepository.findByCodi(organCodi);
+			var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+			var o = organGestorRepository.findByCodi(organCodi);
 //			entityComprovarHelper.comprovarPermisos(entitat.getId(), true, true, false);
-			List<PagadorPostalEntity> pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+			var pagadors = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 			if (!e.getDir3Codi().equals(organCodi)) {
-				List<PagadorPostalEntity> pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
+				var pagadorsPare = findOperadorsPare(entitat, o.getCodiPare());
 				pagadors.addAll(pagadorsPare);
 			}
-			String usr = SecurityContextHolder.getContext().getAuthentication().getName();
+			var usr = SecurityContextHolder.getContext().getAuthentication().getName();
 			List<PagadorPostalEntity> p = new ArrayList<>();
-			for (PagadorPostalEntity pagador : pagadors) {
+			for (var pagador : pagadors) {
 				if (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, pagador.getOrganGestor().getCodi(), PermisEnum.ADMIN)) {
 					continue;
 				}
@@ -257,9 +253,9 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 
 
 		List<PagadorPostalEntity> operadors = new ArrayList<>();
-		OrganGestorEntity o = organGestorRepository.findByCodi(codi);
-		EntitatEntity e = entityComprovarHelper.comprovarEntitat(entitat.getId());
-		List<PagadorPostalEntity> p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
+		var o = organGestorRepository.findByCodi(codi);
+		var e = entityComprovarHelper.comprovarEntitat(entitat.getId());
+		var p = pagadorPostalReposity.findByEntitatAndOrganGestorAndContracteDataVigGreaterThanEqual(e, o, new Date());
 		if (!Strings.isNullOrEmpty(o.getCodiPare()) && !o.getCodi().equals(entitat.getDir3Codi()) && !"A99999999".equals(o.getCodiPare())) {
 			operadors = findOperadorsPare(entitat, o.getCodiPare());
 		}
@@ -272,11 +268,11 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public List<OperadorPostalDto> findByEntitat(Long entitatId) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta els pagadors postal de l'entitat: " + entitatId);
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			List<PagadorPostalEntity> pagadorsPostal = pagadorPostalReposity.findByEntitat(entitat);
+			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+			var pagadorsPostal = pagadorPostalReposity.findByEntitat(entitat);
 			return conversioTipusHelper.convertirList(pagadorsPostal, OperadorPostalDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -287,11 +283,11 @@ public class OperadorPostalServiceImpl implements OperadorPostalService {
 	@Transactional(readOnly = true)
 	public Object findByEntitatAndOrganGestor(EntitatDto entitat, OrganGestorDto organGestor) {
 
-		Timer.Context timer = metricsHelper.iniciMetrica();
+		var timer = metricsHelper.iniciMetrica();
 		try {
 			log.debug("Consulta els pagadors postal de l'entitat: " + entitat.getId() + " i òrgan gestor: " + organGestor.getCodi());
-			List<String> organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
-			List<PagadorPostalEntity> pagadorsPostal = pagadorPostalReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills);
+			var organsFills = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitat.getDir3Codi(), organGestor.getCodi());
+			var pagadorsPostal = pagadorPostalReposity.findByEntitatIdAndOrganGestorCodiIn(entitat.getId(), organsFills);
 			return conversioTipusHelper.convertirList(pagadorsPostal, OperadorPostalDto.class);
 		} finally {
 			metricsHelper.fiMetrica(timer);
