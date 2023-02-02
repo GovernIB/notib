@@ -59,6 +59,7 @@ public class MonitorIntegracioServiceBean implements MonitorIntegracioService {
 	}
 
 	@Override
+	@RolesAllowed({"NOT_SUPER"})
 	public IntegracioDetall detallIntegracio(Long id) {
 		return delegate.detallIntegracio(id);
 	}

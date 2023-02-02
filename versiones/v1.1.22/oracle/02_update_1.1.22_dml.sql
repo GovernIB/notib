@@ -43,6 +43,6 @@ UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (select SUM(DISTINCT CASE E.NOTIFI
 UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (ESTAT_MASK + 2048) WHERE ESTAT = 15 AND registre_env_intent = 0 AND NOTIFICA_ERROR_DATE IS NULL;
 
 -- 741
-INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
+-- INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
 
 UPDATE NOT_PROCESSOS_INICIALS SET INIT = 1 WHERE codi = 'PROPIETATS_CONFIG_ENTITATS';
