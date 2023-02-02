@@ -14,11 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.util.Set;
 
 @Slf4j
 @Controller
@@ -32,20 +28,15 @@ public class AdviserController  extends BaseController {
     @RequestMapping(value = "/sincronitzar", method = RequestMethod.POST, headers="Content-Type=application/json")
     public String actualitzarReferencies(HttpServletRequest request, @RequestBody String env, Model model) {
 
-
         try {
-
-            ObjectMapper mapper = new ObjectMapper();
-            EnviamentAdviser adviser = mapper.readValue(env, EnviamentAdviser.class);
-
-            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-            Validator validator = factory.getValidator();
-            Set<ConstraintViolation<EnviamentAdviser>> violations = validator.validate(adviser);
-
+            var mapper = new ObjectMapper();
+            var adviser = mapper.readValue(env, EnviamentAdviser.class);
+            var factory = Validation.buildDefaultValidatorFactory();
+            var validator = factory.getValidator();
+            var violations = validator.validate(adviser);
             if (!violations.isEmpty()) {
                 return getMessage(request, "adviser.sincronitzar.enviament.error.validacio");
             }
-
             adviserService.sincronitzarEnviament(adviser.asDto());
             return getMessage(request, "adviser.sincronitzar.enviament.ok");
         } catch (Exception ex) {

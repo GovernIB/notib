@@ -2,7 +2,6 @@ package es.caib.notib.back.controller;
 
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.*;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;
 import es.caib.notib.logic.intf.service.EnviamentService;
@@ -51,12 +50,12 @@ public class ReintentMassiuController extends BaseUserController {
 	@RequestMapping(value = "/notificacions", method = RequestMethod.GET)
 	public String getNotificacions(HttpServletRequest request, Model model) {
 
-		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
+		var mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio);
 		model.addAttribute(getFiltre(request));
 		model.addAttribute("procediments", procedimentService.findAll());
-		String prefix = "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.";
-		List<EnumHelper.HtmlOption> estats = EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, prefix);
+		var prefix = "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.";
+		var estats = EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, prefix);
 		model.addAttribute("notificacioEstats", estats);
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
@@ -67,7 +66,7 @@ public class ReintentMassiuController extends BaseUserController {
 
 		request.getSession().setAttribute(MASSIU_CALLBACK_FILTRE, NotificacioErrorCallbackFiltreCommand.asDto(notificacioErrorCallbackFiltreCommand));
 		model.addAttribute("procediments", procedimentService.findAll());
-		String prefix = "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.";
+		var prefix = "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto.";
 		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, prefix));
 		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
 		return "contingutMassiuList";
@@ -77,14 +76,14 @@ public class ReintentMassiuController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 
-		NotificacioErrorCallbackFiltreDto filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
-		PaginaDto<NotificacioDto> pagina = notificacioService.findWithCallbackError(filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
+		var filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
+		var pagina = notificacioService.findWithCallbackError(filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
 		return DatatablesHelper.getDatatableResponse(request, pagina, "id", SESSION_ATTRIBUTE_SELECCIO);
 	}
 
 	private NotificacioErrorCallbackFiltreCommand getFiltre(HttpServletRequest request) {
 
-		NotificacioErrorCallbackFiltreDto filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
+		var filtre = (NotificacioErrorCallbackFiltreDto) request.getSession().getAttribute(MASSIU_CALLBACK_FILTRE);
 		return filtre != null ? NotificacioErrorCallbackFiltreCommand.asCommand(filtre) : new NotificacioErrorCallbackFiltreCommand();
 	}
 	
@@ -92,18 +91,17 @@ public class ReintentMassiuController extends BaseUserController {
 	@RequestMapping(value = "/notificacions/reintentar", method = RequestMethod.GET)
 	public String reintentar(HttpServletRequest request, Model model) {
 
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
-		String url = "redirect:/massiu/notificacions";
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+		var url = "redirect:/massiu/notificacions";
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(request, url, "accio.massiva.seleccio.buida");
 		}
-		for (Long notificacioId : seleccio) {
-			List<NotificacioEventDto> events = notificacioService.eventFindAmbNotificacio(null, notificacioId);
-			
+		List<NotificacioEventDto> events;
+		for (var notificacioId : seleccio) {
+			events = notificacioService.eventFindAmbNotificacio(null, notificacioId);
 			if (events != null && events.size() > 0) {
 				NotificacioEventDto lastEvent = events.get(events.size() - 1);
-				
-				if(lastEvent.isError() && 
+				if(lastEvent.isError() &&
 							(lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.CALLBACK_CLIENT) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT) ||
 							lastEvent.getTipus().equals(NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO) ||
@@ -125,13 +123,13 @@ public class ReintentMassiuController extends BaseUserController {
 	public int select(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null) {
 			seleccio = new HashSet<>();
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
 		}
 		if (ids != null) {
-			for (Long id: ids) {
+			for (var id: ids) {
 				seleccio.add(id);
 			}
 		}
@@ -143,7 +141,7 @@ public class ReintentMassiuController extends BaseUserController {
 	public int deselect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
 		if (seleccio == null) {
 			seleccio = new HashSet<>();
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
@@ -152,7 +150,7 @@ public class ReintentMassiuController extends BaseUserController {
 			seleccio.clear();
 			return seleccio.size();
 		}
-		for (Long id: ids) {
+		for (var id: ids) {
 			seleccio.remove(id);
 		}
 		return seleccio.size();
@@ -161,7 +159,7 @@ public class ReintentMassiuController extends BaseUserController {
 	@RequestMapping(value = "/detallErrorCallback/{notificacioId}", method = RequestMethod.GET)
 	public String info(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 		
-		NotificacioEventDto lastEvent = notificacioService.findUltimEventCallbackByNotificacio(notificacioId);
+		var lastEvent = notificacioService.findUltimEventCallbackByNotificacio(notificacioId);
 		model.addAttribute("event", lastEvent);
 		return "errorCallbackDetall";
 	}
@@ -188,10 +186,10 @@ public class ReintentMassiuController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse registreDatatable(HttpServletRequest request) {
 
-		NotificacioRegistreErrorFiltreDto filtre = (NotificacioRegistreErrorFiltreDto) request.getSession().getAttribute(MASSIU_REGISTRE_FILTRE);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		PaginaDto<NotificacioDto> pagina = notificacioService.findNotificacionsAmbErrorRegistre(entitatActual.getId(), filtre, params);
+		var filtre = (NotificacioRegistreErrorFiltreDto) request.getSession().getAttribute(MASSIU_REGISTRE_FILTRE);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var pagina = notificacioService.findNotificacionsAmbErrorRegistre(entitatActual.getId(), filtre, params);
 		return DatatablesHelper.getDatatableResponse(request, pagina, "id", SESSION_ATTRIBUTE_SELECCIO);
 	}
 	
@@ -199,13 +197,13 @@ public class ReintentMassiuController extends BaseUserController {
 	@RequestMapping(value = "/registre/notificacionsError/reintentar", method = RequestMethod.GET)
 	public String registreReintentar(HttpServletRequest request, Model model) {
 
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
-		String url = "redirect:/massiu/registre/notificacionsError";
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
+		var url = "redirect:/massiu/registre/notificacionsError";
 		if (seleccio == null || seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(request, url, "accio.massiva.seleccio.buida");
 		}
-		List<String> notificacionsError = new ArrayList<String>();
-		for (Long notificacioId : seleccio) {
+		List<String> notificacionsError = new ArrayList<>();
+		for (var notificacioId : seleccio) {
 			try {
 				notificacioService.reactivarRegistre(notificacioId);
 			} catch (Exception e) {
@@ -217,8 +215,8 @@ public class ReintentMassiuController extends BaseUserController {
 			if (notificacionsError.size() == seleccio.size()) {
 				getModalControllerReturnValueError(request, url, "accio.massiva.creat.ko");
 			} else {
-				String desc = "";
-				for (String err: notificacionsError) {
+				var desc = "";
+				for (var err: notificacionsError) {
 					desc = desc + err + " \n";
 				}
 				return getModalControllerReturnValueErrorWithDescription(request, url, "accio.massiva.creat.part", desc);
@@ -229,8 +227,8 @@ public class ReintentMassiuController extends BaseUserController {
 	
 	@RequestMapping(value = "/registre/detallError/{notificacioId}", method = RequestMethod.GET)
 	public String inforErrorReg(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
-		
-		NotificacioEventDto lastEvent = notificacioService.findUltimEventRegistreByNotificacio(notificacioId);
+
+		var lastEvent = notificacioService.findUltimEventRegistreByNotificacio(notificacioId);
 		model.addAttribute("event", lastEvent);
 		return "errorCallbackDetall";
 	}
@@ -240,21 +238,21 @@ public class ReintentMassiuController extends BaseUserController {
 	public int registreSelect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
 		if (seleccio == null) {
 			seleccio = new HashSet<>();
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO, seleccio);
 		}
 		if (ids != null) {
-			for (Long id: ids) {
+			for (var id: ids) {
 				seleccio.add(id);
 			}
 			return seleccio.size();
 		}
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		NotificacioRegistreErrorFiltreDto filtre = (NotificacioRegistreErrorFiltreDto) request.getSession().getAttribute(MASSIU_REGISTRE_FILTRE);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var filtre = (NotificacioRegistreErrorFiltreDto) request.getSession().getAttribute(MASSIU_REGISTRE_FILTRE);
 		try {
-			for (Long id: notificacioService.findNotificacionsIdAmbErrorRegistre(entitatActual.getId(), filtre)) {
+			for (var id: notificacioService.findNotificacionsIdAmbErrorRegistre(entitatActual.getId(), filtre)) {
 				if(!seleccio.contains(id)) {
 					seleccio.add(id);
 				}
@@ -270,7 +268,7 @@ public class ReintentMassiuController extends BaseUserController {
 	public int registreDeselect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
 		@SuppressWarnings("unchecked")
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
+		var seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO);
 		if (seleccio == null) {
 			seleccio = new HashSet<>();
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_REGISTRE_SELECCIO, seleccio);
@@ -279,7 +277,7 @@ public class ReintentMassiuController extends BaseUserController {
 			seleccio.clear();
 			return seleccio.size();
 		}
-		for (Long id: ids) {
+		for (var id: ids) {
 			seleccio.remove(id);
 		}
 		return seleccio.size();

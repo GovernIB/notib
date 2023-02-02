@@ -13,10 +13,8 @@ import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.RolHelper;
 import es.caib.notib.logic.intf.dto.CodiValorDescDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
-import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.config.ConfigDto;
 import es.caib.notib.logic.intf.dto.config.ConfigGroupDto;
@@ -37,7 +35,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -85,7 +82,7 @@ public class EntitatController extends BaseController {
 			return DatatablesHelper.getDatatableResponse(request, entitatService.findAllPaginat(DatatablesHelper.getPaginacioDtoFromRequest(request)));
 		}
 		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+			var entitat = EntitatHelper.getEntitatActual(request);
 			return DatatablesHelper.getDatatableResponse(request, Arrays.asList(entitat));
 		}
 		return null;
@@ -122,7 +119,7 @@ public class EntitatController extends BaseController {
 		var operadorPostalList = entitat != null ? operadorPostalService.findPagadorsByEntitat(entitat) : operadorPostalService.findAllIdentificadorText();
 		model.addAttribute("operadorPostalList", operadorPostalList);
 		model.addAttribute("entitatNova", entitat != null && entitat.getId() != null);
-		List<IdentificadorTextDto> cieList = entitat != null ? cieService.findPagadorsByEntitat(entitat) : cieService.findAllIdentificadorText();
+		var cieList = entitat != null ? cieService.findPagadorsByEntitat(entitat) : cieService.findAllIdentificadorText();
 		model.addAttribute("cieList", cieList);
 		return "entitatForm";
 	}
@@ -130,14 +127,14 @@ public class EntitatController extends BaseController {
 	@RequestMapping(value = "/{entitatId}/configurar", method = RequestMethod.GET)
 	public String configEntitat(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
-		List<ConfigGroupDto> configGroups = configService.findAll();
+		var configGroups = configService.findAll();
 		model.addAttribute("config_groups", configGroups);
-		EntitatDto entitat = entitatService.findById(entitatId);
+		var entitat = entitatService.findById(entitatId);
 		model.addAttribute("entitatNom", entitat.getNom());
 		if (entitat == null || Strings.isNullOrEmpty(entitat.getCodi())) {
 			return "configEntitat";
 		}
-		for (ConfigGroupDto cGroup: configGroups) {
+		for (var cGroup: configGroups) {
 			fillFormsModel(cGroup, model, entitat.getCodi());
 		}
 		return "configEntitat";
@@ -153,7 +150,7 @@ public class EntitatController extends BaseController {
 	private void fillFormsModel(ConfigGroupDto cGroup, Model model, String entiatCodi){
 
 		List<ConfigDto> confs = new ArrayList<>();
-		for (ConfigDto config: cGroup.getConfigs()) {
+		for (var config: cGroup.getConfigs()) {
 			if (Strings.isNullOrEmpty(config.getEntitatCodi()) || !config.getEntitatCodi().equals(entiatCodi)) {
 				continue;
 			}
@@ -164,7 +161,7 @@ public class EntitatController extends BaseController {
 		if (cGroup.getInnerConfigs() == null || cGroup.getInnerConfigs().isEmpty()){
 			return;
 		}
-		for (ConfigGroupDto child : cGroup.getInnerConfigs()){
+		for (var child : cGroup.getInnerConfigs()){
 			fillFormsModel(child, model, entiatCodi);
 		}
 	}
@@ -173,24 +170,24 @@ public class EntitatController extends BaseController {
 	public String save(HttpServletRequest request, @Valid EntitatCommand command, BindingResult bindingResult, Model model) throws NotFoundException, IOException {
 
 		if (bindingResult.hasErrors()) {
-			List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findAllIdentificadorText();
+			var operadorPostalList = operadorPostalService.findAllIdentificadorText();
 			model.addAttribute("operadorPostalList", operadorPostalList);
-			List<IdentificadorTextDto> cieList = cieService.findAllIdentificadorText();
+			var cieList = cieService.findAllIdentificadorText();
 			model.addAttribute("cieList", cieList);
 			model.addAttribute("errors", bindingResult.getAllErrors());
 			model.addAttribute("oficinaSelected", command.getOficina());
 			model.addAttribute("tipusDocSelected", getTipusDocSelected(request, command.getTipusDocName()));
 			return "entitatForm";
 		}
-		String redirect = "redirect:entitat";
-		String msg = command.getId() != null ? "entitat.controller.modificada.ok" : "entitat.controller.creada.ok";
+		var redirect = "redirect:entitat";
+		var msg = command.getId() != null ? "entitat.controller.modificada.ok" : "entitat.controller.creada.ok";
 		if (command.getId() != null) {
-			EntitatDto entitatDto = entitatService.update(command.asDto());
-			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+			var entitatDto = entitatService.update(command.asDto());
+			var entitatActual = EntitatHelper.getEntitatActual(request);
 			if (entitatDto != null && entitatActual != null && entitatDto.equals(entitatActual)) {
 				EntitatHelper.actualitzarEntitatActualEnSessio(request, aplicacioService, entitatService);
 			}
-			boolean isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+			var isAdminEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
 			return getModalControllerReturnValueSuccess(request,redirect + (isAdminEntitat ? "/" + command.getId() : ""), msg);
 		}
 		entitatService.create(command.asDto());
@@ -203,12 +200,14 @@ public class EntitatController extends BaseController {
 			return null;
 		}
 		List<CodiValorDescDto> valors = new ArrayList<>();
-		for (int foo = 0; foo < tipusDocName.length; foo++) {
-			TipusDocumentEnumDto tipus = TipusDocumentEnumDto.toEnum(tipusDocName[foo]);
+		TipusDocumentEnumDto tipus;
+		CodiValorDescDto valor;
+		for (var foo = 0; foo < tipusDocName.length; foo++) {
+			tipus = TipusDocumentEnumDto.toEnum(tipusDocName[foo]);
 			if (tipus == null) {
 				continue;
 			}
-			CodiValorDescDto valor = new CodiValorDescDto();
+			valor = new CodiValorDescDto();
 			valor.setCodi(tipus.getText());
 			valor.setValor(tipus.name());
 			valor.setDesc(MessageHelper.getInstance().getMessage("tipus.document.enum." + tipus.name(),null, getLocale(request)));
@@ -233,7 +232,7 @@ public class EntitatController extends BaseController {
 	@RequestMapping(value = "/{entitatId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long entitatId) {
 
-		String msg = "entitat.controller.esborrada.ok";
+		var msg = "entitat.controller.esborrada.ok";
 		try {
 			if (entitatService.delete(entitatId) != null) {
 				return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", msg);
@@ -249,7 +248,7 @@ public class EntitatController extends BaseController {
 	@RequestMapping(value = "/getEntitatLogoCap", method = RequestMethod.GET)
 	public String getEntitatLogoCap(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual == null) {
 			writeFileToResponse("Logo_cap.png", IOUtils.toByteArray(getDefaultLogo()), response);
 			return null;
@@ -275,7 +274,7 @@ public class EntitatController extends BaseController {
 	@RequestMapping(value = "/getEntitatLogoPeu", method = RequestMethod.GET)
 	public String getEntitatLogoPeu(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual == null) {
 			writeFileToResponse("Logo_cap.png", IOUtils.toByteArray(getDefaultLogo()), response);
 			return null;
@@ -303,13 +302,14 @@ public class EntitatController extends BaseController {
 	public CodiValorDescDto[] getTipusDocument(@PathVariable Long entitatId, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		CodiValorDescDto[] tipusDoc = null;
-		List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatId);
+		var tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatId);
 		if (tipusDocuments == null || tipusDocuments.isEmpty()) {
 			return tipusDoc;
 		}
 		tipusDoc = new CodiValorDescDto[tipusDocuments.size()];
-		for (int i = 0; i < tipusDocuments.size(); i++) {
-			String msg = MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request));
+		String msg;
+		for (var i = 0; i < tipusDocuments.size(); i++) {
+			msg = MessageHelper.getInstance().getMessage("tipus.document.enum." + tipusDocuments.get(i).getTipusDocEnum().name(),null,getLocale(request));
 			tipusDoc[i] = new CodiValorDescDto(String.valueOf(i),tipusDocuments.get(i).getTipusDocEnum().name(), msg);
 		}
 		return tipusDoc;
@@ -331,7 +331,7 @@ public class EntitatController extends BaseController {
 	@ResponseBody
 	private Locale getLocale(HttpServletRequest request) {
 
-		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+		var localeResolver = RequestContextUtils.getLocaleResolver(request);
 		return localeResolver != null ? localeResolver.resolveLocale(request) : request.getLocale();
 	}
 

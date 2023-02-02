@@ -1,7 +1,6 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.logic.intf.service.AplicacioService;
-import es.caib.notib.logic.intf.service.SchedulledService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api")
 public class ApiController extends BaseUserController {
 
-    @Autowired
-    private SchedulledService schedulledService;
     @Autowired
     private AplicacioService aplicacioService;
 

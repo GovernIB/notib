@@ -37,14 +37,11 @@ import es.caib.notib.logic.intf.dto.RegistreDocumentacioFisicaEnumDto;
 import es.caib.notib.logic.intf.dto.RespostaConsultaArxiuDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.ServeiTipusEnumDto;
-import es.caib.notib.logic.intf.dto.SignatureInfoDto;
-import es.caib.notib.logic.intf.dto.TipusDocumentDto;
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioDtoV2;
 import es.caib.notib.logic.intf.dto.notificacio.TipusEnviamentEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
@@ -70,7 +67,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -163,26 +159,26 @@ public class NotificacioFormController extends BaseUserController {
 
     private void initForm(HttpServletRequest request, Model model, TipusEnviamentEnumDto tipusEnviament) {
 
-        String referer = request.getHeader("Referer");
+        var referer = request.getHeader("Referer");
         RequestSessionHelper.actualitzarObjecteSessio(request, EDIT_REFERER, referer);
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        NotificacioCommand notificacioCommand = new NotificacioCommand();
-        List<EnviamentCommand> enviaments = new ArrayList<EnviamentCommand>();
-        EnviamentCommand enviament = new EnviamentCommand();
-        EntregapostalCommand entregaPostal = new EntregapostalCommand();
+        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var notificacioCommand = new NotificacioCommand();
+        List<EnviamentCommand> enviaments = new ArrayList<>();
+        var enviament = new EnviamentCommand();
+        var entregaPostal = new EntregapostalCommand();
         entregaPostal.setPaisCodi("ES");
         enviament.setEntregaPostal(entregaPostal);
         enviaments.add(enviament);
         notificacioCommand.setEnviaments(enviaments);
         notificacioCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
         notificacioCommand.setCaducitatDiesNaturals(10);
-        TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+        var tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
         if (tipusDocumentDefault != null) {
-            for(int i = 0; i < 5; i++) {
+            for(var i = 0; i < 5; i++) {
                 notificacioCommand.setTipusDocumentDefault(i, tipusDocumentDefault.name());
             }
         }
-        for(int i = 0; i < 5; i++) {
+        for(var i = 0; i < 5; i++) {
             notificacioCommand.getDocuments()[i] = new DocumentCommand();
             notificacioCommand.getDocuments()[i].setOrigen(OrigenEnum.ADMINISTRACIO);
             notificacioCommand.getDocuments()[i].setValidesa(ValidesaEnum.ORIGINAL);
@@ -280,7 +276,8 @@ public class NotificacioFormController extends BaseUserController {
 
     @RequestMapping(value = "/new/destinatari", method = RequestMethod.GET)
     public PersonaCommand altaDestinatari(HttpServletRequest request, Model model) {
-        PersonaCommand destinatari = new PersonaCommand();
+
+        var destinatari = new PersonaCommand();
         return destinatari;
     }
 
@@ -306,7 +303,6 @@ public class NotificacioFormController extends BaseUserController {
         var entitatActual = EntitatHelper.getEntitatActual(request);
         ProcSerDto procedimentActual = null;
         model.addAttribute("isPermesComunicacionsSirPropiaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.comunicacions.sir.internes", "false"));
-
         if (notificacioCommand.getProcedimentId() != null) {
             procedimentActual = procedimentService.findById(entitatActual.getId(), isAdministrador(request), notificacioCommand.getProcedimentId());
         }
@@ -347,9 +343,10 @@ public class NotificacioFormController extends BaseUserController {
     }
 
     private void relooadForm(HttpServletRequest request, NotificacioCommand notificacioCommand, BindingResult bindingResult, Model model, List<String> tipusDocumentEnumDto, EntitatDto entitatActual, ProcSerDto procedimentActual) {
+
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
         ompliModelFormulari(request, procedimentActual, entitatActual, notificacioCommand, bindingResult, tipusDocumentEnumDto, model);
-        for (ObjectError error: bindingResult.getAllErrors()) {
+        for (var error: bindingResult.getAllErrors()) {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Error formulari: " + error.toString());
         }
         model.addAttribute(notificacioCommand);
@@ -358,64 +355,55 @@ public class NotificacioFormController extends BaseUserController {
 
     private void updateDocuments(NotificacioCommand notificacioCommand, BindingResult bindingResult) throws IOException {
 
-        for (int i = 0; i < 5; i++) {
-
-            if (notificacioCommand.getTipusDocument()[i] != null) {
-                String arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
-                switch (notificacioCommand.getTipusDocument()[i]) {
-                    case ARXIU:
-                        if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
-                            byte[] contingut = notificacioCommand.getArxiu()[i].getBytes();
-                            String contentType = notificacioCommand.getArxiu()[i].getContentType();
-                            String nom = notificacioCommand.getArxiu()[i].getOriginalFilename();
-                            notificacioCommand.getDocuments()[i].setArxiuNom(nom);
-                            String contingutBase64 = Base64.getEncoder().encodeToString(contingut);
-                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                            notificacioCommand.getDocuments()[i].setMediaType(contentType);
-                            notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
-                            validaFirma(nom, contentType, bindingResult, i, contingut);
-                        } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
-                            byte[] result;
-                            if (notificacioCommand.getId() != null) {
-                                result = gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId);
-                            } else {
-                                result = gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
-                            }
-
-                            String contingutBase64 = Base64.getEncoder().encodeToString(result);
-                            notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
-                            validaFirma(notificacioCommand.getDocuments()[i].getArxiuNom(), notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                    case CSV:
-                        if (notificacioCommand.getDocumentArxiuCsv()[i] != null
-                                && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                    case UUID:
-                        if (notificacioCommand.getDocumentArxiuUuid()[i] != null
-                                && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                    case URL:
-                        if (notificacioCommand.getDocumentArxiuUrl()[i] != null
-                                && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
-                            notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
-                        } else {
-                            notificacioCommand.getDocuments()[i] = null;
-                        }
-                        break;
-                }
-            } else {
+        for (var i = 0; i < 5; i++) {
+            if (notificacioCommand.getTipusDocument()[i] == null) {
                 notificacioCommand.getDocuments()[i] = null;
+                continue;
+            }
+            var arxiuGestdocId = notificacioCommand.getDocuments()[i].getArxiuGestdocId();
+            switch (notificacioCommand.getTipusDocument()[i]) {
+                case ARXIU:
+                    if (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) {
+                        var contingut = notificacioCommand.getArxiu()[i].getBytes();
+                        var contentType = notificacioCommand.getArxiu()[i].getContentType();
+                        var nom = notificacioCommand.getArxiu()[i].getOriginalFilename();
+                        notificacioCommand.getDocuments()[i].setArxiuNom(nom);
+                        var contingutBase64 = Base64.getEncoder().encodeToString(contingut);
+                        notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                        notificacioCommand.getDocuments()[i].setMediaType(contentType);
+                        notificacioCommand.getDocuments()[i].setMida(notificacioCommand.getArxiu()[i].getSize());
+                        validaFirma(nom, contentType, bindingResult, i, contingut);
+                    } else if (notificacioCommand.getArxiu()[i].isEmpty() && arxiuGestdocId != null) {
+                        var result = notificacioCommand.getId() != null ? gestioDocumentalService.obtenirArxiuNotificacio(arxiuGestdocId)
+                                        : gestioDocumentalService.obtenirArxiuTemporal(arxiuGestdocId);
+                        var contingutBase64 = Base64.getEncoder().encodeToString(result);
+                        notificacioCommand.getDocuments()[i].setContingutBase64(contingutBase64);
+                        validaFirma(notificacioCommand.getDocuments()[i].getArxiuNom(), notificacioCommand.getDocuments()[i].getMediaType(), bindingResult, i, result);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
+                case CSV:
+                    if (notificacioCommand.getDocumentArxiuCsv()[i] != null && !notificacioCommand.getDocumentArxiuCsv()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setCsv(notificacioCommand.getDocumentArxiuCsv()[i]);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
+                case UUID:
+                    if (notificacioCommand.getDocumentArxiuUuid()[i] != null && !notificacioCommand.getDocumentArxiuUuid()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setUuid(notificacioCommand.getDocumentArxiuUuid()[i]);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
+                case URL:
+                    if (notificacioCommand.getDocumentArxiuUrl()[i] != null && !notificacioCommand.getDocumentArxiuUrl()[i].isEmpty()) {
+                        notificacioCommand.getDocuments()[i].setUrl(notificacioCommand.getDocumentArxiuUrl()[i]);
+                    } else {
+                        notificacioCommand.getDocuments()[i] = null;
+                    }
+                    break;
             }
         }
     }
@@ -424,21 +412,14 @@ public class NotificacioFormController extends BaseUserController {
     @ResponseBody
     public FirmaValidDto validaFirmaDocument(HttpServletRequest request, @RequestParam(value = "fitxer") MultipartFile fitxer) throws IOException {
 
-        String nom = fitxer.getOriginalFilename();
-        byte[] content = fitxer.getBytes();
-        String contentType = fitxer.getContentType();
+        var nom = fitxer.getOriginalFilename();
+        var content = fitxer.getBytes();
+        var contentType = fitxer.getContentType();
 //        String contingutBase64 = Base64.encodeBase64String(content);
 //        String arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
-        SignatureInfoDto signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
-        return FirmaValidDto.builder()
-//                .arxiuGestdocId(arxiuGestdocId)
-                .nom(nom)
-                .mida(fitxer.getSize())
-                .mediaType(fitxer.getContentType())
-                .signed(signatureInfo.isSigned())
-                .error(signatureInfo.isError())
-                .errorMsg(signatureInfo.getErrorMsg())
-                .build();
+        var signatureInfo = notificacioService.checkIfSignedAttached(content, nom, contentType);
+        return FirmaValidDto.builder().nom(nom).mida(fitxer.getSize()).mediaType(fitxer.getContentType()).signed(signatureInfo.isSigned())
+                .error(signatureInfo.isError()).errorMsg(signatureInfo.getErrorMsg()).build();
     }
 
     private void validaFirma(String nom, String mediaType, BindingResult bindingResult, int position, byte[] content) {
@@ -456,11 +437,11 @@ public class NotificacioFormController extends BaseUserController {
     @RequestMapping(value = "/{notificacioId}/edit", method = RequestMethod.GET)
     public String editar(HttpServletRequest request, Model model, @PathVariable Long notificacioId) {
 
-        String referer = request.getHeader("Referer");
+        var referer = request.getHeader("Referer");
         RequestSessionHelper.actualitzarObjecteSessio(request, EDIT_REFERER, referer);
-        NotificacioDtoV2 notificacioDto = notificacioService.findAmbId(notificacioId, false);
-        NotificacioCommand notificacioCommand = NotificacioCommand.asCommand(notificacioDto);
-        for(int i = 0; i < 5; i++) {
+        var notificacioDto = notificacioService.findAmbId(notificacioId, false);
+        var notificacioCommand = NotificacioCommand.asCommand(notificacioDto);
+        for(var i = 0; i < 5; i++) {
 //                if (notificacio.getDocument()[i] != null) {
             if (notificacioCommand.getDocuments()[i].getArxiuNom() != null) {
                 model.addAttribute("nomDocument_" + i, notificacioCommand.getDocuments()[i].getArxiuNom());
@@ -505,11 +486,11 @@ public class NotificacioFormController extends BaseUserController {
     @ResponseBody
     public DadesProcediment getDadesProcSer(HttpServletRequest request, @PathVariable Long procedimentId) {
 
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        ProcSerDto procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
-        TipusEnviamentEnumDto enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
-        DadesProcediment dadesProcediment = new DadesProcediment();
+        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var usuariActual = aplicacioService.getUsuariActual();
+        var procedimentActual = procedimentService.findById(entitatActual.getId(),false, procedimentId);
+        var enviamentTipus = (TipusEnviamentEnumDto) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENT_TIPUS);
+        var dadesProcediment = new DadesProcediment();
         dadesProcediment.setOrganCodi(procedimentActual.getOrganGestor());
         dadesProcediment.setCaducitat(CaducitatHelper.sumarDiesNaturals(procedimentActual.getCaducitat()));
         dadesProcediment.setCaducitatDiesNaturals(procedimentActual.getCaducitat());
@@ -527,9 +508,9 @@ public class NotificacioFormController extends BaseUserController {
         dadesProcediment.setEntregaCieVigent(procedimentActual.isEntregaCieVigent());
         if (procedimentActual.isComu()) {
             // Obtenim òrgans seleccionables
-
-            PermisEnum permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
+            var permis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ? PermisEnum.COMUNICACIO_SIR :
                     TipusEnviamentEnumDto.COMUNICACIO.equals(enviamentTipus) ? PermisEnum.COMUNICACIO : PermisEnum.NOTIFICACIO;
+
             dadesProcediment.setOrgansDisponibles(permisosService.getOrgansCodisAmbPermisPerProcedimentComu(entitatActual.getId(), usuariActual.getCodi(), permis, procedimentActual));
 //
 //        	List<ProcSerOrganCacheDto> procedimentsOrgansAmbPermis = TipusEnviamentEnumDto.COMUNICACIO_SIR.equals(enviamentTipus) ?
@@ -563,7 +544,7 @@ public class NotificacioFormController extends BaseUserController {
     public RespostaConsultaArxiuDto consultaDocumentIMetadadesCsv(HttpServletRequest request, @RequestBody String csv) {
 
     	DocumentDto doc = null;
-    	Boolean validacioIdCsv = notificacioService.validarIdCsv(csv);
+    	var validacioIdCsv = notificacioService.validarIdCsv(csv);
 //        Boolean formatCsvValid = notificacioService.validarFormatCsv(csv); //TODO AQUEST VALIDACIO NOSE SI FUNCIONA
     	if (validacioIdCsv) {
             doc = notificacioService.consultaDocumentIMetadades(csv, false);
@@ -580,7 +561,7 @@ public class NotificacioFormController extends BaseUserController {
 
     private RespostaConsultaArxiuDto prepararResposta(Boolean validacio, DocumentDto doc, HttpServletRequest request) {
 
-        Boolean teMetadades = Boolean.FALSE;
+        var teMetadades = Boolean.FALSE;
         if (!validacio && doc == null) {
             return RespostaConsultaArxiuDto.builder().validacioIdCsv(false).documentExistent(false).metadadesExistents(teMetadades).origen(null).validesa(null)
                     .tipoDocumental(null).modoFirma(null).build();
@@ -605,7 +586,8 @@ public class NotificacioFormController extends BaseUserController {
     @RequestMapping(value = "/caducitatDiesNaturals/{dia}/{mes}/{any}", method = RequestMethod.GET)
     @ResponseBody
     private long getDiesCaducitat(@PathVariable String dia, @PathVariable String mes, @PathVariable String any) throws ParseException {
-        Date data = df.parse(dia + "/" + mes + "/" + any);
+
+        var data = df.parse(dia + "/" + mes + "/" + any);
         return CaducitatHelper.getDiesEntreDates(data);
     }
 
@@ -622,7 +604,7 @@ public class NotificacioFormController extends BaseUserController {
         List<String> tipusDocumentEnumDto = new ArrayList<>();
         var tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
         if (tipusDocuments != null) {
-            for (TipusDocumentDto tipusDocument : tipusDocuments) {
+            for (var tipusDocument : tipusDocuments) {
                 tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
             }
         }
@@ -689,15 +671,15 @@ public class NotificacioFormController extends BaseUserController {
     private void ompliModelFormulari(HttpServletRequest request, ProcSerDto procedimentActual, EntitatDto entitatActual, NotificacioCommand notificacioCommand,
                                     BindingResult bindingResult, List<String> tipusDocumentEnumDto, Model model) {
 
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        List<TipusDocumentDto> tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
-        TipusDocumentEnumDto tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
+        var usuariActual = aplicacioService.getUsuariActual();
+        var tipusDocuments = entitatService.findTipusDocumentByEntitat(entitatActual.getId());
+        var tipusDocumentDefault = entitatService.findTipusDocumentDefaultByEntitat(entitatActual.getId());
         if (tipusDocuments != null) {
-            for (TipusDocumentDto tipusDocument : tipusDocuments) {
+            for (var tipusDocument : tipusDocuments) {
                 tipusDocumentEnumDto.add(tipusDocument.getTipusDocEnum().name());
             }
             if (tipusDocumentDefault != null) {
-                for (int i = 0; i < 5; i++)
+                for (var i = 0; i < 5; i++)
                     notificacioCommand.setTipusDocumentDefault(i, tipusDocumentDefault.name());
             }
         }
@@ -713,15 +695,14 @@ public class NotificacioFormController extends BaseUserController {
         	model.addAttribute("procedimentId", procedimentActual.getId());
         }
         model.addAttribute("errors", bindingResult.getAllErrors());
-        for (int i = 0; i < 5; i++) {
-            DocumentCommand documentCommand = notificacioCommand.getDocuments()[i];
+        for (var i = 0; i < 5; i++) {
+            var documentCommand = notificacioCommand.getDocuments()[i];
             if (documentCommand == null ) {
                 continue;
             }
             if (documentCommand.getArxiuGestdocId().isEmpty() && notificacioCommand.getTipusDocument()[i] != null &&
                 (notificacioCommand.getArxiu()[i] != null && !notificacioCommand.getArxiu()[i].isEmpty()) &&  notificacioCommand.getTipusDocument()[i] == TipusDocumentEnumDto.ARXIU) {
 
-                String arxiuGestdocId = null;
                 String contingutBase64 = null;
                 try {
                     contingutBase64 = Base64.getEncoder().encodeToString(notificacioCommand.getArxiu()[i].getBytes());
@@ -733,17 +714,17 @@ public class NotificacioFormController extends BaseUserController {
                 documentCommand.setNormalitzat(notificacioCommand.getDocuments()[i].isNormalitzat());
                 documentCommand.setMediaType(notificacioCommand.getArxiu()[i].getContentType());
                 documentCommand.setMida(notificacioCommand.getArxiu()[i].getSize());
-
-                arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(documentCommand.getContingutBase64());
-
+                var arxiuGestdocId = gestioDocumentalService.guardarArxiuTemporal(documentCommand.getContingutBase64());
                 documentCommand.setArxiuGestdocId(arxiuGestdocId);
                 model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
-
-            } else if (documentCommand.getArxiuNom() != null && !documentCommand.getArxiuNom().isEmpty()) {
-                model.addAttribute("nomDocument_" + i, documentCommand.getArxiuNom());
-            } else {
-                model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
+                continue;
             }
+            if (documentCommand.getArxiuNom() != null && !documentCommand.getArxiuNom().isEmpty()) {
+                model.addAttribute("nomDocument_" + i, documentCommand.getArxiuNom());
+                continue;
+            }
+            model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
+
         }
         model.addAttribute("document", notificacioCommand.getDocuments());
         try {
@@ -752,7 +733,7 @@ public class NotificacioFormController extends BaseUserController {
         } catch (Exception ex) {
             log.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
         }
-        String referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
+        var referer = (String) RequestSessionHelper.obtenirObjecteSessio(request, EDIT_REFERER);
         model.addAttribute("referer", referer);
 
     }
@@ -770,8 +751,8 @@ public class NotificacioFormController extends BaseUserController {
         List<CodiValorOrganGestorComuDto> procSerDisponibles = new ArrayList<>();
         procSerDisponibles.addAll(procedimentsDisponibles);
         procSerDisponibles.addAll(serveisDisponibles);
-        List<OrganGestorDto> organsGestors  = null;
         List<CodiValorDto> codisValor = new ArrayList<>();
+        List<OrganGestorDto> organsGestors  = null;
         if (RolEnumDto.NOT_ADMIN.equals(rol)) {
             organsGestors = organGestorService.findByEntitat(entitatActual.getId());
         } else if (RolEnumDto.NOT_ADMIN_ORGAN.equals(rol)) {
@@ -790,15 +771,13 @@ public class NotificacioFormController extends BaseUserController {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.procediments"));
         }
         if (organsGestors != null) {
-            for (OrganGestorDto o : organsGestors) {
+            for (var o : organsGestors) {
                 codisValor.add(CodiValorDto.builder().codi(o.getCodi()).valor(o.getCodi() + " " + o.getCodiNom()).build());
             }
         }
-
         if (codisValor == null || codisValor.isEmpty()) {
             MissatgesHelper.warning(request, getMessage(request, "notificacio.controller.sense.permis.organs"));
         }
-
         model.addAttribute("organsGestors", codisValor);
         model.addAttribute("procediments", procedimentsDisponibles);
         model.addAttribute("serveis", serveisDisponibles);

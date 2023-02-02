@@ -1,16 +1,9 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.FitxerDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioFiltreDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaDataDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaFiltreDto;
-import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaInfoDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaTableItemDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -49,7 +42,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -94,9 +86,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(method = RequestMethod.GET)
     public String mainPage(HttpServletRequest request, Model model) {
 
-        NotificacioMassivaFiltreCommand filtre = getFiltreCommand(request);
+        var filtre = getFiltreCommand(request);
         model.addAttribute("notificacioMassivaFiltreCommand", filtre);
-        String prefix = "es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto.";
+        var prefix = "es.caib.notib.logic.intf.dto.notificacio.NotificacioMassivaEstatDto.";
         model.addAttribute("notificacioMassivaEstats", EnumHelper.getOptionsForEnum(NotificacioMassivaEstatDto.class, prefix));
         return "notificacioMassivaList";
     }
@@ -112,12 +104,12 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @ResponseBody
     public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        NotificacioMassivaFiltreDto filtre = getFiltreCommand(request).asDto();
-        PaginaDto<NotificacioMassivaTableItemDto> notificacions = new PaginaDto<>();
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var filtre = getFiltreCommand(request).asDto();
+        var notificacions = new PaginaDto<NotificacioMassivaTableItemDto>();
         try {
-            RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-            PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+            var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+            var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
             notificacions = notificacioMassivaService.findAmbFiltrePaginat(entitatActual != null ? entitatActual.getId() : null, filtre, rol, params);
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
@@ -128,8 +120,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/resum", method = RequestMethod.GET)
     public String summary(HttpServletRequest request, Model model, @PathVariable Long id) {
 
-        EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-        NotificacioMassivaInfoDto info = notificacioMassivaService.getNotificacioMassivaInfo(entitatActual.getId(), id);
+        var entitatActual = EntitatHelper.getEntitatActual(request);
+        var info = notificacioMassivaService.getNotificacioMassivaInfo(entitatActual.getId(), id);
         model.addAttribute("info", info);
         return "notificacioMassivaInfo";
     }
@@ -138,8 +130,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @ResponseBody
     public void csvDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        FitxerDto file = notificacioMassivaService.getCSVFile(entitatActual.getId(), id);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var file = notificacioMassivaService.getCSVFile(entitatActual.getId(), id);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
@@ -147,8 +139,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/zip/download", method = RequestMethod.GET)
     public void zipDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        FitxerDto file = notificacioMassivaService.getZipFile(entitatActual.getId(), id);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var file = notificacioMassivaService.getZipFile(entitatActual.getId(), id);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
@@ -156,8 +148,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/resum/download", method = RequestMethod.GET)
     public void summaryDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        FitxerDto file = notificacioMassivaService.getResumFile(entitatActual.getId(), id);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var file = notificacioMassivaService.getResumFile(entitatActual.getId(), id);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
@@ -165,8 +157,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/errors/validacio/download", method = RequestMethod.GET)
     public void errorsValidacioDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        FitxerDto file = notificacioMassivaService.getErrorsValidacioFile(entitatActual.getId(), id);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var file = notificacioMassivaService.getErrorsValidacioFile(entitatActual.getId(), id);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
@@ -174,8 +166,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/errors/execucio/download", method = RequestMethod.GET)
     public void errorsExecucioDownload(HttpServletRequest request, HttpServletResponse response, @PathVariable Long id) throws IOException {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        FitxerDto file = notificacioMassivaService.getErrorsExecucioFile(entitatActual.getId(), id);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var file = notificacioMassivaService.getErrorsExecucioFile(entitatActual.getId(), id);
         response.setHeader("Set-cookie", "fileDownload=true; path=/");
         writeFileToResponse(file.getNom(), file.getContingut(), response);
     }
@@ -183,8 +175,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/posposar", method = RequestMethod.GET)
     public String posposar(HttpServletRequest request, @PathVariable Long id) {
 
-        String url = "redirect:..";
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        var url = "redirect:..";
+        var entitatActual = getEntitatActualComprovantPermisos(request);
         try {
             notificacioMassivaService.posposar(entitatActual.getId(), id);
             return getModalControllerReturnValueSuccess(request, url,"notificacio.massiva.controller.posposar.ok");
@@ -197,8 +189,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/reactivar", method = RequestMethod.GET)
     public String reactivar(HttpServletRequest request, @PathVariable Long id) {
 
-        String url = "redirect:..";
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        var url = "redirect:..";
+        var entitatActual = getEntitatActualComprovantPermisos(request);
         try {
             notificacioMassivaService.reactivar(entitatActual.getId(), id);
             return getModalControllerReturnValueSuccess(request, url, "notificacio.massiva.controller.reactivar.ok");
@@ -211,9 +203,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/cancelar", method = RequestMethod.GET)
     public String cancelar(HttpServletRequest request, @PathVariable Long id) {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        String redirect = "redirect:..";
-        String msg = "notificacio.massiva.controller.cancelar.ok";
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var redirect = "redirect:..";
+        var msg = "notificacio.massiva.controller.cancelar.ok";
         try {
             notificacioMassivaService.cancelar(entitatActual.getId(), id);
         } catch (Exception e) {
@@ -227,15 +219,15 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/{id}/remeses", method = RequestMethod.GET)
     public String consultarRemeses(HttpServletRequest request, Model model, @PathVariable Long id) {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        OrganGestorDto organGestorActual = getOrganGestorActual(request);
-        NotificacioFiltreCommand notificacioFiltreCommand = notificacioBackHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var organGestorActual = getOrganGestorActual(request);
+        var notificacioFiltreCommand = notificacioBackHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE);
         model.addAttribute(notificacioFiltreCommand);
         notificacioBackHelper.fillModel(entitatActual, organGestorActual, request, model);
         model.addAttribute("notificacioMassivaId", id);
-        NotificacioMassivaDataDto notMassivaData = notificacioMassivaService.findById(entitatActual.getId(), id);
-        SimpleDateFormat data = new SimpleDateFormat("dd/MM/yyyy");
-        String[] txt = new String[] {data.format(notMassivaData.getCreatedDate()), notMassivaData.getCsvFilename(), notMassivaData.getCreatedBy().getCodi()};
+        var notMassivaData = notificacioMassivaService.findById(entitatActual.getId(), id);
+        var data = new SimpleDateFormat("dd/MM/yyyy");
+        var txt = new String[] {data.format(notMassivaData.getCreatedDate()), notMassivaData.getCsvFilename(), notMassivaData.getCreatedBy().getCodi()};
         model.addAttribute("subtitle", getMessage(request, "notificacio.massiva.notificacions.list.titol.sub", txt));
         return "notificacioMassivaNotificacionsList";
     }
@@ -251,9 +243,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @ResponseBody
     public DatatablesHelper.DatatablesResponse consultarRemesesDatatable(HttpServletRequest request, @PathVariable Long id) {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-        NotificacioFiltreDto filtre = notificacioBackHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE).asDto();
-        PaginaDto<NotificacioTableItemDto> notificacions = new PaginaDto<>();
+        var entitatActual = getEntitatActualComprovantPermisos(request);
+        var filtre = notificacioBackHelper.getFiltreCommand(request, TABLE_NOTIFICACIONS_FILTRE).asDto();
+        var notificacions = new PaginaDto<NotificacioTableItemDto>();
         try {
             notificacions = notificacioMassivaService.findNotificacions(entitatActual.getId(), id, filtre, DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
@@ -265,8 +257,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @RequestMapping(value = "/new")
     public String get(HttpServletRequest request, Model model) {
 
-        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-        NotificacioMassivaCommand notificacioMassiuCommand = new NotificacioMassivaCommand();
+        var entitat = getEntitatActualComprovantPermisos(request);
+        var notificacioMassiuCommand = new NotificacioMassivaCommand();
         notificacioMassiuCommand.setCaducitat(CaducitatHelper.sumarDiesNaturals(10));
         model.addAttribute("notificacioMassivaCommand", notificacioMassiuCommand);
         model.addAttribute("emailSize", notificacioMassiuCommand.getEmailDefaultSize());
@@ -275,7 +267,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
     private String getNotificacioMassivaForm(EntitatDto entitat, HttpServletRequest request, Model model) {
 
-        OrganGestorDto organGestorActual = getOrganGestorActual(request);
+//        OrganGestorDto organGestorActual = getOrganGestorActual(request);
 //        if (organGestorActual != null) {
 //            model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
 //        } else {
@@ -289,8 +281,8 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     public String post(HttpServletRequest request, @Valid NotificacioMassivaCommand notificacioMassivaCommand, BindingResult bindingResult, Model model) throws IOException {
 
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
-        EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
+        var entitat = getEntitatActualComprovantPermisos(request);
+        var usuariActual = aplicacioService.getUsuariActual();
         if (bindingResult.hasErrors()) {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
             model.addAttribute("errors", bindingResult.getAllErrors());
@@ -298,17 +290,17 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
                 log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Error formulari: " + error.toString());
             }
             model.addAttribute("emailSize", notificacioMassivaCommand.getEmailDefaultSize());
-            MultipartFile csvMultipartFile = notificacioMassivaCommand.getFicheroCsv();
+            var csvMultipartFile = notificacioMassivaCommand.getFicheroCsv();
             if (csvMultipartFile != null && !csvMultipartFile.isEmpty()) {
-                String contingutBase64 = Base64.getEncoder().encodeToString(csvMultipartFile.getBytes());
-                String csvGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+                var contingutBase64 = Base64.getEncoder().encodeToString(csvMultipartFile.getBytes());
+                var csvGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
                 notificacioMassivaCommand.setFitxerCSVNom(csvMultipartFile.getOriginalFilename());
                 notificacioMassivaCommand.setFitxerCSVGestdocId(csvGestdocId);
             }
-            MultipartFile zipMultipartFile = notificacioMassivaCommand.getFicheroZip();
+            var zipMultipartFile = notificacioMassivaCommand.getFicheroZip();
             if (zipMultipartFile != null && !zipMultipartFile.isEmpty()) {
-                String contingutBase64 = Base64.getEncoder().encodeToString(zipMultipartFile.getBytes());
-                String csvGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
+                var contingutBase64 = Base64.getEncoder().encodeToString(zipMultipartFile.getBytes());
+                var csvGestdocId = gestioDocumentalService.guardarArxiuTemporal(contingutBase64);
                 notificacioMassivaCommand.setFitxerZIPNom(zipMultipartFile.getOriginalFilename());
                 notificacioMassivaCommand.setFitxerZIPGestdocId(csvGestdocId);
             }
@@ -326,7 +318,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             } else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, InvalidCSVFileNotificacioMassivaException.class)) {
                 MissatgesHelper.error(request, getMessage(request, "notificacio.massiva.csv.error.format"));
             } else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, NotificacioMassivaException.class)) {
-                NotificacioMassivaException notificacioMassivaException = (NotificacioMassivaException) ExceptionHelper.findThrowableInstance(ex, NotificacioMassivaException.class);
+                var notificacioMassivaException = (NotificacioMassivaException) ExceptionHelper.findThrowableInstance(ex, NotificacioMassivaException.class);
                 MissatgesHelper.error(request,
                         getMessage(request, "notificacio.massiva.error.fila", new Object[] {notificacioMassivaException.getFila(), notificacioMassivaException.getColumna()}) +
                                 "<br/>" + notificacioMassivaException.getMessage() +
@@ -366,7 +358,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
     private NotificacioMassivaFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-        NotificacioMassivaFiltreCommand notificacioMassivaFiltreCommand = (NotificacioMassivaFiltreCommand) request.getSession().getAttribute(TABLE_FILTRE);
+        var notificacioMassivaFiltreCommand = (NotificacioMassivaFiltreCommand) request.getSession().getAttribute(TABLE_FILTRE);
         if (notificacioMassivaFiltreCommand == null) {
             notificacioMassivaFiltreCommand = new NotificacioMassivaFiltreCommand();
             RequestSessionHelper.actualitzarObjecteSessio(request, TABLE_FILTRE, notificacioMassivaFiltreCommand);
@@ -377,17 +369,17 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
     @Override
     protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        var entitatActual = getEntitatActualComprovantPermisos(request);
         String organGestorCodi = null;
         if (RolHelper.isUsuariActualUsuariAdministradorOrgan(request) && entitatActual != null) {
             OrganGestorDto organGestorActual = getOrganGestorActual(request);
             organGestorCodi = organGestorActual.getCodi();
 
         }
-        UsuariDto usuariActual = aplicacioService.getUsuariActual();
-        NotificacioFiltreDto filtre = notificacioBackHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
+        var usuariActual = aplicacioService.getUsuariActual();
+        var filtre = notificacioBackHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
         assert entitatActual != null;
-        RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+        var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
         return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, usuariActual.getCodi(), filtre);
     }
 }

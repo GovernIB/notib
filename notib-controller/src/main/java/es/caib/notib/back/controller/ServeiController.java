@@ -52,8 +52,6 @@ public class ServeiController extends BaseUserController{
 	@Autowired
 	private ServeiService serveiService;
 	@Autowired
-	private ProcedimentService procedimentService;
-	@Autowired
 	private OrganGestorService organGestorService;
 	@Autowired
 	private EntitatService entitatService;
@@ -69,14 +67,14 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = SERVEIS_FILTRE;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("procedimentEstats", EnumHelper.getOptionsForEnum(ProcedimentEstat.class, "es.caib.notib.logic.intf.dto.procediment.ProcedimentEstat."));
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
-		String property = aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false");
+		var property = aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false");
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(property));
 		return "serveiListPage";
 	}
@@ -85,7 +83,7 @@ public class ServeiController extends BaseUserController{
 	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String serveiCodi, Model model) {
 
 		this.currentFiltre = SERVEIS_FILTRE;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setCodi(serveiCodi);
 		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
 		return "redirect:/servei";
@@ -94,16 +92,16 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(value = "/organ/{organCodi}", method = RequestMethod.GET)
 	public String getByOrganGestor(HttpServletRequest request, @PathVariable String organCodi, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = SERVEIS_FILTRE_MODAL;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
 		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
 		model.addAttribute("procSerFiltreCommand", procSerFiltreCommand);
 		model.addAttribute("organsGestors", findOrgansGestorsAccessibles(entitat, organGestorActual));
-		String property = aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false");
+		var property = aplicacioService.propertyGetByEntitat("es.caib.notib.plugin.codi.dir3.entitat", "false");
 		model.addAttribute("isCodiDir3Entitat", Boolean.parseBoolean(property));
 		return "serveiListModal";
 	}
@@ -114,8 +112,8 @@ public class ServeiController extends BaseUserController{
 			return organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		}
 		List<CodiValorEstatDto> organsGestors = new ArrayList<>();
-		List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
-		for (OrganGestorDto organ: organsDto) {
+		var organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
+		for (var organ: organsDto) {
 			organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 		}
 		return organsGestors;
@@ -127,13 +125,13 @@ public class ServeiController extends BaseUserController{
 
 		PaginaDto<ProcSerFormDto> serveis = new PaginaDto<>();
 		try {
-			boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-			boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-			OrganGestorDto organGestorActual = getOrganGestorActual(request);
-			ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
-			boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+			var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+			var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+			var organGestorActual = getOrganGestorActual(request);
+			var procSerFiltreCommand = getFiltreCommand(request);
+			var isUsuari = RolHelper.isUsuariActualUsuari(request);
+			var entitat = getEntitatActualComprovantPermisos(request);
+			var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
 			serveis = serveiService.findAmbFiltrePaginat(entitat.getId(), isUsuari, isUsuariEntitat, isAdministrador, organGestorActual, procSerFiltreCommand.asDto(), params);
 		} catch (SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
@@ -187,9 +185,8 @@ public class ServeiController extends BaseUserController{
 	public String formGet(HttpServletRequest request, @PathVariable Long serveiId, Model model) {
 
 		var entitat = getEntitatActualComprovantPermisos(request);
-		ProcSerCommand procSerCommand;
 		var servei = emplenarModelServei(request, serveiId, model);
-		procSerCommand = servei != null ? ProcSerCommand.asCommand(servei) : new ProcSerCommand();
+		var procSerCommand = servei != null ? ProcSerCommand.asCommand(servei) : new ProcSerCommand();
 		model.addAttribute(procSerCommand);
 		var operadorPostalList = operadorPostalService.findNoCaducatsByEntitat(entitat);
 		model.addAttribute("operadorPostalList", operadorPostalList);
@@ -201,9 +198,9 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(value = "/{serveiId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long serveiId) {
 
-		String url = "redirect:../../servei";
+		var url = "redirect:../../servei";
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			var entitat = getEntitatActualComprovantPermisos(request);
 			if (serveiService.serveiEnUs(serveiId)) {
 				return getAjaxControllerReturnValueError(request, url, "servei.controller.esborrat.enUs");
 			}
@@ -216,11 +213,13 @@ public class ServeiController extends BaseUserController{
 
 	@RequestMapping(value = "/{serveiId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long serveiId) {
+
 		serveiService.updateActiu(serveiId, true);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "servei.controller.activada.ok");
 	}
 	@RequestMapping(value = "/{serveiId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long serveiId) {
+
 		serveiService.updateActiu(serveiId, false);
 		return getAjaxControllerReturnValueSuccess(request,"redirect:../../entitat", "servei.controller.desactivada.ok");
 	}
@@ -228,11 +227,11 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 
-		String url = "redirect:../../servei";
+		var url = "redirect:../../servei";
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			boolean trobat = serveiService.actualitzarServei(codiSia, entitat);
-			String msg = trobat ? "servei.controller.update.ok" : "servei.controller.update.no.trobat";
+			var entitat = getEntitatActualComprovantPermisos(request);
+			var trobat = serveiService.actualitzarServei(codiSia, entitat);
+			var msg = trobat ? "servei.controller.update.ok" : "servei.controller.update.no.trobat";
 			return trobat ?  getAjaxControllerReturnValueSuccess(request, url, msg) : getAjaxControllerReturnValueError(request, url, msg);
 		} catch (Exception ex) {
 			return getAjaxControllerReturnValueError(request, url, "servei.controller.update.ko");
@@ -242,7 +241,7 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
 	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("isUpdatingProcediments", serveiService.isUpdatingServeis(entitat));
 		return "serveisActualitzacioForm";
 	}
@@ -250,15 +249,15 @@ public class ServeiController extends BaseUserController{
 	@RequestMapping(value = "/update/auto", method = RequestMethod.POST)
 	public String actualitzacioAutomaticaPost(HttpServletRequest request, Model model) {
 				
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		try {
 			serveiService.actualitzaServeis(entitat);
 			return getAjaxControllerReturnValueSuccess(request, "/serveisActualitzacioForm", "procediment.controller.update.auto.ok");
 		} catch (Exception e) {
 			log.error("Error inesperat al actualitzar els serveis", e);
 			model.addAttribute("errors", e.getMessage());
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
+			var sw = new StringWriter();
+			var pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			MissatgesHelper.error(request, "Error: \n" + sw.toString());
 			return "serveisActualitzacioForm";
@@ -269,14 +268,14 @@ public class ServeiController extends BaseUserController{
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		return serveiService.getProgresActualitzacio(entitat.getDir3Codi());
 	}
 			
 	
 	private ProcSerFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		ProcSerFiltreCommand procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, this.currentFiltre);
+		var procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, this.currentFiltre);
 		if (procSerFiltreCommand != null) {
 			return procSerFiltreCommand;
 		}
@@ -287,7 +286,7 @@ public class ServeiController extends BaseUserController{
 	
 	private ProcSerDto emplenarModelServei(HttpServletRequest request, Long serveiId, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerDto servei = null;
 		if (serveiId != null) {
 			servei = serveiService.findById(entitat.getId(), isAdministrador(request), serveiId);
@@ -296,7 +295,7 @@ public class ServeiController extends BaseUserController{
 			}
 			model.addAttribute(servei);
 		}
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var organGestorActual = getOrganGestorActual(request);
 		if (organGestorActual != null) {
 			model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
 			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitatAndOrganGestor(entitat, organGestorActual));
@@ -321,7 +320,6 @@ public class ServeiController extends BaseUserController{
 		model.addAttribute("organisme", organGestorCodi);
 		return "redirect:/servei/new";
 	}
-	
 
 	private boolean isAdministrador(HttpServletRequest request) {
 		return RolHelper.isUsuariActualAdministrador(request);

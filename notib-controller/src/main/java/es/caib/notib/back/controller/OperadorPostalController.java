@@ -1,13 +1,6 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import es.caib.notib.logic.intf.dto.cie.OperadorPostalDataDto;
 import es.caib.notib.logic.intf.dto.cie.OperadorPostalDto;
-import es.caib.notib.logic.intf.dto.cie.OperadorPostalTableItemDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.back.command.OperadorPostalCommand;
@@ -27,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Controlador per el mantinemnt de pagadors postals.
@@ -49,10 +41,10 @@ public class OperadorPostalController extends BaseUserController{
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OperadorPostalFiltreCommand operadorPostalFiltreCommand = getFiltreCommand(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var operadorPostalFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("operadorPostalFiltreCommand", operadorPostalFiltreCommand);
-		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalList";
 	}
@@ -61,13 +53,12 @@ public class OperadorPostalController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
-		OperadorPostalFiltreCommand operadorPostalFiltreCommand = getFiltreCommand(request);
-		PaginaDto<OperadorPostalTableItemDto> pagadorsPostals = null;
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var operadorPostalFiltreCommand = getFiltreCommand(request);
 		operadorPostalFiltreCommand.setOrganGestorId(organGestorActual != null ? organGestorActual.getId() : null) ;
-		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		pagadorsPostals = operadorPostalService.findAmbFiltrePaginat(entitat.getId(), operadorPostalFiltreCommand.asDto(), params);
+		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var pagadorsPostals = operadorPostalService.findAmbFiltrePaginat(entitat.getId(), operadorPostalFiltreCommand.asDto(), params);
 		return DatatablesHelper.getDatatableResponse(request, pagadorsPostals, "id");
 	}
 	
@@ -79,9 +70,9 @@ public class OperadorPostalController extends BaseUserController{
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(HttpServletRequest request, OperadorPostalFiltreCommand command, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_POSTAL_FILTRE, command);
-		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalList";
 	}
@@ -104,16 +95,15 @@ public class OperadorPostalController extends BaseUserController{
 	@RequestMapping(value = "/{operadorPostalId}", method = RequestMethod.GET)
 	public String formGet(HttpServletRequest request, @PathVariable Long operadorPostalId, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		OperadorPostalCommand operadorPostalCommand = null;
+		var entitatActual = getEntitatActualComprovantPermisos(request);
 		OperadorPostalDto operadorPostal = null;
 		if (operadorPostalId != null) {
 			operadorPostal = operadorPostalService.findById(operadorPostalId);
 			model.addAttribute(operadorPostal);
 		}
-		operadorPostalCommand = operadorPostal != null ? OperadorPostalCommand.asCommand(operadorPostal) : new OperadorPostalCommand();
+		var operadorPostalCommand = operadorPostal != null ? OperadorPostalCommand.asCommand(operadorPostal) : new OperadorPostalCommand();
 		model.addAttribute(operadorPostalCommand);
-		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "operadorPostalForm";
 	}
@@ -122,7 +112,7 @@ public class OperadorPostalController extends BaseUserController{
 	public String delete(HttpServletRequest request, @PathVariable Long operadorPostalId) {
 
 		//EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		String url = "redirect:../../operadorPostal";
+		var url = "redirect:../../operadorPostal";
 		try {
 			operadorPostalService.delete(operadorPostalId);
 			return getAjaxControllerReturnValueSuccess(request, url, "operadorpostal.controller.esborrat.ok");
@@ -133,7 +123,7 @@ public class OperadorPostalController extends BaseUserController{
 
 	private OperadorPostalFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		OperadorPostalFiltreCommand operadorPostalFiltreCommand = (OperadorPostalFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, PAGADOR_POSTAL_FILTRE);
+		var operadorPostalFiltreCommand = (OperadorPostalFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, PAGADOR_POSTAL_FILTRE);
 		if (operadorPostalFiltreCommand != null) {
 			return operadorPostalFiltreCommand;
 		}

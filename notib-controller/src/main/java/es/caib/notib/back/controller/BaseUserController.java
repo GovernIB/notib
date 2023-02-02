@@ -22,9 +22,9 @@ public class BaseUserController extends BaseController {
 
 	public EntitatDto getEntitatActualComprovantPermisos(HttpServletRequest request) {
 
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = EntitatHelper.getEntitatActual(request);
 //		boolean administradorEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		boolean administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (entitat == null) {
 			throw new SecurityException("No te cap entitat assignada");
 		}
@@ -33,7 +33,8 @@ public class BaseUserController extends BaseController {
 //		}
 		if (administradorOrgan && !entitat.isUsuariActualAdministradorOrgan()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador de òrgan");
-		} else if (!entitat.isUsuariActualAdministradorEntitat()) {
+		}
+		if (!entitat.isUsuariActualAdministradorEntitat()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a usuari entitat");
 		}
 		return entitat;
@@ -41,16 +42,13 @@ public class BaseUserController extends BaseController {
 	
 	public OrganGestorDto getOrganGestorActual(HttpServletRequest request) {
 
-		OrganGestorDto organGestor = null;
-		boolean administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		if (administradorOrgan) {
-			organGestor = OrganGestorHelper.getOrganGestorUsuariActual(request);
-		}
-		return organGestor;
+		var administradorOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		return administradorOrgan ? OrganGestorHelper.getOrganGestorUsuariActual(request) : null;
 	}
 	
 	public Long getOrganGestorActualId(HttpServletRequest request) {
-		OrganGestorDto organGestor = getOrganGestorActual(request); 
-		return organGestor!=null ? organGestor.getId() : null;
+
+		var organGestor = getOrganGestorActual(request);
+		return organGestor != null ? organGestor.getId() : null;
 	}
 }

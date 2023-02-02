@@ -58,7 +58,7 @@ public class BaseController implements MessageSourceAware {
 
 	protected String getAjaxControllerReturnValueError(HttpServletRequest request, String url, String messageKey, Object[] messageArgs, Throwable error) {
 
-		String errorMsg = "";
+		var errorMsg = "";
 		if (error != null) {
 			errorMsg = "... " + error.getMessage();
 		}

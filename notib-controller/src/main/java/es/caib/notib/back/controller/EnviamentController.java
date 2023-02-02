@@ -3,10 +3,8 @@
  */
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
 import es.caib.notib.logic.intf.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
@@ -57,8 +55,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	protected List<Long> getIdsElementsFiltrats(HttpServletRequest request) throws ParseException {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		NotificacioEnviamentFiltreCommand filtreCommand = getFiltreCommand(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var filtreCommand = getFiltreCommand(request);
 		return enviamentService.findIdsAmbFiltre(entitatActual.getId(), NotificacioEnviamentFiltreCommand.asDto(filtreCommand));
 	}
 
@@ -67,11 +65,10 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
-		UsuariDto usuariAcutal = aplicacioService.getUsuariActual();
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		var usuariAcutal = aplicacioService.getUsuariActual();
+		var entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
-
-		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
+		var filtreEnviaments = getFiltreCommand(request);
 		model.addAttribute(filtreEnviaments);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
@@ -105,16 +102,16 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, Model model) throws ParseException {
 
-		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
+		var filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
-		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		var isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
 				filtreEnviaments.setEstat(null);
 			}
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			var entitatActual = getEntitatActualComprovantPermisos(request);
 			if (isAdminOrgan) {
 				OrganGestorDto organGestorActual = getOrganGestorActual(request);
 				organGestorCodi = organGestorActual.getCodi();
@@ -132,9 +129,9 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(HttpServletRequest request, Model model) {
 
-		UsuariDto usuari = aplicacioService.getUsuariActual();
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
+		var usuari = aplicacioService.getUsuariActual();
+		var entitat = EntitatHelper.getEntitatActual(request);
+		var columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}
@@ -142,7 +139,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar/save", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @Valid ColumnesCommand columnesCommand, BindingResult bindingResult, Model model) throws IOException {
 
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
+		var entitat = EntitatHelper.getEntitatActual(request);
 		if (bindingResult.hasErrors()) {
 			return "procedimentAdminForm";
 		}
@@ -153,7 +150,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
+		var filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
 		if (filtreCommand != null) {
 			return filtreCommand;
 		}

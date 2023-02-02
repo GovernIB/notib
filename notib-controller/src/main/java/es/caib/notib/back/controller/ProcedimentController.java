@@ -91,7 +91,7 @@ public class ProcedimentController extends BaseUserController{
 	public String getFiltratByOrganGestor(HttpServletRequest request,  @PathVariable String procCodi, Model model) {
 
 		this.currentFiltre = PROCEDIMENTS_FILTRE;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setCodi(procCodi);
 		RequestSessionHelper.actualitzarObjecteSessio(request, this.currentFiltre, procSerFiltreCommand);
 		return "redirect:/procediment";
@@ -101,10 +101,10 @@ public class ProcedimentController extends BaseUserController{
 	public String getByOrganGestor(HttpServletRequest request,
 								   @PathVariable String organCodi,
 								   Model model) {
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
 		this.currentFiltre = PROCEDIMENTS_FILTRE_MODAL;
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
 		procSerFiltreCommand.setOrganGestor(organCodi);
 		model.addAttribute("isModal", true);
 		model.addAttribute("organCodi", organCodi);
@@ -120,8 +120,8 @@ public class ProcedimentController extends BaseUserController{
 		if (organGestorActual == null) {
 			return organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		}
-		List<OrganGestorDto> organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
-		for (OrganGestorDto organ: organsDto) {
+		var organsDto = organGestorService.findDescencentsByCodi(entitatActual.getId(), organGestorActual.getCodi());
+		for (var organ: organsDto) {
 			organsGestors.add(CodiValorEstatDto.builder().codi(organ.getCodi()).valor(organ.getCodi() + " - " + organ.getNom()).estat(organ.getEstat()).build());
 		}
 		return organsGestors;
@@ -130,15 +130,15 @@ public class ProcedimentController extends BaseUserController{
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
-		
-		boolean isUsuari = RolHelper.isUsuariActualUsuari(request);
-		boolean isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
-		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		ProcSerFiltreCommand procSerFiltreCommand = getFiltreCommand(request);
-		PaginaDto<ProcSerFormDto> procediments = new PaginaDto<>();
+
+		var isUsuari = RolHelper.isUsuariActualUsuari(request);
+		var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var procSerFiltreCommand = getFiltreCommand(request);
+		var procediments = new PaginaDto<ProcSerFormDto>();
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			var entitat = getEntitatActualComprovantPermisos(request);
 			procediments = procedimentService.findAmbFiltrePaginat(entitat.getId(), isUsuari, isUsuariEntitat, isAdministrador, organGestorActual,
 							procSerFiltreCommand.asDto(), DatatablesHelper.getPaginacioDtoFromRequest(request));
 		} catch (SecurityException e) {
@@ -191,19 +191,19 @@ public class ProcedimentController extends BaseUserController{
 	@RequestMapping(value = "/operadors/{organ}", method = RequestMethod.GET)
 	public Operadors getOperadors(HttpServletRequest request, @PathVariable String organ) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		List<IdentificadorTextDto> postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
-		List<IdentificadorTextDto> cie = cieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var postal = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
+		var cie = cieService.findNoCaducatsByEntitatAndOrgan(entitat, organ, isAdminOrgan);
 		return Operadors.builder().operadorsPostal(postal).operadorsCie(cie).build();
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long procedimentId) {
 
-		String url = "redirect:../../procediment";
+		var url = "redirect:../../procediment";
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			var entitat = getEntitatActualComprovantPermisos(request);
 			if (procedimentService.procedimentEnUs(procedimentId)) {
 				return getAjaxControllerReturnValueError(request, url, "procediment.controller.esborrat.enUs");
 			}
@@ -246,11 +246,11 @@ public class ProcedimentController extends BaseUserController{
 	@RequestMapping(value = "/{codiSia}/update", method = RequestMethod.GET)
 	public String actualitzarProcediment(HttpServletRequest request, @PathVariable String codiSia) {
 
-		String urlResponse = "redirect:../../procediment";
+		var urlResponse = "redirect:../../procediment";
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			boolean trobat = procedimentService.actualitzarProcediment(codiSia, entitat);
-			String msg = trobat ? "procediment.controller.update.ok" : "procediment.controller.update.no.trobat";
+			var entitat = getEntitatActualComprovantPermisos(request);
+			var trobat = procedimentService.actualitzarProcediment(codiSia, entitat);
+			var msg = trobat ? "procediment.controller.update.ok" : "procediment.controller.update.no.trobat";
 			return trobat ?  getAjaxControllerReturnValueSuccess(request, urlResponse, msg) : getAjaxControllerReturnValueError(request, urlResponse, msg);
 		} catch (Exception ex) {
 			return getAjaxControllerReturnValueError(request, urlResponse, "procediment.controller.update.ko");
@@ -261,22 +261,22 @@ public class ProcedimentController extends BaseUserController{
 	@RequestMapping(value = "/update/auto", method = RequestMethod.GET)
 	public String actualitzacioAutomaticaGet(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		model.addAttribute("isUpdatingProcediments", procedimentService.isUpdatingProcediments(entitat));
 		return "procedimentsActualitzacioForm";
 	}
 	
 	@RequestMapping(value = "/update/auto", method = RequestMethod.POST)
 	public String actualitzacioAutomaticaPost(HttpServletRequest request, Model model) {
-				
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+
+		var entitat = getEntitatActualComprovantPermisos(request);
 		try {
 			procedimentService.actualitzaProcediments(entitat);
 		} catch (Exception e) {
 			log.error("Error inesperat al actualitzar els procediments", e);
 			model.addAttribute("errors", e.getMessage());
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
+			var sw = new StringWriter();
+			var pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
 			MissatgesHelper.error(request, "Error: \n" + sw.toString());
 			return "procedimentsActualitzacioForm";
@@ -288,13 +288,13 @@ public class ProcedimentController extends BaseUserController{
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		return procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
 	}
 	
 	private ProcSerFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		ProcSerFiltreCommand procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, this.currentFiltre);
+		var procSerFiltreCommand = (ProcSerFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, this.currentFiltre);
 		if (procSerFiltreCommand != null) {
 			return procSerFiltreCommand;
 		}
@@ -305,7 +305,7 @@ public class ProcedimentController extends BaseUserController{
 	
 	private ProcSerDto emplenarModelProcediment(HttpServletRequest request, Long procedimentId, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		ProcSerDto procediment = null;
 		if (procedimentId != null) {
 			procediment = procedimentService.findById(entitat.getId(), isAdministrador(request), procedimentId);
@@ -314,8 +314,8 @@ public class ProcedimentController extends BaseUserController{
 			}
 			model.addAttribute(procediment);
 		}
-		
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+
+		var organGestorActual = getOrganGestorActual(request);
 		if (organGestorActual != null) {
 			model.addAttribute("pagadorsPostal", operadorPostalService.findByEntitatAndOrganGestor(entitat, organGestorActual));
 			model.addAttribute("pagadorsCie", pagadorCieService.findByEntitatAndOrganGestor(entitat, organGestorActual));
@@ -346,7 +346,7 @@ public class ProcedimentController extends BaseUserController{
 	@ResponseBody
 	private List<TipusAssumpteDto> getTipusAssumpte(HttpServletRequest request, Model model, @PathVariable Long entitatId) {
 
-		EntitatDto entitat = entitatService.findById(entitatId);
+		var entitat = entitatService.findById(entitatId);
 		model.addAttribute("tipusAssumpte", procedimentService.findTipusAssumpte(entitat));
 		return procedimentService.findTipusAssumpte(entitat);
 	}
@@ -355,7 +355,7 @@ public class ProcedimentController extends BaseUserController{
 	@ResponseBody
 	private List<CodiAssumpteDto> getCodiAssumpte(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable String codiTipusAssumpte) {
 
-		EntitatDto entitat = entitatService.findById(entitatId);
+		var entitat = entitatService.findById(entitatId);
 		return procedimentService.findCodisAssumpte(entitat, codiTipusAssumpte);
 	}
 	
@@ -363,16 +363,15 @@ public class ProcedimentController extends BaseUserController{
 	@ResponseBody
 	private List<OrganismeDto> getOrganismes(HttpServletRequest request, Model model, @PathVariable Long entitatId) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		List<OrganismeDto> organismes;
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
 		return organGestorActual != null ? organGestorService.findOrganismes(entitat, organGestorActual) : organGestorService.findOrganismes(entitat);
 	}
 	
 	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)
 	private String refrescar(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		procedimentService.refrescarCache(entitat);
 		return getAjaxControllerReturnValueSuccess(request, "redirect:../../procediment","procediment.controller.esborrat.cache.ok");
 	}

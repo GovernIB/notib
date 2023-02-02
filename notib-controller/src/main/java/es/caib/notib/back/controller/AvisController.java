@@ -70,7 +70,7 @@ public class AvisController extends BaseUserController {
 			model.addAttribute(AvisCommand.asCommand(avis));
 			return "avisForm";
 		}
-		AvisCommand avisCommand = new AvisCommand();
+		var avisCommand = new AvisCommand();
 		avisCommand.setDataInici(new Date());
 		model.addAttribute(avisCommand);
 		return "avisForm";
@@ -82,8 +82,8 @@ public class AvisController extends BaseUserController {
 		if (bindingResult.hasErrors()) {
 			return "avisForm";
 		}
-		String url = "redirect:avis";
-		String msg = command.getId() != null ? "avis.controller.modificat.ok" : "avis.controller.creat.ok";
+		var url = "redirect:avis";
+		var msg = command.getId() != null ? "avis.controller.modificat.ok" : "avis.controller.creat.ok";
 		if (command.getId() != null) {
 			avisService.update(AvisCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(request, url, msg);

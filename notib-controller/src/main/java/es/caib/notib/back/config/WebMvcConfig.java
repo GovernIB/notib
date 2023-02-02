@@ -86,17 +86,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Bean
 	public LocaleResolver localeResolver() {
-		CustomLocaleResolver localeResolver = new CustomLocaleResolver(
-				Arrays.asList(
-						Locale.forLanguageTag("ca"),
-						Locale.forLanguageTag("es")));
+
+		var localeResolver = new CustomLocaleResolver(Arrays.asList(Locale.forLanguageTag("ca"), Locale.forLanguageTag("es")));
 		localeResolver.setDefaultLocale(Locale.forLanguageTag("ca"));
 		return localeResolver;
 	}
 
 	@Bean
 	public ViewResolver internalResourceViewResolver() {
-		InternalResourceViewResolver bean = new InternalResourceViewResolver();
+
+		var bean = new InternalResourceViewResolver();
 		bean.setViewClass(JstlView.class);
 		bean.setPrefix("/WEB-INF/jsp/");
 		bean.setSuffix(".jsp");
@@ -119,14 +118,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Bean
 	public LocaleChangeInterceptor localeChangeInterceptor() {
-		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+
+		var lci = new LocaleChangeInterceptor();
 		lci.setParamName("lang");
 		return lci;
 	}
 
 	@Bean
 	public FilterRegistrationBean<SiteMeshFilter> sitemeshFilter() {
-		FilterRegistrationBean<SiteMeshFilter> registrationBean = new FilterRegistrationBean<SiteMeshFilter>();
+
+		var  registrationBean = new FilterRegistrationBean<SiteMeshFilter>();
 		registrationBean.setFilter(new SiteMeshFilter());
 		registrationBean.addUrlPatterns("*");
 		return registrationBean;
@@ -168,7 +169,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		CustomPageableHandlerMethodArgumentResolver resolver = new CustomPageableHandlerMethodArgumentResolver();
+
+		var resolver = new CustomPageableHandlerMethodArgumentResolver();
 		resolver.setFallbackPageable(Pageable.unpaged());
 		resolvers.add(resolver);
 		WebMvcConfigurer.super.addArgumentResolvers(resolvers);
@@ -191,15 +193,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			return Pageable.class.equals(parameter.getParameterType());
 		}
 		@Override
-		public Pageable resolveArgument(
-				MethodParameter methodParameter,
-				@Nullable ModelAndViewContainer mavContainer,
-				NativeWebRequest webRequest,
-				@Nullable WebDataBinderFactory binderFactory) {
-			String page = webRequest.getParameter(getParameterNameToUse(getPageParameterName(), methodParameter));
-			String pageSize = webRequest.getParameter(getParameterNameToUse(getSizeParameterName(), methodParameter));
-			Sort sort = sortResolver.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
-			Pageable pageable = getPageable(methodParameter, page, pageSize);
+		public Pageable resolveArgument(MethodParameter methodParameter, @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) {
+
+			var page = webRequest.getParameter(getParameterNameToUse(getPageParameterName(), methodParameter));
+			var pageSize = webRequest.getParameter(getParameterNameToUse(getSizeParameterName(), methodParameter));
+			var sort = sortResolver.resolveArgument(methodParameter, mavContainer, webRequest, binderFactory);
+			var pageable = getPageable(methodParameter, page, pageSize);
 			if (pageable.isPaged() && sort.isSorted()) {
 				return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 			}
@@ -215,16 +214,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		}
 		@Override
 		protected Locale determineDefaultLocale(HttpServletRequest request) {
-			Locale acceptHeaderLocale = acceptHeaderLocaleResolver.resolveLocale(request);
-			if (acceptHeaderLocale == null) {
-				Locale defaultLocale = getDefaultLocale();
-				if (defaultLocale == null) {
-					defaultLocale = request.getLocale();
-				}
-				return defaultLocale;
-			} else {
+
+			var acceptHeaderLocale = acceptHeaderLocaleResolver.resolveLocale(request);
+			if (acceptHeaderLocale != null) {
 				return acceptHeaderLocale;
 			}
+			Locale defaultLocale = getDefaultLocale();
+			if (defaultLocale == null) {
+				defaultLocale = request.getLocale();
+			}
+			return defaultLocale;
 		}
 	}
 

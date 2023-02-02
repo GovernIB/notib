@@ -4,7 +4,6 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.client.domini.Idioma;
-import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.command.UsuariCommand;
 import es.caib.notib.back.helper.EnumHelper;
@@ -44,9 +43,10 @@ public class UsuariController extends BaseController {
 
 		// Només per Jboss
 		// Es itera sobre totes les cookies
-		for(Cookie c : request.getCookies()) {
+		Cookie ck;
+		for(var c : request.getCookies()) {
 			// Es sobre escriu el valor de cada cookie a NULL
-			Cookie ck = new Cookie(c.getName(), null);
+			ck = new Cookie(c.getName(), null);
 			ck.setPath(request.getContextPath());
 			response.addCookie(ck);
 		}
@@ -56,7 +56,7 @@ public class UsuariController extends BaseController {
 	@RequestMapping(value = "/configuracio", method = RequestMethod.GET)
 	public String getConfiguracio(HttpServletRequest request, Model model) {
 
-		UsuariDto usuari = aplicacioService.getUsuariActual();
+		var usuari = aplicacioService.getUsuariActual();
 		model.addAttribute(UsuariCommand.asCommand(usuari));
 		model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 		return "usuariForm";
@@ -66,8 +66,8 @@ public class UsuariController extends BaseController {
 	public String save(HttpServletRequest request, @Valid UsuariCommand command, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
-			UsuariDto usuari = aplicacioService.getUsuariActual();
-			UsuariCommand uc = UsuariCommand.asCommand(usuari);
+			var usuari = aplicacioService.getUsuariActual();
+			var uc = UsuariCommand.asCommand(usuari);
 			uc.setEmailAlt(command.getEmailAlt());
 			command.setNom(uc.getNom());
 			command.setEmail(uc.getEmail());
@@ -78,7 +78,7 @@ public class UsuariController extends BaseController {
 			model.addAttribute("idiomaEnumOptions", EnumHelper.getOptionsForEnum(Idioma.class,"usuari.form.camp.idioma.enum."));
 			return "usuariForm";
 		}
-		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
+		var usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
 		return getModalControllerReturnValueSuccess(request,"redirect:/","usuari.controller.modificat.ok");
 	}

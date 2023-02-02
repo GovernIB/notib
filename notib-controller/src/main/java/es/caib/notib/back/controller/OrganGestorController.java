@@ -1,14 +1,11 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
 import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
-import es.caib.notib.logic.intf.dto.organisme.PrediccioSincronitzacio;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
 import es.caib.notib.logic.intf.service.OrganGestorService;
@@ -67,12 +64,12 @@ public class OrganGestorController extends BaseUserController{
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
-		OrganGestorFiltreCommand filtres = getFiltreCommand(request);
+		var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+		var filtres = getFiltreCommand(request);
 		model.addAttribute("organGestorFiltreCommand", filtres);
 		model.addAttribute("organsEntitat", organService.getOrgansAsList(entitat));
 		model.addAttribute("organGestorFiltreCommand", getFiltreCommand(request));
-		String prefix = "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.";
+		var prefix = "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum.";
 		model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, prefix));
 		model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 		model.addAttribute("setOficina", !entitat.isOficinaEntitat());
@@ -86,11 +83,11 @@ public class OrganGestorController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
-		OrganGestorFiltreCommand organGestorFiltreCommand = getFiltreCommand(request);
+		var organGestorFiltreCommand = getFiltreCommand(request);
 		PaginaDto<OrganGestorDto> organs = new PaginaDto<>();
 		try {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			OrganGestorDto organGestorActual = getOrganGestorActual(request);
+			var entitat = getEntitatActualComprovantPermisos(request);
+			var organGestorActual = getOrganGestorActual(request);
 			String organActualCodiDir3 = null;
 			if (organGestorActual != null) {
 				organActualCodiDir3 = organGestorActual.getCodi();
@@ -132,7 +129,7 @@ public class OrganGestorController extends BaseUserController{
 	public String save(HttpServletRequest request, @Valid OrganGestorCommand organGestorCommand, BindingResult bindingResult, Model model) {
 
 		if (bindingResult.hasErrors()) {
-			EntitatDto entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
+			var entitat = entitatService.findById(getEntitatActualComprovantPermisos(request).getId());
 			model.addAttribute("entitat", entitat);
 			model.addAttribute("setLlibre", !entitat.isLlibreEntitat());
 			model.addAttribute("setOficina", !entitat.isOficinaEntitat());
@@ -187,17 +184,17 @@ public class OrganGestorController extends BaseUserController{
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		ProgresActualitzacioDto progresActualitzacio = organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var progresActualitzacio = organGestorService.getProgresActualitzacio(entitat.getDir3Codi());
 		if (progresActualitzacio == null) {
 //			log.error("No s'ha trobat el progres actualització d'organs gestors per a l'entitat {}", entitat.getDir3Codi());
 			return new ProgresActualitzacioDto();
 		}
 		if (progresActualitzacio.getFase() == 3) {
 //			ProgresActualitzacioDto progresProc = ProcedimentServiceImpl.progresActualitzacio.get(entitat.getDir3Codi());
-			ProgresActualitzacioDto progresProc = procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
+			var progresProc = procedimentService.getProgresActualitzacio(entitat.getDir3Codi());
 			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
-				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+				var progresAcumulat = new ProgresActualitzacioDto();
 				progresAcumulat.setProgres(45 + (progresProc.getProgres() * 18 / 100));
 				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 				progresAcumulat.getInfo().addAll(progresProc.getInfo());
@@ -209,9 +206,9 @@ public class OrganGestorController extends BaseUserController{
 			return progresActualitzacio;
 		}
 //		ProgresActualitzacioDto progresSer = ServeiServiceImpl.progresActualitzacioServeis.get(entitat.getDir3Codi());
-		ProgresActualitzacioDto progresSer = serveiService.getProgresActualitzacio(entitat.getDir3Codi());
+		var progresSer = serveiService.getProgresActualitzacio(entitat.getDir3Codi());
 		if (progresSer != null && progresSer.getInfo() != null && ! progresSer.getInfo().isEmpty()) {
-			ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+			var progresAcumulat = new ProgresActualitzacioDto();
 			progresAcumulat.setProgres(63 + (progresSer.getProgres() * 18 / 100));
 			progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
 			progresAcumulat.getInfo().addAll(progresSer.getInfo());
@@ -248,7 +245,7 @@ public class OrganGestorController extends BaseUserController{
 			return getAjaxControllerReturnValueError(request, redirect, "L'entitat actual no té cap codi DIR3 associat");
 		}
 		try {
-			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
+			var prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
 			model.addAttribute("splitMap", prediccio.getSplitMap());
 			model.addAttribute("mergeMap", prediccio.getMergeMap());
@@ -271,7 +268,7 @@ public class OrganGestorController extends BaseUserController{
 	@RequestMapping(value = "/saveSynchronize", method = RequestMethod.POST)
 	public String synchronizePost(HttpServletRequest request) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			organGestorService.syncDir3OrgansGestors(entitatActual);
 			return getModalControllerReturnValueSuccess(request, "redirect:unitatOrganitzativa", "organgestor.controller.synchronize.ok");
@@ -306,8 +303,8 @@ public class OrganGestorController extends BaseUserController{
 	@RequestMapping(value = "/sync/oficines/{lloc}")
 	public String syncOficinesSIR(HttpServletRequest request, @PathVariable String lloc, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		String redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var redirect = "ARBRE".equalsIgnoreCase(lloc) ? "redirect:../../../organgestorArbre" : "redirect:../../../organgestor";
 		try {
 			organGestorService.syncOficinesSIR(entitat.getId());
 			return getAjaxControllerReturnValueSuccess(request, redirect,"organgestor.list.boto.actualitzar.oficines.ok");
@@ -321,7 +318,7 @@ public class OrganGestorController extends BaseUserController{
 	@RequestMapping(value = "/llibre/{organGestorDir3Codi}", method = RequestMethod.GET)
 	private LlibreDto getLlibreOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		return organGestorService.getLlibreOrganisme(entitat.getId(), organGestorDir3Codi);
 	}
 
@@ -329,13 +326,13 @@ public class OrganGestorController extends BaseUserController{
 	@RequestMapping(value = "/oficines/{organGestorDir3Codi}", method = RequestMethod.GET)
 	private List<OficinaDto> getOficinesOrgan(HttpServletRequest request, Model model, @PathVariable String organGestorDir3Codi) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		return organGestorService.getOficinesSIR(entitat.getId(), organGestorDir3Codi, false);
 	}
 
 	public OrganGestorFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		OrganGestorFiltreCommand organGestorFiltreCommand = (OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, ORGANS_FILTRE);
+		var organGestorFiltreCommand = (OrganGestorFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, ORGANS_FILTRE);
 		if (organGestorFiltreCommand != null) {
 			return organGestorFiltreCommand;
 		}

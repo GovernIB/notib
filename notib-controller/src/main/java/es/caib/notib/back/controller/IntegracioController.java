@@ -3,15 +3,8 @@
  */
 package es.caib.notib.back.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.notib.back.helper.MissatgesHelper;
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IntegracioAccioDto;
 import es.caib.notib.logic.intf.dto.IntegracioDetall;
-import es.caib.notib.logic.intf.dto.IntegracioDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.MonitorIntegracioService;
 import es.caib.notib.back.command.IntegracioFiltreCommand;
 import es.caib.notib.back.helper.DatatablesHelper;
@@ -29,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,7 +40,7 @@ public class IntegracioController extends BaseUserController {
 	@Autowired
 	private MonitorIntegracioService monitorIntegracioService;
 	
-	enum IntegracioEnumDto {
+	enum IntegracioEnum {
 		USUARIS,
 		REGISTRE,
 		NOTIFICA,
@@ -78,16 +69,15 @@ public class IntegracioController extends BaseUserController {
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(HttpServletRequest request, @PathVariable @NonNull String codi, Model model) {
 
-		List<IntegracioDto> integracions = monitorIntegracioService.integracioFindAll();
-
+		var integracions = monitorIntegracioService.integracioFindAll();
 		// Consulta el número d'errors per codi d'integracio
 		try {
 			Map<String, Integer> errors = monitorIntegracioService.countErrors();
 
-			for (IntegracioDto integracio : integracions) {
-				for (IntegracioEnumDto integracioEnum : IntegracioEnumDto.values()) {
+			for (var integracio : integracions) {
+				for (var integracioEnum : IntegracioEnum.values()) {
 					if (integracio.getCodi().equals(integracioEnum.name())) {
-						integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class, "integracio.list.pipella." + integracio.getCodi()).getText());
+						integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnum.class, "integracio.list.pipella." + integracio.getCodi()).getText());
 					}
 				}
 				if (errors.containsKey(integracio.getCodi())) {
@@ -95,11 +85,11 @@ public class IntegracioController extends BaseUserController {
 				}
 			}
 		} catch (Exception ex) {
-			String msg = "Error contant el nombre d'integracions amb error";
+			var msg = "Error contant el nombre d'integracions amb error";
 			log.error(msg, ex);
 			MissatgesHelper.warning(request, msg);
 		}
-		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		var command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
 		model.addAttribute("integracioFiltreCommand", command);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, codi);
 		model.addAttribute("codiActual", codi);
@@ -114,10 +104,10 @@ public class IntegracioController extends BaseUserController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
 
-		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
-		IntegracioFiltreCommand filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
-		PaginaDto<IntegracioAccioDto> accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre !=null ? filtre.asDto() : null);
+		var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
+		var filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		var accions = monitorIntegracioService.integracioFindDarreresAccionsByCodi(codi, paginacio, filtre !=null ? filtre.asDto() : null);
 		return DatatablesHelper.getDatatableResponse(request, accions);
 	}
 

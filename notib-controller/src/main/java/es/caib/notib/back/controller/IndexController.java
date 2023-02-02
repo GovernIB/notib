@@ -40,8 +40,8 @@ public class IndexController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String root(HttpServletRequest request) {
-		var rolActual = RolHelper.getRolActual(request, aplicacioService);
 
+		var rolActual = RolHelper.getRolActual(request, aplicacioService);
 		if (RolHelper.ROLE_SUPER.equals(rolActual)) {
 			return "redirect:/integracio";
 		}

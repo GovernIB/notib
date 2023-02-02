@@ -3,12 +3,10 @@
  */
 package es.caib.notib.back.controller;
 
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.google.common.base.Strings;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,8 +46,8 @@ public class EntitatPermisController extends BaseController {
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long entitatId) {
 
-		PaginacioParamsDto paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		List<PermisDto> permisos = entitatService.permisFindByEntitatId(entitatId, paginacio);
+		var paginacio = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var permisos = entitatService.permisFindByEntitatId(entitatId, paginacio);
 		return DatatablesHelper.getDatatableResponse(request, permisos);
 	}
 
@@ -57,7 +55,7 @@ public class EntitatPermisController extends BaseController {
 	public String getNew(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
 		model.addAttribute("entitat", entitatService.findById(entitatId));
-		PermisCommand permisCommand = new PermisCommand();
+		var permisCommand = new PermisCommand();
 		model.addAttribute(permisCommand);
 		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return "entitatPermisForm";
@@ -67,7 +65,6 @@ public class EntitatPermisController extends BaseController {
 	@RequestMapping(value="/{principal}/existeix", method = RequestMethod.GET)
 	public boolean existeixPrincipal(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable String principal, Model model) {
 
-		System.out.println(principal);
 		if (Strings.isNullOrEmpty(principal)) {
 			return false;
 		}
@@ -83,10 +80,9 @@ public class EntitatPermisController extends BaseController {
 	public String get(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable Long permisId, Model model) {
 
 		model.addAttribute("entitat", entitatService.findById(entitatId));
-		List<PermisDto> permisos = null;
-		permisos = entitatService.permisFindByEntitatId(entitatId, null);
+		var permisos = entitatService.permisFindByEntitatId(entitatId, null);
 		PermisDto permis = null;
-		for (PermisDto p: permisos) {
+		for (var p: permisos) {
 			if (p.getId().equals(permisId)) {
 				permis = p;
 				break;

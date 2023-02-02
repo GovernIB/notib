@@ -3,8 +3,6 @@
  */
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.AplicacioDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.UsuariAplicacioService;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controlador per al manteniment d'aplicacions.
@@ -44,7 +41,7 @@ public class AplicacioController extends BaseController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long entitatId, Model model) {
 
-		AplicacioFiltreCommand command = getFiltreCommand(request);
+		var command = getFiltreCommand(request);
 		model.addAttribute("aplicacioFiltreCommand", command);
 		model.addAttribute("entitat", entitatService.findById(entitatId));
 		return "aplicacioList";
@@ -64,20 +61,19 @@ public class AplicacioController extends BaseController {
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long entitatId) {
 
 
-		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
 		prepararFiltres(request, params);
-		PaginaDto<AplicacioDto> apps = usuariAplicacioService.findPaginatByEntitat(entitatId, params);
+		var apps = usuariAplicacioService.findPaginatByEntitat(entitatId, params);
 		return DatatablesHelper.getDatatableResponse(request, apps);
 	}
 
 	private void prepararFiltres(HttpServletRequest request, PaginacioParamsDto params) {
 
-		List<PaginacioParamsDto.FiltreDto> filtres = new ArrayList<>();
-		AplicacioFiltreCommand command = getFiltreCommand(request);
+		var command = getFiltreCommand(request);
 		if (command == null) {
 			return;
 		}
-		params.setFiltres(new ArrayList<PaginacioParamsDto.FiltreDto>());
+		params.setFiltres(new ArrayList<>());
 		params.afegirFiltre("codiUsuari", command.getCodiUsuari());
 		params.afegirFiltre("callbackUrl", command.getCallbackUrl());
 		params.afegirFiltre("activa", command.getActiva());
@@ -94,7 +90,7 @@ public class AplicacioController extends BaseController {
 	@RequestMapping(value = "/{aplicacioId}", method = RequestMethod.GET)
 	public String update(HttpServletRequest request, Model model, @PathVariable Long entitatId, @PathVariable Long aplicacioId) {
 
-		AplicacioDto dto = aplicacioId != null ? usuariAplicacioService.findByEntitatAndId(entitatId, aplicacioId) : null;
+		var dto = aplicacioId != null ? usuariAplicacioService.findByEntitatAndId(entitatId, aplicacioId) : null;
 		model.addAttribute(dto != null ? AplicacioCommand.asCommand(dto) : new AplicacioCommand());
 		model.addAttribute("entitat", entitatService.findById(entitatId));
 		return "aplicacioForm";
@@ -106,8 +102,8 @@ public class AplicacioController extends BaseController {
 		if (bindingResult.hasErrors()) {model.addAttribute("entitat", entitatService.findById(entitatId));
 			return "aplicacioForm";
 		}
-		String url = "redirect:aplicacio";
-		String msg = command.getId() == null ? "aplicacio.controller.creada.ok" : "aplicacio.controller.modificada.ok";
+		var url = "redirect:aplicacio";
+		var msg = command.getId() == null ? "aplicacio.controller.creada.ok" : "aplicacio.controller.modificada.ok";
 		if (command.getId() == null) {
 			usuariAplicacioService.create(AplicacioCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(request, url, msg);
@@ -138,7 +134,7 @@ public class AplicacioController extends BaseController {
 
 	private AplicacioFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		AplicacioFiltreCommand command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);
+		var command = (AplicacioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, APLICACIO_FILTRE);
 		if (command != null) {
 			return command;
 		}

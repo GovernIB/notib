@@ -127,7 +127,7 @@ public class NotibController implements ErrorController {
 			logPath = logPath.substring(0, logPath.length() - 4) + "." + dia + logPath.substring(logPath.length() - 4);
 		}
 		var logFile = new File(logPath);
-		boolean logExist = logFile.exists();
+		var logExist = logFile.exists();
 		var fileName = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Expires", "0");
@@ -192,7 +192,7 @@ public class NotibController implements ErrorController {
 				HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
 				return httpStatus.getReasonPhrase();
 			}
-			Throwable rootCause = ExceptionUtils.getRootCause(throwable);
+			var rootCause = ExceptionUtils.getRootCause(throwable);
 			return rootCause != null ? rootCause.getMessage() : throwable.getMessage();
 		}
 	}

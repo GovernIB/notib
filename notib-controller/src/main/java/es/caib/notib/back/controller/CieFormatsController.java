@@ -1,10 +1,5 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import es.caib.notib.logic.intf.dto.cie.CieDto;
-import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
-import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.service.*;
 import es.caib.notib.back.command.CieCommand;
 import es.caib.notib.back.command.PagadorCieFormatFullaCommand;
@@ -43,8 +38,8 @@ public class CieFormatsController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/formats/fulla", method = RequestMethod.GET)
 	public String getFormatsFulla(@PathVariable Long pagadorCieId, HttpServletRequest request, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
 		model.addAttribute("pagadorCie", cieCommand);
 		return "pagadorCieFullaAdminList";
 	}
@@ -52,8 +47,8 @@ public class CieFormatsController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/formats/sobre", method = RequestMethod.GET)
 	public String getFormatsSobre(@PathVariable Long pagadorCieId, HttpServletRequest request, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
 		model.addAttribute("pagadorCie", cieCommand);
 		return "pagadorCieSobreAdminList";
 	}
@@ -61,8 +56,8 @@ public class CieFormatsController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/formats/fulla/new", method = RequestMethod.GET)
 	public String getFormFormatFullaNew(@PathVariable Long pagadorCieId, HttpServletRequest request, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
 		model.addAttribute("pagadorCie", cieCommand);
 		model.addAttribute(new PagadorCieFormatFullaCommand());
 		return "pagadorCieFullaAdminForm";
@@ -71,12 +66,10 @@ public class CieFormatsController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/formats/fulla/{formatFullaId}", method = RequestMethod.GET)
 	public String getFormFormatFulla(@PathVariable Long pagadorCieId, HttpServletRequest request, @PathVariable Long formatFullaId, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
-		PagadorCieFormatFullaCommand pagadorCieFormatFullaCommand;
-		CieFormatFullaDto pagadorCieFormatFulla;
-		pagadorCieFormatFulla = pagadorCieFormatFullaService.findById(formatFullaId);
-		pagadorCieFormatFullaCommand = pagadorCieFormatFulla != null ? PagadorCieFormatFullaCommand.asCommand(pagadorCieFormatFulla) : new PagadorCieFormatFullaCommand();
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCieFormatFulla = pagadorCieFormatFullaService.findById(formatFullaId);
+		var pagadorCieFormatFullaCommand = pagadorCieFormatFulla != null ? PagadorCieFormatFullaCommand.asCommand(pagadorCieFormatFulla) : new PagadorCieFormatFullaCommand();
 		model.addAttribute("pagadorCie", cieCommand);
 		model.addAttribute(pagadorCieFormatFullaCommand);
 		return "pagadorCieFullaAdminForm";
@@ -86,7 +79,7 @@ public class CieFormatsController extends BaseUserController{
 	public String formatFullaDelete(@PathVariable Long pagadorCieId, HttpServletRequest request, @PathVariable Long formatFullaId, Model model) {
 		
 		pagadorCieFormatFullaService.delete(formatFullaId);
-		String url = "redirect:../../cie/" + pagadorCieId + "/formats/fulla";
+		var url = "redirect:../../cie/" + pagadorCieId + "/formats/fulla";
 		return getAjaxControllerReturnValueSuccess(request, url,"cie.format.fulla.controller.esborrat.ok");
 	}
 	
@@ -94,14 +87,14 @@ public class CieFormatsController extends BaseUserController{
 	public String saveFormatFulla(@PathVariable Long pagadorCieId, HttpServletRequest request, @Valid PagadorCieFormatFullaCommand pagadorCieFormatFullCommand,
 								  BindingResult bindingResult, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
 		model.addAttribute("pagadorCie", cieCommand);
 		if (bindingResult.hasErrors()) {
 			return "pagadorCieFullaAdminForm";
 		}
-		String url = "redirect:pagadorsCie";
-		String msg = pagadorCieFormatFullCommand.getId() != null ? "cie.format.fulla.controller.modificat.ok" : "cie.format.fulla.controller.creat.ok";
+		var url = "redirect:pagadorsCie";
+		var msg = pagadorCieFormatFullCommand.getId() != null ? "cie.format.fulla.controller.modificat.ok" : "cie.format.fulla.controller.creat.ok";
 		if (pagadorCieFormatFullCommand.getId() != null) {
 			pagadorCieFormatFullaService.update(PagadorCieFormatFullaCommand.asDto(pagadorCieFormatFullCommand));
 			return getModalControllerReturnValueSuccess(request, url, msg);
@@ -113,8 +106,8 @@ public class CieFormatsController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/formats/sobre/new", method = RequestMethod.GET)
 	public String getFormFormatSobreNew(@PathVariable Long pagadorCieId, HttpServletRequest request, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
 		model.addAttribute("pagadorCie", cieCommand);
 		model.addAttribute(new PagadorCieFormatSobreCommand());
 		return "pagadorCieSobreAdminForm";
@@ -123,12 +116,10 @@ public class CieFormatsController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/formats/sobre/{formatSobreId}", method = RequestMethod.GET)
 	public String getFormFormatSobre(@PathVariable Long pagadorCieId, HttpServletRequest request, @PathVariable Long formatSobreId, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
-		PagadorCieFormatSobreCommand pagadorCieFormatSobreCommand;
-		CieFormatSobreDto pagadorCieFormatSobre;
-		pagadorCieFormatSobre = pagadorCieFormatSobreService.findById(formatSobreId);
-		pagadorCieFormatSobreCommand = pagadorCieFormatSobre != null ? PagadorCieFormatSobreCommand.asCommand(pagadorCieFormatSobre) : new PagadorCieFormatSobreCommand();
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCieFormatSobre = pagadorCieFormatSobreService.findById(formatSobreId);
+		var pagadorCieFormatSobreCommand = pagadorCieFormatSobre != null ? PagadorCieFormatSobreCommand.asCommand(pagadorCieFormatSobre) : new PagadorCieFormatSobreCommand();
 		model.addAttribute("pagadorCie", cieCommand);
 		model.addAttribute(pagadorCieFormatSobreCommand);
 		return "pagadorCieSobreAdminForm";
@@ -138,7 +129,7 @@ public class CieFormatsController extends BaseUserController{
 	public String formatSobreDelete(@PathVariable Long pagadorCieId, HttpServletRequest request, @PathVariable Long formatSobreId, Model model) {
 		
 		pagadorCieFormatSobreService.delete(formatSobreId);
-		String url = "redirect:../../cie/" + pagadorCieId + "/formats/sobre";
+		var url = "redirect:../../cie/" + pagadorCieId + "/formats/sobre";
 		return getAjaxControllerReturnValueSuccess(request, url, "cie.format.sobre.controller.esborrat.ok");
 	}
 	
@@ -146,14 +137,14 @@ public class CieFormatsController extends BaseUserController{
 	public String saveFormatSobre(@PathVariable Long pagadorCieId, HttpServletRequest request, @Valid PagadorCieFormatSobreCommand pagadorCieFormatSobreCommand,
 								  BindingResult bindingResult, Model model) {
 
-		CieDto pagadorCie = pagadorCieService.findById(pagadorCieId);
-		CieCommand cieCommand = CieCommand.asCommand(pagadorCie);
+		var pagadorCie = pagadorCieService.findById(pagadorCieId);
+		var cieCommand = CieCommand.asCommand(pagadorCie);
 		model.addAttribute("pagadorCie", cieCommand);
 		if (bindingResult.hasErrors()) {
 			return "pagadorCieFullaAdminForm";
 		}
-		String url = "redirect:pagadorsCie";
-		String msg = pagadorCieFormatSobreCommand.getId() != null ? "cie.format.sobre.controller.modificat.ok" : "cie.format.sobre.controller.creat.ok";
+		var url = "redirect:pagadorsCie";
+		var msg = pagadorCieFormatSobreCommand.getId() != null ? "cie.format.sobre.controller.modificat.ok" : "cie.format.sobre.controller.creat.ok";
 		if (pagadorCieFormatSobreCommand.getId() != null) {
 			pagadorCieFormatSobreService.update(PagadorCieFormatSobreCommand.asDto(pagadorCieFormatSobreCommand));
 			return getModalControllerReturnValueSuccess(request, url, msg);
@@ -166,8 +157,8 @@ public class CieFormatsController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatableFulla(@PathVariable Long pagadorCieId, HttpServletRequest request, Model model) {
 
-		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		PaginaDto<CieFormatFullaDto> formatFullaPagadorCie = pagadorCieFormatFullaService.findAllPaginat(pagadorCieId, params);
+		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var formatFullaPagadorCie = pagadorCieFormatFullaService.findAllPaginat(pagadorCieId, params);
 		return DatatablesHelper.getDatatableResponse(request, formatFullaPagadorCie, "id");
 	}
 	
@@ -175,8 +166,8 @@ public class CieFormatsController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatableSobre(@PathVariable Long pagadorCieId, HttpServletRequest request, Model model) {
 
-		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		PaginaDto<CieFormatSobreDto> formatSobrePagadorCie = pagadorCieFormatSobreService.findAllPaginat(pagadorCieId, params);
+		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var formatSobrePagadorCie = pagadorCieFormatSobreService.findAllPaginat(pagadorCieId, params);
 		return DatatablesHelper.getDatatableResponse(request, formatSobrePagadorCie, "id");
 	}
 	

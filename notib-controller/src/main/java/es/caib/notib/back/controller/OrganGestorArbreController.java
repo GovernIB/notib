@@ -1,11 +1,8 @@
 package es.caib.notib.back.controller;
 
 import es.caib.notib.back.helper.RolHelper;
-import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.IdentificadorTextDto;
 import es.caib.notib.logic.intf.dto.LlibreDto;
-import es.caib.notib.logic.intf.dto.OficinaDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
@@ -75,9 +72,9 @@ public class OrganGestorArbreController extends BaseUserController {
             var filtres = controller.getFiltreCommand(request);
             model.addAttribute("organGestorFiltreCommand", filtres);
             model.addAttribute("organGestorEstats", EnumHelper.getOptionsForEnum(OrganGestorEstatEnum.class, "es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum."));
-            boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
             var organ = getOrganGestorActual(request);
-            Long tf = System.currentTimeMillis();
+            var tf = System.currentTimeMillis();
             System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T1: " + (tf - ti) + "ms");
             ti = tf;
             var arbre = organService.generarArbreOrgans(entitat, filtres.asDto(), isAdminOrgan, organ);
@@ -147,14 +144,14 @@ public class OrganGestorArbreController extends BaseUserController {
 
         try {
             model.addAttribute("desactivarAvisos", true);
-            EntitatDto entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
-            boolean isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-            List<IdentificadorTextDto> operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
+            var entitat = entitatService.findById(controller.getEntitatActualComprovantPermisos(request).getId());
+            var isAdminOrgan = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+            var operadorPostalList = operadorPostalService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("operadorPostalList", operadorPostalList);
-            List<IdentificadorTextDto> cieList = cieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
+            var cieList = cieService.findNoCaducatsByEntitatAndOrgan(entitat, codi, isAdminOrgan);
             model.addAttribute("cieList", cieList);
-            OrganGestorDto o = organService.findByCodi(entitat.getId(), codi);
-            String usr = SecurityContextHolder.getContext().getAuthentication().getName();
+            var o = organService.findByCodi(entitat.getId(), codi);
+            var usr = SecurityContextHolder.getContext().getAuthentication().getName();
             //o = o == null ? organService.getOrganNou(codiSia) : o;
             if (o == null || (isAdminOrgan && !permisosService.hasUsrPermisOrgan(entitat.getId(), usr, codi, PermisEnum.ADMIN))) {
                 throw new NotFoundException(codi, OrganGestorDto.class);
@@ -162,7 +159,7 @@ public class OrganGestorArbreController extends BaseUserController {
             o.setEstatTraduccio(MessageHelper.getInstance().getMessage("es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum." + o.getEstat()));
             omplirModel(model, entitat, o);
         } catch (Exception ex) {
-            String msg = getMessage(request, "organgestor.detall.error", new Object[] {
+            var msg = getMessage(request, "organgestor.detall.error", new Object[] {
                     "<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
                             "\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
                             "\t\t\t</button>\n" +
@@ -177,10 +174,10 @@ public class OrganGestorArbreController extends BaseUserController {
 
     private void omplirModel(Model model, EntitatDto entitat, OrganGestorDto organ) {
 
-        Long ti = System.currentTimeMillis();
+        var ti = System.currentTimeMillis();
         var command = organ != null ? OrganGestorCommand.asCommand(organ) : new OrganGestorCommand();
         command.setEntitatId(entitat.getId());
-        Long tf = System.currentTimeMillis();
+        var tf = System.currentTimeMillis();
         System.out.println(">>>>>>>>>>>>>>>> ARBRE >>> T2.1: " + (tf - ti) + "ms");
         ti = tf;
         model.addAttribute("organsEntitat", organService.getOrgansAsList());

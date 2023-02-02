@@ -1,13 +1,6 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.PaginaDto;
-import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
-import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
-import es.caib.notib.logic.intf.dto.cie.CieTableItemDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PagadorCieService;
 import es.caib.notib.back.command.CieCommand;
@@ -27,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Controlador per el mantinemnt de pagadors cie.
@@ -48,10 +40,10 @@ public class CieController extends BaseUserController{
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		CieFiltreCommand cieFiltreCommand = getFiltreCommand(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var cieFiltreCommand = getFiltreCommand(request);
 		model.addAttribute("cieFiltreCommand", cieFiltreCommand);
-		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "cieList";
 	}
@@ -60,12 +52,12 @@ public class CieController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request ) {
 
-		CieFiltreCommand cieFiltreCommand = getFiltreCommand(request);
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var cieFiltreCommand = getFiltreCommand(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
 		cieFiltreCommand.setOrganGestorId(organGestorActual != null ? organGestorActual.getId() : null);
-		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		PaginaDto<CieTableItemDto> pagadorsCie = pagadorCieService.findAmbFiltrePaginat(entitat.getId(), cieFiltreCommand.asDto(), params);
+		var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var pagadorsCie = pagadorCieService.findAmbFiltrePaginat(entitat.getId(), cieFiltreCommand.asDto(), params);
 		return DatatablesHelper.getDatatableResponse(request, pagadorsCie, "id");
 	}
 	
@@ -77,9 +69,9 @@ public class CieController extends BaseUserController{
 	@RequestMapping(method = RequestMethod.POST)
 	public String post(HttpServletRequest request, CieFiltreCommand command, Model model) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
 		RequestSessionHelper.actualitzarObjecteSessio(request, PAGADOR_CIE_FILTRE, command);
-		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
+		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitat.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "cieList";
 	}
@@ -102,8 +94,8 @@ public class CieController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}", method = RequestMethod.GET)
 	public String formGet(HttpServletRequest request, @PathVariable Long pagadorCieId, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		CieCommand cieCommand = null;
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		CieCommand cieCommand;
 		CieDto pagadorCie = null;
 		if (pagadorCieId != null) {
 			pagadorCie = pagadorCieService.findById(pagadorCieId);
@@ -111,7 +103,7 @@ public class CieController extends BaseUserController{
 		}
 		cieCommand = pagadorCie != null ? CieCommand.asCommand(pagadorCie) : new CieCommand();
 		model.addAttribute(cieCommand);
-		List<CodiValorEstatDto> organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
+		var organsGestors = organGestorService.findOrgansGestorsCodiByEntitat(entitatActual.getId());
 		model.addAttribute("organsGestors", organsGestors);
 		return "cieForm";
 	}
@@ -119,7 +111,7 @@ public class CieController extends BaseUserController{
 	@RequestMapping(value = "/{pagadorCieId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long pagadorCieId) {
 
-		String url = "redirect:../../cie";
+		var url = "redirect:../../cie";
 		try {
 			pagadorCieService.delete(pagadorCieId);
 			return getAjaxControllerReturnValueSuccess(request, url, "cie.controller.esborrat.ok");
@@ -130,7 +122,7 @@ public class CieController extends BaseUserController{
 	
 	private CieFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		CieFiltreCommand cieFiltreCommand = (CieFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, PAGADOR_CIE_FILTRE);
+		var cieFiltreCommand = (CieFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, PAGADOR_CIE_FILTRE);
 		if (cieFiltreCommand != null) {
 			return cieFiltreCommand;
 		}

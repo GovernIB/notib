@@ -1,12 +1,9 @@
 package es.caib.notib.back.controller;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.TipusEnumDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganismeDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.logic.intf.service.GrupService;
 import es.caib.notib.logic.intf.service.OperadorPostalService;
@@ -57,9 +54,9 @@ public class ProcedimentPermisController extends BaseUserController{
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
-		boolean isAdministrador = RolHelper.isUsuariActualAdministrador(request);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ProcSerDto procediment = procedimentService.findById(entitatActual.getId(), isAdministrador, procedimentId);
+		var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var procediment = procedimentService.findById(entitatActual.getId(), isAdministrador, procedimentId);
 		model.addAttribute("procediment", procediment);
 		return "procedimentAdminPermis";
 	}
@@ -68,18 +65,18 @@ public class ProcedimentPermisController extends BaseUserController{
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
-		PaginacioParamsDto paginacioParams = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
-		String codi = organGestorActual != null ? organGestorActual.getCodi() : null;
-		List<PermisDto> permisos = procedimentService.permisFind(entitatActual.getId(), isAdministrador(request), procedimentId, null, codi, null, paginacioParams);
+		var paginacioParams = DatatablesHelper.getPaginacioDtoFromRequest(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
+		var codi = organGestorActual != null ? organGestorActual.getCodi() : null;
+		var permisos = procedimentService.permisFind(entitatActual.getId(), isAdministrador(request), procedimentId, null, codi, null, paginacioParams);
 		return DatatablesHelper.getDatatableResponse(request, permisos,	"id");
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/permis/new", method = RequestMethod.GET)
 	public String getNew(HttpServletRequest request, @PathVariable Long procedimentId, Model model) {
 
-		PermisCommand permisCommand = new PermisCommand();
+		var permisCommand = new PermisCommand();
 		model.addAttribute("principalSize", permisCommand.getPrincipalDefaultSize());
 		return get(request, procedimentId, null, model);
 	}
@@ -121,7 +118,7 @@ public class ProcedimentPermisController extends BaseUserController{
 	@RequestMapping(value = "/{procedimentId}/permis", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, @PathVariable Long procedimentId, @Valid PermisCommand command, BindingResult bindingResult, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("entitat", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
 			if (command.getOrgan() != null) {
@@ -131,7 +128,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			return "procedimentAdminPermisForm";
 		}
 
-		boolean isRol = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
+		var isRol = RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
 		if (TipusEnumDto.ROL.equals(command.getTipus()) && command.getPrincipal().equalsIgnoreCase("tothom") && isRol) {
 			model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
 			if (command.getOrgan() != null) {
@@ -139,39 +136,39 @@ public class ProcedimentPermisController extends BaseUserController{
 			}
 			return getModalControllerReturnValueError(request, "procedimentAdminPermisForm", "procediment.controller.permis.modificat.ko");
 		}
-		
-		Long organGestorActualId = getOrganGestorActualId(request);
+
+		var organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisUpdate(entitatActual.getId(), organGestorActualId, procedimentId, PermisCommand.asDto(command));
-		String url = "redirect:../../procediment/" + procedimentId + "/permis";
+		var url = "redirect:../../procediment/" + procedimentId + "/permis";
 		return getModalControllerReturnValueSuccess(request, url, "procediment.controller.permis.modificat.ok");
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/permis/{permisId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long procedimentId, @PathVariable Long permisId, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Long organGestorActualId = getOrganGestorActualId(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisDelete(entitatActual.getId(), organGestorActualId, procedimentId, null, permisId, TipusPermis.PROCEDIMENT);
-		String url = "redirect:../../../../procediment/" + procedimentId + "/permis";
+		var url = "redirect:../../../../procediment/" + procedimentId + "/permis";
 		return getAjaxControllerReturnValueSuccess(request, url, "procediment.controller.permis.esborrat.ok");
 	}
 	
 	@RequestMapping(value = "/{procedimentId}/organ/{organ}/permis/{permisId}/delete", method = RequestMethod.GET)
 	public String deletePermisOrgan(HttpServletRequest request, @PathVariable Long procedimentId, @PathVariable String organ, @PathVariable Long permisId, Model model) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Long organGestorActualId = getOrganGestorActualId(request);
+		var entitatActual = getEntitatActualComprovantPermisos(request);
+		var organGestorActualId = getOrganGestorActualId(request);
 		procedimentService.permisDelete(entitatActual.getId(), organGestorActualId, procedimentId, organ, permisId, TipusPermis.PROCEDIMENT_ORGAN);
-		String url = "redirect:../../../../procediment/" + procedimentId + "/permis";
+		var url = "redirect:../../../../procediment/" + procedimentId + "/permis";
 		return getAjaxControllerReturnValueSuccess(request, url, "procediment.controller.permis.esborrat.ok");
 	}
 	
 	private List<OrganismeDto> getOrganismes(HttpServletRequest request) {
 
-		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		var entitat = getEntitatActualComprovantPermisos(request);
+		var organGestorActual = getOrganGestorActual(request);
 		List<OrganismeDto> organismes;
-		OrganismeDto organismeActual = OrganismeDto.builder().build();
+		var organismeActual = OrganismeDto.builder().build();
 		if (organGestorActual != null) {
 			organismes = organGestorService.findOrganismes(entitat, organGestorActual);
 			organismeActual.setCodi(organGestorActual.getCodi());
@@ -181,7 +178,7 @@ public class ProcedimentPermisController extends BaseUserController{
 			organismeActual.setCodi(entitat.getDir3Codi());
 			organismeActual.setNom("Global");
 		}
-		int index = organismes.indexOf(organismeActual);
+		var index = organismes.indexOf(organismeActual);
 		if (index != -1) {
 			organismes.remove(index);
 			organismes.add(0, organismeActual);

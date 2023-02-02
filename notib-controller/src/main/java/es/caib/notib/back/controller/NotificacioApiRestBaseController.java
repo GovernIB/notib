@@ -30,32 +30,31 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 
 		String errorDescripcio;
 		if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
-			errorDescripcio = "L'usuari " + aplicacioService.getUsuariActual().getCodi() + " no té els permisos necessaris: " + e.getMessage();
-		} else {
-			errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);
-			if (errorDescripcio == null || errorDescripcio.isEmpty()) {
-				errorDescripcio = e.getMessage();
-			}
+			return "L'usuari " + aplicacioService.getUsuariActual().getCodi() + " no té els permisos necessaris: " + e.getMessage();
+
+		}
+		errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);
+		if (errorDescripcio == null || errorDescripcio.isEmpty()) {
+			errorDescripcio = e.getMessage();
 		}
 		return errorDescripcio;
 	}
 
 	protected String extractIdentificador(HttpServletRequest request) {
 
-		String url = request.getRequestURL().toString();
-		String[] urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
-		String referencia = urlArr.length > 1 ? urlArr[1].substring(1) : "";
-		return referencia;
+		var url = request.getRequestURL().toString();
+		var urlArr = url.split("/consultaEstatNotificacio|/consultaEstatEnviament|/consultaJustificantNotificacio");
+		return  urlArr.length > 1 ? urlArr[1].substring(1) : "";
 	}
 
 	public RespostaConsultaJustificantEnviament consultaJustificant(HttpServletRequest request) {
 
 		try {
-			String referencia = extractIdentificador(request);
+			var referencia = extractIdentificador(request);
 			if (!referencia.isEmpty()) {
 				return notificacioServiceWsV2.consultaJustificantEnviament(referencia);
 			}
-			String msg = "No s'ha informat cap referència de l'enviament";
+			var msg = "No s'ha informat cap referència de l'enviament";
 			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
 		} catch (Exception e) {
 			return RespostaConsultaJustificantEnviament.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
