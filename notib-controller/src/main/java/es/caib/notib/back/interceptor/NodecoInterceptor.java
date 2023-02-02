@@ -21,13 +21,8 @@ import es.caib.notib.back.helper.NodecoHelper;
 public class NodecoInterceptor implements AsyncHandlerInterceptor {
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		boolean resposta = NodecoHelper.comprovarNodecoInterceptor(request, response);
-		//System.out.println(">>> NODECO: " + request.getRequestURI() + ", " + AjaxHelper.isAjax(request));
-		return resposta;
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		return NodecoHelper.comprovarNodecoInterceptor(request, response);
 	}
 
 }

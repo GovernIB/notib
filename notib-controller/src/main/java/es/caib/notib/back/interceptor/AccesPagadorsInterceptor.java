@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.helper.RolHelper;
 import org.springframework.context.annotation.Lazy;
@@ -28,14 +27,12 @@ public class AccesPagadorsInterceptor implements AsyncHandlerInterceptor {
 
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		if (!RolHelper.isUsuariActualAdministradorEntitat(request))
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+		var usuariActual = aplicacioService.getUsuariActual();
+		if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
 			throw new SecurityException("L'usuari actual " + usuariActual.getCodi() + " no pot accedir a la gestió de pagadors", null);
-		
+		}
 		return true;
 	}
 

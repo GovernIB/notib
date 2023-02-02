@@ -20,13 +20,8 @@ import es.caib.notib.back.helper.AjaxHelper;
 public class AjaxInterceptor implements AsyncHandlerInterceptor {
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		boolean resposta = AjaxHelper.comprovarAjaxInterceptor(request, response);
-		//System.out.println(">>> AJAX: " + request.getRequestURI() + ", " + AjaxHelper.isAjax(request));
-		return resposta;
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		return AjaxHelper.comprovarAjaxInterceptor(request, response);
 	}
 
 }

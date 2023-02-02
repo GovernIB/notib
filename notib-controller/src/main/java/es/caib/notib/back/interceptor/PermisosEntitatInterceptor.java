@@ -27,13 +27,9 @@ public class PermisosEntitatInterceptor implements AsyncHandlerInterceptor {
 
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		PermisosHelper.comprovarPermisosEntitatsUsuariActual(
-				request,
-				entitatService);
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+		PermisosHelper.comprovarPermisosEntitatsUsuariActual(request, entitatService);
 		return true;
 	}
 

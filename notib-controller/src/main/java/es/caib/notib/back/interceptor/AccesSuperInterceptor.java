@@ -27,14 +27,12 @@ public class AccesSuperInterceptor implements AsyncHandlerInterceptor {
 
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-		if (!RolHelper.isUsuariActualAdministrador(request))
-			throw new SecurityException("Es necessari el rol de superusuari per accedir a aquesta página.", null); // L'usuari actual " + usuariActual.getCodi() + " no té el rol.", null);
-		
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+		aplicacioService.getUsuariActual();
+		if (!RolHelper.isUsuariActualAdministrador(request)) {
+			throw new SecurityException("Es necessari el rol de superusuari per accedir a aquesta página.", null);
+		}
 		return true;
 	}
 

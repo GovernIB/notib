@@ -31,17 +31,11 @@ public class LlistaRolsInterceptor implements AsyncHandlerInterceptor {
 	private AplicacioService aplicacioService;
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
 		if (!ContingutEstaticHelper.isContingutEstatic(request)) {
-			RolHelper.processarCanviRols(
-					request,
-					aplicacioService);
-			OrganGestorHelper.getOrgansGestorsUsuariActual(
-					request,
-					organGestorService);
+			RolHelper.processarCanviRols(request, aplicacioService);
+			OrganGestorHelper.getOrgansGestorsUsuariActual(request, organGestorService);
 		}
 		return true;
 	}

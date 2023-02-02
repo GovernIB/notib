@@ -27,14 +27,11 @@ public class AccesUsuariInterceptor implements AsyncHandlerInterceptor {
 
 
 	@Override
-	public boolean preHandle(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			Object handler) throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
 		if (RolHelper.isUsuariActualUsuari(request)) {
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			throw new SecurityException("No es pot accedir a la página amb el rol usuari. " +
-					"L'usuari actual " + usuariActual.getCodi() + " no té cap rol requerit.", null);
+			throw new SecurityException("No es pot accedir a la página amb el rol usuari. L'usuari actual " + usuariActual.getCodi() + " no té cap rol requerit.", null);
 		}
 		return true;
 	}
