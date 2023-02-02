@@ -1,7 +1,6 @@
 package es.caib.notib.back.helper;
 
 import es.caib.notib.logic.intf.dto.AvisDto;
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.service.AvisService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,17 +19,14 @@ public class AvisHelper {
 	@SuppressWarnings("unchecked")
 	public static void findAvisos(HttpServletRequest request, AvisService avisService) {
 		
-		List<AvisDto> avisos = (List<AvisDto>) request.getAttribute(REQUEST_PARAMETER_AVISOS);
-		boolean canviRol = request.getParameter(RolHelper.getRequestParameterCanviRol()) != null;
-		if ((avisos == null && !RequestSessionHelper.isError(request) && avisService != null) || canviRol) {
-			if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
-				EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-				avisos = avisService.findActiveAdmin(entitatActual.getId());
-			}
-			else
-				avisos = avisService.findActive();
-			request.setAttribute(REQUEST_PARAMETER_AVISOS, avisos);
+		var avisos = (List<AvisDto>) request.getAttribute(REQUEST_PARAMETER_AVISOS);
+		var canviRol = request.getParameter(RolHelper.getRequestParameterCanviRol()) != null;
+		if ((avisos != null || RequestSessionHelper.isError(request) || avisService == null) && !canviRol) {
+			return;
 		}
+		avisos = RolHelper.isUsuariActualAdministradorEntitat(request) ?
+				avisService.findActiveAdmin(EntitatHelper.getEntitatActual(request).getId()) : avisService.findActive();
+		request.setAttribute(REQUEST_PARAMETER_AVISOS, avisos);
 	}
 	
 	@SuppressWarnings("unchecked")

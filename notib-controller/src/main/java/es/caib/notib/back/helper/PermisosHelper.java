@@ -1,20 +1,11 @@
 package es.caib.notib.back.helper;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
-import es.caib.notib.logic.intf.dto.PermisEnum;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
-import es.caib.notib.logic.intf.dto.UsuariDto;
-import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
-import es.caib.notib.logic.intf.dto.procediment.ProcSerCacheDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
-import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.logic.intf.service.PermisosService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Utilitat per a gestionar els permisos de l'usuari actual.

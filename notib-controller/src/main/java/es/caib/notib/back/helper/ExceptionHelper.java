@@ -8,47 +8,42 @@ public class ExceptionHelper {
 	private static final int N_CHECKED_NESTED_EXCEPTIONS = 3;
 	
 	public static boolean isExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass) {
-		
 		return isExceptionOrCauseInstanceOf(e, exceptionClass, N_CHECKED_NESTED_EXCEPTIONS);
 	}
 	
 	public static boolean isExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
-		int i = 0;
-		boolean isTheException = exceptionClass.isInstance(e);
+
+		var i = 0;
+		var isTheException = exceptionClass.isInstance(e);
 		Throwable t = e;
-		while (i < nCheckedNestedExceptions && !isTheException && t.getCause() != null)
-		{
+		while (i < nCheckedNestedExceptions && !isTheException && t.getCause() != null) {
 			t = t.getCause();
 			isTheException = exceptionClass.isInstance(t);
 			i++;
 		}
-		
 		return isTheException;
 	}
 
 	public static Throwable findThrowableInstance(Exception e, Class<? extends Exception> exceptionClass) {
-
 		return findThrowableInstance(e, exceptionClass, N_CHECKED_NESTED_EXCEPTIONS);
 	}
 
 	public static Throwable findThrowableInstance(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
-		int i = 0;
+
+		var i = 0;
 		Throwable exception = null;
-		boolean isTheException = exceptionClass.isInstance(e);
+		var isTheException = exceptionClass.isInstance(e);
 		if (isTheException) {
 			exception = e;
 		}
 		Throwable t = e;
-		while (i < nCheckedNestedExceptions && !isTheException && t.getCause() != null)
-		{
+		while (i < nCheckedNestedExceptions && !isTheException && t.getCause() != null) {
 			t = t.getCause();
 			isTheException = exceptionClass.isInstance(t);
 			i++;
-			
 			if (isTheException) {
 				exception = t;
 			}
-			
 		}
 		return exception;
 	}

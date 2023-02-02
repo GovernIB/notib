@@ -39,40 +39,32 @@ public class NotificacioBackHelper {
 	@Autowired
 	MessageSource messageSource;
 
-	public NotificacioFiltreCommand getFiltreCommand(
-			HttpServletRequest request, String keyAttr) {
-		NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession()
-				.getAttribute(keyAttr);
 
-		if (notificacioFiltreCommand == null) {
-			notificacioFiltreCommand = new NotificacioFiltreCommand();
-			if (getLast3months()) {
-				Calendar cal = new GregorianCalendar();
-				cal.add(Calendar.MONTH, -3);
-				notificacioFiltreCommand.setDataInici(cal.getTime());
-				notificacioFiltreCommand.setDataFi(new Date());
-			}
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					keyAttr,
-					notificacioFiltreCommand);
+	public NotificacioFiltreCommand getFiltreCommand(HttpServletRequest request, String keyAttr) {
+
+		NotificacioFiltreCommand notificacioFiltreCommand = (NotificacioFiltreCommand) request.getSession().getAttribute(keyAttr);
+		if (notificacioFiltreCommand != null) {
+			return notificacioFiltreCommand;
 		}
+		notificacioFiltreCommand = new NotificacioFiltreCommand();
+		if (getLast3months()) {
+			var cal = new GregorianCalendar();
+			cal.add(Calendar.MONTH, -3);
+			notificacioFiltreCommand.setDataInici(cal.getTime());
+			notificacioFiltreCommand.setDataFi(new Date());
+		}
+		RequestSessionHelper.actualitzarObjecteSessio(request, keyAttr, notificacioFiltreCommand);
 		return notificacioFiltreCommand;
 	}
 
 	public void fillModel(EntitatDto entitatActual, OrganGestorDto organGestorActual, HttpServletRequest request, Model model) {
 
 		ompleProcediments(entitatActual, organGestorActual, request, model);
-		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class,
-				"es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
-		model.addAttribute("tipusUsuari", EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class,
-				"es.caib.notib.logic.intf.dto.TipusUsuariEnumDto."));
-		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class,
-				"es.caib.notib.client.domini.EnviamentEstat."));
-		model.addAttribute("notificacioComunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class,
-				"es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
-		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class,
-				"es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
+		model.addAttribute("notificacioEstats", EnumHelper.getOptionsForEnum(NotificacioEstatEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto."));
+		model.addAttribute("tipusUsuari", EnumHelper.getOptionsForEnum(TipusUsuariEnumDto.class, "es.caib.notib.logic.intf.dto.TipusUsuariEnumDto."));
+		model.addAttribute("notificacioEnviamentEstats", EnumHelper.getOptionsForEnum(EnviamentEstat.class, "es.caib.notib.client.domini.EnviamentEstat."));
+		model.addAttribute("notificacioComunicacioTipus", EnumHelper.getOptionsForEnum(NotificacioComunicacioTipusEnumDto.class, "es.caib.notib.logic.intf.dto.notificacio.NotificacioComunicacioTipusEnumDto."));
+		model.addAttribute("notificacioEnviamentTipus", EnumHelper.getOptionsForEnum(NotificaEnviamentTipusEnumDto.class, "es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto."));
 		model.addAttribute("mostrarColumnaEntitat", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.entitat"));
 		model.addAttribute("mostrarColumnaNumExpedient", aplicacioService.propertyGetByEntitat("es.caib.notib.columna.num.expedient"));
 	}
@@ -80,11 +72,10 @@ public class NotificacioBackHelper {
 	public void ompleProcediments(EntitatDto entitatActual, OrganGestorDto organGestorActual, HttpServletRequest request, Model model) {
 
 		List<CodiValorEstatDto> organsDisponibles = new ArrayList<>();
-		Long entitatId = entitatActual.getId();
-		String usuari = SecurityContextHolder.getContext().getAuthentication().getName();
-		RolEnumDto rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-		String organ = organGestorActual != null ? organGestorActual.getCodi() : null;
-
+		var entitatId = entitatActual.getId();
+		var usuari = SecurityContextHolder.getContext().getAuthentication().getName();
+		var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
+		var organ = organGestorActual != null ? organGestorActual.getCodi() : null;
 		if (RolHelper.isUsuariActualAdministrador(request)) {
 			model.addAttribute("entitat", entitatService.findAll());
 		}
@@ -94,13 +85,12 @@ public class NotificacioBackHelper {
 
 		try {
 			organsDisponibles = organGestorService.getOrgansGestorsDisponiblesConsulta(entitatId, usuari, rol, organ);
-		}catch (Exception e) {
-			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, NoPermisosException.class))
-				MissatgesHelper.warning(request, messageSource.getMessage(
-						"notificacio.controller.sense.permis.lectura",
-						null,
-						"???" + "notificacio.controller.sense.permis.lectura" + "???",
-						new RequestContext(request).getLocale()));
+		} catch (Exception e) {
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, NoPermisosException.class)) {
+				var msg = "notificacio.controller.sense.permis.lectura";
+				var defMsg = "???" + "notificacio.controller.sense.permis.lectura" + "???";
+				MissatgesHelper.warning(request, messageSource.getMessage(msg, null, defMsg, new RequestContext(request).getLocale()));
+			}
 		}
 		model.addAttribute("organsGestorsPermisLectura", organsDisponibles);
 

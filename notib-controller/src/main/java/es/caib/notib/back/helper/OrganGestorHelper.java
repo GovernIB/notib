@@ -3,7 +3,6 @@
  */
 package es.caib.notib.back.helper;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.organisme.OrganGestorDto;
 import es.caib.notib.logic.intf.service.OrganGestorService;
@@ -26,8 +25,7 @@ public class OrganGestorHelper {
 	private static final String SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC = "OrganGestorHelper.organsProcNoSincronitzats";
 	private static final String SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC = "OrganGestorHelper.organsServNoSincronitzats";
 
-	public static List<OrganGestorDto> getOrgansGestorsUsuariActual(
-			HttpServletRequest request) {
+	public static List<OrganGestorDto> getOrgansGestorsUsuariActual(HttpServletRequest request) {
 		return getOrgansGestorsUsuariActual(request, null);
 	}
 	
@@ -38,7 +36,7 @@ public class OrganGestorHelper {
 		if (organGestorService == null) {
 			organsGestorsUsuariActual = (List<OrganGestorDto>)request.getSession().getAttribute(ORGANS_ACCESSIBLES);
 		} else {
-			String rolActual = RolHelper.getRolActual(request);
+			var rolActual = RolHelper.getRolActual(request);
 			if (rolActual != null && RolEnumDto.NOT_ADMIN_ORGAN.name().equals(rolActual)) {
 				organsGestorsUsuariActual = organGestorService.findAccessiblesByUsuariActual();
 				request.getSession().setAttribute(ORGANS_ACCESSIBLES, organsGestorsUsuariActual);
@@ -46,7 +44,7 @@ public class OrganGestorHelper {
 		}
 		
 		if (organsGestorsUsuariActual != null) {
-			String canviOrgan = request.getParameter(REQUEST_PARAMETER_CANVI_ORGAN);
+			var canviOrgan = request.getParameter(REQUEST_PARAMETER_CANVI_ORGAN);
 			if (canviOrgan != null && !canviOrgan.isEmpty()) {
 				setOrganGestorUsuariActual(request, canviOrgan);
 			} else if (request.getSession().getAttribute(ORGAN_ACTUAL) == null || organsGestorsUsuariActual != null && !organsGestorsUsuariActual.isEmpty()) {
@@ -57,41 +55,36 @@ public class OrganGestorHelper {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void setOrganGestorUsuariActual(
-			HttpServletRequest request, 
-			String strOrganId) {
-		if (request.getSession().getAttribute(ORGANS_ACCESSIBLES) != null) {
-			List<OrganGestorDto> organsGestorsUsuariActual = (List<OrganGestorDto>)request.getSession().getAttribute(ORGANS_ACCESSIBLES);
-			if (!organsGestorsUsuariActual.isEmpty()) {
-				Long organId = null;
-				try {
-					organId = Long.parseLong(strOrganId);
-				} catch (Exception e) {}
-				if(organId != null) {
-					for (OrganGestorDto organGestor: organsGestorsUsuariActual) {
-						if (organGestor.getId().equals(organId)) {
-							request.getSession().setAttribute(
-									ORGAN_ACTUAL,
-									organGestor);
-							break;
-						}
-							
-					}
-				} else {
-					request.getSession().setAttribute(
-							ORGAN_ACTUAL,
-							organsGestorsUsuariActual.get(0));
-				}
+	public static void setOrganGestorUsuariActual(HttpServletRequest request, String strOrganId) {
+
+		if (request.getSession().getAttribute(ORGANS_ACCESSIBLES) == null) {
+			return;
+		}
+		List<OrganGestorDto> organsGestorsUsuariActual = (List<OrganGestorDto>)request.getSession().getAttribute(ORGANS_ACCESSIBLES);
+		if (organsGestorsUsuariActual.isEmpty()) {
+			return;
+		}
+		Long organId = null;
+		try {
+			organId = Long.parseLong(strOrganId);
+		} catch (Exception e) {
+
+		}
+		if(organId == null) {
+			request.getSession().setAttribute(ORGAN_ACTUAL, organsGestorsUsuariActual.get(0));
+			return;
+		}
+		for (var organGestor: organsGestorsUsuariActual) {
+			if (organGestor.getId().equals(organId)) {
+				request.getSession().setAttribute(ORGAN_ACTUAL, organGestor);
+				break;
 			}
+
 		}
 	}
 	
 	public static OrganGestorDto getOrganGestorUsuariActual(HttpServletRequest request) {
-		OrganGestorDto organGestorActual = null;
-		if (request.getSession().getAttribute(ORGAN_ACTUAL) != null) {
-			organGestorActual = (OrganGestorDto)request.getSession().getAttribute(ORGAN_ACTUAL);
-		}
-		return organGestorActual;
+		return request.getSession().getAttribute(ORGAN_ACTUAL) != null ? (OrganGestorDto)request.getSession().getAttribute(ORGAN_ACTUAL) : null;
 	}
 	
 	public static String getRequestParameterCanviOrgan() {
@@ -99,33 +92,35 @@ public class OrganGestorHelper {
 	}
 
 	public static void setOrgansProcedimentsNoSincronitzats(HttpServletRequest request, ProcedimentService procedimentService) {
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		if (entitatActual != null && procedimentService != null)
-			request.getSession().setAttribute(
-					OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC,
-					procedimentService.getProcedimentsAmbOrganNoSincronitzat(entitatActual.getId()));
+
+		var entitatActual = EntitatHelper.getEntitatActual(request);
+		if (entitatActual == null || procedimentService == null) {
+			return;
+		}
+		var procs = procedimentService.getProcedimentsAmbOrganNoSincronitzat(entitatActual.getId());
+		request.getSession().setAttribute(OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC, procs);
 	}
 
 	public static void setOrgansServeisNoSincronitzats(HttpServletRequest request, ServeiService serveiService) {
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		if (entitatActual != null && serveiService != null)
-			request.getSession().setAttribute(
-					OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC,
-					serveiService.getServeisAmbOrganNoSincronitzat(entitatActual.getId()));
+
+		var entitatActual = EntitatHelper.getEntitatActual(request);
+		if (entitatActual == null || serveiService == null) {
+			return;
+		}
+		var serveis = serveiService.getServeisAmbOrganNoSincronitzat(entitatActual.getId());
+		request.getSession().setAttribute(OrganGestorHelper.SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC, serveis);
 	}
 
 	public static Integer getOrgansProcNoSincronitzats(HttpServletRequest request) {
-		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC);
+
+		var organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_PROC_NO_SYNC);
 		return organsNoSincronitzats != null ? organsNoSincronitzats : 0;
 	}
 
 	public static Integer getOrgansServNoSincronitzats(HttpServletRequest request) {
-		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC);
+
+		var organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_SERV_NO_SYNC);
 		return organsNoSincronitzats != null ? organsNoSincronitzats : 0;
 	}
-
-
-
-//	private static final Logger LOGGER = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 }

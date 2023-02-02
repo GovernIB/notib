@@ -3,17 +3,14 @@
  */
 package es.caib.notib.back.helper;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.UsuariDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.logic.intf.service.EntitatService;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Utilitat per a gestionar accions de context de sessió.
@@ -29,7 +26,7 @@ public class SessioHelper {
 
 	public static void processarAutenticacio(HttpServletRequest request, HttpServletResponse response, AplicacioService aplicacioService, EntitatService entitatService) {
 
-		HttpSession session =  request.getSession();
+		var session =  request.getSession();
 		if (request.getUserPrincipal() != null) {
 			Boolean autenticacioProcessada = (Boolean) session.getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA);
 			if (autenticacioProcessada == null) { // Authenticam usuari
@@ -37,9 +34,9 @@ public class SessioHelper {
 				session.setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, Boolean.TRUE);
 			}
 		}
-		UsuariDto usuari = aplicacioService.getUsuariActual();
-		String idioma_usuari = usuari.getIdioma();
-		LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
+		var usuari = aplicacioService.getUsuariActual();
+		var idioma_usuari = usuari.getIdioma();
+		var localeResolver = RequestContextUtils.getLocaleResolver(request);
 
 		session.setAttribute("SessionHelper.capsaleraCapLogo", aplicacioService.propertyGet("es.caib.notib.capsalera.logo"));
 		session.setAttribute("SessionHelper.capsaleraPeuLogo", aplicacioService.propertyGet("es.caib.notib.peu.logo"));
@@ -48,7 +45,7 @@ public class SessioHelper {
 		session.setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 		session.setAttribute("dadesUsuariActual", usuari);
 		// Assegurem que l'entitat i rol actual s'hagin carregat correctament
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request, aplicacioService, entitatService);
+		var entitat = EntitatHelper.getEntitatActual(request, aplicacioService, entitatService);
 		aplicacioService.actualitzarEntitatThreadLocal(entitat != null ? entitat.getCodi() : null);
 		RolHelper.getRolActual(request, aplicacioService);
         localeResolver.setLocale(request, response, StringUtils.parseLocaleString((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI)));

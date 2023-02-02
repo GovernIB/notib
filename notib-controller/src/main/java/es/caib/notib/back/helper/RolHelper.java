@@ -3,12 +3,11 @@
  */
 package es.caib.notib.back.helper;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.service.AplicacioService;
 import lombok.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class RolHelper {
 
 	public static final String ROLE_SUPER = RolEnumDto.NOT_SUPER.name(); 				// "NOT_SUPER";
@@ -44,30 +44,26 @@ public class RolHelper {
 		return request.isUserInRole(ROLE_APLICACIO);
 	}
 
-	public static void processarCanviRols(
-			HttpServletRequest request,
-			AplicacioService aplicacioService) {
-		String canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
-		if (canviRol != null && canviRol.length() > 0) {
-			LOGGER.debug("Processant canvi rol (rol=" + canviRol + ")");
-			if (request.isUserInRole(canviRol) || 
-				(RolEnumDto.NOT_ADMIN_ORGAN.name().equals(canviRol) && 
-					request.isUserInRole(RolEnumDto.tothom.name()) &&
-					(boolean)request.getAttribute("permisAdminOrgan"))) {
-				updateUltimRol(request, aplicacioService, canviRol);
-			}
+	public static void processarCanviRols(HttpServletRequest request, AplicacioService aplicacioService) {
+
+		var canviRol = request.getParameter(REQUEST_PARAMETER_CANVI_ROL);
+		if (Strings.isNullOrEmpty(canviRol)) {
+			return;
+		}
+		log.debug("Processant canvi rol (rol=" + canviRol + ")");
+		if (request.isUserInRole(canviRol) || (RolEnumDto.NOT_ADMIN_ORGAN.name().equals(canviRol)
+				&& request.isUserInRole(RolEnumDto.tothom.name()) && (boolean)request.getAttribute("permisAdminOrgan"))) {
+
+			updateUltimRol(request, aplicacioService, canviRol);
 		}
 	}
 
-	private static void updateUltimRol(
-			HttpServletRequest request,
-			AplicacioService aplicacioService,
-			String rol) {
-		request.getSession().setAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL,
-				rol);
-		if (aplicacioService != null)
+	private static void updateUltimRol(HttpServletRequest request, AplicacioService aplicacioService, String rol) {
+
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, rol);
+		if (aplicacioService != null) {
 			aplicacioService.updateRolUsuariActual(rol);
+		}
 	}
 
 	public static String getRolActual(HttpServletRequest request) {
@@ -75,15 +71,13 @@ public class RolHelper {
 	}
 	
 	public static String getRolActual(HttpServletRequest request, AplicacioService aplicacioService) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+
+		var rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		if (rolActual == null && aplicacioService != null) {
 			rolActual = aplicacioService.getUsuariActual().getUltimRol();
-			request.getSession().setAttribute(
-					SESSION_ATTRIBUTE_ROL_ACTUAL,
-					rolActual);
+			request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, rolActual);
 		}
-		List<String> rolsDisponibles = getRolsUsuariActual(request);
+		var rolsDisponibles = getRolsUsuariActual(request);
 		if (rolActual == null || !rolsDisponibles.contains(rolActual)) {
 			if (request.isUserInRole(ROLE_USUARI) && rolsDisponibles.contains(ROLE_USUARI)) {
 				rolActual = ROLE_USUARI;
@@ -97,44 +91,51 @@ public class RolHelper {
 			if (rolActual != null)
 				updateUltimRol(request, aplicacioService, rolActual);
 		}
-		LOGGER.debug("Obtenint rol actual (rol=" + rolActual + ")");
+		log.debug("Obtenint rol actual (rol=" + rolActual + ")");
 		return rolActual;
 	}
 
 	public static boolean isUsuariActualAdministrador(HttpServletRequest request) {
 		return ROLE_SUPER.equals(getRolActual(request));
 	}
+
 	public static boolean isUsuariActualAdministradorEntitat( HttpServletRequest request ) {
 		return ROLE_ADMIN_ENTITAT.equals(getRolActual(request));
 	}
+
 	public static boolean isUsuariActualUsuari(HttpServletRequest request) {
 		return ROLE_USUARI.equals(getRolActual(request));
 	}
+
 	public static boolean isUsuariActualAplicacio(HttpServletRequest request) {
 		return ROLE_APLICACIO.equals(getRolActual(request));
 	}
+
 	public static boolean isUsuariActualUsuariAdministradorOrgan(HttpServletRequest request) {
 		return ROLE_ADMIN_ORGAN.equals(getRolActual(request));
 	}
 
 	public static List<String> getRolsUsuariActual(@NonNull HttpServletRequest request) {
-		LOGGER.debug("Obtenint rols disponibles per a l'usuari actual");
-		List<String> rols = new ArrayList<String>();
-		boolean permisUsuariSobreEntitat = request.isUserInRole(ROLE_USUARI);
-		boolean permisAdminSobreEntitat = request.isUserInRole(ROLE_ADMIN_ENTITAT);
-		boolean permisAplicacioSobreEntitat = request.isUserInRole(ROLE_APLICACIO);
-		boolean permisAdminSobreOrgan = false;
+
+		log.debug("Obtenint rols disponibles per a l'usuari actual");
+		List<String> rols = new ArrayList<>();
+		var permisUsuariSobreEntitat = request.isUserInRole(ROLE_USUARI);
+		var permisAdminSobreEntitat = request.isUserInRole(ROLE_ADMIN_ENTITAT);
+		var permisAplicacioSobreEntitat = request.isUserInRole(ROLE_APLICACIO);
+		var permisAdminSobreOrgan = false;
 		
-		if (request.getAttribute("permisUsuariEntitat") != null) 
+		if (request.getAttribute("permisUsuariEntitat") != null) {
 			permisUsuariSobreEntitat = (boolean) request.getAttribute("permisUsuariEntitat");
-		if (request.getAttribute("permisAdminEntitat") != null)
+		}
+		if (request.getAttribute("permisAdminEntitat") != null) {
 			permisAdminSobreEntitat = (boolean) request.getAttribute("permisAdminEntitat");
-		if (request.getAttribute("permisAplicacioEntitat") != null)
+		}
+		if (request.getAttribute("permisAplicacioEntitat") != null) {
 			permisAplicacioSobreEntitat = (boolean) request.getAttribute("permisAplicacioEntitat");
+		}
 		if (request.getAttribute("permisAdminOrgan") != null) {
 			permisAdminSobreOrgan = (boolean) request.getAttribute("permisAdminOrgan");
 		}
-		
 		if (request.isUserInRole(ROLE_SUPER)) {
 			rols.add(ROLE_SUPER);
 		}
@@ -147,13 +148,15 @@ public class RolHelper {
 		if (request.isUserInRole(ROLE_USUARI) && permisAdminSobreOrgan) {
 			rols.add(ROLE_ADMIN_ORGAN);
 		}
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+		var entitatActual = EntitatHelper.getEntitatActual(request);
 		if (entitatActual != null) {
-			if (entitatActual.isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat)
+			if (entitatActual.isUsuariActualAdministradorEntitat() && request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat) {
 				rols.add(ROLE_ADMIN_ENTITAT);
+			}
 		} else {
-			if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat)
+			if (request.isUserInRole(ROLE_ADMIN_ENTITAT) && permisAdminSobreEntitat) {
 				rols.add(ROLE_ADMIN_ENTITAT);
+			}
 		}
 		return rols;
 	}
@@ -165,7 +168,5 @@ public class RolHelper {
 	public static String getRequestParameterCanviRol() {
 		return REQUEST_PARAMETER_CANVI_ROL;
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RolHelper.class);
 
 }

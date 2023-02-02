@@ -14,18 +14,17 @@ import javax.servlet.http.HttpServletRequest;
 public class ContingutEstaticHelper {
 
 	public static boolean isContingutEstatic(HttpServletRequest request) {
-		String uri = request.getRequestURI();
-		String path = uri.substring(request.getContextPath().length());
-		for (String pce : pathsContingutEstatic)
-			if (path.startsWith(pce))
+
+		var uri = request.getRequestURI();
+		var path = uri.substring(request.getContextPath().length());
+		for (var pce : pathsContingutEstatic) {
+			if (path.startsWith(pce)) {
 				return true;
+			}
+		}
 		return false;
 	}
 
-	private static final String[] pathsContingutEstatic = {
-			"/css/",
-			"/font/",
-			"/img/",
-			"/js/"};
+	private static final String[] pathsContingutEstatic = {"/css/", "/font/", "/img/", "/js/"};
 
 }

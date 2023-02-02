@@ -8,8 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class PropertiesHelper extends Properties {
 
@@ -32,44 +32,42 @@ public class PropertiesHelper extends Properties {
 		return getProperties(null);
 	}
 	public static PropertiesHelper getProperties(String path) {
+
 		String propertiesPath = path;
 		if (propertiesPath == null) {
 			propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
 		}
-		if (instance == null) {
-			instance = new PropertiesHelper();
-			if (propertiesPath != null) {
-				instance.llegirSystem = false;
-				logger.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
-				try {
-					if (propertiesPath.startsWith("classpath:")) {
-						instance.load(
-								PropertiesHelper.class.getClassLoader().getResourceAsStream(
-										propertiesPath.substring("classpath:".length())));
-					} else if (propertiesPath.startsWith("file://")) {
-						FileInputStream fis = new FileInputStream(
-								propertiesPath.substring("file://".length()));
-						instance.load(fis);
-					} else {
-						FileInputStream fis = new FileInputStream(propertiesPath);
-						instance.load(fis);
-					}
-				} catch (Exception ex) {
-					logger.error("No s'han pogut llegir els properties", ex);
-				}
+		if (instance != null) {
+			return instance;
+		}
+		if (propertiesPath == null) {
+			return new PropertiesHelper();
+		}
+		instance = new PropertiesHelper();
+		instance.llegirSystem = false;
+		log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
+		try {
+			if (propertiesPath.startsWith("classpath:")) {
+				instance.load(PropertiesHelper.class.getClassLoader().getResourceAsStream(propertiesPath.substring("classpath:".length())));
+			} else if (propertiesPath.startsWith("file://")) {
+				FileInputStream fis = new FileInputStream(propertiesPath.substring("file://".length()));
+				instance.load(fis);
+			} else {
+				FileInputStream fis = new FileInputStream(propertiesPath);
+				instance.load(fis);
 			}
+		} catch (Exception ex) {
+			log.error("No s'han pogut llegir els properties", ex);
 		}
 		return instance;
 	}
 
 	public String getProperty(String key) {
-		if (llegirSystem)
-			return System.getProperty(key);
-		else
-			return super.getProperty(key);
+			return llegirSystem ? System.getProperty(key) : super.getProperty(key);
 	}
+
 	public String getProperty(String key, String defaultValue) {
-		String val = getProperty(key);
+		var val = getProperty(key);
         return (val == null) ? defaultValue : val;
 	}
 
@@ -102,34 +100,30 @@ public class PropertiesHelper extends Properties {
 	}
 
 	public Map<String, String> findByPrefix(String prefix) {
+
 		Map<String, String> properties = new HashMap<String, String>();
 		if (llegirSystem) {
 			for (Object key: System.getProperties().keySet()) {
 				if (key instanceof String) {
 					String keystr = (String)key;
 					if (keystr.startsWith(prefix)) {
-						properties.put(
-								keystr,
-								System.getProperty(keystr));
+						properties.put(keystr, System.getProperty(keystr));
 					}
 				}
 			}
-		} else {
-			for (Object key: this.keySet()) {
-				if (key instanceof String) {
-					String keystr = (String)key;
-					if (keystr.startsWith(prefix)) {
-						properties.put(
-								keystr,
-								getProperty(keystr));
-					}
+			return properties;
+		}
+		for (Object key: this.keySet()) {
+			if (key instanceof String) {
+				String keystr = (String)key;
+				if (keystr.startsWith(prefix)) {
+					properties.put(keystr, getProperty(keystr));
 				}
 			}
 		}
 		return properties;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
 	private static final long serialVersionUID = 1L;
 
 }

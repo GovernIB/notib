@@ -12,30 +12,19 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestSessionHelper {
 
-	public static Object obtenirObjecteSessio(
-			HttpServletRequest request,
-			String clau) {
+	public static Object obtenirObjecteSessio(HttpServletRequest request, String clau) {
 		return request.getSession().getAttribute(clau);
 	}
-	public static void actualitzarObjecteSessio(
-			HttpServletRequest request,
-			String clau,
-			Object valor) {
+	public static void actualitzarObjecteSessio(HttpServletRequest request, String clau, Object valor) {
 		request.getSession().setAttribute(clau, valor);
 	}
-	public static void esborrarObjecteSessio(
-			HttpServletRequest request,
-			String clau) {
+	public static void esborrarObjecteSessio(HttpServletRequest request, String clau) {
 		request.getSession().removeAttribute(clau);
 	}
-	public static boolean existeixObjecteSessio(
-			HttpServletRequest request,
-			String clau) {
+	public static boolean existeixObjecteSessio(HttpServletRequest request, String clau) {
 		return request.getSession().getAttribute(clau) != null;
 	}
-
-	public static boolean isError(
-			HttpServletRequest request) {
+	public static boolean isError(HttpServletRequest request) {
 		return request.getAttribute("javax.servlet.error.request_uri") != null;
 	}
 

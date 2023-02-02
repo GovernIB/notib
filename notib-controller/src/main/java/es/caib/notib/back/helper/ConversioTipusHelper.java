@@ -65,8 +65,7 @@ public class ConversioTipusHelper {
                 	personaDto.setNom(null);
                 }
             }                   
-        })
-		.register();
+        }).register();
 		
 		mapperFactory.classMap(PersonaDto.class, PersonaCommand.class)
 		.byDefault()
@@ -77,8 +76,7 @@ public class ConversioTipusHelper {
                 	personaCommand.setNom(personaDto.getRaoSocial() != null ? personaDto.getRaoSocial() : personaDto.getNomInput());
                 }
             }                   
-        })
-		.register();
+        }).register();
 		
 		mapperFactory.classMap(EnviamentCommand.class, NotEnviamentDatabaseDto.class)
 			.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
@@ -91,12 +89,12 @@ public class ConversioTipusHelper {
 				}
 				@Override
 				public void mapBtoA(NotEnviamentDatabaseDto dto, EnviamentCommand command, MappingContext context) {
-					EntregapostalCommand epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
+					var epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
 					epCommand.setActiva(dto.getEntregaPostal() != null);
 					command.setEntregaPostal(epCommand);
 				}
-			})
-			.register();
+			}).register();
+
 		mapperFactory.classMap(EnviamentCommand.class, NotificacioEnviamentDtoV2.class)
 				.fieldAToB("entregaPostal.activa", "entregaPostalActiva")
 				.field("entregaDeh.activa", "entregaDehActiva")
@@ -108,12 +106,12 @@ public class ConversioTipusHelper {
 					}
 					@Override
 					public void mapBtoA(NotificacioEnviamentDtoV2 dto, EnviamentCommand command, MappingContext context) {
-						EntregapostalCommand epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
+						var epCommand = command.getEntregaPostal() == null ? new EntregapostalCommand() : command.getEntregaPostal();
 						epCommand.setActiva(dto.getEntregaPostal() != null);
 						command.setEntregaPostal(epCommand);
 					}
-				})
-				.register();
+				}).register();
+
 		mapperFactory.classMap(NotificacioDtoV2.class, NotificacioCommand.class)
 				.byDefault()
 				.customize(new CustomMapper<NotificacioDtoV2, NotificacioCommand>() {
@@ -121,7 +119,7 @@ public class ConversioTipusHelper {
 					public void mapAtoB(NotificacioDtoV2 notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
 						int i = 0;
 						// Documents
-						DocumentCommand[] documents = new DocumentCommand[5];
+						var documents = new DocumentCommand[5];
 						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
 						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
 						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
@@ -134,21 +132,26 @@ public class ConversioTipusHelper {
 					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDtoV2 notificacioDto, MappingContext context) {
 						// Documents
 						List<DocumentDto> documents = new ArrayList<>();
-						DocumentDto document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
-						if (document != null)
+						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+						if (document != null) {
 							documents.add(document);
-						DocumentDto document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
-						if (document2 != null)
+						}
+						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+						if (document2 != null) {
 							documents.add(document2);
-						DocumentDto document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
-						if (document3 != null)
+						}
+						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+						if (document3 != null) {
 							documents.add(document3);
-						DocumentDto document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
-						if (document4 != null)
+						}
+						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+						if (document4 != null) {
 							documents.add(document4);
-						DocumentDto document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
-						if (document5 != null)
+						}
+						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+						if (document5 != null) {
 							documents.add(document5);
+						}
 						notificacioDto.setDocument(documents.size() > 0 ? documents.get(0) : null);
 						notificacioDto.setDocument2(documents.size() > 1 ? documents.get(1) : null);
 						notificacioDto.setDocument3(documents.size() > 2 ? documents.get(2) : null);
@@ -161,8 +164,8 @@ public class ConversioTipusHelper {
 						}
 
 					}
-				})
-				.register();
+				}).register();
+
 		mapperFactory.classMap(NotificacioDatabaseDto.class, NotificacioCommand.class)
 				.exclude("enviamentTipus")
 				.byDefault()
@@ -171,7 +174,7 @@ public class ConversioTipusHelper {
 					public void mapAtoB(NotificacioDatabaseDto notificacioDto, NotificacioCommand notificacioCommand, MappingContext context) {
 						int i = 0;
 						// Documents
-						DocumentCommand[] documents = new DocumentCommand[5];
+						var documents = new DocumentCommand[5];
 						documents[0] = DocumentCommand.asCommand(notificacioDto.getDocument());
 						documents[1] = DocumentCommand.asCommand(notificacioDto.getDocument2());
 						documents[2] = DocumentCommand.asCommand(notificacioDto.getDocument3());
@@ -180,14 +183,15 @@ public class ConversioTipusHelper {
 						notificacioCommand.setDocuments(documents);
 						if (NotificaEnviamentTipusEnumDto.NOTIFICACIO.equals(notificacioDto.getEnviamentTipus())){
 							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
-						} else {
-							notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
-							if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
-									notificacioDto.getEnviaments().get(0).getTitular()!= null){
-								PersonaDto titular = notificacioDto.getEnviaments().get(0).getTitular();
-								if (InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
-									notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
-								}
+							return;
+						}
+						notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO);
+						if (notificacioDto.getEnviaments() != null && !notificacioDto.getEnviaments().isEmpty() &&
+								notificacioDto.getEnviaments().get(0).getTitular()!= null){
+
+							var titular = notificacioDto.getEnviaments().get(0).getTitular();
+							if (InteressatTipus.ADMINISTRACIO.equals(titular.getInteressatTipus())) {
+								notificacioCommand.setEnviamentTipus(TipusEnviamentEnumDto.COMUNICACIO_SIR);
 							}
 						}
 					}
@@ -195,19 +199,23 @@ public class ConversioTipusHelper {
 					public void mapBtoA(NotificacioCommand notificacioCommand, NotificacioDatabaseDto notificacioDto, MappingContext context) {
 						// Documents
 						List<DocumentDto> documents = new ArrayList<>();
-						DocumentDto document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
-						if (document != null)
+						var document = DocumentCommand.asDto(notificacioCommand.getDocuments()[0]);
+						if (document != null) {
 							documents.add(document);
-						DocumentDto document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
-						if (document2 != null)
+						}
+						var document2 = DocumentCommand.asDto(notificacioCommand.getDocuments()[1]);
+						if (document2 != null) {
 							documents.add(document2);
-						DocumentDto document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
-						if (document3 != null)
+						}
+						var document3 = DocumentCommand.asDto(notificacioCommand.getDocuments()[2]);
+						if (document3 != null) {
 							documents.add(document3);
-						DocumentDto document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
-						if (document4 != null)
+						}
+						var document4 = DocumentCommand.asDto(notificacioCommand.getDocuments()[3]);
+						if (document4 != null) {
 							documents.add(document4);
-						DocumentDto document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
+						}
+						var document5 = DocumentCommand.asDto(notificacioCommand.getDocuments()[4]);
 						if (document5 != null)
 							documents.add(document5);
 						notificacioDto.setDocument(documents.size() > 0 ? documents.get(0) : null);
@@ -222,33 +230,25 @@ public class ConversioTipusHelper {
 							notificacioDto.setEnviamentTipus(NotificaEnviamentTipusEnumDto.COMUNICACIO);
 						}
 					}
-				})
-				.register();
+				}).register();
 	}
 
 	
 	public static <T> T convertir(Object source, Class<T> targetType) {
-		if (source == null)
-			return null;
-		return getMapperFacade().map(source, targetType);
+		return source != null ? getMapperFacade().map(source, targetType) : null;
 	}
+
 	public static <T> List<T> convertirList(List<?> items, Class<T> targetType) {
-		if (items == null)
-			return null;
-		return getMapperFacade().mapAsList(items, targetType);
+		return items != null ? getMapperFacade().mapAsList(items, targetType) : null;
 	}
+
 	public static <T> Set<T> convertirSet(Set<?> items, Class<T> targetType) {
-		if (items == null)
-			return null;
-		return getMapperFacade().mapAsSet(items, targetType);
+		return items != null ? getMapperFacade().mapAsSet(items, targetType) : null;
 	}
-
-
 
 	private static MapperFacade getMapperFacade() {
-		if (mapperFactory == null)
-			mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build();
-		return mapperFactory.getMapperFacade();
+		return mapperFactory != null ? mapperFactory.getMapperFacade()
+			: new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build().getMapperFacade();
 	}
 
 }

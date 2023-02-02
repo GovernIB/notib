@@ -10,6 +10,7 @@ public class NifHelper {
 	private static final String LLETRES_NIE = "XYZ";
 	private static final String DIGIT_CONTRTOL_CIF = "JABCDEFGHI";
 	private static final String LLETRA_CIF = "KPQRSNW";
+
 	
 	public static boolean isvalid(String nif) {
 
@@ -17,8 +18,8 @@ public class NifHelper {
             return false;
         }
         nif = nif.toUpperCase();
-        String primerCaracter = nif.substring(0, 1);
-        boolean totNumeros = NumberUtils.isNumber(StringUtils.stripStart(nif.substring(1,nif.length()-1), "0"));
+        var primerCaracter = nif.substring(0, 1);
+        var totNumeros = NumberUtils.isNumber(StringUtils.stripStart(nif.substring(1,nif.length()-1), "0"));
         if (LLETRES_CIF.contains(primerCaracter) && totNumeros) {
             return isCifValid(nif);
         }
@@ -34,8 +35,7 @@ public class NifHelper {
             return false;
         }
         nif = nif.toUpperCase();
-        String primerCaracter = nif.substring(0, 1);
-
+        var primerCaracter = nif.substring(0, 1);
         if (LLETRES_CIF.contains(primerCaracter)) {
             return false;
         }
@@ -51,27 +51,27 @@ public class NifHelper {
             return false;
         }
         nif = nif.toUpperCase();
-        String primerCaracter = nif.substring(0, 1);
+        var primerCaracter = nif.substring(0, 1);
         return LLETRES_CIF.contains(primerCaracter) ? isCifValid(nif) : false;
     }
 	
 	private static boolean isCifValid(String cif) {
 
-        String aux = cif.substring(0, 8);
+        var aux = cif.substring(0, 8);
         aux = calculaCif(aux);
         return cif.equals(aux);
     }
 	
 	private static boolean isNieValid(String nie) {
 
-        String aux = nie.substring(0, 8);
+        var aux = nie.substring(0, 8);
         aux = calculaNie(aux);
         return nie.equals(aux);
     }
 	
 	private static boolean isDniValid(String dni) {
 
-        String aux = dni.substring(0, 8);
+        var aux = dni.substring(0, 8);
         aux = calculaDni(aux);
         return dni.equals(aux);
     }
@@ -83,44 +83,39 @@ public class NifHelper {
 	
 	private static String calculaDigitControl(String cif) {
 
-        String str = cif.substring(1, 8);
-        String cabecera = cif.substring(0, 1);
-        int sumaPar = 0;
-        int sumaImpar = 0;
+        var str = cif.substring(1, 8);
+        var cabecera = cif.substring(0, 1);
+        var sumaPar = 0;
+        var sumaImpar = 0;
         int sumaTotal;
-
-        for (int i = 1; i < str.length(); i += 2) {
-            int aux = Integer.parseInt("" + str.charAt(i));
+        int aux;
+        for (var i = 1; i < str.length(); i += 2) {
+            aux = Integer.parseInt("" + str.charAt(i));
             sumaPar += aux;
         }
-
-        for (int i = 0; i < str.length(); i += 2) {
+        for (var i = 0; i < str.length(); i += 2) {
             sumaImpar += posicioSenar("" + str.charAt(i));
         }
-
         sumaTotal = sumaPar + sumaImpar;
         sumaTotal = 10 - (sumaTotal % 10);
         if(sumaTotal==10){
             sumaTotal=0;
         }
-
-        str = LLETRA_CIF.contains(cabecera) ? "" + DIGIT_CONTRTOL_CIF.charAt(sumaTotal) : "" + sumaTotal;
-        return str;
+        return LLETRA_CIF.contains(cabecera) ? "" + DIGIT_CONTRTOL_CIF.charAt(sumaTotal) : "" + sumaTotal;
     }
 	
 	private static int posicioSenar(String str) {
 
-        int aux = Integer.parseInt(str);
+        var aux = Integer.parseInt(str);
         aux = aux * 2;
-        aux = (aux / 10) + (aux % 10);
-        return aux;
+        return (aux / 10) + (aux % 10);
     }
 	
 	private static String calculaNie(String nie) {
 
-        String str = null;
+        var str = null;
         if(nie.length()==9){
-            nie=nie.substring(0, nie.length()-1);
+            nie = nie.substring(0, nie.length()-1);
         }
         if (nie.startsWith("X")) {
             str = nie.replace('X', '0');
@@ -138,9 +133,9 @@ public class NifHelper {
 	
 	private static String calculaDni(String dni) {
 
-        String str = completaZeros(dni, 8);
+        var str = completaZeros(dni, 8);
         if(str.length()==9){
-            str=str.substring(0,dni.length()-1);
+            str = str.substring(0,dni.length()-1);
         }
         return str + calculaLletra(str);
     }
