@@ -109,12 +109,13 @@ public class NotificacioCommand {
 			return arxiu[i].getBytes();
 		} catch (IOException e) {
 			logger.error("No s'ha pogut recuperar el contingut del fitxer per validar");
+			return null;
 		}
-		return null;
 	}
 
 	public boolean isComunicacioSIR() {
-		for (EnviamentCommand enviament : enviaments) {
+
+		for (var enviament : enviaments) {
 			if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
 				return true;
 			}
@@ -123,11 +124,11 @@ public class NotificacioCommand {
 	}
 
 	public static NotificacioCommand asCommand(NotificacioDtoV2 dto) {
+
 		if (dto == null) {
 			return null;
 		}
-		NotificacioCommand command = ConversioTipusHelper.convertir(dto, NotificacioCommand.class);
-		
+		var command = ConversioTipusHelper.convertir(dto, NotificacioCommand.class);
 		if (dto.getProcediment() != null) {
 			if (ProcSerTipusEnum.SERVEI.equals(dto.getProcediment().getTipus())) {
 				command.setServeiId(dto.getProcediment().getId());
@@ -137,8 +138,8 @@ public class NotificacioCommand {
 		}
 
 		if (NotificaEnviamentTipusEnumDto.COMUNICACIO.equals(dto.getEnviamentTipus())) {
-			boolean aAdministracio = false;
-			for (NotificacioEnviamentDtoV2 enviament : dto.getEnviaments()) {
+			var aAdministracio = false;
+			for (var enviament : dto.getEnviaments()) {
 				if (InteressatTipus.ADMINISTRACIO.equals(enviament.getTitular().getInteressatTipus())) {
 					aAdministracio = true;
 					break;
@@ -154,7 +155,6 @@ public class NotificacioCommand {
 		} else {
 			command.setEnviamentTipus(TipusEnviamentEnumDto.NOTIFICACIO);
 		}
-
 		if (dto.getCaducitat() != null) {
 			command.setCaducitatDiesNaturals(CaducitatHelper.getDiesEntreDates(dto.getCaducitat()));
 		}
@@ -162,67 +162,63 @@ public class NotificacioCommand {
 	}
 	public NotificacioDatabaseDto asDatabaseDto() {
 
-		NotificacioDatabaseDto dto = ConversioTipusHelper.convertir(this, NotificacioDatabaseDto.class);
-		ProcSerDto procedimentDto = new ProcSerDto();
-		if ("PROCEDIMENT".equals(tipusProcSer)) {
-//		if (procedimentId != null) {
-			procedimentDto.setId(this.getProcedimentId());
-		} else {
-			procedimentDto.setId(this.getServeiId());
-		}
+		var dto = ConversioTipusHelper.convertir(this, NotificacioDatabaseDto.class);
+		var procedimentDto = new ProcSerDto();
+		procedimentDto.setId("PROCEDIMENT".equals(tipusProcSer) ? this.getProcedimentId(): this.getServeiId());
 		dto.setProcediment(procedimentDto);
-
-		GrupDto grupDto = new GrupDto();
+		var grupDto = new GrupDto();
 		grupDto.setId(this.getGrupId());
 		dto.setGrup(grupDto);
-
 		// Format de municipi i província
-		if (dto.getEnviaments() != null) {
-			for (NotEnviamentDatabaseDto enviament: dto.getEnviaments()) {
-				if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty()) {
-					enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+", ""));
+		if (dto.getEnviaments() == null) {
+			return dto;
+		}
+		for (NotEnviamentDatabaseDto enviament: dto.getEnviaments()) {
+			if (enviament.getTitular().getEmail() != null && !enviament.getTitular().getEmail().isEmpty()) {
+				enviament.getTitular().setEmail(enviament.getTitular().getEmail().replaceAll("\\s+", ""));
+			}
+			establecerCamposPersona(enviament.getTitular());
+			if (enviament.getDestinataris() == null) {
+				continue;
+			}
+			for (var destinatari : enviament.getDestinataris()) {
+				if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty()) {
+					destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+", ""));
 				}
-
-				establecerCamposPersona(enviament.getTitular());
-
-				if (enviament.getDestinataris() != null) {
-					for (PersonaDto destinatari : enviament.getDestinataris()) {
-						if (destinatari.getEmail() != null && !destinatari.getEmail().isEmpty()) {
-							destinatari.setEmail(destinatari.getEmail().replaceAll("\\s+", ""));
-						}
-						establecerCamposPersona(destinatari);
-						destinatari.setIncapacitat(Boolean.FALSE);
-					}
-				}
+				establecerCamposPersona(destinatari);
+				destinatari.setIncapacitat(Boolean.FALSE);
 			}
 		}
 		return dto;
 	}
 	
 	private void establecerCamposPersona(PersonaDto persona) {
-		if (persona != null) {
-			if (InteressatTipus.FISICA.equals(persona.getInteressatTipus())) {
-				persona.setDir3Codi(null);
-				persona.setDocumentTipus(null);
-			} else if (InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
-				persona.setDir3Codi(null);
-			} else if (InteressatTipus.JURIDICA.equals(persona.getInteressatTipus())) {
-				persona.setDocumentTipus(null);
-				persona.setLlinatge1(null);
-				persona.setLlinatge2(null);
-			} else if (InteressatTipus.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
-				persona.setDocumentTipus(null);
-				persona.setIncapacitat(Boolean.FALSE);
-				persona.setLlinatge1(null);
-				persona.setLlinatge2(null);	
-			}
+
+		if (persona == null) {
+			return;
+		}
+		if (InteressatTipus.FISICA.equals(persona.getInteressatTipus())) {
+			persona.setDir3Codi(null);
+			persona.setDocumentTipus(null);
+		} else if (InteressatTipus.FISICA_SENSE_NIF.equals(persona.getInteressatTipus())) {
+			persona.setDir3Codi(null);
+		} else if (InteressatTipus.JURIDICA.equals(persona.getInteressatTipus())) {
+			persona.setDocumentTipus(null);
+			persona.setLlinatge1(null);
+			persona.setLlinatge2(null);
+		} else if (InteressatTipus.ADMINISTRACIO.equals(persona.getInteressatTipus())) {
+			persona.setDocumentTipus(null);
+			persona.setIncapacitat(Boolean.FALSE);
+			persona.setLlinatge1(null);
+			persona.setLlinatge2(null);
 		}
 	}
 	
 	public int getConcepteDefaultSize() {
+
 		int concepteSize = 0;
 		try {
-			Field concepte = this.getClass().getDeclaredField("concepte");
+			var concepte = this.getClass().getDeclaredField("concepte");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut recuperar la longitud del concepte: " + ex.getMessage());
@@ -231,9 +227,10 @@ public class NotificacioCommand {
 	}
 	
 	public int getDescripcioDefaultSize() {
-		int descripcioSize = 0;
+
+		var descripcioSize = 0;
 		try {
-			Field descripcio = this.getClass().getDeclaredField("descripcio");
+			var descripcio = this.getClass().getDeclaredField("descripcio");
 			descripcioSize = descripcio.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut recuperar la longitud de descripció: " + ex.getMessage());
@@ -257,9 +254,10 @@ public class NotificacioCommand {
 	}
 	
 	public int getLlinatge1DefaultSize() {
-		int concepteSize = 0;
+
+		var concepteSize = 0;
 		try {
-			Field concepte = PersonaCommand.class.getDeclaredField("llinatge1");
+			var concepte = PersonaCommand.class.getDeclaredField("llinatge1");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut recuperar la longitud del llinatge 1: " + ex.getMessage());
@@ -268,9 +266,10 @@ public class NotificacioCommand {
 	}
 	
 	public int getLlinatge2DefaultSize() {
-		int concepteSize = 0;
+
+		var concepteSize = 0;
 		try {
-			Field concepte = PersonaCommand.class.getDeclaredField("llinatge2");
+			var concepte = PersonaCommand.class.getDeclaredField("llinatge2");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut recuperar la longitud del llinatge 2: " + ex.getMessage());
@@ -279,9 +278,10 @@ public class NotificacioCommand {
 	}
 	
 	public int getEmailDefaultSize() {
-		int concepteSize = 0;
+
+		var concepteSize = 0;
 		try {
-			Field concepte = PersonaCommand.class.getDeclaredField("email");
+			var concepte = PersonaCommand.class.getDeclaredField("email");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut recuperar la longitud de l'email: " + ex.getMessage());
@@ -290,9 +290,10 @@ public class NotificacioCommand {
 	}
 	
 	public int getTelefonDefaultSize() {
-		int concepteSize = 0;
+
+		var concepteSize = 0;
 		try {
-			Field concepte = PersonaCommand.class.getDeclaredField("telefon");
+			var concepte = PersonaCommand.class.getDeclaredField("telefon");
 			concepteSize = concepte.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut recuperar la longitud del telèfon: " + ex.getMessage());

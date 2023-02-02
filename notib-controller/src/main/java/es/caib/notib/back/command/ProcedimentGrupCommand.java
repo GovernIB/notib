@@ -25,32 +25,25 @@ public class ProcedimentGrupCommand {
 
 	
 	public static ProcedimentGrupCommand asCommand(ProcSerGrupDto dto) {
+
 		if (dto == null) {
 			return null;
 		}
-		ProcedimentGrupCommand command = ConversioTipusHelper.convertir(
-				dto,
-				ProcedimentGrupCommand.class );
-		
+		ProcedimentGrupCommand command = ConversioTipusHelper.convertir(dto, ProcedimentGrupCommand.class );
 		command.setGrupId(dto.getGrup().getId());
 		command.setProcedimentId(dto.getProcSer().getId());
-		
 		return command;
 	}
 	
 	public static ProcSerGrupDto asDto(ProcedimentGrupCommand command) {
+
 		if (command == null) {
 			return null;
 		}
-		
-		ProcSerGrupDto dto = ConversioTipusHelper.convertir(
-				command,
-				ProcSerGrupDto.class);
-		
-		GrupDto grupDto = new GrupDto();
+		ProcSerGrupDto dto = ConversioTipusHelper.convertir(command, ProcSerGrupDto.class);
+		var grupDto = new GrupDto();
 		grupDto.setId(command.getGrupId());
 		dto.setGrup(grupDto);
-		
 		return dto;
 	}
 

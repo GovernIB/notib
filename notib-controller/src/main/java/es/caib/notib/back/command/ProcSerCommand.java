@@ -55,41 +55,26 @@ public class ProcSerCommand {
 	private Long cieId;
 
 	public static ProcSerCommand asCommand(ProcSerDto dto) {
+
 		if (dto == null) {
 			return null;
 		}
-		ProcSerCommand command = ConversioTipusHelper.convertir(
-				dto,
-				ProcSerCommand.class );
-		if (dto.getEntitat() != null)
+		var command = ConversioTipusHelper.convertir(dto, ProcSerCommand.class );
+		if (dto.getEntitat() != null) {
 			command.setEntitatId(dto.getEntitat().getId());
+		}
 		return command;
 	}
+
 	public static ProcSerDto asDto(ProcSerCommand command) {
+
 		if (command == null) {
 			return null;
 		}
-		ProcSerDto dto = ConversioTipusHelper.convertir(
-				command,
-				ProcSerDto.class);
-		
-		EntitatDto entitatDto = new EntitatDto();
+		var dto = ConversioTipusHelper.convertir(command, ProcSerDto.class);
+		var entitatDto = new EntitatDto();
 		entitatDto.setId(command.getEntitatId());
 		dto.setEntitat(entitatDto);
-
-//		OperadorPostalDto pagadoPostalDto = null;
-//		if (command.getPagadorPostalId() != null) {
-//			pagadoPostalDto = new OperadorPostalDto();
-//			pagadoPostalDto.setId(command.getPagadorPostalId());
-//		}
-//		dto.setPagadorpostal(pagadoPostalDto);
-//
-//		CieDto cieDto = null;
-//		if (command.getPagadorCieId() != null) {
-//			cieDto = new CieDto();
-//			cieDto.setId(command.getPagadorCieId());
-//		}
-//		dto.setPagadorcie(cieDto);
 		return dto;
 	}
 

@@ -42,28 +42,15 @@ public class NotificacioFiltreCommand {
 	private boolean nomesAmbErrors;
 	
 	public static NotificacioFiltreCommand asCommand(NotificacioFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		NotificacioFiltreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				NotificacioFiltreCommand.class );
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto, NotificacioFiltreCommand.class ) : null;
 	}
+
 	public static NotificacioFiltreDto asDto(NotificacioFiltreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		NotificacioFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
-				NotificacioFiltreDto.class);
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, NotificacioFiltreDto.class) : null;
 	}
 
 	public NotificacioFiltreDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				NotificacioFiltreDto.class);
+		return ConversioTipusHelper.convertir(this, NotificacioFiltreDto.class);
 	}
 
 	@Override

@@ -47,14 +47,10 @@ public class NotificacioEnviamentFiltreCommand {
 
 	
 	public static NotificacioEnviamentFiltreCommand asCommand(NotificacioEnviamentFiltreDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				NotificacioEnviamentFiltreCommand.class);
+		return ConversioTipusHelper.convertir(dto, NotificacioEnviamentFiltreCommand.class);
 	}
 	public static NotificacioEnviamentFiltreDto asDto(NotificacioEnviamentFiltreCommand command) {
-		return ConversioTipusHelper.convertir(
-				command,
-				NotificacioEnviamentFiltreDto.class);
+		return ConversioTipusHelper.convertir(command, NotificacioEnviamentFiltreDto.class);
 	}
 	
 	@Override

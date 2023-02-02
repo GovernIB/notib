@@ -3,6 +3,8 @@ package es.caib.notib.back.command;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import es.caib.notib.logic.intf.dto.cie.CieFormatSobreDto;
@@ -13,6 +15,8 @@ import es.caib.notib.back.helper.ConversioTipusHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class PagadorCieFormatSobreCommand {
 	
 	private Long id;
@@ -20,42 +24,13 @@ public class PagadorCieFormatSobreCommand {
 	@Size(max=64)
 	private String codi;
 	private Long pagadorCieId;
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getCodi() {
-		return codi;
-	}
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	public Long getPagadorCieId() {
-		return pagadorCieId;
-	}
-	public void setPagadorCieId(Long pagadorCieId) {
-		this.pagadorCieId = pagadorCieId;
-	}
+
 	public static PagadorCieFormatSobreCommand asCommand(CieFormatSobreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		PagadorCieFormatSobreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				PagadorCieFormatSobreCommand.class );
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto, PagadorCieFormatSobreCommand.class ) : null;
 	}
+
 	public static CieFormatSobreDto asDto(PagadorCieFormatSobreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		CieFormatSobreDto dto = ConversioTipusHelper.convertir(
-				command,
-				CieFormatSobreDto.class);
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, CieFormatSobreDto.class) : null;
 	}
 
 	@Override

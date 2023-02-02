@@ -50,7 +50,7 @@ public class OrganGestorCommand {
 		if (dto == null) {
 			return null;
 		}
-		OrganGestorCommand command = ConversioTipusHelper.convertir(dto, OrganGestorCommand.class);
+		var command = ConversioTipusHelper.convertir(dto, OrganGestorCommand.class);
 		if (dto.getOficina() != null) {
 			command.setOficina(dto.getOficina().getCodi());
 			command.setOficinaNom(dto.getOficina().getNom());
@@ -62,8 +62,8 @@ public class OrganGestorCommand {
 		if (command == null) {
 			return null;
 		}
-		OrganGestorDto organGestorDto = ConversioTipusHelper.convertir(command, OrganGestorDto.class);
-		OficinaDto oficina = new OficinaDto();
+		var organGestorDto = ConversioTipusHelper.convertir(command, OrganGestorDto.class);
+		var oficina = new OficinaDto();
 		oficina.setCodi(command.getOficina());
 		oficina.setNom(command.getOficinaNom());
 		organGestorDto.setOficina(oficina);

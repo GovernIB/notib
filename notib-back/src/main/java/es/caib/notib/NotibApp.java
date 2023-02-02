@@ -9,7 +9,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 /**
@@ -23,10 +22,10 @@ public abstract class NotibApp extends SpringBootServletInitializer {
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		try {
-			Manifest manifest = new Manifest(servletContext.getResourceAsStream("/META-INF/MANIFEST.MF"));
-			Attributes attributes = manifest.getMainAttributes();
-			String version = attributes.getValue("Implementation-Version");
-			String buildTimestamp = attributes.getValue("Build-Timestamp");
+			var manifest = new Manifest(servletContext.getResourceAsStream("/META-INF/MANIFEST.MF"));
+			var attributes = manifest.getMainAttributes();
+			var version = attributes.getValue("Implementation-Version");
+			var buildTimestamp = attributes.getValue("Build-Timestamp");
 			log.info("Carregant l'aplicació NOTIB versió " + version + " generada en data " + buildTimestamp);
 			/*
 			Implementation-SCM-Revision: 

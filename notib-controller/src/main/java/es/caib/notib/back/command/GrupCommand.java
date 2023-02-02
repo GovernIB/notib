@@ -40,22 +40,11 @@ public class GrupCommand {
 		this.nom = nom;
 	}
 	public static GrupCommand asCommand(GrupDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		GrupCommand command = ConversioTipusHelper.convertir(
-				dto,
-				GrupCommand.class );
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto, GrupCommand.class ) : null;
 	}
+
 	public static GrupDto asDto(GrupCommand command) {
-		if (command == null) {
-			return null;
-		}
-		GrupDto dto = ConversioTipusHelper.convertir(
-				command,
-				GrupDto.class);
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, GrupDto.class) : null;
 	}
 
 	@Override

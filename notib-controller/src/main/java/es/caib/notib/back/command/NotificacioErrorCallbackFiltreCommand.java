@@ -30,22 +30,11 @@ public class NotificacioErrorCallbackFiltreCommand {
 	private String usuari;
 
 	public static NotificacioErrorCallbackFiltreCommand asCommand(NotificacioErrorCallbackFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		NotificacioErrorCallbackFiltreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				NotificacioErrorCallbackFiltreCommand.class );
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto, NotificacioErrorCallbackFiltreCommand.class ) : null;
 	}
+
 	public static NotificacioErrorCallbackFiltreDto asDto(NotificacioErrorCallbackFiltreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		NotificacioErrorCallbackFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
-				NotificacioErrorCallbackFiltreDto.class);
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, NotificacioErrorCallbackFiltreDto.class) : null;
 	}
 
 	@Override

@@ -27,17 +27,11 @@ public class CieCommand {
 	private Date contracteDataVig;
 
 	public static CieCommand asCommand(CieDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		return ConversioTipusHelper.convertir(
-				dto,
-				CieCommand.class );
+		return dto != null ? ConversioTipusHelper.convertir(dto, CieCommand.class ) : null;
 	}
+
 	public CieDataDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				CieDataDto.class);
+		return ConversioTipusHelper.convertir(this, CieDataDto.class);
 	}
 
 	@Override

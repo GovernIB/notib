@@ -17,9 +17,6 @@ public class NotificacioMassivaFiltreCommand {
     private boolean nomesAmbErrors;
 
     public NotificacioMassivaFiltreDto asDto() {
-        NotificacioMassivaFiltreDto dto = ConversioTipusHelper.convertir(
-                this,
-                NotificacioMassivaFiltreDto.class);
-        return dto;
+        return ConversioTipusHelper.convertir(this, NotificacioMassivaFiltreDto.class);
     }
 }

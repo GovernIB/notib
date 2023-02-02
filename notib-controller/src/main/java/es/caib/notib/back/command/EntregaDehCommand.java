@@ -26,25 +26,13 @@ public class EntregaDehCommand {
 	private boolean activa;
 	
 	public static EntregaDehCommand asCommand(DocumentDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		EntregaDehCommand command = ConversioTipusHelper.convertir(
-				dto,
-				EntregaDehCommand.class );
-		return command;
-	}
-	public static EntregaDehDto asDto(DocumentCommand command) {
-		if (command == null) {
-			return null;
-		}
-		EntregaDehDto dto = ConversioTipusHelper.convertir(
-				command,
-				EntregaDehDto.class);
-		return dto;
+		return dto != null ? ConversioTipusHelper.convertir(dto, EntregaDehCommand.class ) : null;
 	}
 
-	
+	public static EntregaDehDto asDto(DocumentCommand command) {
+		return command != null ? ConversioTipusHelper.convertir(command, EntregaDehDto.class) : null;
+	}
+
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

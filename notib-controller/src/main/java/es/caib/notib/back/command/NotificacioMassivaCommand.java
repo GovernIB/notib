@@ -6,6 +6,7 @@ import es.caib.notib.back.helper.ConversioTipusHelper;
 import es.caib.notib.back.validation.ValidNotificacioMassiu;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Getter @Setter
 @ValidNotificacioMassiu
 public class NotificacioMassivaCommand {
@@ -45,8 +47,7 @@ public class NotificacioMassivaCommand {
 	}
 	public NotificacioMassivaDto asDto(GestioDocumentalService gestioDocumentalService) throws IOException {
 		
-		NotificacioMassivaDto notificacioMassivaDto = ConversioTipusHelper.convertir(this, NotificacioMassivaDto.class);
-
+		var notificacioMassivaDto = ConversioTipusHelper.convertir(this, NotificacioMassivaDto.class);
 		if (fitxerCSVGestdocId == null || fitxerCSVGestdocId.isEmpty() ) {
 			notificacioMassivaDto.setFicheroCsvBytes(this.getFicheroCsv().getBytes());
 			notificacioMassivaDto.setFicheroCsvNom(this.getFicheroCsv().getOriginalFilename());
@@ -66,12 +67,12 @@ public class NotificacioMassivaCommand {
 	
 	public int getEmailDefaultSize() {
 
-		int emailSize = 0;
+		var emailSize = 0;
 		try {
-			Field email = this.getClass().getDeclaredField("email");
+			var email = this.getClass().getDeclaredField("email");
 			emailSize = email.getAnnotation(Size.class).max();
 		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la longitud del email: " + ex.getMessage());
+			log.error("No s'ha pogut recuperar la longitud del email: " + ex.getMessage());
 		}
 		return emailSize;
 	}
@@ -81,5 +82,4 @@ public class NotificacioMassivaCommand {
 		return ToStringBuilder.reflectionToString(this);
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(NotificacioMassivaCommand.class);
 }

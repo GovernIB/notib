@@ -40,28 +40,18 @@ public class DocumentCommand {
 	private boolean modoFirma;
 	
 	public static DocumentCommand asCommand(DocumentDto dto) {
-		if (dto == null) {
-			return new DocumentCommand();
-		}
-		DocumentCommand command = ConversioTipusHelper.convertir(
-				dto,
-				DocumentCommand.class );
-		return command;
+
+		return dto != null ? ConversioTipusHelper.convertir(dto, DocumentCommand.class ) : new DocumentCommand();
 	}
 	public static DocumentDto asDto(DocumentCommand command) {
-		if (command == null || (
+
+		return command == null || (
 				(command.getArxiuGestdocId() == null || command.getArxiuGestdocId().isEmpty()) &&
 				(command.getContingutBase64() == null || command.getContingutBase64().isEmpty()) &&
 				(command.getUuid() == null || command.getUuid().isEmpty()) &&
 				(command.getCsv() == null || command.getCsv().isEmpty()) &&
 				(command.getUrl() == null || command.getUrl().isEmpty()))
-		) {
-			return null;
-		}
-		DocumentDto dto = ConversioTipusHelper.convertir(
-				command,
-				DocumentDto.class);
-		return dto;
+				? null : ConversioTipusHelper.convertir(command, DocumentDto.class);
 	}
 
 	@Override

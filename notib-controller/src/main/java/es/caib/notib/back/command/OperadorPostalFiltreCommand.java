@@ -19,17 +19,11 @@ public class OperadorPostalFiltreCommand {
 	private Long organGestorId;
 
 	public static OperadorPostalFiltreCommand asCommand(OperadorPostalFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		return ConversioTipusHelper.convertir(
-				dto,
-				OperadorPostalFiltreCommand.class );
+		return dto != null ? ConversioTipusHelper.convertir(dto, OperadorPostalFiltreCommand.class ) : null;
 	}
+
 	public OperadorPostalFiltreDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				OperadorPostalFiltreDto.class);
+		return ConversioTipusHelper.convertir(this, OperadorPostalFiltreDto.class);
 	}
 
 	@Override

@@ -27,22 +27,10 @@ public class GrupFiltreCommand {
 	
 	
 	public static GrupFiltreCommand asCommand(GrupFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		GrupFiltreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				GrupFiltreCommand.class );
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto, GrupFiltreCommand.class ): null;
 	}
 	public static GrupFiltreDto asDto(GrupFiltreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		GrupFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
-				GrupFiltreDto.class);
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, GrupFiltreDto.class) : null;
 	}
 
 	@Override

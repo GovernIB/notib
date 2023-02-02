@@ -20,17 +20,11 @@ public class CieFiltreCommand {
 	
 	
 	public static CieFiltreCommand asCommand(CieFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		return ConversioTipusHelper.convertir(
-				dto,
-				CieFiltreCommand.class );
+		return dto != null ? ConversioTipusHelper.convertir(dto, CieFiltreCommand.class ) : null;
 	}
+
 	public CieFiltreDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				CieFiltreDto.class);
+		return ConversioTipusHelper.convertir(this, CieFiltreDto.class);
 	}
 
 	@Override

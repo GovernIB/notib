@@ -35,14 +35,10 @@ public class AvisCommand {
 	private AvisNivellEnumDto avisNivell;
 	
 	public static AvisCommand asCommand(AvisDto dto) {
-		return ConversioTipusHelper.convertir(
-				dto,
-				AvisCommand.class);
+		return ConversioTipusHelper.convertir(dto, AvisCommand.class);
 	}
 	public static AvisDto asDto(AvisCommand command) {
-		return ConversioTipusHelper.convertir(
-				command,
-				AvisDto.class);
+		return ConversioTipusHelper.convertir(command, AvisDto.class);
 	}
 
 	@Override

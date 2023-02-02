@@ -43,29 +43,13 @@ public class PersonaCommand {
 	@Size(max=9)	
 	private String dir3Codi;
 
-//	private void setNom(String nom) {
-//		this.nom = InteressatTipusEnumDto.JURIDICA.equals(interessatTipus) ? raoSocial : nomInput;
-//	}
 	
 	public static PersonaCommand asCommand(PersonaDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		PersonaCommand command = ConversioTipusHelper.convertir(dto, PersonaCommand.class );
-//		if (InteressatTipusEnumDto.JURIDICA.equals(command.getInteressatTipus())) {
-//			command.setRaoSocial(dto.getNom());
-//		} else {
-//			command.setNomInput(dto.getNom());
-//		}
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto, PersonaCommand.class ) : null;
 	}
+
 	public static PersonaDto asDto(PersonaCommand command) {
-		if (command == null) {
-			return null;
-		}
-		PersonaDto dto = ConversioTipusHelper.convertir(command, PersonaDto.class);
-//		dto.setNom(InteressatTipusEnumDto.JURIDICA.equals(command.getInteressatTipus()) ? command.getNomInput() : command.getRaoSocial());
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, PersonaDto.class) : null;
 	}
 
 	@Override
@@ -74,17 +58,14 @@ public class PersonaCommand {
 	}
 
 	public String getNif() {
-		if (nif == null || nif.trim().length() == 0) {
-			return null;
-		}
-		return Character.isDigit(nif.trim().charAt(0)) && nif.trim().length() < 9 ? afegirZerosNif() : nif.trim();
+		return nif != null && nif.trim().length() != 0 ? Character.isDigit(nif.trim().charAt(0)) && nif.trim().length() < 9 ? afegirZerosNif() : nif.trim() : null;
 	}
 
 	private String afegirZerosNif() {
 
 		nif = nif.trim();
-		int length = 9 - nif.length();
-		for (int foo = 0; foo < length; foo++) {
+		var length = 9 - nif.length();
+		for (var foo = 0; foo < length; foo++) {
 			nif = 0 + nif;
 		}
 		return nif;

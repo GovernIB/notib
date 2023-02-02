@@ -26,11 +26,7 @@ public class OrganGestorFiltreCommand {
 	private String isFiltre;
 
 	public static OrganGestorFiltreCommand asCommand(OrganGestorFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		OrganGestorFiltreCommand command = ConversioTipusHelper.convertir(dto,OrganGestorFiltreCommand.class );
-		return command;
+		return dto != null ? ConversioTipusHelper.convertir(dto,OrganGestorFiltreCommand.class ) : null;
 	}
 	public OrganGestorFiltreDto asDto() {
 		return ConversioTipusHelper.convertir(this, OrganGestorFiltreDto.class);

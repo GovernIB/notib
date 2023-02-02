@@ -32,18 +32,11 @@ public class OperadorPostalCommand {
 	private String facturacioClientCodi;
 
 	public static OperadorPostalCommand asCommand(OperadorPostalDto dto) {
-		if (dto == null) {
-			return null;
-		}
-
-		return ConversioTipusHelper.convertir(
-				dto,
-				OperadorPostalCommand.class );
+		return dto != null ?  ConversioTipusHelper.convertir(dto, OperadorPostalCommand.class ) : null;
 	}
+
 	public OperadorPostalDataDto asDto() {
-		return ConversioTipusHelper.convertir(
-				this,
-				OperadorPostalDataDto.class);
+		return ConversioTipusHelper.convertir(this, OperadorPostalDataDto.class);
 	}
 
 	@Override

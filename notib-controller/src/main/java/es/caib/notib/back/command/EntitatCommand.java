@@ -67,65 +67,61 @@ public class EntitatCommand {
 	private String nomOficinaVirtual;
 
 	public String getLlibreCodiNom() {
-		if (llibre != null)
-			return llibre + " - " + (llibreNom != null ? llibreNom : "");
-		return "";
+
+		return llibre != null ? llibre + " - " + (llibreNom != null ? llibreNom : "") : "";
 	}
 	public void setLlibreCodiNom(String llibreCodiNom) {
-		if (llibreCodiNom != null) {
-			int div = llibreCodiNom.indexOf(" - ");
-			if (div > 0) {
-				this.llibre = llibreCodiNom.substring(0, div);
-				this.llibreNom = llibreCodiNom.substring(div + 3);
-			}
+
+		if (llibreCodiNom == null) {
+			return;
+		}
+		var div = llibreCodiNom.indexOf(" - ");
+		if (div > 0) {
+			this.llibre = llibreCodiNom.substring(0, div);
+			this.llibreNom = llibreCodiNom.substring(div + 3);
 		}
 	}
 	
-	public static List<EntitatCommand> toEntitatCommands(
-			List<EntitatDto> dtos) {
-		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();
-		for (EntitatDto dto: dtos) {
-			commands.add(
-					ConversioTipusHelper.convertir(
-							dto,
-							EntitatCommand.class));
+	public static List<EntitatCommand> toEntitatCommands(List<EntitatDto> dtos) {
+
+		List<EntitatCommand> commands = new ArrayList<>();
+		for (var dto: dtos) {
+			commands.add(ConversioTipusHelper.convertir(dto, EntitatCommand.class));
 		}
 		return commands;
 	}
 
-	public static EntitatCommand asCommand(EntitatDto dto) {	
-		EntitatCommand entitat = ConversioTipusHelper.convertir(
-				dto,
-				EntitatCommand.class);
+	public static EntitatCommand asCommand(EntitatDto dto) {
+
+		var entitat = ConversioTipusHelper.convertir(dto, EntitatCommand.class);
 		if (dto.getTipusDocDefault() != null && dto.getTipusDocDefault().getTipusDocEnum() != null) {
 			entitat.setTipusDocDefault(dto.getTipusDocDefault().getTipusDocEnum().name());
 		}
 		return entitat;
 	}
 	public EntitatDataDto asDto() throws IOException {
-		EntitatDataDto entitat = ConversioTipusHelper.convertir(
-				this,
-				EntitatDataDto.class);
-		List<TipusDocumentDto> tipusDocuments = new ArrayList<TipusDocumentDto>();
-		TipusDocumentDto tipusDocumentDefault = new TipusDocumentDto();
+
+		var entitat = ConversioTipusHelper.convertir(this, EntitatDataDto.class);
+		List<TipusDocumentDto> tipusDocuments = new ArrayList<>();
+		var tipusDocumentDefault = new TipusDocumentDto();
 		entitat.setLogoCapBytes(this.getLogoCap().getBytes());
 		entitat.setLogoPeuBytes(this.getLogoPeu().getBytes());
-		
 		if (this.getTipusDocName() != null) {
-			for (String tipusDocumentStr : this.getTipusDocName()) {
-				TipusDocumentEnumDto tipusDocumentEnum = TipusDocumentEnumDto.valueOf(tipusDocumentStr);
-				TipusDocumentDto tipusDocument = new TipusDocumentDto();
+			TipusDocumentEnumDto tipusDocumentEnum;
+			TipusDocumentDto tipusDocument;
+			for (var tipusDocumentStr : this.getTipusDocName()) {
+				tipusDocumentEnum = TipusDocumentEnumDto.valueOf(tipusDocumentStr);
+				tipusDocument = new TipusDocumentDto();
 				tipusDocument.setTipusDocEnum(tipusDocumentEnum);
 				tipusDocuments.add(tipusDocument);
 			}
 		}
 		if (this.getTipusDocDefault() != null && !this.getTipusDocDefault().isEmpty()) {
-			TipusDocumentEnumDto tipusDocumentDefaultEnum = TipusDocumentEnumDto.valueOf(this.getTipusDocDefault());
+			var tipusDocumentDefaultEnum = TipusDocumentEnumDto.valueOf(this.getTipusDocDefault());
 			tipusDocumentDefault.setTipusDocEnum(tipusDocumentDefaultEnum);
 		}
 		entitat.setTipusDocDefault(tipusDocumentDefault);
 		entitat.setTipusDoc(tipusDocuments);
-		
 		if (!this.isLlibreEntitat()) {
 			entitat.setLlibre(null);
 			entitat.setLlibreNom(null);

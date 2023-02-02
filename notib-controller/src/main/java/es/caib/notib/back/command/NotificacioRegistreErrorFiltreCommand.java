@@ -28,22 +28,12 @@ public class NotificacioRegistreErrorFiltreCommand {
 	private String usuari;
 
 	public static NotificacioRegistreErrorFiltreCommand asCommand(NotificacioRegistreErrorFiltreDto dto) {
-		if (dto == null) {
-			return null;
-		}
-		NotificacioRegistreErrorFiltreCommand command = ConversioTipusHelper.convertir(
-				dto,
-				NotificacioRegistreErrorFiltreCommand.class );
-		return command;
+
+		return dto != null ? ConversioTipusHelper.convertir(dto, NotificacioRegistreErrorFiltreCommand.class ) : null;
 	}
+
 	public static NotificacioRegistreErrorFiltreDto asDto(NotificacioRegistreErrorFiltreCommand command) {
-		if (command == null) {
-			return null;
-		}
-		NotificacioRegistreErrorFiltreDto dto = ConversioTipusHelper.convertir(
-				command,
-				NotificacioRegistreErrorFiltreDto.class);
-		return dto;
+		return command != null ? ConversioTipusHelper.convertir(command, NotificacioRegistreErrorFiltreDto.class) : null;
 	}
 
 	@Override
