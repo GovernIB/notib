@@ -5,7 +5,7 @@ INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 UPDATE NOT_USUARI SET REBRE_EMAILS_CREATS = 1 WHERE REBRE_EMAILS_CREATS = 0;
 
 -- Changeset db/changelog/changes/1.1.22/747.yaml::1665140886759-2::limit
-INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.monitor.integracions.eliminar.periode', '3', 'Periode execució en dies de la neteja del monitor integracions', 'GENERAL', 0, 0, 'INT');
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.monitor.integracions.eliminar.periode', '0 30 1 * * *', 'Periode execució en dies de la neteja del monitor integracions', 'GENERAL', 0, 0, 'CRON');
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) VALUES ('es.caib.notib.monitor.integracions.eliminar.anterior.dies', '3', 'Llindar en dies pel procés de neteja del monitor integracions', 'GENERAL', 0, 0, 'INT');
 
 -- Changeset db/changelog/changes/1.1.22/755.yaml::1665140886759-3::limit
@@ -32,5 +32,17 @@ UPDATE NOT_PAGADOR_CIE  SET ORGAN_GESTOR = (SELECT nog.id FROM NOT_ORGAN_GESTOR 
 
 -- Changeset db/changelog/changes/1.1.22/762.yaml::1668153867375-1::limit
 INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.notib.comunicacions.sir.internes', 'false','Permetre realitzar comunicacions SIR dins la pròpia entitat', 'GENERAL', 0, 0, 'BOOL', 1);
+
+-- MULTITHREAD CONFIG --
+INSERT INTO NOT_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE) values ('es.caib.notib.multithread',0,'Permetre execucions multithread','SCHEDULLED',0,0,'BOOL');
+
+-- optimitzacions
+UPDATE NOT_NOTIFICACIO_TABLE SET TITULAR = (select listagg(NOM || ' ' || LLINATGE1 || ' ' || LLINATGE2 || ' ' || NIF || ' ' || RAO_SOCIAL,', ') WITHIN GROUP (ORDER BY NOTIFICACIO_ENV_ID) FROM NOT_PERSONA P, NOT_NOTIFICACIO_ENV E WHERE P.ID = E.TITULAR_ID AND E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+UPDATE NOT_NOTIFICACIO_TABLE SET notifica_ids = (select listagg(E.NOTIFICA_ID, ', ') WITHIN GROUP (ORDER BY E.ID) FROM NOT_NOTIFICACIO_ENV E WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (select SUM(DISTINCT CASE E.NOTIFICA_ESTAT WHEN 15 THEN 1 WHEN 23 THEN 2 WHEN 24 THEN 4 WHEN 22 THEN 8 WHEN 25 THEN 16 WHEN 10 THEN 32 WHEN 14 THEN 64 WHEN 20 THEN 128 WHEN 27 THEN 256 WHEN 28 THEN 512 WHEN 29 THEN 1024 ELSE 0 END) as MASK FROM NOT_NOTIFICACIO_ENV_TABLE E WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
+UPDATE NOT_NOTIFICACIO_TABLE SET ESTAT_MASK = (ESTAT_MASK + 2048) WHERE ESTAT = 15 AND registre_env_intent = 0 AND NOTIFICA_ERROR_DATE IS NULL;
+
+-- 741
+INSERT INTO not_acl_entry (acl_object_identity, ace_order, sid, mask, granting, audit_success, audit_failure) SELECT acl_object_identity, ace_order, sid, 8192, granting, audit_success, audit_failure FROM not_acl_entry WHERE mask = 1024;
 
 UPDATE NOT_PROCESSOS_INICIALS SET INIT = 1 WHERE codi = 'PROPIETATS_CONFIG_ENTITATS';
