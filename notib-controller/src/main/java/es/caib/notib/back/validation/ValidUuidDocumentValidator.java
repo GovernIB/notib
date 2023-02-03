@@ -7,8 +7,6 @@ import javax.validation.ConstraintValidatorContext;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.back.helper.MessageHelper;
