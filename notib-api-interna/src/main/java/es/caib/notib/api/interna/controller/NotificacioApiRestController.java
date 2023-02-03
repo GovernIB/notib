@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -47,17 +46,17 @@ public class NotificacioApiRestController {
 	@ResponseBody
 	public AppInfo getAppInfo(HttpServletRequest request) throws IOException {
 
-		AppInfo appInfo = new AppInfo();
+		var appInfo = new AppInfo();
 		appInfo.setNom("Notib");
-		Manifest manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
-		Attributes manifestAtributs = manifest.getMainAttributes();
-		Map<String, Object>manifestAtributsMap = new HashMap<String, Object>();
-		for (Object key: new HashMap(manifestAtributs).keySet()) {
+		var manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
+		var manifestAtributs = manifest.getMainAttributes();
+		Map<String, Object>manifestAtributsMap = new HashMap<>();
+		for (var key: new HashMap(manifestAtributs).keySet()) {
 			manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
 		}
 		if (!manifestAtributsMap.isEmpty()) {
-			Object version = manifestAtributsMap.get("Implementation-Version");
-			Object data = manifestAtributsMap.get("Release-Date");
+			var version = manifestAtributsMap.get("Implementation-Version");
+			var data = manifestAtributsMap.get("Release-Date");
 			appInfo.setVersio(version != null ? version.toString() : null);
 			appInfo.setData(data != null ? data.toString() : null);
 		}

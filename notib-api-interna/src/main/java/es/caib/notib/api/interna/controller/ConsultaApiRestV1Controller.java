@@ -1,6 +1,5 @@
 package es.caib.notib.api.interna.controller;
 
-import es.caib.notib.client.domini.RespostaAltaV2;
 import es.caib.notib.logic.intf.dto.ApiConsulta;
 import es.caib.notib.logic.intf.dto.ArxiuDto;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
@@ -21,18 +20,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.util.Base64;
 import java.util.Date;
 
@@ -63,10 +58,10 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 		
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
-													.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(null)
+						.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
 	
@@ -86,10 +81,10 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
-				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(null)
+								.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
 
@@ -109,9 +104,9 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -132,9 +127,9 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(false)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -155,9 +150,9 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.COMUNICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -178,9 +173,9 @@ public class ConsultaApiRestV1Controller {
 			@Parameter(name = "mida", description = "Mida de la pàgina a mostrar en la paginació", required = false)
 			@RequestParam(value = "mida", required = false) Integer mida) {
 
-		URI location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
-		String basePath = location.toString();
-		ApiConsulta consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
+		var location = ServletUriComponentsBuilder.fromServletMapping(request).path("/api/consulta/v1").buildAndExpand().toUri();
+		var basePath = location.toString();
+		var consulta = ApiConsulta.builder().dniTitular(dniTitular).tipus(NotificaEnviamentTipusEnumDto.NOTIFICACIO).estatFinal(true)
 				.basePath(basePath).pagina(pagina).mida(mida).dataInicial(dataInicial).dataFinal(dataFinal).build();
 		return enviamentService.findEnviaments(consulta);
 	}
@@ -190,9 +185,9 @@ public class ConsultaApiRestV1Controller {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Arxiu.class, description = "Informació de comunicacions/notificacions"))})})
 	public ResponseEntity<Arxiu> getDocument(HttpServletRequest request, @Parameter(description = "Identificador de la notificació de la que es vol obtenir el document", required = true) @PathVariable Long notificacioId) {
 
-		Arxiu document = null;
+		Arxiu document;
 		ArxiuDto arxiu = null;
-		HttpStatus status = HttpStatus.OK;
+		var status = HttpStatus.OK;
 		try {
 			arxiu = notificacioService.getDocumentArxiu(notificacioId);
 		} catch (Exception e) {
@@ -200,10 +195,10 @@ public class ConsultaApiRestV1Controller {
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
 			if (arxiu.getContentType() == null && arxiu.getNom() != null) {
-				String type = arxiu.getNom().endsWith(".pdf") ? "application/pdf" : (arxiu.getNom().endsWith(".pdf") ? "application/zip" :null);
+				var type = arxiu.getNom().endsWith(".pdf") ? "application/pdf" : (arxiu.getNom().endsWith(".pdf") ? "application/zip" :null);
 				arxiu.setContentType(type);
 			}
-			String contingutDocumentBasse64 = Base64.getEncoder().encodeToString(arxiu.getContingut());
+			var contingutDocumentBasse64 = Base64.getEncoder().encodeToString(arxiu.getContingut());
 			document = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutDocumentBasse64).build();
 			return new ResponseEntity<>(document, status);
 		}
@@ -217,16 +212,16 @@ public class ConsultaApiRestV1Controller {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Arxiu.class, description = "Informació de comunicacions/notificacions"))})})
 	public ResponseEntity<Arxiu> getCertificacio(HttpServletRequest request, @Parameter(description = "Identificador de l'enviament de la que es vol obtenir la certificació", required = true) @PathVariable Long enviamentId) {
 
-		Arxiu certificacio = null;
+		Arxiu certificacio;
 		ArxiuDto arxiu = null;
-		HttpStatus status = HttpStatus.OK;
+		var status = HttpStatus.OK;
 		try {
 			arxiu = notificacioService.enviamentGetCertificacioArxiu(enviamentId);
 		} catch (Exception e) {
 			log.debug("No s'ha trobat la certificació per a l'enviament amb identificador " + enviamentId);
 		}
 		if (arxiu != null && arxiu.getContingut() != null) {
-			String contingutCertificacioBasse64 = Base64.getEncoder().encodeToString(arxiu.getContingut());
+			var contingutCertificacioBasse64 = Base64.getEncoder().encodeToString(arxiu.getContingut());
 			certificacio = Arxiu.builder().nom(arxiu.getNom()).mediaType(arxiu.getContentType()).contingut(contingutCertificacioBasse64).build();
 			return new ResponseEntity<>(certificacio, status);
 		}
@@ -240,16 +235,16 @@ public class ConsultaApiRestV1Controller {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Notificacions/Comunicacions per titular", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema( implementation = Arxiu.class, description = "Informació de comunicacions/notificacions"))})})
 	public ResponseEntity<Arxiu> getJustificant(HttpServletRequest request, @Parameter(description = "Identificador de l'enviament de la que es vol obtenir el justificant", required = true) @PathVariable Long enviamentId) {
 
-		Arxiu justificant = null;
+		Arxiu justificant;
 		byte[] contingutJustificant = null;
-		HttpStatus status = HttpStatus.OK;
+		var status = HttpStatus.OK;
 		try {
 			contingutJustificant = enviamentService.getDocumentJustificant(enviamentId);
 		} catch (Exception e) {
 			log.debug("No s'ha trobat el justificant per a l'enviament amb identificador " + enviamentId);
 		}
 		if (contingutJustificant != null) {
-			String contingutJustificantBasse64 = Base64.getEncoder().encodeToString(contingutJustificant);
+			var contingutJustificantBasse64 = Base64.getEncoder().encodeToString(contingutJustificant);
 			justificant = Arxiu.builder().nom("Justificant").mediaType(com.google.common.net.MediaType.PDF.toString()).contingut(contingutJustificantBasse64).build();
 			return new ResponseEntity<>(justificant, status);
 		}

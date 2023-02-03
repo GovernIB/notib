@@ -59,12 +59,12 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(HttpServletRequest request) throws UnsupportedEncodingException {
 
-		String identificador = extractIdentificador(request);
+		var identificador = extractIdentificador(request);
 		try {
 			if (!identificador.isEmpty()) {
 				return notificacioServiceWs.consultaEstatNotificacio(identificador);
 			}
-			String msg = "No s'ha informat cap identificador de la notificació";
+			var msg = "No s'ha informat cap identificador de la notificació";
 			return RespostaConsultaEstatNotificacio.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
 		} catch (Exception e) {
 			return RespostaConsultaEstatNotificacio.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
@@ -77,12 +77,12 @@ public class NotificacioApiRestV1Controller extends NotificacioApiRestBaseContro
 	@GetMapping(value = {"/consultaEstatEnviament/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(HttpServletRequest request) throws UnsupportedEncodingException {
 
-		String referencia = extractIdentificador(request);
+		var referencia = extractIdentificador(request);
 		try {
 			if (!referencia.isEmpty()) {
 				return notificacioServiceWs.consultaEstatEnviament(referencia);
 			}
-			String msg = "No s'ha informat cap referència de l'enviament";
+			var msg = "No s'ha informat cap referència de l'enviament";
 			return RespostaConsultaEstatEnviament.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
 		} catch (Exception e) {
 			return RespostaConsultaEstatEnviament.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();

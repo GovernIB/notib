@@ -39,9 +39,10 @@ public class EjbClientConfig {
 	}
 
 	private LocalStatelessSessionProxyFactoryBean getLocalEjbFactoyBean(Class<?> serviceClass) {
-		String jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;
+
+		var jndiName = EJB_JNDI_PREFIX + serviceClass.getSimpleName() + EJB_JNDI_SUFFIX;
 		log.debug("Creating EJB proxy for serviceClass with JNDI name " + jndiName);
-		LocalStatelessSessionProxyFactoryBean factory = new LocalStatelessSessionProxyFactoryBean();
+		var factory = new LocalStatelessSessionProxyFactoryBean();
 		factory.setBusinessInterface(serviceClass);
 		factory.setJndiName(jndiName);
 		return factory;

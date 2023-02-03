@@ -52,12 +52,12 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 	@GetMapping(value = {"/consultaEstatNotificacio/**"}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacio(HttpServletRequest request) throws UnsupportedEncodingException {
 
-		String identificador = extractIdentificador(request);
+		var identificador = extractIdentificador(request);
 		try {
 			if (!identificador.isEmpty()) {
 				return notificacioServiceWs.consultaEstatNotificacioV2(identificador);
 			}
-			String msg = "No s'ha informat cap identificador de la notificació";
+			var msg = "No s'ha informat cap identificador de la notificació";
 			return RespostaConsultaEstatNotificacioV2.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
 		} catch (Exception e) {
 			return RespostaConsultaEstatNotificacioV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
@@ -71,12 +71,12 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviament(
 			HttpServletRequest request) throws UnsupportedEncodingException {
 
-		String referencia = extractIdentificador(request);
+		var referencia = extractIdentificador(request);
 		try {
 			if (!referencia.isEmpty()) {
 				return notificacioServiceWs.consultaEstatEnviamentV2(referencia);
 			}
-			String msg = "No s'ha informat cap referència de l'enviament";
+			var msg = "No s'ha informat cap referència de l'enviament";
 			return RespostaConsultaEstatEnviamentV2.builder().error(true).errorDescripcio(msg).errorData(new Date()).build();
 		} catch (Exception e) {
 			return RespostaConsultaEstatEnviamentV2.builder().error(true).errorDescripcio(getErrorDescripcio(e)).errorData(new Date()).build();
@@ -86,10 +86,9 @@ public class NotificacioApiRestV2Controller extends NotificacioApiRestBaseContro
 	@Operation(summary = "Genera el justificant i consulta la informació del registre d'una notificació.", description = "Retorna la informació del registre i el justificant d'una notificació dins Notib.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Consulta realitzada correctament", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = RespostaConsultaDadesRegistreV2.class, description = "Estat del registre")) }) })
 	@PostMapping(value = {"/consultaDadesRegistre"}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(
-			@Parameter(description = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament",
-					required = false)
-			@RequestBody DadesConsulta dadesConsulta) {
+	public RespostaConsultaDadesRegistreV2 consultaDadesRegistre(@Parameter(description = "Objecte amb les dades necessàries per consultar les dades de registre d'una notificació o enviament",
+					required = false) @RequestBody DadesConsulta dadesConsulta) {
+
 		try {
 			return notificacioServiceWs.consultaDadesRegistreV2(dadesConsulta);
 		} catch (Exception e) {
