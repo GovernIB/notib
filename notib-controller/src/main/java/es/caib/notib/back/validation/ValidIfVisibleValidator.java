@@ -26,38 +26,31 @@ public class ValidIfVisibleValidator implements ConstraintValidator<ValidIfVisib
 	
 	@Override
 	public void initialize(ValidIfVisible annotation) {
-		 fieldName          = annotation.fieldName();
-	     expectedFieldValue = annotation.fieldValue();
-	     dependFieldName    = annotation.dependFieldName();
+
+		fieldName = annotation.fieldName();
+		expectedFieldValue = annotation.fieldValue();
+ 		dependFieldName = annotation.dependFieldName();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(
-			final Object value, 
-			final ConstraintValidatorContext context) {
-		boolean valid = true;
-		
+	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+
 		try {
-			String fieldValue       = BeanUtils.getProperty(value, fieldName);
-            String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			
+			var valid = true;
+			var fieldValue = BeanUtils.getProperty(value, fieldName);
+            var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
             if (expectedFieldValue.equals(fieldValue) && dependFieldValue.isEmpty()) {
-            	context.buildConstraintViolationWithTemplate(
-            			MessageHelper.getInstance().getMessage("NotEmpty"))
-                    .addNode(dependFieldName)
-                    .addConstraintViolation();
-                    valid = false;
+				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
+            	context.buildConstraintViolationWithTemplate(msg).addNode(dependFieldName).addConstraintViolation();
+				valid = false;
             }
-			
+			if (!valid) {
+				context.disableDefaultConstraintViolation();
+			}
+			return valid;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
-		
-		if (!valid)
-			context.disableDefaultConstraintViolation();
-		
-        return valid;
 	}
-
 }

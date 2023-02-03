@@ -3,13 +3,11 @@
  */
 package es.caib.notib.back.validation;
 
-import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.service.EntitatService;
 import es.caib.notib.back.command.EntitatCommand;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -24,18 +22,18 @@ import javax.validation.ConstraintValidatorContext;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<EntitatValorsNoRepetits, EntitatCommand> {
 
 	private HttpServletRequest request;
-
 	@Autowired
 	private EntitatService entitatService;
 
 
-
 	@Override
 	public void initialize(final EntitatValorsNoRepetits constraintAnnotation) {
-		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+
+		var attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		request = attr.getRequest();
 	}
 
@@ -44,13 +42,13 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 	public boolean isValid(final EntitatCommand entitatCommand, final ConstraintValidatorContext context) {
 
 		try {
-			final Long id = entitatCommand.getId();
-			final String codi = entitatCommand.getCodi();
-			final String dir3 = entitatCommand.getDir3Codi();
-			boolean valid = true;
+			final var id = entitatCommand.getId();
+			final var codi = entitatCommand.getCodi();
+			final var dir3 = entitatCommand.getDir3Codi();
+			var valid = true;
 
 			// Comprovar codi no repetit
-			EntitatDto entitat = entitatService.findByCodi(codi);
+			var entitat = entitatService.findByCodi(codi);
 			if (entitat != null  && (id != null && !id.equals(entitat.getId()) && codi.equals(entitat.getCodi()) || id == null && codi.equals(entitat.getCodi()))) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
@@ -68,8 +66,7 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 			if (entitatCommand.isOficinaEntitat() && (entitatCommand.getOficina() == null || entitatCommand.getOficina().isEmpty())) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-						.addNode("oficina").addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty")).addNode("oficina").addConstraintViolation();
 			}
 			if (!entitatCommand.isEntregaCieActiva()) {
 				return valid;
@@ -84,17 +81,14 @@ public class EntitatValorsNoRepetitsValidator implements ConstraintValidator<Ent
 			if (entitatCommand.getCieId() == null) {
 				valid = false;
 				context.disableDefaultConstraintViolation();
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
-						.addNode("cieId").addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty")).addNode("cieId").addConstraintViolation();
 			}
 			return valid;
         } catch (Exception ex) {
-        	LOGGER.error("Error al validar si el codi d'entitat és únic", ex);
+        	log.error("Error al validar si el codi d'entitat és únic", ex);
         	MissatgesHelper.error(request, "Error inesperat en la validació de les dades de l'entitat.");
-        }
-        return false;
+			return false;
+		}
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(EntitatValorsNoRepetitsValidator.class);
 
 }

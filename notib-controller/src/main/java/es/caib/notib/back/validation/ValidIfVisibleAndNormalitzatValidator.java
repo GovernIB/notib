@@ -21,7 +21,6 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
 
 	private String fieldNameVisible;
 	private String expectedFieldValueVisible;
-	
 	private String fieldName;
     private NotificaDomiciliConcretTipus expectedFieldValue;
     private String dependFieldName;
@@ -29,68 +28,61 @@ public class ValidIfVisibleAndNormalitzatValidator implements ConstraintValidato
 	
 	@Override
 	public void initialize(ValidIfVisibleAndNormalitzat annotation) {
-		fieldNameVisible   = annotation.fieldNameVisible();
+
+		fieldNameVisible = annotation.fieldNameVisible();
 		expectedFieldValueVisible = annotation.fieldValueVisble();
-		
-		fieldName          		= annotation.fieldName();
-	    expectedFieldValue 		= annotation.fieldValue();
-	    dependFieldName    		= annotation.dependFieldName();
-	    dependFieldNameSecond   = annotation.dependFieldNameSecond();
+		fieldName = annotation.fieldName();
+	    expectedFieldValue = annotation.fieldValue();
+	    dependFieldName = annotation.dependFieldName();
+	    dependFieldNameSecond = annotation.dependFieldNameSecond();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(
-			final Object value, 
-			final ConstraintValidatorContext context) {
+	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
 		
-		boolean valid = true;
+		var valid = true;
 		try {
-            boolean dependFieldValueEmpty = true;
-            boolean validarDependFieldNameSecondValue = true;
-            
-			String fieldValueVisible       = BeanUtils.getProperty(value, fieldNameVisible);
-			String fieldValue       = BeanUtils.getProperty(value, fieldName);
-            String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-            String dependFieldNameSecondValue = BeanUtils.getProperty(value, dependFieldNameSecond);
-            
+			var dependFieldValueEmpty = true;
+			var validarDependFieldNameSecondValue = true;
+			var fieldValueVisible = BeanUtils.getProperty(value, fieldNameVisible);
+			var fieldValue = BeanUtils.getProperty(value, fieldName);
+			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
+			var dependFieldNameSecondValue = BeanUtils.getProperty(value, dependFieldNameSecond);
             if (dependFieldValue != null) {
             	dependFieldValue = dependFieldValue.replaceAll(",", "");
             	dependFieldValueEmpty  = dependFieldValue.isEmpty();
             }
             
             if (dependFieldValue != null && dependFieldNameSecondValue != null) {
-	            if (fieldValue.equals("NACIONAL") && 
-	            		(dependFieldName.equals("puntKm") && dependFieldValue.isEmpty()) &&
-	            		(dependFieldNameSecond.equals("numeroCasa") && !dependFieldNameSecondValue.isEmpty())) {
-	            	validarDependFieldNameSecondValue = false;
+	            if (fieldValue.equals("NACIONAL") && (dependFieldName.equals("puntKm") && dependFieldValue.isEmpty())
+					&& (dependFieldNameSecond.equals("numeroCasa") && !dependFieldNameSecondValue.isEmpty())) {
+
+					validarDependFieldNameSecondValue = false;
 	            }
 	            
-	            if (fieldValue.equals("NACIONAL") && 
-	            		(dependFieldName.equals("numeroCasa") && dependFieldValue.isEmpty()) && 
-	            		(dependFieldNameSecond.equals("puntKm") && !dependFieldNameSecondValue.isEmpty())) {
-	            	validarDependFieldNameSecondValue = false;
+	            if (fieldValue.equals("NACIONAL") && (dependFieldName.equals("numeroCasa") && dependFieldValue.isEmpty())
+					&& (dependFieldNameSecond.equals("puntKm") && !dependFieldNameSecondValue.isEmpty())) {
+
+					validarDependFieldNameSecondValue = false;
 	            }
             }
             
-            if (expectedFieldValueVisible.equals(fieldValueVisible) && 
-            		fieldValue.equalsIgnoreCase(expectedFieldValue.name()) && 
-            		dependFieldValueEmpty &&
-            		validarDependFieldNameSecondValue) {
-            	context.buildConstraintViolationWithTemplate(
-            			MessageHelper.getInstance().getMessage("NotEmpty"))
-                    .addNode(dependFieldName)
-                    .addConstraintViolation();
-                    valid = false;
+            if (expectedFieldValueVisible.equals(fieldValueVisible) && fieldValue.equalsIgnoreCase(expectedFieldValue.name())
+				&& dependFieldValueEmpty && validarDependFieldNameSecondValue) {
+
+				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
+            	context.buildConstraintViolationWithTemplate(msg).addNode(dependFieldName).addConstraintViolation();
+				valid = false;
             }
+			if (!valid) {
+				context.disableDefaultConstraintViolation();
+			}
+			return valid;
 			
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
-		if (!valid)
-			context.disableDefaultConstraintViolation();
-		
-        return valid;
 	}
 
 }

@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 
 import es.caib.notib.back.helper.MessageHelper;
@@ -18,6 +19,7 @@ import es.caib.notib.back.helper.MessageHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class ValidDir3CodiIfAdmValidator implements ConstraintValidator<ValidDir3CodiIfAdm, Object> {
 
 	private String fieldName2;
@@ -28,41 +30,36 @@ public class ValidDir3CodiIfAdmValidator implements ConstraintValidator<ValidDir
 	
 	@Override
 	public void initialize(ValidDir3CodiIfAdm annotation) {
-		 fieldName           = annotation.fieldName();
-		 fieldName2          = annotation.fieldName2();
-	     expectedFieldValue  = annotation.fieldValue();
+
+		 fieldName = annotation.fieldName();
+		 fieldName2 = annotation.fieldName2();
+	     expectedFieldValue = annotation.fieldValue();
 	     expectedFieldValue2 = annotation.fieldValue2();
-	     dependFieldName     = annotation.dependFieldName();
+	     dependFieldName = annotation.dependFieldName();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(
-			final Object value, 
-			final ConstraintValidatorContext context) {
-		boolean valid = true;
-		
+	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+
+		var valid = true;
 		try {
-			String fieldValue       = BeanUtils.getProperty(value, fieldName);
-            String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			
-            String fieldValue2       = BeanUtils.getProperty(value, fieldName2);
-            
+			var fieldValue = BeanUtils.getProperty(value, fieldName);
+            var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
+            var fieldValue2 = BeanUtils.getProperty(value, fieldName2);
             if ((expectedFieldValue.equals(fieldValue) && dependFieldValue.isEmpty()) && (expectedFieldValue2.equals(fieldValue2))) {
-            	context.buildConstraintViolationWithTemplate(
-            			MessageHelper.getInstance().getMessage("NotEmpty"))
-                    .addNode(dependFieldName)
-                    .addConstraintViolation();
-                    valid = false;
+				var msg = MessageHelper.getInstance().getMessage("NotEmpty");
+            	context.buildConstraintViolationWithTemplate(msg).addNode(dependFieldName).addConstraintViolation();
+				valid = false;
             }
-			
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+			if (!valid) {
+				context.disableDefaultConstraintViolation();
+			}
+			return valid;
+		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
-		if (!valid)
-			context.disableDefaultConstraintViolation();
-		
-		return valid;
+
 	}
 
 }

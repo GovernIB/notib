@@ -2,7 +2,6 @@ package es.caib.notib.back.validation;
 
 import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.service.AplicacioService;
-import es.caib.notib.logic.intf.service.ProcedimentService;
 import es.caib.notib.back.command.UsuariCommand;
 import es.caib.notib.back.helper.EmailValidHelper;
 import es.caib.notib.back.helper.MessageHelper;
@@ -19,8 +18,6 @@ public class ValidUsuariValidator implements ConstraintValidator<ValidUsuari, Us
 
     @Autowired
     private AplicacioService aplicacioService;
-    @Autowired
-    private ProcedimentService procedimentService;
 
     @Override
     public void initialize(final ValidUsuari constraintAnnotation) {
@@ -30,14 +27,14 @@ public class ValidUsuariValidator implements ConstraintValidator<ValidUsuari, Us
     @Override
     public boolean isValid(final UsuariCommand usuari, final ConstraintValidatorContext context) {
 
-        boolean valid = true;
-        Locale locale = new Locale(SessioHelper.getIdioma(aplicacioService));
+        var valid = true;
+        var locale = new Locale(SessioHelper.getIdioma(aplicacioService));
         context.disableDefaultConstraintViolation();
         try {
             if (!Strings.isNullOrEmpty(usuari.getEmailAlt()) && !EmailValidHelper.isEmailValid(usuari.getEmailAlt())) {
                 valid = false;
-                context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale))
-                        .addNode("emailAlt").addConstraintViolation();
+                var msg = MessageHelper.getInstance().getMessage("entregadeh.form.valid.valid.email", null, locale);
+                context.buildConstraintViolationWithTemplate(msg).addNode("emailAlt").addConstraintViolation();
             }
         } catch (final Exception ex) {
             valid = false;

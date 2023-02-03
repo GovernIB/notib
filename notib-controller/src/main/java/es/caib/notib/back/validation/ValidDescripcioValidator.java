@@ -3,9 +3,8 @@ package es.caib.notib.back.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import es.caib.notib.back.helper.MessageHelper;
 
@@ -14,6 +13,7 @@ import es.caib.notib.back.helper.MessageHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class ValidDescripcioValidator implements ConstraintValidator<ValidDescripcio, Object> {
 	
 	private String fieldName;
@@ -24,45 +24,42 @@ public class ValidDescripcioValidator implements ConstraintValidator<ValidDescri
 	}
 
 	@Override
-	public boolean isValid(
-			final Object value,
-			final ConstraintValidatorContext context) {
+	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+
 		boolean valid = true;
 		try {
-			String fieldValue = BeanUtils.getProperty(value,  fieldName);
-			if (fieldValue == null || fieldValue.isEmpty())
+			var fieldValue = BeanUtils.getProperty(value,  fieldName);
+			if (fieldValue == null || fieldValue.isEmpty()) {
 				valid = true;
+			}
 			valid = validacioConcepte(fieldValue,context);
 		} catch (final Exception ex) {
-			LOGGER.error("Error en la validació del concepte", ex);
+			log.error("Error en la validació del concepte", ex);
 			valid = false;
 		}
-		if (!valid)
+		if (!valid) {
 			context.disableDefaultConstraintViolation();
-		
+		}
 		return valid;
 	}
+
 	// Validació del concepte
 	private static final String CONTROL_CARACTERS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;";
 	
 	@SuppressWarnings("deprecation")
 	private static boolean validacioConcepte(String concepte, final ConstraintValidatorContext context) {
-		char[] concepte_chars = concepte.toCharArray();
-		
-		boolean esCaracterValid = true;
-		for (int i = 0; esCaracterValid && i < concepte_chars.length; i++) {
+
+		var concepte_chars = concepte.toCharArray();
+		var esCaracterValid = true;
+		for (var i = 0; esCaracterValid && i < concepte_chars.length; i++) {
 			esCaracterValid = !(CONTROL_CARACTERS.indexOf(concepte_chars[i]) < 0);
 			if (!esCaracterValid) {
-				context
-				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte"))
-				.addNode("descripcio")
-				.addConstraintViolation();
+				var msg = MessageHelper.getInstance().getMessage("notificacio.form.valid.concepte");
+				context.buildConstraintViolationWithTemplate(msg).addNode("descripcio").addConstraintViolation();
 				break;
 			}
 	    }
 		return esCaracterValid;
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDescripcioValidator.class);	
 }

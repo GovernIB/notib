@@ -7,8 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,57 +24,50 @@ import es.caib.notib.back.helper.MissatgesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class CodiAplicacioNoRepetitValidator implements ConstraintValidator<CodiAplicacioNoRepetit, AplicacioCommand> {
 
 	private HttpServletRequest request;
-
 	@Autowired
 	private UsuariAplicacioService usuariAplicacioService;
 	
 	
 	@Override
 	public void initialize(final CodiAplicacioNoRepetit constraintAnnotation) {
-		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+
+		var attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		request = attr.getRequest();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(
-			final AplicacioCommand command, 
-			final ConstraintValidatorContext context) {
+	public boolean isValid(final AplicacioCommand command, final ConstraintValidatorContext context) {
+
 		try {
-			
-			final Long id = command.getId();
-			final String usuariCodi = command.getUsuariCodi();
-			final Long entitatId = command.getEntitatId();
-			
-			boolean valid = true;
+			final var id = command.getId();
+			final var usuariCodi = command.getUsuariCodi();
+			final var entitatId = command.getEntitatId();
+			var valid = true;
 			
 			// Comprovar codi no repetit
 //			AplicacioDto aplicacio = usuariAplicacioService.findByUsuariCodi(usuariCodi);
 			AplicacioDto aplicacio = usuariAplicacioService.findByEntitatAndUsuariCodi(entitatId, usuariCodi);
-			if (aplicacio != null) {
-				if (id == null) {
-					valid = false;
-				} else {
-					valid = ( id.longValue() == aplicacio.getId().longValue() );
-				}
-				if (!valid) {
-					context.disableDefaultConstraintViolation();
-					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("aplicacio.validation.codi.repetit")).addNode("usuariCodi").addConstraintViolation();
-				}
+			if (aplicacio == null) {
+				return valid;
 			}
-			
+			valid = id != null ? id.longValue() == aplicacio.getId().longValue() : false;
+			if (!valid) {
+				context.disableDefaultConstraintViolation();
+				var msg = MessageHelper.getInstance().getMessage("aplicacio.validation.codi.repetit");
+				context.buildConstraintViolationWithTemplate(msg).addNode("usuariCodi").addConstraintViolation();
+			}
 			return valid;
 			
         } catch (final Exception ex) {
-        	LOGGER.error("Error al validar si el codi de l'aplicació és únic", ex);
+        	log.error("Error al validar si el codi de l'aplicació és únic", ex);
         	MissatgesHelper.error(request, "Error inesperat en la validació del codi de l'aplicació.");
-        }
-        return false;
+			return false;
+		}
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodiAplicacioNoRepetitValidator.class);
 
 }

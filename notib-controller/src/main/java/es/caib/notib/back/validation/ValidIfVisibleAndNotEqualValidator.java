@@ -27,43 +27,35 @@ public class ValidIfVisibleAndNotEqualValidator implements ConstraintValidator<V
 	
 	@Override
 	public void initialize(ValidIfVisibleAndNotEqual annotation) {
-		 fieldName          = annotation.fieldName();
+
+		 fieldName = annotation.fieldName();
 	     expectedFieldValue = annotation.fieldValue();
-	     dependFieldName    = annotation.dependFieldName();
+	     dependFieldName = annotation.dependFieldName();
 	     noDependFieldName = annotation.noDependFieldName();
 	     noExpectedFieldValue = annotation.noExpectedFieldValue();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean isValid(
-			final Object value, 
-			final ConstraintValidatorContext context) {
-		boolean valid = true;
-		
+	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
+
 		try {
-			String fieldValue       = BeanUtils.getProperty(value, fieldName);
-			String noDependFieldValue = BeanUtils.getProperty(value, noDependFieldName);
-            String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			
-            if (expectedFieldValue.equals(fieldValue) && 
-            		dependFieldValue.isEmpty() &&
-            		!noDependFieldValue.equalsIgnoreCase(noExpectedFieldValue.name())) {
-            	context.buildConstraintViolationWithTemplate(
-            			MessageHelper.getInstance().getMessage("NotEmpty"))
-                    .addNode(dependFieldName)
-                    .addConstraintViolation();
-                    valid = false;
+			var valid = true;
+			var fieldValue = BeanUtils.getProperty(value, fieldName);
+			var noDependFieldValue = BeanUtils.getProperty(value, noDependFieldName);
+            var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
+            if (expectedFieldValue.equals(fieldValue) && dependFieldValue.isEmpty() && !noDependFieldValue.equalsIgnoreCase(noExpectedFieldValue.name())) {
+            	var msg = MessageHelper.getInstance().getMessage("NotEmpty");
+				context.buildConstraintViolationWithTemplate(msg).addNode(dependFieldName).addConstraintViolation();
+				valid = false;
             }
-			
+			if (!valid) {
+				context.disableDefaultConstraintViolation();
+			}
+			return valid;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             throw new RuntimeException(ex);
         }
-		
-		if (!valid)
-			context.disableDefaultConstraintViolation();
-		
-        return valid;
 	}
 
 }

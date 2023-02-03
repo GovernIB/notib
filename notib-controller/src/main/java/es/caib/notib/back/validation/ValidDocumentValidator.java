@@ -5,9 +5,8 @@ package es.caib.notib.back.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import es.caib.notib.logic.intf.dto.TipusDocumentEnumDto;
 import es.caib.notib.back.helper.MessageHelper;
@@ -17,6 +16,7 @@ import es.caib.notib.back.helper.MessageHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class ValidDocumentValidator implements ConstraintValidator<ValidDocument, Object> {
 
 	String fieldName;
@@ -24,60 +24,41 @@ public class ValidDocumentValidator implements ConstraintValidator<ValidDocument
 	
 	@Override
 	public void initialize(final ValidDocument constraintAnnotation) {
-		fieldName 		= constraintAnnotation.fieldName();
+
+		fieldName = constraintAnnotation.fieldName();
 		dependFieldName = constraintAnnotation.dependFieldName();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isValid(final Object value, final ConstraintValidatorContext context) {
-		boolean valid = true;
-		
+
+		var valid = true;
 		try {
-			
-			String FieldType = BeanUtils.getProperty(value, fieldName);
-			String dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
-			
+			var FieldType = BeanUtils.getProperty(value, fieldName);
+			var dependFieldValue = BeanUtils.getProperty(value, dependFieldName);
+			var msg = MessageHelper.getInstance().getMessage("NotEmpty");
 			if (FieldType == TipusDocumentEnumDto.URL.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
-				context
-				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("NotEmpty"))
-				.addNode("documentArxiuUrl")
-				.addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUrl").addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.UUID.name() && (dependFieldValue == null || dependFieldValue.isEmpty())) {
-				context
-				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("NotEmpty"))
-				.addNode("documentArxiuUuid")
-				.addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuUuid").addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.ARXIU.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
-				context
-				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("NotEmpty"))
-				.addNode("arxiu")
-				.addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(msg).addNode("arxiu").addConstraintViolation();
 				valid = false;
 			} else if (FieldType == TipusDocumentEnumDto.CSV.name() && (dependFieldValue == null || dependFieldValue.isEmpty())){
-				context
-				.buildConstraintViolationWithTemplate(
-						MessageHelper.getInstance().getMessage("NotEmpty"))
-				.addNode("documentArxiuCsv")
-				.addConstraintViolation();
+				context.buildConstraintViolationWithTemplate(msg).addNode("documentArxiuCsv").addConstraintViolation();
 				valid = false;
 			} 
 		} catch (final Exception ex) {
-        	LOGGER.error("Ha d'informar el email quan hi ha entrega DEH", ex);
+        	log.error("Ha d'informar el email quan hi ha entrega DEH", ex);
         	valid = false;
         }
-		
-		if (!valid)
+		if (!valid) {
 			context.disableDefaultConstraintViolation();
-		
+		}
 		return valid;
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ValidDocumentValidator.class);
 
 }

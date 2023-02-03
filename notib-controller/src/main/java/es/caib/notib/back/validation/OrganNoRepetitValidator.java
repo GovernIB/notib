@@ -10,6 +10,7 @@ import es.caib.notib.logic.intf.service.OrganGestorService;
 import es.caib.notib.back.command.OrganGestorCommand;
 import es.caib.notib.back.helper.MessageHelper;
 import es.caib.notib.back.helper.MissatgesHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,10 @@ import javax.validation.ConstraintValidatorContext;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepetit, OrganGestorCommand> {
 
 	private HttpServletRequest request;
-
 	@Autowired
 	private OrganGestorService organGestorService;
 	@Autowired
@@ -38,25 +39,20 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 	
 	@Override
 	public void initialize(final OrganNoRepetit constraintAnnotation) {
-		ServletRequestAttributes attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+
+		var attr = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		request = attr.getRequest();
 	}
 
 	@Override
-	public boolean isValid(
-			final OrganGestorCommand command, 
-			final ConstraintValidatorContext context) {
+	public boolean isValid(final OrganGestorCommand command, final ConstraintValidatorContext context) {
 
-		boolean valid = true;
-		
+		var valid = true;
 		try {
-			
-			final String codi = command.getCodi();
-			final Long id = command.getId();
-
+			final var codi = command.getCodi();
+			final var id = command.getId();
 			if (command.getEntitatId() == null) {
-				valid = false;
-				LOGGER.error("La entitat no pot estar buida");
+				log.error("La entitat no pot estar buida");
 				throw new Exception();
 			}
 			
@@ -99,16 +95,14 @@ public class OrganNoRepetitValidator implements ConstraintValidator<OrganNoRepet
 			
         } catch (final Exception ex) {
         	valid = false;
-        	LOGGER.error("Error al validar si el codi de l'òrgan gestor és únic", ex);
+        	log.error("Error al validar si el codi de l'òrgan gestor és únic", ex);
         	MissatgesHelper.error(request, "Error inesperat en la validació del codi de l'òrgan gestor.");
         }
        	if (!valid) {
 			context.disableDefaultConstraintViolation();
 		}
-       	
        	return valid;
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(OrganNoRepetitValidator.class);
 
 }
