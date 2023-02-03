@@ -9,13 +9,11 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 //import org.fundaciobit.genapp.common.utils.Utils;
@@ -42,7 +40,8 @@ public abstract class RegWeb3Utils {
 	}
 
 	protected String getEndPoint(String api) {
-		String url = properties.getProperty("es.caib.notib.plugin.registre.url");
+
+		var url = properties.getProperty("es.caib.notib.plugin.registre.url");
 		if (!url.endsWith("/")) {
 			url = url + "/";
 		}
@@ -59,8 +58,8 @@ public abstract class RegWeb3Utils {
 
 	protected void configAddressUserPassword(String usr, String pwd, String endpoint, Object api) {
 
-		BindingProvider bp = (BindingProvider) api;
-		Map<String, Object> reqContext = bp.getRequestContext();
+		var bp = (BindingProvider) api;
+		var reqContext = bp.getRequestContext();
 		reqContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
 		reqContext.put(BindingProvider.USERNAME_PROPERTY, usr);
 		reqContext.put(BindingProvider.PASSWORD_PROPERTY, pwd);
@@ -71,31 +70,23 @@ public abstract class RegWeb3Utils {
 
 	protected RegWebHelloWorldWs getHelloWorldApi() throws Exception {
 
-		final String endpoint = getEndPoint(HELLO_WORLD);
-		final URL wsdl = new URL(endpoint + "?wsdl");
-
-
-		RegWebHelloWorldWsService helloService = new RegWebHelloWorldWsService(wsdl);
-		RegWebHelloWorldWs helloApi = helloService.getRegWebHelloWorldWs();
-
+		final var endpoint = getEndPoint(HELLO_WORLD);
+		final var wsdl = new URL(endpoint + "?wsdl");
+		var helloService = new RegWebHelloWorldWsService(wsdl);
+		var helloApi = helloService.getRegWebHelloWorldWs();
 		// Adreça servidor
-		Map<String, Object> reqContext = ((BindingProvider) helloApi).getRequestContext();
+		var reqContext = ((BindingProvider) helloApi).getRequestContext();
 		reqContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, endpoint);
-
 		return helloApi;
-
 	}
 
 	protected RegWebHelloWorldWithSecurityWs getHelloWorldWithSecurityApi() throws Exception {
 
-		final String endpoint = getEndPoint(HELLO_WORLD_WITH_SECURITY);
-		final URL wsdl = new URL(endpoint + "?wsdl");
-		
-		RegWebHelloWorldWithSecurityWsService service = new RegWebHelloWorldWithSecurityWsService(wsdl);
-		RegWebHelloWorldWithSecurityWs api = service.getRegWebHelloWorldWithSecurityWs();
-
+		final var endpoint = getEndPoint(HELLO_WORLD_WITH_SECURITY);
+		final var wsdl = new URL(endpoint + "?wsdl");
+		var service = new RegWebHelloWorldWithSecurityWsService(wsdl);
+		var api = service.getRegWebHelloWorldWithSecurityWs();
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
-		
 		return api;
 	}
 
@@ -103,25 +94,19 @@ public abstract class RegWeb3Utils {
 		
 		final String endpoint = getEndPoint(REGWEB3_PERSONAS);
 		final URL wsdl = new URL(endpoint + "?wsdl");
-		
-		RegWebPersonasWsService service = new RegWebPersonasWsService(wsdl);
-		RegWebPersonasWs api = service.getRegWebPersonasWs();
-
+		var service = new RegWebPersonasWsService(wsdl);
+		var api = service.getRegWebPersonasWs();
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
-		
 		return api;
 	}
 
 	protected RegWebRegistroEntradaWs getRegistroEntradaApi() throws Exception {
-		final String endpoint = getEndPoint(REGWEB3_REGISTRO_ENTRADA);
 
-		final URL wsdl = new URL(endpoint + "?wsdl");
-		RegWebRegistroEntradaWsService service = new RegWebRegistroEntradaWsService(wsdl);
-
-		RegWebRegistroEntradaWs api = service.getRegWebRegistroEntradaWs();
-
+		final var endpoint = getEndPoint(REGWEB3_REGISTRO_ENTRADA);
+		final var wsdl = new URL(endpoint + "?wsdl");
+		var service = new RegWebRegistroEntradaWsService(wsdl);
+		var api = service.getRegWebRegistroEntradaWs();
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
-
 		return api;
 	}
 
@@ -129,49 +114,36 @@ public abstract class RegWeb3Utils {
 		
 		final String endpoint = getEndPoint(REGWEB3_REGISTRO_SALIDA);
 		final URL wsdl = new URL(endpoint + "?wsdl");
-		
-		RegWebRegistroSalidaWsService service = new RegWebRegistroSalidaWsService(wsdl);
-		RegWebRegistroSalidaWs api = service.getRegWebRegistroSalidaWs();
-
+		var service = new RegWebRegistroSalidaWsService(wsdl);
+		var api = service.getRegWebRegistroSalidaWs();
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
-
 		return api;
 	}
 
 	protected RegWebAsientoRegistralWs getAsientoRegistralApi() throws Exception {
 		
-		final String endpoint = getEndPoint(REGWEB3_ASIENTO_REGISTRAL);
-		final URL wsdl = new URL(endpoint + "?wsdl");
-		
-		RegWebAsientoRegistralWsService service = new RegWebAsientoRegistralWsService(wsdl);
-		RegWebAsientoRegistralWs api = service.getRegWebAsientoRegistralWs();
-
+		final var endpoint = getEndPoint(REGWEB3_ASIENTO_REGISTRAL);
+		final var wsdl = new URL(endpoint + "?wsdl");
+		var service = new RegWebAsientoRegistralWsService(wsdl);
+		var api = service.getRegWebAsientoRegistralWs();
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
-
 		return api;
 	}
 
 	protected RegWebInfoWs getInfoApi() throws Exception  {
 		
-		final String endpoint = getEndPoint(REGWEB3_INFO);
-		final URL wsdl = new URL(endpoint + "?wsdl");
-		
-		RegWebInfoWsService service = new RegWebInfoWsService(wsdl);
-		RegWebInfoWs api = service.getRegWebInfoWs();
-
+		final var endpoint = getEndPoint(REGWEB3_INFO);
+		final var wsdl = new URL(endpoint + "?wsdl");
+		var service = new RegWebInfoWsService(wsdl);
+		var api = service.getRegWebInfoWs();
 		configAddressUserPassword(getAppUserName(), getAppPassword(), endpoint, api);
-
 		return api;
 	}
 
 	protected byte[] constructFitxerFromResource(String name) throws Exception  {
-		String filename;
-		if (name.startsWith("/")) {
-			filename = name.substring(1);
-		} else {
-			filename = '/' + name; 
-		}
-		InputStream is = RegWeb3Utils.class.getResourceAsStream(filename);
+
+		var filename = name.startsWith("/") ? name.substring(1) : '/' + name;
+		var is = RegWeb3Utils.class.getResourceAsStream(filename);
 		if (is == null) {
 			return null;
 		}
@@ -183,21 +155,18 @@ public abstract class RegWeb3Utils {
 			} catch (Exception e) {
 			}
 		}
-
 	}
 	
 	protected Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
-		if (calendar == null) {
-			return null;
-		}
-		return calendar.toGregorianCalendar().getTime();
+		return calendar != null ? calendar.toGregorianCalendar().getTime() : null;
 	}
 	
 	protected XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
+
 		if (date == null) {
 			return null;
 		}
-		GregorianCalendar gc = new GregorianCalendar();
+		var gc = new GregorianCalendar();
 		gc.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
 	}

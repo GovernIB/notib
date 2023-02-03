@@ -23,9 +23,9 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 	}
 
 	@Override
-	public DadesUsuari consultarAmbCodi(
-			String usuariCodi) {
-		DadesUsuari dadesUsuari = new DadesUsuari();
+	public DadesUsuari consultarAmbCodi(String usuariCodi) {
+
+		var dadesUsuari = new DadesUsuari();
 		dadesUsuari.setCodi(usuariCodi);
 		dadesUsuari.setNomSencer(usuariCodi);
 		dadesUsuari.setEmail(usuariCodi + "@aqui.es");
@@ -33,14 +33,12 @@ public class DadesUsuariPluginMock implements DadesUsuariPlugin {
 	}
 
 	@Override
-	public List<DadesUsuari> consultarAmbGrup(
-			String grupCodi) throws SistemaExternException {
+	public List<DadesUsuari> consultarAmbGrup(String grupCodi) throws SistemaExternException {
 		throw new SistemaExternException("Mètode no implementat");
 	}
 
 	@Override
-	public List<String> consultarRolsAmbCodi(
-			String usuariCodi) throws SistemaExternException {
+	public List<String> consultarRolsAmbCodi(String usuariCodi) throws SistemaExternException {
 		return Arrays.asList("NOT_SUPER", "NOT_ADMIN", "NOT_CARPETA", "NOT_APL", "tothom");
 	}
 

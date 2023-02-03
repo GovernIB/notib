@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -27,11 +26,13 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 	}
 
 	public boolean handleMessage(SOAPMessageContext messageContext) {
+
 		log(messageContext);
 		return true;
 	}
 
 	public boolean handleFault(SOAPMessageContext messageContext) {
+
 		log(messageContext);
 		return true;
 	}
@@ -44,11 +45,11 @@ public class SOAPLoggingHandler implements SOAPHandler<SOAPMessageContext> {
 		if (!LOGGER.isDebugEnabled()) {
 			return;
 		}
-		StringBuilder sb = new StringBuilder();
-		Boolean outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+		var sb = new StringBuilder();
+		var outboundProperty = (Boolean)messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
 		sb.append(outboundProperty.booleanValue() ? "Missarge sortint: " : "Missarge entrant: ");
-		SOAPMessage message = messageContext.getMessage();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		var message = messageContext.getMessage();
+		var baos = new ByteArrayOutputStream();
 		try {
 			message.writeTo(baos);
 			sb.append(baos);

@@ -1,6 +1,5 @@
 package es.caib.notib.plugin.registre;
 
-import es.caib.notib.logic.intf.dto.AnexoWsDto;
 import es.caib.notib.logic.intf.dto.AsientoRegistralBeanDto;
 import es.caib.notib.logic.intf.dto.InteresadoWsDto;
 import es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto;
@@ -8,8 +7,7 @@ import es.caib.notib.logic.intf.dto.PersonaDto;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDocumentTipusDtoEnum;
 import es.caib.notib.logic.intf.dto.RegistreInteressatDto;
 import es.caib.regweb3.ws.api.v3.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
@@ -27,7 +25,7 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-
+@Slf4j
 public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistrePlugin{
 	
 	public static final String GESDOC_AGRUPACIO_NOTIFICACIONS = "notificacions";
@@ -40,55 +38,36 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 
 	@Override
-	public RespostaConsultaRegistre salidaAsientoRegistral(
-			String codiDir3Entitat, 
-			AsientoRegistralBeanDto arb, 
-			Long tipusOperacio,
-			boolean generarJustificant) {
-		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
-		
-			try {			
-				AsientoRegistralWs asiento = toAsientoRegistralBean(arb);
-				return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(
-						null,
-						codiDir3Entitat, 
-						asiento, 
-						tipusOperacio,
-						generarJustificant,
-						false));
-			} catch (WsI18NException e) {
-				rc.setErrorCodi("0");
-				rc.setErrorDescripcio(e.getMessage());
-				return rc;
-			} catch (WsValidationException e) {
-				rc.setErrorCodi("1");
-				rc.setErrorDescripcio(e.getMessage());
-				return rc;
-			} catch (Exception e) {
-				e.printStackTrace();
-				rc.setErrorCodi("2");
-				rc.setErrorDescripcio(e.getMessage());
-				return rc;
-			}	
-		
+	public RespostaConsultaRegistre salidaAsientoRegistral(String codiDir3Entitat, AsientoRegistralBeanDto arb, Long tipusOperacio, boolean generarJustificant) {
+
+		var rc = new RespostaConsultaRegistre();
+		try {
+			var asiento = toAsientoRegistralBean(arb);
+			return toRespostaConsultaRegistre(getAsientoRegistralApi().crearAsientoRegistral(null, codiDir3Entitat, asiento, tipusOperacio, generarJustificant, false));
+		} catch (WsI18NException e) {
+			rc.setErrorCodi("0");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (WsValidationException e) {
+			rc.setErrorCodi("1");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		} catch (Exception e) {
+			e.printStackTrace();
+			rc.setErrorCodi("2");
+			rc.setErrorDescripcio(e.getMessage());
+			return rc;
+		}
 	}
 	
 	@Override
-	public RespostaConsultaRegistre obtenerAsientoRegistral(
-			String codiDir3Entitat, 
-			String numeroRegistre,
-			Long tipusOperacio,
-			boolean ambAnnexos) {
-		RespostaConsultaRegistre rc = new RespostaConsultaRegistre();
+	public RespostaConsultaRegistre obtenerAsientoRegistral(String codiDir3Entitat, String numeroRegistre, Long tipusOperacio, boolean ambAnnexos) {
+
+		var rc = new RespostaConsultaRegistre();
 		try {
 //			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//			logger.info(ow.writeValueAsString(arb.getInteresados()));
-			AsientoRegistralWs asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(
-					codiDir3Entitat, 
-					numeroRegistre, 
-					tipusOperacio, 
-					ambAnnexos);
-			
+//			log.info(ow.writeValueAsString(arb.getInteresados()));
+			var asientoRegistralWs = getAsientoRegistralApi().obtenerAsientoRegistral(codiDir3Entitat, numeroRegistre, tipusOperacio, ambAnnexos);
 			return toRespostaConsultaRegistre(asientoRegistralWs);
 		} catch (WsI18NException e) {
 			rc.setErrorCodi("0");
@@ -107,16 +86,11 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 	
 	@Override
-	public RespostaJustificantRecepcio obtenerJustificante(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat, 
-			long tipusRegistre){
-		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+	public RespostaJustificantRecepcio obtenerJustificante(String codiDir3Entitat, String numeroRegistreFormatat, long tipusRegistre){
+
+		var rj = new RespostaJustificantRecepcio();
 		try {
-			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(
-					codiDir3Entitat, 
-					numeroRegistreFormatat, 
-					tipusRegistre));
+			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerJustificante(codiDir3Entitat, numeroRegistreFormatat, tipusRegistre));
 //			return toRespostaJustificantRecepcio(getRegistroSalidaApi().obtenerJustificante(
 //					codiDir3Entitat, 
 //					numeroRegistreFormatat));
@@ -137,10 +111,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 	
 	@Override
-	public RespostaJustificantRecepcio obtenerOficioExterno(
-			String codiDir3Entitat, 
-			String numeroRegistreFormatat) {
-		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+	public RespostaJustificantRecepcio obtenerOficioExterno(String codiDir3Entitat, String numeroRegistreFormatat) {
+
+		var rj = new RespostaJustificantRecepcio();
 		try {
 			return toRespostaJustificantRecepcio(getAsientoRegistralApi().obtenerOficioExterno(codiDir3Entitat, numeroRegistreFormatat));
 		} catch (WsI18NException e) {
@@ -158,20 +131,23 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		}
 	}
 
-	public RespostaJustificantRecepcio toRespostaJustificantRecepcio(JustificanteWs ofici){
-		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+	public RespostaJustificantRecepcio toRespostaJustificantRecepcio(JustificanteWs ofici) {
+
+		var rj = new RespostaJustificantRecepcio();
 		rj.setJustificant(ofici.getJustificante());
 		return rj;
 	}
 
-	public RespostaJustificantRecepcio toRespostaJustificantRecepcio(OficioWs ofici){
-		RespostaJustificantRecepcio rj = new RespostaJustificantRecepcio();
+	public RespostaJustificantRecepcio toRespostaJustificantRecepcio(OficioWs ofici) {
+
+		var rj = new RespostaJustificantRecepcio();
 		rj.setJustificant(ofici.getOficio());
 		return rj;
 	}
 
 	private AsientoRegistralWs toAsientoRegistralBean(AsientoRegistralBeanDto dto) {
-		AsientoRegistralWs ar = new AsientoRegistralWs();
+
+		var ar = new AsientoRegistralWs();
 		ar.setAplicacion(dto.getAplicacion());
 		ar.setAplicacionTelematica(dto.getAplicacionTelematica());
 		ar.setCodigoAsunto(dto.getCodigoAsunto());
@@ -219,8 +195,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		ar.setUnidadTramitacionOrigenCodigo(dto.getUnidadTramitacionOrigenCodigo());
 		ar.setUnidadTramitacionOrigenDenominacion(dto.getUnidadTramitacionOrigenDenominacion());
 		if(dto.getAnexos() != null) {
-			for (AnexoWsDto anexo: dto.getAnexos()) {
-				AnexoWs anexe = new AnexoWs();
+			AnexoWs anexe;
+			for (var anexo: dto.getAnexos()) {
+				anexe = new AnexoWs();
 				anexe.setCsv(anexo.getCsv());
 				anexe.setFicheroAnexado(anexo.getFicheroAnexado());
 				anexe.setFirmaAnexada(anexo.getFirmaAnexada());
@@ -240,8 +217,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		}
 		//Interessat + representant
 		if (dto.getInteresados() != null) {
-			for (InteresadoWsDto interessatWsDto : dto.getInteresados()) {
-				InteresadoWs interessat = interesadoWsDtoToInteresadoWs(interessatWsDto);
+			InteresadoWs interessat;
+			for (var interessatWsDto : dto.getInteresados()) {
+				interessat = interesadoWsDtoToInteresadoWs(interessatWsDto);
 				ar.getInteresados().add(interessat);
 			}
 		}
@@ -250,8 +228,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 	
 	public RespostaAnotacioRegistre toRespostaAnotacioRegistre(IdentificadorWs iw) throws DatatypeConfigurationException {
-		RespostaAnotacioRegistre resposta = new RespostaAnotacioRegistre();
-		
+
+		var resposta = new RespostaAnotacioRegistre();
 		resposta.setData(new Timestamp(System.currentTimeMillis()));
 		resposta.setNumeroRegistroFormateado(iw.getNumeroRegistroFormateado());
 		resposta.setNumero(String.valueOf(iw.getNumero()));
@@ -259,7 +237,8 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 	
 	public RespostaConsultaRegistre toRespostaConsultaRegistre(AsientoRegistralWs ar) {
-		RespostaConsultaRegistre resposta = new RespostaConsultaRegistre();
+
+		var resposta = new RespostaConsultaRegistre();
 		resposta.setRegistreNumeroFormatat(ar.getNumeroRegistroFormateado());
 		resposta.setRegistreNumero(Integer.toString(ar.getNumeroRegistro()));
 		resposta.setRegistreData(timeStampToDate(ar.getFechaRegistro()));
@@ -270,45 +249,45 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 		resposta.setCodigoEntidadRegistralProcesado(ar.getCodigoEntidadRegistralProcesado());
 		resposta.setDecodificacionEntidadRegistralProcesado(ar.getDecodificacionEntidadRegistralProcesado());
 		switch(ar.getEstado().intValue()) {
-		case 1:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
-			break;
-		case 2:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.RESERVA);
-			break;
-		case 3:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
-			break;
-		case 4:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_EXTERN);
-			break;
-		case 5:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_INTERN);
-			break;
-		case 6:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
-			break;
-		case 7:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUIT);
-			break;
-		case 8:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.ANULAT);
-			break;
-		case 9:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.RECTIFICAT);
-			break;
-		case 10:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.REBUTJAT);
-			break;
-		case 11:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.REENVIAT);
-			break;
-		case 12:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUINT);
-			break;
-		case 13:
-			resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_SIR);
-			break;
+			case 1:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.VALID);
+				break;
+			case 2:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.RESERVA);
+				break;
+			case 3:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.PENDENT);
+				break;
+			case 4:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_EXTERN);
+				break;
+			case 5:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_INTERN);
+				break;
+			case 6:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_ACCEPTAT);
+				break;
+			case 7:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUIT);
+				break;
+			case 8:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.ANULAT);
+				break;
+			case 9:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.RECTIFICAT);
+				break;
+			case 10:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.REBUTJAT);
+				break;
+			case 11:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.REENVIAT);
+				break;
+			case 12:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.DISTRIBUINT);
+				break;
+			case 13:
+				resposta.setEstat(NotificacioRegistreEstatEnumDto.OFICI_SIR);
+				break;
 		}
 		resposta.setEntitatCodi(ar.getEntidadCodigo());
 		resposta.setEntitatDenominacio(ar.getEntidadDenominacion());
@@ -320,15 +299,18 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 
 	private Date timeStampToDate(Timestamp timestamp) {
-		if (timestamp == null)
+
+		if (timestamp == null) {
 			return null;
-		Calendar cal = Calendar.getInstance();
+		}
+		var cal = Calendar.getInstance();
 		cal.setTimeInMillis(timestamp.getTime());
 		return cal.getTime();
 	}
 	
 	public RegistreInteressatDto personaToRegistreInteresatDto (PersonaDto persona) {
-		RegistreInteressatDto interessat = new RegistreInteressatDto();
+
+		var interessat = new RegistreInteressatDto();
 		interessat.setNom(persona.getNom());
 		interessat.setLlinatge1(persona.getLlinatge1());
 		interessat.setLlinatge2(persona.getLlinatge2());
@@ -340,8 +322,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 	
 	public InteresadoWs personaToInteresadoWs (PersonaDto persona) {
-		InteresadoWs interessat = new InteresadoWs();
-		DatosInteresadoWs interessatDades = new DatosInteresadoWs();
+
+		var interessat = new InteresadoWs();
+		var interessatDades = new DatosInteresadoWs();
 		interessatDades.setTipoInteresado(persona.getInteressatTipus().getLongVal());
 		interessatDades.setTipoDocumentoIdentificacion("N");
 		interessatDades.setDocumento(persona.getNif());
@@ -360,9 +343,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	}
 	
 	public InteresadoWs interesadoWsDtoToInteresadoWs(InteresadoWsDto interesadoWsDto) {
-		InteresadoWs interessat = new InteresadoWs();
-		
-		if(interesadoWsDto.getInteresado() != null) {
+
+		var interessat = new InteresadoWs();
+		if (interesadoWsDto.getInteresado() != null) {
 			String nom = interesadoWsDto.getInteresado().getNombre();
 			String raoSocial = interesadoWsDto.getInteresado().getRazonSocial();
 			DatosInteresadoWs interessatDades = new DatosInteresadoWs();
@@ -387,7 +370,7 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			interessat.setInteresado(interessatDades);
 		}
 
-		if(interesadoWsDto.getRepresentante() != null) {
+		if (interesadoWsDto.getRepresentante() != null) {
 			String nom = interesadoWsDto.getRepresentante().getNombre();
 			String raoSocial = interesadoWsDto.getRepresentante().getRazonSocial();
 			DatosInteresadoWs representantDades = new DatosInteresadoWs();
@@ -411,14 +394,13 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 			representantDades.setProvincia(interesadoWsDto.getRepresentante().getProvincia());
 			interessat.setRepresentante(representantDades);
 		}
-		
 		return interessat;
 	}
 	
-	
 	public static DocumentBuilder getDocumentBuilder() throws Exception {
+
 		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			var dbf = DocumentBuilderFactory.newInstance();
 			dbf.setIgnoringComments(true);
 			dbf.setCoalescing(true);
 			dbf.setIgnoringElementContentWhitespace(true);
@@ -429,9 +411,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
     	}
 	}
 
-
 	@Override
 	public List<TipusAssumpte> llistarTipusAssumpte(String entitatcodi) throws RegistrePluginException {
+
 		try {
 			return toTipusAssumpte(getInfoApi().listarTipoAsunto(entitatcodi));
 		} catch (Exception ex) {
@@ -441,46 +423,40 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 	@Override
 	public List<CodiAssumpte> llistarCodisAssumpte(String entitatCodi, String tipusAssumpte) throws RegistrePluginException {
+
 		try {
-			return toCodisAssumpte(getInfoApi().listarCodigoAsunto(
-					entitatCodi,
-					tipusAssumpte));
+			return toCodisAssumpte(getInfoApi().listarCodigoAsunto(entitatCodi, tipusAssumpte));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error recuperant codi assumpte", ex);
 		}
 	}
 
 	@Override
-	public Oficina llistarOficinaVirtual(
-			String entitatCodi, 
-			String nomOficinaVirtualEntitat,
-			Long autoritzacioValor) throws RegistrePluginException {
-		List<Oficina> oficines = new ArrayList<Oficina>();
-		Oficina oficinaVirtual = new Oficina();
+	public Oficina llistarOficinaVirtual(String entitatCodi, String nomOficinaVirtualEntitat, Long autoritzacioValor) throws RegistrePluginException {
+
 		String nomOficinaVirtual = nomOficinaVirtualEntitat != null ? nomOficinaVirtualEntitat : OFICINA_VIRTUAL_DEFAULT;
 		try {
-			oficines = toOficines(getInfoApi().listarOficinas(
-					entitatCodi,
-					autoritzacioValor));
-			if (oficines != null) {
-				for (Oficina oficina : oficines) {
-					if (oficina.getNom().equalsIgnoreCase(nomOficinaVirtual)) {
-						oficinaVirtual = oficina;
-					}
+			var oficines = toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
+			if (oficines == null || oficines.isEmpty()) {
+				return new Oficina();
+			}
+			Oficina oficinaVirtual = new Oficina();
+			for (Oficina oficina : oficines) {
+				if (oficina.getNom().equalsIgnoreCase(nomOficinaVirtual)) {
+					oficinaVirtual = oficina;
 				}
 			}
+			return oficinaVirtual;
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error recuperant oficina virtual", ex);
 		}
-		return oficinaVirtual;
 	}
 	
 	@Override
 	public List<Oficina> llistarOficines(String entitatCodi, Long autoritzacioValor) throws RegistrePluginException {
+
 		try {
-			return toOficines(getInfoApi().listarOficinas(
-					entitatCodi,
-					autoritzacioValor));
+			return toOficines(getInfoApi().listarOficinas(entitatCodi, autoritzacioValor));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error obtenint les oficines", ex);
 		}
@@ -488,11 +464,9 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 	
 	@Override
 	public List<Llibre> llistarLlibres(String entitatCodi, String oficina, Long autoritzacioValor) throws RegistrePluginException {
+
 		try {
-			return toLlibres(getInfoApi().listarLibros(
-					entitatCodi,
-					oficina,
-					autoritzacioValor));
+			return toLlibres(getInfoApi().listarLibros(entitatCodi, oficina, autoritzacioValor));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error obtenint els llibres", ex);
 		}
@@ -500,62 +474,57 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 
 	@Override
 	public List<Organisme> llistarOrganismes(String entitatCodi) throws RegistrePluginException {
+
 		try {
-			return toOrganismes(getInfoApi().listarOrganismos(
-					entitatCodi));
+			return toOrganismes(getInfoApi().listarOrganismos(entitatCodi));
 		} catch (Exception ex) {
 			throw new RegistrePluginException("Error obtenint els organismes", ex);
 		}
 	}
 
 	@Override
-	public List<LlibreOficina> llistarLlibresOficines(
-			String entitatCodi, 
-			String usuariCodi, 
-			Long tipusRegistre) {
+	public List<LlibreOficina> llistarLlibresOficines(String entitatCodi, String usuariCodi, Long tipusRegistre) {
+
 		List<LlibreOficina> llibreOficina = null;
 		try {
-			llibreOficina = toLlibreOficina(getInfoApi().obtenerLibrosOficinaUsuario(
-					entitatCodi, 
-					usuariCodi, 
-					tipusRegistre));
+			llibreOficina = toLlibreOficina(getInfoApi().obtenerLibrosOficinaUsuario(entitatCodi, usuariCodi, tipusRegistre));
 		} catch (RegistrePluginException rex) {
-			logger.error("Error a plugin registre obtenció llibres i oficina", rex);
+			log.error("Error a plugin registre obtenció llibres i oficina", rex);
 		} catch (WsI18NException wse) {
-			logger.error("Error ws obtenció llibres i oficina", wse);
+			log.error("Error ws obtenció llibres i oficina", wse);
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir els llibres i oficina", ex);
+			log.error("Error a l'hora d'obtenir els llibres i oficina", ex);
 		}
 		return llibreOficina;
 	}
 	
 	@Override
-	public Llibre llistarLlibreOrganisme(
-			String entitatCodi, 
-			String organismeCodi) throws RegistrePluginException {
-		Llibre llibreOrganisme = new Llibre();
+	public Llibre llistarLlibreOrganisme(String entitatCodi, String organismeCodi) throws RegistrePluginException {
+
+		var llibreOrganisme = new Llibre();
 		try {
-			llibreOrganisme = toLlibreOrganisme(getInfoApi().listarLibroOrganismo(
-					entitatCodi, 
-					organismeCodi));
-			
+			llibreOrganisme = toLlibreOrganisme(getInfoApi().listarLibroOrganismo(entitatCodi, organismeCodi));
 		} catch (RegistrePluginException rex) {
-			logger.error("Error a plugin registre obtenció llibres d'organisme", rex);
+			log.error("Error a plugin registre obtenció llibres d'organisme", rex);
 		} catch (WsI18NException wse) {
-			logger.error("Error ws obtenció llibres organisme", wse);
+			log.error("Error ws obtenció llibres organisme", wse);
 		} catch (Exception ex) {
-			logger.error("Error a l'hora d'obtenir els llibres d'organisme", ex);
+			log.error("Error a l'hora d'obtenir els llibres d'organisme", ex);
 		}
 		return llibreOrganisme;
 	}
 	
 	private List<LlibreOficina> toLlibreOficina(List<LibroOficinaWs> llibresOficinaWs) throws RegistrePluginException {
-		List<LlibreOficina> llibresOficina = new ArrayList<LlibreOficina>();
+
+		List<LlibreOficina> llibresOficina = new ArrayList<>();
 		try {
-			for (LibroOficinaWs llibreOficinaWs : llibresOficinaWs) {
-				LlibreOficina llibreOficina = new LlibreOficina();
-				Llibre llibre = new Llibre();
-				Oficina oficina = new Oficina();
+			LlibreOficina llibreOficina;
+			Llibre llibre;
+			Oficina oficina;
+			for (var llibreOficinaWs : llibresOficinaWs) {
+				llibreOficina = new LlibreOficina();
+				llibre = new Llibre();
+				oficina = new Oficina();
 				//Llibre
 				llibre.setCodi(llibreOficinaWs.getLibroWs().getCodigoLibro());
 				llibre.setNomCurt(llibreOficinaWs.getLibroWs().getNombreCorto());
@@ -570,108 +539,116 @@ public class RegistrePluginRegweb3Impl extends RegWeb3Utils implements RegistreP
 				llibresOficina.add(llibreOficina);
 			}
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió dels llibres i oficines", ex);
+			log.error("Error a l'hora de fer la conversió dels llibres i oficines", ex);
 			throw new RegistrePluginException("Error conversió de llibres i oficines", ex);
 		}
 		return llibresOficina;
 	}
 	
 	private Llibre toLlibreOrganisme(LibroWs llibreWs) throws RegistrePluginException {
-		Llibre llibre = new Llibre();
+
 		try {
+			var llibre = new Llibre();
 			llibre.setCodi(llibreWs.getCodigoLibro());
 			llibre.setNomCurt(llibreWs.getNombreCorto());
 			llibre.setNomLlarg(llibreWs.getNombreLargo());
 			llibre.setOrganisme(llibreWs.getCodigoOrganismo());
+			return llibre;
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió dels llibres i oficines", ex);
+			log.error("Error a l'hora de fer la conversió dels llibres i oficines", ex);
 			throw new RegistrePluginException("Error conversió de llibres i oficines", ex);
 		}
-		return llibre;
 	}
 	
 	private List<Llibre> toLlibres(List<LibroWs> llibresWs) throws RegistrePluginException {
-		List<Llibre> llibres = new ArrayList<Llibre>();
+
 		try {
-			for (LibroWs llibreWs : llibresWs) {
-				Llibre llibre = new Llibre();
+			List<Llibre> llibres = new ArrayList<>();
+			Llibre llibre;
+			for (var llibreWs : llibresWs) {
+				llibre = new Llibre();
 				llibre.setCodi(llibreWs.getCodigoLibro());
 				llibre.setNomCurt(llibreWs.getNombreCorto());
 				llibre.setNomLlarg(llibreWs.getNombreLargo());
 				llibre.setOrganisme(llibreWs.getCodigoOrganismo());
 				llibres.add(llibre);
 			}
+			return llibres;
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió dels llibres", ex);
+			log.error("Error a l'hora de fer la conversió dels llibres", ex);
 			throw new RegistrePluginException("Error conversió de llibres", ex);
 		}
-		return llibres;
 	}
+
 	private List<Oficina> toOficines(List<OficinaWs> oficinesWs) throws RegistrePluginException {
-		List<Oficina> oficines = new ArrayList<Oficina>();
-		
+
+		List<Oficina> oficines = new ArrayList<>();
 		try {
-			for (OficinaWs oficinaWs : oficinesWs) {
-				Oficina oficina = new Oficina();
+			Oficina oficina;
+			for (var oficinaWs : oficinesWs) {
+				oficina = new Oficina();
 				oficina.setCodi(oficinaWs.getCodigo());
 				oficina.setNom(oficinaWs.getNombre());
 				oficines.add(oficina);
 			}
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió de les oficines", ex);
+			log.error("Error a l'hora de fer la conversió de les oficines", ex);
 			throw new RegistrePluginException("Error conversió de oficines", ex);
 		}
 		return oficines;
 	}
 	private List<Organisme> toOrganismes(List<OrganismoWs> organismesWs) throws RegistrePluginException {
-		List<Organisme> organismes = new ArrayList<Organisme>();
-		
+
+		List<Organisme> organismes = new ArrayList<>();
 		try {
-			for (OrganismoWs organWs : organismesWs) {
-				Organisme organ = new Organisme();
+			Organisme organ;
+			for (var organWs : organismesWs) {
+				organ = new Organisme();
 				organ.setCodi(organWs.getCodigo());
 				organ.setNom(organWs.getNombre());
 				organismes.add(organ);
 			}
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió dels organismes", ex);
+			log.error("Error a l'hora de fer la conversió dels organismes", ex);
 			throw new RegistrePluginException("Error conversió organismes", ex);
 		}
 		return organismes;
 	}
 	
 	private List<TipusAssumpte> toTipusAssumpte(List<TipoAsuntoWs> tipusAssumpteWs) throws RegistrePluginException {
-		List<TipusAssumpte> tipusAssumpte = new ArrayList<TipusAssumpte>();
+
+		List<TipusAssumpte> tipusAssumpte = new ArrayList<>();
 		try {
-			for (TipoAsuntoWs tipusWs : tipusAssumpteWs) {
-				TipusAssumpte tipus = new TipusAssumpte();
+			TipusAssumpte tipus;
+			for (var tipusWs : tipusAssumpteWs) {
+				tipus = new TipusAssumpte();
 				tipus.setCodi(tipusWs.getCodigo());
 				tipus.setNom(tipusWs.getNombre());
 				tipusAssumpte.add(tipus);
 			}
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió del tipus d'assumpte", ex);
+			log.error("Error a l'hora de fer la conversió del tipus d'assumpte", ex);
 			throw new RegistrePluginException("Error conversió tipus assumpte", ex);
 		}
 		return tipusAssumpte;
 	}
 	
 	private List<CodiAssumpte> toCodisAssumpte(List<CodigoAsuntoWs> codisAssumpteWs) throws RegistrePluginException {
-		List<CodiAssumpte> codisAssumpte = new ArrayList<CodiAssumpte>();
+
+		List<CodiAssumpte> codisAssumpte = new ArrayList<>();
 		try {
-			for (CodigoAsuntoWs codiWs : codisAssumpteWs) {
-				CodiAssumpte codi = new CodiAssumpte();
+			CodiAssumpte codi;
+			for (var codiWs : codisAssumpteWs) {
+				codi = new CodiAssumpte();
 				codi.setCodi(codiWs.getCodigo());
 				codi.setNom(codiWs.getNombre());
 				codisAssumpte.add(codi);
 			}
 		} catch (Exception ex) {
-			logger.error("Error a l'hora de fer la conversió dels codis d'assumpte", ex);
+			log.error("Error a l'hora de fer la conversió dels codis d'assumpte", ex);
 			throw new RegistrePluginException("Error conversió codis assumpte", ex);
 		}
 		return codisAssumpte;
 	}
-
-	private static final Logger logger = LoggerFactory.getLogger(RegistrePluginRegweb3Impl.class);
 
 }

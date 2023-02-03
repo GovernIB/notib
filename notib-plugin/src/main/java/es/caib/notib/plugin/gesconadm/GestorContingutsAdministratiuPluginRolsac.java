@@ -3,7 +3,6 @@ package es.caib.notib.plugin.gesconadm;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
@@ -13,8 +12,7 @@ import com.sun.jersey.api.representation.Form;
 import es.caib.notib.plugin.SistemaExternException;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.ejb.CreateException;
 import javax.management.InstanceNotFoundException;
@@ -30,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+@Slf4j
 public class GestorContingutsAdministratiuPluginRolsac implements GestorContingutsAdministratiuPlugin {
 	
 	private static final String ROLSAC_SERVICE_PATH = "api/rest/v1/";
@@ -46,19 +45,18 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	public GesconAdm getProcSerByCodiSia(String codiSia, boolean isServei) throws SistemaExternException {
 
 		try {
-			String url = getBaseUrl() + ROLSAC_SERVICE_PATH + (isServei ? "servicios" : "procedimientos");
-			Client jerseyClient = generarClient();
+			var url = getBaseUrl() + ROLSAC_SERVICE_PATH + (isServei ? "servicios" : "procedimientos");
+			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, url);
-			Form form = new Form();
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
 			form.add("filtro", "{\"activo\":\"1\", \"codigoSia\":\"" + codiSia + "\"}");
-			String json = jerseyClient.resource(url).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
-			ObjectMapper mapper  = new ObjectMapper();
+			var json = jerseyClient.resource(url).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			return isServei ? getServeiByCodiSia(mapper, json) :getProcedimentByCodiSia(mapper, json);
 		} catch (Exception ex) {
-			throw new SistemaExternException("No s'han pogut consultar el " + (isServei ? "servei" : "procediment")
-					+ " amb codi SIA " + codiSia + " via REST", ex);
+			throw new SistemaExternException("No s'han pogut consultar el " + (isServei ? "servei" : "procediment") + " amb codi SIA " + codiSia + " via REST", ex);
 		}
 	}
 
@@ -66,11 +64,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	public GcaServei getServeiByCodiSia(ObjectMapper mapper, String json) throws Exception {
 
 		try {
-			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			var resposta = mapper.readValue(json, RespostaServeis.class);
 			if (resposta == null) {
 				return null;
 			}
-			List<GcaServei> procs = toServeiDto(resposta.getResultado());
+			var procs = toServeiDto(resposta.getResultado());
 			return !procs.isEmpty() ? procs.get(0) : null;
 		} catch (Exception ex) {
 			throw ex;
@@ -81,11 +79,11 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	public GcaProcediment getProcedimentByCodiSia(ObjectMapper mapper, String json) throws Exception {
 
 		try {
-			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
+			var resposta = mapper.readValue(json, RespostaProcediments.class);
 			if (resposta == null) {
 				return null;
 			}
-			List<GcaProcediment> procs = toProcedimentDto(resposta.getResultado());
+			var procs = toProcedimentDto(resposta.getResultado());
 			return !procs.isEmpty() ? procs.get(0) : null;
 		} catch (Exception ex) {
 			throw ex;
@@ -94,78 +92,62 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	@Override
 	public List<GcaProcediment> getAllProcediments() throws SistemaExternException {
-		List<Procediment> procediments = new ArrayList<Procediment>();
+
+		List<Procediment> procediments = new ArrayList<>();
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
 			
 			Client jerseyClient = generarClient();
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode);
-			
-			Form form = new Form();
+			autenticarClient(jerseyClient, urlAmbMetode);
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
 			form.add("filtro", "{\"activo\":\"1\"}");
-		    
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
-					accept(MediaType.APPLICATION_JSON_TYPE).
-					post(String.class, form);
-			
-			ObjectMapper mapper  = new ObjectMapper();
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+							.accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
-			if (resposta != null)
+			var resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta != null) {
 				procediments = resposta.getResultado();
+			}
 			return toProcedimentDto(procediments);
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar els procediments via REST",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar els procediments via REST", ex);
 		}
 	}
 	
 	@Override
-	public List<GcaProcediment> getProcedimentsByUnitat(
-			String codi,
-			int numPagina) throws SistemaExternException {
-		List<Procediment> procediments = new ArrayList<Procediment>();
+	public List<GcaProcediment> getProcedimentsByUnitat(String codi, int numPagina) throws SistemaExternException {
+
+		List<Procediment> procediments = new ArrayList<>();
 		try {
-			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
-			
-			Client jerseyClient = generarClient();
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode);
-			
-			Form form = new Form();
+			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
+			var jerseyClient = generarClient();
+			autenticarClient(jerseyClient, urlAmbMetode);
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"" + numPagina + "\", \"size\":\"30\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 		    
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
-					accept(MediaType.APPLICATION_JSON_TYPE).
-					post(String.class, form);
-			
-			ObjectMapper mapper  = new ObjectMapper();
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
-			if (resposta != null)
+			var resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta != null) {
 				procediments = resposta.getResultado();
+			}
 			return toProcedimentDto(procediments);
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar els procediments via REST",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar els procediments via REST", ex);
 		}
 	}
 
 	@Override
 	public List<GcaProcediment> getProcedimentsByUnitat(String codi) throws SistemaExternException {
 
-		List<Procediment> procediments = new ArrayList<Procediment>();
+		List<Procediment> procediments = new ArrayList<>();
 		try {
 			var numElements = getTotalProcediments(codi);
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
@@ -192,27 +174,21 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	@Override
 	public String getUnitatAdministrativa(String codi) throws SistemaExternException {
-		if (unitatsAdministratives.containsKey(codi))
+
+		if (unitatsAdministratives.containsKey(codi)) {
 			return unitatsAdministratives.get(codi);
-		
+		}
 		try {
-			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
-			
-			Client jerseyClient = generarClient();
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode);
-			
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					post(String.class);
-			
-			ObjectMapper mapper  = new ObjectMapper();
+			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "unidades_administrativas/" + codi;
+			var jerseyClient = generarClient();
+			autenticarClient(jerseyClient, urlAmbMetode);
+			var json = jerseyClient.resource(urlAmbMetode).post(String.class);
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaUnitatAdministrativa resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
+			var resposta = mapper.readValue(json, RespostaUnitatAdministrativa.class);
 			String unitatCodi = null;
 			if (resposta.getResultado() != null && !resposta.getResultado().isEmpty()) {
-				UnitatAdministrativa unitat = resposta.getResultado().get(0);
+				var unitat = resposta.getResultado().get(0);
 				if (unitat.getCodigoDIR3() != null && !unitat.getCodigoDIR3().isEmpty()) {
 					unitatCodi = unitat.getCodigoDIR3();
 				} else if (unitat.getPadre() != null && unitat.getPadre().getCodigo() != null && !unitat.getPadre().getCodigo().isEmpty()){
@@ -222,9 +198,7 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			unitatsAdministratives.put(codi, unitatCodi);
 			return unitatCodi;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar els procediments via REST",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar els procediments via REST", ex);
 		}
 		
 //		UnitatAdministrativa unitat = getUnitatAdministrativaRolsac(codi);
@@ -238,69 +212,56 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 	
 	@Override
 	public int getTotalProcediments(String codi) throws SistemaExternException {
+
 		int numeroElements = 0;
 		try {
 			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "procedimientos";
-			
-			Client jerseyClient = generarClient();
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode);
-			
-			Form form = new Form();
+
+			var jerseyClient = generarClient();
+			autenticarClient(jerseyClient, urlAmbMetode);
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"1\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
-		    
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
-					accept(MediaType.APPLICATION_JSON_TYPE).
-					post(String.class, form);
-			
-			ObjectMapper mapper  = new ObjectMapper();
+
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaProcediments resposta = mapper.readValue(json, RespostaProcediments.class);
-			if (resposta != null) 
+			var resposta = mapper.readValue(json, RespostaProcediments.class);
+			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
+			}
 			return numeroElements;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut consultar els total de procediments via REST",
-					ex);
+			throw new SistemaExternException("No s'ha pogut consultar els total de procediments via REST", ex);
 		}
 	}
 
 	@Override
 	public List<GcaServei> getAllServeis() throws SistemaExternException {
-		List<Servei> serveis = new ArrayList<Servei>();
+
+		List<Servei> serveis = new ArrayList<>();
 		try {
-			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
-
-			Client jerseyClient = generarClient();
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode);
-
-			Form form = new Form();
+			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
+			var jerseyClient = generarClient();
+			autenticarClient(jerseyClient, urlAmbMetode);
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"100000\"}");
 			form.add("filtro", "{\"activo\":\"1\"}");
 
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
-					accept(MediaType.APPLICATION_JSON_TYPE).
-					post(String.class, form);
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+					accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
 
-			ObjectMapper mapper  = new ObjectMapper();
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
-			if (resposta != null)
+			var resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta != null) {
 				serveis = resposta.getResultado();
+			}
 			return toServeiDto(serveis);
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'han pogut consultar els procediments via REST",
-					ex);
+			throw new SistemaExternException("No s'han pogut consultar els procediments via REST", ex);
 		}
 	}
 
@@ -312,12 +273,12 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
 			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
-
 			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"" + numPagina + "\", \"size\":\"30\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 
-			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+						.accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
 
 			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -338,17 +299,18 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		try {
 			var numElements = getTotalServeis(codi);
 			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
-			Client jerseyClient = generarClient();
+			var jerseyClient = generarClient();
 			autenticarClient(jerseyClient, urlAmbMetode);
-			Form form = new Form();
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"" + numElements + "\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 
-			String json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+							.accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
 
-			ObjectMapper mapper  = new ObjectMapper();
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
+			var resposta = mapper.readValue(json, RespostaServeis.class);
 			if (resposta != null) {
 				serveis = resposta.getResultado();
 			}
@@ -360,35 +322,28 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	@Override
 	public int getTotalServeis(String codi) throws SistemaExternException {
+
 		int numeroElements = 0;
 		try {
-			String urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
-
-			Client jerseyClient = generarClient();
-			autenticarClient(
-					jerseyClient,
-					urlAmbMetode);
-
-			Form form = new Form();
+			var urlAmbMetode = getBaseUrl() + ROLSAC_SERVICE_PATH + "servicios";
+			var jerseyClient = generarClient();
+			autenticarClient(jerseyClient, urlAmbMetode);
+			var form = new Form();
 			form.add("filtroPaginacion", "{\"page\":\"1\", \"size\":\"1\"}");
 			form.add("filtro", "{\"codigoUADir3\":\"" + codi + "\", \"buscarEnDescendientesUA\":\"1\", \"activo\":\"1\", \"estadoUA\":\"1\"}");
 
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
-					accept(MediaType.APPLICATION_JSON_TYPE).
-					post(String.class, form);
+			var json = jerseyClient.resource(urlAmbMetode).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).
+						accept(MediaType.APPLICATION_JSON_TYPE).post(String.class, form);
 
-			ObjectMapper mapper  = new ObjectMapper();
+			var mapper  = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-			RespostaServeis resposta = mapper.readValue(json, RespostaServeis.class);
-			if (resposta != null)
+			var resposta = mapper.readValue(json, RespostaServeis.class);
+			if (resposta != null) {
 				numeroElements = resposta.getNumeroElementos();
+			}
 			return numeroElements;
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut consultar els total de procediments via REST",
-					ex);
+			throw new SistemaExternException("No s'ha pogut consultar els total de procediments via REST", ex);
 		}
 	}
 
@@ -397,39 +352,39 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		if (procediments == null) {
 			return new ArrayList<>();
 		}
-		List<GcaProcediment> procedimentsDto = new ArrayList<GcaProcediment>();
-		for (Procediment procediment: procediments) {
+		List<GcaProcediment> procedimentsDto = new ArrayList<>();
+		for (var procediment: procediments) {
 			procedimentsDto.add(toDto(procediment));
 		}
 		return procedimentsDto;
 	}
 	
 	private GcaProcediment toDto(Procediment procediment) throws SistemaExternException {
-		GcaProcediment dto = new GcaProcediment();
+
+		var dto = new GcaProcediment();
 		dto.setCodiSIA(procediment.getCodigoSIA());
 		dto.setNom(procediment.getNombre());
 		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
 		dto.setDataActualitzacio(procediment.getFechaActualizacion());
 		//Com que Procediment ens ve amb Boolean i al nostre sistema ho tenim amb boolean primitiu, si es null ho tractam com false:
-		if (procediment.getComun()!=null) 
-			dto.setComu(procediment.getComun().booleanValue());	
-		else 
-			dto.setComu(false);
+		dto.setComu(procediment.getComun()!=null ? procediment.getComun().booleanValue() : false);
 //		dto.setUnidadAdministrativa(getUnitatAdministrativa(procediment.getUnidadAdministrativa().getCodigo()));
 //		dto.setUnitatAdministrativaPare(getUnitatAdministrativaArrel(procediment.getUnidadAdministrativa().getCodigo()));
 		return dto;
 	}
 
 	private List<GcaServei> toServeiDto(List<Servei> serveis) throws SistemaExternException {
-		List<GcaServei> serveisDto = new ArrayList<GcaServei>();
-		for (Servei servei: serveis) {
+
+		List<GcaServei> serveisDto = new ArrayList<>();
+		for (var servei: serveis) {
 			serveisDto.add(toDto(servei));
 		}
 		return serveisDto;
 	}
 
 	private GcaServei toDto(Servei servei) throws SistemaExternException {
-		GcaServei dto = new GcaServei();
+		
+		var dto = new GcaServei();
 		dto.setCodiSIA(servei.getCodigoSIA());
 		dto.setNom(servei.getNombre());
 		dto.setUnitatAdministrativacodi(getUnitatAdministrativa(servei.getOrganoInstructor().getCodigo()));
@@ -446,7 +401,8 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 //	}
 
 	private Client generarClient() {
-		Client jerseyClient = Client.create();
+		
+		var jerseyClient = Client.create();
 		jerseyClient.addFilter(
 				new ClientFilter() {
 					private ArrayList<Object> cookies;
@@ -455,10 +411,10 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 						if (cookies != null) {
 							request.getHeaders().put("Cookie", cookies);
 						}
-						ClientResponse response = getNext().handle(request);
+						var response = getNext().handle(request);
 						if (response.getCookies() != null) {
 							if (cookies == null) {
-								cookies = new ArrayList<Object>();
+								cookies = new ArrayList<>();
 							}
 							cookies.addAll(response.getCookies());
 						}
@@ -470,16 +426,14 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 				new ClientFilter() {
 					@Override
 					public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-						ClientHandler ch = getNext();
-				        ClientResponse resp = ch.handle(request);
-
+						var ch = getNext();
+				        var resp = ch.handle(request);
 				        if (resp.getStatusInfo().getFamily() != Response.Status.Family.REDIRECTION) {
 				            return resp;
-				        } else {
-				            String redirectTarget = resp.getHeaders().getFirst("Location");
-				            request.setURI(UriBuilder.fromUri(redirectTarget).build());
-				            return ch.handle(request);
-				        }
+				        } 
+						var redirectTarget = resp.getHeaders().getFirst("Location");
+						request.setURI(UriBuilder.fromUri(redirectTarget).build());
+						return ch.handle(request);
 					}
 				}
 		);
@@ -488,17 +442,17 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 
 	private void autenticarClient(Client jerseyClient, String urlAmbMetode) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException, CreateException {
 
-		String username = getUsernameServiceUrl();
-		String password = getPasswordServiceUrl();
+		var username = getUsernameServiceUrl();
+		var password = getPasswordServiceUrl();
 		if (isServiceBasicAuthentication()) {
-			logger.debug("Autenticant REST amb autenticació de tipus HTTP basic (" + "urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
+			log.debug("Autenticant REST amb autenticació de tipus HTTP basic (" + "urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
 			jerseyClient.addFilter(new HTTPBasicAuthFilter(username, password));
 			return;
 		}
-		logger.debug("Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
+		log.debug("Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " + "username=" + username + "password=********)");
 		jerseyClient.resource(urlAmbMetode).get(String.class);
-		Form form = new Form();
+		var form = new Form();
 		form.putSingle("j_username", username);
 		form.putSingle("j_password", password);
 		jerseyClient.resource(baseUrl + "j_security_check").type("application/x-www-form-urlencoded").post(form);
@@ -535,6 +489,4 @@ public class GestorContingutsAdministratiuPluginRolsac implements GestorContingu
 		private String codiPare;
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(GestorContingutsAdministratiuPluginRolsac.class);
-
 }

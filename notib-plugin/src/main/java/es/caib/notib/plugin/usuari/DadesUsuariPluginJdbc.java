@@ -1,10 +1,7 @@
 package es.caib.notib.plugin.usuari;
 
 import es.caib.notib.plugin.SistemaExternException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.naming.Context;
+import lombok.extern.slf4j.Slf4j;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,69 +16,55 @@ import java.util.Properties;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 
 	private final Properties properties;
-
 	public DadesUsuariPluginJdbc(Properties properties) {
 		this.properties = properties;
 	}
 
 
 	@Override
-	public List<String> consultarRolsAmbCodi(
-			String usuariCodi) throws SistemaExternException {
-		LOGGER.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
+	public List<String> consultarRolsAmbCodi(String usuariCodi) throws SistemaExternException {
+
+		log.debug("Consulta dels rols de l'usuari (usuariCodi=" + usuariCodi + ")");
 		try {
-			return consultaRolsUsuariUnic(
-					getLdapFiltreRolsCodi(),
-					"codi",
-					usuariCodi);
+			return consultaRolsUsuariUnic(getLdapFiltreRolsCodi(), "codi", usuariCodi);
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")",
-					ex);
+			throw new SistemaExternException("Error al consultar els rols de l'usuari (usuariCodi=" + usuariCodi + ")", ex);
 		}
 	}
 	
 	@Override
-	public DadesUsuari consultarAmbCodi(
-			String usuariCodi) throws SistemaExternException {
-		LOGGER.debug("Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
-		return consultaDadesUsuariUnic(
-				getJdbcQueryUsuariCodi(),
-				"codi",
-				usuariCodi);
+	public DadesUsuari consultarAmbCodi(String usuariCodi) throws SistemaExternException {
+
+		log.debug("Consulta de les dades de l'usuari (usuariCodi=" + usuariCodi + ")");
+		return consultaDadesUsuariUnic(getJdbcQueryUsuariCodi(), "codi", usuariCodi);
 	}
 
 	@Override
-	public List<DadesUsuari> consultarAmbGrup(
-			String grupCodi) throws SistemaExternException {
-		LOGGER.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
-		return consultaDadesUsuari(
-				getJdbcQueryUsuariGrup(),
-				"grup",
-				grupCodi);
+	public List<DadesUsuari> consultarAmbGrup(String grupCodi) throws SistemaExternException {
+
+		log.debug("Consulta dels usuaris del grup (grupCodi=" + grupCodi + ")");
+		return consultaDadesUsuari(getJdbcQueryUsuariGrup(), "grup", grupCodi);
 	}
 
 
-	private List<String> consultaRolsUsuariUnic(
-			String sqlQuery,
-			String paramName,
-			String paramValue) throws SistemaExternException {
-		List<String> rols = new ArrayList<String>();
+	private List<String> consultaRolsUsuariUnic(String sqlQuery, String paramName, String paramValue) throws SistemaExternException {
+
+		List<String> rols = new ArrayList<>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			Context initContext = new InitialContext();
-			DataSource ds = (DataSource)initContext.lookup(getDatasourceJndiName());
+			var initContext = new InitialContext();
+			var ds = (DataSource)initContext.lookup(getDatasourceJndiName());
 			con = ds.getConnection();
 			if (sqlQuery.contains("?")) {
 				ps = con.prepareStatement(sqlQuery);
 				ps.setString(1, paramValue);
 			} else if (sqlQuery.contains(":" + paramName)) {
-				ps = con.prepareStatement(
-						sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
+				ps = con.prepareStatement(sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
 			} else {
 				ps = con.prepareStatement(sqlQuery);
 			}
@@ -95,51 +78,41 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 			try {
 				if (ps != null) ps.close();
 			} catch (Exception ex) {
-				LOGGER.error("Error al tancar el PreparedStatement", ex);
+				log.error("Error al tancar el PreparedStatement", ex);
 			}
 			try {
 				if (con != null) con.close();
 			} catch (Exception ex) {
-				LOGGER.error("Error al tancar la connexió", ex);
+				log.error("Error al tancar la connexió", ex);
 			}
 		}
 		return rols;
 	}
-	private DadesUsuari consultaDadesUsuariUnic(
-			String sqlQuery,
-			String paramName,
-			String paramValue) throws SistemaExternException {
-		List<DadesUsuari> llista = consultaDadesUsuari(
-				sqlQuery,
-				paramName,
-				paramValue);
-		if (llista.size() > 0)
-			return llista.get(0);
-		else
-			return null;
+
+	private DadesUsuari consultaDadesUsuariUnic(String sqlQuery, String paramName, String paramValue) throws SistemaExternException {
+
+		List<DadesUsuari> llista = consultaDadesUsuari(sqlQuery, paramName, paramValue);
+		return llista.size() > 0 ? llista.get(0) : null;
 	}
 
-	private List<DadesUsuari> consultaDadesUsuari(
-			String sqlQuery,
-			String paramName,
-			String paramValue) throws SistemaExternException {
-		List<DadesUsuari> llistaUsuaris = new ArrayList<DadesUsuari>();
+	private List<DadesUsuari> consultaDadesUsuari(String sqlQuery, String paramName, String paramValue) throws SistemaExternException {
+
+		List<DadesUsuari> llistaUsuaris = new ArrayList<>();
 		Connection con = null;
 		PreparedStatement ps = null;
 		try {
-			Context initContext = new InitialContext();
-			DataSource ds = (DataSource)initContext.lookup(getDatasourceJndiName());
+			var initContext = new InitialContext();
+			var ds = (DataSource)initContext.lookup(getDatasourceJndiName());
 			con = ds.getConnection();
 			if (sqlQuery.contains("?")) {
 				ps = con.prepareStatement(sqlQuery);
 				ps.setString(1, paramValue);
 			} else if (sqlQuery.contains(":" + paramName)) {
-				ps = con.prepareStatement(
-						sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
+				ps = con.prepareStatement(sqlQuery.replace(":" + paramName, "'" + paramValue + "'"));
 			} else {
 				ps = con.prepareStatement(sqlQuery);
 			}
-			ResultSet rs = ps.executeQuery();
+			var rs = ps.executeQuery();
 			while (rs.next()) {
 				DadesUsuari dadesUsuari = new DadesUsuari();
 				dadesUsuari.setCodi(rs.getString(1));
@@ -154,12 +127,12 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 			try {
 				if (ps != null) ps.close();
 			} catch (Exception ex) {
-				LOGGER.error("Error al tancar el PreparedStatement", ex);
+				log.error("Error al tancar el PreparedStatement", ex);
 			}
 			try {
 				if (con != null) con.close();
 			} catch (Exception ex) {
-				LOGGER.error("Error al tancar la connexió", ex);
+				log.error("Error al tancar la connexió", ex);
 			}
 		}
 		return llistaUsuaris;
@@ -168,20 +141,21 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	private String getDatasourceJndiName() {
 		return properties.getProperty("es.caib.notib.plugin.dades.usuari.jdbc.datasource.jndi.name");
 	}
+	
 	private String getJdbcQueryUsuariCodi() {
 		String query = properties.getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query");
 		if (query == null || query.isEmpty())
 			query = properties.getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.codi");
 		return query;
 	}
+	
 	private String getLdapFiltreRolsCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
 		return properties.getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.rols");
 	}
+	
 	private String getJdbcQueryUsuariGrup() {
 		return properties.getProperty("es.caib.notib.plugin.dades.usuari.jdbc.query.grup");
 	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);
 
 }

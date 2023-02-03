@@ -43,7 +43,8 @@ public class ValidacioFirmesPluginMock implements IValidateSignaturePlugin {
 
     @Override
     public ValidateSignatureResponse validateSignature(ValidateSignatureRequest validateSignatureRequest) throws Exception {
-        ValidateSignatureResponse validateSignatureResponse = new ValidateSignatureResponse();
+
+        var validateSignatureResponse = new ValidateSignatureResponse();
         ValidationStatus validationStatus = new ValidationStatus();
         validationStatus.setStatus(ValidationStatus.SIGNATURE_VALID); // Validacio VALID
 //        validationStatus.setStatus(ValidationStatus.SIGNATURE_INVALID); // Validacio INVALID

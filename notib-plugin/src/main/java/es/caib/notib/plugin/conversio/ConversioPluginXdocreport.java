@@ -42,142 +42,112 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 	private static final int BARCODE_POSITION_RIGHT = 3;
 
 	@Override
-	public ConversioArxiu convertirPdf(
-			ConversioArxiu arxiu) throws SistemaExternException {
+	public ConversioArxiu convertirPdf(ConversioArxiu arxiu) throws SistemaExternException {
+
 		try {
 			return convertirIEstampar(arxiu, null);
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut convertir l'arxiu a format PDF (" +
-					"arxiuNom=" + arxiu.getArxiuNom() + ", " +
-					"arxiuTamany=" + arxiu.getArxiuContingut().length + ")",
-					ex);
+			throw new SistemaExternException("No s'ha pogut convertir l'arxiu a format PDF (arxiuNom=" + arxiu.getArxiuNom()
+					+ ", arxiuTamany=" + arxiu.getArxiuContingut().length + ")", ex);
 		}
 	}
 
 	@Override
-	public ConversioArxiu convertirPdfIEstamparUrl(
-			ConversioArxiu arxiu,
-			String url) throws SistemaExternException {
+	public ConversioArxiu convertirPdfIEstamparUrl(ConversioArxiu arxiu, String url) throws SistemaExternException {
+
 		try {
 			return convertirIEstampar(arxiu, url);
 		} catch (Exception ex) {
-			throw new SistemaExternException(
-					"No s'ha pogut convertir l'arxiu a format PDF (" +
-					"arxiuNom=" + arxiu.getArxiuNom() + ", " +
-					"arxiuTamany=" + arxiu.getArxiuContingut().length + ")",
-					ex);
+			throw new SistemaExternException("No s'ha pogut convertir l'arxiu a format PDF (arxiuNom=" + arxiu.getArxiuNom() + ", " +
+					"arxiuTamany=" + arxiu.getArxiuContingut().length + ")", ex);
 		}
 	}
 
 	@Override
 	public String getNomArxiuConvertitPdf(String nomOriginal) {
-		if (nomOriginal == null || nomOriginal.lastIndexOf(".") == -1)
-			return nomOriginal;
-		return nomOriginal.substring(0, nomOriginal.lastIndexOf(".")) + ".pdf";
+		return nomOriginal == null || nomOriginal.lastIndexOf(".") == -1 ? nomOriginal : nomOriginal.substring(0, nomOriginal.lastIndexOf(".")) + ".pdf";
 	}
 
-
-
-	private boolean isExtensioPdf(
-			ConversioArxiu arxiu) {
+	private boolean isExtensioPdf(ConversioArxiu arxiu) {
 		return "pdf".equalsIgnoreCase(arxiu.getArxiuExtensio());
 	}
 
-	private DocumentKind getDocumentKind(
-			ConversioArxiu arxiu) throws SistemaExternException {
-		String extensio = arxiu.getArxiuExtensio();
+	private DocumentKind getDocumentKind(ConversioArxiu arxiu) throws SistemaExternException {
+
+		var extensio = arxiu.getArxiuExtensio();
 		if ("odt".equalsIgnoreCase(extensio)) {
 			return DocumentKind.ODT;
-		} else if ("docx".equalsIgnoreCase(extensio)) {
-			return DocumentKind.DOCX;
-		} else {
-			throw new SistemaExternException(
-					"Tipus de document no suportat (arxiuNom=" + arxiu.getArxiuNom() + ")");
 		}
+		if ("docx".equalsIgnoreCase(extensio)) {
+			return DocumentKind.DOCX;
+		}
+		throw new SistemaExternException("Tipus de document no suportat (arxiuNom=" + arxiu.getArxiuNom() + ")");
 	}
 
-	private ConversioArxiu convertirIEstampar(
-			ConversioArxiu arxiu,
-			String url) throws Exception {
-		ConversioArxiu convertit = new ConversioArxiu();
+	private ConversioArxiu convertirIEstampar(ConversioArxiu arxiu, String url) throws Exception {
+
+		var convertit = new ConversioArxiu();
 		ByteArrayOutputStream baosConversio = null;
 		if (!isExtensioPdf(arxiu)) {
-			Options options = Options.getFrom(
-					getDocumentKind(arxiu)).to(
-					ConverterTypeTo.PDF);
+			Options options = Options.getFrom(getDocumentKind(arxiu)).to(ConverterTypeTo.PDF);
 			ByteArrayInputStream bais = new ByteArrayInputStream(arxiu.getArxiuContingut());
 			baosConversio = new ByteArrayOutputStream();
 			IConverter converter = ConverterRegistry.getRegistry().getConverter(options);
 			converter.convert(bais, baosConversio, options);
 		}
-		if (url != null) {
-			PdfReader pdfReader;
-			if (baosConversio != null)
-				pdfReader = new PdfReader(baosConversio.toByteArray());
-			else
-				pdfReader = new PdfReader(arxiu.getArxiuContingut());
-			ByteArrayOutputStream baosEstampacio = new ByteArrayOutputStream();
-			PdfStamper pdfStamper = new PdfStamper(pdfReader, baosEstampacio);
-			for (int i = 0; i < pdfReader.getNumberOfPages(); i++) {
-				PdfContentByte over = pdfStamper.getOverContent(i + 1);
-				estamparBarcodePdf417(
-						over,
-						url,
-						BARCODE_POSITION_LEFT,
-						10);
+		if (url == null) {
+			convertit.setArxiuContingut(baosConversio != null ? baosConversio.toByteArray() : arxiu.getArxiuContingut());
+		} else {
+			var pdfReader = baosConversio != null ? new PdfReader(baosConversio.toByteArray()) : new PdfReader(arxiu.getArxiuContingut());
+			var baosEstampacio = new ByteArrayOutputStream();
+			var pdfStamper = new PdfStamper(pdfReader, baosEstampacio);
+			PdfContentByte over;
+			for (var i = 0; i < pdfReader.getNumberOfPages(); i++) {
+				over = pdfStamper.getOverContent(i + 1);
+				estamparBarcodePdf417(over, url, BARCODE_POSITION_LEFT, 10);
 			}
 			pdfStamper.close();
 			convertit.setArxiuContingut(baosEstampacio.toByteArray());
-		} else {
-			if (baosConversio != null)
-				convertit.setArxiuContingut(baosConversio.toByteArray());
-			else
-				convertit.setArxiuContingut(arxiu.getArxiuContingut());
 		}
-		convertit.setArxiuNom(
-				getNomArxiuConvertitPdf(arxiu.getArxiuNom()));
+		convertit.setArxiuNom(getNomArxiuConvertitPdf(arxiu.getArxiuNom()));
 		return convertit;
 	}
 
-	private void estamparBarcodePdf417(
-			PdfContentByte contentByte,
-			String url,
-			int posicio,
-			float margin) throws Exception {
-		float paddingUrl = 5;
+	private void estamparBarcodePdf417(PdfContentByte contentByte, String url, int posicio, float margin) throws Exception {
+
+		var paddingUrl = 5;
 		// Calcula les dimensions de la pàgina i la taula
-		Rectangle page = contentByte.getPdfDocument().getPageSize();
-		float pageWidth = page.getWidth();
-		float pageHeight = page.getHeight();
+		var page = contentByte.getPdfDocument().getPageSize();
+		var pageWidth = page.getWidth();
+		var pageHeight = page.getHeight();
 		if (posicio == BARCODE_POSITION_TOP || posicio == BARCODE_POSITION_BOTTOM) {
-			float ampladaTaulaMax = pageWidth - (2 * margin);
+			var ampladaTaulaMax = pageWidth - (2 * margin);
 			// Crea la cel·la del codi de barres
-			BarcodePDF417 pdf417 = new BarcodePDF417();
+			var pdf417 = new BarcodePDF417();
 			pdf417.setText(url);
-			Image img = pdf417.getImage();
-			PdfPCell pdf417Cell = new PdfPCell(img);
+			var img = pdf417.getImage();
+			var pdf417Cell = new PdfPCell(img);
 			pdf417Cell.setBorder(0);
 			pdf417Cell.setFixedHeight(img.getHeight());
-			float imgCellWidth = img.getWidth();
+			var imgCellWidth = img.getWidth();
 			// Crea la cel·la amb la url
-			Font urlFont = new Font(Font.HELVETICA, 6);
-			Chunk urlChunk = new Chunk(url, urlFont);
-			Phrase urlPhrase = new Phrase(urlChunk);
-			PdfPCell urlCell = new PdfPCell(urlPhrase);
+			var urlFont = new Font(Font.HELVETICA, 6);
+			var urlChunk = new Chunk(url, urlFont);
+			var urlPhrase = new Phrase(urlChunk);
+			var urlCell = new PdfPCell(urlPhrase);
 			urlCell.setPadding(0);
 			urlCell.setBorder(0);
 			urlCell.setFixedHeight(img.getHeight());
 			urlCell.setUseAscender(true);
 			urlCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 			urlCell.setPaddingLeft(paddingUrl);
-			float urlWidth = urlChunk.getWidthPoint() + 5;
-			float urlCellWidth = (imgCellWidth + urlWidth > ampladaTaulaMax) ? ampladaTaulaMax - imgCellWidth : urlWidth;
+			var urlWidth = urlChunk.getWidthPoint() + 5;
+			var urlCellWidth = (imgCellWidth + urlWidth > ampladaTaulaMax) ? ampladaTaulaMax - imgCellWidth : urlWidth;
 			// Estampa el codi de barres en la posició elegida
-			PdfPTable table = new PdfPTable(2);
+			var table = new PdfPTable(2);
 			table.addCell(pdf417Cell);
 			table.addCell(urlCell);
-			float ampladaTaula = imgCellWidth + urlCellWidth;
+			var ampladaTaula = imgCellWidth + urlCellWidth;
 			table.setWidths(new float[]{img.getWidth(), ampladaTaula - img.getWidth()});
 			table.setTotalWidth(ampladaTaula);
 			if (posicio == BARCODE_POSITION_TOP) {
@@ -186,37 +156,37 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 				table.writeSelectedRows(0, -1, (pageWidth / 2) - (ampladaTaula / 2), margin + img.getHeight(), contentByte);
 			}
 		} else if (posicio == BARCODE_POSITION_LEFT || posicio == BARCODE_POSITION_RIGHT) {
-			float ampladaTaulaMax = pageHeight - (2 * margin);
+			var ampladaTaulaMax = pageHeight - (2 * margin);
 			// Crea la cel·la del codi de barres
-			BarcodePDF417 pdf417 = new BarcodePDF417();
+			var pdf417 = new BarcodePDF417();
 			pdf417.setText(url);
-			Image img = pdf417.getImage();
-			PdfPCell pdf417Cell = new PdfPCell(img);
+			var img = pdf417.getImage();
+			var pdf417Cell = new PdfPCell(img);
 			pdf417Cell.setBorder(1);
 			pdf417Cell.setFixedHeight(img.getWidth());
 			pdf417Cell.setRotation(90);
-			float imgCellWidth = img.getWidth();
+			var imgCellWidth = img.getWidth();
 			// Crea la cel·la amb la url
-			Font urlFont = new Font(Font.HELVETICA, 6);
-			Chunk urlChunk = new Chunk(url, urlFont);
-			Phrase urlPhrase = new Phrase(urlChunk);
-			PdfPCell urlCell = new PdfPCell(urlPhrase);
+			var urlFont = new Font(Font.HELVETICA, 6);
+			var urlChunk = new Chunk(url, urlFont);
+			var urlPhrase = new Phrase(urlChunk);
+			var urlCell = new PdfPCell(urlPhrase);
 			urlCell.setPadding(0);
 			urlCell.setBorder(0);
 			urlCell.setUseAscender(true);
 			urlCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 			urlCell.setPaddingBottom(paddingUrl);
 			urlCell.setRotation(90);
-			float urlWidth = urlChunk.getWidthPoint() + 5;
-			float urlCellWidth = (imgCellWidth + urlWidth > ampladaTaulaMax) ? ampladaTaulaMax - imgCellWidth : urlWidth;
+			var urlWidth = urlChunk.getWidthPoint() + 5;
+			var urlCellWidth = (imgCellWidth + urlWidth > ampladaTaulaMax) ? ampladaTaulaMax - imgCellWidth : urlWidth;
 			urlCell.setFixedHeight(urlCellWidth);
 			// Estampa el codi de barres en la posició elegida
-			PdfPTable table = new PdfPTable(1);
+			var table = new PdfPTable(1);
 			table.addCell(urlCell);
 			table.addCell(pdf417Cell);
 			table.setWidths(new float[]{img.getHeight()});
 			table.setTotalWidth(img.getHeight());
-			float ampladaTaula = imgCellWidth + urlCellWidth;
+			var ampladaTaula = imgCellWidth + urlCellWidth;
 			if (posicio == BARCODE_POSITION_LEFT) {
 				table.writeSelectedRows(0, -1, margin, pageHeight - (pageHeight / 2) + (ampladaTaula / 2), contentByte);
 			} else {
