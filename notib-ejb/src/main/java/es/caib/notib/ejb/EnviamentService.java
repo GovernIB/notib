@@ -41,28 +41,14 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public List<Long> findIdsAmbFiltre(
-			Long entitatId, 
-			NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
+	public List<Long> findIdsAmbFiltre(Long entitatId, NotificacioEnviamentFiltreDto filtre) throws NotFoundException, ParseException {
 		return getDelegateService().findIdsAmbFiltre(entitatId, filtre);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(
-			Long entitatId,
-			RolEnumDto rol,
-			String organGestorCodi,
-			String usuariCodi,
-			NotificacioEnviamentFiltreDto filtre,
-			PaginacioParamsDto paginacio) throws ParseException {
-		return getDelegateService().enviamentFindByEntityAndFiltre(
-				entitatId,
-				rol,
-				organGestorCodi,
-				usuariCodi,
-				filtre, 
-				paginacio);
+	public PaginaDto<NotEnviamentTableItemDto> enviamentFindByEntityAndFiltre(Long entitatId, RolEnumDto rol, String organGestorCodi, String usuariCodi, NotificacioEnviamentFiltreDto filtre, PaginacioParamsDto paginacio) throws ParseException {
+		return getDelegateService().enviamentFindByEntityAndFiltre(entitatId, rol, organGestorCodi, usuariCodi, filtre, paginacio);
 	}
 
 
@@ -92,47 +78,26 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public void columnesCreate(
-			UsuariDto usuaris, 
-			Long entitatId, 
-			ColumnesDto columnes) {
-		getDelegateService().columnesCreate(
-				usuaris, 
-				entitatId, 
-				columnes);
+	public void columnesCreate(UsuariDto usuaris, Long entitatId, ColumnesDto columnes) {
+		getDelegateService().columnesCreate(usuaris, entitatId, columnes);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public void columnesUpdate(
-			Long entitatId, 
-			ColumnesDto columnes) {
-		getDelegateService().columnesUpdate(
-				entitatId, 
-				columnes);
+	public void columnesUpdate(Long entitatId, ColumnesDto columnes) {
+		getDelegateService().columnesUpdate(entitatId, columnes);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public ColumnesDto getColumnesUsuari(
-			Long entitatId, 
-			UsuariDto usuari) {
-		return getDelegateService().getColumnesUsuari(
-				entitatId, 
-				usuari);
+	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuari) {
+		return getDelegateService().getColumnesUsuari(entitatId, usuari);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public FitxerDto exportacio(
-			Long entitatId, 
-			Collection<Long> enviamentIds, 
-			String format)
-			throws IOException, NotFoundException, ParseException {
-		return getDelegateService().exportacio(
-				entitatId, 
-				enviamentIds, 
-				format);
+	public FitxerDto exportacio(Long entitatId, Collection<Long> enviamentIds, String format) throws IOException, NotFoundException, ParseException {
+		return getDelegateService().exportacio(entitatId, enviamentIds, format);
 	}
 
 	@Override

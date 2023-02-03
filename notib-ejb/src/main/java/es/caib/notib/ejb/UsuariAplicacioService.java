@@ -23,30 +23,25 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
-	public AplicacioDto create(
-			AplicacioDto aplicacio) {
+	public AplicacioDto create(AplicacioDto aplicacio) {
 		return getDelegateService().create(aplicacio);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
-	public AplicacioDto update(
-			AplicacioDto aplicacio) throws NotFoundException {
+	public AplicacioDto update(AplicacioDto aplicacio) throws NotFoundException {
 		return getDelegateService().update(aplicacio);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "NOT_ADMIN"})
-	public AplicacioDto delete(
-			Long id, 
-			Long entitatId) throws NotFoundException {
+	public AplicacioDto delete(Long id, Long entitatId) throws NotFoundException {
 		return getDelegateService().delete(id, entitatId);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
-	public AplicacioDto findById(
-			Long aplicacioId) {
+	public AplicacioDto findById(Long aplicacioId) {
 		return getDelegateService().findById(aplicacioId);
 	}
 	
@@ -58,23 +53,19 @@ public class UsuariAplicacioService extends AbstractService<es.caib.notib.logic.
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
-	public AplicacioDto findByUsuariCodi(
-			String usuariCodi) {
+	public AplicacioDto findByUsuariCodi(String usuariCodi) {
 		return getDelegateService().findByUsuariCodi(usuariCodi);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN", "NOT_APL"})
-	public AplicacioDto findByEntitatAndUsuariCodi(
-			Long entitatId, 
-			String usuariCodi) {
+	public AplicacioDto findByEntitatAndUsuariCodi(Long entitatId, String usuariCodi) {
 		return getDelegateService().findByEntitatAndUsuariCodi(entitatId, usuariCodi);
 	}
 
 	@Override
 	@RolesAllowed({"NOT_SUPER", "tothom", "NOT_ADMIN"})
-	public PaginaDto<AplicacioDto> findPaginat(
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<AplicacioDto> findPaginat(PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findPaginat(paginacioParams);
 	}
 

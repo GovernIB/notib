@@ -39,6 +39,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaAlta alta(NotificacioV2 notificacio) {
+
 		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().alta(notificacio);
 	}
@@ -52,9 +53,8 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
     @Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(String identificador) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().consultaEstatNotificacio(identificador);
 	}
 
@@ -67,9 +67,8 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public RespostaConsultaEstatEnviament consultaEstatEnviament(String referencia) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().consultaEstatEnviament(referencia);
 	}
 
@@ -82,16 +81,14 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 	@Override
 	@RolesAllowed({"NOT_APL"})
 	public boolean donarPermisConsulta(PermisConsulta permisConsulta) {
-		usuariHelper.generarUsuariAutenticatEjb(
-				sessionContext,
-				true);
+
+		usuariHelper.generarUsuariAutenticatEjb(sessionContext, true);
 		return getDelegateService().donarPermisConsulta(permisConsulta);
 	}
 	
 	@Override
 	@RolesAllowed({"NOT_APL"})
-	public RespostaConsultaDadesRegistre consultaDadesRegistre(
-			DadesConsulta dadesConsulta) {
+	public RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta) {
 		return getDelegateService().consultaDadesRegistre(dadesConsulta);
 	}
 
@@ -103,8 +100,7 @@ public class NotificacioServiceWs extends AbstractService<es.caib.notib.logic.in
 
     @Override
 	@RolesAllowed({"NOT_APL"})
-	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(
-			@WebParam(name="identificador") @XmlElement(required = true) String identificador){
+	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(@WebParam(name="identificador") @XmlElement(required = true) String identificador){
 		return getDelegateService().consultaJustificantEnviament(identificador);
 
 	}

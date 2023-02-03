@@ -21,9 +21,7 @@ public class PagadorCieFormatSobreService extends AbstractService<es.caib.notib.
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public CieFormatSobreDto create(Long entitatId, CieFormatSobreDto formatSobre) {
-		return getDelegateService().create(
-				entitatId, 
-				formatSobre);
+		return getDelegateService().create(entitatId, formatSobre);
 	}
 
 	@Override
@@ -58,12 +56,8 @@ public class PagadorCieFormatSobreService extends AbstractService<es.caib.notib.
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public PaginaDto<CieFormatSobreDto> findAllPaginat(
-			Long pagadorCieId, 
-			PaginacioParamsDto paginacioParams) {
-		return getDelegateService().findAllPaginat(
-				pagadorCieId,
-				paginacioParams);
+	public PaginaDto<CieFormatSobreDto> findAllPaginat(Long pagadorCieId, PaginacioParamsDto paginacioParams) {
+		return getDelegateService().findAllPaginat(pagadorCieId, paginacioParams);
 	}
 
 }

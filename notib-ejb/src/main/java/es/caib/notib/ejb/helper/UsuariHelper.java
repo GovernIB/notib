@@ -3,9 +3,6 @@
  */
 package es.caib.notib.ejb.helper;
 
-import es.caib.notib.logic.helper.CacheHelper;
-import es.caib.notib.logic.helper.ConfigHelper;
-import es.caib.notib.persist.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,7 +11,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.ejb.SessionContext;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,20 +25,13 @@ import java.util.List;
 @Slf4j
 @Component
 public class UsuariHelper {
- 
-	@Resource
-	private UsuariRepository usuariRepository;
-	@Resource
-	private CacheHelper cacheHelper;
-	@Resource
-	private ConfigHelper configHelper;
 
 	public Authentication generarUsuariAutenticatEjb(SessionContext sessionContext, boolean establirComAUsuariActual) {
 
 		if (sessionContext == null || sessionContext.getCallerPrincipal() == null) {
 			return null;
 		}
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		List<GrantedAuthority> authorities = new ArrayList<>();
 		if (sessionContext.isCallerInRole("NOT_APL")) {
 			authorities.add(new SimpleGrantedAuthority("NOT_APL"));
 		}

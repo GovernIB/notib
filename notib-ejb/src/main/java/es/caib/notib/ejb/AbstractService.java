@@ -10,7 +10,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 
 /**
  * Funcionalitat bàsica pels EJBs.
@@ -38,14 +37,16 @@ public abstract class AbstractService<S> {
 
 	@SuppressWarnings("unchecked")
 	protected Class<S> getServiceClass() {
-		if (serviceClass == null) {
-			Type genericSuperClass = getClass().getGenericSuperclass();
-			while (genericSuperClass != null && !(genericSuperClass instanceof ParameterizedType)) {
-				genericSuperClass = ((Class<?>)genericSuperClass).getGenericSuperclass();
-			}
-			ParameterizedType parameterizedType = (ParameterizedType)genericSuperClass;
-			serviceClass = (Class<S>)parameterizedType.getActualTypeArguments()[0];
+
+		if (serviceClass != null) {
+			return serviceClass;
 		}
+		var genericSuperClass = getClass().getGenericSuperclass();
+		while (genericSuperClass != null && !(genericSuperClass instanceof ParameterizedType)) {
+			genericSuperClass = ((Class<?>)genericSuperClass).getGenericSuperclass();
+		}
+		var parameterizedType = (ParameterizedType)genericSuperClass;
+		serviceClass = (Class<S>)parameterizedType.getActualTypeArguments()[0];
 		return serviceClass;
 	}
 

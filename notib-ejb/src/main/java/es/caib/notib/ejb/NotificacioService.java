@@ -115,9 +115,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
 	public NotificacioEnviamenEstatDto enviamentRefrescarEstat(Long entitatId, Long enviamentId) {
-		return getDelegateService().enviamentRefrescarEstat(
-				entitatId,
-				enviamentId);
+		return getDelegateService().enviamentRefrescarEstat(entitatId, enviamentId);
 	}
 
 	@Override
@@ -128,8 +126,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioDatabaseDto update(Long entitatId, NotificacioDatabaseDto notificacio,
-			boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
+	public NotificacioDatabaseDto update(Long entitatId, NotificacioDatabaseDto notificacio, boolean isAdministradorEntitat) throws NotFoundException, RegistreNotificaException {
 		return getDelegateService().update(entitatId, notificacio, isAdministradorEntitat);
 	}
 	
@@ -228,9 +225,7 @@ public class NotificacioService extends AbstractService<es.caib.notib.logic.intf
 
 	@Override
 	@RolesAllowed({"NOT_SUPER"})
-	public PaginaDto<NotificacioDto> findWithCallbackError(
-			NotificacioErrorCallbackFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<NotificacioDto> findWithCallbackError(NotificacioErrorCallbackFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findWithCallbackError(filtre, paginacioParams);
 	}
 

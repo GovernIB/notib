@@ -17,18 +17,8 @@ public class AuditService extends AbstractService<es.caib.notib.logic.intf.servi
 
 	@Override
 	@PermitAll
-	public void audita(
-			Object objecteAuditar, 
-			TipusOperacio tipusOperacio, 
-			TipusEntitat tipusEntitat,
-			TipusObjecte tipusObjecte, 
-			String joinPoint) {
-		getDelegateService().audita(
-				objecteAuditar, 
-				tipusOperacio, 
-				tipusEntitat, 
-				tipusObjecte, 
-				joinPoint);
+	public void audita(Object objecteAuditar, TipusOperacio tipusOperacio, TipusEntitat tipusEntitat, TipusObjecte tipusObjecte, String joinPoint) {
+		getDelegateService().audita(objecteAuditar, tipusOperacio, tipusEntitat, tipusObjecte, joinPoint);
 	}
 	
 }

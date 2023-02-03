@@ -39,13 +39,11 @@ public abstract class NotificacioBaseRestClient {
 	protected int readTimeout = 120000;
 
 	public RespostaConsultaJustificantEnviament consultaJustificantEnviament(String identificador, String serviceUrl) {
+
 		try {
 			String urlAmbMetode = baseUrl + serviceUrl + "/consultaJustificantNotificacio/" + identificador;
 			Client jerseyClient = generarClient(urlAmbMetode);
-			String json = jerseyClient.
-					resource(urlAmbMetode).
-					type("application/json").
-					get(String.class);
+			String json = jerseyClient.resource(urlAmbMetode).type("application/json").get(String.class);
 			return getMapper().readValue(json, RespostaConsultaJustificantEnviament.class);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);

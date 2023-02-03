@@ -100,26 +100,18 @@ public class NotificacioMassivaService extends AbstractService<es.caib.notib.log
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public NotificacioMassivaDataDto create(
-			Long entitatId,
-			String usuariCodi,
+	public NotificacioMassivaDataDto create(Long entitatId, String usuariCodi,
 			NotificacioMassivaDto notificacioMassiu) throws RegistreNotificaException {
 		return getDelegateService().create(entitatId, usuariCodi, notificacioMassiu);
 	}
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL"})
-	public void delete(
-			Long entitatId,
-			Long notificacioMassivaId) {
+	public void delete(Long entitatId, Long notificacioMassivaId) {
 		getDelegateService().delete(entitatId, notificacioMassivaId);
 	}
 	@Override
 	@RolesAllowed({"tothom"})
-	public PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(
-			Long entitatId,
-			NotificacioMassivaFiltreDto filtre,
-			RolEnumDto rol,
-			PaginacioParamsDto paginacioParams) {
+	public PaginaDto<NotificacioMassivaTableItemDto> findAmbFiltrePaginat(Long entitatId, NotificacioMassivaFiltreDto filtre, RolEnumDto rol, PaginacioParamsDto paginacioParams) {
 		return getDelegateService().findAmbFiltrePaginat(entitatId, filtre, rol, paginacioParams);
 	}
 }
