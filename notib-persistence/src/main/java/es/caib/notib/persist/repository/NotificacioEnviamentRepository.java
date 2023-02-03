@@ -40,8 +40,7 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 	List<Long> findIdByNotificacioIdIn(@Param("notificacioIdList")  Collection<Long> notificacioIdList);
 
 	@Query(value = "FROM NotificacioEnviamentEntity n WHERE n.id = :notificacioId ORDER BY n.notificaEstatData DESC, n.notificaEstatDataActualitzacio DESC")
-	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(
-			@Param("notificacioId")  Long notificacioId);
+	List<NotificacioEnviamentEntity> findByNotificacioIdOrderByNotificaEstatDataAndOrderByNotificaEstatDataActualitzacioDesc(@Param("notificacioId")  Long notificacioId);
 	
 //	NotificacioEnviamentEntity findById(Long id);
 	
@@ -171,11 +170,9 @@ public interface NotificacioEnviamentRepository extends JpaRepository<Notificaci
 
 
 
-	@Query(	"from" +
-			"    NotificacioEnviamentEntity n " +
-			"where " +
-			"	 (:esNullCodiNotifica = true or n.notificaIdentificador = :notificaIdentificador) " +
-			"and n.notificacio = :notificacio")
+	@Query(	"from NotificacioEnviamentEntity n " +
+			"where (:esNullCodiNotifica = true or n.notificaIdentificador = :notificaIdentificador) " +
+			"	and n.notificacio = :notificacio")
 	List<Long> findIdByEntitatAndFiltre (
 			@Param("esNullCodiNotifica") boolean esNullCodiNotifica,
 			@Param("notificaIdentificador") String codiNotifica,

@@ -896,33 +896,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 				columnes.setTitularNomLlinatge(true);
 			}
 			// Dades generals de la notificació
-			var columnesBuilder = ColumnesEntity.getBuilder(
-					columnes.isDataEnviament(),
-					columnes.isDataProgramada(), 
-					columnes.isNotIdentificador(), 
-					columnes.isProCodi(),
-					columnes.isGrupCodi(),
-					columnes.isDir3Codi(), 
-					columnes.isUsuari(), 
-					columnes.isEnviamentTipus(), 
-					columnes.isConcepte(),
-					columnes.isDescripcio(), 
-					columnes.isTitularNif(), 
-					columnes.isTitularNomLlinatge(),
-					columnes.isTitularEmail(),
-					columnes.isDestinataris(),
-					columnes.isLlibreRegistre(),
-					columnes.isNumeroRegistre(), 
-					columnes.isDataRegistre(), 
-					columnes.isDataCaducitat(),
-					columnes.isCodiNotibEnviament(), 
-					columnes.isNumCertificacio(), 
-					columnes.isCsvUuid(), 
-					columnes.isEstat(),
-					entitatEntity,
-					usuariEntity);
-	
-			var columnesEntity = columnesBuilder.build();
+			var columnesEntity = new ColumnesEntity(columnes, entitatEntity, usuariEntity);
 			columnesRepository.saveAndFlush(columnesEntity);
 		} finally {
 			metricsHelper.fiMetrica(timer);
@@ -936,30 +910,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var columnesEntity = columnesRepository.findById(columnes.getId()).orElseThrow();
-			columnesEntity.update(
-					columnes.isDataEnviament(), 
-					columnes.isDataProgramada(), 
-					columnes.isNotIdentificador(),
-					columnes.isProCodi(), 
-					columnes.isGrupCodi(), 
-					columnes.isDir3Codi(), 
-					columnes.isUsuari(),
-					columnes.isEnviamentTipus(), 
-					columnes.isConcepte(), 
-					columnes.isDescripcio(), 
-					columnes.isTitularNif(),
-					columnes.isTitularNomLlinatge(), 
-					columnes.isTitularEmail(), 
-					columnes.isDestinataris(),
-					columnes.isLlibreRegistre(), 
-					columnes.isNumeroRegistre(), 
-					columnes.isDataRegistre(),
-					columnes.isDataCaducitat(), 
-					columnes.isCodiNotibEnviament(), 
-					columnes.isNumCertificacio(),
-					columnes.isCsvUuid(), 
-					columnes.isEstat(),
-					columnes.isReferenciaNotificacio());
+			columnesEntity.update(columnes);
 			columnesRepository.saveAndFlush(columnesEntity);
 		} finally {
 			metricsHelper.fiMetrica(timer);

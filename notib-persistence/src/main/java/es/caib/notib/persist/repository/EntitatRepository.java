@@ -61,7 +61,6 @@ public interface EntitatRepository extends JpaRepository<EntitatEntity, Long> {
 			" where " +
 			"     e.id in (:ids) " +
 			" and e.activa = :activa ")
-	List<EntitatEntity> findByIdsAndActiva(@Param("ids") List<Long> ids,
-										   @Param("activa") boolean activa);
+	List<EntitatEntity> findByIdsAndActiva(@Param("ids") List<Long> ids, @Param("activa") boolean activa);
 
 }

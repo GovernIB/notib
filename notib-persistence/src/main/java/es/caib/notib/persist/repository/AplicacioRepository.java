@@ -28,19 +28,13 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 	@Query(	  "FROM AplicacioEntity a "
 			+ "WHERE lower(a.usuariCodi) like concat('%', lower(:filtre), '%') "
 			+ "   OR lower(a.callbackUrl) like concat('%', lower(:filtre), '%')")
-	Page<AplicacioEntity> findAllFiltrat(
-			@Param("filtre") String filtre,
-			Pageable paginacio
-			);
+	Page<AplicacioEntity> findAllFiltrat(@Param("filtre") String filtre, Pageable paginacio);
 	
 	@Query(	  "FROM AplicacioEntity a "
 			+ "WHERE a.entitat.id = :entitatId "
 			+ "  AND (lower(a.usuariCodi) like concat('%', lower(:filtre), '%') "
 			+ "   OR lower(a.callbackUrl) like concat('%', lower(:filtre), '%'))")
-	Page<AplicacioEntity> findByEntitatIdFiltrat(
-			@Param("entitatId") Long entitatId,
-			@Param("filtre") String filtre,
-			Pageable paginacio);
+	Page<AplicacioEntity> findByEntitatIdFiltrat(@Param("entitatId") Long entitatId, @Param("filtre") String filtre, Pageable paginacio);
 
 	@Query(	  "FROM AplicacioEntity a "
 			+ "WHERE a.entitat.id = :entitatId "
@@ -71,9 +65,7 @@ public interface AplicacioRepository extends JpaRepository<AplicacioEntity, Long
 			+ "WHERE a.entitat.id = :entitatId"
 			+ "		AND lower(a.usuariCodi) like concat('%', lower(:text), '%') "
 			+ "ORDER BY a.usuariCodi desc")
-	AplicacioEntity findByText(
-			@Param("entitatId") Long entitatId,
-			@Param("text") String text);
+	AplicacioEntity findByText(@Param("entitatId") Long entitatId, @Param("text") String text);
 
 	int deleteAplicacioEntityByEntitat(EntitatEntity entitat);
 

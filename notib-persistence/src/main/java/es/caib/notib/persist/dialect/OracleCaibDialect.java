@@ -20,36 +20,31 @@ public class OracleCaibDialect extends Oracle10gDialect {
 	private static final String HIBERNATE_SEQ = "hibernate_seq";
 
 	public OracleCaibDialect() {
+
 		super();
 		registerFunction("bitand", new OracleBitwiseAndSQLFunction("bitand", IntegerType.INSTANCE));
 	}
 
 	@Override
 	public String getSelectSequenceNextValString(String sequenceName) {
-		if (sequenceName.equalsIgnoreCase("hibernate_sequence")) {
-			return AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ + ".nextval";
-		} else {
-			return sequenceName + ".nextval";
-		}
+		return sequenceName.equalsIgnoreCase("hibernate_sequence")
+				? AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ + ".nextval"
+				:sequenceName + ".nextval";
 	}
 
 	@Override
 	public String getCreateSequenceString(String sequenceName) {
 		//starts with 1, implicitly
-		if (sequenceName.equalsIgnoreCase("hibernate_sequence")) {
-			return "create sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ;
-		} else {
-			return "create sequence " + sequenceName;
-		}
+		return sequenceName.equalsIgnoreCase("hibernate_sequence")
+				? "create sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ
+				: "create sequence " + sequenceName;
 	}
 
 	@Override
 	public String getDropSequenceString(String sequenceName) {
-		if (sequenceName.equalsIgnoreCase("hibernate_sequence")) {
-			return "drop sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ;
-		} else {
-			return "drop sequence " + sequenceName;
-		}
+		return sequenceName.equalsIgnoreCase("hibernate_sequence")
+			 	? "drop sequence " + AbstractAuditableEntity.TABLE_PREFIX + "_" + HIBERNATE_SEQ
+				: "drop sequence " + sequenceName;
 	}
 
 }

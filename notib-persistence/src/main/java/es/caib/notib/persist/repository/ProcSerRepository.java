@@ -71,13 +71,9 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"			) " +
 			"		) " +
 			"order by pro.nom asc")
-	Long countProcedimentsByEntitatAndGrupAndIds(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups,
-			@Param("ids") List<Long> ids);
+	Long countProcedimentsByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
-	@Query("from " +
-			"	ProcSerEntity pro " +
+	@Query("from ProcSerEntity pro " +
 			"where " +
 			"		pro.entitat = :entitat " +
 			"	and pro.id in (:ids)" +
@@ -91,13 +87,9 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"			) " +
 			"		) " +
 			"order by pro.nom asc")
-	List<ProcSerEntity> findProcedimentsByEntitatAndGrupAndIds(
-            @Param("entitat") EntitatEntity entitat,
-            @Param("grups") List<String> grups,
-            @Param("ids") List<Long> ids);
+	List<ProcSerEntity> findProcedimentsByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
-	@Query("from " +
-			"	ProcSerEntity pro " +
+	@Query("from ProcSerEntity pro " +
 			"where " +
 			"		pro.entitat = :entitat " +
 			"	and	(:isTipusNull = true or pro.tipus = :tipus) " +
@@ -120,10 +112,8 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("tipus") ProcSerTipusEnum tipus);
 
 	@Query("select count(pro.id) " +
-			"from " +
-			"	ProcSerEntity pro " +
-			"where " +
-			"		pro.entitat = :entitat " +
+			"from ProcSerEntity pro " +
+			"where pro.entitat = :entitat " +
 			"	and pro.actiu = true " +
 			"	and pro.id in (:ids)" +
 			"  	and (pro.agrupar = false " +
@@ -136,15 +126,10 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"			) " +
 			"		) " +
 			"order by pro.nom asc")
-	Long countProcedimentsActiusByEntitatAndGrupAndIds(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups,
-			@Param("ids") List<Long> ids);
+	Long countProcedimentsActiusByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
-	@Query("from " +
-			"	ProcSerEntity pro " +
-			"where " +
-			"		pro.entitat = :entitat " +
+	@Query("from ProcSerEntity pro " +
+			"where pro.entitat = :entitat " +
 			"	and	(:isTipusNull = true or pro.tipus = :tipus) " +
 			"	and pro.actiu = true " +
 			"	and pro.id in (:ids)" +
@@ -273,8 +258,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups);
 
-	@Query(
-			"from ProcSerEntity pro " +
+	@Query("from ProcSerEntity pro " +
 			"where (pro.organGestor.codi in (:organsCodis) " +
 			"  and pro.entitat = :entitat " +
 			"  and pro.requireDirectPermission = false" +
@@ -291,8 +275,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
             @Param("organsCodis") List<String> organsCodis,
             @Param("grups") List<String> grups);
 
-	@Query(
-			"from ProcSerEntity pro " +
+	@Query("from ProcSerEntity pro " +
 					"where (pro.organGestor.codi in (:organsCodis) " +
 					"  and pro.entitat = :entitat " +
 					"  and pro.requireDirectPermission = false" +
@@ -331,8 +314,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsCodis") List<String> organsCodis,
 			@Param("grups") List<String> grups);
-	@Query(
-			"from ProcSerEntity pro " +
+	@Query("from ProcSerEntity pro " +
 					"where (pro.organGestor.codi in (:organsCodis) " +
 					"  and pro.entitat = :entitat " +
 					"  and pro.requireDirectPermission = false" +
@@ -355,14 +337,8 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 
 	ProcSerEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 
-	@Query(
-			"from " +
-					"    ProcedimentEntity pro " +
-					"where pro.entitat = (:entitatActual) and " +
-					"lower(pro.codi) = (lower(:codiProcediment))")
-	ProcSerEntity findByEntitatAndCodiProcediment(
-			@Param("entitatActual") EntitatEntity entitat,
-			@Param("codiProcediment") String codiProcediment);
+	@Query("from ProcedimentEntity pro where pro.entitat = (:entitatActual) and lower(pro.codi) = (lower(:codiProcediment))")
+	ProcSerEntity findByEntitatAndCodiProcediment(@Param("entitatActual") EntitatEntity entitat, @Param("codiProcediment") String codiProcediment);
 
 	@Query(	"select p " +
 			"from ProcSerEntity p " +
@@ -395,9 +371,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by p.nom asc")
-	Long countProcedimentsComusByEntitatSenseAccesDirecte(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups
+	Long countProcedimentsComusByEntitatSenseAccesDirecte(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups
 	);
 
 	@Query(	"select p " +
@@ -434,10 +408,7 @@ public interface ProcSerRepository extends JpaRepository<ProcSerEntity, Long> {
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by p.nom asc")
-	Long countProcedimentsComusActiusByEntitatSenseAccesDirecte(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups
-	);
+	Long countProcedimentsComusActiusByEntitatSenseAccesDirecte(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups);
 
 	@Query(	"select p " +
 			"from ProcSerEntity p " +

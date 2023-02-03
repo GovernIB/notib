@@ -11,6 +11,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import es.caib.notib.logic.intf.dto.notenviament.ColumnesDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.notib.persist.audit.NotibAuditable;
@@ -21,6 +26,10 @@ import es.caib.notib.persist.audit.NotibAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Entity
 @Table(name="not_columnes")
 @EntityListeners(AuditingEntityListener.class)
@@ -82,241 +91,39 @@ public class ColumnesEntity extends NotibAuditable<Long> {
 	@JoinColumn(name = "usuari_codi")
 	@ForeignKey(name = "not_columnes_usuari_fk")
 	private UsuariEntity user;
-	
-	public boolean isDataEnviament() {
-		return dataEnviament;
-	}
-	public boolean isDataProgramada() {
-		return dataProgramada;
-	}
-	public boolean isNotIdentificador() {
-		return notIdentificador;
-	}
-	public boolean isProCodi() {
-		return proCodi;
-	}
-	public boolean isGrupCodi() {
-		return grupCodi;
-	}
-	public boolean isDir3Codi() {
-		return dir3Codi;
-	}
-	public boolean isUsuari() {
-		return usuari;
-	}
-	public boolean isEnviamentTipus() {
-		return enviamentTipus;
-	}
-	public boolean isConcepte() {
-		return concepte;
-	}
-	public boolean isDescripcio() {
-		return descripcio;
-	}
-	public boolean isTitularNif() {
-		return titularNif;
-	}
-	public boolean isTitularNomLlinatge() {
-		return titularNomLlinatge;
-	}
-	public boolean isTitularEmail() {
-		return titularEmail;
-	}
-	public boolean isDestinataris() {
-		return destinataris;
-	}
-	public boolean isLlibreRegistre() {
-		return llibreRegistre;
-	}
-	public boolean isNumeroRegistre() {
-		return numeroRegistre;
-	}
-	public boolean isDataRegistre() {
-		return dataRegistre;
-	}
-	public boolean isDataCaducitat() {
-		return dataCaducitat;
-	}
-	public boolean isCodiNotibEnviament() {
-		return codiNotibEnviament;
-	}
-	public boolean isNumCertificacio() {
-		return numCertificacio;
-	}
-	public boolean isCsvUuid() {
-		return csvUuid;
-	}
-	public boolean isEstat() {
-		return estat;
-	}
-	public EntitatEntity getEntitat() {
-		return entitat;
-	}
-	public UsuariEntity getUser() {
-		return user;
-	}
-	public boolean isReferenciaNotificacio() {
-		return referenciaNotificacio;
-	}
-	
-	public void update(
-			boolean dataEnviament,
-			boolean dataProgramada,
-			boolean notIdentificador,
-			boolean proCodi,
-			boolean grupCodi,
-			boolean dir3Codi,
-			boolean usuari,
-			boolean enviamentTipus,
-			boolean concepte,
-			boolean descripcio,
-			boolean titularNif,
-			boolean titularNomLlinatge,
-			boolean titularEmail,
-			boolean destinataris,
-			boolean llibreRegistre,
-			boolean numeroRegistre,
-			boolean dataRegistre,
-			boolean dataCaducitat,
-			boolean codiNotibEnviament,
-			boolean numCertificacio,
-			boolean csvUuid,
-			boolean estat,
-			boolean referenciaNotificacio) {
-		this.dataEnviament = dataEnviament;
-		this.dataProgramada = dataProgramada;
-		this.notIdentificador = notIdentificador;
-		this.proCodi = proCodi;
-		this.grupCodi = grupCodi;
-		this.dir3Codi = dir3Codi;
-		this.usuari = usuari;
-		this.enviamentTipus = enviamentTipus;
-		this.concepte = concepte;
-		this.descripcio = descripcio;
-		this.titularNif = titularNif;
-		this.titularNomLlinatge = titularNomLlinatge;
-		this.titularEmail = titularEmail;
-		this.destinataris = destinataris;
-		this.llibreRegistre = llibreRegistre;
-		this.numeroRegistre = numeroRegistre;
-		this.dataRegistre = dataRegistre;
-		this.dataCaducitat = dataCaducitat;
-		this.codiNotibEnviament = codiNotibEnviament;
-		this.numCertificacio = numCertificacio;
-		this.csvUuid = csvUuid;
-		this.estat = estat;
-		this.referenciaNotificacio = referenciaNotificacio;
-	}
-	
-	public static Builder getBuilder(
-			boolean dataEnviament,
-			boolean dataProgramada,
-			boolean notIdentificador,
-			boolean proCodi,
-			boolean grupCodi,
-			boolean dir3Codi,
-			boolean usuari,
-			boolean enviamentTipus,
-			boolean concepte,
-			boolean descripcio,
-			boolean titularNif,
-			boolean titularNomLlinatge,
-			boolean titularEmail,
-			boolean destinataris,
-			boolean llibreRegistre,
-			boolean numeroRegistre,
-			boolean dataRegistre,
-			boolean dataCaducitat,
-			boolean codiNotibEnviament,
-			boolean numCertificacio,
-			boolean csvUuid,
-			boolean estat,
-			EntitatEntity entitat,
-			UsuariEntity user) {
-		return new Builder(
-				dataEnviament, 
-				dataProgramada, 
-				notIdentificador, 
-				proCodi, 
-				grupCodi, 
-				dir3Codi, 
-				usuari, 
-				enviamentTipus, 
-				concepte, 
-				descripcio, 
-				titularNif, 
-				titularNomLlinatge, 
-				titularEmail,
-				destinataris, 
-				llibreRegistre, 
-				numeroRegistre, 
-				dataRegistre,
-				dataCaducitat,
-				codiNotibEnviament, 
-				numCertificacio, 
-				csvUuid, 
-				estat,
-				entitat,
-				user);
+
+	public ColumnesEntity(ColumnesDto col,  EntitatEntity entitat, UsuariEntity user) {
+
+		update(col);
+		this.entitat = entitat;
+		this.user = user;
 	}
 
-	public static class Builder {
-		ColumnesEntity built;
-		Builder(
-					boolean dataEnviament,
-					boolean dataProgramada,
-					boolean notIdentificador,
-					boolean proCodi,
-					boolean grupCodi,
-					boolean dir3Codi,
-					boolean usuari,
-					boolean enviamentTipus,
-					boolean concepte,
-					boolean descripcio,
-					boolean titularNif,
-					boolean titularNomLlinatge,
-					boolean titularEmail,
-					boolean destinataris,
-					boolean llibreRegistre,
-					boolean numeroRegistre,
-					boolean dataRegistre,
-					boolean dataCaducitat,
-					boolean codiNotibEnviament,
-					boolean numCertificacio,
-					boolean csvUuid,
-					boolean estat,
-					EntitatEntity entitat,
-					UsuariEntity user) {
-			built = new ColumnesEntity();
-			built.dataEnviament = dataEnviament;
-			built.dataProgramada = dataProgramada;
-			built.notIdentificador = notIdentificador;
-			built.proCodi = proCodi;
-			built.grupCodi = grupCodi;
-			built.dir3Codi = dir3Codi;
-			built.usuari = usuari;
-			built.enviamentTipus = enviamentTipus;
-			built.concepte = concepte;
-			built.descripcio = descripcio;
-			built.titularNif = titularNif;
-			built.titularNomLlinatge = titularNomLlinatge;
-			built.titularEmail = titularEmail;
-			built.destinataris = destinataris;
-			built.llibreRegistre = llibreRegistre;
-			built.numeroRegistre = numeroRegistre;
-			built.dataRegistre = dataRegistre;
-			built.dataCaducitat = dataCaducitat;
-			built.codiNotibEnviament = codiNotibEnviament;
-			built.numCertificacio = numCertificacio;
-			built.csvUuid = csvUuid;
-			built.estat = estat;
-			built.entitat = entitat;
-			built.user = user;
-		}
-		
-		public ColumnesEntity build() {
-			return built;
-		}
+	public void update(ColumnesDto col) {
+
+		dataEnviament = col.isDataEnviament();
+		dataProgramada = col.isDataProgramada();
+		notIdentificador = col.isNotIdentificador();
+		proCodi = col.isProCodi();
+		grupCodi = col.isGrupCodi();
+		usuari = col.isUsuari();
+		dir3Codi = col.isDir3Codi();
+		enviamentTipus = col.isEnviamentTipus();
+		concepte = col.isConcepte();
+		descripcio = col.isDescripcio();
+		titularNif = col.isTitularNif();
+		titularNomLlinatge = col.isTitularNomLlinatge();
+		titularEmail = col.isTitularEmail();
+		destinataris = col.isDestinataris();
+		llibreRegistre = col.isLlibreRegistre();
+		numeroRegistre = col.isNumeroRegistre();
+		dataRegistre = col.isDataRegistre();
+		dataCaducitat = col.isDataCaducitat();
+		codiNotibEnviament = col.isCodiNotibEnviament();
+		numCertificacio = col.isNumCertificacio();
+		csvUuid = col.isCsvUuid();
+		estat = col.isEstat();
+		referenciaNotificacio = col.isReferenciaNotificacio();
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

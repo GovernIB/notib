@@ -16,16 +16,15 @@ public class CustomImplicitNamingStrategy implements ImplicitNamingStrategy {
     }
 
     public Identifier determinePrimaryTableName(ImplicitEntityNameSource source) {
+
         if (source == null) {
             throw new HibernateException("Entity naming information was not provided.");
-        } else {
-            String tableName = this.transformEntityName(source.getEntityNaming());
-            if (tableName == null) {
-                throw new HibernateException("Could not determine primary table name for entity");
-            } else {
-                return this.toIdentifier(tableName, source.getBuildingContext());
-            }
         }
+        var tableName = this.transformEntityName(source.getEntityNaming());
+        if (tableName == null) {
+            throw new HibernateException("Could not determine primary table name for entity");
+        }
+        return this.toIdentifier(tableName, source.getBuildingContext());
     }
 
     protected String transformEntityName(EntityNaming entityNaming) {
@@ -33,13 +32,15 @@ public class CustomImplicitNamingStrategy implements ImplicitNamingStrategy {
     }
 
     public Identifier determineJoinTableName(ImplicitJoinTableNameSource source) {
-        String name = source.getOwningPhysicalTableName() + '_' + source.getNonOwningPhysicalTableName();
+
+        var name = source.getOwningPhysicalTableName() + '_' + source.getNonOwningPhysicalTableName();
         return this.toIdentifier(name, source.getBuildingContext());
     }
 
     public Identifier determineCollectionTableName(ImplicitCollectionTableNameSource source) {
-        String entityName = this.transformEntityName(source.getOwningEntityNaming());
-        String name = entityName + '_' + this.transformAttributePath(source.getOwningAttributePath());
+
+        var entityName = this.transformEntityName(source.getOwningEntityNaming());
+        var name = entityName + '_' + this.transformAttributePath(source.getOwningAttributePath());
         return this.toIdentifier(name, source.getBuildingContext());
     }
 
@@ -60,12 +61,10 @@ public class CustomImplicitNamingStrategy implements ImplicitNamingStrategy {
     }
 
     public Identifier determineJoinColumnName(ImplicitJoinColumnNameSource source) {
-        String name;
-        if (source.getNature() != ImplicitJoinColumnNameSource.Nature.ELEMENT_COLLECTION && source.getAttributePath() != null) {
-            name = this.transformAttributePath(source.getAttributePath()) + '_' + source.getReferencedColumnName().getText();
-        } else {
-            name = this.transformEntityName(source.getEntityNaming()) + '_' + source.getReferencedColumnName().getText();
-        }
+
+        var name = source.getNature() != ImplicitJoinColumnNameSource.Nature.ELEMENT_COLLECTION && source.getAttributePath() != null
+                        ? this.transformAttributePath(source.getAttributePath()) + '_' + source.getReferencedColumnName().getText()
+                        : this.transformEntityName(source.getEntityNaming()) + '_' + source.getReferencedColumnName().getText();
 
         return this.toIdentifier(name, source.getBuildingContext());
     }
@@ -91,17 +90,20 @@ public class CustomImplicitNamingStrategy implements ImplicitNamingStrategy {
     }
 
     public Identifier determineForeignKeyName(ImplicitForeignKeyNameSource source) {
-        Identifier userProvidedIdentifier = source.getUserProvidedIdentifier();
+
+        var userProvidedIdentifier = source.getUserProvidedIdentifier();
         return userProvidedIdentifier != null ? userProvidedIdentifier : this.toIdentifier(NamingHelper.withCharset(source.getBuildingContext().getBuildingOptions().getSchemaCharset()).generateHashedFkName("FK", source.getTableName(), source.getReferencedTableName(), source.getColumnNames()), source.getBuildingContext());
     }
 
     public Identifier determineUniqueKeyName(ImplicitUniqueKeyNameSource source) {
-        Identifier userProvidedIdentifier = source.getUserProvidedIdentifier();
+
+        var userProvidedIdentifier = source.getUserProvidedIdentifier();
         return userProvidedIdentifier != null ? userProvidedIdentifier : this.toIdentifier(NamingHelper.withCharset(source.getBuildingContext().getBuildingOptions().getSchemaCharset()).generateHashedConstraintName("UK", source.getTableName(), source.getColumnNames()), source.getBuildingContext());
     }
 
     public Identifier determineIndexName(ImplicitIndexNameSource source) {
-        Identifier userProvidedIdentifier = source.getUserProvidedIdentifier();
+
+        var userProvidedIdentifier = source.getUserProvidedIdentifier();
         return userProvidedIdentifier != null ? userProvidedIdentifier : this.toIdentifier(NamingHelper.withCharset(source.getBuildingContext().getBuildingOptions().getSchemaCharset()).generateHashedConstraintName("IDX", source.getTableName(), source.getColumnNames()), source.getBuildingContext());
     }
 
@@ -110,7 +112,8 @@ public class CustomImplicitNamingStrategy implements ImplicitNamingStrategy {
     }
 
     protected Identifier toIdentifier(String stringForm, MetadataBuildingContext buildingContext) {
-        String attr = convertAuditAtributes(stringForm);
+
+        var attr = convertAuditAtributes(stringForm);
         log.info("CUSTOM STRG --> In: {}, Out: {}", stringForm, attr);
         return buildingContext.getMetadataCollector().getDatabase().getJdbcEnvironment().getIdentifierHelper().toIdentifier(attr);
     }

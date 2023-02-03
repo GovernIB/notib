@@ -41,8 +41,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 	List<PagadorPostalEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsFills);
 	List<PagadorPostalEntity> findByOrganGestorId(Long organGestorId);
 
-	@Query(	"from " +
-			"    PagadorPostalEntity b " +
+	@Query(	"from PagadorPostalEntity b " +
 			"where " +
 			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +
@@ -55,8 +54,7 @@ public interface PagadorPostalRepository extends JpaRepository<PagadorPostalEnti
 			@Param("entitat") EntitatEntity entitat,
 			Pageable paginacio);
 
-	@Query(	"from " +
-			"    PagadorPostalEntity b " +
+	@Query(	"from PagadorPostalEntity b " +
 			"where " +
 			"	 (:esNullFiltreOrganismePagador = true or lower(b.organGestor.codi) like lower('%'||:organismePagadorCodi||'%')) " +
 			"and (:esNullFiltreNumContracte = true or lower(b.contracteNum) like lower('%'||:numContracte||'%')) " +

@@ -36,15 +36,12 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcSerOrganEntity> findProcedimentsOrganByEntitatAndGrup(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups);
+	List<ProcSerOrganEntity> findProcedimentsOrganByEntitatAndGrup(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups);
 
     List<ProcSerOrganEntity> findByProcSerIdAndOrganGestorCodiIn(Long procSerId, List<String> unitatsEntitat);
 
 	@Query(	"select count(pog.id) from ProcSerOrganEntity pog where pog.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
-
 
 	@Query(	"select count(po.procSer) " +
 			"from ProcSerOrganEntity po " +
@@ -59,10 +56,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public Long countProcedimentsByEntitatAndGrupAndIds(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups,
-			@Param("ids") List<Long> ids);
+	public Long countProcedimentsByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
 	@Query(	"select po.procSer " +
 			"from ProcSerOrganEntity po " +
@@ -119,10 +113,8 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public Long countProcedimentsActiusByEntitatAndGrupAndIds(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("grups") List<String> grups,
-			@Param("ids") List<Long> ids);
+	public Long countProcedimentsActiusByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
+
 	@Query(	"select po.procSer " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +

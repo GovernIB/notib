@@ -145,22 +145,13 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 	private String notificaDatatErrorDescripcio;
 
 
-	public static Builder getBuilder(
-			NotificacioEnviamentEntity notificacioEnviamentEntity,
-			TipusOperacio tipusOperacio,
-			String joinPoint) {
-		return new Builder(
-				notificacioEnviamentEntity,
-				tipusOperacio,
-				joinPoint);
+	public static Builder getBuilder(NotificacioEnviamentEntity notificacioEnviamentEntity, TipusOperacio tipusOperacio, String joinPoint) {
+		return new Builder(notificacioEnviamentEntity, tipusOperacio, joinPoint);
 	}
 
 	public static class Builder {
 		NotificacioEnviamentAudit built;
-		Builder(
-				NotificacioEnviamentEntity notificacioEnviamentEntity,
-				TipusOperacio tipusOperacio,
-				String joinPoint) {
+		Builder(NotificacioEnviamentEntity notificacioEnviamentEntity, TipusOperacio tipusOperacio, String joinPoint) {
 			built = new NotificacioEnviamentAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;
@@ -215,31 +206,23 @@ public class NotificacioEnviamentAudit extends NotibAuditoria<Long> {
 		}
 
 		private String getDestinataris(List<PersonaEntity> destinataris) {
-			String destinatariIds = "";
 
+			String destinatariIds = "";
 			if (destinataris != null) {
 				for (PersonaEntity destinatari: destinataris) {
 					destinatariIds += destinatari.getId() + " - ";
 				}
 			}
-
 			if (destinatariIds.isEmpty()) {
 				return null;
-			} else {
-				if (destinatariIds.length() > 100)
-					return ellipsis(destinatariIds, 100);
-				return destinatariIds.substring(0, destinatariIds.length() - 1);
 			}
+			return destinatariIds.length() > 100 ? ellipsis(destinatariIds, 100) : destinatariIds.substring(0, destinatariIds.length() - 1);
+
 		}
 		private String ellipsis(final String text, int length) {
-			if (text.length() > length) {
-				return text.substring(0, length - 3) + "...";
-			}
-			return text;
+			return text.length() > length ? text.substring(0, length - 3) + "..." : text;
 		}
 	}
-
-
 
 	private static final long serialVersionUID = 6993171107561077019L;
 }

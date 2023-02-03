@@ -25,25 +25,11 @@ public interface EntitatTipusDocRepository extends JpaRepository<EntitatTipusDoc
 	
 	public List<EntitatTipusDocEntity> findByEntitat(EntitatEntity entitat);
 	
-	@Query("from " +
-			"   EntitatTipusDocEntity tipus " +
-			"where " +
-			"   tipus.tipusDocEnum = :tipusDoc" +
-			" AND " +
-			"   tipus.entitat.id = :entitatId")
-	public EntitatTipusDocEntity findByEntitatAndTipus(
-			@Param("entitatId") Long entitat,
-			@Param("tipusDoc") TipusDocumentEnumDto tipusDoc);
+	@Query("from EntitatTipusDocEntity tipus where tipus.tipusDocEnum = :tipusDoc AND tipus.entitat.id = :entitatId")
+	public EntitatTipusDocEntity findByEntitatAndTipus(@Param("entitatId") Long entitat, @Param("tipusDoc") TipusDocumentEnumDto tipusDoc);
 	
 	@Transactional
 	@Modifying
-	@Query("delete from " +
-			"   EntitatTipusDocEntity tipus " +
-			"where " +
-			"   tipus.tipusDocEnum != :tipusDoc" +
-			" AND " +
-			"   tipus.entitat.id = :entitatId")
-	public int deleteNotInList(
-			@Param("entitatId") Long entitatId,
-			@Param("tipusDoc") TipusDocumentEnumDto tipusDoc);
+	@Query("delete from EntitatTipusDocEntity tipus where tipus.tipusDocEnum != :tipusDoc AND tipus.entitat.id = :entitatId")
+	public int deleteNotInList(@Param("entitatId") Long entitatId, @Param("tipusDoc") TipusDocumentEnumDto tipusDoc);
 }

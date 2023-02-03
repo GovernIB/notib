@@ -18,11 +18,11 @@ public class OracleBitwiseAndSQLFunction extends StandardSQLFunction {
 
     @Override
     public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor sessionFactory) {
+
         if (arguments.size() != 2){
             throw new IllegalArgumentException("the function must be passed 2 arguments");
         }
-
-        StringBuffer buf = new StringBuffer("BITAND(");
+        var buf = new StringBuffer("BITAND(");
         buf.append(arguments.get(0).toString());
         buf.append(", ");
         buf.append(arguments.get(1).toString());

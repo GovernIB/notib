@@ -18,31 +18,14 @@ import es.caib.notib.persist.entity.ProcedimentFormEntity;
  */
 public interface ProcedimentFormRepository extends JpaRepository<ProcedimentFormEntity, Long> {
 
-	@Query(
-			"from " +
-			"    ProcedimentFormEntity pro " + 
-			" where (pro.entitat_id = :entitatId)")
-	Page<ProcedimentFormEntity> findAmbEntitatActual(
-			@Param("entitatId") Long entitatId,
-			Pageable paginacio);
+	@Query("from ProcedimentFormEntity pro where (pro.entitat_id = :entitatId)")
+	Page<ProcedimentFormEntity> findAmbEntitatActual(@Param("entitatId") Long entitatId, Pageable paginacio);
 	
-	@Query(
-			"from " +
-			"    ProcedimentFormEntity pro " + 
-			" where (pro.entitat_id in (:entitatsActivesId))")
-	Page<ProcedimentFormEntity> findAmbEntitatActiva(
-			@Param("entitatsActivesId") List<Long> entitatActiveId,
-			Pageable paginacio);
+	@Query("from ProcedimentFormEntity pro where (pro.entitat_id in (:entitatsActivesId))")
+	Page<ProcedimentFormEntity> findAmbEntitatActiva(@Param("entitatsActivesId") List<Long> entitatActiveId, Pageable paginacio);
 	
-	@Query(
-			"from " +
-			"    ProcedimentFormEntity pro " + 
-			"where (pro.entitat_id = :entitatId) " +
-			" and ((pro.organGestor in (:organsGestors)) or pro.comu = true)")
-	Page<ProcedimentFormEntity> findAmbOrganGestorActualOrComu(
-			@Param("entitatId") Long entitatId,
-			@Param("organsGestors") List<String> organsGestors,
-			Pageable paginacio);
+	@Query("from ProcedimentFormEntity pro where (pro.entitat_id = :entitatId) and ((pro.organGestor in (:organsGestors)) or pro.comu = true)")
+	Page<ProcedimentFormEntity> findAmbOrganGestorActualOrComu(@Param("entitatId") Long entitatId, @Param("organsGestors") List<String> organsGestors, Pageable paginacio);
 	
 	@Query(	"from " +
 			"    ProcedimentFormEntity pro " +

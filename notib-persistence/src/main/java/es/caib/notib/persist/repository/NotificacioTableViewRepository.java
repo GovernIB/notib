@@ -88,26 +88,15 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 	 * Consulta de la taula de remeses sense filtres per al rol d'administrador d'entitat
 	 *
 	 */
-	@Query( "select ntf " +
-			"from " +
-			"    NotificacioTableEntity ntf " +
-			"where ntf.entitat = (:entitatActual)")
-	Page<NotificacioTableEntity> findByEntitatActual(
-			@Param("entitatActual") EntitatEntity entitatActiva,
-			Pageable paginacio);
+	@Query( "select ntf from NotificacioTableEntity ntf where ntf.entitat = (:entitatActual)")
+	Page<NotificacioTableEntity> findByEntitatActual(@Param("entitatActual") EntitatEntity entitatActiva, Pageable paginacio);
 
 	/**
 	 * Consulta de la taula de remeses sense filtres per al rol superadministrador
 	 *
 	 */
-	@Query(
-			"from " +
-			"    NotificacioTableEntity ntf " +
-			"where ntf.entitat in (:entitatActiva)")
-	Page<NotificacioTableEntity> findByEntitatActiva(
-			@Param("entitatActiva") List<EntitatEntity> entitatActiva,
-			Pageable paginacio);
-
+	@Query("from NotificacioTableEntity ntf where ntf.entitat in (:entitatActiva)")
+	Page<NotificacioTableEntity> findByEntitatActiva(@Param("entitatActiva") List<EntitatEntity> entitatActiva, Pageable paginacio);
 
 	/**
 	 * Consulta de la taula de remeses per al rol d'usuari

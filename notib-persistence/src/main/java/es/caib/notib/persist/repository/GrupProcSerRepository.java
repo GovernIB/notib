@@ -19,11 +19,11 @@ import java.util.List;
  */
 public interface GrupProcSerRepository extends JpaRepository<GrupProcSerEntity, Long> {
 
-	public List<GrupProcSerEntity> findByGrup(GrupEntity grup);
-	public List<GrupProcSerEntity> findByProcSer(ProcSerEntity procSer);
-	public List<GrupProcSerEntity> findByProcSer(ProcSerEntity procSer, Pageable paginacio);
-	public GrupProcSerEntity findByGrupAndProcSer(GrupEntity grup, ProcSerEntity procSer);
-	public List<GrupProcSerEntity> findByProcSerEntitat(EntitatEntity entitat);
+	List<GrupProcSerEntity> findByGrup(GrupEntity grup);
+	List<GrupProcSerEntity> findByProcSer(ProcSerEntity procSer);
+	List<GrupProcSerEntity> findByProcSer(ProcSerEntity procSer, Pageable paginacio);
+	GrupProcSerEntity findByGrupAndProcSer(GrupEntity grup, ProcSerEntity procSer);
+	List<GrupProcSerEntity> findByProcSerEntitat(EntitatEntity entitat);
 
 	@Query(
 			"select distinct g.codi " +
@@ -32,7 +32,5 @@ public interface GrupProcSerRepository extends JpaRepository<GrupProcSerEntity, 
 			"  left outer join gp.grup g " +
 			" where p.codi in (:procedimentCodis) " +
 			"	and p.entitat = :entitat ")
-	public List<String> getGrupCodisByProcSerIds(
-			@Param("procedimentCodis") List<String> procedimentCodis,
-			@Param("entitat") EntitatEntity entitat);
+	public List<String> getGrupCodisByProcSerIds(@Param("procedimentCodis") List<String> procedimentCodis, @Param("entitat") EntitatEntity entitat);
 }

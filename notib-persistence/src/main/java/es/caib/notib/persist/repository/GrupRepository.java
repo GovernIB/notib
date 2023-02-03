@@ -19,19 +19,19 @@ import es.caib.notib.persist.entity.GrupEntity;
  */
 public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 
-	public List<GrupEntity> findByEntitat(EntitatEntity entitat);
-	public List<GrupEntity> findByOrganGestorId(Long organGestorId);
-	public List<GrupEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsGestorsCodis);
-	public GrupEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+	List<GrupEntity> findByEntitat(EntitatEntity entitat);
+	List<GrupEntity> findByOrganGestorId(Long organGestorId);
+	List<GrupEntity> findByEntitatIdAndOrganGestorCodiIn(Long entitatId, List<String> organsGestorsCodis);
+	GrupEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
-	public Page<GrupEntity> findByEntitat(
+	Page<GrupEntity> findByEntitat(
 			EntitatEntity entitat,
 			Pageable pageable);
 	
 	@Query(	"from GrupEntity b " +
 			"where (:esNullFiltreCodi = true or b.codi = :codi) " + 
 			"and b.entitat = :entitat")
-	public Page<GrupEntity> findByCodiNotNullFiltrePaginat(
+	Page<GrupEntity> findByCodiNotNullFiltrePaginat(
 			@Param("esNullFiltreCodi") boolean esNullFiltrecodi,
 			@Param("codi") String codi, 
 			@Param("entitat") EntitatEntity entitat,
@@ -42,7 +42,7 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			"where (:esNullFiltreCodi = true or b.codi = :codi) " + 
 			"and b.organGestor.codi in (:organsGestors) " +
 			"and b.entitat = :entitat")
-	public Page<GrupEntity> findByCodiNotNullFiltrePaginatWithOrgan(
+	Page<GrupEntity> findByCodiNotNullFiltrePaginatWithOrgan(
 			@Param("esNullFiltreCodi") boolean esNullFiltrecodi,
 			@Param("codi") String codi, 
 			@Param("organsGestors") List<String> organsGestors,

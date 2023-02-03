@@ -43,19 +43,13 @@ public class PagadorCieFormatFullaEntity extends NotibAuditable<Long> {
 		this.codi = codi;
 	}
 	
-	public static Builder getBuilder(
-			String codi,
-			PagadorCieEntity pagadorCie) {
-		return new Builder(
-				codi,
-				pagadorCie);
+	public static Builder getBuilder(String codi, PagadorCieEntity pagadorCie) {
+		return new Builder(codi, pagadorCie);
 	}
 	
 	public static class Builder {
 		PagadorCieFormatFullaEntity built;
-		Builder(
-				String codi,
-				PagadorCieEntity pagadorCie) {
+		Builder(String codi, PagadorCieEntity pagadorCie) {
 			built = new PagadorCieFormatFullaEntity();
 			built.codi = codi;
 			built.pagadorCie = pagadorCie;
@@ -67,23 +61,27 @@ public class PagadorCieFormatFullaEntity extends NotibAuditable<Long> {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PagadorCieFormatFullaEntity other = (PagadorCieFormatFullaEntity) obj;
 		if (codi == null) {
-			if (other.codi != null)
+			if (other.codi != null) {
 				return false;
-		} else if (!codi.equals(other.codi))
+			}
+		} else if (!codi.equals(other.codi)) {
 			return false;
+		}
 		return true;
 	}
-	
-	
-	
+
 	public void setDir3codi(String codi) {
 		this.codi = codi;
 	}
@@ -91,8 +89,6 @@ public class PagadorCieFormatFullaEntity extends NotibAuditable<Long> {
 	public void setContracteDataVig(PagadorCieEntity pagadorCie) {
 		this.pagadorCie = pagadorCie;
 	}
-
-
 
 	private static final long serialVersionUID = 8596990469127710436L;
 	

@@ -49,32 +49,17 @@ public class ProcedimentAudit extends NotibAuditoria<Long> {
 	@Column(name = "pagadorcie_id")
 	protected Long pagadorcieId;
 	
-	public static Builder getBuilder(
-			ProcSerEntity objecteAuditar,
-			TipusOperacio tipusOperacio, 
-			String joinPoint) {
-		return new Builder(
-				objecteAuditar,
-				tipusOperacio,
-				joinPoint);
+	public static Builder getBuilder(ProcSerEntity objecteAuditar, TipusOperacio tipusOperacio, String joinPoint) {
+		return new Builder(objecteAuditar, tipusOperacio, joinPoint);
 	}
 	
-	public static Builder getBuilder(
-			ProcSerDto procSerDto,
-			TipusOperacio tipusOperacio,
-			String joinPoint) {
-		return new Builder(
-				procSerDto,
-				tipusOperacio,
-				joinPoint);
+	public static Builder getBuilder(ProcSerDto procSerDto, TipusOperacio tipusOperacio, String joinPoint) {
+		return new Builder(procSerDto, tipusOperacio, joinPoint);
 	}
 
 	public static class Builder {
 		ProcedimentAudit built;
-		Builder(
-				ProcSerEntity procSerEntity,
-				TipusOperacio tipusOperacio,
-				String joinPoint) {
+		Builder(ProcSerEntity procSerEntity, TipusOperacio tipusOperacio, String joinPoint) {
 			built = new ProcedimentAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;
@@ -88,10 +73,7 @@ public class ProcedimentAudit extends NotibAuditoria<Long> {
 			built.agrupar = procSerEntity.isAgrupar();
 			built.comu = procSerEntity.isComu();
 		}
-		Builder(
-				ProcSerDto procSerDto,
-				TipusOperacio tipusOperacio, 
-				String joinPoint) {
+		Builder(ProcSerDto procSerDto, TipusOperacio tipusOperacio, String joinPoint) {
 			built = new ProcedimentAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;

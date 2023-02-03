@@ -34,22 +34,13 @@ public class GrupAudit extends NotibAuditoria<Long> {
 	@Column(name = "organ", length = 64)
 	private String organ;
 	
-	public static Builder getBuilder(
-			GrupDto grupDto,
-			TipusOperacio tipusOperacio, 
-			String joinPoint) {
-		return new Builder(
-				grupDto,
-				tipusOperacio,
-				joinPoint);
+	public static Builder getBuilder(GrupDto grupDto, TipusOperacio tipusOperacio, String joinPoint) {
+		return new Builder(grupDto, tipusOperacio, joinPoint);
 	}
 	
 	public static class Builder {
 		GrupAudit built;
-		Builder(
-				GrupDto grupDto,
-				TipusOperacio tipusOperacio, 
-				String joinPoint) {
+		Builder(GrupDto grupDto, TipusOperacio tipusOperacio, String joinPoint) {
 			built = new GrupAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;

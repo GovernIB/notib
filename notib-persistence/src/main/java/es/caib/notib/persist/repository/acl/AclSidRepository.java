@@ -15,26 +15,12 @@ import java.util.List;
  */
 public interface AclSidRepository extends JpaRepository<AclSidEntity, Long> {
 
-	@Query(	"select " +
-			"    sid " +
-			"from " +
-			"    AclSidEntity " +
-			"where " +
-			"    principal = false")
+	@Query(	"select sid from AclSidEntity where principal = false")
 	List<String> findSidByPrincipalFalse();
 
-	@Query(	"from " +
-			"    AclSidEntity " +
-			"where " +
-			"    sid = :name " +
-			"    and principal = true")
+	@Query(	"from AclSidEntity where sid = :name and principal = true")
 	AclSidEntity getUserSid(@Param("name") String name);
 
-
-	@Query(	"from " +
-			"    AclSidEntity " +
-			"where " +
-			"     sid in (:name) " +
-			" and principal = false")
+	@Query(	"from AclSidEntity where sid in (:name) and principal = false")
 	List<AclSidEntity> findRolesSid(@Param("name") List<String> name);
 }

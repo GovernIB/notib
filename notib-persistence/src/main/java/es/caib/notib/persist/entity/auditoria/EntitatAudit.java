@@ -56,22 +56,13 @@ public class EntitatAudit extends NotibAuditoria<Long> {
 	private String llibreNom;
 
 	
-	public static Builder getBuilder(
-			EntitatDto entitatDto,
-			TipusOperacio tipusOperacio, 
-			String joinPoint) {
-		return new Builder(
-				entitatDto,
-				tipusOperacio,
-				joinPoint);
+	public static Builder getBuilder(EntitatDto entitatDto, TipusOperacio tipusOperacio, String joinPoint) {
+		return new Builder(entitatDto, tipusOperacio, joinPoint);
 	}
 
 	public static class Builder {
 		EntitatAudit built;
-		Builder(
-				EntitatDto entitatDto,
-				TipusOperacio tipusOperacio, 
-				String joinPoint) {
+		Builder(EntitatDto entitatDto, TipusOperacio tipusOperacio, String joinPoint) {
 			built = new EntitatAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;

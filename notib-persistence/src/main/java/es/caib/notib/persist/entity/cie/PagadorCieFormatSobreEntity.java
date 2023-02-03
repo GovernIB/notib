@@ -43,19 +43,13 @@ public class PagadorCieFormatSobreEntity extends NotibAuditable<Long> {
 		this.codi = codi;
 	}
 	
-	public static Builder getBuilder(
-			String codi,
-			PagadorCieEntity pagadorCie) {
-		return new Builder(
-				codi,
-				pagadorCie);
+	public static Builder getBuilder(String codi, PagadorCieEntity pagadorCie) {
+		return new Builder(codi, pagadorCie);
 	}
 	
 	public static class Builder {
 		PagadorCieFormatSobreEntity built;
-		Builder(
-				String codi,
-				PagadorCieEntity pagadorCie) {
+		Builder(String codi, PagadorCieEntity pagadorCie) {
 			built = new PagadorCieFormatSobreEntity();
 			built.codi = codi;
 			built.pagadorCie = pagadorCie;
@@ -67,18 +61,24 @@ public class PagadorCieFormatSobreEntity extends NotibAuditable<Long> {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		PagadorCieFormatSobreEntity other = (PagadorCieFormatSobreEntity) obj;
 		if (codi == null) {
-			if (other.codi != null)
+			if (other.codi != null) {
 				return false;
-		} else if (!codi.equals(other.codi))
+			}
+		} else if (!codi.equals(other.codi)) {
 			return false;
+		}
 		return true;
 	}
 	

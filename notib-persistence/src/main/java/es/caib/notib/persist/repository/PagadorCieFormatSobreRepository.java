@@ -17,10 +17,7 @@ import es.caib.notib.persist.entity.cie.PagadorCieFormatSobreEntity;
  */
 public interface PagadorCieFormatSobreRepository extends JpaRepository<PagadorCieFormatSobreEntity, Long> {
 
-	Page<PagadorCieFormatSobreEntity> findByPagadorCie(
-			PagadorCieEntity pagadorCie,
-			Pageable pageable);
+	Page<PagadorCieFormatSobreEntity> findByPagadorCie(PagadorCieEntity pagadorCie, Pageable pageable);
 	
-	List<PagadorCieFormatSobreEntity> findByPagadorCie(
-			PagadorCieEntity pagadorCie);
+	List<PagadorCieFormatSobreEntity> findByPagadorCie(PagadorCieEntity pagadorCie);
 }

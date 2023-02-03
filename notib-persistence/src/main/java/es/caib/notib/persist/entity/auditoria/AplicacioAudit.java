@@ -37,22 +37,13 @@ public class AplicacioAudit extends NotibAuditoria<Long> {
 	@Column(name = "activa")
 	private boolean activa;
 	
-	public static Builder getBuilder(
-			AplicacioDto aplicacioDto,
-			TipusOperacio tipusOperacio, 
-			String joinPoint) {
-		return new Builder(
-				aplicacioDto,
-				tipusOperacio,
-				joinPoint);
+	public static Builder getBuilder(AplicacioDto aplicacioDto, TipusOperacio tipusOperacio, String joinPoint) {
+		return new Builder(aplicacioDto, tipusOperacio, joinPoint);
 	}
 
 	public static class Builder {
 		AplicacioAudit built;
-		Builder(
-				AplicacioDto aplicacioDto,
-				TipusOperacio tipusOperacio,
-				String joinPoint) {
+		Builder(AplicacioDto aplicacioDto, TipusOperacio tipusOperacio, String joinPoint) {
 			built = new AplicacioAudit();
 			built.tipusOperacio = tipusOperacio;
 			built.joinPoint = joinPoint;

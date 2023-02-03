@@ -14,7 +14,6 @@
  */
 package es.caib.notib.persist.acl;
 
-//import es.caib.notib.logic.helper.ConfigHelper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.security.acls.domain.AccessControlEntryImpl;
@@ -23,7 +22,6 @@ import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.domain.PrincipalSid;
 import org.springframework.security.acls.jdbc.LookupStrategy;
 import org.springframework.security.acls.model.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -94,6 +92,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     //~ Constructors ===================================================================================================
 
     public JdbcMutableAclService(DataSource dataSource, LookupStrategy lookupStrategy, AclCache aclCache) {
+
         super(dataSource, lookupStrategy);
         try {
             dialect = dataSource.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
@@ -105,22 +104,22 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     //~ Methods ========================================================================================================
 
     public MutableAcl createAcl(ObjectIdentity objectIdentity) throws AlreadyExistsException {
-        Assert.notNull(objectIdentity, "Object Identity required");
 
+        Assert.notNull(objectIdentity, "Object Identity required");
         // Check this object identity hasn't already been persisted
         if (retrieveObjectIdentityPrimaryKey(objectIdentity) != null) {
             throw new AlreadyExistsException("Object identity '" + objectIdentity + "' already exists");
         }
 
         // Need to retrieve the current principal, in order to know who "owns" this ACL (can be changed later on)
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        PrincipalSid sid = new PrincipalSid(auth);
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        var sid = new PrincipalSid(auth);
 
         // Create the acl_object_identity row
         createObjectIdentity(objectIdentity, sid);
 
         // Retrieve the ACL via superclass (ensures cache registration, proper retrieval etc)
-        Acl acl = readAclById(objectIdentity);
+        var acl = readAclById(objectIdentity);
         Assert.isInstanceOf(MutableAcl.class, acl, "MutableAcl should be been returned");
 
         return (MutableAcl) acl;
@@ -132,6 +131,7 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
      * @param acl containing the ACEs to insert
      */
     protected void createEntries(final MutableAcl acl) {
+
         jdbcTemplate.batchUpdate(insertEntry,
             new BatchPreparedStatementSetter() {
                 public int getBatchSize() {
@@ -162,8 +162,9 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
      * @param owner for the SID column (will be created if there is no acl_sid entry for this particular Sid already)
      */
     protected void createObjectIdentity(ObjectIdentity object, Sid owner) {
-        Long sidId = createOrRetrieveSidPrimaryKey(owner, true);
-        Long classId = createOrRetrieveClassPrimaryKey(object.getType(), true);
+
+        var sidId = createOrRetrieveSidPrimaryKey(owner, true);
+        var classId = createOrRetrieveClassPrimaryKey(object.getType(), true);
         jdbcTemplate.update(insertObjectIdentity, classId, object.getIdentifier(), sidId, Boolean.TRUE);
     }
 
@@ -177,20 +178,17 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
      * @return the primary key or null if not found
      */
 	protected Long createOrRetrieveClassPrimaryKey(String type, boolean allowCreate) {
-        List<Long> classIds = jdbcTemplate.queryForList(selectClassPrimaryKey, new Object[] {type}, Long.class);
 
+        var classIds = jdbcTemplate.queryForList(selectClassPrimaryKey, new Object[] {type}, Long.class);
         if (!classIds.isEmpty()) {
             return classIds.get(0);
         }
-
-        if (allowCreate) {
-            jdbcTemplate.update(insertClass, type);
-            Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(),
-                    "Transaction must be running");
-            return new Long(jdbcTemplate.queryForObject(getClassIdentityQuery(), Long.class));
+        if (!allowCreate) {
+            return null;
         }
-
-        return null;
+        jdbcTemplate.update(insertClass, type);
+        Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(), "Transaction must be running");
+        return new Long(jdbcTemplate.queryForObject(getClassIdentityQuery(), Long.class));
     }
 
     /**
@@ -205,11 +203,10 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
      * @throws IllegalArgumentException if the <tt>Sid</tt> is not a recognized implementation.
      */
     protected Long createOrRetrieveSidPrimaryKey(Sid sid, boolean allowCreate) {
+
         Assert.notNull(sid, "Sid required");
-
         String sidName;
-        boolean sidIsPrincipal = true;
-
+        var sidIsPrincipal = true;
         if (sid instanceof PrincipalSid) {
             sidName = ((PrincipalSid) sid).getPrincipal();
         } else if (sid instanceof GrantedAuthoritySid) {
@@ -218,29 +215,24 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
         } else {
             throw new IllegalArgumentException("Unsupported implementation of Sid");
         }
-
-        List<Long> sidIds = jdbcTemplate.queryForList(selectSidPrimaryKey,
-                new Object[] {Boolean.valueOf(sidIsPrincipal), sidName},  Long.class);
-
+        List<Long> sidIds = jdbcTemplate.queryForList(selectSidPrimaryKey, new Object[] {Boolean.valueOf(sidIsPrincipal), sidName},  Long.class);
         if (!sidIds.isEmpty()) {
             return sidIds.get(0);
         }
-
-        if (allowCreate) {
-            jdbcTemplate.update(insertSid, Boolean.valueOf(sidIsPrincipal), sidName);
-            Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(), "Transaction must be running");
-            return new Long(jdbcTemplate.queryForObject(getSidIdentityQuery(), Long.class));
+        if (!allowCreate) {
+            return null;
         }
-
-        return null;
+        jdbcTemplate.update(insertSid, Boolean.valueOf(sidIsPrincipal), sidName);
+        Assert.isTrue(TransactionSynchronizationManager.isSynchronizationActive(), "Transaction must be running");
+        return new Long(jdbcTemplate.queryForObject(getSidIdentityQuery(), Long.class));
     }
 
     public void deleteAcl(ObjectIdentity objectIdentity, boolean deleteChildren) throws ChildrenExistException {
+
         Assert.notNull(objectIdentity, "Object Identity required");
         Assert.notNull(objectIdentity.getIdentifier(), "Object Identity doesn't provide an identifier");
-
         if (deleteChildren) {
-            List<ObjectIdentity> children = findChildren(objectIdentity);
+            var children = findChildren(objectIdentity);
             if (children != null) {
                 for (ObjectIdentity child : children) {
                     deleteAcl(child, true);
@@ -250,22 +242,17 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
             if (!foreignKeysInDatabase) {
                 // We need to perform a manual verification for what a FK would normally do
                 // We generally don't do this, in the interests of deadlock management
-                List<ObjectIdentity> children = findChildren(objectIdentity);
+                var children = findChildren(objectIdentity);
                 if (children != null) {
-                    throw new ChildrenExistException("Cannot delete '" + objectIdentity + "' (has " + children.size()
-                            + " children)");
+                    throw new ChildrenExistException("Cannot delete '" + objectIdentity + "' (has " + children.size() + " children)");
                 }
             }
         }
-
         Long oidPrimaryKey = retrieveObjectIdentityPrimaryKey(objectIdentity);
-
         // Delete this ACL's ACEs in the acl_entry table
         deleteEntries(oidPrimaryKey);
-
         // Delete this ACL's acl_object_identity row
         deleteObjectIdentity(oidPrimaryKey);
-
         // Clear the cache
         aclCache.evictFromCache(objectIdentity);
     }
@@ -280,8 +267,9 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     }
 
     public void deleteEntries(ObjectIdentity oid, Sid sid) {
-    	Long oidPrimaryKey = retrieveObjectIdentityPrimaryKey(oid);
-    	Long sidId = createOrRetrieveSidPrimaryKey(sid, true);
+
+    	var oidPrimaryKey = retrieveObjectIdentityPrimaryKey(oid);
+    	var sidId = createOrRetrieveSidPrimaryKey(sid, true);
     	jdbcTemplate.update(deleteEntryByObjectIdentityAndSid, oidPrimaryKey, sidId);
     }
     /**
@@ -322,34 +310,28 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     public MutableAcl updateAcl(MutableAcl acl) throws NotFoundException {
     	
     	Assert.notNull(acl.getId(), "Object Identity doesn't provide an identifier");
-
-    	if (acl.getEntries().size() > 0) {
-	        // Delete this ACL's ACEs in the acl_entry table
-	        deleteEntries(retrieveObjectIdentityPrimaryKey(acl.getObjectIdentity()));
-	
-	        // Create this ACL's ACEs in the acl_entry table
-	        createEntries(acl);
-	
-	        // Change the mutable columns in acl_object_identity
-	        updateObjectIdentity(acl);
-	
-	        // Clear the cache, including children
-	        clearCacheIncludingChildren(acl.getObjectIdentity());
-	
-	        // Retrieve the ACL via superclass (ensures cache registration, proper retrieval etc)
-	        return (MutableAcl) super.readAclById(acl.getObjectIdentity());
-    	} else {
-    		// Change the mutable columns in acl_object_identity
-    		updateObjectIdentity(acl);
-
-    		// Retrieve the ACL via superclass (ensures cache registration, proper retrieval etc)
-    		return (MutableAcl)super.readAclById(acl.getObjectIdentity());
-    	}
+    	if (acl.getEntries().isEmpty()) {
+            // Change the mutable columns in acl_object_identity
+            updateObjectIdentity(acl);
+            // Retrieve the ACL via superclass (ensures cache registration, proper retrieval etc)
+            return (MutableAcl)super.readAclById(acl.getObjectIdentity());
+        }
+        // Delete this ACL's ACEs in the acl_entry table
+        deleteEntries(retrieveObjectIdentityPrimaryKey(acl.getObjectIdentity()));
+        // Create this ACL's ACEs in the acl_entry table
+        createEntries(acl);
+        // Change the mutable columns in acl_object_identity
+        updateObjectIdentity(acl);
+        // Clear the cache, including children
+        clearCacheIncludingChildren(acl.getObjectIdentity());
+        // Retrieve the ACL via superclass (ensures cache registration, proper retrieval etc)
+        return (MutableAcl) super.readAclById(acl.getObjectIdentity());
     }
 
     private void clearCacheIncludingChildren(ObjectIdentity objectIdentity) {
+
         Assert.notNull(objectIdentity, "ObjectIdentity required");
-        List<ObjectIdentity> children = findChildren(objectIdentity);
+        var children = findChildren(objectIdentity);
         if (children != null) {
             for (ObjectIdentity child : children) {
                 clearCacheIncludingChildren(child);
@@ -367,22 +349,16 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
      * @throws NotFoundException if the ACL could not be found to update.
      */
     protected void updateObjectIdentity(MutableAcl acl) {
+
         Long parentId = null;
-
         if (acl.getParentAcl() != null) {
-            Assert.isInstanceOf(ObjectIdentityImpl.class, acl.getParentAcl().getObjectIdentity(),
-                "Implementation only supports ObjectIdentityImpl");
-
-            ObjectIdentityImpl oii = (ObjectIdentityImpl) acl.getParentAcl().getObjectIdentity();
+            Assert.isInstanceOf(ObjectIdentityImpl.class, acl.getParentAcl().getObjectIdentity(), "Implementation only supports ObjectIdentityImpl");
+            var oii = (ObjectIdentityImpl) acl.getParentAcl().getObjectIdentity();
             parentId = retrieveObjectIdentityPrimaryKey(oii);
         }
-
         Assert.notNull(acl.getOwner(), "Owner is required in this implementation");
-
-        Long ownerSid = createOrRetrieveSidPrimaryKey(acl.getOwner(), true);
-        int count = jdbcTemplate.update(updateObjectIdentity,
-                parentId, ownerSid, Boolean.valueOf(acl.isEntriesInheriting()), acl.getId());
-
+        var ownerSid = createOrRetrieveSidPrimaryKey(acl.getOwner(), true);
+        var count = jdbcTemplate.update(updateObjectIdentity, parentId, ownerSid, Boolean.valueOf(acl.isEntriesInheriting()), acl.getId());
         if (count != 1) {
             throw new NotFoundException("Unable to locate ACL to update");
         }
@@ -459,27 +435,30 @@ public class JdbcMutableAclService extends JdbcAclService implements NotibMutabl
     }
     
     private String getClassIdentityQuery() {
-		if (dialect.contains("oracle")) {
+
+        if (dialect.contains("oracle")) {
 			return CLASS_IDENTITY_ORACLE;
-		} else if (dialect.contains("postgres")) {
-			return CLASS_IDENTITY_POSTGRES;
-		} else if (dialect.contains("hsql")) {
-			return CLASS_IDENTITY_HSQL;
-		} else {
-			throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
 		}
+        if (dialect.contains("postgres")) {
+			return CLASS_IDENTITY_POSTGRES;
+		}
+        if (dialect.contains("hsql")) {
+			return CLASS_IDENTITY_HSQL;
+		}
+        throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
 	}
 
 	private String getSidIdentityQuery() {
-		if (dialect.contains("oracle")) {
-			return SID_IDENTITY_ORACLE;
-		} else if (dialect.contains("postgres")) {
-			return SID_IDENTITY_POSTGRES;
-		} else if (dialect.contains("hsql")) {
-			return SID_IDENTITY_HSQL;
-		} else {
-			throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
-		}
+        if (dialect.contains("oracle")) {
+            return SID_IDENTITY_ORACLE;
+        }
+        if (dialect.contains("postgres")) {
+            return SID_IDENTITY_POSTGRES;
+        }
+        if (dialect.contains("hsql")) {
+            return SID_IDENTITY_HSQL;
+        }
+        throw new RuntimeException("Dialecte Hibernate no suportat pel mòdul ACL");
 	}
 
 }

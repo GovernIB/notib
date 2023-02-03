@@ -123,10 +123,7 @@ public class AclConfig {
 
 	@Bean
 	public SpringCacheBasedAclCache aclCache() {
-		return new SpringCacheBasedAclCache(
-				cacheManager.getCache("aclCache"),
-				permissionGrantingStrategy(),
-				aclAuthorizationStrategy());
+		return new SpringCacheBasedAclCache(cacheManager.getCache("aclCache"), permissionGrantingStrategy(), aclAuthorizationStrategy());
 	}
 //	public EhCacheBasedAclCache aclCache() {
 //		return new EhCacheBasedAclCache(
@@ -158,12 +155,9 @@ public class AclConfig {
 		return new AclAuthorizationStrategy() {
 			@Override
 			public void securityCheck(Acl acl, int changeType) {
-				if ((SecurityContextHolder.getContext() == null)
-						|| (SecurityContextHolder.getContext().getAuthentication() == null)
-						|| !SecurityContextHolder.getContext().getAuthentication()
-								.isAuthenticated()) {
-					throw new AccessDeniedException(
-							"Authenticated principal required to operate with ACLs");
+				if ((SecurityContextHolder.getContext() == null) || (SecurityContextHolder.getContext().getAuthentication() == null)
+						|| !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+					throw new AccessDeniedException("Authenticated principal required to operate with ACLs");
 				}
 			}
 		};
@@ -171,7 +165,8 @@ public class AclConfig {
 
 	@Bean
 	public MethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler() {
-		DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+
+		var expressionHandler = new DefaultMethodSecurityExpressionHandler();
 		expressionHandler.setPermissionEvaluator(permissionEvaluator());
 		expressionHandler.setPermissionCacheOptimizer(new AclPermissionCacheOptimizer(aclService()));
 		return expressionHandler;
@@ -179,11 +174,8 @@ public class AclConfig {
 
 	@Bean
 	public LookupStrategy lookupStrategy() {
-		BasicLookupStrategy lookupStrategy = new BasicLookupStrategy(
-				dataSource,
-				aclCache(),
-				aclAuthorizationStrategy(),
-				new ConsoleAuditLogger());
+
+		var lookupStrategy = new BasicLookupStrategy(dataSource, aclCache(), aclAuthorizationStrategy(), new ConsoleAuditLogger());
 		lookupStrategy.setPermissionFactory(permissionFactory());
 		lookupStrategy.setSelectClause(SELECT_CLAUSE);
 		lookupStrategy.setLookupPrimaryKeysWhereClause(LOOKUP_KEYS_WHERE_CLAUSE);
@@ -210,16 +202,10 @@ public class AclConfig {
 		// dient que no es pot convertir un bigint al tipus varchar.
 		NotibMutableAclService jdbcMutableAclService = new JdbcMutableAclService(dataSource, lookupStrategy(), aclCache()) {
 			protected Long retrieveObjectIdentityPrimaryKey(ObjectIdentity oid) {
-				return super.retrieveObjectIdentityPrimaryKey(
-						new ObjectIdentityImpl(
-								oid.getType(),
-								oid.getIdentifier().toString()));
+				return super.retrieveObjectIdentityPrimaryKey(new ObjectIdentityImpl(oid.getType(), oid.getIdentifier().toString()));
 			}
 			public List<ObjectIdentity> findChildren(ObjectIdentity parentIdentity) {
-				return super.findChildren(
-						new ObjectIdentityImpl(
-								parentIdentity.getType(),
-								parentIdentity.getIdentifier().toString()));
+				return super.findChildren(new ObjectIdentityImpl(parentIdentity.getType(), parentIdentity.getIdentifier().toString()));
 			}
 		};
 //		jdbcMutableAclService.setFindChildrenQuery(SELECT_ACL_WITH_PARENT_SQL);

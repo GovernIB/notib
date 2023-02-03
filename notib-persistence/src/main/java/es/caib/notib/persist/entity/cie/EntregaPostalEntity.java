@@ -172,36 +172,28 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 			this.formatSobre = entregaPostal.getFormatSobre();
 			this.formatFulla = entregaPostal.getFormatFulla();
 		}
-
 		this.domiciliPaisCodiIso = entregaPostal.getPaisCodi();
 		this.domiciliCodiPostal = entregaPostal.getCodiPostal();
 		this.domiciliLinea1 = entregaPostal.getLinea1();
 		this.domiciliLinea2 = entregaPostal.getLinea2();
 	}
 
-	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(
-			EntregaPostalVia viaTipus) {
-		if (viaTipus == null) {
-			return null;
-		}
-		return NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name());
+	private NotificaDomiciliViaTipusEnumDto toEnviamentViaTipusEnum(EntregaPostalVia viaTipus) {
+		return viaTipus != null ? NotificaDomiciliViaTipusEnumDto.valueOf(viaTipus.name()) : null;
 	}
 
 	public String provinciaCodiFormatted(){
-		if (domiciliProvinciaCodi != null && !domiciliProvinciaCodi.isEmpty()) {
-			return String.format("%02d", Integer.parseInt(domiciliProvinciaCodi));
-		}
-		return "";
+		return domiciliProvinciaCodi != null && !domiciliProvinciaCodi.isEmpty() ?String.format("%02d", Integer.parseInt(domiciliProvinciaCodi)) : "";
 	}
 
 	public String municipiCodiFormatted(){
-		if (domiciliMunicipiCodiIne != null && !domiciliMunicipiCodiIne.isEmpty()) {
-			return provinciaCodiFormatted() + String.format("%04d", Integer.parseInt(domiciliMunicipiCodiIne));
-		}
-		return "";
+		return domiciliMunicipiCodiIne != null && !domiciliMunicipiCodiIne.isEmpty() ?
+				provinciaCodiFormatted() + String.format("%04d", Integer.parseInt(domiciliMunicipiCodiIne)) : "";
 	}
+
 	@Override
 	public String toString() {
+
 		String domicili = "";
 		String domiciliPoblacio ="";
 		switch (domiciliConcretTipus) {
@@ -234,41 +226,47 @@ public class EntregaPostalEntity extends NotibAuditable<Long> {
 		return domicili;
 	}
 	private String getDomiciliPoblacioString() {
-		String domiciliPoblacioCurt = "";
+
 		if (domiciliPoblacio != null) {
-			if (domiciliPoblacio.length() > 30) {
-				domiciliPoblacioCurt = " (" + domiciliPoblacio.substring(0, 30) + ") - ";
-			} else {
-				domiciliPoblacioCurt += " (" + domiciliPoblacio + ") - ";
-			}
+			return domiciliPoblacio;
 		}
-		return domiciliPoblacioCurt;
+		return domiciliPoblacio.length() > 30 ? " (" + domiciliPoblacio.substring(0, 30) + ") - " : " (" + domiciliPoblacio + ") - ";
 	}
 	private String getAdressa() {
-		String adressa = "";
 
-		if (domiciliViaTipus != null)
+		var adressa = "";
+		if (domiciliViaTipus != null) {
 			adressa += domiciliViaTipus + " ";
-		if (domiciliViaNom != null && !domiciliViaNom.isEmpty())
+		}
+		if (domiciliViaNom != null && !domiciliViaNom.isEmpty()) {
 			adressa += domiciliViaNom + " ";
-		if(NotificaDomiciliNumeracioTipusEnumDto.NUMERO.equals(domiciliNumeracioTipus))
+		}
+		if (NotificaDomiciliNumeracioTipusEnumDto.NUMERO.equals(domiciliNumeracioTipus)) {
 			adressa += domiciliNumeracioNumero + " ";
-		else if(NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC.equals(domiciliNumeracioTipus))
+		} else if(NotificaDomiciliNumeracioTipusEnumDto.PUNT_KILOMETRIC.equals(domiciliNumeracioTipus)) {
 			adressa += domiciliNumeracioPuntKm + " ";
-		if (domiciliNumeracioQualificador != null && !domiciliNumeracioQualificador.isEmpty())
+		}
+		if (domiciliNumeracioQualificador != null && !domiciliNumeracioQualificador.isEmpty()) {
 			adressa += domiciliNumeracioQualificador + " ";
-		if (domiciliBloc != null && !domiciliBloc.isEmpty())
+		}
+		if (domiciliBloc != null && !domiciliBloc.isEmpty()) {
 			adressa += "b. " + domiciliBloc + " ";
-		if (domiciliPortal != null && !domiciliPortal.isEmpty())
+		}
+		if (domiciliPortal != null && !domiciliPortal.isEmpty()) {
 			adressa += "pt. " + domiciliPortal + " ";
-		if (domiciliEscala != null && !domiciliEscala.isEmpty())
+		}
+		if (domiciliEscala != null && !domiciliEscala.isEmpty()) {
 			adressa += "e. " + domiciliEscala + " ";
-		if (domiciliPlanta != null && !domiciliPlanta.isEmpty())
+		}
+		if (domiciliPlanta != null && !domiciliPlanta.isEmpty()) {
 			adressa += "pl. " + domiciliPlanta + " ";
-		if (domiciliPorta != null && !domiciliPorta.isEmpty())
+		}
+		if (domiciliPorta != null && !domiciliPorta.isEmpty()) {
 			adressa += "p. " + domiciliPorta + " ";
-		if (domiciliComplement != null && !domiciliComplement.isEmpty())
+		}
+		if (domiciliComplement != null && !domiciliComplement.isEmpty()) {
 			adressa += "c. " + domiciliComplement + " ";
+		}
 		return adressa;
 	}
 

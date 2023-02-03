@@ -27,11 +27,11 @@ public class ConfigTypeEntity {
     private String value;
 
     public List<String> getValidValues() {
+
         if (value == null || value.isEmpty()) {
             return Collections.emptyList();
         }
-
-        String[] values = value.split(",");
+        var values = value.split(",");
         return Arrays.asList(values);
 
     }

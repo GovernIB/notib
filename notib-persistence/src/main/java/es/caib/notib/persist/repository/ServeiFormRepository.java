@@ -17,34 +17,16 @@ import java.util.List;
  */
 public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Long> {
 
-	@Query(
-			"from " +
-			"    ServeiFormEntity pro " + 
-			" where (pro.entitat_id = :entitatId)")
-	Page<ServeiFormEntity> findAmbEntitatActual(
-            @Param("entitatId") Long entitatId,
-            Pageable paginacio);
+	@Query("from ServeiFormEntity pro  where (pro.entitat_id = :entitatId)")
+	Page<ServeiFormEntity> findAmbEntitatActual(@Param("entitatId") Long entitatId, Pageable paginacio);
 	
-	@Query(
-			"from " +
-			"    ServeiFormEntity pro " + 
-			" where (pro.entitat_id in (:entitatsActivesId))")
-	Page<ServeiFormEntity> findAmbEntitatActiva(
-            @Param("entitatsActivesId") List<Long> entitatActiveId,
-            Pageable paginacio);
+	@Query("from ServeiFormEntity pro  where (pro.entitat_id in (:entitatsActivesId))")
+	Page<ServeiFormEntity> findAmbEntitatActiva(@Param("entitatsActivesId") List<Long> entitatActiveId, Pageable paginacio);
 	
-	@Query(
-			"from " +
-			"    ServeiFormEntity pro " + 
-			"where (pro.entitat_id = :entitatId) " +
-			" and ((pro.organGestor in (:organsGestors)) or pro.comu = true)")
-	Page<ServeiFormEntity> findAmbOrganGestorActualOrComu(
-            @Param("entitatId") Long entitatId,
-            @Param("organsGestors") List<String> organsGestors,
-            Pageable paginacio);
+	@Query("from ServeiFormEntity pro where (pro.entitat_id = :entitatId)  and ((pro.organGestor in (:organsGestors)) or pro.comu = true)")
+	Page<ServeiFormEntity> findAmbOrganGestorActualOrComu(@Param("entitatId") Long entitatId, @Param("organsGestors") List<String> organsGestors, Pageable paginacio);
 	
-	@Query(	"from " +
-			"    ServeiFormEntity pro " +
+	@Query(	"from ServeiFormEntity pro " +
 			"where (pro.entitat_id = :entitatId)" +
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +
@@ -66,8 +48,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
             Pageable paginacio);
 	
-	@Query(	"from " +
-			"    ServeiFormEntity pro " +
+	@Query(	"from ServeiFormEntity pro " +
 			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
 			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))" +
 			" and (:isOrganGestorNull = true or pro.organGestor like :organ)" +
@@ -87,8 +68,7 @@ public interface ServeiFormRepository extends JpaRepository<ServeiFormEntity, Lo
             @Param("isEntregaCieActiva") boolean isEntregaCieActiva,
             Pageable paginacio);
 
-	@Query(	"from " +
-			"    ServeiFormEntity pro " +
+	@Query(	"from ServeiFormEntity pro " +
 			"where (pro.entitat_id = :entitatId)" +
 			" and (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))" +

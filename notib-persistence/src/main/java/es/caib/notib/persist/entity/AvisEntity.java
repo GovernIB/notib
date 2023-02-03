@@ -47,12 +47,8 @@ public class AvisEntity extends NotibAuditable<Long> {
 	private Long entitatId;
 	
 	
-	public void update(
-			String assumpte,
-			String missatge,
-			Date dataInici,
-			Date dataFinal,
-			AvisNivellEnumDto avisNivell) {
+	public void update(String assumpte, String missatge, Date dataInici, Date dataFinal, AvisNivellEnumDto avisNivell) {
+
 		this.assumpte = assumpte;
 		this.missatge = missatge;
 		this.dataInici = dataInici;
@@ -60,41 +56,19 @@ public class AvisEntity extends NotibAuditable<Long> {
 		this.avisNivell = avisNivell;
 	}
 	
-	public void updateActiva(
-			Boolean actiu) {
+	public void updateActiva(Boolean actiu) {
 		this.actiu = actiu;
 	}
 	
 
-	public static Builder getBuilder(
-			String assumpte,
-			String missatge,
-			Date dataInici,
-			Date dataFinal,
-			AvisNivellEnumDto avisNivell,
-			Boolean avisAdministrador,
-			Long entitatId) {
-		return new Builder(
-				assumpte,
-				missatge,
-				dataInici,
-				dataFinal,
-				avisNivell,
-				avisAdministrador,
-				entitatId);
+	public static Builder getBuilder(String assumpte, String missatge, Date dataInici, Date dataFinal, AvisNivellEnumDto avisNivell, Boolean avisAdministrador, Long entitatId) {
+		return new Builder(assumpte, missatge, dataInici, dataFinal, avisNivell, avisAdministrador, entitatId);
 	}
 
 
 	public static class Builder {
 		AvisEntity built;
-		Builder(
-				String assumpte,
-				String missatge,
-				Date dataInici,
-				Date dataFinal,
-				AvisNivellEnumDto avisNivell,
-				Boolean avisAdministrador,
-				Long entitatId) {
+		Builder(String assumpte, String missatge, Date dataInici, Date dataFinal, AvisNivellEnumDto avisNivell, Boolean avisAdministrador, Long entitatId) {
 			built = new AvisEntity();
 			built.assumpte = assumpte;
 			built.missatge = missatge;

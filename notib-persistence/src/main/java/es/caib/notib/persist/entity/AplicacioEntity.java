@@ -40,34 +40,23 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 	@ForeignKey(name = "not_aplicacio_entitat_fk")
 	protected EntitatEntity entitat;
 
-	public void update(
-			String usuariCodi,
-			String callbackUrl) {
+	public void update(String usuariCodi, String callbackUrl) {
+
 		this.usuariCodi = usuariCodi;
 		this.callbackUrl = callbackUrl;
 	}
 	
-	public void updateActiva(
-			boolean activa) {
+	public void updateActiva(boolean activa) {
 		this.activa = activa;
 	}
 
-	public static Builder getBuilder(
-			EntitatEntity entitat,
-			String codi,
-			String urlCallback) {
-		return new Builder(
-				entitat,
-				codi,
-				urlCallback);
+	public static Builder getBuilder(EntitatEntity entitat, String codi, String urlCallback) {
+		return new Builder(entitat, codi, urlCallback);
 	}
 
 	public static class Builder {
 		AplicacioEntity built;
-		Builder(
-				EntitatEntity entitat,
-				String usuariCodi,
-				String callbackUrl) {
+		Builder(EntitatEntity entitat, String usuariCodi, String callbackUrl) {
 			built = new AplicacioEntity();
 			built.entitat = entitat;
 			built.usuariCodi = usuariCodi;
@@ -81,22 +70,26 @@ public class AplicacioEntity extends NotibAuditable<Long> {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
+
+		final var prime = 31;
+		var result = super.hashCode();
 		result = (int) (prime * result + getId());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		AplicacioEntity other = (AplicacioEntity) obj;
-		
+		}
+		var other = (AplicacioEntity) obj;
 		return getId() == other.getId();
 	}
 

@@ -122,12 +122,7 @@ public class NotificacioAudit extends NotibAuditoria<Long> {
 	@Column(name = "referencia", length = 36)
 	protected String referencia;
 
-	public NotificacioAudit (
-			NotificacioEntity notificacioEntity,
-			NotificacioEventEntity lastErrorEvent,
-			TipusOperacio tipusOperacio, 
-			String joinPoint
-			) {
+	public NotificacioAudit (NotificacioEntity notificacioEntity, NotificacioEventEntity lastErrorEvent, TipusOperacio tipusOperacio, String joinPoint) {
 		this.tipusOperacio = tipusOperacio;
 		this.joinPoint = joinPoint;
 		this.notificacioId = notificacioEntity.getId();

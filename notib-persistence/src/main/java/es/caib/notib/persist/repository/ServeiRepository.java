@@ -25,18 +25,16 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 	@Query("from ProcedimentEntity pro where pro.id = :id")
 	ProcSerEntity findProcSer(@Param("id") Long id);
 
-	@Query(
-			"from ServeiEntity pro " +
+	@Query("from ServeiEntity pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.agrupar = false ")
 //			"  and pro.id not in (select distinct p.id " +
 //			"		from GrupServeiEntity gp " +
 //			"		left outer join gp.servei p " +
 //			"		where p.entitat = :entitat) ")
-	public List<ServeiEntity> findServeisSenseGrupsByEntitat(@Param("entitat") EntitatEntity entitat);
+	List<ServeiEntity> findServeisSenseGrupsByEntitat(@Param("entitat") EntitatEntity entitat);
 	
-	@Query(
-			"from ServeiEntity pro " +
+	@Query("from ServeiEntity pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -44,12 +42,11 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"		left outer join gp.grup g " +
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups)) ")
-	public List<ServeiEntity> findServeisAmbGrupsByEntitatAndGrup(
+	List<ServeiEntity> findServeisAmbGrupsByEntitatAndGrup(
             @Param("entitat") EntitatEntity entitat,
             @Param("grups") List<String> grups);
 	
-	@Query(
-			"from ServeiEntity pro " +
+	@Query("from ServeiEntity pro " +
 			"where pro.entitat = :entitat " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -59,14 +56,12 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ServeiEntity> findServeisByEntitatAndGrup(
+	List<ServeiEntity> findServeisByEntitatAndGrup(
             @Param("entitat") EntitatEntity entitat,
             @Param("grups") List<String> grups);
 
-	@Query("from " +
-			"	ServeiEntity pro " +
-			"where " +
-			"		pro.entitat = :entitat " +
+	@Query("from ServeiEntity pro " +
+			"where pro.entitat = :entitat " +
 			"	and pro.id in (:ids)" +
 			"  	and (pro.agrupar = false " +
 			"  		or (pro.agrupar = true " +
@@ -78,10 +73,7 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"			) " +
 			"		) " +
 			"order by pro.nom asc")
-	List<ServeiEntity> findServeisByEntitatAndGrupAndIds(
-            @Param("entitat") EntitatEntity entitat,
-            @Param("grups") List<String> grups,
-            @Param("ids") List<Long> ids);
+	List<ServeiEntity> findServeisByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
 	@Query( "select distinct pro " +
 			"from ServeiEntity pro " +
@@ -96,12 +88,9 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ServeiEntity> findServeisByOrganGestorAndGrup(
-            @Param("entitat") EntitatEntity entitat,
-            @Param("organGestorId") Long organGestorId,
-            @Param("grups") List<String> grups);
+	public List<ServeiEntity> findServeisByOrganGestorAndGrup(@Param("entitat") EntitatEntity entitat, @Param("organGestorId") Long organGestorId, @Param("grups") List<String> grups);
 	
-	public List<ServeiEntity> findByComuTrue();
+	List<ServeiEntity> findByComuTrue();
 
 	List<ServeiEntity> findByEntitatAndComuTrue(EntitatEntity entitat);
 
@@ -109,26 +98,15 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 
 	List<ServeiEntity> findByEntitatActiva(boolean activa);
 	
-	@Query(
-			"from " +
-			"    ServeiEntity pro " +
-			"where pro.entitat = (:entitatActual)")
-	Page<ServeiEntity> findByEntitatActual(
-            @Param("entitatActual") EntitatEntity entitatActiva,
-            Pageable paginacio);
+	@Query("from ServeiEntity pro where pro.entitat = (:entitatActual)")
+	Page<ServeiEntity> findByEntitatActual(@Param("entitatActual") EntitatEntity entitatActiva, Pageable paginacio);
 	
-	@Query(
-			"from " +
-			"    ServeiEntity pro " +
+	@Query("from ServeiEntity pro " +
 			"where pro.entitat = (:entitatActual) and " + 
 			"lower(pro.codi) = (lower(:codiServei))")
-	ServeiEntity findByEntitatAndCodiServei(
-            @Param("entitatActual") EntitatEntity entitat,
-            @Param("codiServei") String codiServei);
+	ServeiEntity findByEntitatAndCodiServei(@Param("entitatActual") EntitatEntity entitat, @Param("codiServei") String codiServei);
 	
-	ServeiEntity findByIdAndEntitat(
-            Long serveiId,
-            EntitatEntity entitat);
+	ServeiEntity findByIdAndEntitat(Long serveiId, EntitatEntity entitat);
 	
 //	ServeiEntity findById(Long serveiId);
 	
@@ -136,56 +114,42 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 	
 	ServeiEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
-	@Query(
-			"from " +
-			"    ServeiEntity pro " +
-			"where pro.entitat in (:entitatActiva)")
-	Page<ServeiEntity> findByEntitatActiva(
-            @Param("entitatActiva") List<EntitatEntity> entitatActiva,
-            Pageable paginacio);
+	@Query("from ServeiEntity pro where pro.entitat in (:entitatActiva)")
+	Page<ServeiEntity> findByEntitatActiva(@Param("entitatActiva") List<EntitatEntity> entitatActiva, Pageable paginacio);
 	
-	List<ServeiEntity> findByEntitat(
-            EntitatEntity entitat);
+	List<ServeiEntity> findByEntitat(EntitatEntity entitat);
 	
-	List<ServeiEntity> findByEntitatOrderByNomAsc(
-            EntitatEntity entitat);
+	List<ServeiEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 	
-	Page<ServeiEntity> findByEntitat(
-            EntitatEntity entitat,
-            Pageable paginacio);
+	Page<ServeiEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 
 
-	@Query(	"from " +
-			"    ServeiEntity pro " +
+	@Query(	"from ServeiEntity pro " +
 			"where (:isCodiNull = true or lower(pro.codi) like lower('%'||:codi||'%'))" +
 			" and (:isNomNull = true or lower(pro.nom) like lower('%'||:nom||'%'))")
-	public Page<ServeiEntity> findAmbEntitatAndFiltre(
+	Page<ServeiEntity> findAmbEntitatAndFiltre(
             @Param("isCodiNull") boolean isCodiNull,
             @Param("codi") String codi,
             @Param("isNomNull") boolean isNomNull,
             @Param("nom") String nom,
             Pageable paginacio);
 	
-	@Query(	"from " +
-			"    ServeiEntity pro " +
+	@Query(	"from ServeiEntity pro " +
 			"where ((:isCodiNull = true) or (lower(pro.codi) like lower('%'||:codi||'%')))" + 
 			" and ((:isNomNull = true) or (lower(pro.nom) like lower('%'||:nom||'%')))")
-	public Page<ServeiEntity> findAmbFiltre(
+	Page<ServeiEntity> findAmbFiltre(
             @Param("isCodiNull") boolean isCodiNull,
             @Param("codi") String codi,
             @Param("isNomNull") boolean isNomNull,
             @Param("nom") String nom,
             Pageable paginacio);
 
-	@Query(	"select distinct pro.organGestor " +
-			"  from ServeiEntity pro " +
-			" where pro.entitat = :entitat")
-	public List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
+	@Query(	"select distinct pro.organGestor from ServeiEntity pro  where pro.entitat = :entitat")
+	List<String> findOrgansGestorsCodisByEntitat(@Param("entitat") EntitatEntity entitat);
 	
 	List<ServeiEntity> findByOrganGestorId(Long organGestorId);
 
-	@Query(
-			"from ServeiEntity pro " +
+	@Query("from ServeiEntity pro " +
 			"where pro.organGestor.codi in (:organsCodis) " +
 			"  and pro.requireDirectPermission = false" +
 			"  and (pro.agrupar = false " +
@@ -195,30 +159,22 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 			"		left outer join gp.grup g " +
 			"		where g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	List<ServeiEntity> findServeisAccesiblesPerOrganGestor(
-            @Param("organsCodis") List<String> organsCodis,
-            @Param("grups") List<String> grups);
+	List<ServeiEntity> findServeisAccesiblesPerOrganGestor(@Param("organsCodis") List<String> organsCodis, @Param("grups") List<String> grups);
 
-	public List<ServeiEntity> findByOrganGestorCodiIn(List<String> organsFills);
+	List<ServeiEntity> findByOrganGestorCodiIn(List<String> organsFills);
 
-	@Query(
-			"from ServeiEntity pro " +
+	@Query("from ServeiEntity pro " +
 			"where (pro.organGestor.codi in (:organsCodis) " +
 			"  	or pro.comu = true) " +
 			"  and pro.entitat in (:entitat) " +
 			"order by pro.nom asc")
-	public List<ServeiEntity> findByOrganGestorCodiInOrComu(
-            @Param("organsCodis") List<String> organsCodis,
-            @Param("entitat") EntitatEntity entitat);
+	List<ServeiEntity> findByOrganGestorCodiInOrComu(@Param("organsCodis") List<String> organsCodis, @Param("entitat") EntitatEntity entitat);
 	
-	@Query(
-			"from " +
+	@Query("from " +
 			"    ServeiEntity pro " +
 			"where pro.entitat = (:entitatActual) and " + 
 			"lower(pro.nom) = (lower(:nomServei))")
-	List<ServeiEntity> findByNomAndEntitat(
-            @Param("nomServei") String nomServei,
-            @Param("entitatActual") EntitatEntity entitat);
+	List<ServeiEntity> findByNomAndEntitat(@Param("nomServei") String nomServei, @Param("entitatActual") EntitatEntity entitat);
 
     Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 
@@ -226,12 +182,10 @@ public interface ServeiRepository extends JpaRepository<ServeiEntity, Long> {
 	Integer countByEntitatIdAndActiuTrue(Long entitatId);
 	Integer countByEntitatIdAndActiuFalse(Long entitatId);
 
-	@Query(	"select distinct pro.codi " +
-			"  from ServeiEntity pro " +
-			" where pro.entitat.codi = :entitatCodi and pro.actiu = true")
-	public List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
+	@Query(	"select distinct pro.codi from ServeiEntity pro where pro.entitat.codi = :entitatCodi and pro.actiu = true")
+	List<String> findCodiActiusByEntitat(@Param("entitatCodi") String entitatCodi);
 
 	@Modifying
 	@Query("update ServeiEntity pro set pro.actiu = :actiu where pro.codi = :codi")
-	public void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
+	void updateActiu(@Param("codi") String codi, @Param("actiu") boolean actiu);
 }

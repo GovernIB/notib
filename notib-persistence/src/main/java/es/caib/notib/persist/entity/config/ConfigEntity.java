@@ -64,6 +64,7 @@ public class ConfigEntity {
 //    private Date lastModifiedDate;
 
     public ConfigEntity(String key, String value) {
+
         this.key = key;
         this.value = value;
     }

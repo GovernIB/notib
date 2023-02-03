@@ -18,6 +18,7 @@ import org.hibernate.type.IntegerType;
 public class PostgreSqlCaibDialect extends PostgreSQL9Dialect {
 
 	public PostgreSqlCaibDialect() {
+
 		super();
 		registerFunction("bitand", new PostgresBitwiseAndSQLFunction("bitand", IntegerType.INSTANCE));
 	}
