@@ -1,5 +1,8 @@
 package es.caib.notib.plugin.registre;
 
+import lombok.Getter;
+
+@Getter
 public enum AutoritzacioRegiWeb3Enum {
 
 	REGISTRE_ENTRADA(1L),
@@ -8,12 +11,11 @@ public enum AutoritzacioRegiWeb3Enum {
 	CONSULTA_REGISTRE_SORTIDA(4L);
 
 	private final Long valor;
-	private AutoritzacioRegiWeb3Enum(Long valor) {
+	 AutoritzacioRegiWeb3Enum(Long valor) {
 		this.valor = valor;
 	}
-	public Long getValor() {
-		return valor;
-	}
+
+
 //	private static final Map<Long, AutoritzacioRegiWeb3> lookup;
 //	static {
 //		lookup = new HashMap<Long, AutoritzacioRegiWeb3>();

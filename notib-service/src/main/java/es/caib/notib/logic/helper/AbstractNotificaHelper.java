@@ -99,25 +99,28 @@ public abstract class AbstractNotificaHelper {
 			}
 		}
 		log.info("Estat final: " + estatsEnviamentsFinals);
-		if (estatsEnviamentsNotificaFinals) {
-			if (estatsEnviamentsFinals) {
-				auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
-			} else {
-				auditNotificacioHelper.updateEstatAFinalitzadaAmbError(notificaEstat.name(), enviament.getNotificacio());
-			}
-			log.info("Envio correu en cas d'usuaris no APLICACIÓ");
-			var notificacio = enviament.getNotificacio();
-			if (notificacio.getTipusUsuari() == TipusUsuariEnumDto.INTERFICIE_WEB) {
-				var startTime = System.nanoTime();
-				try {
-					emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
-				} catch (Exception ex) {
-					throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
-				}
-				var elapsedTime = (System.nanoTime() - startTime) / 10e6;
-				log.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
-			}
-			
+		if (!estatsEnviamentsNotificaFinals) {
+			return enviament;
+		}
+		if (estatsEnviamentsFinals) {
+			auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
+		} else {
+			auditNotificacioHelper.updateEstatAFinalitzadaAmbError(notificaEstat.name(), enviament.getNotificacio());
+		}
+		log.info("Envio correu en cas d'usuaris no APLICACIÓ");
+		var notificacio = enviament.getNotificacio();
+		if (!TipusUsuariEnumDto.INTERFICIE_WEB.equals(notificacio.getTipusUsuari())) {
+			return enviament;
+		}
+		var startTime = System.nanoTime();
+		try {
+			emailNotificacioHelper.prepararEnvioEmailNotificacio(notificacio);
+		} catch (Exception ex) {
+			throw new Exception("Hi ha hagut un error preparant mail notificació (prepararEnvioEmailNotificacio) [Id: " + enviament.getId() + "]", ex);
+		}
+		var elapsedTime = (System.nanoTime() - startTime) / 10e6;
+		log.info(" [TIMER-EST] Preparar enviament mail notificació (prepararEnvioEmailNotificacio)  [Id: " + enviament.getId() + "]: " + elapsedTime + " ms");
+
 //			//Marcar com a processada si la notificació s'ha fet des de una aplicació
 //			if (enviament.getNotificacio() != null && enviament.getNotificacio().getTipusUsuari() == TipusUsuariEnumDto.APLICACIO) {
 //				log.info("Marcant notificació com processada per ser usuari aplicació...");
@@ -125,7 +128,6 @@ public abstract class AbstractNotificaHelper {
 //				enviament.getNotificacio().updateMotiu(notificaEstat.name());
 //				enviament.getNotificacio().updateEstatDate(new Date());
 //			}
-		}
 		return enviament;
 	}
 
@@ -217,92 +219,92 @@ public abstract class AbstractNotificaHelper {
 			return null;
 		}
 		switch (viaTipus) {
-		case ALAMEDA:
-			return "ALMDA";
-		case AVENIDA:
-			return "AVDA";
-		case AVINGUDA:
-			return "AVGDA";
-		case BARRIO:
-			return "BAR";
-		case BULEVAR:
-			return "BVR";
-		case CALLE:
-			return "CALLE";
-		case CALLEJA:
-			return "CJA";
-		case CAMI:
-			return "CAMÍ";
-		case CAMINO:
-			return "CAMNO";
-		case CAMPO:
-			return "CAMPO";
-		case CARRER:
-			return "CARR";
-		case CARRERA:
-			return "CRA";
-		case CARRETERA:
-			return "CTRA";
-		case CUESTA:
-			return "CSTA";
-		case EDIFICIO:
-			return "EDIF";
-		case ENPARANTZA:
-			return "EPTZA";
-		case ESTRADA:
-			return "ESTR";
-		case GLORIETA:
-			return "GTA";
-		case JARDINES:
-			return "JARD";
-		case JARDINS:
-			return "JARDI";
-		case KALEA:
-			return "KALEA";
-		case OTROS:
-			return "OTROS";
-		case PARQUE:
-			return "PRQUE";
-		case PASAJE:
-			return "PSJ";
-		case PASEO:
-			return "PASEO";
-		case PASSATGE:
-			return "PASTG";
-		case PASSEIG:
-			return "PSG";
-		case PLACETA:
-			return "PLCTA";
-		case PLAZA:
-			return "PLAZA";
-		case PLAZUELA:
-			return "PLZA";
-		case PLAÇA:
-			return "PLAÇA";
-		case POBLADO:
-			return "POBL";
-		case POLIGONO:
-			return "POLIG";
-		case PRAZA:
-			return "PRAZA";
-		case RAMBLA:
-			return "RAMBL";
-		case RONDA:
-			return "RONDA";
-		case RUA:
-			return "RÚA";
-		case SECTOR:
-			return "SECT";
-		case TRAVESIA:
-			return "TRAV";
-		case TRAVESSERA:
-			return "TRAVS";
-		case URBANIZACION:
-			return "URB";
-		case VIA:
-			return "VIA";
-		default:
-			return null;
+			case ALAMEDA:
+				return "ALMDA";
+			case AVENIDA:
+				return "AVDA";
+			case AVINGUDA:
+				return "AVGDA";
+			case BARRIO:
+				return "BAR";
+			case BULEVAR:
+				return "BVR";
+			case CALLE:
+				return "CALLE";
+			case CALLEJA:
+				return "CJA";
+			case CAMI:
+				return "CAMÍ";
+			case CAMINO:
+				return "CAMNO";
+			case CAMPO:
+				return "CAMPO";
+			case CARRER:
+				return "CARR";
+			case CARRERA:
+				return "CRA";
+			case CARRETERA:
+				return "CTRA";
+			case CUESTA:
+				return "CSTA";
+			case EDIFICIO:
+				return "EDIF";
+			case ENPARANTZA:
+				return "EPTZA";
+			case ESTRADA:
+				return "ESTR";
+			case GLORIETA:
+				return "GTA";
+			case JARDINES:
+				return "JARD";
+			case JARDINS:
+				return "JARDI";
+			case KALEA:
+				return "KALEA";
+			case OTROS:
+				return "OTROS";
+			case PARQUE:
+				return "PRQUE";
+			case PASAJE:
+				return "PSJ";
+			case PASEO:
+				return "PASEO";
+			case PASSATGE:
+				return "PASTG";
+			case PASSEIG:
+				return "PSG";
+			case PLACETA:
+				return "PLCTA";
+			case PLAZA:
+				return "PLAZA";
+			case PLAZUELA:
+				return "PLZA";
+			case PLAÇA:
+				return "PLAÇA";
+			case POBLADO:
+				return "POBL";
+			case POLIGONO:
+				return "POLIG";
+			case PRAZA:
+				return "PRAZA";
+			case RAMBLA:
+				return "RAMBL";
+			case RONDA:
+				return "RONDA";
+			case RUA:
+				return "RÚA";
+			case SECTOR:
+				return "SECT";
+			case TRAVESIA:
+				return "TRAV";
+			case TRAVESSERA:
+				return "TRAVS";
+			case URBANIZACION:
+				return "URB";
+			case VIA:
+				return "VIA";
+			default:
+				return null;
 		}
 	}
 

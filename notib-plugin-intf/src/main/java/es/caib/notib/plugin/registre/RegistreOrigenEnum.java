@@ -23,14 +23,13 @@ public enum RegistreOrigenEnum {
 	}
 	private static final Map<Integer, RegistreOrigenEnum> lookup;
 	static {
-		lookup = new HashMap<Integer, RegistreOrigenEnum>();
-		for (RegistreOrigenEnum s: EnumSet.allOf(RegistreOrigenEnum.class))
+		lookup = new HashMap<>();
+		for (var s: EnumSet.allOf(RegistreOrigenEnum.class)) {
 			lookup.put(s.getValor(), s);
+		}
 	}
 	public static RegistreOrigenEnum valorAsEnum(Integer valor) {
-		if (valor == null)
-			return null;
-        return lookup.get(valor); 
+        return valor != null ? lookup.get(valor) : null;
     }
 
 }

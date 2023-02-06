@@ -1,5 +1,8 @@
 package es.caib.notib.plugin.registre;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
@@ -7,6 +10,8 @@ import java.util.List;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class RegistreNotificacio {
 
 	private DadesExpedient dadesExpedient;
@@ -15,42 +20,5 @@ public class RegistreNotificacio {
 	private DadesRepresentat dadesRepresentat;
 	private DadesNotificacio dadesNotificacio;
 	private List<DocumentRegistre_llorenc> documents;
-
-	public DadesExpedient getDadesExpedient() {
-		return dadesExpedient;
-	}
-	public void setDadesExpedient(DadesExpedient dadesExpedient) {
-		this.dadesExpedient = dadesExpedient;
-	}
-	public DadesOficina getDadesOficina() {
-		return dadesOficina;
-	}
-	public void setDadesOficina(DadesOficina dadesOficina) {
-		this.dadesOficina = dadesOficina;
-	}
-	public DadesInteressat getDadesInteressat() {
-		return dadesInteressat;
-	}
-	public void setDadesInteressat(DadesInteressat dadesInteressat) {
-		this.dadesInteressat = dadesInteressat;
-	}
-	public DadesRepresentat getDadesRepresentat() {
-		return dadesRepresentat;
-	}
-	public void setDadesRepresentat(DadesRepresentat dadesRepresentat) {
-		this.dadesRepresentat = dadesRepresentat;
-	}
-	public DadesNotificacio getDadesNotificacio() {
-		return dadesNotificacio;
-	}
-	public void setDadesNotificacio(DadesNotificacio dadesNotificacio) {
-		this.dadesNotificacio = dadesNotificacio;
-	}
-	public List<DocumentRegistre_llorenc> getDocuments() {
-		return documents;
-	}
-	public void setDocuments(List<DocumentRegistre_llorenc> documents) {
-		this.documents = documents;
-	}
 
 }

@@ -1,10 +1,15 @@
 package es.caib.notib.plugin.registre;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Resposta base del plugin de registre
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class RespostaBase {
 
 	public static final String ERROR_CODI_OK = "OK";
@@ -12,19 +17,6 @@ public class RespostaBase {
 
 	private String errorCodi;
 	private String errorDescripcio;
-
-	public String getErrorCodi() {
-		return errorCodi;
-	}
-	public void setErrorCodi(String errorCodi) {
-		this.errorCodi = errorCodi;
-	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
-	}
-	public void setErrorDescripcio(String errorDescripcio) {
-		this.errorDescripcio = errorDescripcio;
-	}
 
 	public boolean isOk() {
 		return ERROR_CODI_OK.equals(errorCodi);

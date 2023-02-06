@@ -27,16 +27,11 @@ public class SistemaExternException extends Exception {
 		super(message, cause);
 	}
 
-	public SistemaExternException(
-			String sistemaExternCodi,
-			String message) {
+	public SistemaExternException(String sistemaExternCodi, String message) {
 		super(message);
 	}
 
-	public SistemaExternException(
-			String sistemaExternCodi,
-			String message,
-			Throwable cause) {
+	public SistemaExternException(String sistemaExternCodi, String message, Throwable cause) {
 		super(message, cause);
 	}
 

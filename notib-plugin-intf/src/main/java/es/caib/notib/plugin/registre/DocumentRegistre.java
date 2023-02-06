@@ -1,5 +1,8 @@
 package es.caib.notib.plugin.registre;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
 /**
@@ -7,6 +10,8 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class DocumentRegistre {
 
 	private String nom;
@@ -21,77 +26,5 @@ public class DocumentRegistre {
 	private Integer modeFirma;
 	private String observacions;
 	private String csv;
-	
-	public String getNom() {
-		return nom;
-	}
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public Date getData() {
-		return data;
-	}
-	public void setData(Date data) {
-		this.data = data;
-	}
-	public String getIdiomaCodi() {
-		return idiomaCodi;
-	}
-	public void setIdiomaCodi(String idiomaCodi) {
-		this.idiomaCodi = idiomaCodi;
-	}
-	public String getArxiuNom() {
-		return arxiuNom;
-	}
-	public void setArxiuNom(String arxiuNom) {
-		this.arxiuNom = arxiuNom;
-	}
-	public byte[] getArxiuContingut() {
-		return arxiuContingut;
-	}
-	public void setArxiuContingut(byte[] arxiuContingut) {
-		this.arxiuContingut = arxiuContingut;
-	}
-	public String getTipusDocument() {
-		return tipusDocument;
-	}
-	public void setTipusDocument(
-			String tipusDocument) {
-		this.tipusDocument = tipusDocument;
-	}
-	public String getTipusDocumental() {
-		return tipusDocumental;
-	}
-	public void setTipusDocumental(
-			String tipusDocumental) {
-		this.tipusDocumental = tipusDocumental;
-	}
-	public Integer getOrigen() {
-		return origen;
-	}
-	public void setOrigen(
-			Integer origen) {
-		this.origen = origen;
-	}
-	public Integer getModeFirma() {
-		return modeFirma;
-	}
-	public void setModeFirma(
-			Integer modeFirma) {
-		this.modeFirma = modeFirma;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public void setObservacions(
-			String observacions) {
-		this.observacions = observacions;
-	}
-	public String getCsv() {
-		return csv;
-	}
-	public void setCsv(String csv) {
-		this.csv = csv;
-	}
 
 }

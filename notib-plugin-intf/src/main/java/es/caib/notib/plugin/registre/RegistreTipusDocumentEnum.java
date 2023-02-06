@@ -23,15 +23,15 @@ public enum RegistreTipusDocumentEnum {
 		return valor;
 	}
 	private static final Map<String, RegistreTipusDocumentEnum> lookup;
+
 	static {
-		lookup = new HashMap<String, RegistreTipusDocumentEnum>();
-		for (RegistreTipusDocumentEnum s: EnumSet.allOf(RegistreTipusDocumentEnum.class))
+		lookup = new HashMap<>();
+		for (var s: EnumSet.allOf(RegistreTipusDocumentEnum.class))
 			lookup.put(s.getValor(), s);
 	}
+
 	public static RegistreTipusDocumentEnum valorAsEnum(String valor) {
-		if (valor == null)
-			return null;
-        return lookup.get(valor); 
+        return valor != null ? lookup.get(valor) : null;
     }
 
 }

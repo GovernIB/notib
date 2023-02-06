@@ -28,8 +28,7 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * Retorna la llista de tots els procediments definits al Gestor documental administratiu.
 	 *
 	 * @return La llista de procediments.
-	 * @throws SistemaExternException
-	 *            Si es produeix un error al consultar els procediments.
+	 * @throws SistemaExternException Si es produeix un error al consultar els procediments.
 	 */
 	public List<GcaProcediment> getAllProcediments() throws SistemaExternException;
 
@@ -39,20 +38,18 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * @param codi CodiDir3 de la unitat administrativa
 	 * @param numPagina indica el número de pàgina a recuperar
 	 * @return La llista de procediments.
-	 * @throws SistemaExternException
-	 *            Si es produeix un error al consultar els procediments.
+	 * @throws SistemaExternException Si es produeix un error al consultar els procediments.
 	 */
-	public List<GcaProcediment> getProcedimentsByUnitat(String codi, int numPagina) throws SistemaExternException;
+	List<GcaProcediment> getProcedimentsByUnitat(String codi, int numPagina) throws SistemaExternException;
 
-	public List<GcaProcediment> getProcedimentsByUnitat(String codi) throws SistemaExternException;
+	List<GcaProcediment> getProcedimentsByUnitat(String codi) throws SistemaExternException;
 	
 	/**
 	 * Retorna una unitat administrativa donat el seu codi.
 	 * 
 	 * @param codi CodiDir3 de la unitat administrativa
 	 * @return La unitat administrativa.
-	 * @throws SistemaExternException
-	 *            Si es produeix un error al consultar la unitat administrativa.
+	 * @throws SistemaExternException Si es produeix un error al consultar la unitat administrativa.
 	 */
 	public String getUnitatAdministrativa(String codi) throws SistemaExternException;
 	
@@ -61,10 +58,9 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * 
 	 * @param codi CodiDir3 de la unitat administrativa
 	 * @return La llista de procediments.
-	 * @throws SistemaExternException
-	 *            Si es produeix un error al consultar els procediments.
+	 * @throws SistemaExternException Si es produeix un error al consultar els procediments.
 	 */
-	public int getTotalProcediments(String codi) throws SistemaExternException;
+	int getTotalProcediments(String codi) throws SistemaExternException;
 
 
 	// Serveis
@@ -76,7 +72,7 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar els serveis.
 	 */
-	public List<GcaServei> getAllServeis() throws SistemaExternException;
+	List<GcaServei> getAllServeis() throws SistemaExternException;
 
 	/**
 	 * Retorna la llista de tots els serveis definits al Gestor documental administratiu per a una unitat administrativa.
@@ -87,9 +83,9 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar els serveis.
 	 */
-	public List<GcaServei> getServeisByUnitat(String codi, int numPagina) throws SistemaExternException;
+	List<GcaServei> getServeisByUnitat(String codi, int numPagina) throws SistemaExternException;
 
-	public List<GcaServei> getServeisByUnitat(String codi) throws SistemaExternException;
+	List<GcaServei> getServeisByUnitat(String codi) throws SistemaExternException;
 
 	/**
 	 * Retorna el total de serveis per una entitat.
@@ -99,6 +95,6 @@ public interface GestorContingutsAdministratiuPlugin {
 	 * @throws SistemaExternException
 	 *            Si es produeix un error al consultar els serveis.
 	 */
-	public int getTotalServeis(String codi) throws SistemaExternException;
+	int getTotalServeis(String codi) throws SistemaExternException;
 
 }

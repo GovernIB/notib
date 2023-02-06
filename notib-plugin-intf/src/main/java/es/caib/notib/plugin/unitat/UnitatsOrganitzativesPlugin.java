@@ -41,7 +41,7 @@ public interface UnitatsOrganitzativesPlugin {
 	 * @return La llista d'unitats organitzatives.
 	 * @throws SistemaExternException Si es produeix un error al consultar les unitats organitzatives.
 	 */
-	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException;
+	List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException;
 
 	/**
 	 * Retorna la unitat organtizativa donat el pareCodi
@@ -63,7 +63,7 @@ public interface UnitatsOrganitzativesPlugin {
 	 * @return La llista d'unitats organitzatives.
 	 * @throws SistemaExternException Si es produeix un error al consultar les unitats organitzatives.
 	 */
-	public List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException;
+	List<ObjetoDirectorio> unitatsPerEntitat(String codiEntitat, boolean inclourePare) throws SistemaExternException;
 
 	/**
 	 * Retorna la denominació  d'una unitats organitzativa.

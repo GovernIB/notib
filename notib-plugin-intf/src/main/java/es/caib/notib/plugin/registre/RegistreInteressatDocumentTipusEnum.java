@@ -27,15 +27,16 @@ public enum RegistreInteressatDocumentTipusEnum {
 		return valor;
 	}
 	private static final Map<String, RegistreInteressatDocumentTipusEnum> lookup;
+
 	static {
-		lookup = new HashMap<String, RegistreInteressatDocumentTipusEnum>();
-		for (RegistreInteressatDocumentTipusEnum s: EnumSet.allOf(RegistreInteressatDocumentTipusEnum.class))
+		lookup = new HashMap<>();
+		for (var s: EnumSet.allOf(RegistreInteressatDocumentTipusEnum.class)) {
 			lookup.put(s.getValor(), s);
+		}
 	}
+
 	public static RegistreInteressatDocumentTipusEnum valorAsEnum(String valor) {
-		if (valor == null)
-			return null;
-        return lookup.get(valor); 
+        return valor != null ? lookup.get(valor) : null;
     }
 
 }

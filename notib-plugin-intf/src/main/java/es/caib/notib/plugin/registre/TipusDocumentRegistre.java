@@ -1,5 +1,11 @@
 package es.caib.notib.plugin.registre;
 
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class TipusDocumentRegistre {
 
 	private String nom;
@@ -9,21 +15,4 @@ public class TipusDocumentRegistre {
 		this.codi = codi;
 		this.nom = nom;
 	}
-
-	public String getNom() {
-		return nom;
-	}
-
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
-
-	public String getCodi() {
-		return codi;
-	}
-
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-
 }

@@ -37,7 +37,7 @@ public class AuditAdvice {
 	    if (method.getDeclaringClass().isInterface()) {
 	        method = joinPoint.getTarget().getClass().getDeclaredMethod(methodName, method.getParameterTypes());    
 	    }
-	    Audita auditAnnotation = method.getAnnotation(Audita.class);
+	    var auditAnnotation = method.getAnnotation(Audita.class);
 		log.debug(">>> AUDIT - JoinPoint: " + joinPoint.getSignature().toShortString());
 		log.debug(">>> AUDIT - Entitat a auditar: " + auditAnnotation.entityType());
 		log.debug(">>> AUDIT - Tipus d'operació: " + auditAnnotation.operationType());

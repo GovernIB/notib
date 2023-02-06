@@ -23,23 +23,19 @@ public class NotificacioTableAdvice {
 	@Autowired
 	private NotificacioTableHelper notificacioTableHelper;
 
-	@AfterReturning(
-			pointcut = "execution(* es.caib.notib.logic.helper.AuditNotificacioHelper.desa*(..))",
-			returning = "notificacio")
+	@AfterReturning(pointcut = "execution(* es.caib.notib.logic.helper.AuditNotificacioHelper.desa*(..))", returning = "notificacio")
 	public void addNotificacioTableView(NotificacioEntity notificacio) {
 		notificacioTableHelper.crearRegistre(notificacio);
 	}
 
 	@AfterReturning(
 //			pointcut = "execution(* es.caib.notib.core.helper.AuditNotificacioHelper.update*(..)) || @annotation(UpdateNotificacioTable)",
-			pointcut = "@annotation(UpdateNotificacioTable)",
-			returning = "notificacio")
+			pointcut = "@annotation(UpdateNotificacioTable)", returning = "notificacio")
 	public void updateNotificacioTableView(NotificacioEntity notificacio) {
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 	}
 
-	@Before(
-			"execution(* es.caib.notib.logic.helper.AuditNotificacioHelper.deleteNotificacio(es.caib.notib.persist.entity.NotificacioEntity)) && args(notificacio)")
+	@Before("execution(* es.caib.notib.logic.helper.AuditNotificacioHelper.deleteNotificacio(es.caib.notib.persist.entity.NotificacioEntity)) && args(notificacio)")
 	public void deleteNotificacioTableView(NotificacioEntity notificacio) {
 		notificacioTableHelper.eliminarRegistre(notificacio);
 	}

@@ -26,25 +26,19 @@ public class EnviamentTableAdvice {
 	@Autowired
 	private EnviamentTableHelper enviamentTableHelper;
 
-	@AfterReturning(
-			pointcut = "execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.desa*(..))",
-			returning = "enviament")
+	@AfterReturning(pointcut = "execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.desa*(..))", returning = "enviament")
 	public void addNotificacioTableView(NotificacioEnviamentEntity enviament) {
 		enviamentTableHelper.crearRegistre(enviament);
 	}
 
-	@AfterReturning(
-			pointcut =  "    execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.update*(..)) " +
+	@AfterReturning(pointcut =  "    execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.update*(..)) " +
 						" || execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.reset*(..)) " +
-						" || @annotation(UpdateEnviamentTable)",
-			returning = "enviament")
+						" || @annotation(UpdateEnviamentTable)", returning = "enviament")
 	public void updateNotificacioTableView(NotificacioEnviamentEntity enviament) {
 		enviamentTableHelper.actualitzarRegistre(enviament);
 	}
 
-	@Before(
-			"    execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.deleteEnviament(es.caib.notib.persist.entity.NotificacioEnviamentEntity)) " +
-			" && args(enviament)")
+	@Before("execution(* es.caib.notib.logic.helper.AuditEnviamentHelper.deleteEnviament(es.caib.notib.persist.entity.NotificacioEnviamentEntity)) && args(enviament)")
 	public void deleteNotificacioTableView(NotificacioEnviamentEntity enviament) {
 		enviamentTableRepository.deleteById(enviament.getId());
 	}

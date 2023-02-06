@@ -36,7 +36,7 @@ public class OrganGestorCachable {
     @Cacheable(value = "codisOrgansFills", key="#codiDir3Entitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisOrgansGestorsFillsByOrgan(String codiDir3Entitat, String codiDir3Organ) {
 
-       var organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
+        var organigramaEntitat = findOrganigramaByEntitat(codiDir3Entitat);
         var codiDir3 = codiDir3Organ != null ? codiDir3Organ : codiDir3Entitat;
         List<String> unitatsEntitat = new ArrayList<>();
         unitatsEntitat.addAll(getCodisOrgansGestorsFills(organigramaEntitat, codiDir3));

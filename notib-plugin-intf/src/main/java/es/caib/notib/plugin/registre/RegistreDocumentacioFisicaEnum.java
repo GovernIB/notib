@@ -23,15 +23,16 @@ public enum RegistreDocumentacioFisicaEnum {
 		return valor;
 	}
 	private static final Map<String, RegistreDocumentacioFisicaEnum> lookup;
+
 	static {
-		lookup = new HashMap<String, RegistreDocumentacioFisicaEnum>();
-		for (RegistreDocumentacioFisicaEnum s: EnumSet.allOf(RegistreDocumentacioFisicaEnum.class))
+		lookup = new HashMap<>();
+		for (var s: EnumSet.allOf(RegistreDocumentacioFisicaEnum.class)) {
 			lookup.put(s.getValor(), s);
+		}
 	}
+
 	public static RegistreDocumentacioFisicaEnum valorAsEnum(String valor) {
-		if (valor == null)
-			return null;
-        return lookup.get(valor); 
+        return valor != null ? lookup.get(valor) : null;
     }
 
 }

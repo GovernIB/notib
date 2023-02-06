@@ -9,12 +9,7 @@ import es.caib.notib.plugin.SistemaExternException;
  */
 public interface FirmaServidorPlugin {
 
-	public byte[] firmar(
-			String nom,
-			String motiu,
-			byte[] contingut,
-			TipusFirma tipusFirma,
-			String idioma) throws SistemaExternException;
+	public byte[] firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException;
 
 	public static enum TipusFirma {
 		PADES,

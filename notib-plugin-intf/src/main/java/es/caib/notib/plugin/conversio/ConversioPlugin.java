@@ -22,8 +22,7 @@ public interface ConversioPlugin {
 	 * @throws SistemaExternException
 	 *             Si hi ha hagut algun problema per a fer la conversió.
 	 */
-	public ConversioArxiu convertirPdf(
-			ConversioArxiu arxiu) throws SistemaExternException;
+	ConversioArxiu convertirPdf(ConversioArxiu arxiu) throws SistemaExternException;
 
 	/**
 	 * Converteix un arxiu a format PDF estampant un codi de barres
@@ -37,9 +36,7 @@ public interface ConversioPlugin {
 	 * @throws SistemaExternException
 	 *             Si hi ha hagut algun problema per a fer la conversió.
 	 */
-	public ConversioArxiu convertirPdfIEstamparUrl(
-			ConversioArxiu arxiu,
-			String url) throws SistemaExternException;
+	ConversioArxiu convertirPdfIEstamparUrl(ConversioArxiu arxiu, String url) throws SistemaExternException;
 
 	/**
 	 * Retorna el nom de l'arxiu convertit.
@@ -48,7 +45,6 @@ public interface ConversioPlugin {
 	 *            El nom de l'arxiu original.
 	 * @return el nom de l'arxiu convertit.
 	 */
-	public String getNomArxiuConvertitPdf(
-			String nomOriginal);
+	String getNomArxiuConvertitPdf(String nomOriginal);
 
 }

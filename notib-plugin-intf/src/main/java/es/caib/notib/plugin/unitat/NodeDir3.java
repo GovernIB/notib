@@ -60,8 +60,9 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 	
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
+
+		final var prime = 31;
+		var result = 1;
 		result = prime * result + ((codi == null) ? 0 : codi.hashCode());
 		result = prime * result + ((denominacio == null) ? 0 : denominacio.hashCode());
 		result = prime * result + ((estat == null) ? 0 : estat.hashCode());
@@ -70,28 +71,41 @@ public class NodeDir3 implements Serializable, Comparable<NodeDir3> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		NodeDir3 other = (NodeDir3) obj;
+		}
+		var other = (NodeDir3) obj;
 		if (codi == null) {
-			if (other.codi != null)
+			if (other.codi != null) {
 				return false;
-		} else if (!codi.equals(other.codi))
+			}
+		}
+		if (!codi.equals(other.codi)) {
 			return false;
+		}
 		if (denominacio == null) {
-			if (other.denominacio != null)
+			if (other.denominacio != null) {
 				return false;
-		} else if (!denominacio.equals(other.denominacio))
+			}
+		}
+		if (!denominacio.equals(other.denominacio)) {
 			return false;
+		}
 		if (estat == null) {
-			if (other.estat != null)
+			if (other.estat != null) {
 				return false;
-		} else if (!estat.equals(other.estat))
+			}
+		}
+		if (!estat.equals(other.estat)) {
 			return false;
+		}
 		return true;
 	}
 

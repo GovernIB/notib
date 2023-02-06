@@ -68,15 +68,14 @@ public enum RegistreTipusDocumentalEnum {
 		return valor;
 	}
 	private static final Map<String, RegistreTipusDocumentalEnum> lookup;
+
 	static {
-		lookup = new HashMap<String, RegistreTipusDocumentalEnum>();
-		for (RegistreTipusDocumentalEnum s: EnumSet.allOf(RegistreTipusDocumentalEnum.class))
+		lookup = new HashMap<>();
+		for (var s: EnumSet.allOf(RegistreTipusDocumentalEnum.class))
 			lookup.put(s.getValor(), s);
 	}
 	public static RegistreTipusDocumentalEnum valorAsEnum(String valor) {
-		if (valor == null)
-			return null;
-        return lookup.get(valor); 
+        return valor != null ? lookup.get(valor) : null;
     }
 
 }

@@ -23,15 +23,16 @@ public enum RegistreModeFirmaEnum {
 		return valor;
 	}
 	private static final Map<Integer, RegistreModeFirmaEnum> lookup;
+
 	static {
-		lookup = new HashMap<Integer, RegistreModeFirmaEnum>();
-		for (RegistreModeFirmaEnum s: EnumSet.allOf(RegistreModeFirmaEnum.class))
+		lookup = new HashMap<>();
+		for (var s: EnumSet.allOf(RegistreModeFirmaEnum.class)) {
 			lookup.put(s.getValor(), s);
+		}
 	}
+
 	public static RegistreModeFirmaEnum valorAsEnum(Integer valor) {
-		if (valor == null)
-			return null;
-        return lookup.get(valor); 
+        return valor != null ? lookup.get(valor) : null;
     }
 
 }
