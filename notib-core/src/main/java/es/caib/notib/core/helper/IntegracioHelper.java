@@ -211,7 +211,7 @@ public class IntegracioHelper {
 	private String getUsuariNomCodi(boolean obtenirUsuari) {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null) {
+		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
 			return "";
 		}
 		String usuariNomCodi = auth.getName();
