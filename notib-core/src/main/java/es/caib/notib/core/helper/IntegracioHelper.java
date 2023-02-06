@@ -218,12 +218,17 @@ public class IntegracioHelper {
 		if (!obtenirUsuari) {
 			return usuariNomCodi;
 		}
-		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
-		if (usuari == null) {
-			log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+		try {
+			UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+			if (usuari == null) {
+				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+				return usuariNomCodi;
+			}
+			return usuari.getNom() + " (" + usuari.getCodi() + ")";
+		} catch (Exception ex) {
+			log.error("[Error Integració] Error al buscar l'usuari " + usuariNomCodi);
 			return usuariNomCodi;
 		}
-		return usuari.getNom() + " (" + usuari.getCodi() + ")";
 	}
 
 	private IntegracioDto novaIntegracio(String codi) {

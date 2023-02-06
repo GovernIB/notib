@@ -166,6 +166,10 @@ public class NotificacioMassivaEntity extends NotibAuditable<Long> {
     }
 
     private void updateProgres() {
+
+        if (notificacionsValidades == null || notificacionsValidades == 0) {
+            return;
+        }
         this.progress = ((notificacionsProcessades + notificacionsProcessadesAmbError) * 100) / notificacionsValidades;
         log.info("[PROCES MASSIU] updateProgres (" + this.progress + ") - validades: " + notificacionsValidades + ", processades: " + notificacionsProcessades + ", error: " + notificacionsProcessadesAmbError);
 
