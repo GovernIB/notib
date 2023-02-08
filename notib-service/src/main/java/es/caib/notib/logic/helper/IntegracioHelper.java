@@ -1,9 +1,11 @@
 package es.caib.notib.logic.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.IntegracioAccioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.IntegracioDto;
 import es.caib.notib.logic.intf.dto.IntegracioInfo;
+import es.caib.notib.persist.entity.UsuariEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioEntity;
 import es.caib.notib.persist.entity.monitor.MonitorIntegracioParamEntity;
 import es.caib.notib.persist.repository.AplicacioRepository;
@@ -13,6 +15,7 @@ import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
@@ -167,20 +170,24 @@ public class IntegracioHelper {
 	private String getUsuariNomCodi(boolean obtenirUsuari) {
 
 		var auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null) {
+		if (auth == null || Strings.isNullOrEmpty(auth.getName())) {
 			return "";
 		}
 		var usuariNomCodi = auth.getName();
 		if (!obtenirUsuari) {
 			return usuariNomCodi;
 		}
-//		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
-		var usuari = usuariRepository.findByCodi(auth.getName()); // TODO LA LINIA SUPERIOR FUNCIONA A NOTIB-DEV
-		if (usuari == null) {
-			log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+		try {
+			var usuari = usuariRepository.findByCodi(auth.getName());
+			if (usuari == null) {
+				log.warn("Error IntegracioHelper.getUsuariNomCodi -> Usuari no trobat a la bdd");
+				return usuariNomCodi;
+			}
+			return usuari.getNom() + " (" + usuari.getCodi() + ")";
+		} catch (Exception ex) {
+			log.error("[Error Integració] Error al buscar l'usuari " + usuariNomCodi);
 			return usuariNomCodi;
 		}
-		return usuari.getNom() + " (" + usuari.getCodi() + ")";
 	}
 
 	private IntegracioDto novaIntegracio(String codi) {

@@ -548,8 +548,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							usuariCodi,
 							filtreNetejat.getNomesAmbErrors().getField(),
 							filtreNetejat.getNomesSenseErrors().getField(),
-							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
-							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
@@ -588,8 +586,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getIdentificador().getField(),
 							filtreNetejat.getNomesAmbErrors().getField(),
 							filtreNetejat.getNomesSenseErrors().getField(),
-							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
-							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
@@ -630,8 +626,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getIdentificador().getField(),
 							organs,
 							filtreNetejat.getNomesSenseErrors().getField(),
-							filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
-							filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);

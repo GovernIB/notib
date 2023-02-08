@@ -129,10 +129,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-			") " +
 			"and (:isIdentificadorNull = true or lower(ntf.notificaIds) like concat('%', lower(:identificador), '%'))" +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:nomesAmbErrors = false or ntf.notificaErrorData is not null) " +
@@ -176,8 +172,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("usuariCodi") String usuariCodi,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			@Param("isReferenciaNull") boolean isReferenciaNull,
 			@Param("referencia") String referencia,
 			Pageable paginacio);
@@ -211,10 +205,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 //			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 //			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
-			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-			") " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
@@ -254,8 +244,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("identificador") String identificador,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			@Param("isReferenciaNull") boolean isReferenciaNull,
 			@Param("referencia") String referencia,
 			Pageable paginacio);
@@ -296,10 +284,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
 			"and (:isNumExpedientNull = true or ntf.numExpedient = :numExpedient)" +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
-			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-			") " +
 			"and (:nomesSenseErrors = false or ntf.notificaErrorData is null) " +
 			"and (:isIdentificadorNull = true or " +
 			"		(ntf.id in (select env.notificacio.id"
@@ -339,8 +323,6 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("identificador") String identificador,
 			@Param("organs") List<String> organs,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			@Param("isReferenciaNull") boolean isReferenciaNull,
 			@Param("referencia") String referencia,
 			Pageable paginacio);

@@ -213,15 +213,15 @@ public class NotificacioListHelper {
         var isEstatNull = estat == null;
         var nomesSenseErrors = false;
         var nomesAmbErrors = filtreDto.isNomesAmbErrors();
-        if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
-            estat = NotificacioEstatEnumDto.PENDENT;
-            hasZeronotificaEnviamentIntent = true;
-            nomesSenseErrors = true;
-
-        } else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
-            hasZeronotificaEnviamentIntent = false;
-//					nomesAmbErrors = true;
-        }
+//        if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
+//            estat = NotificacioEstatEnumDto.PENDENT;
+//            hasZeronotificaEnviamentIntent = true;
+//            nomesSenseErrors = true;
+//
+//        } else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
+//            hasZeronotificaEnviamentIntent = false;
+////					nomesAmbErrors = true;
+//        }
         return NotificacioFiltre.builder()
                 .entitatId(new FiltreField<>(filtreDto.getEntitatId()))
                 .comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
