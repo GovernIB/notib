@@ -137,8 +137,8 @@
 		   data-botons-template="#botonsTemplate">
 		<thead>
 			<tr>
-				<th data-col-name="excepcioMessage" data-visible="false"></th>
-				<th data-col-name="excepcioStacktrace" data-visible="false"></th>
+<%--				<th data-col-name="excepcioMessage" data-visible="false"></th>--%>
+<%--				<th data-col-name="excepcioStacktrace" data-visible="false"></th>--%>
 				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="integracio.list.columna.data"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
 				<c:if test="${codiActual == 'CALLBACK'}">
