@@ -643,7 +643,8 @@ function loadOrgansGestors(urlCercaUnitats){
     let codiProvincia = $('#o_provincia').val()!=null?$('#o_provincia').val():'';
     let codiLocalitat = $("#o_localitat").val()!=null?$('#o_localitat').val():'';
 
-    if ((codi || denominacio) && !codiComunitat || codiComunitat && !codi && !denominacio || !codi && !denominacio && !codiComunitat) {
+    // if ((codi || denominacio) && !codiComunitat || codiComunitat && !codi && !denominacio || !codi && !denominacio && !codiComunitat) {
+    if (!(codi || denominacio)) {
         alert(textMessages['notificacio.form.dir3.cercar.noMinimOrgansFiltre']);
         return false;
     }
