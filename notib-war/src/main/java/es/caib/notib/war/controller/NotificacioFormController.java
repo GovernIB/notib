@@ -234,7 +234,8 @@ public class NotificacioFormController extends BaseUserController {
         boolean codiNull = Strings.isNullOrEmpty(codi);
         boolean denominacioNull = Strings.isNullOrEmpty(denominacio);
         boolean comunitatNull = comunitatAutonoma == null;
-        if (comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+//        if (comunitatNull && comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+        if (codiNull && denominacioNull) {
             return new ArrayList<>();
         }
         try {
