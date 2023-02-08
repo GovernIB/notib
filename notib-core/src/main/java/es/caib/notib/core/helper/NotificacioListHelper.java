@@ -238,19 +238,19 @@ public class NotificacioListHelper {
             procediment = serveiRepository.findById(filtreDto.getServeiId());
         }
         NotificacioEstatEnumDto estat = filtreDto.getEstat();
-        Boolean hasZeronotificaEnviamentIntent = null;
+//        Boolean hasZeronotificaEnviamentIntent = null;
         boolean isEstatNull = estat == null;
         boolean nomesSenseErrors = false;
         boolean nomesAmbErrors = filtreDto.isNomesAmbErrors();
-        if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
-            estat = NotificacioEstatEnumDto.PENDENT;
-            hasZeronotificaEnviamentIntent = true;
-            nomesSenseErrors = true;
-
-        } else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
-            hasZeronotificaEnviamentIntent = false;
-//					nomesAmbErrors = true;
-        }
+//        if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.ENVIANT)) {
+//            estat = NotificacioEstatEnumDto.PENDENT;
+//            hasZeronotificaEnviamentIntent = true;
+//            nomesSenseErrors = true;
+//
+//        } else if (!isEstatNull && estat.equals(NotificacioEstatEnumDto.PENDENT)) {
+//            hasZeronotificaEnviamentIntent = false;
+////					nomesAmbErrors = true;
+//        }
         return NotificacioFiltre.builder()
                 .entitatId(new FiltreField<>(filtreDto.getEntitatId()))
                 .comunicacioTipus(new FiltreField<>(filtreDto.getComunicacioTipus()))
@@ -268,7 +268,7 @@ public class NotificacioListHelper {
                 .identificador(new StringField(filtreDto.getIdentificador()))
                 .nomesAmbErrors(new FiltreField<>(nomesAmbErrors))
                 .nomesSenseErrors(new FiltreField<>(nomesSenseErrors))
-                .hasZeronotificaEnviamentIntent(new FiltreField<>(hasZeronotificaEnviamentIntent))
+//                .hasZeronotificaEnviamentIntent(new FiltreField<>(hasZeronotificaEnviamentIntent))
                 .referencia(new StringField(filtreDto.getReferencia()))
                 .build();
     }
