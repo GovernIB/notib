@@ -544,6 +544,7 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 				OficinaSir oficinaSIR = new OficinaSir();
 				oficinaSIR.setCodi(oficinaTF.getCodigo());
 				oficinaSIR.setNom(oficinaTF.getDenominacion());
+				oficinaSIR.setSir(oficinaTF.getSirOfi() != null && !oficinaTF.getSirOfi().isEmpty());
 				oficinesSIR.add(oficinaSIR);
 			}
 			return oficinesSIR;

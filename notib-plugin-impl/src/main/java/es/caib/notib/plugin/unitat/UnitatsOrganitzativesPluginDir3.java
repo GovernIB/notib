@@ -138,13 +138,14 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 
 	@Override
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
-		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
 		try {
+			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			List<NodeDir3> unitats = new ArrayList<>();
 			List<UnidadTF> unidades = new ArrayList<>();
 			URL url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
-					(dataActualitzacio != null ? "&fechaActualizacion=" + dataActualitzacio : "") +
-					(dataSincronitzacio != null ? "&fechaSincronizacion=" + dataSincronitzacio : ""));
+					(dataActualitzacio != null ? "&fechaActualizacion=" + sdf.format(dataActualitzacio) : "") +
+					(dataSincronitzacio != null ? "&fechaSincronizacion=" + sdf.format(dataSincronitzacio) : ""));
 			byte[] response = getResponse(url);
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
