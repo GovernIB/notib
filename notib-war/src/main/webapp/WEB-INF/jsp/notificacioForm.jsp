@@ -339,6 +339,8 @@
 		"comu.boto.seleccionar": "<spring:message code="comu.boto.seleccionar"/>",
 		"notificacio.sir.emprar.valib": "<spring:message code="notificacio.sir.emprar.valib"/>",
 		"notificacio.sir.emprar.valib.text": "<spring:message code="notificacio.sir.emprar.valib.text"/>",
+		"notificacio.form.dir3.cercar.noMinimCodiFiltre": "<spring:message code='notificacio.form.dir3.cercar.noMinimCodiFiltre'/>",
+		"notificacio.form.dir3.cercar.noMinimDenominacioFiltre": "<spring:message code='notificacio.form.dir3.cercar.noMinimDenominacioFiltre'/>",
 	};
 
 	var destinatariHTMLTemplate =' \

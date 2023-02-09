@@ -647,6 +647,12 @@ function loadOrgansGestors(urlCercaUnitats){
     if (!(codi || denominacio)) {
         alert(textMessages['notificacio.form.dir3.cercar.noMinimOrgansFiltre']);
         return false;
+    } else if (codi && codi.length < 5) {
+        alert(textMessages['notificacio.form.dir3.cercar.noMinimCodiFiltre']);
+        return false;
+    } else if (denominacio && denominacio.length < 5) {
+        alert(textMessages['notificacio.form.dir3.cercar.noMinimDenominacioFiltre']);
+        return false;
     }
 
     $(".loading-screen").show();

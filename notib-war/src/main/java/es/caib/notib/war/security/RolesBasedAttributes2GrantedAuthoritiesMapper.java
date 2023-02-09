@@ -41,12 +41,12 @@ public class RolesBasedAttributes2GrantedAuthoritiesMapper implements Attributes
 				gaList.add(new SimpleGrantedAuthority(attribute));
 			}
 		}
-		log.info("Mapeig dels rols a GrantedAuthority");
+//		log.info("Mapeig dels rols a GrantedAuthority");
 		String rolsStr = Arrays.toString(attributes.toArray());
-		log.info("Rols de l'aplicació: " + rolsStr);
+//		log.info("Rols de l'aplicació: " + rolsStr);
 
 		rolsStr =  StringUtils.join(gaList, ",");
-		log.info(String.format("Rols mapejats: %s", rolsStr));
+//		log.info(String.format("Rols mapejats: %s", rolsStr));
 		return gaList;
 	}
 

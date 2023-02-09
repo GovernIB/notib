@@ -37,11 +37,11 @@ public class RolesBasedPreAuthenticatedWebAuthenticationDetailsSource extends J2
             }
         }
 		String rolsStr = Arrays.toString(j2eeMappableRoles.toArray());
-		log.info("Rols de l'aplicació: " + rolsStr);
+//		log.info("Rols de l'aplicació: " + rolsStr);
 
 		rolsStr = Arrays.toString(j2eeUserRolesList.toArray());
-		log.info(String.format("Rols accessibles per l'usuari (%s): %s",
-				request.getUserPrincipal().getName(), rolsStr));
+//		log.info(String.format("Rols accessibles per l'usuari (%s): %s",
+//				request.getUserPrincipal().getName(), rolsStr));
         return j2eeUserRolesList;
     }
 	@Override

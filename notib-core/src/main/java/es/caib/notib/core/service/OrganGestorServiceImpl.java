@@ -1884,6 +1884,11 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		for (CodiValorDto org : organsAmbPermisDirecte) {
 			organsCodis.add(org.getCodi());
 		}
+		// Els òrgans ammb permís comú també es poden consultar
+		List<CodiValorDto> organsAmbPermisComuns = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, PermisEnum.COMUNS);
+		for (CodiValorDto org : organsAmbPermisComuns) {
+			organsCodis.add(org.getCodi());
+		}
 		if (!organsCodis.isEmpty())
 			organsGestorsAmbPermis = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), organsCodis);
 
