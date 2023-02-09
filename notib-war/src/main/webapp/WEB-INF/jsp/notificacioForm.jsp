@@ -516,6 +516,7 @@
 				$file.closest(".fileinput").next(".validating-block").remove();
 				$('<p class="validating-block text-info"><span class="fa fa-spin fa-circle-o-notch"></span>&nbsp;<spring:message code="notificacio.form.valid.document.validant"/></p>').insertAfter($file.closest(".fileinput"));
 
+				$("#saveForm").attr("disabled", true);
 				$.ajax({
 					type: "POST",
 					enctype: 'multipart/form-data',
@@ -527,7 +528,6 @@
 					timeout: 600000,
 					success: function (data) {
 
-						console.log("SUCCESS : ", data);
 						$file.prop("disabled", false);
 						$file.closest(".fileinput").next(".validating-block").remove();
 
@@ -556,12 +556,11 @@
 
 					},
 					error: function (e) {
-
-						console.log("ERROR : ", e);
+						console.error("ERROR : ", e);
 						$file.prop("disabled", false);
 
 					}
-				});
+				}).done(() => $("#saveForm").attr("disabled", false));
 
 			});
 		}

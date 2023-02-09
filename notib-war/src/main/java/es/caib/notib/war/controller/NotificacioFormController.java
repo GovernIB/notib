@@ -707,7 +707,7 @@ public class NotificacioFormController extends BaseUserController {
         model.addAttribute("errors", bindingResult.getAllErrors());
         for (int i = 0; i < 5; i++) {
             DocumentCommand documentCommand = notificacioCommand.getDocuments()[i];
-            if (documentCommand == null ) {
+            if (documentCommand == null) {
                 continue;
             }
             if (documentCommand.getArxiuGestdocId().isEmpty() && notificacioCommand.getTipusDocument()[i] != null &&
@@ -733,7 +733,7 @@ public class NotificacioFormController extends BaseUserController {
 
             } else if (documentCommand.getArxiuNom() != null && !documentCommand.getArxiuNom().isEmpty()) {
                 model.addAttribute("nomDocument_" + i, documentCommand.getArxiuNom());
-            } else {
+            } else if (notificacioCommand.getArxiu()[i] != null) {
                 model.addAttribute("nomDocument_" + i, notificacioCommand.getArxiu()[i].getOriginalFilename());
             }
         }
