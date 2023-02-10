@@ -36,6 +36,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name="not_notificacio", uniqueConstraints = @UniqueConstraint(columnNames={"REFERENCIA"}))
 @EntityListeners(AuditingEntityListener.class)

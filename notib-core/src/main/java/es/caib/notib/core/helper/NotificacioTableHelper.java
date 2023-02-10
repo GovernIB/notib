@@ -1,7 +1,10 @@
 package es.caib.notib.core.helper;
 
+import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.notenviament.EnviamentDto;
+import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -94,6 +97,32 @@ public class NotificacioTableHelper {
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
             log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);
+        }
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void actualitzar(NotTableUpdate not) {
+
+        try {
+            NotificacioTableEntity item = notificacioTableViewRepository.findOne(not.getId());
+            if (item == null) {
+                return;
+            }
+            if (not.getEstatProcessatDate() != null) {
+                item.setEstatProcessatDate(not.getEstatProcessatDate());
+            }
+            if (not.getEstatDate() != null) {
+                item.setEstatDate(not.getEstatDate());
+            }
+
+            if (not.getEstat() != null) {
+                item.setEstat(not.getEstat());
+                // Estat de la notificacio
+                item.setEstatMask(item.getEstatMask() - item.getEstat().getMask() + not.getEstat().getMask());
+            }
+            notificacioTableViewRepository.saveAndFlush(item);
+        } catch (Exception ex) {
+            log.error("Error acutalitzant la informació de la notificació " + not.getId(), ex);
         }
     }
 

@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -104,6 +105,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private EntityManager entityManager;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -137,6 +140,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 				} else {
 					logger.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
 					notificacioHelper.registrarNotificar(pendent);
+					entityManager.flush();
+					entityManager.clear();
 				}
 			}
 //			Set<Long> keys = futurs.keySet();
