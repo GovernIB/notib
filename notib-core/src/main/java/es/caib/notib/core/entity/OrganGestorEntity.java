@@ -86,6 +86,9 @@ public class OrganGestorEntity extends AbstractPersistable<Long> {
 	@Enumerated(EnumType.STRING)
 	private TipusTransicioEnumDto tipusTransicio;
 
+	@Column(name = "no_vigent")
+	private Boolean noVigent;
+
 //	public void update(
 //			String codi,
 //			String nom,

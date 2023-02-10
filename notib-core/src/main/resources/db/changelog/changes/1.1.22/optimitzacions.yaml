@@ -7,6 +7,14 @@ databaseChangeLog:
       name: varcharUnit
       value: ''
       dbms: postgresql
+  - property:
+      name: boolUnit
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolUnit
+      value: bool
+      dbms: postgresql
   - changeSet:
       id: 1671453604619-1
       author: limit
@@ -23,6 +31,12 @@ databaseChangeLog:
               - column:
                   name: estat_mask
                   type: int
+        - addColumn:
+            tableName: not_organ_gestor
+            columns:
+              - column:
+                  name: no_vigent
+                  type: ${boolUnit}
         - sql: "
         UPDATE NOT_NOTIFICACIO_TABLE SET TITULAR = (select listagg(NOM || ' ' || LLINATGE1 || ' ' || LLINATGE2 || ' ' || NIF || ' ' || RAO_SOCIAL,', ') WITHIN GROUP (ORDER BY NOTIFICACIO_ENV_ID) FROM NOT_PERSONA P, NOT_NOTIFICACIO_ENV E WHERE P.ID = E.TITULAR_ID AND E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);
         UPDATE NOT_NOTIFICACIO_TABLE SET notifica_ids = (select listagg(E.NOTIFICA_ID, ', ') WITHIN GROUP (ORDER BY E.ID) FROM NOT_NOTIFICACIO_ENV E WHERE E.NOTIFICACIO_ID = NOT_NOTIFICACIO_TABLE.ID);

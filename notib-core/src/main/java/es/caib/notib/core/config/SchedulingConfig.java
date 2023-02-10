@@ -530,7 +530,46 @@ public class SchedulingConfig implements SchedulingConfigurer {
             }
         );
         monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
+
+
+        // 12. Consulta de canvis en l'organigrama
+        /////////////////////////////////////////////////////////////////////////
+        final String actualitzarEstatOrgansEnviamentTable = "actualitzarEstatOrgansEnviamentTable";
+        monitorTasquesService.addTasca(consultaCanvisOrganigrama);
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        try {
+                            monitorTasquesService.inici(actualitzarEstatOrgansEnviamentTable);
+                            schedulledService.actualitzarEstatOrgansEnviamentTable();
+                            monitorTasquesService.fi(actualitzarEstatOrgansEnviamentTable);
+                        } catch(Exception e) {
+                            monitorTasquesService.error(actualitzarEstatOrgansEnviamentTable);
+                        }
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+//                        String cron = configHelper.getConfig(PropertiesConstants.actualitzarEstatOrgansEnviamentTable);
+//                        if (cron == null) {
+                            String cron = "0 30 3 * * *";
+//                            String cron = "* * * * * *";
+//                        }
+                        CronTrigger trigger = new CronTrigger(cron);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long millis = nextExecution.getTime() - System.currentTimeMillis();
+                        monitorTasquesService.updateProperaExecucio(actualitzarEstatOrgansEnviamentTable, millis);
+                        return nextExecution;
+                    }
+                }
+        );
+        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
     }
+
+
 
     private long calcularDelay() {
 

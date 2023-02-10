@@ -251,6 +251,9 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("organs") List<String> organs,
 			Pageable pageable);
 
+	@Query( "from EnviamentTableEntity nenv where (:entitat = nenv.entitat)")
+	Page<EnviamentTableEntity> find4EntitatAdminRole(@Param("entitat") EntitatEntity entitat, Pageable pageable);
+
 	@Query( "from " +
 			"    EnviamentTableEntity nenv " +
 			"where " +
@@ -378,4 +381,9 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"where nt.id = :enviamentId ")
 	void updateNotificaReferencia(@Param("notificaReferencia") String notificaReferencia,
 								  @Param("enviamentId") Long procedimentCodi);
+
+
+	@Modifying
+	@Query("update EnviamentTableEntity nt set nt.organEstat = :estat where nt.organCodi = :organCodi")
+	void updateOrganEstat(@Param("organCodi") String organCodi, @Param("estat") OrganGestorEstatEnum estat);
 }

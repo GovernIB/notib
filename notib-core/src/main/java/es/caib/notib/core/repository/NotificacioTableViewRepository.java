@@ -4,6 +4,7 @@ import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioMassivaEntity;
 import es.caib.notib.core.entity.NotificacioTableEntity;
@@ -444,4 +445,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 						   @Param("procedimentNom") String procedimentNom,
 						   @Param("procedimentRequirePermission") boolean procedimentRequireDirectPermission,
 						   @Param("procedimentCodi") String procedimentCodi);
+
+	@Modifying
+	@Query("update NotificacioTableEntity nt set nt.organEstat = :estat where nt.organCodi = :organCodi")
+	void updateOrganEstat(@Param("organCodi") String organCodi, @Param("estat") OrganGestorEstatEnum estat);
 }

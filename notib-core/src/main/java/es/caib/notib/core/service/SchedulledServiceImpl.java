@@ -13,6 +13,7 @@ import es.caib.notib.core.clases.RegistrarThread;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
 import es.caib.notib.core.helper.SemaforNotificacio;
@@ -25,6 +26,9 @@ import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
 import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -68,6 +72,12 @@ public class SchedulledServiceImpl implements SchedulledService {
 
 	@Resource
 	private EntitatRepository entitatRepository;
+	@Resource
+	private OrganGestorRepository organRepository;
+	@Resource
+	private EnviamentTableRepository envTableRepository;
+	@Resource
+	private NotificacioTableViewRepository notTableRepository;
 	@Autowired
 	private NotificaHelper notificaHelper;
 	@Autowired
@@ -392,6 +402,30 @@ public class SchedulledServiceImpl implements SchedulledService {
 		c.add(DAY_OF_MONTH, -d);
 		Date llindar = c.getTime();
 		integracioHelper.eliminarAntics(llindar);
+	}
+
+	@Transactional
+	@Override
+	public void actualitzarEstatOrgansEnviamentTable() {
+
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		List<OrganGestorEntity> organs;
+		Date ara = new Date();
+		long diferencia;
+		for (EntitatEntity e : entitats) {
+			if (e.getDataActualitzacio() == null) {
+				continue;
+			}
+			diferencia = ara.getTime() - e.getDataActualitzacio().getTime();
+			if (86400000 < diferencia) {
+				continue;
+			}
+			organs = organRepository.findByNoVigentIsTrue();
+			for (OrganGestorEntity o : organs) {
+				envTableRepository.updateOrganEstat(o.getCodi(), o.getEstat());
+				notTableRepository.updateOrganEstat(o.getCodi(), o.getEstat());
+			}
+		}
 	}
 
 	private void esborrarTemporals(String dir) throws Exception {
