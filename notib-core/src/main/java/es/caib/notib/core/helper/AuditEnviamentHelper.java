@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -37,11 +36,7 @@ public class AuditEnviamentHelper {
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
 	@Autowired
 	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
-	private NotificaHelper notificaHelper;
-	@Resource
-	private ConversioTipusHelper conversioTipusHelper;
-	
+
 	
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.CREATE)
 	public NotificacioEnviamentEntity desaEnviament(
@@ -115,17 +110,17 @@ public class AuditEnviamentHelper {
 
 	@Audita(entityType = TipusEntitat.ENVIAMENT, operationType = TipusOperacio.UPDATE)
 	public NotificacioEnviamentEntity updateEnviamentEnviat(
-			NotificacioEntity notificacio,
-			NotificacioEventEntity event,
-			String identificadorResultat,
-			NotificacioEnviamentEntity enviament) {
+//			NotificacioEntity notificacio,
+//			NotificacioEventEntity event,
+			NotificacioEnviamentEntity enviament,
+			String identificadorResultat) {
 		enviament.updateNotificaEnviada(identificadorResultat);
 
-		//Registrar event per enviament
-		log.info(" >>> Canvi estat a ENVIADA ");
-		event.setEnviament(enviament);
-		notificacio.updateEventAfegir(event);
-		notificacioEventRepository.save(event);
+//		//Registrar event per enviament
+//		log.info(" >>> Canvi estat a ENVIADA ");
+//		event.setEnviament(enviament);
+//		notificacio.updateEventAfegir(event);
+//		notificacioEventRepository.save(event);
 
 		return enviament;
 	}
@@ -154,8 +149,7 @@ public class AuditEnviamentHelper {
 			String registreNum,
 			Date registreData,
 			NotificacioRegistreEstatEnumDto registreEstat,
-			boolean totsAdministracio,
-			NotificacioEventEntity event) {
+			boolean totsAdministracio) {
 
 		enviament.setRegistreNumeroFormatat(registreNum);
 		enviament.setRegistreData(registreData);
@@ -166,9 +160,6 @@ public class AuditEnviamentHelper {
 			enviament.setNotificaEstat(EnviamentEstat.ENVIAT_SIR);
 		}
 		
-		event.setEnviament(enviament);
-		notificacioEntity.updateEventAfegir(event);
-		notificacioEventRepository.saveAndFlush(event);
 		return enviament;
 	}
 	

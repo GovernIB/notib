@@ -61,6 +61,7 @@ import es.caib.notib.core.repository.EnviamentTableRepository;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.OrganGestorRepository;
 import es.caib.notib.core.repository.UsuariRepository;
 import lombok.Builder;
 import lombok.Getter;
@@ -107,6 +108,8 @@ import java.util.Set;
 @Slf4j
 @Service
 public class EnviamentServiceImpl implements EnviamentService {
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
 
 	@Autowired
 	PermisosService permisosService;
@@ -411,6 +414,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
 
 			NotificacioEnviamentFiltre filtreFields = getFiltre(entitatId, filtre);
+
+
 			if (isUsuari) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> codisProcedimentsDisponibles = new ArrayList<>();
 				List<String> codisOrgansGestorsDisponibles = new ArrayList<>();
@@ -431,200 +436,221 @@ public class EnviamentServiceImpl implements EnviamentService {
 				boolean esProcedimentsCodisNotibNull = (codisProcedimentsDisponibles == null || codisProcedimentsDisponibles.isEmpty());
 				boolean esOrgansGestorsCodisNotibNull = (codisOrgansGestorsDisponibles == null || codisOrgansGestorsDisponibles.isEmpty());
 				boolean esProcedimentOrgansAmbPermisNull = (codisProcedimentsOrgans == null || codisProcedimentsOrgans.isEmpty());
-
-				pageEnviaments = enviamentTableRepository.find4UserRole(
-						filtreFields.codiProcediment.isNull(),
-						filtreFields.codiProcediment.getField(),
-						filtreFields.grup.isNull(),
-						filtreFields.grup.getField(),
-						filtreFields.concepte.isNull(),
-						filtreFields.concepte.getField(),
-						filtreFields.descripcio.isNull(),
-						filtreFields.descripcio.getField(),
-						filtreFields.dataProgramadaDisposicioInici.isNull(),
-						filtreFields.dataProgramadaDisposicioInici.getField(),
-						filtreFields.dataProgramadaDisposicioFi.isNull(),
-						filtreFields.dataProgramadaDisposicioFi.getField(),
-						filtreFields.dataCaducitatInici.isNull(),
-						filtreFields.dataCaducitatInici.getField(),
-						filtreFields.dataCaducitatFi.isNull(),
-						filtreFields.dataCaducitatFi.getField(),
-						filtreFields.enviamentTipus.isNull(),
-						filtreFields.enviamentTipus.getField(),
-						filtreFields.csvUuid.isNull(),
-						filtreFields.csvUuid.getField(),
-						filtreFields.estat.isNull(),
-						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
-						entitatEntity,
-						filtreFields.dataEnviamentInici.isNull(),
-						filtreFields.dataEnviamentInici.getField(),
-						filtreFields.dataEnviamentFi.isNull(),
-						filtreFields.dataEnviamentFi.getField(),
-						filtreFields.codiNotifica.isNull(),
-						filtreFields.codiNotifica.getField(),
-						filtreFields.creadaPer.isNull(),
-						filtreFields.creadaPer.getField(),
-						filtreFields.nifTitular.isNull(),
-						filtreFields.nifTitular.getField(),
-						filtreFields.nomTitular.isNull(),
-						filtreFields.nomTitular.getField(),
-						filtreFields.emailTitular.isNull(),
-						filtreFields.emailTitular.getField(),
-						filtreFields.dir3Codi.isNull(),
-						filtreFields.dir3Codi.getField(),
-						filtreFields.numeroCertCorreus.isNull(),
-						filtreFields.numeroCertCorreus.getField(),
-						filtreFields.usuari.isNull(),
-						filtreFields.usuari.getField(),
-						filtreFields.registreNumero.isNull(),
-						filtreFields.registreNumero.getField(),
-						filtreFields.codiNotibEnviament.isNull(),
-						filtreFields.codiNotibEnviament.getField(),
-						filtreFields.dataRegistreInici.isNull(),
-						filtreFields.dataRegistreInici.getField(),
-						filtreFields.dataRegistreFi.isNull(),
-						filtreFields.dataRegistreFi.getField(),
-						esProcedimentsCodisNotibNull,
-						esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
-						esOrgansGestorsCodisNotibNull,
-						esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
-						esProcedimentOrgansAmbPermisNull,
-						esProcedimentOrgansAmbPermisNull ? null : codisProcedimentsOrgans,
-						aplicacioService.findRolsUsuariActual(),
-						usuariCodi,
-						filtreFields.nomesAmbErrors,
-						filtreFields.nomesSenseErrors,
-						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
-						filtreFields.hasZeronotificaEnviamentIntent.getField(),
-						filtreFields.referenciaNotificacio.isNull(),
-						filtreFields.referenciaNotificacio.getField(),
-						pageable);
+				if (filtreFields.isEmpty()) {
+					pageEnviaments = enviamentTableRepository.find4UserRole(
+							entitatEntity,
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+							esOrgansGestorsCodisNotibNull,
+							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esProcedimentOrgansAmbPermisNull,
+							esProcedimentOrgansAmbPermisNull ? null : codisProcedimentsOrgans,
+							aplicacioService.findRolsUsuariActual(),
+							usuariCodi,
+							pageable);
+				} else {
+					pageEnviaments = enviamentTableRepository.find4UserRole(
+							filtreFields.codiProcediment.isNull(),
+							filtreFields.codiProcediment.getField(),
+							filtreFields.grup.isNull(),
+							filtreFields.grup.getField(),
+							filtreFields.concepte.isNull(),
+							filtreFields.concepte.getField(),
+							filtreFields.descripcio.isNull(),
+							filtreFields.descripcio.getField(),
+							filtreFields.dataProgramadaDisposicioInici.isNull(),
+							filtreFields.dataProgramadaDisposicioInici.getField(),
+							filtreFields.dataProgramadaDisposicioFi.isNull(),
+							filtreFields.dataProgramadaDisposicioFi.getField(),
+							filtreFields.dataCaducitatInici.isNull(),
+							filtreFields.dataCaducitatInici.getField(),
+							filtreFields.dataCaducitatFi.isNull(),
+							filtreFields.dataCaducitatFi.getField(),
+							filtreFields.enviamentTipus.isNull(),
+							filtreFields.enviamentTipus.getField(),
+							filtreFields.csvUuid.isNull(),
+							filtreFields.csvUuid.getField(),
+							filtreFields.estat.isNull(),
+							filtreFields.estat.getField(),
+							!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
+							entitatEntity,
+							filtreFields.dataEnviamentInici.isNull(),
+							filtreFields.dataEnviamentInici.getField(),
+							filtreFields.dataEnviamentFi.isNull(),
+							filtreFields.dataEnviamentFi.getField(),
+							filtreFields.codiNotifica.isNull(),
+							filtreFields.codiNotifica.getField(),
+							filtreFields.creadaPer.isNull(),
+							filtreFields.creadaPer.getField(),
+							filtreFields.nifTitular.isNull(),
+							filtreFields.nifTitular.getField(),
+							filtreFields.nomTitular.isNull(),
+							filtreFields.nomTitular.getField(),
+							filtreFields.emailTitular.isNull(),
+							filtreFields.emailTitular.getField(),
+							filtreFields.dir3Codi.isNull(),
+							filtreFields.dir3Codi.getField(),
+							filtreFields.numeroCertCorreus.isNull(),
+							filtreFields.numeroCertCorreus.getField(),
+							filtreFields.usuari.isNull(),
+							filtreFields.usuari.getField(),
+							filtreFields.registreNumero.isNull(),
+							filtreFields.registreNumero.getField(),
+							filtreFields.codiNotibEnviament.isNull(),
+							filtreFields.codiNotibEnviament.getField(),
+							filtreFields.dataRegistreInici.isNull(),
+							filtreFields.dataRegistreInici.getField(),
+							filtreFields.dataRegistreFi.isNull(),
+							filtreFields.dataRegistreFi.getField(),
+							esProcedimentsCodisNotibNull,
+							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
+							esOrgansGestorsCodisNotibNull,
+							esOrgansGestorsCodisNotibNull ? null : codisOrgansGestorsDisponibles,
+							esProcedimentOrgansAmbPermisNull,
+							esProcedimentOrgansAmbPermisNull ? null : codisProcedimentsOrgans,
+							aplicacioService.findRolsUsuariActual(),
+							usuariCodi,
+							filtreFields.nomesAmbErrors,
+							filtreFields.nomesSenseErrors,
+							filtreFields.hasZeronotificaEnviamentIntent.isNull(),
+							filtreFields.hasZeronotificaEnviamentIntent.getField(),
+							filtreFields.referenciaNotificacio.isNull(),
+							filtreFields.referenciaNotificacio.getField(),
+							pageable);
+				}
 			} else if (isAdminOrgan) { // && !procedimentsCodisNotib.isEmpty()) {
 				List<String> organs = organigramaHelper.getCodisOrgansGestorsFillsExistentsByOrgan(entitatEntity.getDir3Codi(), organGestorCodi);
-				pageEnviaments = enviamentTableRepository.find4OrganAdminRole(
-						filtreFields.codiProcediment.isNull(),
-						filtreFields.codiProcediment.getField(),
-						filtreFields.grup.isNull(),
-						filtreFields.grup.getField(),
-						filtreFields.concepte.isNull(),
-						filtreFields.concepte.getField(),
-						filtreFields.descripcio.isNull(),
-						filtreFields.descripcio.getField(),
-						filtreFields.dataProgramadaDisposicioInici.isNull(),
-						filtreFields.dataProgramadaDisposicioInici.getField(),
-						filtreFields.dataProgramadaDisposicioFi.isNull(),
-						filtreFields.dataProgramadaDisposicioFi.getField(),
-						filtreFields.dataCaducitatInici.isNull(),
-						filtreFields.dataCaducitatInici.getField(),
-						filtreFields.dataCaducitatFi.isNull(),
-						filtreFields.dataCaducitatFi.getField(),
-						filtreFields.enviamentTipus.isNull(),
-						filtreFields.enviamentTipus.getField(),
-						filtreFields.csvUuid.isNull(),
-						filtreFields.csvUuid.getField(),
-						filtreFields.estat.isNull(),
-						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
-						entitatEntity,
-						filtreFields.dataEnviamentInici.isNull(),
-						filtreFields.dataEnviamentInici.getField(),
-						filtreFields.dataEnviamentFi.isNull(),
-						filtreFields.dataEnviamentFi.getField(),
-						filtreFields.codiNotifica.isNull(),
-						filtreFields.codiNotifica.getField(),
-						filtreFields.creadaPer.isNull(),
-						filtreFields.creadaPer.getField(),
-						filtreFields.nifTitular.isNull(),
-						filtreFields.nifTitular.getField(),
-						filtreFields.nomTitular.isNull(),
-						filtreFields.nomTitular.getField(),
-						filtreFields.emailTitular.isNull(),
-						filtreFields.emailTitular.getField(),
-						filtreFields.dir3Codi.isNull(),
-						filtreFields.dir3Codi.getField(),
-						filtreFields.numeroCertCorreus.isNull(),
-						filtreFields.numeroCertCorreus.getField(),
-						filtreFields.usuari.isNull(),
-						filtreFields.usuari.getField(),
-						filtreFields.registreNumero.isNull(),
-						filtreFields.registreNumero.getField(),
-						filtreFields.codiNotibEnviament.isNull(),
-						filtreFields.codiNotibEnviament.getField(),
-						filtreFields.dataRegistreInici.isNull(),
-						filtreFields.dataRegistreInici.getField(),
-						filtreFields.dataRegistreFi.isNull(),
-						filtreFields.dataRegistreFi.getField(),
-						filtreFields.nomesAmbErrors,
-						filtreFields.nomesSenseErrors,
-						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
-						filtreFields.hasZeronotificaEnviamentIntent.getField(),
-						filtreFields.referenciaNotificacio.isNull(),
-						filtreFields.referenciaNotificacio.getField(),
-						organs,
-						pageable);
+				if (filtreFields.isEmpty()) {
+					pageEnviaments = enviamentTableRepository.find4OrganAdminRole(entitatEntity, organs, pageable);
+				} else {
+					pageEnviaments = enviamentTableRepository.find4OrganAdminRole(
+							filtreFields.codiProcediment.isNull(),
+							filtreFields.codiProcediment.getField(),
+							filtreFields.grup.isNull(),
+							filtreFields.grup.getField(),
+							filtreFields.concepte.isNull(),
+							filtreFields.concepte.getField(),
+							filtreFields.descripcio.isNull(),
+							filtreFields.descripcio.getField(),
+							filtreFields.dataProgramadaDisposicioInici.isNull(),
+							filtreFields.dataProgramadaDisposicioInici.getField(),
+							filtreFields.dataProgramadaDisposicioFi.isNull(),
+							filtreFields.dataProgramadaDisposicioFi.getField(),
+							filtreFields.dataCaducitatInici.isNull(),
+							filtreFields.dataCaducitatInici.getField(),
+							filtreFields.dataCaducitatFi.isNull(),
+							filtreFields.dataCaducitatFi.getField(),
+							filtreFields.enviamentTipus.isNull(),
+							filtreFields.enviamentTipus.getField(),
+							filtreFields.csvUuid.isNull(),
+							filtreFields.csvUuid.getField(),
+							filtreFields.estat.isNull(),
+							filtreFields.estat.getField(),
+							!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
+							entitatEntity,
+							filtreFields.dataEnviamentInici.isNull(),
+							filtreFields.dataEnviamentInici.getField(),
+							filtreFields.dataEnviamentFi.isNull(),
+							filtreFields.dataEnviamentFi.getField(),
+							filtreFields.codiNotifica.isNull(),
+							filtreFields.codiNotifica.getField(),
+							filtreFields.creadaPer.isNull(),
+							filtreFields.creadaPer.getField(),
+							filtreFields.nifTitular.isNull(),
+							filtreFields.nifTitular.getField(),
+							filtreFields.nomTitular.isNull(),
+							filtreFields.nomTitular.getField(),
+							filtreFields.emailTitular.isNull(),
+							filtreFields.emailTitular.getField(),
+							filtreFields.dir3Codi.isNull(),
+							filtreFields.dir3Codi.getField(),
+							filtreFields.numeroCertCorreus.isNull(),
+							filtreFields.numeroCertCorreus.getField(),
+							filtreFields.usuari.isNull(),
+							filtreFields.usuari.getField(),
+							filtreFields.registreNumero.isNull(),
+							filtreFields.registreNumero.getField(),
+							filtreFields.codiNotibEnviament.isNull(),
+							filtreFields.codiNotibEnviament.getField(),
+							filtreFields.dataRegistreInici.isNull(),
+							filtreFields.dataRegistreInici.getField(),
+							filtreFields.dataRegistreFi.isNull(),
+							filtreFields.dataRegistreFi.getField(),
+							filtreFields.nomesAmbErrors,
+							filtreFields.nomesSenseErrors,
+							filtreFields.hasZeronotificaEnviamentIntent.isNull(),
+							filtreFields.hasZeronotificaEnviamentIntent.getField(),
+							filtreFields.referenciaNotificacio.isNull(),
+							filtreFields.referenciaNotificacio.getField(),
+							organs,
+							pageable);
+				}
 			} else if (isUsuariEntitat) {
 				long ti = System.nanoTime();
-				pageEnviaments = enviamentTableRepository.find4EntitatAdminRole(
-						filtreFields.codiProcediment.isNull(),
-						filtreFields.codiProcediment.getField(),
-						filtreFields.grup.isNull(),
-						filtreFields.grup.getField(),
-						filtreFields.concepte.isNull(),
-						filtreFields.concepte.getField(),
-						filtreFields.descripcio.isNull(),
-						filtreFields.descripcio.getField(),
-						filtreFields.dataProgramadaDisposicioInici.isNull(),
-						filtreFields.dataProgramadaDisposicioInici.getField(),
-						filtreFields.dataProgramadaDisposicioFi.isNull(),
-						filtreFields.dataProgramadaDisposicioFi.getField(),
-						filtreFields.dataCaducitatInici.isNull(),
-						filtreFields.dataCaducitatInici.getField(),
-						filtreFields.dataCaducitatFi.isNull(),
-						filtreFields.dataCaducitatFi.getField(),
-						filtreFields.enviamentTipus.isNull(),
-						filtreFields.enviamentTipus.getField(),
-						filtreFields.csvUuid.isNull(),
-						filtreFields.csvUuid.getField(),
-						filtreFields.estat.isNull(),
-						filtreFields.estat.getField(),
-						!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
-						entitatEntity,
-						filtreFields.dataEnviamentInici.isNull(),
-						filtreFields.dataEnviamentInici.getField(),
-						filtreFields.dataEnviamentFi.isNull(),
-						filtreFields.dataEnviamentFi.getField(),
-						filtreFields.codiNotifica.isNull(),
-						filtreFields.codiNotifica.getField(),
-						filtreFields.creadaPer.isNull(),
-						filtreFields.creadaPer.getField(),
-						filtreFields.nifTitular.isNull(),
-						filtreFields.nifTitular.getField(),
-						filtreFields.nomTitular.isNull(),
-						filtreFields.nomTitular.getField(),
-						filtreFields.emailTitular.isNull(),
-						filtreFields.emailTitular.getField(),
-						filtreFields.dir3Codi.isNull(),
-						filtreFields.dir3Codi.getField(),
-						filtreFields.numeroCertCorreus.isNull(),
-						filtreFields.numeroCertCorreus.getField(),
-						filtreFields.usuari.isNull(),
-						filtreFields.usuari.getField(),
-						filtreFields.registreNumero.isNull(),
-						filtreFields.registreNumero.getField(),
-						filtreFields.codiNotibEnviament.isNull(),
-						filtreFields.codiNotibEnviament.getField(),
-						filtreFields.dataRegistreInici.isNull(),
-						filtreFields.dataRegistreInici.getField(),
-						filtreFields.dataRegistreFi.isNull(),
-						filtreFields.dataRegistreFi.getField(),
-						filtreFields.nomesAmbErrors,
-						filtreFields.nomesSenseErrors,
-						filtreFields.hasZeronotificaEnviamentIntent.isNull(),
-						filtreFields.hasZeronotificaEnviamentIntent.getField(),
-						filtreFields.referenciaNotificacio.isNull(),
-						filtreFields.referenciaNotificacio.getField(),
-						pageable);
+				if (filtreFields.isEmpty()) {
+					pageEnviaments = enviamentTableRepository.find4EntitatAdminRole(entitatEntity, pageable);
+				} else {
+					pageEnviaments = enviamentTableRepository.find4EntitatAdminRole(
+							filtreFields.codiProcediment.isNull(),
+							filtreFields.codiProcediment.getField(),
+							filtreFields.grup.isNull(),
+							filtreFields.grup.getField(),
+							filtreFields.concepte.isNull(),
+							filtreFields.concepte.getField(),
+							filtreFields.descripcio.isNull(),
+							filtreFields.descripcio.getField(),
+							filtreFields.dataProgramadaDisposicioInici.isNull(),
+							filtreFields.dataProgramadaDisposicioInici.getField(),
+							filtreFields.dataProgramadaDisposicioFi.isNull(),
+							filtreFields.dataProgramadaDisposicioFi.getField(),
+							filtreFields.dataCaducitatInici.isNull(),
+							filtreFields.dataCaducitatInici.getField(),
+							filtreFields.dataCaducitatFi.isNull(),
+							filtreFields.dataCaducitatFi.getField(),
+							filtreFields.enviamentTipus.isNull(),
+							filtreFields.enviamentTipus.getField(),
+							filtreFields.csvUuid.isNull(),
+							filtreFields.csvUuid.getField(),
+							filtreFields.estat.isNull(),
+							filtreFields.estat.getField(),
+							!filtreFields.estat.isNull() ? EnviamentEstat.valueOf(filtreFields.estat.getField().toString()) : null,
+							entitatEntity,
+							filtreFields.dataEnviamentInici.isNull(),
+							filtreFields.dataEnviamentInici.getField(),
+							filtreFields.dataEnviamentFi.isNull(),
+							filtreFields.dataEnviamentFi.getField(),
+							filtreFields.codiNotifica.isNull(),
+							filtreFields.codiNotifica.getField(),
+							filtreFields.creadaPer.isNull(),
+							filtreFields.creadaPer.getField(),
+							filtreFields.nifTitular.isNull(),
+							filtreFields.nifTitular.getField(),
+							filtreFields.nomTitular.isNull(),
+							filtreFields.nomTitular.getField(),
+							filtreFields.emailTitular.isNull(),
+							filtreFields.emailTitular.getField(),
+							filtreFields.dir3Codi.isNull(),
+							filtreFields.dir3Codi.getField(),
+							filtreFields.numeroCertCorreus.isNull(),
+							filtreFields.numeroCertCorreus.getField(),
+							filtreFields.usuari.isNull(),
+							filtreFields.usuari.getField(),
+							filtreFields.registreNumero.isNull(),
+							filtreFields.registreNumero.getField(),
+							filtreFields.codiNotibEnviament.isNull(),
+							filtreFields.codiNotibEnviament.getField(),
+							filtreFields.dataRegistreInici.isNull(),
+							filtreFields.dataRegistreInici.getField(),
+							filtreFields.dataRegistreFi.isNull(),
+							filtreFields.dataRegistreFi.getField(),
+							filtreFields.nomesAmbErrors,
+							filtreFields.nomesSenseErrors,
+							filtreFields.hasZeronotificaEnviamentIntent.isNull(),
+							filtreFields.hasZeronotificaEnviamentIntent.getField(),
+							filtreFields.referenciaNotificacio.isNull(),
+							filtreFields.referenciaNotificacio.getField(),
+							pageable);
+				}
 				logger.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
@@ -801,6 +827,38 @@ public class EnviamentServiceImpl implements EnviamentService {
 //		private FiltreField<Boolean> nomesAmbErrors;
 //		private FiltreField<Boolean> nomesSenseErrors;
 //		private FiltreField<Boolean> hasZeronotificaEnviamentIntent;
+
+		public boolean isEmpty() {
+			if (!entitatId.isNull()) return false;
+			if (!dataEnviamentInici.isNull()) return false;
+			if (!dataEnviamentFi.isNull()) return false;
+			if (!dataProgramadaDisposicioInici.isNull()) return false;
+			if (!dataProgramadaDisposicioFi.isNull()) return false;
+			if (!codiNotifica.isNull()) return false;
+			if (!codiProcediment.isNull()) return false;
+			if (!grup.isNull()) return false;
+			if (!usuari.isNull()) return false;
+			if (!enviamentTipus.isNull()) return false;
+			if (!concepte.isNull()) return false;
+			if (!descripcio.isNull()) return false;
+			if (!nifTitular.isNull()) return false;
+			if (!nomTitular.isNull()) return false;
+			if (!emailTitular.isNull()) return false;
+			if (!registreNumero.isNull()) return false;
+			if (!dataRegistreInici.isNull()) return false;
+			if (!dataRegistreFi.isNull()) return false;
+			if (!dataCaducitatInici.isNull()) return false;
+			if (!dataCaducitatFi.isNull()) return false;
+			if (!codiNotibEnviament.isNull()) return false;
+			if (!numeroCertCorreus.isNull()) return false;
+			if (!csvUuid.isNull()) return false;
+			if (!estat.isNull()) return false;
+			if (!dir3Codi.isNull()) return false;
+			if (!creadaPer.isNull()) return false;
+			if (!hasZeronotificaEnviamentIntent.isNull()) return false;
+			if (!referenciaNotificacio.isNull()) return false;
+			return true;
+		}
 	}
 
 	@Transactional(readOnly = true)

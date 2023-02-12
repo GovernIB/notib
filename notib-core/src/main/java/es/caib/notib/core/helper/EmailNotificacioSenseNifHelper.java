@@ -87,16 +87,22 @@ public class EmailNotificacioSenseNifHelper {
 		boolean hasErrors = false;
 		for (NotificacioEnviamentEntity enviament : enviamentsSenseNif) {
 			String error = sendEmailInfoEnviamentSenseNif(enviament);
-			notificacioEventHelper.addNotificacioEmailEvent(notificacio, enviament,error != null, error);
+			if (error == null) {
+				notificacioEventHelper.addEmailEnviamentEvent(notificacio, enviament);
+				auditEnviamentHelper.updateEnviamentEmailFinalitzat(enviament);
+			} else {
+				notificacioEventHelper.addEmailEnviamentEventError(notificacio, enviament, error);
+			}
 			hasErrors = hasErrors || error != null;
 		}
 
 		// Event Notificació x envaiment per email
 		if (hasErrors) {
-			notificacioEventHelper.addEnviamentEmailErrorEvent(notificacio);
+			notificacioEventHelper.addEmailEnviamentEventError(notificacio, null,
+					"S'ha produït algun error en l'enviament via email. Els errors es poden consultar en cada un dels enviaments.");
 			auditNotificacioHelper.updateNotificacioEnviadaAmbErrors(notificacio);
 		} else {
-			notificacioEventHelper.addEnviamentEmailOKEvent(notificacio);
+			notificacioEventHelper.addEmailEnviamentEvent(notificacio, null);
 		}
 
 		// Estat de la notificació

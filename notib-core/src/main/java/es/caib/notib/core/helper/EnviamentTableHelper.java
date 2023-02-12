@@ -1,8 +1,11 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EnviamentTableEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.PersonaEntity;
 import es.caib.notib.core.repository.EnviamentTableRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,8 +18,6 @@ public class EnviamentTableHelper {
     @Autowired
     private EnviamentTableRepository enviamentTableRepository;
 
-    @Autowired
-    private NotificacioEventRepository notificacioEventRepository;
 
     @Transactional(propagation = Propagation.MANDATORY)
     public void crearRegistre(NotificacioEnviamentEntity enviament){

@@ -3,7 +3,6 @@ package es.caib.notib.core.repository;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.EnviamentTableEntity;
 import org.springframework.data.domain.Page;
@@ -33,6 +32,30 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			"	where net.id = nte.id) where nte.notificaReferencia is null")
 	void updateReferenciesNules();
 
+	@Query( "select nenv " +
+			"from EnviamentTableEntity nenv " +
+			"where (:entitat = nenv.entitat) " +
+			"and ((:esProcedimentsCodisNotibNull = false and nenv.procedimentCodiNotib is not null and nenv.procedimentCodiNotib in (:procedimentsCodisNotib))" +	// Té permís sobre el procediment
+			"	or (:isOrgansGestorsCodisNotibNull = false and nenv.organCodi is not null and " +
+			"			(nenv.procedimentCodiNotib is null or (nenv.procedimentIsComu = true and nenv.procedimentRequirePermission = false)) and nenv.organCodi in (:organsGestorsCodisNotib)" +
+			"		) " + // Té permís sobre l'òrgan
+			"   or ((nenv.procedimentCodiNotib is null or nenv.procedimentIsComu = true) and nenv.usuariCodi = :usuariCodi)" + // És una notificaicó sense procediment o un procediment comú, iniciat pel propi usuari
+			"   or 	(:esProcedimentOrgansIdsNotibNull = false and nenv.procedimentCodiNotib is not null and " +
+			"			CONCAT(nenv.procedimentCodiNotib, '-', nenv.organCodi) in (:procedimentOrgansIdsNotib)" +
+			"		) " +	// Procediment comú amb permís de procediment-òrgan
+			") " +
+			"and (nenv.grupCodi = null or (nenv.grupCodi in (:grupsProcedimentCodisNotib)))")
+	Page<EnviamentTableEntity> find4UserRole(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esProcedimentsCodisNotibNull") boolean esProcedimentsCodisNotibNull,
+			@Param("procedimentsCodisNotib") List<String> procedimentsCodisNotib,
+			@Param("isOrgansGestorsCodisNotibNull") boolean isOrgansGestorsCodisNotibNull,
+			@Param("organsGestorsCodisNotib") List<String> organsGestorsCodisNotib,
+			@Param("esProcedimentOrgansIdsNotibNull") boolean esProcedimentOrgansIdsNotibNull,
+			@Param("procedimentOrgansIdsNotib") List<String> procedimentOrgansIdsNotib,
+			@Param("grupsProcedimentCodisNotib") List<String> grupsProcedimentCodisNotib,
+			@Param("usuariCodi") String usuariCodi,
+			Pageable pageable);
 	@Query( "select" +
 			"	nenv " +
 			"from" +
@@ -151,6 +174,14 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("referenciaNotificacio") String referenciaNotificacio,
 			Pageable pageable);
 
+	@Query( "from EnviamentTableEntity nenv " +
+			"where (:entitat = nenv.entitat) " +
+			"  and (nenv.organCodi is not null and nenv.organCodi in (:organs))")
+	Page<EnviamentTableEntity> find4OrganAdminRole(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organs") List<String> organs,
+			Pageable pageable);
+
 	@Query( "from" +
 			"    EnviamentTableEntity nenv " +
 			"where " +
@@ -249,6 +280,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("isReferenciaNotificacioNull") boolean isReferenciaNotificacioNull,
 			@Param("referenciaNotificacio") String referenciaNotificacio,
 			@Param("organs") List<String> organs,
+			Pageable pageable);
+
+	@Query( "from EnviamentTableEntity nenv where (:entitat = nenv.entitat)")
+	Page<EnviamentTableEntity> find4EntitatAdminRole(
+			@Param("entitat") EntitatEntity entitat,
 			Pageable pageable);
 
 	@Query( "from " +

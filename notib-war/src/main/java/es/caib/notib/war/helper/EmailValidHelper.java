@@ -161,7 +161,7 @@ public class EmailValidHelper {
                 say( wtr, "RSET" ); hear( rdr );
                 say( wtr, "QUIT" ); hear( rdr );
 
-                System.out.println("Response for address " + address + ": " + res);
+//                System.out.println("Response for address " + address + ": " + res);
                 if ( res != 250 )
                     throw new Exception( "Address is not valid!" );
 
@@ -181,20 +181,19 @@ public class EmailValidHelper {
         return false;
     }
 
-    public static void main( String args[] ) {
-        String testData[] = {
-                "sandreu@limit.es",
-                "siona@limit.es",
-                "sion.limit@gmail.com",
-                "jvazquez@dgtic.caib.es",
-                "monsalut@hotmail.es"
-        };
-
-        for ( int ctr = 0 ; ctr < testData.length ; ctr++ ) {
-            System.out.println( testData[ ctr ] + " is valid? " +
-                    isAddressValid( testData[ ctr ] ) );
-        }
-        return;
-    }
+//    public static void main( String args[] ) {
+//        String testData[] = {
+//                "sandreu@limit.es",
+//                "siona@limit.es",
+//                "sion.limit@gmail.com",
+//                "jvazquez@dgtic.caib.es",
+//                "monsalut@hotmail.es"
+//        };
+//
+//        for ( int ctr = 0 ; ctr < testData.length ; ctr++ ) {
+//            System.out.println( testData[ ctr ] + " is valid? " + isAddressValid( testData[ ctr ] ) );
+//        }
+//        return;
+//    }
 
 }

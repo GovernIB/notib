@@ -2,7 +2,11 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -12,14 +16,18 @@ import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvios;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.*;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datados;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -32,7 +40,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Helper MOCK de prova.
@@ -46,8 +56,6 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Autowired
 	private NotificacioRepository notificacioRepository;
 	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
-	@Autowired
 	private NotificacioEventHelper notificacioEventHelper;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
@@ -56,9 +64,11 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 	@Autowired
 	private IntegracioHelper integracioHelper;
 
+	@SneakyThrows
 	@UpdateNotificacioTable
 	public NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail) {
 
+		Thread.sleep(1000);
 		IntegracioInfo info = new IntegracioInfo(IntegracioHelper.INTCODI_NOTIFICA,"Enviament d'una notificació", IntegracioAccioTipusEnumDto.ENVIAMENT,
 												new AccioParam("Identificador de la notificacio", String.valueOf(notificacioId)));
 
@@ -82,27 +92,26 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 				}
 				//Crea un nou event
-				Map<NotificacioEnviamentEntity, String> identificadorsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							identificadorsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
+							auditEnviamentHelper.updateEnviamentEnviat(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
 				}
-				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsEnviaments);
+				notificacioEventHelper.addNotificaEnviamentEvent(notificacio);
 			} else {
 				log.info(" >>> ... ERROR:");
 				//Crea un nou event
 				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 				log.info(" >>> " + errorDescripcio);
-				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT,true);
+				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 			String errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
-			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,true);
+			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
@@ -113,15 +122,14 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		return notificacio;
 	}
 
-	private void updateEventWithEnviament(NotificacioEntity notificacio, String errorDescripcio,
-										  NotificacioErrorTipusEnumDto notificacioErrorTipus, boolean notificaError) {
-
-		notificacioEventHelper.addErrorEvent(notificacio, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
-
+	private void updateEventWithEnviament(NotificacioEntity notificacio, String errorDescripcio, NotificacioErrorTipusEnumDto notificacioErrorTipus) {
+		notificacioEventHelper.addNotificaEnviamentEventError(notificacio, notificacioErrorTipus, errorDescripcio);
 	}
 
+	@SneakyThrows
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
+		Thread.sleep(1000);
 		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		try {
@@ -134,8 +142,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 		return enviament;
 	}
 
+	@SneakyThrows
 	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
+		Thread.sleep(1000);
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return enviamentRefrescarEstat(enviament, raiseExceptions);
 	}
@@ -237,13 +247,11 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 					log.info("Fi actualització certificació. Creant nou event per certificació...");
 					//Crea un nou event
-					notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
-							NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-							datatDarrer.getResultado());
+					notificacioEventHelper.addNotificaCertificacioEvent(enviament.getNotificacio(), enviament, datatDarrer.getResultado(), true);
 				}
 				log.info("Enviament actualitzat");
 			}
-			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament, "", false);
+			notificacioEventHelper.addNotificaConsultaEvent(notificacio, enviament);
 
 			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
 			EnviamentEstat estat = getEstatNotifica(datatDarrer.getResultado());
@@ -266,9 +274,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 
 				//Crea un nou event
 				log.info("Creant nou event per Datat...");
-				notificacioEventHelper.addNotificaCallbackEvent(notificacio, enviament,
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-						datatDarrer.getResultado());
+				notificacioEventHelper.addNotificaDatatEvent(enviament.getNotificacio(), enviament, datatDarrer.getResultado(), true);
 
 				log.info("Actualitzant Datat enviament...");
 				enviamentUpdateDatat(
@@ -294,17 +300,10 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			String errorPrefix = "Error al consultar l'estat d'un enviament fet amb NotificaV0 (" +
 					"notificacioId=" + notificacio.getId() + ", " +
 					"notificaIdentificador=" + enviament.getNotificaIdentificador() + ")";
-			log.error(
-					errorPrefix,
-					ex);
-			notificacioEventHelper.addNotificaConsultaInfoEvent(notificacio, enviament,
-					ExceptionUtils.getStackTrace(ex),
-					true);
-
+			log.error(errorPrefix, ex);
+			boolean errorMaxReintents = enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty();
+			notificacioEventHelper.addNotificaConsultaEventError(enviament.getNotificacio(), enviament, ExceptionUtils.getStackTrace(ex), errorMaxReintents);
 			log.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-			if (enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty()) {
-				notificacioEventHelper.addNotificaConsultaErrorEvent(notificacio, enviament);
-			}
 			//integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			if (raiseExceptions){
 				throw ex;

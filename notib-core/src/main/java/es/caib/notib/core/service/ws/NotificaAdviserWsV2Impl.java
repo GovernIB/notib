@@ -25,7 +25,6 @@ import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioEventHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
-import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.wsdl.adviser.Acuse;
 import es.caib.notib.core.wsdl.adviser.AdviserWsV2PortType;
 import es.caib.notib.core.wsdl.adviser.Opciones;
@@ -65,8 +64,6 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 //	private NotificacioRepository notificacioRepository;
 	@Autowired
 	private NotificacioEnviamentRepository notificacioEnviamentRepository;
-	@Autowired
-	private NotificacioEventRepository notificacioEventRepository;
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
@@ -308,13 +305,11 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		logger.debug("Peticició processada correctament.");
 
 		if (enviament != null && createEvent) { // si no hi ha cap errada enviament mai serà null quan createEvent es true
-			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-					estado,
-					eventErrorDescripcio,
-					eventInitialitzaCallback
-			);
-
+			if (eventErrorDescripcio != null){
+				notificacioEventHelper.addNotificaDatatEventError(enviament.getNotificacio(), enviament, estado, eventErrorDescripcio, eventInitialitzaCallback);
+			} else {
+				notificacioEventHelper.addNotificaDatatEvent(enviament.getNotificacio(), enviament, estado, eventInitialitzaCallback);
+			}
 			logger.debug("Event callbackdatat registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT.name());
 		}
 		logger.info("[ADV] Fi sincronització enviament Adviser [Id: " + (identificador != null ? identificador : "") + "]");
@@ -380,8 +375,9 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 		NotificacioEventEntity eventCert = null;
 		String gestioDocumentalId = null;
+		boolean ambAcuse = acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0;
 		try {
-			if (acusePDF != null && acusePDF.getContenido() != null && acusePDF.getContenido().length > 0) {
+			if (ambAcuse) {
 				//si hi ha una certificació
 				if (enviament.getNotificaCertificacioArxiuId() != null) {
 					logger.debug("Esborrant certificació antiga...");
@@ -418,16 +414,11 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 						NotificaCertificacioArxiuTipusEnumDto.PDF,
 						null); // núm. seguiment
 				logger.debug("Registrant event callbackcertificacio de l'Adviser...");
-				eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-						NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-						null,
-						null,
-						true
-				);
-				
+				notificacioEventHelper.addNotificaCertificacioEvent(enviament.getNotificacio(), enviament, null, true);
+
 				codigoRespuesta.value = "000";
 				descripcionRespuesta.value = "OK";
-				logger.debug("Event callbackcertificacio registrat correctament: " + eventCert.getTipus().name());
+				logger.debug("Event callbackcertificacio registrat correctament: " + NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO.name());
 			} else {
 				logger.error(
 						"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
@@ -444,23 +435,18 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			logger.debug(
 					"Error al processar petició datadoOrganismo dins el callback de Notifica (" +
 					"identificadorDestinatario=" + identificador + ")");
-			eventCert = notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-					null,
-					ExceptionUtils.getStackTrace(ex),
-					true
-			);
+			notificacioEventHelper.addNotificaCertificacioEventError(enviament.getNotificacio(), enviament, null, ExceptionUtils.getStackTrace(ex), true);
 			codigoRespuesta.value = "666";
 			descripcionRespuesta.value = "Error procesando peticion";
 		}
-		if (eventCert == null) {
+		if (!ambAcuse) {
 			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).");
-			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
+			notificacioEventHelper.addNotificaCertificacioEventError(
+					enviament.getNotificacio(),
+					enviament,
 					null,
 					"Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value,
-					true
-			);
+					true);
 		}
 
 		logger.debug("Sortint de la certificació...");

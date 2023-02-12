@@ -9,7 +9,6 @@ import es.caib.notib.core.api.dto.AsientoRegistralBeanDto;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.RegistreNotificaException;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,6 +40,8 @@ public class RegistreNotificaHelper {
 	private RegistreHelper registreHelper;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private AuditEnviamentHelper auditEnviamentHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
@@ -160,12 +160,12 @@ public class RegistreNotificaHelper {
 		//Registrar event
 		if(arbResposta.getErrorCodi() != null) {
 			logger.info(" >>> ... ERROR: (" + arbResposta.getErrorCodi() + ") " + arbResposta.getErrorDescripcio());
-			updateEventWithError(arbResposta, notificacioEntity, null);
+			updateEventWithError(arbResposta, notificacioEntity, enviament);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] Hi ha hagut un error realitzant el procés de registre (temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, notificacioEntity, new HashSet<>(Arrays.asList(enviament)), false);
+			finalitzaRegistre(arbResposta, notificacioEntity, enviament, false);
 			long t1 = System.currentTimeMillis();
 			info.getParams().add(new AccioParam("Procés descripció: ", " [REG-NOT] El procés de registre ha finalizat correctament (temps=" + (t1 - t0) + "ms)"));
 			info.getParams().add(new AccioParam("Procés descripció: ", " Procedim a enviar la notificació a Notific@"));
@@ -197,7 +197,7 @@ public class RegistreNotificaHelper {
 					"(temps=" + (t1 - t0) + "ms): " + arbResposta.getErrorDescripcio()));
 		} else {
 			logger.info(" >>> ... OK");
-			finalitzaRegistre(arbResposta, notificacioEntity, new HashSet<>(Arrays.asList(enviament)), totsAdministracio);
+			finalitzaRegistre(arbResposta, notificacioEntity, enviament, totsAdministracio);
 
 			//Comunicació + administració (SIR)
 			if (totsAdministracio) {
@@ -248,26 +248,21 @@ public class RegistreNotificaHelper {
 			errorDescripcio += "Codi error: " + (arbResposta.getErrorCodi() != null ? arbResposta.getErrorCodi() : "Codi no proporcionat") + "\n";
 			errorDescripcio += arbResposta.getErrorDescripcio() != null ? arbResposta.getErrorDescripcio() : "El registre no aporta cap descripció de l'error";
 		}
-		notificacioEventHelper.addNotificaRegistreEvent(notificacioEntity, enviament, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REGISTRE);
+		notificacioEventHelper.addRegistreNotificaEventError(notificacioEntity, enviament, errorDescripcio);
 	}
 
-	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacioEntity, Set<NotificacioEnviamentEntity> enviaments, boolean totsAdministracio) {
+	private void finalitzaRegistre(RespostaConsultaRegistre arbResposta, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament, boolean totsAdministracio) {
 
 		if (arbResposta == null) {
 			return;
 		}
-//		if (enviamentsRegistrats(notificacioEntity.getEnviaments())) {
-//			auditNotificacioHelper.updateNotificacioRegistre(arbResposta, notificacioEntity);
-//		}
-//			// Actualitzar progrés notificació massiva.
-//			if (notificacioEntity.getNotificacioMassivaEntity() != null) {
-//				notificacioMassivaHelper.updateProgress(notificacioEntity.getNotificacioMassivaEntity().getId());
-//			}
 		String registreNum = arbResposta.getRegistreNumeroFormatat();
 		Date registreData = arbResposta.getRegistreData();
 		NotificacioRegistreEstatEnumDto registreEstat = arbResposta.getEstat();
+		auditEnviamentHelper.updateRegistreEnviament(notificacio, enviament, registreNum, registreData, registreEstat, totsAdministracio);
 		//Crea un nou event
-		notificacioEventHelper.addEnviamentRegistreOKEvent(notificacioEntity, registreNum, registreData, registreEstat, enviaments, totsAdministracio);
+		String descripcio = arbResposta.getEstat() != null ? arbResposta.getEstat().name() : arbResposta.getRegistreNumeroFormatat();
+		notificacioEventHelper.addRegistreNotificaEvent(notificacio, enviament, descripcio);
 	}
 
 	private boolean enviamentsRegistrats(Set<NotificacioEnviamentEntity> enviaments) {

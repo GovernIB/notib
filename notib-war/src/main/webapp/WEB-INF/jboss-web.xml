@@ -2,4 +2,11 @@
 <jboss-web>
 	<context-root>/notib</context-root>
 	<security-domain>java:/jaas/seycon</security-domain>
+
+<!--	<max-active-sessions>50</max-active-sessions>-->
+<!--	<passivation-config>-->
+<!--		<use-session-passivation>true</use-session-passivation>-->
+<!--		<passivation-min-idle-time>60</passivation-min-idle-time>-->
+<!--		<passivation-max-idle-time>600</passivation-max-idle-time>-->
+<!--	</passivation-config>-->
 </jboss-web>

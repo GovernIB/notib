@@ -43,6 +43,8 @@ public abstract class AbstractNotificaHelper {
 	@Autowired
 	protected AuditNotificacioHelper auditNotificacioHelper;
 	@Autowired
+	protected AuditEnviamentHelper auditEnviamentHelper;
+	@Autowired
 	protected ConfigHelper configHelper;
 	@Autowired
 	protected NotificacioRepository notificacioRepository;

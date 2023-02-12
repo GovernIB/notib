@@ -198,9 +198,16 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	// Custom builder setters
 	public static class NotificacioEventEntityBuilder {
-		private String errorDescripcio;
+//		private String errorDescripcio;
 		public NotificacioEventEntityBuilder errorDescripcio(String errorDescripcio){
 			this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
+			return this;
+		}
+		public NotificacioEventEntityBuilder descripcio(String descripcio) {
+			if (descripcio.length() > 256) {
+				descripcio = descripcio.substring(0, 256);
+			}
+			this.descripcio = descripcio;
 			return this;
 		}
 	}

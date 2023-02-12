@@ -90,7 +90,7 @@ public class AuditNotificacioHelper {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacio.updateEstatDate(new Date());
-		notificacioEventHelper.clearOldUselessEvents(notificacio);
+//		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
@@ -101,7 +101,7 @@ public class AuditNotificacioHelper {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacio.updateEstatDate(new Date());
-		notificacioEventHelper.clearOldUselessEvents(notificacio);
+//		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
@@ -110,7 +110,7 @@ public class AuditNotificacioHelper {
 	public NotificacioEntity updateLastCallbackError(NotificacioEntity notificacio, boolean error) {
 
 		notificacio.updateLastCallbackError(error);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+//		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
 	
@@ -145,7 +145,7 @@ public class AuditNotificacioHelper {
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviada(NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
-		notificacioEventHelper.clearOldUselessEvents(notificacio);
+//		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}
@@ -153,7 +153,7 @@ public class AuditNotificacioHelper {
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateNotificacioEnviadaEmail(NotificacioEntity notificacio) {
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
-		notificacioEventHelper.clearOldUselessEvents(notificacio);
+//		notificacioEventHelper.clearOldUselessEvents(notificacio);
 		notificacioTableHelper.actualitzarRegistre(notificacio);
 		return notificacio;
 	}

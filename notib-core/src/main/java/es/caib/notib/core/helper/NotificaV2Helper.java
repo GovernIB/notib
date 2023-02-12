@@ -7,7 +7,6 @@ import es.caib.notib.core.api.dto.AccioParam;
 import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.notib.core.api.dto.IntegracioInfo;
 import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
-import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -25,7 +24,20 @@ import es.caib.notib.core.entity.cie.EntregaPostalEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.ProcSerRepository;
 import es.caib.notib.core.wsdl.notificaV2.NotificaWsV2PortType;
-import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.*;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.AltaRemesaEnvios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Destinatarios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Documento;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaDEH;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.EntregaPostal;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Envio;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Envios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opcion;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Opciones;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorCIE;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.OrganismoPagadorPostal;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.Persona;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
+import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
 import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
@@ -66,8 +78,6 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -125,16 +135,16 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
  					auditNotificacioHelper.updateNotificacioEnviada(notificacio);
 				}
 				//Crea un nou event
-				Map<NotificacioEnviamentEntity, String> identificadorsResultatsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 						String nif = enviament.getTitular().getNif();
 						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
-							identificadorsResultatsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
+							auditEnviamentHelper.updateEnviamentEnviat(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
 				}
-				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsResultatsEnviaments);
+				notificacioEventHelper.addNotificaEnviamentEvent(notificacio);
+
 				elapsedTime = (System.nanoTime() - startTime) / 10e6;
 				logger.info(" [TIMER-NOT] Notificació enviar (Preparar events)  [Id: " + notificacioId + "]: " + elapsedTime + " ms");
 				integracioHelper.addAccioOk(info);
@@ -143,13 +153,13 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				//Crea un nou event
 				String errorDescripcio = "[" + resultadoAlta.getCodigoRespuesta() + "] " + resultadoAlta.getDescripcionRespuesta();
 				logger.info(" >>> " + errorDescripcio);
-				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT,true);
+				updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_REMOT);
 				integracioHelper.addAccioError(info, errorDescripcio);
 			}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			String errorDescripcio = ex instanceof SOAPFaultException ? ex.getMessage() : ExceptionUtils.getStackTrace(ex);
-			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA,true);
+			updateEventWithEnviament(notificacio, errorDescripcio, NotificacioErrorTipusEnumDto.ERROR_XARXA);
 			integracioHelper.addAccioError(info, "Error al enviar la notificació", ex);
 		}
 		boolean fiReintents = notificacio.getNotificaEnviamentIntent() >= pluginHelper.getNotificaReintentsMaxProperty();
@@ -220,7 +230,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				logger.info(" [EST] Notifica no té cap certificació de l'enviament [Id: " + enviament.getId() + "] ...");
 
 			}
-			notificacioEventHelper.addNotificaConsultaInfoEvent(enviament.getNotificacio(), enviament, "", false);
+			notificacioEventHelper.addNotificaConsultaEvent(enviament.getNotificacio(), enviament);
 
 			logger.info(" [EST] Actualitzant informació enviament amb Datat...");
 			Date dataDatat = toDate(resultadoInfoEnvio.getFechaCreacion());
@@ -236,11 +246,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
 
 		} catch (Exception ex) {
-			notificacioEventHelper.addNotificaConsultaInfoEvent(enviament.getNotificacio(), enviament, ExceptionUtils.getStackTrace(ex),true);
+			boolean errorMaxReintents = enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty();
+			notificacioEventHelper.addNotificaConsultaEventError(enviament.getNotificacio(), enviament, ExceptionUtils.getStackTrace(ex), errorMaxReintents);
 			logger.info(" [EST] Fi actualitzar estat enviament [Id: " + enviament.getId() + ", Estat: " + enviament.getNotificaEstat() + "]");
-			if (enviament.getNotificaIntentNum() >= pluginHelper.getConsultaReintentsMaxProperty()) {
-				notificacioEventHelper.addNotificaConsultaErrorEvent(enviament.getNotificacio(), enviament);
-			}
 			integracioHelper.addAccioError(info, "Error consultat l'estat de l'enviament", ex);
 			if (raiseExceptions){
 				throw ex;
@@ -332,9 +340,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		logger.info(" [EST] Fi actualització certificació. Creant nou event per certificació...");
 		//Crea un nou event
-		notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-				NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-				darrerDatat.getResultado());
+		notificacioEventHelper.addNotificaCertificacioEvent(enviament.getNotificacio(), enviament, darrerDatat.getResultado(), true);
 	}
 
 	private void actualitzaDatatEnviament(ResultadoInfoEnvioV2 resultadoInfoEnvio,
@@ -359,9 +365,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 
 		//Crea un nou event
 		logger.info(" [EST] Creant nou event per Datat...");
-		notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-				NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_DATAT,
-				darrerDatat.getResultado());
+		notificacioEventHelper.addNotificaDatatEvent(enviament.getNotificacio(), enviament, darrerDatat.getResultado(), true);
 		logger.info(" [EST] L'event s'ha guardat correctament...");
 
 		logger.info(" [EST] Actualitzant Datat enviament...");
@@ -716,9 +720,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return envios;
 	}
 	
-	private void updateEventWithEnviament(NotificacioEntity notificacio, String errorDescripcio, NotificacioErrorTipusEnumDto notificacioErrorTipus, boolean notificaError) {
-
-		notificacioEventHelper.addErrorEvent(notificacio, NotificacioEventTipusEnumDto.NOTIFICA_ENVIAMENT, errorDescripcio, notificacioErrorTipus, notificaError);
+	private void updateEventWithEnviament(NotificacioEntity notificacio, String errorDescripcio, NotificacioErrorTipusEnumDto notificacioErrorTipus) {
+		notificacioEventHelper.addNotificaEnviamentEventError(notificacio, notificacioErrorTipus, errorDescripcio);
 	}
 	
 	private NotificaWsV2PortType getNotificaWs(String apiKey) throws InstanceNotFoundException, MalformedObjectNameException, MalformedURLException, RemoteException, NamingException, CreateException {
