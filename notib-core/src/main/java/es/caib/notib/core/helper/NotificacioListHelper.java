@@ -31,6 +31,7 @@ import es.caib.notib.core.repository.ServeiRepository;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +44,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.springframework.web.util.HtmlUtils.htmlEscape;
 
+@Slf4j
 @Component
 public class NotificacioListHelper {
 
@@ -55,20 +58,13 @@ public class NotificacioListHelper {
     private PaginacioHelper paginacioHelper;
     @Autowired
     private MessageHelper messageHelper;
-    @Autowired
-    private NotificacioEnviamentRepository notificacioEnviamentRepository;
+
     @Autowired
     private ProcedimentRepository procedimentRepository;
     @Autowired
     private ServeiRepository serveiRepository;
     @Autowired
     private OrganGestorRepository organGestorRepository;
-    @Autowired
-    private OrganGestorService organGestorService;
-    @Autowired
-    private NotificacioRepository notificacioRepository;
-    @Autowired
-    private NotificacioEnviamentRepository enviamentRepository;
 
     public Pageable getMappeigPropietats(PaginacioParamsDto paginacioParams) {
         Map<String, String[]> mapeigPropietatsOrdenacio = new HashMap<String, String[]>();
@@ -80,7 +76,8 @@ public class NotificacioListHelper {
         mapeigPropietatsOrdenacio.put("estatString", new String[] {"estat"});
         return paginacioHelper.toSpringDataPageable(paginacioParams, mapeigPropietatsOrdenacio);
     }
-    public PaginaDto<NotificacioTableItemDto> complementaNotificacions(EntitatEntity entitatEntity, String usuariCodi, Page<NotificacioTableEntity> notificacions, String ... locale) {
+
+    public PaginaDto<NotificacioTableItemDto> complementaNotificacions(EntitatEntity entitatEntity, String usuariCodi, Page<NotificacioTableEntity> notificacions) {
 
         if (notificacions == null) {
             return paginacioHelper.getPaginaDtoBuida(NotificacioTableItemDto.class);
@@ -102,28 +99,50 @@ public class NotificacioListHelper {
 
         boolean permisProcessar;
         List<NotificacioTableItemDto> notificacionsDto = new ArrayList<>();
-        for (NotificacioTableEntity not : notificacions.getContent()) {
-            NotificacioTableItemDto notificacio = crearTableItem(not);
+        long inici = System.currentTimeMillis();
+        long iniciPreparaEstat;
+        long fiPreparaEstat = 0;
+        long iniciCrearTableItem;
+        long fiCrearTableItem = 0;
+        NotificacioTableItemDto notificacio;
+        Set<NotificacioEnviamentEntity> envs;
+        NotificacioEnviamentEntity env;
+        Date cerData;
+        Long id;
+        boolean hasEnviamentsPendents;
+        List<NotificacioTableEntity> nots = notificacions.getContent();
+        int size = nots.size();
+        NotificacioTableEntity not;
+        for (int foo = 0; foo<size;foo++) {
+//        for (NotificacioTableEntity not : notificacions.getContent()) {
+            not = nots.get(foo);
+            iniciCrearTableItem = System.currentTimeMillis();
+            notificacio = crearTableItem(not);
+            fiCrearTableItem += System.currentTimeMillis() - iniciCrearTableItem;
             permisProcessar = false;
             if (notificacio.getProcedimentCodi() != null && NotificacioEstatEnumDto.FINALITZADA.equals(notificacio.getEstat())) {
                 permisProcessar = codis.contains(notificacio.getProcedimentCodi()) || codis.contains(notificacio.getOrganCodi());
             }
 
             notificacio.setPermisProcessar(permisProcessar);
-            notificacio.setHasEnviamentsPendentsRegistre(notificacioEnviamentRepository.hasEnviamentsPendentsByNotificacioId(notificacio.getId()));
-//            notificacio.setDocumentId(notificacioRepository.findDOcumentId(notificacio.getId()));
-            NotificacioEntity e = notificacioRepository.findById(notificacio.getId());
-            List<NotificacioEnviamentEntity> envs = e != null ? new ArrayList<>(e.getEnviaments()) : new ArrayList<NotificacioEnviamentEntity>();
+            iniciPreparaEstat = System.currentTimeMillis();
+            envs = not.getEnviaments();
             prepararColumnaEstat(notificacio, envs);
+            fiPreparaEstat += System.currentTimeMillis() - iniciPreparaEstat;
 
-            Date cerData = envs != null && !envs.isEmpty() && envs.get(0) != null ? envs.get(0).getNotificaCertificacioData() : null;
-            Long id = e != null && e.getDocument() != null ? e.getDocument().getId() : null;
+            env = envs.iterator().next();
+            cerData = envs != null && !envs.isEmpty() && env != null ? env.getNotificaCertificacioData() : null;
+            id = not != null && not.getNotificacio().getDocument() != null ? not.getNotificacio().getDocument().getId() : null;
             notificacio.setDocumentId(id);
             notificacio.setEnvCerData(cerData);
-            notificacio.setOrganEstat(e != null && e.getOrganGestor() != null ? e.getOrganGestor().getEstat() : null);
-            notificacio.setErrorLastCallback(e != null ? e.isErrorLastCallback() : false);
+            notificacio.setOrganEstat(not.getNotificacio().getOrganGestor() != null ? not.getNotificacio().getOrganGestor().getEstat() : null);
+            notificacio.setErrorLastCallback(not.getNotificacio().isErrorLastCallback());
             notificacionsDto.add(notificacio);
         }
+        long fi = System.currentTimeMillis() - inici;
+        log.info("Total crear table item: " + fiCrearTableItem);
+        log.info("Total preparar estat: " + fiPreparaEstat);
+        log.info("For remeses: " + fi);
         return  paginacioHelper.toPaginaDto(notificacionsDto, notificacions);
     }
 
@@ -156,7 +175,7 @@ public class NotificacioListHelper {
                 .build();
     }
 
-    private void prepararColumnaEstat(NotificacioTableItemDto item, List<NotificacioEnviamentEntity> enviaments) {
+    private void prepararColumnaEstat(NotificacioTableItemDto item, Set<NotificacioEnviamentEntity> enviaments) {
 
 //        List<NotificacioEnviamentDatatableDto> enviaments = enviamentService.enviamentFindAmbNotificacio(item.getId());
         String estat = item.isEnviant() ? "<span class=\"fa fa-clock-o\"></span>" :
@@ -184,6 +203,7 @@ public class NotificacioListHelper {
         String notificaEstat = "";
         String registreEstat = "";
         Map<String, Integer>  registres = new HashMap<>();
+        boolean hasEnviamentsPendents = false;
         for (NotificacioEnviamentEntity env : enviaments) {
             item.updateEstatTipusCount(env.getNotificaEstat());
 //                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
@@ -204,7 +224,11 @@ public class NotificacioListHelper {
                         messageHelper.getMessage("es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto." + r)
                         + "\" class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "";
             }
+            if (!env.isNotificaEstatFinal() && EnviamentEstat.NOTIB_PENDENT.equals(env.getNotificaEstat())) {
+                hasEnviamentsPendents = true;
+            }
         }
+        item.setHasEnviamentsPendentsRegistre(hasEnviamentsPendents);
         notificaEstat = notificaEstat.length() > 0 ? notificaEstat.substring(0, notificaEstat.length()-2) : "";
         estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
                 + "</div></div>" + data + notificaEstat;
