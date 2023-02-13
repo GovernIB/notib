@@ -109,6 +109,16 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 		this.callbackData = new Date();
 	}
 
+	public boolean isCallbackActiu() {
+		return CallbackEstatEnumDto.PENDENT.equals(this.callbackEstat);
+	}
+
+	public void callbackDesactiva() {
+		this.callbackEstat = null;
+		this.callbackIntents = 0;
+		this.callbackData = null;
+	}
+
 
 	public static BuilderOld getBuilder(
 			NotificacioEventTipusEnumDto tipus,
@@ -198,16 +208,9 @@ public class NotificacioEventEntity extends NotibAuditable<Long> {
 
 	// Custom builder setters
 	public static class NotificacioEventEntityBuilder {
-//		private String errorDescripcio;
+		private String errorDescripcio;
 		public NotificacioEventEntityBuilder errorDescripcio(String errorDescripcio){
 			this.errorDescripcio = StringUtils.abbreviate(errorDescripcio, ERROR_DESC_MAX_LENGTH/2);
-			return this;
-		}
-		public NotificacioEventEntityBuilder descripcio(String descripcio) {
-			if (descripcio.length() > 256) {
-				descripcio = descripcio.substring(0, 256);
-			}
-			this.descripcio = descripcio;
 			return this;
 		}
 	}

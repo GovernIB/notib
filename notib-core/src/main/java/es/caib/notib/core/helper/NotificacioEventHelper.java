@@ -42,17 +42,21 @@ public class NotificacioEventHelper {
             eventInfo.setNotificacio(eventInfo.getEnviament().getNotificacio());
         }
 
-        // TODO: Modificar aquest mètode
-        deleteByNotificacioAndTipusAndError(eventInfo.getNotificacio(), eventInfo.getEnviament(), eventInfo.getTipus(),eventInfo.isError() );
+        clearErrorAndCallback(
+                eventInfo.getNotificacio(),
+                eventInfo.getEnviament(),
+                eventInfo.getTipus(),
+                eventInfo.isError(),
+                eventInfo.activaCallback);
 
-            NotificacioEventEntity event = NotificacioEventEntity.builder()
-                    .notificacio(eventInfo.getNotificacio())
-                    .enviament(eventInfo.getEnviament())
-                    .tipus(eventInfo.getTipus())
-                    .descripcio(eventInfo.getDescripcio())
-                    .error(eventInfo.isError())
-                    .errorTipus(eventInfo.getErrorTipus())
-                    .errorDescripcio(eventInfo.getErrorDescripcio()).build();
+        NotificacioEventEntity event = NotificacioEventEntity.builder()
+                .notificacio(eventInfo.getNotificacio())
+                .enviament(eventInfo.getEnviament())
+                .tipus(eventInfo.getTipus())
+                .descripcio(eventInfo.getDescripcio())
+                .error(eventInfo.isError())
+                .errorTipus(eventInfo.getErrorTipus())
+                .errorDescripcio(eventInfo.getErrorDescripcio()).build();
 
 
         if (eventInfo.isActivaCallback()) {
@@ -352,38 +356,64 @@ public class NotificacioEventHelper {
         notificacioEventRepository.saveAndFlush(event);
     }
 
-    private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament,
-                                                     NotificacioEventTipusEnumDto tipus, boolean isError){
 
-        if (isError && notificacio.getEvents() != null) {
-            for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
-                if (e.getTipus().equals(tipus) && e.isError() == isError){
-                    preRemoveErrorEvent(e, notificacio, enviament);
+    private void clearErrorAndCallback(
+            NotificacioEntity notificacio,
+            NotificacioEnviamentEntity enviament,
+            NotificacioEventTipusEnumDto tipus,
+            boolean isError,
+            boolean activarCallback){
+
+        for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+            if (e.getTipus().equals(tipus) && enviament == e.getEnviament() && e.isError() == isError){
+                if (isError && enviament != null) {
+                    enviament.setNotificacioErrorEvent(null);
                 }
-            }
-        }
-        if (notificacio.getEvents() != null) {
-            for (NotificacioEventEntity e : new ArrayList<>(notificacio.getEvents())) {
-                if (tipus.equals(e.getTipus()) && e.isError() == isError) {
+                if (notificacio.getEvents() != null)
                     notificacio.getEvents().remove(e);
-                }
+                notificacioEventRepository.delete(e.getId());
+                continue;
+            }
+            if (activarCallback && e.isCallbackActiu() && enviament == e.getEnviament()) {
+                e.callbackDesactiva();
             }
         }
-        notificacioEventRepository.deleteByNotificacioAndTipusAndError(notificacio, tipus, isError);
+
     }
 
-    private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
 
-        if (event.getEnviament() != null) {
-            event.getEnviament().setNotificacioErrorEvent(null);
-        }
-        if (enviament != null) {
-            enviament.setNotificacioErrorEvent(null);
-        }
-        if (event.getNotificacio() != null && notificacio.getEvents() != null) {
-            notificacio.getEvents().remove(event);
-        }
-    }
+//    private void deleteByNotificacioAndTipusAndError(NotificacioEntity notificacio, NotificacioEnviamentEntity enviament,
+//                                                     NotificacioEventTipusEnumDto tipus, boolean isError){
+//
+//        if (isError && notificacio.getEvents() != null) {
+//            for (NotificacioEventEntity e: new ArrayList<>(notificacio.getEvents())) {
+//                if (e.getTipus().equals(tipus) && e.isError() == isError){
+//                    preRemoveErrorEvent(e, notificacio, enviament);
+//                }
+//            }
+//        }
+//        if (notificacio.getEvents() != null) {
+//            for (NotificacioEventEntity e : new ArrayList<>(notificacio.getEvents())) {
+//                if (tipus.equals(e.getTipus()) && e.isError() == isError) {
+//                    notificacio.getEvents().remove(e);
+//                }
+//            }
+//        }
+//        notificacioEventRepository.deleteByNotificacioAndTipusAndError(notificacio, tipus, isError);
+//    }
+
+//    private void preRemoveErrorEvent(NotificacioEventEntity event, NotificacioEntity notificacio, NotificacioEnviamentEntity enviament) {
+//
+//        if (event.getEnviament() != null) {
+//            event.getEnviament().setNotificacioErrorEvent(null);
+//        }
+//        if (enviament != null) {
+//            enviament.setNotificacioErrorEvent(null);
+//        }
+//        if (event.getNotificacio() != null && notificacio.getEvents() != null) {
+//            notificacio.getEvents().remove(event);
+//        }
+//    }
 
 //    /**
 //     * Elimina tots els events associats a la notificació indicada. Conserva els rellevants:
