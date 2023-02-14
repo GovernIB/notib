@@ -47,6 +47,9 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
 	public UsuariDto findUsuariAmbCodi(String codi);
 
+	@PreAuthorize("hasRole('NOT_SUPER') or hasRole('NOT_ADMIN') or hasRole('tothom') or hasRole('NOT_APL') or hasRole('NOT_CARPETA')")
+	String getIdiomaUsuariActual();
+
 	/**
 	 * Obté els rols d'un usuari donat el seu codi.
 	 * 

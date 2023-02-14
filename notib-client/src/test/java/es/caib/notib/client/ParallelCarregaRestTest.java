@@ -36,7 +36,7 @@ import java.util.Random;
 public class ParallelCarregaRestTest {
 
 //    private static final String URL = "https://dev.caib.es/notib";
-    private static final String URL = "http://localhost:8080/notib";
+    private static final String URL = "http://localhost:8280/notib";
 //    private static final String USERNAME = "$ripea_notib";
     private static final String USERNAME = "admin";
 //    private static final String PASSWORD = "ripea_notib";
@@ -100,7 +100,7 @@ public class ParallelCarregaRestTest {
             String keystorePath = ClientRestTest.class.getResource("/es/caib/notib/client/truststore.jks").toURI().getPath();
             System.setProperty("javax.net.ssl.trustStore", keystorePath);
             System.setProperty("javax.net.ssl.trustStorePassword", "tecnologies");
-            client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, true);
+            client = NotificacioRestClientFactory.getRestClientV2(URL, USERNAME, PASSWORD, false);
         }
 
         @Test

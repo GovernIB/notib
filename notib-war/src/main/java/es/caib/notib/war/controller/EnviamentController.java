@@ -67,7 +67,6 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
-		UsuariDto usuariAcutal = aplicacioService.getUsuariActual();
 		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
 
@@ -75,9 +74,10 @@ public class EnviamentController extends TableAccionsMassivesController {
 		model.addAttribute(filtreEnviaments);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
-			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), usuariAcutal);
+			String codiUsuari = getCodiUsuariActual();
+			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
 			if (columnes == null) {
-				enviamentService.columnesCreate(usuariAcutal, entitatActual.getId(), columnes);
+				enviamentService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
 			}
 		} else {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.creada"));
@@ -124,7 +124,6 @@ public class EnviamentController extends TableAccionsMassivesController {
 		NotificacioEnviamentFiltreCommand filtreEnviaments = getFiltreCommand(request);
 		PaginaDto<NotEnviamentTableItemDto> enviaments = new PaginaDto<>();
 		boolean isAdminOrgan= RolHelper.isUsuariActualUsuariAdministradorOrgan(request);
-		UsuariDto usuariActual = aplicacioService.getUsuariActual();
 		String organGestorCodi = null;
 		try {
 			if(filtreEnviaments.getEstat() != null && filtreEnviaments.getEstat().toString().equals("")) {
@@ -140,7 +139,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 					entitatActual.getId(),
 					RolEnumDto.valueOf(RolHelper.getRolActual(request)),
 					organGestorCodi,
-					usuariActual.getCodi(),
+					getCodiUsuariActual(),
 					NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments),
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
 
@@ -153,9 +152,8 @@ public class EnviamentController extends TableAccionsMassivesController {
 	@RequestMapping(value = "/visualitzar", method = RequestMethod.GET)
 	public String visualitzar(HttpServletRequest request, Model model) {
 
-		UsuariDto usuari = aplicacioService.getUsuariActual();
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
+		ColumnesDto columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}

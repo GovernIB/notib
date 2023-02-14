@@ -140,10 +140,7 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public void columnesCreate(
-			UsuariDto usuaris,
-			Long entitatId,
-			ColumnesDto columnes);
+	void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes);
 	
 	/**
 	 * Actualitza les columnes s'han de mostrar
@@ -162,9 +159,7 @@ public interface EnviamentService {
 	 * @return columnes que s'han de visualitzar.
 	 */
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
-	public ColumnesDto getColumnesUsuari(
-			Long entitatId,
-			UsuariDto usuari);
+	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari);
 	
 	@PreAuthorize("hasRole('NOT_ADMIN') or hasRole('NOT_SUPER') or hasRole('tothom')")
 	NotificacioEnviamentDtoV2 getOne(Long enviamentId);

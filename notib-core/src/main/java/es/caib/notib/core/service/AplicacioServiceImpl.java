@@ -173,6 +173,21 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Transactional(readOnly = true)
 	@Override
+	public String getIdiomaUsuariActual() {
+
+		Timer.Context timer = metricsHelper.iniciMetrica();
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			logger.debug("Obtenint usuari actual");
+			return auth != null ? usuariRepository.getIdiomaUsuari(auth.getName()) : null;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+
+	@Transactional(readOnly = true)
+	@Override
 	public List<String> findRolsUsuariAmbCodi(String codi) {
 
 		Timer.Context timer = metricsHelper.iniciMetrica();

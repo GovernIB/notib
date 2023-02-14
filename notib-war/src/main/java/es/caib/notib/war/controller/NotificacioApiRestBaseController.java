@@ -29,7 +29,7 @@ public abstract class NotificacioApiRestBaseController extends BaseController {
 	protected String getErrorDescripcio(Exception e) {
 		String errorDescripcio;
 		if (UtilitatsNotib.isExceptionOrCauseInstanceOf(e, EJBAccessException.class)) {
-			errorDescripcio = "L'usuari " + aplicacioService.getUsuariActual().getCodi() + " no té els permisos necessaris: " + e.getMessage();
+			errorDescripcio = "L'usuari " + getCodiUsuariActual() + " no té els permisos necessaris: " + e.getMessage();
 		} else {
 			errorDescripcio = UtilitatsNotib.getMessageExceptionOrCauseInstanceOf(e, EJBAccessException.class);
 			if (errorDescripcio == null || errorDescripcio.isEmpty()) {

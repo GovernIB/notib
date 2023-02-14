@@ -65,6 +65,12 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+	public String getIdiomaUsuariActual() {
+		return delegate.getIdiomaUsuariActual();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return delegate.findUsuariAmbText(text);
 	}
