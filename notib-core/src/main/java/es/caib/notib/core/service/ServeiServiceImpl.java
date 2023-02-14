@@ -18,8 +18,8 @@ import es.caib.notib.core.api.dto.procediment.ProcSerFiltreDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerFormDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerGrupDto;
 import es.caib.notib.core.api.dto.procediment.ProcSerSimpleDto;
-import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.dto.procediment.ProcedimentEstat;
+import es.caib.notib.core.api.dto.procediment.ProgresActualitzacioProcSer;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.PermissionDeniedException;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
@@ -81,11 +81,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementació del servei de gestió de serveis.
@@ -1036,19 +1034,7 @@ ServeiServiceImpl implements ServeiService{
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				Set<CodiValorOrganGestorComuDto> setServeis = new HashSet<>(recuperarServeiAmbPermis(entitat, permis, organFiltreCodi));
-				Set<ServeiEntity> auxSet = serveiRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
-				//TODO PREGUNTAR SI HAN DE SORTIR TOTS ELS COMUNS O NOMÉS ELS QUE TÉ PERMÍS
-				for (ServeiEntity servei: auxSet) {
-					setServeis.add(CodiValorOrganGestorComuDto.builder()
-							.id(servei.getId())
-							.codi(servei.getCodi())
-							.valor(servei.getCodi() + ((servei.getNom() != null && !servei.getNom().isEmpty()) ? " - " + servei.getNom() : ""))
-							.organGestor(servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "")
-							.comu(servei.isComu())
-							.build());
-				}
-				serveis = new ArrayList<>(setServeis);
+				serveis = recuperarServeiAmbPermis(entitat, permis, organFiltreCodi);
 			} else {
 				List<ServeiEntity> serveisEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

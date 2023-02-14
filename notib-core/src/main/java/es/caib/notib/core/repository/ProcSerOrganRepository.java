@@ -3,7 +3,6 @@ package es.caib.notib.core.repository;
 import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.entity.EntitatEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
-import es.caib.notib.core.entity.ProcSerEntity;
 import es.caib.notib.core.entity.ProcSerOrganEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -49,7 +48,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -62,11 +61,11 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids);
-	@Query(	"select po.procSer " +
+	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -76,17 +75,18 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcSerEntity> findProcedimentsByEntitatAndGrupAndIds(
+	public List<ProcSerOrganEntity> findProcedimentsByEntitatAndGrupAndIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
 			@Param("tipus") ProcSerTipusEnum tipus);
 
-	@Query(	"from ProcSerOrganEntity po " +
+	@Query(	"select po " +
+			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -108,7 +108,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.actiu = true " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -121,13 +121,13 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids);
-	@Query(	"select po.procSer " +
+	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.actiu = true " +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -136,19 +136,20 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcSerEntity> findProcedimentsActiusByEntitatAndGrupAndIds(
+	public List<ProcSerOrganEntity> findProcedimentsActiusByEntitatAndGrupAndIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
 			@Param("tipus") ProcSerTipusEnum tipus);
 
-	@Query(	"from ProcSerOrganEntity po " +
+	@Query(	"select po " +
+			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.actiu = true " +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
