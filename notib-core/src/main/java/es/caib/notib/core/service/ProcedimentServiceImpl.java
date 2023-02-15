@@ -11,6 +11,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.TipusAssumpteDto;
@@ -1092,6 +1093,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 			if (RolEnumDto.tothom.equals(rol)) {
 				procediments = recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi);
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth != null) {
+					List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
+					procediments.addAll(permisosService.getProcSerComuns(entitat.getId(), grups, true, ProcSerTipusEnum.PROCEDIMENT));
+				}
 			} else {
 				List<ProcedimentEntity> procedimentsEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

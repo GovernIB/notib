@@ -8,6 +8,7 @@ import es.caib.notib.core.api.dto.PaginaDto;
 import es.caib.notib.core.api.dto.PaginacioParamsDto;
 import es.caib.notib.core.api.dto.PermisDto;
 import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProcSerTipusEnum;
 import es.caib.notib.core.api.dto.ProgresActualitzacioDto;
 import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.notificacio.TipusEnviamentEnumDto;
@@ -1035,6 +1036,11 @@ ServeiServiceImpl implements ServeiService{
 
 			if (RolEnumDto.tothom.equals(rol)) {
 				serveis = recuperarServeiAmbPermis(entitat, permis, organFiltreCodi);
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth != null) {
+					List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
+					serveis.addAll(permisosService.getProcSerComuns(entitat.getId(), grups, true, ProcSerTipusEnum.SERVEI));
+				}
 			} else {
 				List<ServeiEntity> serveisEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

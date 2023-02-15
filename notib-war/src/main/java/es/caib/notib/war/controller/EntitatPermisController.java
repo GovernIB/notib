@@ -67,7 +67,7 @@ public class EntitatPermisController extends BaseController {
 	@RequestMapping(value="/{principal}/existeix", method = RequestMethod.GET)
 	public boolean existeixPrincipal(HttpServletRequest request, @PathVariable Long entitatId, @PathVariable String principal, Model model) {
 
-		System.out.println(principal);
+//		System.out.println(principal);
 		if (Strings.isNullOrEmpty(principal)) {
 			return false;
 		}

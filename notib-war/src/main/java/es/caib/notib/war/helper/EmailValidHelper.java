@@ -161,7 +161,7 @@ public class EmailValidHelper {
                 say( wtr, "RSET" ); hear( rdr );
                 say( wtr, "QUIT" ); hear( rdr );
 
-                System.out.println("Response for address " + address + ": " + res);
+//                System.out.println("Response for address " + address + ": " + res);
                 if ( res != 250 )
                     throw new Exception( "Address is not valid!" );
 

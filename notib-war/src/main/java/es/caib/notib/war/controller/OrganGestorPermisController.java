@@ -75,7 +75,6 @@ public class OrganGestorPermisController extends BaseUserController{
 			List<PermisDto> permisos = organGestorService.permisFind(entitatActual.getId(), organGestorId, paginacio);
 			return DatatablesHelper.getDatatableResponse(request, permisos, "id");
 		} catch(Exception ex) {
-			System.out.println(ex.getMessage());
 			String msg = getMessage(request, "organgestor.permis.datatable.error", new Object[] {
 					"<button class=\"btn btn-default btn-xs pull-right\" data-toggle=\"collapse\" data-target=\"#collapseError\" aria-expanded=\"false\" aria-controls=\"collapseError\">\n" +
 					"\t\t\t\t<span class=\"fa fa-bars\"></span>\n" +
