@@ -1752,8 +1752,9 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		for (var org : organsAmbPermisDirecte) {
 			organsCodis.add(org.getCodi());
 		}
-		var organsPermisComuns = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, PermisEnum.COMUNS);
-		for (var org : organsPermisComuns) {
+		// Els òrgans ammb permís comú també es poden consultar
+		var organsAmbPermisComuns = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, PermisEnum.COMUNS);
+		for (var org : organsAmbPermisComuns) {
 			organsCodis.add(org.getCodi());
 		}
 		if (!organsCodis.isEmpty())
