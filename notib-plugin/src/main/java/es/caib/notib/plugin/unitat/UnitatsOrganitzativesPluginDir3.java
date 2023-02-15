@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -137,11 +139,12 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
 	public List<NodeDir3> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 
 		try {
+			var sdf = new SimpleDateFormat("yyyy-MM-dd");
 			List<NodeDir3> unitats = new ArrayList<>();
 			List<UnidadTF> unidades = new ArrayList<>();
 			var url = new URL(getServiceUrl() + SERVEI_UNITATS + "obtenerArbolUnidades?codigo=" + pareCodi +
-					(dataActualitzacio != null ? "&fechaActualizacion=" + dataActualitzacio : "") +
-					(dataSincronitzacio != null ? "&fechaSincronizacion=" + dataSincronitzacio : ""));
+					(dataActualitzacio != null ? "&fechaActualizacion=" + sdf.format(dataActualitzacio) : "") +
+					(dataSincronitzacio != null ? "&fechaSincronizacion=" + sdf.format(dataSincronitzacio) : ""));
 			var response = getResponse(url);
 			var mapper = new ObjectMapper();
 			mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);

@@ -536,12 +536,13 @@ public class UnitatsOrganitzativesPluginDir3Ws implements UnitatsOrganitzativesP
 	@Override
 	public List<OficinaSir> getOficinesEntitat(String entitat) throws SistemaExternException {
 
-		List<OficinaSir> oficinesSIR = new ArrayList<OficinaSir>();
-		List<OficinaTF> oficinesWS = new ArrayList<OficinaTF>();
+		List<OficinaSir> oficinesSIR = new ArrayList<>();
+		List<OficinaTF> oficinesWS = new ArrayList<>();
 		try {
 			oficinesWS = getObtenerOficinasSIRUnidad().obtenerArbolOficinas(entitat, null, null);
-			for (OficinaTF oficinaTF : oficinesWS) {
-				OficinaSir oficinaSIR = new OficinaSir();
+			OficinaSir oficinaSIR;
+			for (var oficinaTF : oficinesWS) {
+				oficinaSIR = new OficinaSir();
 				oficinaSIR.setCodi(oficinaTF.getCodigo());
 				oficinaSIR.setNom(oficinaTF.getDenominacion());
 				oficinaSIR.setSir(oficinaTF.getSirOfi() != null && !oficinaTF.getSirOfi().isEmpty());
