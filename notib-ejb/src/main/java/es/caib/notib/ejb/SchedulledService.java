@@ -94,4 +94,9 @@ public class SchedulledService extends AbstractService<es.caib.notib.logic.intf.
 		getDelegateService().monitorIntegracionsEliminarAntics();
 	}
 
+	@Override
+	public void actualitzarEstatOrgansEnviamentTable() {
+		getDelegateService().actualitzarEstatOrgansEnviamentTable();
+	}
+
 }

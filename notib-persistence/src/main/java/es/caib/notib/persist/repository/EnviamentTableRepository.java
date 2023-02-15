@@ -3,6 +3,7 @@ package es.caib.notib.persist.repository;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.logic.intf.dto.NotificaEnviamentTipusEnumDto;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
+import es.caib.notib.logic.intf.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.persist.entity.EntitatEntity;
 import es.caib.notib.persist.entity.EnviamentTableEntity;
 import org.springframework.data.domain.Page;
@@ -250,6 +251,11 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 			@Param("organs") List<String> organs,
 			Pageable pageable);
 
+
+	@Query( "from EnviamentTableEntity nenv where (:entitat = nenv.entitat)")
+	Page<EnviamentTableEntity> find4EntitatAdminRole(@Param("entitat") EntitatEntity entitat, Pageable pageable);
+
+
 	@Query( "from " +
 			"    EnviamentTableEntity nenv " +
 			"where " +
@@ -365,10 +371,10 @@ public interface EnviamentTableRepository extends JpaRepository<EnviamentTableEn
 						   @Param("procedimentCodi") String procedimentCodi);
 
 	@Modifying
-	@Query("update EnviamentTableEntity nt " +
-			"set " +
-			" nt.notificaReferencia = :notificaReferencia " +
-			"where nt.id = :enviamentId ")
-	void updateNotificaReferencia(@Param("notificaReferencia") String notificaReferencia,
-								  @Param("enviamentId") Long procedimentCodi);
+	@Query("update EnviamentTableEntity nt set  nt.notificaReferencia = :notificaReferencia where nt.id = :enviamentId ")
+	void updateNotificaReferencia(@Param("notificaReferencia") String notificaReferencia, @Param("enviamentId") Long procedimentCodi);
+
+	@Modifying
+	@Query("update EnviamentTableEntity nt set nt.organEstat = :estat where nt.organCodi = :organCodi")
+	void updateOrganEstat(@Param("organCodi") String organCodi, @Param("estat") OrganGestorEstatEnum estat);
 }

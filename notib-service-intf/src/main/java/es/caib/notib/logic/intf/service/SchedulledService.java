@@ -73,4 +73,6 @@ public interface SchedulledService {
 	void consultaCanvisOrganigrama();
 
 	void monitorIntegracionsEliminarAntics();
+
+	void actualitzarEstatOrgansEnviamentTable();
 }
