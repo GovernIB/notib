@@ -20,6 +20,7 @@ import es.caib.notib.logic.helper.ProcSerSyncHelper;
 import es.caib.notib.logic.intf.dto.AccioParam;
 import es.caib.notib.logic.intf.dto.Arbre;
 import es.caib.notib.logic.intf.dto.ArbreNode;
+import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorEstatDto;
 import es.caib.notib.logic.intf.dto.EntitatDto;
 import es.caib.notib.logic.intf.dto.IntegracioAccioTipusEnumDto;
@@ -1749,6 +1750,10 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		List<String> organsCodis = new ArrayList<>();
 		var organsAmbPermisDirecte = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, permis);
 		for (var org : organsAmbPermisDirecte) {
+			organsCodis.add(org.getCodi());
+		}
+		var organsPermisComuns = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, PermisEnum.COMUNS);
+		for (var org : organsPermisComuns) {
 			organsCodis.add(org.getCodi());
 		}
 		if (!organsCodis.isEmpty())

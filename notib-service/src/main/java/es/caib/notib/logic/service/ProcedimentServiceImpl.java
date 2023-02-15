@@ -854,6 +854,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			if (RolEnumDto.tothom.equals(rol)) {
 				Set<CodiValorOrganGestorComuDto> setProcediments = new HashSet<>(recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi));
 				var auxSet = procedimentRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
+				//TODO PREGUNTAR SI HAN DE SORTIR TOTS ELS COMUNS O NOMÉS ELS QUE TÉ PERMÍS
 				for (var procediment: auxSet) {
 					setProcediments.add(CodiValorOrganGestorComuDto.builder()
 							.id(procediment.getId())
