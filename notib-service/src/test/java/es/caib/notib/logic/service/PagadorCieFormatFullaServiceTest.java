@@ -1,6 +1,5 @@
 package es.caib.notib.logic.service;
 
-import es.caib.notib.logic.intf.dto.cie.CieDataDto;
 import es.caib.notib.logic.intf.dto.cie.CieDto;
 import es.caib.notib.logic.intf.dto.cie.CieFormatFullaDto;
 import es.caib.notib.logic.intf.exception.NotFoundException;

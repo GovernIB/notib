@@ -248,7 +248,8 @@ public class NotificacioFormController extends BaseUserController {
         var codiNull = Strings.isNullOrEmpty(codi);
         var denominacioNull = Strings.isNullOrEmpty(denominacio);
         var comunitatNull = comunitatAutonoma == null;
-        if (comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+//        if (comunitatNull && (!codiNull || !denominacioNull) ||  !comunitatNull && codiNull && denominacioNull || codiNull && denominacioNull && comunitatNull) {
+        if (codiNull && denominacioNull) {
             return new ArrayList<>();
         }
         try {

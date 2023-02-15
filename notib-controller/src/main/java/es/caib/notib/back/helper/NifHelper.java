@@ -113,7 +113,7 @@ public class NifHelper {
 	
 	private static String calculaNie(String nie) {
 
-        var str = null;
+        String str = null;
         if(nie.length()==9){
             nie = nie.substring(0, nie.length()-1);
         }

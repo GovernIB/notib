@@ -138,25 +138,14 @@ public class CallbackHelperTest {
     @Test
     public void whenNotificaTipusEventIncorrecte_ThenCallBackEstatIsERROR() throws Exception {
         // Given
-        NotificacioEventEntity event = NotificacioEventEntity.builder()
-                .callbackIntents(0)
-                .tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
-                .enviament(enviamentMock)
-                .notificacio(notificacioMock)
-                .build();
-
+        var event = NotificacioEventEntity.builder().callbackIntents(0).tipus(NotificacioEventTipusEnumDto.NOTIFICA_CONSULTA_INFO)
+                    .enviament(enviamentMock).notificacio(notificacioMock).build();
         // When
         callbackHelper.notifica(event);
-
         // Then
         Assert.assertEquals(CallbackEstatEnumDto.ERROR, event.getCallbackEstat());
-
         // Verificam que s'ha asociat un event i que és d'error
-        Mockito.verify(notificacioEventHelper).addCallbackEvent(
-                Mockito.any(NotificacioEntity.class),
-                Mockito.eq(event),
-                Mockito.eq(true)
-        );
+        Mockito.verify(notificacioEventHelper).addCallbackEvent(Mockito.any(NotificacioEntity.class), Mockito.eq(event), Mockito.eq(true));
     }
 
     @Test

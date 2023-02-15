@@ -162,7 +162,6 @@ public class CallbackHelper {
 		}
 		var start = System.nanoTime();
 		notificacioEventHelper.addCallbackEvent(notificacio, event, isError);
-		notificacioEventHelper.addCallbackEvent(notificacio, event, isError);
 		log.info(String.format("[Callback] Fi intent %d de l'enviament del callback [Id: %d] de la notificacio [Id: %d]", intents, event.getId(), notificacio.getId()));
 		var elapsedTime = System.nanoTime() - start;
 		log.info("addCallbackEvent: "  + elapsedTime);

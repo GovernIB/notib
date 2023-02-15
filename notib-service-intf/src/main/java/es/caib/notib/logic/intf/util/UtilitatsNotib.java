@@ -24,27 +24,25 @@ public class UtilitatsNotib {
 	}
 	
 	public static String getMessageExceptionOrCauseInstanceOf(Exception e, Class<? extends Exception> exceptionClass) {
-		
-		String msgKey = null;
-		
+
+
 		if (exceptionClass.isInstance(e)) {
 			return e.getMessage();
-		}else{		 
-			if (e.getCause() != null) {
-				Throwable t = e.getCause();
-				if (exceptionClass.isInstance(t)) {
-					return t.getMessage();
-				}else{
-					if (t.getCause() != null) { // && t.getClass().getName().equals("javax.trasaction.RollbackException")) {
-						if (exceptionClass.isInstance(t.getCause())) {
-							return t.getCause().getMessage();
-						}
-					}
-				}
-			}
 		}
-		
-		return msgKey;
+		if (e.getCause() == null) {
+			return null;
+		}
+		Throwable t = e.getCause();
+		if (exceptionClass.isInstance(t)) {
+			return t.getMessage();
+		}
+		if (t.getCause() == null) {
+			return null;
+		}
+		if (exceptionClass.isInstance(t.getCause())) {
+			return t.getCause().getMessage();
+		}
+		return null;
 //		return exceptionClass.isInstance(e) || e.getCause() != null && exceptionClass.isInstance(e.getCause());
 	}
 	
@@ -52,21 +50,21 @@ public class UtilitatsNotib {
 		
 		if (exceptionClass.isInstance(e)) {
 			return e;
-		}else{		 	
-			if (e.getCause() != null) {
-				Throwable t = e.getCause();
-				if (exceptionClass.isInstance(t)) {
-					return t;
-				}else{
-					if (t.getCause() != null) { // && t.getClass().getName().equals("javax.trasaction.RollbackException")) {
-						if (exceptionClass.isInstance(t.getCause())) {
-							return t.getCause();
-						}
-					}
-				}
-			}
 		}
-		
+
+		if (e.getCause() == null) {
+			return null;
+		}
+		Throwable t = e.getCause();
+		if (exceptionClass.isInstance(t)) {
+			return t;
+		}
+		if (t.getCause() == null) {
+			return null;
+		}
+		if (exceptionClass.isInstance(t.getCause())) {
+			return t.getCause();
+		}
 		return null;
 	}
 }

@@ -58,7 +58,7 @@
         </sec:authentication-provider>
     </sec:authentication-manager>
 
-	<bean id="aclService" class="es.caib.notib.logic.security.JdbcMutableAclService">
+	<bean id="aclService" class="es.caib.notib.persist.acl.JdbcMutableAclService">
 		<constructor-arg ref="dataSource" />
 		<constructor-arg ref="lookupStrategy" />
 		<constructor-arg ref="aclCache" />
@@ -101,7 +101,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="packagesToScan">
 			<list>
-				<value>es.caib.notib.logic.entity</value>
+				<value>es.caib.notib.persist.entity</value>
 			</list>
 		</property>
 		<property name="jpaDialect">
@@ -124,7 +124,9 @@
 
 	<context:component-scan base-package="es.caib.notib.logic.test" />
 
-	<import resource="classpath:es/caib/notib/logic/context/application-context-model.xml_" />
-	<import resource="classpath:es/caib/notib/logic/context/application-context-model-security.xml_" />
+<!--	<import resource="classpath:es/caib/notib/logic/context/application-context-model.xml_" />-->
+<!--	<import resource="classpath:es/caib/notib/logic/context/application-context-model-security.xml_" />-->
+<!--	<import resource="classpath:es/caib/notib/logic/application-context-test.xml" />-->
+<!--	<import resource="classpath:es/caib/notib/logic/application-context-synctest.xml" />-->
 
 </beans>

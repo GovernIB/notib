@@ -21,7 +21,7 @@ import javax.validation.Validation;
 @RequestMapping("/adviser")
 public class AdviserController  extends BaseController {
 
-    @Autowired
+//    @Autowired
     private AdviserService adviserService;
 
     @ResponseBody

@@ -26,12 +26,10 @@ public interface NotificacioServiceWsV2 {
 	 *            Dades per a donar d'alta la notificació.
 	 * @return la llista de referencies generades per NOTIB (una per enviament)).
 	 */
-	public RespostaAlta alta(
-			@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio) throws NotificacioServiceWsException;
+	RespostaAlta alta(@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio) throws NotificacioServiceWsException;
 
 
-    public RespostaAltaV2 altaV2(
-			@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio) throws NotificacioServiceWsException;
+    RespostaAltaV2 altaV2(@WebParam(name="notificacio") @XmlElement(required = true) NotificacioV2 notificacio) throws NotificacioServiceWsException;
 
     /**
 	 * Dona permís de consulta sobre un procediment.
@@ -40,8 +38,7 @@ public interface NotificacioServiceWsV2 {
 	 *            Dades per a donar d'alta la notificació.
 	 * @return la llista de referencies generades per NOTIB (una per enviament)).
 	 */
-	public boolean donarPermisConsulta(
-			PermisConsulta permisConsulta);
+	boolean donarPermisConsulta(PermisConsulta permisConsulta);
 	/**
 	 * Consulta l'estat d'un enviament d'una notificació.
 	 * 
@@ -50,10 +47,10 @@ public interface NotificacioServiceWsV2 {
 	 * @return la informació de la notificació amb l'enviament
 	 *            especificat.
 	 */
-	public RespostaConsultaEstatNotificacio consultaEstatNotificacio(
+	RespostaConsultaEstatNotificacio consultaEstatNotificacio(
 			@WebParam(name="identificador") @XmlElement(required = true) String identificador);
 
-	public RespostaConsultaEstatNotificacioV2 consultaEstatNotificacioV2(
+	RespostaConsultaEstatNotificacioV2 consultaEstatNotificacioV2(
 			@WebParam(name="identificador") @XmlElement(required = true) String identificador);
 
 	/**
@@ -64,10 +61,10 @@ public interface NotificacioServiceWsV2 {
 	 * @return la informació de la notificació amb l'enviament
 	 *            especificat.
 	 */
-	public RespostaConsultaEstatEnviament consultaEstatEnviament(
+	RespostaConsultaEstatEnviament consultaEstatEnviament(
 			@WebParam(name="referencia") @XmlElement(required = true) String referencia);
 
-	public RespostaConsultaEstatEnviamentV2 consultaEstatEnviamentV2(
+	RespostaConsultaEstatEnviamentV2 consultaEstatEnviamentV2(
 			@WebParam(name="referencia") @XmlElement(required = true) String referencia) throws NotificacioServiceWsException;
 
 	/**
@@ -78,11 +75,9 @@ public interface NotificacioServiceWsV2 {
 	 * @return la informació de la notificació amb l'enviament
 	 *            especificat.
 	 */
-	public RespostaConsultaDadesRegistre consultaDadesRegistre(
-			DadesConsulta dadesConsulta);
+	RespostaConsultaDadesRegistre consultaDadesRegistre(DadesConsulta dadesConsulta);
 
-	public RespostaConsultaDadesRegistreV2 consultaDadesRegistreV2(
-			DadesConsulta dadesConsulta);
+	RespostaConsultaDadesRegistreV2 consultaDadesRegistreV2(DadesConsulta dadesConsulta);
 
 	/**
 	 * Consulta el justificant de l'enviament d'una notificació.
@@ -92,7 +87,6 @@ public interface NotificacioServiceWsV2 {
 	 * @return la informació de la notificació amb l'enviament
 	 *            especificat.
 	 */
-	RespostaConsultaJustificantEnviament consultaJustificantEnviament(
-			@WebParam(name="identificador") @XmlElement(required = true) String identificador);
+	RespostaConsultaJustificantEnviament consultaJustificantEnviament(@WebParam(name="identificador") @XmlElement(required = true) String identificador);
 
 }
