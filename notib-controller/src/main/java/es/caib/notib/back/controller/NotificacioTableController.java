@@ -179,84 +179,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             var id = entitatActual != null ? entitatActual.getId() : null;
             var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
             notificacions = notificacioService.findAmbFiltrePaginat(id, rol, organGestorCodi, usuariActual.getCodi(), filtre, params);
-            prepararColumnaEstat(request, notificacions.getContingut());
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }
         return DatatablesHelper.getDatatableResponse(request, notificacions, "id", SESSION_ATTRIBUTE_SELECCIO);
-    }
-
-    private void prepararColumnaEstat(HttpServletRequest request, List<NotificacioTableItemDto> items) {
-
-        List<NotificacioEnviamentDatatableDto> enviaments;
-        String estat, nomEstat, error, data, notificaEstat, registreEstat, padding, boxShadow;
-        Map<String, Integer>  registres;
-        for (var item : items) {
-            enviaments = enviamentService.enviamentFindAmbNotificacio(item.getId());
-            estat = item.isEnviant() ? "<span class=\"fa fa-clock-o\"></span>" :
-                    NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) ? "<span class=\"fa fa-clock-o\"></span>" :
-                    NotificacioEstatEnumDto.ENVIADA.equals(item.getEstat()) || NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-send-o\"></span>" :
-                    NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) ? "<span class=\"fa fa-check\"></span>" :
-                    NotificacioEstatEnumDto.REGISTRADA.equals(item.getEstat()) ? "<span class=\"fa fa-file-o\"></span>" :
-                    NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) ? "<span class=\"fa fa-check-circle\"></span>" : "";
-            nomEstat = " " + getMessage(request, "es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto." + item.getEstat().name()) + "";
-            error = item.isNotificaError() ? " <span class=\"fa fa-warning text-danger\" title=\"" + htmlEscape(item.getNotificaErrorDescripcio()) + " \"></span>" : "";
-            error += TipusUsuariEnumDto.APLICACIO.equals(item.getTipusUsuari()) && item.isErrorLastCallback() ?
-                    " <span class=\"fa fa-exclamation-circle text-primary\" title=\"<spring:message code=\"notificacio.list.client.error/>\"></span>" : "";
-            estat = "<span>" + estat + nomEstat + error + "</span>";
-            data = "\n";
-            if ((NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())) && item.getEstatDate() != null) {
-                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                String d = df.format(item.getEstatDate());
-                data += "<span class=\"horaProcessat\">" + d + "</span>\n";
-            } else if (NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) && item.getEstatProcessatDate() != null) {
-                SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
-                String d = df.format(item.getEstatProcessatDate());
-                data += "<span class=\"horaProcessat\">" + d + "</span>\n";
-            }
-
-            notificaEstat = "";
-            registreEstat = "";
-            registres = new HashMap<>();
-            for (var env : enviaments) {
-                item.updateEstatTipusCount(env.getNotificaEstat());
-//                if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat()) || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat())) {
-//                    notificaEstat += getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + env.getNotificaEstat()) + ", ";
-//                }
-                if (env.getRegistreEstat() != null) {
-                    if (registres.containsKey(env.getRegistreEstat().name())) {
-                        Integer count = registres.get(env.getRegistreEstat().name());
-                        count = count + 1;
-                        registres.put(env.getRegistreEstat().name(), count);
-                    } else {
-                        registres.put(env.getRegistreEstat().name(), 1);
-                    }
-                }
-                if (item.isComunicacioSir()) {
-                    var r = env.getRegistreEstat();
-                    registreEstat += env.getRegistreEstat() != null ?  "<div><span style=\"padding-bottom:1px; background-color: " + r.getColor() + ";\" title=\"" +
-                            getMessage(request, "es.caib.notib.logic.intf.dto.NotificacioRegistreEstatEnumDto." + r)
-                            + "\" class=\"label label-primary\">" + r.getBudget() + "</span></div>" : "";
-                }
-            }
-            notificaEstat = notificaEstat.length() > 0 ? notificaEstat.substring(0, notificaEstat.length()-2) : "";
-            estat = "<div class=\"flex-column\"><div style=\"display:flex; justify-content:space-between\">" + estat + (registreEstat.length() > 0 ? registreEstat : "")
-                    + "</div></div>" + data + notificaEstat;
-            padding = "; padding-left: 5px;";
-            boxShadow = "box-shadow: inset 3px 0px 0px ";
-
-            if (NotificacioEstatEnumDto.FINALITZADA.equals(item.getEstat()) || NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(item.getEstat())
-                    || NotificacioEstatEnumDto.PROCESSADA.equals(item.getEstat()) || notificaEstat.length() > 0 || item.getContadorEstat().size() > 1) {
-
-                for (var entry : item.getContadorEstat().entrySet()) {
-                    estat += "<div style=\"font-size:11px;" + boxShadow + entry.getKey().getColor() + padding + "\">" +
-                            entry.getValue() + " " + getMessage(request, "es.caib.notib.client.domini.EnviamentEstat." + entry.getKey())
-                            + "</div>";
-                }
-            }
-
-            item.setEstatString(estat);
-        }
     }
 
 
