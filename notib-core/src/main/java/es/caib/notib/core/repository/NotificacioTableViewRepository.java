@@ -39,7 +39,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"    NotificacioTableEntity ntf " +
 			"where " +
 			"   (" +
-			"		(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +	// Té permís sobre el procediment
+			"		(:esProcedimentsCodisNotibNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib) and ntf.procedimentIsComu = false) " +	// Té permís sobre el procediment
 			"	or	(:esOrgansGestorsCodisNotibNull = false and ntf.organCodi is not null " +
 			"												and (ntf.procedimentCodiNotib is null or (ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false)) " + // comunicacions o procediments comuns
 			"												and ntf.organCodi in (:organsGestorsCodisNotib)) " +						// Té permís sobre l'òrgan
@@ -118,7 +118,7 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			"	 (:entitat = ntf.entitat) " +
 			"and (:isEntitatIdNull = true or ntf.entitat.id = :entitatId) " +
 			"and (" +
-			"		(:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib)) " +			 // Té permís sobre el procediment
+			"		(:isProcNull = false and ntf.procedimentCodiNotib is not null and ntf.procedimentCodiNotib in (:procedimentsCodisNotib) and ntf.procedimentIsComu = false) " +			 // Té permís sobre el procediment
 			"	or	(:isOrgansGestorsCodisNotibNull = false and ntf.organCodi is not null and " +
 			"			(ntf.procedimentCodiNotib is null or (ntf.procedimentIsComu = true and ntf.procedimentRequirePermission = false)) and ntf.organCodi in (:organsGestorsCodisNotib)" +
 			"		) " + // Té permís sobre l'òrgan
