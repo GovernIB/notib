@@ -77,6 +77,21 @@ public class PaginacioHelper {
 		return toPaginaDto(page, null);
 	}
 
+	public <T, S> PaginaDto<T> toPaginaDto(List<T> list, Page<S> page) {
+
+		PaginaDto<T> dto = new PaginaDto<>();
+		dto.setNumero(page.getNumber());
+		dto.setTamany(page.getSize());
+		dto.setTotal(page.getTotalPages());
+		dto.setElementsTotal(page.getTotalElements());
+		dto.setAnteriors(page.hasPrevious());
+		dto.setPrimera(page.isFirst());
+		dto.setPosteriors(page.hasNext());
+		dto.setDarrera(page.isLast());
+		dto.setContingut(list);
+		return dto;
+	}
+
 	public <T> PaginaDto<T> toPaginaDto(Page<?> page, List<?> llista, Class<T> targetType) {
 
 		var dto = new PaginaDto<T>();

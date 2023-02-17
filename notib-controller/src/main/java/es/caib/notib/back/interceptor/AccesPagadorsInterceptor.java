@@ -6,11 +6,8 @@ package es.caib.notib.back.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.helper.RolHelper;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -22,18 +19,20 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 @Component
 public class AccesPagadorsInterceptor implements AsyncHandlerInterceptor {
 
-	@Autowired @Lazy
-	private AplicacioService aplicacioService;
-
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		var usuariActual = aplicacioService.getUsuariActual();
-		if (!RolHelper.isUsuariActualAdministradorEntitat(request)) {
-			throw new SecurityException("L'usuari actual " + usuariActual.getCodi() + " no pot accedir a la gestió de pagadors", null);
+		if (RolHelper.isUsuariActualAdministradorEntitat(request)) {
+			return true;
 		}
-		return true;
+		var name = "";
+		try {
+			name = SecurityContextHolder.getContext().getAuthentication().getName();
+		} catch (Exception ex) {
+			name = "AUTH_ERROR";
+		}
+		throw new SecurityException("L'usuari actual " + name + " no pot accedir a la gestió de pagadors", null);
 	}
 
 }

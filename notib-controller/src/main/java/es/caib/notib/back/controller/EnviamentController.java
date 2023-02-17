@@ -65,16 +65,16 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
 		model.addAttribute("mantenirPaginacio", mantenirPaginacio != null ? mantenirPaginacio : false);
-		var usuariAcutal = aplicacioService.getUsuariActual();
 		var entitatActual = EntitatHelper.getEntitatActual(request);
 		ColumnesDto columnes = null;
 		var filtreEnviaments = getFiltreCommand(request);
 		model.addAttribute(filtreEnviaments);
 		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
 		if(entitatActual != null) {
-			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), usuariAcutal);
+			var codiUsuari = getCodiUsuariActual();
+			columnes = enviamentService.getColumnesUsuari(entitatActual.getId(), codiUsuari);
 			if (columnes == null) {
-				enviamentService.columnesCreate(usuariAcutal, entitatActual.getId(), columnes);
+				enviamentService.columnesCreate(codiUsuari, entitatActual.getId(), columnes);
 			}
 		} else {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.creada"));
@@ -118,7 +118,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 			}
 
 			enviaments = enviamentService.enviamentFindByEntityAndFiltre(entitatActual.getId(), RolEnumDto.valueOf(RolHelper.getRolActual(request)), organGestorCodi,
-							usuariActual.getCodi(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
+							getCodiUsuariActual(), NotificacioEnviamentFiltreCommand.asDto(filtreEnviaments), DatatablesHelper.getPaginacioDtoFromRequest(request));
 
 		} catch (SecurityException e) {
 			MissatgesHelper.error(request, getMessage(request, "enviament.controller.entitat.cap.assignada"));
@@ -131,7 +131,7 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 		var usuari = aplicacioService.getUsuariActual();
 		var entitat = EntitatHelper.getEntitatActual(request);
-		var columnes = enviamentService.getColumnesUsuari(entitat.getId(), usuari);
+		var columnes = enviamentService.getColumnesUsuari(entitat.getId(), getCodiUsuariActual());
 		model.addAttribute(columnes != null ? ColumnesCommand.asCommand(columnes) : new ColumnesCommand());
 		return "enviamentColumns";
 	}

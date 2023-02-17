@@ -282,7 +282,6 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
         log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. ");
         var entitat = getEntitatActualComprovantPermisos(request);
-        var usuariActual = aplicacioService.getUsuariActual();
         if (bindingResult.hasErrors()) {
             log.debug("[NOT-CONTROLLER] POST notificació desde interfície web. Errors de validació formulari. ");
             model.addAttribute("errors", bindingResult.getAllErrors());
@@ -309,7 +308,7 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
 
         try {
             log.debug("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Processant dades del formulari. ");
-            notificacioMassivaService.create(entitat.getId(), usuariActual.getCodi(),notificacioMassivaCommand.asDto(gestioDocumentalService));
+            notificacioMassivaService.create(entitat.getId(), getCodiUsuariActual(), notificacioMassivaCommand.asDto(gestioDocumentalService));
         } catch (Exception ex) {
             log.error("[NOT-CONTROLLER] POST notificació massiu desde interfície web. Excepció al processar les dades del formulari", ex);
             log.error(ExceptionUtils.getStackTrace(ex));
@@ -376,10 +375,9 @@ public class NotificacioMassivaController extends TableAccionsMassivesController
             organGestorCodi = organGestorActual.getCodi();
 
         }
-        var usuariActual = aplicacioService.getUsuariActual();
         var filtre = notificacioBackHelper.getFiltreCommand(request, TABLE_FILTRE).asDto();
         assert entitatActual != null;
         var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, usuariActual.getCodi(), filtre);
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, getCodiUsuariActual(), filtre);
     }
 }

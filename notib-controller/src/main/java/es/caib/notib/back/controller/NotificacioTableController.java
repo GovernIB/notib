@@ -110,11 +110,10 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             organGestorCodi = organGestorActual.getCodi();
 
         }
-        var usuariActual = aplicacioService.getUsuariActual();
         var filtre = notificacioBackHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         assert entitatActual != null;
         var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
-        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, usuariActual.getCodi(), filtre);
+        return notificacioService.findIdsAmbFiltre(entitatActual.getId(), rol, organGestorCodi, getCodiUsuariActual(), filtre);
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -161,7 +160,6 @@ public class NotificacioTableController extends TableAccionsMassivesController {
         var entitatActual = getEntitatActualComprovantPermisos(request);
         var filtre = notificacioBackHelper.getFiltreCommand(request, NOTIFICACIONS_FILTRE).asDto();
         var notificacions = new PaginaDto<NotificacioTableItemDto>();
-        var usuariActual = aplicacioService.getUsuariActual();
         var isUsuari = RolHelper.isUsuariActualUsuari(request);
         var isUsuariEntitat = RolHelper.isUsuariActualAdministradorEntitat(request);
         var isAdministrador = RolHelper.isUsuariActualAdministrador(request);
@@ -178,7 +176,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             var rol = RolEnumDto.valueOf(RolHelper.getRolActual(request));
             var id = entitatActual != null ? entitatActual.getId() : null;
             var params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-            notificacions = notificacioService.findAmbFiltrePaginat(id, rol, organGestorCodi, usuariActual.getCodi(), filtre, params);
+            notificacions = notificacioService.findAmbFiltrePaginat(id, rol, organGestorCodi, getCodiUsuariActual(), filtre, params);
         } catch (SecurityException e) {
             MissatgesHelper.error(request, getMessage(request, "notificacio.controller.entitat.cap.assignada"));
         }

@@ -9,6 +9,8 @@ import es.caib.notib.back.helper.MissatgesHelper;
 import es.caib.notib.back.helper.ModalHelper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -24,6 +26,16 @@ import java.io.IOException;
 public class BaseController implements MessageSourceAware {
 
 	MessageSource messageSource;
+
+	public String getCodiUsuariActual() {
+
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			return auth != null ? auth.getName() : null;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
 
 	protected String modalUrlTancar() {
 		return "redirect:" + ModalHelper.ACCIO_MODAL_TANCAR;

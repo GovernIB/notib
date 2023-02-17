@@ -8,6 +8,7 @@ import es.caib.notib.logic.intf.service.AplicacioService;
 import es.caib.notib.back.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -29,11 +30,16 @@ public class AccesUsuariInterceptor implements AsyncHandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		if (RolHelper.isUsuariActualUsuari(request)) {
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			throw new SecurityException("No es pot accedir a la página amb el rol usuari. L'usuari actual " + usuariActual.getCodi() + " no té cap rol requerit.", null);
+		if (!RolHelper.isUsuariActualUsuari(request)) {
+			return true;
 		}
-		return true;
+		var name = "";
+		try {
+			name = SecurityContextHolder.getContext().getAuthentication().getName();
+		} catch (Exception ex) {
+			name = "AUTH_ERROR";
+		}
+		throw new SecurityException("No es pot accedir a la página amb el rol usuari. L'usuari actual " + name + " no té cap rol requerit.", null);
 	}
 
 }

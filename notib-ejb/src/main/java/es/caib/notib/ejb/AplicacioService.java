@@ -59,6 +59,12 @@ public class AplicacioService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
+		public String getIdiomaUsuariActual() {
+		return getDelegateService().getIdiomaUsuariActual();
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom", "NOT_APL", "NOT_CARPETA"})
 	public List<UsuariDto> findUsuariAmbText(String text) {
 		return getDelegateService().findUsuariAmbText(text);
 	}

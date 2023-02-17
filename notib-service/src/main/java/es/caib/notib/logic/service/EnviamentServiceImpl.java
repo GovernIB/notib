@@ -896,12 +896,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 
 	@Override
-	public void columnesCreate(UsuariDto usuari, Long entitatId, ColumnesDto columnes) {
+	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var entitatEntity = entityComprovarHelper.comprovarEntitat(entitatId);
-			var usuariEntity = usuariRepository.findByCodi(usuari.getCodi());
+			var usuariEntity = usuariRepository.findByCodi(codiUsuari);
 			if (columnes == null) {
 				columnes = new ColumnesDto();
 				columnes.setDataEnviament(true);
@@ -937,12 +937,12 @@ public class EnviamentServiceImpl implements EnviamentService {
 		
 	@Transactional(readOnly = true)	
 	@Override
-	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuariDto) {
+	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
 
 		var timer = metricsHelper.iniciMetrica();
 		try {
 			var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-			var usuari = usuariRepository.findByCodi(usuariDto.getCodi());
+			var usuari = usuariRepository.findByCodi(codiUsuari);
 			var columnes = columnesRepository.findByEntitatAndUser(entitat, usuari);
 			return conversioTipusHelper.convertir(columnes, ColumnesDto.class);
 		} finally {

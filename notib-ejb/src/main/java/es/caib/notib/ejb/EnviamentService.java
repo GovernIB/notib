@@ -78,8 +78,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 	
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public void columnesCreate(UsuariDto usuaris, Long entitatId, ColumnesDto columnes) {
-		getDelegateService().columnesCreate(usuaris, entitatId, columnes);
+	public void columnesCreate(String codiUsuari, Long entitatId, ColumnesDto columnes) {
+		getDelegateService().columnesCreate(codiUsuari, entitatId, columnes);
 	}
 
 	@Override
@@ -90,8 +90,8 @@ public class EnviamentService extends AbstractService<es.caib.notib.logic.intf.s
 
 	@Override
 	@RolesAllowed({"NOT_ADMIN", "NOT_SUPER", "tothom"})
-	public ColumnesDto getColumnesUsuari(Long entitatId, UsuariDto usuari) {
-		return getDelegateService().getColumnesUsuari(entitatId, usuari);
+	public ColumnesDto getColumnesUsuari(Long entitatId, String codiUsuari) {
+		return getDelegateService().getColumnesUsuari(entitatId, codiUsuari);
 	}
 
 	@Override

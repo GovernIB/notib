@@ -3,7 +3,8 @@
  */
 package es.caib.notib.logic.helper;
 
-import es.caib.notib.persist.repository.UsuariRepository;
+import com.google.common.base.Strings;
+import es.caib.notib.logic.intf.service.AplicacioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -23,8 +24,8 @@ public class MessageHelper implements MessageSourceAware {
 
 	private MessageSource messageSource;
 	@Autowired
-	private UsuariRepository usuariRepository;
-	
+	private AplicacioService aplicacioService;
+
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 
 		var msg = "???" + (keys.length > 0 ? keys[keys.length-1] : "") + "???";
@@ -54,14 +55,8 @@ public class MessageHelper implements MessageSourceAware {
 			if (locale != null) {
 				return messageSource.getMessage(key, vars, locale);
 			}
-			var lang = "ca";
-			var auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null) {
-				var usuariActual = usuariRepository.findById(auth.getName()).orElse(null); //aplicacioService.getUsuariActual();
-				if (usuariActual != null && usuariActual.getIdioma() != null && !usuariActual.getIdioma().isEmpty())
-					lang = usuariActual.getIdioma();
-			}
-			locale = new Locale(lang);
+			String idioma = aplicacioService.getIdiomaUsuariActual();
+			locale = new Locale(!Strings.isNullOrEmpty(idioma) ? idioma : "ca");
 			return messageSource.getMessage(key, vars, locale);
 		} catch (NoSuchMessageException ex) {
 			return key.startsWith("enum.") ? key.substring(key.lastIndexOf(".") + 1) :"???" + key + "???";

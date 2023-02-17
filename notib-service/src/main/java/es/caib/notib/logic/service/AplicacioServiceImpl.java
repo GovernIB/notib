@@ -3,6 +3,7 @@
  */
 package es.caib.notib.logic.service;
 
+import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
@@ -20,6 +21,7 @@ import es.caib.notib.persist.repository.acl.AclSidRepository;
 import es.caib.notib.plugin.usuari.DadesUsuari;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,6 +156,20 @@ public class AplicacioServiceImpl implements AplicacioService {
 			var auth = SecurityContextHolder.getContext().getAuthentication();
 			log.debug("Obtenint usuari actual");
 			return auth != null ? toUsuariDtoAmbRols(usuariRepository.findById(auth.getName()).orElse(null)) : null;
+		} finally {
+			metricsHelper.fiMetrica(timer);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public String getIdiomaUsuariActual() {
+
+		var timer = metricsHelper.iniciMetrica();
+		try {
+			var auth = SecurityContextHolder.getContext().getAuthentication();
+			log.debug("Obtenint usuari actual");
+			return auth != null ? usuariRepository.getIdiomaUsuari(auth.getName()) : null;
 		} finally {
 			metricsHelper.fiMetrica(timer);
 		}
