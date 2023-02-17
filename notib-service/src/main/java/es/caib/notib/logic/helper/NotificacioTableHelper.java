@@ -2,6 +2,7 @@ package es.caib.notib.logic.helper;
 
 import es.caib.notib.client.domini.InteressatTipus;
 import es.caib.notib.logic.intf.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.persist.entity.NotificacioEntity;
 import es.caib.notib.persist.entity.NotificacioEventEntity;
@@ -74,6 +75,33 @@ public class NotificacioTableHelper {
             notificacioTableViewRepository.save(tableViewItem);
         } catch (Exception ex) {
             log.error("No ha estat possible crear la informació de la notificació " + notificacio.getId(), ex);
+        }
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void actualitzar(NotTableUpdate not) {
+
+        try {
+            var opt = notificacioTableViewRepository.findById(not.getId());
+            if (opt.isEmpty()) {
+                return;
+            }
+            var item = opt.get();
+            if (not.getEstatProcessatDate() != null) {
+                item.setEstatProcessatDate(not.getEstatProcessatDate());
+            }
+            if (not.getEstatDate() != null) {
+                item.setEstatDate(not.getEstatDate());
+            }
+
+            if (not.getEstat() != null) {
+                item.setEstat(not.getEstat());
+                // Estat de la notificacio
+                item.setEstatMask(item.getEstatMask() - item.getEstat().getMask() + not.getEstat().getMask());
+            }
+            notificacioTableViewRepository.saveAndFlush(item);
+        } catch (Exception ex) {
+            log.error("Error acutalitzant la informació de la notificació " + not.getId(), ex);
         }
     }
 

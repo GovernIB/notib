@@ -1,5 +1,6 @@
 package es.caib.notib.logic.helper;
 
+import es.caib.notib.logic.intf.dto.notificacio.NotTableUpdate;
 import es.caib.notib.logic.intf.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.logic.intf.dto.TipusUsuariEnumDto;
 import es.caib.notib.logic.intf.service.AuditService.TipusEntitat;
@@ -81,7 +82,8 @@ public class AuditNotificacioHelper {
 		notificacio.updateEstat(NotificacioEstatEnumDto.PROCESSADA);
 		notificacio.updateEstatProcessatDate(new Date());
 		notificacio.updateMotiu(motiu);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.PROCESSADA).estatProcessatDate(new Date()).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -93,7 +95,8 @@ public class AuditNotificacioHelper {
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacio.updateEstatDate(new Date());
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.FINALITZADA).estatDate(new Date()).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -104,7 +107,8 @@ public class AuditNotificacioHelper {
 		notificacio.updateMotiu(notificaEstatNom);
 		notificacio.updateEstatDate(new Date());
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS).estatDate(new Date()).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -123,7 +127,8 @@ public class AuditNotificacioHelper {
 		notificacio.updateRegistreNumeroFormatat(arbResposta.getRegistreNumeroFormatat());
 		notificacio.updateRegistreData(arbResposta.getRegistreData());
 		notificacio.updateEstat(NotificacioEstatEnumDto.REGISTRADA);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.REGISTRADA).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -134,7 +139,8 @@ public class AuditNotificacioHelper {
 		for (var env: notificacio.getEnviaments()) {
 			enviamentTableHelper.actualitzarRegistre(env);
 		}
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -151,7 +157,8 @@ public class AuditNotificacioHelper {
 
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.ENVIADA).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -160,7 +167,8 @@ public class AuditNotificacioHelper {
 
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA);
 		notificacioEventHelper.clearOldUselessEvents(notificacio);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.FINALITZADA).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -168,7 +176,8 @@ public class AuditNotificacioHelper {
 	public NotificacioEntity updateNotificacioEnviadaAmbErrors(NotificacioEntity notificacio) {
 
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -176,7 +185,8 @@ public class AuditNotificacioHelper {
 	public NotificacioEntity updateNotificacioFinalitzadaAmbErrors(NotificacioEntity notificacio) {
 
 		notificacio.updateEstat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS);
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 
@@ -185,7 +195,8 @@ public class AuditNotificacioHelper {
 
 		notificacio.updateEstat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS);
 		notificacio.resetIntentsNotificacio();
-		notificacioTableHelper.actualitzarRegistre(notificacio);
+		NotTableUpdate not = NotTableUpdate.builder().estat(NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS).build();
+		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
 

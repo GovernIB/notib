@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Principal;
@@ -86,6 +87,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private EntityManager entityManager;
 
 //	@Override
 //	public void restartSchedulledTasks() {
@@ -115,6 +118,8 @@ public class SchedulledServiceImpl implements SchedulledService {
 				} else {
 					log.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
 					notificacioHelper.registrarNotificar(pendent);
+					entityManager.flush();
+					entityManager.clear();
 				}
 			}
 		} finally {

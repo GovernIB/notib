@@ -261,6 +261,9 @@ public class OrganGestorHelper {
 			unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
+			if (unitat != null && !OrganGestorEstatEnum.V.equals(unitat.getEstat())) {
+				unitat.setNoVigent(true);
+			}
 		}
 		progres.setProgres(22);
 //		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
