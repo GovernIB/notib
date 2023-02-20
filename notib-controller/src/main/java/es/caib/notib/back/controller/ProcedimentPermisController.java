@@ -120,7 +120,7 @@ public class ProcedimentPermisController extends BaseUserController{
 
 		var entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("entitat", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
+			model.addAttribute("procediment", procedimentService.findById(entitatActual.getId(), isAdministrador(request), procedimentId));
 			if (command.getOrgan() != null) {
 				model.addAttribute("organs", getOrganismes(request));
 			}
