@@ -21,6 +21,7 @@ import es.caib.notib.logic.intf.dto.PaginaDto;
 import es.caib.notib.logic.intf.dto.PaginacioParamsDto;
 import es.caib.notib.logic.intf.dto.PermisDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.ProgresActualitzacioDto;
 import es.caib.notib.logic.intf.dto.RolEnumDto;
 import es.caib.notib.logic.intf.dto.TipusAssumpteDto;
@@ -69,6 +70,7 @@ import es.caib.notib.persist.repository.ProcedimentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -853,6 +855,11 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 
 			if (RolEnumDto.tothom.equals(rol)) {
 				procediments = recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi);
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				if (auth != null) {
+					List<String> grups = cacheHelper.findRolsUsuariAmbCodi(auth.getName());
+					procediments.addAll(permisosService.getProcSerComuns(entitat.getId(), grups, true, ProcSerTipusEnum.PROCEDIMENT));
+				}
 			} else {
 				List<ProcedimentEntity> procedimentsEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

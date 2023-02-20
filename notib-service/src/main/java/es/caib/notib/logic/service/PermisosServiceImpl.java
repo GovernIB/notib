@@ -655,6 +655,14 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PERMÍS PROCEDIMENT COMU ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
+
+        var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+        var comuns = getProcSerComunsAmbPermisPerOrgan(entitat, grups, removeInactius, tipus);
+        Set<ProcSerEntity> c = new HashSet<>(comuns);
+        return procedimentsToCodiValorOrganGestorComuDto(c);
+    }
+
     private List<ProcSerEntity> getProcSerComunsAmbPermisPerOrgan(EntitatEntity entitat, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
 
         var organsAmbPermis = getOrgansAmbPermisComu(entitat, grups);

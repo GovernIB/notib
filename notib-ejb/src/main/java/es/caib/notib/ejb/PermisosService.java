@@ -7,6 +7,7 @@ package es.caib.notib.ejb;
 import es.caib.notib.logic.intf.dto.CodiValorDto;
 import es.caib.notib.logic.intf.dto.CodiValorOrganGestorComuDto;
 import es.caib.notib.logic.intf.dto.PermisEnum;
+import es.caib.notib.logic.intf.dto.ProcSerTipusEnum;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
 
 import javax.annotation.security.RolesAllowed;
@@ -67,6 +68,12 @@ public class PermisosService extends AbstractService<es.caib.notib.logic.intf.se
 	@RolesAllowed({"NOT_ADMIN", "tothom"})
 	public List<CodiValorOrganGestorComuDto> getProcSersAmbPermis(Long entitatId, String usuariCodi, PermisEnum permis) {
 		return getDelegateService().getProcSersAmbPermis(entitatId, usuariCodi, permis);
+	}
+
+	@Override
+	@RolesAllowed({"NOT_ADMIN", "tothom"})
+	public List<CodiValorOrganGestorComuDto> getProcSerComuns(Long entitatId, List<String> grups, boolean removeInactius, ProcSerTipusEnum tipus) {
+		return getDelegateService().getProcSerComuns(entitatId, grups, removeInactius, tipus);
 	}
 
 	@Override
