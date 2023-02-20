@@ -1034,19 +1034,7 @@ public class ServeiServiceImpl implements ServeiService{
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				Set<CodiValorOrganGestorComuDto> setServeis = new HashSet<>(recuperarServeiAmbPermis(entitat, permis, organFiltreCodi));
-				var auxSet = serveiRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
-				//TODO PREGUNTAR SI HAN DE SORTIR TOTS ELS COMUNS O NOMÉS ELS QUE TÉ PERMÍS
-				for (var servei: auxSet) {
-					setServeis.add(CodiValorOrganGestorComuDto.builder()
-							.id(servei.getId())
-							.codi(servei.getCodi())
-							.valor(servei.getCodi() + ((servei.getNom() != null && !servei.getNom().isEmpty()) ? " - " + servei.getNom() : ""))
-							.organGestor(servei.getOrganGestor() != null ? servei.getOrganGestor().getCodi() : "")
-							.comu(servei.isComu())
-							.build());
-				}
-				serveis = new ArrayList<>(setServeis);
+				serveis = recuperarServeiAmbPermis(entitat, permis, organFiltreCodi);
 			} else {
 				List<ServeiEntity> serveisEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

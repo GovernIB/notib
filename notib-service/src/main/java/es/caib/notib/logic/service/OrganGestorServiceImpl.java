@@ -1745,14 +1745,24 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (!procedimentsDisponiblesIds.isEmpty())
 			organsGestorsProcediments = organGestorRepository.findByProcedimentIds(procedimentsDisponiblesIds);
 
-		// 2-recuperam els òrgans amb permís
 		List<OrganGestorEntity> organsGestorsAmbPermis = new ArrayList<>();
 		List<String> organsCodis = new ArrayList<>();
+		// 2- Recuperam els òrgans de procediments comuns
+		List<String> procsOrgans = permisosService.getProcedimentsOrgansAmbPermis(entitat.getId(), usuari, permis);
+		for(String procOrgan: procsOrgans) {
+			if (!Strings.isNullOrEmpty(procOrgan)) {
+				String[] splProcOrgan = procOrgan.split("-");
+				if (splProcOrgan.length > 1)
+					organsCodis.add(procOrgan.split("-")[1]);
+			}
+		}
+
+		// 3-Recuperam els òrgans amb permís
 		var organsAmbPermisDirecte = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, permis);
 		for (var org : organsAmbPermisDirecte) {
 			organsCodis.add(org.getCodi());
 		}
-		// Els òrgans ammb permís comú també es poden consultar
+		// 4- Els òrgans ammb permís comú també es poden consultar
 		var organsAmbPermisComuns = permisosService.getOrgansAmbPermis(entitat.getId(), usuari, PermisEnum.COMUNS);
 		for (var org : organsAmbPermisComuns) {
 			organsCodis.add(org.getCodi());
@@ -1760,7 +1770,7 @@ public class OrganGestorServiceImpl implements OrganGestorService{
 		if (!organsCodis.isEmpty())
 			organsGestorsAmbPermis = organGestorRepository.findByEntitatCodiAndCodiIn(entitat.getCodi(), organsCodis);
 
-		// 3-juntam tots els òrgans i ordenam per nom
+		// 3- Juntam tots els òrgans i ordenam per nom
 		List<OrganGestorEntity> organsGestors;
 		Set<OrganGestorEntity> setOrgansGestors = new HashSet<>(organsGestorsProcediments);
 		setOrgansGestors.addAll(organsGestorsAmbPermis);

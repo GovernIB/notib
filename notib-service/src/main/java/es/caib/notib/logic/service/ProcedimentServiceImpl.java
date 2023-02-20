@@ -852,19 +852,7 @@ public class ProcedimentServiceImpl implements ProcedimentService{
 			}
 
 			if (RolEnumDto.tothom.equals(rol)) {
-				Set<CodiValorOrganGestorComuDto> setProcediments = new HashSet<>(recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi));
-				var auxSet = procedimentRepository.findByEntitatAndComuTrueAndRequireDirectPermissionIsFalse(entitat);
-				//TODO PREGUNTAR SI HAN DE SORTIR TOTS ELS COMUNS O NOMÉS ELS QUE TÉ PERMÍS
-				for (var procediment: auxSet) {
-					setProcediments.add(CodiValorOrganGestorComuDto.builder()
-							.id(procediment.getId())
-							.codi(procediment.getCodi())
-							.valor(procediment.getCodi() + ((procediment.getNom() != null && !procediment.getNom().isEmpty()) ? " - " + procediment.getNom() : ""))
-							.organGestor(procediment.getOrganGestor() != null ? procediment.getOrganGestor().getCodi() : "")
-							.comu(procediment.isComu())
-							.build());
-				}
-				procediments = new ArrayList<>(setProcediments);
+				procediments = recuperarProcedimentAmbPermis(entitat, permis, organFiltreCodi);
 			} else {
 				List<ProcedimentEntity> procedimentsEntitat = new ArrayList<>();
 				if (organFiltreCodi != null) {

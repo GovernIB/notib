@@ -47,7 +47,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -58,11 +58,11 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"order by pro.nom asc")
 	public Long countProcedimentsByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
-	@Query(	"select po.procSer " +
+	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
@@ -72,7 +72,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcSerEntity> findProcedimentsByEntitatAndGrupAndIds(
+	public List<ProcSerOrganEntity> findProcedimentsByEntitatAndGrupAndIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
@@ -104,7 +104,7 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.actiu = true " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -115,13 +115,13 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"order by pro.nom asc")
 	public Long countProcedimentsActiusByEntitatAndGrupAndIds(@Param("entitat") EntitatEntity entitat, @Param("grups") List<String> grups, @Param("ids") List<Long> ids);
 
-	@Query(	"select po.procSer " +
+	@Query(	"select po " +
 			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.actiu = true " +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
@@ -130,19 +130,20 @@ public interface ProcSerOrganRepository extends JpaRepository<ProcSerOrganEntity
 			"		where g.entitat = :entitat " +
 			"		  and g.codi in (:grups))) ) " +
 			"order by pro.nom asc")
-	public List<ProcSerEntity> findProcedimentsActiusByEntitatAndGrupAndIds(
+	public List<ProcSerOrganEntity> findProcedimentsActiusByEntitatAndGrupAndIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("grups") List<String> grups,
 			@Param("ids") List<Long> ids,
 			@Param("isTipusNull") boolean isTipusNull,
 			@Param("tipus") ProcSerTipusEnum tipus);
 
-	@Query(	"from ProcSerOrganEntity po " +
+	@Query(	"select po " +
+			"from ProcSerOrganEntity po " +
 			"left outer join po.procSer pro " +
 			"where pro.entitat = :entitat " +
 			"  and pro.actiu = true " +
 			"  and (:isTipusNull = true or pro.tipus = :tipus) " +
-			"  and pro.id in (:ids)" +
+			"  and po.id in (:ids)" +
 			"  and (pro.agrupar = false " +
 			"  	or (pro.agrupar = true " +
 			"  and pro in (select distinct gp.procSer " +
