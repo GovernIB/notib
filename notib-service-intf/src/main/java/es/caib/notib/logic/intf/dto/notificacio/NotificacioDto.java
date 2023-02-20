@@ -6,8 +6,10 @@ package es.caib.notib.logic.intf.dto.notificacio;
 import es.caib.notib.logic.intf.dto.*;
 import es.caib.notib.logic.intf.dto.notenviament.EnviamentDto;
 import es.caib.notib.logic.intf.dto.procediment.ProcSerDto;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -21,6 +23,8 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class NotificacioDto extends AuditoriaDto {
