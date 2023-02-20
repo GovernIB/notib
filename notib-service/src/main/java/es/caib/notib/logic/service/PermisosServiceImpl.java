@@ -375,7 +375,7 @@ public class PermisosServiceImpl implements PermisosService {
     // PERMIS COMUNICACIONS SENSE PROCEDIMENTS
     private Boolean hasPermisComunicacionsSenseProcediment(EntitatEntity entitat, List<String> grups) {
 
-        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(ProcSerOrganEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
+        var organsAmbPermisIds = permisosHelper.getObjectsIdsWithPermission(OrganGestorEntity.class, new Permission[]{ExtendedPermission.COMUNICACIO_SENSE_PROCEDIMENT});
         return hasElementsGivenIds(organsAmbPermisIds, new OrgansPermisSenseProcedimentCountCommand(), entitat, grups);
     }
     public class OrgansPermisSenseProcedimentCountCommand implements Command<Long, Long> {
