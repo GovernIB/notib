@@ -29,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 /**
  * Controlador per el mantinement d'enviaments.
@@ -150,12 +153,33 @@ public class EnviamentController extends TableAccionsMassivesController {
 
 	private NotificacioEnviamentFiltreCommand getFiltreCommand(HttpServletRequest request) {
 
-		var filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
+		NotificacioEnviamentFiltreCommand filtreCommand = (NotificacioEnviamentFiltreCommand) RequestSessionHelper.obtenirObjecteSessio(request, ENVIAMENTS_FILTRE);
 		if (filtreCommand != null) {
+			setDefaultFiltreData(filtreCommand);
 			return filtreCommand;
 		}
 		filtreCommand = new NotificacioEnviamentFiltreCommand();
+		setDefaultFiltreData(filtreCommand);
 		RequestSessionHelper.actualitzarObjecteSessio(request, ENVIAMENTS_FILTRE, filtreCommand);
 		return filtreCommand;
+
+		/*Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
+		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));*/
+	}
+
+	private  void setDefaultFiltreData(NotificacioEnviamentFiltreCommand command) {
+
+		var df = new SimpleDateFormat("dd/MM/yyyy");
+		var avui = new Date();
+		if (command.getDataEnviamentFi() == null) {
+			command.setDataEnviamentFi(df.format(avui));
+		}
+		if (command.getDataEnviamentInici() == null) {
+			var c = Calendar.getInstance();
+			c.setTime(avui);
+			c.add(Calendar.MONTH, -3);
+			var inici = c.getTime();
+			command.setDataEnviamentInici(df.format(inici));
+		}
 	}
 }
