@@ -632,15 +632,10 @@ public class EnviamentServiceImpl implements EnviamentService {
 				}
 				logger.info(String.format("Consulta enviaments: %f ms", (System.nanoTime() - ti) / 1e6));
 			}
-			Long later = System.currentTimeMillis() - now;
 			if(pageEnviaments == null || !pageEnviaments.hasContent()) {
 				pageEnviaments = new PageImpl<>(new ArrayList<EnviamentTableEntity>());
 			}
-			now = System.currentTimeMillis();
 			PaginaDto<NotEnviamentTableItemDto> paginaDto = paginacioHelper.toPaginaDto(pageEnviaments, NotEnviamentTableItemDto.class);
-			later = System.currentTimeMillis() - now;
-			now = System.currentTimeMillis();
-			later = System.currentTimeMillis() - now;
 			return paginaDto;
 		} finally {
 			metricsHelper.fiMetrica(timer);

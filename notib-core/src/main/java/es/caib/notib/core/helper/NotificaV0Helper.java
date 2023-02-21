@@ -85,7 +85,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 				Map<NotificacioEnviamentEntity, String> identificadorsEnviaments = new HashMap<>();
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
-						if (enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						if (enviament.getTitular() != null && enviament.getTitular().getNif().equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
 							identificadorsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
 						}
 					}
