@@ -1,9 +1,7 @@
 package es.caib.notib.core.helper;
 
-import com.google.common.base.Strings;
 import es.caib.notib.client.domini.InteressatTipusEnumDto;
 import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
-import es.caib.notib.core.api.dto.notenviament.EnviamentDto;
 import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.entity.NotificacioEntity;
@@ -116,9 +114,9 @@ public class NotificacioTableHelper {
             }
 
             if (not.getEstat() != null) {
-                item.setEstat(not.getEstat());
                 // Estat de la notificacio
                 item.setEstatMask(item.getEstatMask() - item.getEstat().getMask() + not.getEstat().getMask());
+                item.setEstat(not.getEstat());
             }
             notificacioTableViewRepository.saveAndFlush(item);
         } catch (Exception ex) {

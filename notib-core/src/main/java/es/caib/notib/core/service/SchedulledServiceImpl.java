@@ -12,11 +12,9 @@ import es.caib.notib.core.api.service.ServeiService;
 import es.caib.notib.core.clases.RegistrarThread;
 import es.caib.notib.core.config.SchedulingConfig;
 import es.caib.notib.core.entity.EntitatEntity;
-import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.OrganGestorEntity;
 import es.caib.notib.core.helper.ConfigHelper;
 import es.caib.notib.core.helper.ConversioTipusHelper;
-import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.helper.EnviamentHelper;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MetricsHelper;
@@ -25,11 +23,11 @@ import es.caib.notib.core.helper.NotificacioHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.PluginHelper;
 import es.caib.notib.core.helper.PropertiesConstants;
+import es.caib.notib.core.helper.SemaforNotificacio;
 import es.caib.notib.core.repository.EntitatRepository;
 import es.caib.notib.core.repository.EnviamentTableRepository;
 import es.caib.notib.core.repository.NotificacioTableViewRepository;
 import es.caib.notib.core.repository.OrganGestorRepository;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -53,13 +50,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 
@@ -105,8 +96,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private EntityManager entityManager;
 
 	@Override
 	public void restartSchedulledTasks() {
@@ -140,8 +129,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 				} else {
 					logger.info("[REG] >>> Realitzant registre de la notificació id: " + pendent);
 					notificacioHelper.registrarNotificar(pendent);
-					entityManager.flush();
-					entityManager.clear();
 				}
 			}
 //			Set<Long> keys = futurs.keySet();
