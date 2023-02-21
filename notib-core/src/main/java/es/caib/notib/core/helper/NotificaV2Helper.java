@@ -302,8 +302,8 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		Date dataUltimaCertificacio = enviament.getNotificaCertificacioData();
 		Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
 		Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
-		if (dataCertificacio.equals(dataUltimaCertificacio)) {
-			logger.info(" [EST] El certificat de l'enviament ja esteia actualitzat");
+		if (dataCertificacio.equals(dataUltimaCertificacio) && enviament.getNotificaCertificacioArxiuId() != null) {
+			logger.info(" [EST] El certificat de l'enviament ja estava actualitzat");
 			return;
 		}
 		byte[] decodificat = certificacio.getContenidoCertificacion();

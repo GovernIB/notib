@@ -9,13 +9,30 @@ import es.caib.notib.client.domini.consulta.GenericInfo;
 import es.caib.notib.client.domini.consulta.PersonaConsultaV2;
 import es.caib.notib.client.domini.consulta.RespostaConsultaV2;
 import es.caib.notib.client.domini.consulta.TransmissioV2;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.ApiConsulta;
+import es.caib.notib.core.api.dto.CallbackEstatEnumDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaEnviamentTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDtoV2;
+import es.caib.notib.core.api.dto.NotificacioEnviamentFiltreDto;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioRegistreEstatEnumDto;
+import es.caib.notib.core.api.dto.NotificacioTipusEnviamentEnumDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PaginacioParamsDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.PersonaDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
+import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
 import es.caib.notib.core.api.dto.notenviament.ColumnesDto;
 import es.caib.notib.core.api.dto.notenviament.NotEnviamentTableItemDto;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
-import es.caib.notib.core.api.dto.organisme.OrganGestorEstatEnum;
 import es.caib.notib.core.api.exception.NotFoundException;
 import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.rest.consulta.Estat;
@@ -49,6 +66,7 @@ import es.caib.notib.core.helper.FiltreHelper.StringField;
 import es.caib.notib.core.helper.IntegracioHelper;
 import es.caib.notib.core.helper.MessageHelper;
 import es.caib.notib.core.helper.MetricsHelper;
+import es.caib.notib.core.helper.NotificaHelper;
 import es.caib.notib.core.helper.NotificacioEventHelper;
 import es.caib.notib.core.helper.OrganGestorHelper;
 import es.caib.notib.core.helper.OrganigramaHelper;
@@ -157,6 +175,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 	private AplicacioRepository aplicacioRepository;
 	@Autowired
 	private AuditNotificacioHelper auditNotificacioHelper;
+	@Autowired
+	private NotificaHelper notificaHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
@@ -362,6 +382,16 @@ public class EnviamentServiceImpl implements EnviamentService {
 		try {
 			logger.debug("Consulta de destinatari donat el seu id (destinatariId=" + enviamentId + ")");
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findById(enviamentId);
+			// #779: Obtenim la certificació de forma automàtica
+			if (enviament.getNotificaCertificacioArxiuId() == null &&
+					( EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) ||
+					EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
+				try {
+					enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+				} catch (Exception ex) {
+					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
+				}
+			}
 			//NotificacioEntity notificacio = notificacioRepository.findOne( destinatari.getNotificacio().getId() );
 			entityComprovarHelper.comprovarPermisos(null, false, false, false);
 			return enviamentToDto(enviament);

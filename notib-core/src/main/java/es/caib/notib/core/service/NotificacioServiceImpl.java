@@ -31,11 +31,32 @@ import es.caib.notib.core.api.exception.ValidationException;
 import es.caib.notib.core.api.service.AplicacioService;
 import es.caib.notib.core.api.service.NotificacioService;
 import es.caib.notib.core.api.service.PermisosService;
-import es.caib.notib.core.entity.*;
+import es.caib.notib.core.entity.DocumentEntity;
+import es.caib.notib.core.entity.EntitatEntity;
+import es.caib.notib.core.entity.NotificacioEntity;
+import es.caib.notib.core.entity.NotificacioEnviamentEntity;
+import es.caib.notib.core.entity.NotificacioEventEntity;
+import es.caib.notib.core.entity.NotificacioTableEntity;
+import es.caib.notib.core.entity.PersonaEntity;
+import es.caib.notib.core.entity.ProcSerEntity;
+import es.caib.notib.core.entity.ProcSerOrganEntity;
+import es.caib.notib.core.entity.ProcedimentEntity;
+import es.caib.notib.core.entity.UsuariEntity;
 import es.caib.notib.core.entity.auditoria.NotificacioAudit;
 import es.caib.notib.core.entity.cie.EntregaCieEntity;
 import es.caib.notib.core.helper.*;
-import es.caib.notib.core.repository.*;
+import es.caib.notib.core.repository.ColumnesRepository;
+import es.caib.notib.core.repository.DocumentRepository;
+import es.caib.notib.core.repository.EntitatRepository;
+import es.caib.notib.core.repository.EnviamentTableRepository;
+import es.caib.notib.core.repository.NotificacioEnviamentRepository;
+import es.caib.notib.core.repository.NotificacioEventRepository;
+import es.caib.notib.core.repository.NotificacioRepository;
+import es.caib.notib.core.repository.NotificacioTableViewRepository;
+import es.caib.notib.core.repository.PersonaRepository;
+import es.caib.notib.core.repository.ProcSerOrganRepository;
+import es.caib.notib.core.repository.ProcedimentRepository;
+import es.caib.notib.core.repository.ProcessosInicialsRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioAuditRepository;
 import es.caib.notib.core.repository.auditoria.NotificacioEnviamentAuditRepository;
 import es.caib.notib.plugin.unitat.CodiValor;
@@ -1074,6 +1095,13 @@ public class NotificacioServiceImpl implements NotificacioService {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
 			NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
+			// #779: Obtenim la certificació de forma automàtica
+			if (enviament.getNotificaCertificacioArxiuId() == null) {
+				enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+			}
+			if (enviament.getNotificaCertificacioArxiuId() == null) {
+				throw new RuntimeException("No s'ha trobat la certificació de l'enviament amb id: " + enviamentId);
+			}
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
 			pluginHelper.gestioDocumentalGet(enviament.getNotificaCertificacioArxiuId(), PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, output);
 			return new ArxiuDto(calcularNomArxiuCertificacio(enviament), enviament.getNotificaCertificacioMime(), output.toByteArray(), output.size());
