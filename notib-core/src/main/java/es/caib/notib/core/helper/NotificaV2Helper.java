@@ -129,8 +129,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				for (ResultadoEnvio resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (NotificacioEnviamentEntity enviament: notificacio.getEnviamentsPerNotifica()) {
 						String nif = enviament.getTitular().getNif();
-						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !identificadorsResultatsEnviaments.containsKey(enviament)) {
 							identificadorsResultatsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
+							break;
 						}
 					}
 				}
@@ -176,7 +177,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		return enviament;
 	}
 
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
 		NotificacioEnviamentEntity enviament = notificacioEnviamentRepository.findOne(enviamentId);
 		return enviamentRefrescarEstat(enviament, raiseExceptions);

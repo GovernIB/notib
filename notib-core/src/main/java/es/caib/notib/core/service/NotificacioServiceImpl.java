@@ -1678,8 +1678,9 @@ public class NotificacioServiceImpl implements NotificacioService {
 		return configHelper.getAsInt("es.caib.notib.document.consulta.id.csv.mida.min");
 	}
 	
-	
-	private void estatCalcularCampsAddicionals(
+
+	@Transactional
+	public void estatCalcularCampsAddicionals(
 			NotificacioEnviamentEntity enviament,
 			NotificacioEnviamenEstatDto estatDto) {
 		if (enviament.isNotificaError()) {

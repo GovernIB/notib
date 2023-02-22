@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 import javax.xml.ws.Holder;
 
 @Service
-public class AdviserServiceImpl implements AdviserService {
+public class
+AdviserServiceImpl implements AdviserService {
 
     @Autowired
     private AdviserWsV2PortType adviser;
