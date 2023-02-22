@@ -1,16 +1,13 @@
 package es.caib.notib.core.helper;
 
-import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDatabaseDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotTableUpdate;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.service.AuditService.TipusEntitat;
 import es.caib.notib.core.api.service.AuditService.TipusOperacio;
 import es.caib.notib.core.aspect.Audita;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioTableEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.plugin.registre.RespostaConsultaRegistre;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +138,10 @@ public class AuditNotificacioHelper {
 		for (NotificacioEnviamentEntity env: notificacio.getEnviaments()) {
 			enviamentTableHelper.actualitzarRegistre(env);
 		}
-		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build();
+		NotTableUpdate not = NotTableUpdate.builder()
+				.id(notificacio.getId())
+				.estat(notificacio.getEstat())
+				.reintentsRegistre(notificacio.getRegistreEnviamentIntent()).build();
 		notificacioTableHelper.actualitzar(not);
 		return notificacio;
 	}
