@@ -2,7 +2,12 @@
 package es.caib.notib.core.helper;
 
 import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.AccioParam;
+import es.caib.notib.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.notib.core.api.dto.IntegracioInfo;
+import es.caib.notib.core.api.dto.NotificaRespostaDatatDto;
+import es.caib.notib.core.api.dto.NotificacioErrorTipusEnumDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.api.exception.ValidationException;
@@ -12,14 +17,18 @@ import es.caib.notib.core.aspect.UpdateEnviamentTable;
 import es.caib.notib.core.aspect.UpdateNotificacioTable;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
-import es.caib.notib.core.entity.NotificacioEventEntity;
 import es.caib.notib.core.repository.NotificacioEnviamentRepository;
 import es.caib.notib.core.repository.NotificacioEventRepository;
 import es.caib.notib.core.repository.NotificacioRepository;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoAltaRemesaEnvios;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvio;
 import es.caib.notib.core.wsdl.notificaV2.altaremesaenvios.ResultadoEnvios;
-import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.*;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Certificacion;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.CodigoDIR;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datado;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.Datados;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.InfoEnvioV2;
+import es.caib.notib.core.wsdl.notificaV2.infoEnvioV2.ResultadoInfoEnvioV2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -32,7 +41,11 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper MOCK de prova.
@@ -91,6 +104,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 					}
 				}
 				notificacioEventHelper.addEnviamentNotificaOKEvent(notificacio, identificadorsEnviaments);
+				integracioHelper.addAccioOk(info);
 			} else {
 				log.info(" >>> ... ERROR:");
 				//Crea un nou event
@@ -209,7 +223,7 @@ public class NotificaV0Helper extends AbstractNotificaHelper {
 			if (resultadoInfoEnvio.getCertificacion() != null) {
 				log.info("Actualitzant informació enviament amb certificació...");
 				Certificacion certificacio = resultadoInfoEnvio.getCertificacion();
-
+				configHelper.setEntitatCodi(enviament.getNotificacio().getEntitat().getCodi());
 				Date dataCertificacio = toDate(certificacio.getFechaCertificacion());
 				if (!dataCertificacio.equals(dataUltimaCertificacio)) {
 					byte[] decodificat = certificacio.getContenidoCertificacion();

@@ -376,7 +376,7 @@ public class EnviamentServiceImpl implements EnviamentService {
 	}
 	
 	@Override
-	@Transactional(readOnly = true)
+	@Transactional
 	public NotificacioEnviamentDto enviamentFindAmbId(Long enviamentId) {
 		Timer.Context timer = metricsHelper.iniciMetrica();
 		try {
@@ -387,7 +387,8 @@ public class EnviamentServiceImpl implements EnviamentService {
 					( EnviamentEstat.REBUTJADA.equals(enviament.getNotificaEstat()) ||
 					EnviamentEstat.NOTIFICADA.equals(enviament.getNotificaEstat()) )) {
 				try {
-					enviament = notificaHelper.enviamentRefrescarEstat(enviamentId);
+					notificaHelper.enviamentRefrescarEstat(enviamentId);
+					enviament = notificacioEnviamentRepository.findById(enviamentId);
 				} catch (Exception ex) {
 					log.error("No s'ha pogut actualitzar la certificació de l'enviament amb id: " + enviamentId, ex);
 				}

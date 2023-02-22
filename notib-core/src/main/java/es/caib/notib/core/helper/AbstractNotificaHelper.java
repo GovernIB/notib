@@ -6,6 +6,7 @@ package es.caib.notib.core.helper;
 import es.caib.notib.client.domini.EnviamentEstat;
 import es.caib.notib.core.api.dto.NotificaDomiciliViaTipusEnumDto;
 import es.caib.notib.core.api.dto.TipusUsuariEnumDto;
+import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
@@ -113,7 +114,8 @@ public abstract class AbstractNotificaHelper {
 			}
 		}
 		logger.info("Estat final: " + estatsEnviamentsFinals);
-		if (estatsEnviamentsNotificaFinals) {
+		NotificacioEstatEnumDto notificacioEstat = enviament.getNotificacio().getEstat();
+		if (estatsEnviamentsNotificaFinals && !NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
 			if (estatsEnviamentsFinals) {
 				auditNotificacioHelper.updateEstatAFinalitzada(notificaEstat.name(), enviament.getNotificacio());
 			} else {
