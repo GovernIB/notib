@@ -532,10 +532,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
         monitorTasquesService.addTasca(monitorIntegracionsEliminarAntics);
 
 
-        // 12. Consulta de canvis en l'organigrama
+        // 14. Actualitzar estat organs enviament table
         /////////////////////////////////////////////////////////////////////////
         final String actualitzarEstatOrgansEnviamentTable = "actualitzarEstatOrgansEnviamentTable";
-        monitorTasquesService.addTasca(consultaCanvisOrganigrama);
+        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
