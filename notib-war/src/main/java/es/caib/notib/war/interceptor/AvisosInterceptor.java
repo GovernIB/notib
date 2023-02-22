@@ -28,7 +28,7 @@ public class AvisosInterceptor extends HandlerInterceptorAdapter {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			Object handler) throws Exception {
-		log.info("[AVISOS] Executant interceptor");
+		log.debug("[AVISOS] Executant interceptor - " + request.getRequestURI());
 		List<String> rols = RolHelper.getRolsUsuariActual(request);
 		// Si es un usuari que no només té accés d'aplicació
 		if (rols.contains(RolHelper.ROLE_USUARI) ||

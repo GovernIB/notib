@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestsHelper {
 
-    private static Integer CONNECT_TIMEOUT = 10000;
-    private static Integer READ_TIMEOUT = 30000;
+    private static Integer CONNECT_TIMEOUT = 5000;
+    private static Integer READ_TIMEOUT = 20000;
 
     public ClientResponse callbackAplicacioNotificaCanvi(String urlCallback, NotificacioCanviClient contingut)
             throws JsonProcessingException {

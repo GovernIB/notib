@@ -271,6 +271,7 @@
 			<mvc:exclude-mapping path="/api/services/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<mvc:exclude-mapping path="/notificacio/refrescarEstatNotifica/estat"/>
+			<mvc:exclude-mapping path="/**/monitor/tasques"/>
 			<bean class="es.caib.notib.war.interceptor.AvisosInterceptor"/>
 		</mvc:interceptor>
 	</mvc:interceptors>
