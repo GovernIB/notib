@@ -119,6 +119,24 @@ public class NotificacioTableHelper {
             if (not.getEstat() != null) {
                 // Estat de la notificacio
                 item.setEstatMask(item.getEstatMask() - item.getEstat().getMask() + not.getEstat().getMask());
+                if (NotificacioEstatEnumDto.PENDENT.equals(item.getEstat()) && item.getRegistreEnviamentIntent() > 0) {
+                    item.setEstatMask(NotificacioEstatEnumDto.PENDENT.getMask());
+                }
+                // Estats dels enviaments
+                if (NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) ||
+                        NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(not.getEstat()) ||
+                        NotificacioEstatEnumDto.PROCESSADA.equals(not.getEstat())) {
+                    Integer estatMask = item.getEstatMask();
+                    for (NotificacioEnviamentEntity enviament : item.getEnviaments()) {
+                        if (EnumUtils.isValidEnum(NotificacioEstatEnumDto.class, enviament.getNotificaEstat().name())) {
+                            NotificacioEstatEnumDto eventEstat = NotificacioEstatEnumDto.valueOf(enviament.getNotificaEstat().name());
+                            if ((estatMask & eventEstat.getMask()) == 0) {
+                                estatMask += eventEstat.getMask();
+                            }
+                        }
+                    }
+                    item.setEstatMask(estatMask);
+                }
                 item.setEstat(not.getEstat());
             }
             notificacioTableViewRepository.saveAndFlush(item);

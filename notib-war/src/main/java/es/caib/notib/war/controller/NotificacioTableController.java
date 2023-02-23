@@ -1,11 +1,24 @@
 package es.caib.notib.war.controller;
 
 import com.google.common.base.Strings;
-import es.caib.notib.client.domini.EnviamentEstat;
-import es.caib.notib.core.api.dto.*;
+import es.caib.notib.core.api.dto.ArxiuDto;
+import es.caib.notib.core.api.dto.CodiValorOrganGestorComuDto;
+import es.caib.notib.core.api.dto.EntitatDto;
+import es.caib.notib.core.api.dto.FitxerDto;
+import es.caib.notib.core.api.dto.GrupDto;
+import es.caib.notib.core.api.dto.NotificacioAuditDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamenEstatDto;
+import es.caib.notib.core.api.dto.NotificacioEnviamentDto;
+import es.caib.notib.core.api.dto.NotificacioEventDto;
+import es.caib.notib.core.api.dto.NotificacioEventTipusEnumDto;
+import es.caib.notib.core.api.dto.PaginaDto;
+import es.caib.notib.core.api.dto.PermisEnum;
+import es.caib.notib.core.api.dto.ProgresActualitzacioCertificacioDto;
+import es.caib.notib.core.api.dto.ProgresDescarregaDto;
+import es.caib.notib.core.api.dto.RegistreIdDto;
+import es.caib.notib.core.api.dto.RolEnumDto;
 import es.caib.notib.core.api.dto.missatges.Missatge;
 import es.caib.notib.core.api.dto.notenviament.NotificacioEnviamentDatatableDto;
-import es.caib.notib.core.api.dto.notificacio.NotificacioEstatEnumDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioFiltreDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioInfoDto;
 import es.caib.notib.core.api.dto.notificacio.NotificacioTableItemDto;
@@ -36,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomBooleanEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -364,7 +376,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             return "notificacioInfo";
         }
         for (RegistreIdDto registreIdDto : registresIdDto) {
-            if (registreIdDto.getNumero() != null) {
+            if (registreIdDto.getNumero() != null || registreIdDto.getNumeroRegistreFormat() != null) {
                 MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(request,"notificacio.controller.registrar.ok"));
                 continue;
             }
