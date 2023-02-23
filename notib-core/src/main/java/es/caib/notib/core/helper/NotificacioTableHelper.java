@@ -123,7 +123,9 @@ public class NotificacioTableHelper {
                     item.setEstatMask(NotificacioEstatEnumDto.PENDENT.getMask());
                 }
                 // Estats dels enviaments
-                if (NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) ||
+                if (NotificacioEstatEnumDto.ENVIADA.equals(not.getEstat()) ||
+                        NotificacioEstatEnumDto.ENVIADA_AMB_ERRORS.equals(not.getEstat()) ||
+                        NotificacioEstatEnumDto.FINALITZADA.equals(not.getEstat()) ||
                         NotificacioEstatEnumDto.FINALITZADA_AMB_ERRORS.equals(not.getEstat()) ||
                         NotificacioEstatEnumDto.PROCESSADA.equals(not.getEstat())) {
                     Integer estatMask = item.getEstatMask();
