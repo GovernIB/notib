@@ -11,7 +11,6 @@ import es.caib.notib.core.api.exception.SistemaExternException;
 import es.caib.notib.core.entity.NotificacioEntity;
 import es.caib.notib.core.entity.NotificacioEnviamentEntity;
 import es.caib.notib.core.repository.NotificacioRepository;
-
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +24,21 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import javax.xml.soap.*;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
+import javax.xml.soap.SOAPHeader;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Mètodes comuns per a accedir a Notific@.
@@ -49,7 +56,7 @@ public abstract class AbstractNotificaHelper {
 	protected NotificacioRepository notificacioRepository;
 	@Autowired 
 	private EmailNotificacioHelper emailNotificacioHelper;
-	
+
 	private boolean modeTest;
 	
 	public abstract NotificacioEntity notificacioEnviar(Long notificacioId, boolean ambEnviamentPerEmail);
@@ -143,6 +150,9 @@ public abstract class AbstractNotificaHelper {
 //				enviament.getNotificacio().updateMotiu(notificaEstat.name());
 //				enviament.getNotificacio().updateEstatDate(new Date());
 //			}
+		} else {
+			// Actualitzar màscara d'estats
+			auditNotificacioHelper.updateMascaraEstats(enviament.getNotificacio());
 		}
 		return enviament;
 	}
