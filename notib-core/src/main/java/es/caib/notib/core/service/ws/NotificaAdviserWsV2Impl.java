@@ -299,10 +299,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 		}
 
 		if (enviament != null && !createEvent && !tipoEntrega.equals(BigInteger.valueOf(3L))) {
-			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null");
+			String msg = "L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null";
+			logger.debug(msg);
 			createEvent = true;
 			eventInitialitzaCallback = true;
-			eventErrorDescripcio = "Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value;
+			eventErrorDescripcio = "Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ?  "[" + codigoRespuesta.value + "] " : "")
+					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
 		}
 
 		logger.debug("Peticició processada correctament.");
@@ -454,13 +456,12 @@ public class NotificaAdviserWsV2Impl implements AdviserWsV2PortType {
 			descripcionRespuesta.value = "Error procesando peticion";
 		}
 		if (eventCert == null) {
-			logger.debug("L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).");
-			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament,
-					NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO,
-					null,
-					"Error retornat cap a Notifica: [" + codigoRespuesta.value + "] " + descripcionRespuesta.value,
-					true
-			);
+			String msg = "L'event de l'enviament identificador " + enviament.getNotificaIdentificador() + " és null (certificació).";
+			logger.debug(msg);
+			String error = "Error retornat cap a Notifica: " + (!Strings.isNullOrEmpty(codigoRespuesta.value) ?  "[" + codigoRespuesta.value + "] " : "")
+					+ (!Strings.isNullOrEmpty(descripcionRespuesta.value) ? descripcionRespuesta.value : msg);
+			NotificacioEventTipusEnumDto eventTipus = NotificacioEventTipusEnumDto.NOTIFICA_CALLBACK_CERTIFICACIO;
+			notificacioEventHelper.addNotificaCallbackEvent(enviament.getNotificacio(), enviament, eventTipus, null, error, true);
 		}
 
 		logger.debug("Sortint de la certificació...");
