@@ -459,14 +459,18 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
-			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
-			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
-			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
-
 			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
 			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
+
+			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
+			NotificacioTableEntity notificacioTableEntity = notificacioTableViewRepository.findOne(id);
+			if (notificacioTableEntity == null) {
+				return dto;
+			}
+			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
+			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
 
 			return dto;
 		} finally {
@@ -590,7 +594,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 				NotificacioListHelper.NotificacioFiltre filtreNetejat = notificacioListHelper.getFiltre(filtre);
 
 				if (isUsuari) {
-					long start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findAmbFiltreAndProcedimentCodiNotibAndGrupsCodiNotib(
 							entitatActual,
 							filtreNetejat.getEntitatId().isNull(),
@@ -634,8 +637,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							filtreNetejat.getReferencia().isNull(),
 							filtreNetejat.getReferencia().getField(),
 							pageable);
-						long elapsedTime = System.nanoTime() - start;
-						log.info(">>>>>>>>>>>>> Notificacions amb filtre: "  + elapsedTime);
 				} else if (isUsuariEntitat || isSuperAdmin) {
 					Long entitatFiltre;
 					if (isUsuariEntitat){
