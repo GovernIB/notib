@@ -102,6 +102,8 @@ public abstract class AbstractNotificaHelper {
 		log.info("Estat final: " + estatsEnviamentsFinals);
 		var notificacioEstat = enviament.getNotificacio().getEstat();
 		if (!estatsEnviamentsNotificaFinals || NotificacioEstatEnumDto.PROCESSADA.equals(notificacioEstat)) {
+			// Actualitzar màscara d'estats
+			auditNotificacioHelper.updateMascaraEstats(enviament.getNotificacio());
 			return enviament;
 		}
 		if (estatsEnviamentsFinals) {

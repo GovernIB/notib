@@ -87,6 +87,10 @@ public class AuditNotificacioHelper {
 		return notificacio;
 	}
 
+	public void updateMascaraEstats(NotificacioEntity notificacio) {
+		NotTableUpdate not = NotTableUpdate.builder().id(notificacio.getId()).estat(notificacio.getEstat()).build();
+		notificacioTableHelper.actualitzar(not);
+	}
 
 	@Audita(entityType = TipusEntitat.NOTIFICACIO, operationType = TipusOperacio.UPDATE)
 	public NotificacioEntity updateEstatAFinalitzada(String notificaEstatNom, NotificacioEntity notificacio) {
