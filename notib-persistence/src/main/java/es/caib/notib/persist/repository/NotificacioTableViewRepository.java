@@ -360,10 +360,10 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 //			"    or lower(env.titular.nif) like concat('%', lower(:titular), '%') " +
 //			"    ) > 0) " +
 			"and (:isTipusUsuariNull = true or ntf.tipusUsuari = :tipusUsuari) " +
-			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
-			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
-			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
-			") " +
+//			"and (:isHasZeronotificaEnviamentIntentNull = true or " +
+//			"	(:hasZeronotificaEnviamentIntent = true and ntf.registreEnviamentIntent = 0) or " +
+//			"	(:hasZeronotificaEnviamentIntent = false and ntf.registreEnviamentIntent > 0) " +
+//			") " +
 			"and (:isNumExpedientNull = true or lower(ntf.numExpedient) like concat('%', lower(:numExpedient), '%')) " +
 			"and (:isCreadaPerNull = true or ntf.createdBy.codi = :creadaPer) " +
 			"and (:isIdentificadorNull = true or " +
@@ -403,8 +403,8 @@ public interface NotificacioTableViewRepository extends JpaRepository<Notificaci
 			@Param("identificador") String identificador,
 			@Param("nomesAmbErrors") boolean nomesAmbErrors,
 			@Param("nomesSenseErrors") boolean nomesSenseErrors,
-			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
-			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
+//			@Param("isHasZeronotificaEnviamentIntentNull") boolean isHasZeronotificaEnviamentIntentNull,
+//			@Param("hasZeronotificaEnviamentIntent") Boolean hasZeronotificaEnviamentIntent,
 			Pageable paginacio);
 
 	@Modifying

@@ -329,8 +329,8 @@ public class NotificacioMassivaServiceImpl implements NotificacioMassivaService 
                 filtreNetejat.getIdentificador().getField(),
                 filtreNetejat.getNomesAmbErrors().getField(),
                 filtreNetejat.getNomesSenseErrors().getField(),
-                filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
-                filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
+//                filtreNetejat.getHasZeronotificaEnviamentIntent().isNull(),
+//                filtreNetejat.getHasZeronotificaEnviamentIntent().getField(),
                 pageable);
 
         var auth = SecurityContextHolder.getContext().getAuthentication();

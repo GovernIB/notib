@@ -544,7 +544,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         // 12. Actualitzar l'estat dels òrgans a not_notificacio_env_table
         /////////////////////////////////////////////////////////////////////////
         final String actualitzarEstatOrgansEnviamentTable = "actualitzarEstatOrgansEnviamentTable";
-        monitorTasquesService.addTasca(consultaCanvisOrganigrama);
+        monitorTasquesService.addTasca(actualitzarEstatOrgansEnviamentTable);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
