@@ -40,7 +40,7 @@ public class CallbackServiceImpl implements CallbackService {
 
 
 	@Override
-	@Transactional(readOnly = true)
+//	@Transactional(readOnly = true)
 	public void processarPendents() {
 
 		var timer = metricsHelper.iniciMetrica();
@@ -51,7 +51,7 @@ public class CallbackServiceImpl implements CallbackService {
 			log.info("[Callback] Cercant notificacions pendents d'enviar al client");
 			int maxPendents = getEventsProcessarMaxProperty();
 			var page = PageRequest.of(0, maxPendents);
-			var pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendentIds(page);
+			var pendentsIds = notificacioEventRepository.findEventsAmbCallbackPendent(page);
 			if (pendentsIds.isEmpty()) {
 				log.info("[Callback] No hi ha notificacions pendents d'enviar. ");
 				return;
@@ -62,25 +62,33 @@ public class CallbackServiceImpl implements CallbackService {
 			Map<Long, Future<Boolean>> futurs = new HashMap<>();
 			CallbackProcessarPendentsThread thread;
 			Future<Boolean> futur;
+			Map<Long, Long> nots = new HashMap<>();
 			var multiThread = Boolean.parseBoolean(configHelper.getConfig(PropertiesConstants.SCHEDULLED_MULTITHREAD));
-			for (var eventId: pendentsIds) {
-				log.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + eventId);
+			Long notificacioId;
+			for (var e: pendentsIds) {
+				// TODO: Això necessita la transacció, però la transacció espatlla la resta!
+				notificacioId = notificacioEventRepository.findNotificacioIdByEventId(e.getId());
+				if (nots.get(notificacioId) != null) {
+					continue;
+				}
+				log.info("[Callback] >>> Enviant avís a aplicació client de canvi d'estat de l'event amb identificador: " + e.getId());
+				nots.put(notificacioId, e.getId());
 				try {
 					if (multiThread) {
-						thread = new CallbackProcessarPendentsThread(eventId, callbackHelper);
+						thread = new CallbackProcessarPendentsThread(e.getId(), callbackHelper);
 						futur = executorService.submit(thread);
-						futurs.put(eventId, futur);
+						futurs.put(e.getId(), futur);
 						continue;
 					}
 
-					if(!callbackHelper.notifica(eventId)) {
+					if(!callbackHelper.notifica(e.getId())) {
 						errors++;
 					}
 
-				} catch (Exception e) {
+				} catch (Exception ex) {
 					errors++;
-					log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", eventId), e);
-					callbackHelper.marcarEventNoProcessable(eventId, e.getMessage(), ExceptionUtils.getStackTrace(e));
+					log.error(String.format("[Callback] L'event [Id: %d] ha provocat la següent excepcio:", e.getId()), e);
+					callbackHelper.marcarEventNoProcessable(e.getId(), ex.getMessage(), ExceptionUtils.getStackTrace(ex));
 				}
 			}
 			var keys = futurs.keySet();

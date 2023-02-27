@@ -19,6 +19,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -66,7 +67,7 @@ public class CallbackHelper {
 		return notificacioProcessada == null || !notificacioProcessada.isErrorLastCallback();
 	}
 
-	@Transactional (rollbackFor = RuntimeException.class)
+	@Transactional (rollbackFor = RuntimeException.class, propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEntity notifica(@NonNull NotificacioEventEntity event) throws Exception{
 
 		log.trace("[Callback] Consultant aplicació de l'event. ");

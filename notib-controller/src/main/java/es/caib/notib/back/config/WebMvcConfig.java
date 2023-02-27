@@ -135,7 +135,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	private static final String[] PERMISOS_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/error", "/api/consulta/**", "/api/consulta/**" };
 	private static final String[] APLICACIO_INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/notificacio/refrescarEstatNotifica/estat" };
-	private static final String[] INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/error", "/notificacio/refrescarEstatNotifica/estat"	};
+	private static final String[] INTERCEPTOR_EXCLUSIONS = { "/js/**", "/css/**", "/fonts/**", "/img/**", "/images/**", "/extensions/**", "/webjars/**", "/**/datatable/**", "/**/selection/**", "/api/rest/**", "/api/apidoc**", "/api-docs/**", "/**/api-docs/", "/api/consulta/**", "/error", "/notificacio/refrescarEstatNotifica/estat", "/**/monitor/tasques"};
 	private static final String[] USUARI_EXCLUSIONS = { "/entitat/organigrama/**", "/entitat/getEntitatLogoCap", "/entitat/getEntitatLogoPeu" };
 
 	private static final String[] PAGADORS_PATHS = { "/cie**", "/cie/**", "/operadorPostal**", "/operadorPostal/**" };

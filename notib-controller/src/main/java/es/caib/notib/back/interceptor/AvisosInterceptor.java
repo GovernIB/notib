@@ -28,7 +28,7 @@ public class AvisosInterceptor implements AsyncHandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		log.info("[AVISOS] Executant interceptor");
+		log.debug("[AVISOS] Executant interceptor - " + request.getRequestURI());
 		var rols = RolHelper.getRolsUsuariActual(request);
 		// Si es un usuari que no només té accés d'aplicació
 		if (rols.contains(RolHelper.ROLE_USUARI) || rols.contains(RolHelper.ROLE_ADMIN_ENTITAT)

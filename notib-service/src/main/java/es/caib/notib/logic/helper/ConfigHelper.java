@@ -33,6 +33,8 @@ import static es.caib.notib.logic.config.ReadDbPropertiesPostProcessor.DBAPP_PRO
         "file://${" + ConfigService.APP_SYSTEM_PROPERTIES + "}"})
 public class ConfigHelper {
 
+    // TODO REPASSAR QUE NO FALTI CAP @Transactional(readOnly = true) EN ALGUN DELS MÈTODES PER OBTENIR PROPIETATS
+
     @Autowired
     private ConfigurableEnvironment environment;
     @Autowired
@@ -71,30 +73,37 @@ public class ConfigHelper {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).orElse(defaultValue);
     }
 
+    @Transactional(readOnly = true)
     public Long getConfigAsLong(String propietatGlobal)  {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Long::parseLong).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
 
+    @Transactional(readOnly = true)
     public Long getConfigAsLong(String propietatGlobal, Long defaultValue)  {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Long::parseLong).orElse(defaultValue);
     }
 
+    @Transactional(readOnly = true)
     public Integer getConfigAsInteger(String propietatGlobal)  {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Integer::parseInt).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
 
+    @Transactional(readOnly = true)
     public Integer getConfigAsInteger(String propietatGlobal, Integer defaultValue)  {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Integer::parseInt).orElse(defaultValue);
     }
 
+    @Transactional(readOnly = true)
     public Boolean getConfigAsBoolean(String propietatGlobal)  {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Boolean::parseBoolean).orElseThrow(() -> new NotDefinedConfigException(propietatGlobal));
     }
 
+    @Transactional(readOnly = true)
     public Boolean getConfigAsBoolean(String propietatGlobal, Boolean defaultValue)  {
         return getPropietat(getEntitatActualCodi(), propietatGlobal).map(Boolean::parseBoolean).orElse(defaultValue);
     }
 
+    @Transactional(readOnly = true)
     public String getPrefix() {
 
         var prefix = getConfig(PropertiesConstants.CODI_ENTORN);
