@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,8 @@ public class NotificacioHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private EntityManager entityManager;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public List<RegistreIdDto> registrarNotificar(Long notificacioId) throws RegistreNotificaException {
@@ -139,6 +142,8 @@ public class NotificacioHelper {
 		elapsedTime = (System.nanoTime() - startTime) / 10e6;
 		log.info(" [TIMER-REG] Temps global registrar notificar amb esperes concurrents [Id: " + notificacio.getId() + "]: " + elapsedTime + " ms");
 		log.info(" [REG] Fi registre notificació [Id: " + notificacio.getId() + ", Estat: " + notificacio.getEstat() + "]");
+		entityManager.flush();
+		entityManager.clear();
 		return registresIdDto;
 	}
 

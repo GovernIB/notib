@@ -95,9 +95,9 @@ public class NotificacioTableHelper {
             }
 
             if (not.getEstat() != null) {
-                item.setEstat(not.getEstat());
                 // Estat de la notificacio
                 item.setEstatMask(item.getEstatMask() - item.getEstat().getMask() + not.getEstat().getMask());
+                item.setEstat(not.getEstat());
             }
             notificacioTableViewRepository.saveAndFlush(item);
         } catch (Exception ex) {
