@@ -362,7 +362,7 @@ public class NotificacioTableController extends TableAccionsMassivesController {
             return "notificacioInfo";
         }
         for (RegistreIdDto registreIdDto : registresIdDto) {
-            if (registreIdDto.getNumero() != null) {
+            if (registreIdDto.getNumero() != null || registreIdDto.getNumeroRegistreFormat() != null) {
                 MissatgesHelper.success(request, "(" + registreIdDto.getNumeroRegistreFormat() + ")" + getMessage(request,"notificacio.controller.registrar.ok"));
                 continue;
             }
