@@ -123,8 +123,9 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 				for (var resultadoEnvio: resultadoAlta.getResultadoEnvios().getItem()) {
 					for (var enviament: notificacio.getEnviamentsPerNotifica()) {
 						var nif = enviament.getTitular().getNif();
-						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular())) {
+						if (nif != null && nif.equalsIgnoreCase(resultadoEnvio.getNifTitular()) && !identificadorsResultatsEnviaments.containsKey(enviament)) {
 							identificadorsResultatsEnviaments.put(enviament, resultadoEnvio.getIdentificador());
+							break;
 						}
 					}
 				}
@@ -155,7 +156,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 	}
 
 
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId) throws SistemaExternException {
 
 		log.info(String.format(" [NOT] Refrescant estat de notific@ de l'enviament (Id=%d)", enviamentId));
@@ -170,7 +171,7 @@ public class NotificaV2Helper extends AbstractNotificaHelper {
 		}
 	}
 
-	@Transactional(timeout = 60, propagation = Propagation.REQUIRES_NEW)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public NotificacioEnviamentEntity enviamentRefrescarEstat(Long enviamentId, boolean raiseExceptions) throws Exception {
 
 		var enviament = notificacioEnviamentRepository.findById(enviamentId).orElseThrow();

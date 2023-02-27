@@ -24,6 +24,7 @@ import es.caib.notib.persist.repository.EntitatRepository;
 import es.caib.notib.persist.repository.EnviamentTableRepository;
 import es.caib.notib.persist.repository.NotificacioTableViewRepository;
 import es.caib.notib.persist.repository.OrganGestorRepository;
+import es.caib.notib.persist.repository.monitor.MonitorIntegracioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,9 @@ public class SchedulledServiceImpl implements SchedulledService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
+	@Autowired
+	private MonitorIntegracioRepository monitorRepository;
+
 //	@Override
 //	public void restartSchedulledTasks() {
 //		schedulingConfig.restartSchedulledTasks();
@@ -364,7 +368,6 @@ public class SchedulledServiceImpl implements SchedulledService {
 		}
     }
 
-	@Transactional
 	@Override
 	public void monitorIntegracionsEliminarAntics() {
 
@@ -379,7 +382,15 @@ public class SchedulledServiceImpl implements SchedulledService {
 		var c = Calendar.getInstance();
 		c.add(DAY_OF_MONTH, -d);
 		var llindar = c.getTime();
-		integracioHelper.eliminarAntics(llindar);
+		try {
+			List<Long> ids;
+			while (monitorRepository.existeixenAntics(llindar) == 1) {
+				ids = monitorRepository.getNotificacionsAntigues(llindar);
+				integracioHelper.eliminarAntics(ids);
+			}
+		} catch (Exception ex) {
+			log.error("Error esborrant les entrades del monitor d'integracions antigues.", ex);
+		}
 	}
 
 	@Transactional

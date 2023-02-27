@@ -18,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -236,11 +239,24 @@ public class IntegracioHelper {
 	public void eliminarAntics(Date llindar) {
 
 		try {
-			monitorParamRepository.deleteDataBefore(llindar);
-			monitorRepository.flush();
-			monitorRepository.eliminarAntics(llindar);
+
+			List<Long> ids;
+			while (monitorRepository.existeixenAntics(llindar) == 1) {
+				ids = monitorRepository.getNotificacionsAntigues(llindar);
+				eliminarAntics(ids);
+			}
+//			monitorRepository.flush();
+//			monitorRepository.eliminarAntics(llindar);
 		} catch (Exception ex) {
 			log.error("Error esborrant les entrades del monitor d'integracions antigues.", ex);
 		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void eliminarAntics(List<Long> ids) {
+
+		monitorParamRepository.eliminarAntics(ids);
+		monitorRepository.eliminarAntics(ids);
+		monitorRepository.flush();
 	}
 }

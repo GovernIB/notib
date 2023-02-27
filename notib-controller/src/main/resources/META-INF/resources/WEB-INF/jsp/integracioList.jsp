@@ -51,11 +51,11 @@
 		$('#missatges-integracions').on('click', '.integracio-details', function() {
 
 			let id = $(this).attr("data-index");
+			let baseUrl = "<c:url value="/integracio/${codiActual}/detall/"/>";
 			$.ajax({
 				type: 'GET',
-				url: "${codiActual}/detall/" + id,
+				url: baseUrl + id,
 				success: data => {
-					console.log(data);
 					$('#integracio-data').html(formate_date(data.data, 'datetime'));
 					$('#integracio-descripcio').html(data.descripcio);
 					$('#integracio-tipus').html(data.tipus);
