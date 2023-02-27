@@ -40,6 +40,7 @@ import es.caib.notib.plugin.unitat.CodiValor;
 import es.caib.notib.plugin.unitat.NodeDir3;
 import es.caib.notib.plugin.unitat.ObjetoDirectorio;
 import es.caib.notib.plugin.usuari.DadesUsuari;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
@@ -62,6 +63,7 @@ import java.util.Set;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Component
 public class ConversioTipusHelper {
 
@@ -478,8 +480,12 @@ public class ConversioTipusHelper {
 			if (event == null) {
 				return;
 			}
-			notificacioEnviamentDto.setNotificaErrorData(event.getData());
-			notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+			try {
+				notificacioEnviamentDto.setNotificaErrorData(event.getData());
+				notificacioEnviamentDto.setNotificaErrorDescripcio(event.getErrorDescripcio());
+			} catch (Exception ex) {
+				log.error("[ConversioTipusHelper.NotificacioEnviamentDto] event no trobat.");
+			}
 		}
 	}
 

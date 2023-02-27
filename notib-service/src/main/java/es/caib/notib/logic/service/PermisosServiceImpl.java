@@ -229,7 +229,7 @@ public class PermisosServiceImpl implements PermisosService {
 
         try {
             var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-            return getProcSerAmPermis(entitatId, usuariCodi, permisos, null, permis.isPermisNotCom());
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, null, permis.isPermisNotCom(), !PermisEnum.CONSULTA.equals(permis));
         } catch (Exception ex) {
             log.error("Error obtenint permisos de " + permis.name() + " de procediments i serveis per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
             throw ex;
@@ -243,7 +243,7 @@ public class PermisosServiceImpl implements PermisosService {
 
         try {
             var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.PROCEDIMENT, permis.isPermisNotCom());
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.PROCEDIMENT, permis.isPermisNotCom(), !PermisEnum.CONSULTA.equals(permis));
         } catch (Exception ex) {
             log.error("Error obtenint permisos de " + permis.name() + " de procediments per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
             throw ex;
@@ -257,7 +257,7 @@ public class PermisosServiceImpl implements PermisosService {
 
         try {
             var permisos = new Permission[] { entityComprovarHelper.getPermissionFromName(permis) };
-            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.SERVEI, permis.isPermisNotCom());
+            return getProcSerAmPermis(entitatId, usuariCodi, permisos, ProcSerTipusEnum.SERVEI, permis.isPermisNotCom(), !PermisEnum.CONSULTA.equals(permis));
         } catch (Exception ex) {
             log.error("Error obtenint permisos de " + permis.name() + " de serveis per l'usuari " + usuariCodi + " a l'entitat " + entitatId, ex);
             throw ex;
@@ -605,7 +605,7 @@ public class PermisosServiceImpl implements PermisosService {
 
     // PROCEDIMENTS I SERVEIS ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public List<CodiValorOrganGestorComuDto> getProcSerAmPermis(Long entitatId, String usuariCodi, Permission[] permisos, ProcSerTipusEnum tipus, boolean incloureComuns) {
+    public List<CodiValorOrganGestorComuDto> getProcSerAmPermis(Long entitatId, String usuariCodi, Permission[] permisos, ProcSerTipusEnum tipus, boolean incloureComuns, boolean removeInactius) {
 
         Set<ProcSerEntity> procSerAmbPermis = new HashSet<>();
 
@@ -613,20 +613,20 @@ public class PermisosServiceImpl implements PermisosService {
         var entitat = entityComprovarHelper.comprovarEntitat(entitatId);
         // 1. Obtenim procediments amb permís directe sobre procediments
 
-        procSerAmbPermis.addAll(getProcSerAmbPermisDirecte(entitat, permisos, grups, true, tipus));
+        procSerAmbPermis.addAll(getProcSerAmbPermisDirecte(entitat, permisos, grups, removeInactius, tipus));
 
         // 2. Obtenim procediments amb permís directe sobre procediment/òrgan
-        var procedimentsOrganAmbPermisDirecte = getProcedimentsForProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, true, tipus);
+        var procedimentsOrganAmbPermisDirecte = getProcedimentsForProcedimentsOrganAmbPermisDirecte(entitat, permisos, grups, removeInactius, tipus);
         for (var procSerOrgan: procedimentsOrganAmbPermisDirecte) {
             procSerAmbPermis.add(procSerOrgan.getProcSer());
         }
 
         // 3. Obtenim procediments amb permís sobre procediments comuns per òrgan gestor
         if (incloureComuns) {
-            procSerAmbPermis.addAll(getProcSerComunsAmbPermisPerOrgan(entitat, grups, true, tipus));
+            procSerAmbPermis.addAll(getProcSerComunsAmbPermisPerOrgan(entitat, grups, removeInactius, tipus));
         }
         // 4. Obtenim procediments amb permís sobre procediments per òrgan gestor
-        procSerAmbPermis.addAll(getProcSerAmbPermisPerOrgan(entitat, permisos, grups, true, tipus));
+        procSerAmbPermis.addAll(getProcSerAmbPermisPerOrgan(entitat, permisos, grups, removeInactius, tipus));
         return procedimentsToCodiValorOrganGestorComuDto(procSerAmbPermis);
     }
 

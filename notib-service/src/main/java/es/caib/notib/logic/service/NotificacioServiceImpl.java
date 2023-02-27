@@ -383,13 +383,19 @@ public class NotificacioServiceImpl implements NotificacioService {
 				dto.setCie(conversioTipusHelper.convertir(entregaCieEntity.getCie(), CieDataDto.class));
 			}
 
-			var notificacioTableEntity = notificacioTableViewRepository.findById(id).orElseThrow();
-			dto.setNotificaErrorData(notificacioTableEntity.getNotificaErrorData());
-			dto.setNotificaErrorDescripcio(notificacioTableEntity.getNotificaErrorDescripcio());
-			var lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
+			NotificacioEventEntity lastErrorEvent = notificacioEventRepository.findLastErrorEventByNotificacioId(notificacio.getId());
 			dto.setNoticaErrorEventTipus(lastErrorEvent != null ? lastErrorEvent.getTipus() : null);
 			dto.setNotificaErrorTipus(lastErrorEvent != null ? lastErrorEvent.getErrorTipus() : null);
 			dto.setEnviadaDate(getEnviadaDate(notificacio));
+
+			// TODO RECUPERAR INFORMACIÓ DIRECTAMENT DE LES ENTITATS
+			var opt  = notificacioTableViewRepository.findById(id);
+			if (opt.isEmpty()) {
+				return dto;
+			}
+			var not = opt.get();
+			dto.setNotificaErrorData(not.getNotificaErrorData());
+			dto.setNotificaErrorDescripcio(not.getNotificaErrorDescripcio());
 
 			return dto;
 		} finally {
@@ -472,7 +478,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 			if (filtre == null || filtre.isEmpty()) {
 				//Consulta les notificacions sobre les quals té permis l'usuari actual
 				if (isUsuari) {
-					var start = System.nanoTime();
 					notificacions = notificacioTableViewRepository.findByProcedimentCodiNotibAndGrupsCodiNotibAndEntitat(
 							esProcedimentsCodisNotibNull,
 							esProcedimentsCodisNotibNull ? null : codisProcedimentsDisponibles,
@@ -485,8 +490,6 @@ public class NotificacioServiceImpl implements NotificacioService {
 							entitatActual,
 							usuariCodi,
 							pageable);
-					var elapsedTime = System.nanoTime() - start;
-					log.info(">>>>>>>>>>>>> Notificacions sense filtre: "  + elapsedTime);
 				//Consulta les notificacions de l'entitat acutal
 				} else if (isUsuariEntitat) {
 					notificacions = notificacioTableViewRepository.findByEntitatActual(entitatActual, pageable);
